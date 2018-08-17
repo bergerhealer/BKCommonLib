@@ -18,6 +18,7 @@ import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import org.bukkit.Chunk;
@@ -272,6 +273,35 @@ public class PlayerUtil extends EntityUtil {
             index = 8 - (index - 36);
         }
         return index;
+    }
+
+    /**
+     * Sets an item in the player's inventory without causing events or packets to be sent to the player.
+     * 
+     * @param player
+     * @param index of the slot in the inventory
+     * @param item to set to
+     */
+    public static void setItemSilently(Player player, int index, ItemStack item) {
+        Object rawContainer = CommonNMS.getHandle(player).getActiveContainer().getRaw();
+        List<Object> rawOldItems = (List<Object>) ContainerHandle.T.oldItems.raw.get(rawContainer);
+        List<Object> rawSlots = (List<Object>) ContainerHandle.T.slots.raw.get(rawContainer);
+
+        int convertedIndex = getInventorySlotIndex(index); // conversion is needed
+
+        if (convertedIndex >= 0 && convertedIndex < rawOldItems.size() && convertedIndex < rawSlots.size()) {
+            Object oldItem = SlotHandle.T.getItem.raw.invoke(rawSlots.get(convertedIndex));
+            if (oldItem != null && oldItem != ItemStackHandle.EMPTY_ITEM.getRaw()) {
+                // Copy all fields from the input item to this old item
+                NMSItemStack.T.transfer(HandleConversion.toItemStackHandle(item), oldItem);
+            } else {
+                // Item is not modifiable, we have to set it (and cause a change)
+                player.getInventory().setItem(index, item);
+            }
+        }
+
+        // Writes the item at the slot to the 'old items' list
+        markItemUnchanged(player, index);
     }
 
     /**

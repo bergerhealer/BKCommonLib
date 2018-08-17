@@ -107,11 +107,6 @@ public class CommonMapController implements PacketListener, Listener {
     // This is required, otherwise we can run out of the 32K map Ids we have available given enough uptime
     private static final int GENERATION_COUNTER_CLEANUP_INTERVAL = 1000;
     private int idGenerationCounter = 0;
-    // When items are updated we sometimes wish to do so silently, without refreshing the client
-    // This prevents the client hiding and re-showing the map when data is updated
-    private static final ThreadLocal<Boolean> disableMapItemChanges = new ThreadLocal<Boolean>() {
-        protected Boolean initialValue() { return false; }
-    };
 
     /**
      * These packet types are listened to handle the virtualized Map Display API
@@ -250,10 +245,7 @@ public class CommonMapController implements PacketListener, Listener {
                     UUID mapUUID = CommonMapUUIDStore.getMapUUID(inv.getItem(i));
                     if (oldMapUUID.equals(mapUUID)) {
                         if (unchanged) {
-                            disableMapItemChanges.set(true);
-                            inv.setItem(i, newItem);
-                            PlayerUtil.markItemUnchanged(player, i);
-                            disableMapItemChanges.set(false);
+                            PlayerUtil.setItemSilently(player, i, newItem);
                         } else {
                             inv.setItem(i, newItem);
                         }
@@ -266,11 +258,9 @@ public class CommonMapController implements PacketListener, Listener {
                 if (itemFrameInfo.lastMapUUID != null && oldMapUUID.equals(itemFrameInfo.lastMapUUID.getUUID())) {
                     if (unchanged) {
                         // When unchanged set the item in the metadata without causing a refresh
-                        disableMapItemChanges.set(true);
                         DataWatcher data = EntityHandle.fromBukkit(itemFrameInfo.itemFrame).getDataWatcher();
                         DataWatcher.Item<ItemStack> dataItem = data.getItem(EntityItemFrameHandle.DATA_ITEM);
                         dataItem.setValue(newItem, dataItem.isChanged());
-                        disableMapItemChanges.set(false);
                     } else {
                         // When changed, set it normally so the item is refreshed
                         CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, newItem);
@@ -497,11 +487,7 @@ public class CommonMapController implements PacketListener, Listener {
             ItemStack oldItem = event.getPacket().read(PacketType.OUT_WINDOW_SET_SLOT.item);
             ItemStack newItem = this.handleItemSync(oldItem, 0, 0);
             if (newItem != null) {
-                if (disableMapItemChanges.get()) {
-                    event.setCancelled(true);
-                } else {
-                    event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
-                }
+                event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
             }
         }
  
@@ -522,10 +508,6 @@ public class CommonMapController implements PacketListener, Listener {
                 return; // not a map
             }
             frameInfo.sentToPlayers = true;
-            if (disableMapItemChanges.get()) {
-                event.setCancelled(true);
-                return; // map changes are suppressed
-            }
             int staticMapId = CommonMapUUIDStore.getStaticMapId(frameInfo.lastMapUUID.getUUID());
             if (staticMapId != -1) {
                 this.storeStaticMapId(staticMapId);
