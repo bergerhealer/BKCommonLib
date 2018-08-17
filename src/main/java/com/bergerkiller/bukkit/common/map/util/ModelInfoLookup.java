@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map.util;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -273,6 +274,11 @@ public class ModelInfoLookup {
                 // Fix some derps on Mojang's part...
                 if (itemName.equals("dye_lightBlue")) {
                     itemName = "dye_light_blue";
+                }
+
+                // On MC 1.13, for some reason, ink sac itself is an exception
+                if (itemName.equals("dye_ink_sac") && Common.evaluateMCVersion(">=", "1.13")) {
+                    itemName = "ink_sac";
                 }
             }
         }
