@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
@@ -207,6 +208,9 @@ public class TemplateTest {
             assertAvailable(EntityHandle.T.DATA_FLAGS);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME_VISIBLE);
+            assertAvailable(DataWatcherHandle.ItemHandle.T.key);
+        } else {
+            assertAvailable(DataWatcherHandle.ItemHandle.T.keyId);
         }
     }
 
@@ -247,6 +251,9 @@ public class TemplateTest {
             if (e.isAvailable()) {
                 return;
             }
+        }
+        if (elements.length == 1) {
+            throw new IllegalStateException("Optional template member not found: " + elements[0].getElementName());
         }
         throw new IllegalStateException("None of these optional template members could be found");
     }

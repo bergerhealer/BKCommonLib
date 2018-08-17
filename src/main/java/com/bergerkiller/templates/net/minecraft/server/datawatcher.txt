@@ -91,13 +91,13 @@ class DataWatcher {
 #if version >= 1.9
         private optional final int typeId:###;
         private optional final int keyId:###;
-        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<?> key:a;
         private T value:b;
         private boolean changed:c;
 #else
         private optional final int typeId:a;
         private optional final int keyId:b;
-        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:###;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<?> key:###;
         private Object value:c;
         private boolean changed:d;
 #endif
