@@ -410,19 +410,23 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     public static class Key<V> extends BasicWrapper<DataWatcherObjectHandle> {
         private final Type<V> _serializer;
 
-        @SuppressWarnings("unchecked")
         public Key(Object handle) {
-            setHandle(DataWatcherObjectHandle.createHandle(handle));
-
-            Object token = this.handle.getSerializer();
-            Class<V> type = (Class<V>) DataSerializerRegistry.getInternalTypeFromToken(token);
-            this._serializer = Type.getForType(type);
+            this(handle, null);
         }
 
         public Key(Object handle, Type<V> serializer) {
             setHandle(DataWatcherObjectHandle.createHandle(handle));
+            
+            Object token = this.handle.getSerializer();
+            DataSerializerRegistry.InternalType internalType = DataSerializerRegistry.getInternalTypeFromToken(token);
+            if (internalType == null) {
+                throw new RuntimeException("Token serializer not found: " + token);
+            }
+            if (serializer == null) {
+                serializer = Type.getForType((Class<V>) internalType.type);
+            }
 
-            this._serializer = serializer;
+            this._serializer = serializer.setInternalOptional(internalType.optional);
         }
 
         /**
@@ -498,6 +502,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             private static final HashMap<Class<?>, Type<?>> byTypeMapping = new HashMap<Class<?>, Type<?>>();
             private final Object _token;
             private final DuplexConverter<Object, T> _converter;
+            private Type<T> _optional_opposite;
 
             // All below serializers are guaranteed to always be available
             public static final Type<Boolean> BOOLEAN = getForType(Boolean.class);
@@ -510,12 +515,25 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
 
+            private Type(Object token, DuplexConverter<Object, T> converter) {
+                this._token = token;
+                this._converter = converter;
+            }
+
             @SuppressWarnings("unchecked")
             private Type(Class<?> internalType, Class<T> externalType) {
-                this._token = DataSerializerRegistry.getSerializerToken(internalType);
-                if (this._token == null) {
+                boolean optional = false;
+                Object token = DataSerializerRegistry.getSerializerToken(internalType, optional);
+                if (token == null) {
+                    // Try optional
+                    optional = true;
+                    token = DataSerializerRegistry.getSerializerToken(internalType, optional);
+                }
+                if (token == null) {
                     throw new RuntimeException("No token found for internal type " + internalType.getName());
                 }
+
+                this._token = token;
 
                 DuplexConverter<Object, T> converter = Conversion.findDuplex((Class<Object>) internalType, externalType);
                 if (converter == null) {
@@ -523,13 +541,81 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                             internalType.getName() + " to " + externalType.getName());
                 }
 
-                // Some types used a Google Optional to wrap the value - this must be handled
-                if (DataSerializerRegistry.usesOptional(internalType)) {
+                if (optional) {
                     converter = new OptionalDuplexConverter<T>(converter);
                 }
 
-                // Set it
                 this._converter = converter;
+            }
+
+            /**
+             * Searches and then uses a duplex converter to translate the type exposed to the API.
+             * 
+             * @param exposedType that is used
+             * @return translated type
+             */
+            @SuppressWarnings("unchecked")
+            public <C> Type<C> translate(Class<C> exposedType) {
+                return (Type<C>) translate(TypeDeclaration.fromClass(exposedType));
+            }
+
+            /**
+             * Searches and then uses a duplex converter to translate the type exposed to the API.
+             * 
+             * @param exposedType that is used
+             * @return translated type
+             */
+            @SuppressWarnings("unchecked")
+            public Type<?> translate(TypeDeclaration exposedType) {
+                return translate((DuplexConverter<T, ?>) Conversion.findDuplex(this._converter.output, exposedType));
+            }
+
+            /**
+             * Uses a duplex converter to translate the type exposed to the API.
+             * 
+             * @param converter to use
+             * @return translated Type
+             */
+            public <C> Type<C> translate(DuplexConverter<T, C> converter) {
+                // Merge this converter with the one specified, completing the chain
+                final DuplexConverter<Object, T> ca = this._converter;
+                final DuplexConverter<T, C> cb = converter;
+                return new Type<C>(this._token, new DuplexConverter<Object, C>(ca.input, cb.output) {
+                    @Override
+                    public C convertInput(Object value) {
+                        T ca_output = ca.convertInput(value);
+                        return (ca_output == null) ? null : cb.convertInput(ca_output);
+                    }
+
+                    @Override
+                    public Object convertOutput(C value) {
+                        T cb_input = cb.convertOutput(value);
+                        return (cb_input == null) ? null : ca.convertOutput(cb_input);
+                    }
+                });
+            }
+
+            /**
+             * Sets whether the internal type representation is Optional
+             * 
+             * @param optional
+             * @return modified type, if needed
+             */
+            public Type<T> setInternalOptional(boolean optional) {
+                boolean selfIsOptional = (this._converter instanceof OptionalDuplexConverter);
+                if (selfIsOptional == optional) {
+                    return this; // Already correct
+                }
+
+                // Cache this to better deal with repeated calls
+                if (this._optional_opposite == null) {
+                    if (selfIsOptional) {
+                        this._optional_opposite = new Type<T>(this._token, ((OptionalDuplexConverter<T>) this._converter)._baseConverter);
+                    } else {
+                        this._optional_opposite = new Type<T>(this._token, new OptionalDuplexConverter<T>(this._converter));
+                    }
+                }
+                return this._optional_opposite;
             }
 
             /**
@@ -616,10 +702,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
     // Stores the internal type Serializer mapping, and how exposed types (IntVector3) are internally stored (BlockPosition)
     private static class DataSerializerRegistry {
-        private static final HashMap<Object, Class<?>> tokenRegistryRev = new HashMap<Object, Class<?>>();
-        private static final HashMap<Class<?>, Object> tokenRegistry = new HashMap<Class<?>, Object>();
+        private static final HashMap<Object, InternalType> tokenRegistryRev = new HashMap<Object, InternalType>();
+        private static final HashMap<Class<?>, InternalType> tokenRegistry = new HashMap<Class<?>, InternalType>();
+        private static final HashMap<Class<?>, InternalType> tokenRegistry_optional = new HashMap<Class<?>, InternalType>();
         private static final HashMap<Class<?>, Class<?>> typeMapping = new HashMap<Class<?>, Class<?>>();
-        private static final HashSet<Class<?>> usesOptional = new HashSet<Class<?>>();
 
         static {
             Class<?> registryClass = CommonUtil.getNMSClass("DataWatcherRegistry");
@@ -637,13 +723,13 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                                 TypeDeclaration dataType = typeDec.genericTypes[0];
 
                                 // Sometimes google Optional is used to wrap null values. We aren't interested in that ourselves.
-                                if (dataType.type.equals(CommonNMS.GOOGLE_OPTIONAL_CLASS) && dataType.genericTypes.length == 1) {
+                                boolean isOptional = CommonNMS.isDWROptionalType(dataType.type) && (dataType.genericTypes.length == 1);
+                                if (isOptional) {
                                     dataType = dataType.genericTypes[0];
-                                    usesOptional.add(dataType.type);
                                 }
 
                                 // Store in map for future use, mapped to the serializer instance
-                                register(dataType.type, f.get(null));
+                                register(dataType.type, f.get(null), isOptional);
                             }
                         } catch (Throwable t) {
                             t.printStackTrace();
@@ -678,6 +764,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             for (Class<?> type : tokenRegistry.keySet()) {
                 typeMapping.put(type, type);
             }
+            for (Class<?> type : tokenRegistry_optional.keySet()) {
+                typeMapping.put(type, type);
+            }
 
             // Vector -> Vector3f
             typeMapping.put(Vector.class, CommonUtil.getNMSClass("Vector3f"));
@@ -688,24 +777,44 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         }
 
         private static void register(Class<?> type, Object token) {
-            tokenRegistry.put(type, token);
-            tokenRegistryRev.put(token, type);
+            register(type, token, false);
+        }
+
+        private static void register(Class<?> type, Object token, boolean optional) {
+            register(new InternalType(token, type, optional));
+        }
+
+        private static void register(InternalType type) {
+            if (type.optional) {
+                tokenRegistry_optional.put(type.type, type);
+            } else {
+                tokenRegistry.put(type.type, type);
+            }
+            tokenRegistryRev.put(type.token, type);
         }
 
         public static Class<?> getInternalType(Class<?> exposedType) {
             return typeMapping.get(exposedType);
         }
 
-        public static Object getSerializerToken(Class<?> type) {
-            return tokenRegistry.get(type);
+        public static Object getSerializerToken(Class<?> type, boolean optional) {
+            return (optional ? tokenRegistry_optional : tokenRegistry).get(type);
         }
 
-        public static Class<?> getInternalTypeFromToken(Object token) {
+        public static InternalType getInternalTypeFromToken(Object token) {
             return tokenRegistryRev.get(token);
         }
 
-        public static boolean usesOptional(Class<?> internalType) {
-            return usesOptional.contains(internalType);
+        public static final class InternalType {
+            public final Object token;
+            public final Class<?> type;
+            public final boolean optional;
+
+            private InternalType(Object token, Class<?> type, boolean optional) {
+                this.token = token;
+                this.type = type;
+                this.optional = optional;
+            }
         }
     }
 
@@ -719,21 +828,19 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         @Override
         public T convertInput(Object value) {
-            value = CommonNMS.unwrapGoogleOptional(value);
+            value = CommonNMS.unwrapDWROptional(value);
             return this._baseConverter.convertInput(value);
         }
 
         @Override
         public Object convertOutput(T value) {
             Object result = this._baseConverter.convertOutput(value);
-            if (!(result instanceof com.google.common.base.Optional)) {
-                result = (Object) com.google.common.base.Optional.of(result);
-            }
+            result = CommonNMS.wrapDWROptional(result);
             return result;
         }
 
         private static TypeDeclaration makeOptional(TypeDeclaration type) {
-            return TypeDeclaration.createGeneric(com.google.common.base.Optional.class, type);
+            return TypeDeclaration.createGeneric(CommonNMS.DWR_OPTIONAL_TYPE, type);
         }
     }
 }

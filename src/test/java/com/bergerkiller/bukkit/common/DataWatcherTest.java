@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
@@ -26,11 +27,11 @@ public class DataWatcherTest {
 
         // Do a single test run with a String type, which is quite safe
         assertFalse(dataWatcher.isWatched(EntityHandle.DATA_CUSTOM_NAME));
-        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, "original");
+        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("original"));
         assertTrue(dataWatcher.isWatched(EntityHandle.DATA_CUSTOM_NAME));
-        assertEquals("original", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME));
-        dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, "new");
-        assertEquals("new", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME));
+        assertEquals("original", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME).getMessage());
+        dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("new"));
+        assertEquals("new", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME).getMessage());
 
         // Now do a run with an Integer type
         dataWatcher.watch(EntityHandle.DATA_AIR_TICKS, 300);
@@ -61,7 +62,7 @@ public class DataWatcherTest {
         dataWatcher.set(EntityHandle.DATA_AIR_TICKS, 200);
         assertTrue(dataWatcher.isChanged());
 
-        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, "frank");
+        dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("frank"));
 
         // debug
         //for (DataWatcher.Item<?> item : dataWatcher.getWatchedItems()) {

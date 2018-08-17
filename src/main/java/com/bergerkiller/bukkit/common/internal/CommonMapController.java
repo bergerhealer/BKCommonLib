@@ -1120,7 +1120,7 @@ public class CommonMapController implements PacketListener, Listener {
         public void updateItem() {
             // Avoid expensive conversion and creation of CraftItemStack by detecting changes
             Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
-            raw_item = CommonNMS.unwrapGoogleOptional(raw_item); // May be needed
+            raw_item = CommonNMS.unwrapDWROptional(raw_item); // May be needed
             if (this.lastFrameRawItem != raw_item) {
                 this.lastFrameRawItem = raw_item;
                 this.lastFrameItem = WrapperConversion.toItemStack(this.lastFrameRawItem);

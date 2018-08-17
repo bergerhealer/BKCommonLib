@@ -9,6 +9,7 @@ import org.bukkit.entity.Item;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -74,7 +75,7 @@ public class NMSEntity {
 
     public static final DataWatcher.Key<Byte> DATA_FLAGS = EntityHandle.DATA_FLAGS;
     public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = EntityHandle.DATA_AIR_TICKS;
-    public static final DataWatcher.Key<String> DATA_CUSTOM_NAME = EntityHandle.DATA_CUSTOM_NAME;
+    public static final DataWatcher.Key<ChatText> DATA_CUSTOM_NAME = EntityHandle.DATA_CUSTOM_NAME;
     public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = EntityHandle.DATA_CUSTOM_NAME_VISIBLE;
     public static final DataWatcher.Key<Boolean> DATA_SILENT = EntityHandle.DATA_SILENT;
     public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = EntityHandle.DATA_NO_GRAVITY;

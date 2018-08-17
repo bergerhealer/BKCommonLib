@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
@@ -48,14 +49,40 @@ import org.bukkit.entity.Player;
 public class CommonNMS {
     private static WorldServerHandle dummyTrackerWorld = null; // lazy-initialized once
     private static EntityTrackerHandle dummyTracker = null; // lazy-initialized once
-    public static Class<?> GOOGLE_OPTIONAL_CLASS = CommonUtil.getClass("com.google.common.base.Optional");
+
+    // Optional class that is used by the DataWatcherRegistry. Differs between 1.13 vs older.
+    private static Class<?> JAVA_UTIL_OPTIONAL_TYPE = CommonUtil.getClass("java.util.Optional");
+    private static Class<?> GOOGLE_OPTIONAL_TYPE = CommonUtil.getClass("com.google.common.base.Optional");
+    public static Class<?> DWR_OPTIONAL_TYPE = Common.evaluateMCVersion(">=", "1.13") ? JAVA_UTIL_OPTIONAL_TYPE : GOOGLE_OPTIONAL_TYPE;
+
+    public static boolean isDWROptionalType(Class<?> type) {
+        return type != null && type.equals(DWR_OPTIONAL_TYPE);
+    }
 
     @SuppressWarnings("unchecked")
-    public static Object unwrapGoogleOptional(Object value) {
-        if (GOOGLE_OPTIONAL_CLASS != null) {
-            if (value instanceof com.google.common.base.Optional) {
-                com.google.common.base.Optional<Object> opt = (com.google.common.base.Optional<Object>) value;
-                return opt.isPresent() ? opt.get() : null;
+    public static Object unwrapDWROptional(Object value) {
+        if (DWR_OPTIONAL_TYPE != null) {
+            if (DWR_OPTIONAL_TYPE == GOOGLE_OPTIONAL_TYPE) {
+                if (value instanceof com.google.common.base.Optional) {
+                    com.google.common.base.Optional<Object> opt = (com.google.common.base.Optional<Object>) value;
+                    return opt.isPresent() ? opt.get() : null;
+                }
+            } else if (DWR_OPTIONAL_TYPE == JAVA_UTIL_OPTIONAL_TYPE) {
+                if (value instanceof java.util.Optional) {
+                    java.util.Optional<Object> opt = (java.util.Optional<Object>) value;
+                    return opt.isPresent() ? opt.get() : null;
+                }
+            }
+        }
+        return value;
+    }
+
+    public static Object wrapDWROptional(Object value) {
+        if (DWR_OPTIONAL_TYPE != null && (value == null || !DWR_OPTIONAL_TYPE.isAssignableFrom(value.getClass()))) {
+            if (DWR_OPTIONAL_TYPE.equals(JAVA_UTIL_OPTIONAL_TYPE)) {
+                value = java.util.Optional.ofNullable(value);
+            } else {
+                value = com.google.common.base.Optional.fromNullable(value);
             }
         }
         return value;
