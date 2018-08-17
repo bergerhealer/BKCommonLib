@@ -29,14 +29,14 @@ public class MapIsometricTest {
 
         MapTexture sprite1 = renderSprite(texturePack.getBlockModel(Material.DIRT));
         MapTexture sprite2 = renderSprite(texturePack.getBlockModel(Material.GRASS_BLOCK));
-        MapTexture sprite3 = renderSprite(texturePack.getBlockModel(Material.TORCH));
+        MapTexture sprite3 = renderSprite(texturePack.getBlockModel(Material.LEGACY_SIGN_POST));
 
         MapTexture tile = MapTexture.createEmpty(128, 128);
         //tile.fill(MapColorPalette.COLOR_RED);
         renderTile(tile, sprite1, 0, 18);
         renderTile(tile, sprite2, 0, 0);
         renderTile(tile, sprite3, 0, -18);
-        
+
         // Show a 2x2 map display
         MapTexture tile2x2 = MapTexture.createEmpty(256, 256);
         for (int x = 0; x < 2; x++) {

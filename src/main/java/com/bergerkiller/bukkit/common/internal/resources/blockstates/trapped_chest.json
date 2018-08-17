@@ -1,8 +1,8 @@
 {
     "variants": {
-        "facing=north": { "model": "trapped_chest" },
-        "facing=south": { "model": "trapped_chest", "y": 180 },
-        "facing=west":  { "model": "trapped_chest", "y": 270 },
-        "facing=east":  { "model": "trapped_chest", "y": 90 }
+        "facing=north": { "model": "block/trapped_chest" },
+        "facing=south": { "model": "block/trapped_chest", "y": 180 },
+        "facing=west":  { "model": "block/trapped_chest", "y": 270 },
+        "facing=east":  { "model": "block/trapped_chest", "y": 90 }
     }
 }

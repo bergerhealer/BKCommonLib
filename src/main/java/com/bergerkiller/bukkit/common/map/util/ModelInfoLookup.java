@@ -101,6 +101,11 @@ public class ModelInfoLookup {
         String name = options.getBlockData().getBlockName();
         String variant = options.get("variant");
 
+        // MC 1.13 sign -> standing_sign
+        if (name.equals("sign")) {
+            name = "standing_sign";
+        }
+
         // Not all slabs are equal
         if (name.equals("purpur_slab") || name.equals("purpur_double_slab")) {
             variant = null;

@@ -27,7 +27,9 @@ public class VariantListDeserializer implements JsonDeserializer<BlockModelState
         // On legacy, make sure the model name is an absolute path
         if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             for (BlockModelState.Variant variant : list) {
-                variant.modelName = "block/" + variant.modelName;
+                if (!variant.modelName.startsWith("block/")) {
+                    variant.modelName = "block/" + variant.modelName;
+                }
             }
         }
 

@@ -43,6 +43,35 @@ public class BlockModelState {
         return result;
     }
 
+    @Override
+    public String toString() {
+        StringBuilder result = new StringBuilder();
+        result.append('{');
+        if (this.multipart != null && !this.multipart.isEmpty()) {
+            result.append("multipart=[");
+            boolean first = true;
+            for (Multipart part : this.multipart) {
+                if (first) {
+                    first = false;
+                } else {
+                    result.append(", ");
+                }
+                result.append(part);
+            }
+            result.append("]\n");
+        }
+        if (this.variants != null && !this.variants.isEmpty()) {
+            result.append("variants={");
+            for (Map.Entry<Condition, VariantList> entry : this.variants.entrySet()) {
+                result.append(entry.getKey()).append(" -> ").append(entry.getValue());
+                result.append('\n');
+            }
+            result.append("}\n");
+        }
+        result.append('}');
+        return result.toString();
+    }
+
     public static class Multipart {
         public Condition when = Condition.ALWAYS;
         public VariantList apply;
@@ -102,7 +131,7 @@ public class BlockModelState {
                 } else {
                     result.append(", ");
                 }
-                result.append('\n');
+                result.append("\n  ");
                 result.append(variant.toString());
             }
             result.append("\n]");
