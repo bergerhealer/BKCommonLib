@@ -53,7 +53,15 @@ public class ConditionalDeserializer implements JsonDeserializer<BlockModelState
 
         if (jsonElement.isJsonPrimitive()) {
             // Options stored in a single String token
-            Map<String, String> options = new BlockRenderOptions(BlockData.AIR, jsonElement.getAsString());
+            String options_str = jsonElement.getAsString();
+
+            // If empty, it is actually a normal distribution selector (1.13)
+            if (options_str.isEmpty()) {
+                options_str = "normal";
+            }
+
+            // Parse
+            Map<String, String> options = new BlockRenderOptions(BlockData.AIR, options_str);
             for (Map.Entry<String, String> option : options.entrySet()) {
                 result.conditions.add(createSelfCondition(option.getKey(), option.getValue()));
             }
@@ -92,10 +100,17 @@ public class ConditionalDeserializer implements JsonDeserializer<BlockModelState
             }
         }
 
-        // Simplify if only one element
-        if (result.conditions.size() == 1) {
+        // Simplify when 0/1 elements
+        switch (result.conditions.size()) {
+        case 0:
+            result.mode = BlockModelState.Condition.Mode.SELF;
+            result.conditions = Collections.emptyList();
+            result.key = "normal";
+            result.value = "";
+            return result;
+        case 1:
             return result.conditions.get(0);
-        } else {
+        default:
             return result;
         }
     }

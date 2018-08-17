@@ -6,7 +6,9 @@ import java.util.Collection;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
@@ -45,7 +47,11 @@ public class RedstoneWireRenderingProvider extends BlockRenderProvider {
 
     @Override
     public Collection<Material> getTypes() {
-        return Arrays.asList(Material.REDSTONE_WIRE);
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            return Arrays.asList(Material.REDSTONE_WIRE, MaterialUtil.getMaterial("LEGACY_REDSTONE_WIRE"));
+        } else {
+            return Arrays.asList(Material.REDSTONE_WIRE);
+        }
     }
 
 }

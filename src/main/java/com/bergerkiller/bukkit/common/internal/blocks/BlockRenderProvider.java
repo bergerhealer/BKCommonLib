@@ -9,12 +9,14 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.blocks.type.FluidRenderingProvider;
 import com.bergerkiller.bukkit.common.internal.blocks.type.GrassRenderingProvider;
 import com.bergerkiller.bukkit.common.internal.blocks.type.RedstoneWireRenderingProvider;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapResourcePack.ResourceType;
 import com.bergerkiller.bukkit.common.map.util.Model;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
@@ -27,8 +29,9 @@ public abstract class BlockRenderProvider {
     private static final Map<Material, BlockRenderProvider> providers = new HashMap<Material, BlockRenderProvider>();
 
     static {
-        register(new FluidRenderingProvider("blocks/water_overlay", "blocks/water_still", Material.WATER, Material.getMaterial("STATIONARY_WATER")));
-        register(new FluidRenderingProvider("blocks/lava_still", "blocks/lava_still", Material.LAVA, Material.getMaterial("STATIONARY_LAVA")));
+        String tex_root = Common.evaluateMCVersion(">=",  "1.13") ? "block/" : "blocks/";
+        register(new FluidRenderingProvider(tex_root + "water_overlay", tex_root + "water_still", MaterialUtil.ISWATER.getMaterials()));
+        register(new FluidRenderingProvider(tex_root + "lava_still", tex_root + "lava_still", MaterialUtil.ISLAVA.getMaterials()));
         register(new GrassRenderingProvider());
         register(new RedstoneWireRenderingProvider());
     }

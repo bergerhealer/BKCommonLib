@@ -389,7 +389,7 @@ public class MapResourcePack {
      * @return the model, or <i>null</i> if not found
      */
     protected final Model loadBlockModel(BlockRenderOptions blockRenderOptions) {
-        if (blockRenderOptions.getBlockData().getType() == Material.AIR) {
+        if (blockRenderOptions.getBlockData().isType(Material.AIR)) {
             return new Model(); // air. No model.
         }
 
@@ -453,7 +453,7 @@ public class MapResourcePack {
     }
 
     private Model loadBlockVariant(BlockModelState.Variant variant, BlockRenderOptions blockRenderOptions) {
-        Model model = this.loadModel("block/" + variant.modelName, blockRenderOptions);
+        Model model = this.loadModel(variant.modelName, blockRenderOptions);
         if (model == null) {
             return null;
         }

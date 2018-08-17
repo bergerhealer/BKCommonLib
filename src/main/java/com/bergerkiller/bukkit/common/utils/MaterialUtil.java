@@ -280,6 +280,12 @@ public class MaterialUtil {
     public static final MaterialTypeProperty ISARMOR = new MaterialTypeProperty(ISBOOTS, ISLEGGINGS, ISCHESTPLATE, ISHELMET);
 
     /**
+     * The material is a type of armor made of leather, such as leather boots or leather helmet.
+     * Distinctive of this property is that the armor material can be painted because of it.
+     */
+    public static final MaterialTypeProperty ISLEATHERARMOR = TYPE_PROPERTIES.get("ISLEATHERARMOR");
+
+    /**
      * The material can be interacted with, such as buttons and levers.
      * Materials of this type suppress block placement upon interaction.
      */
@@ -304,6 +310,12 @@ public class MaterialUtil {
      * The material is a type of Leaves
      */
     public static final MaterialTypeProperty ISLEAVES = TYPE_PROPERTIES.get("ISLEAVES");
+
+    /**
+     * The material is a type of Potion. Distinctive is that this type of material
+     * allows the color of the liquid contents to be changed.
+     */
+    public static final MaterialTypeProperty ISPOTION = TYPE_PROPERTIES.get("ISPOTION");
 
     /**
      * The material causes suffocation to entities inside

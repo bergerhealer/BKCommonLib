@@ -4,8 +4,11 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
@@ -28,12 +31,7 @@ public class ModelInfoLookup {
 
         // Some items, like leather boots, require additional render options passed
         ItemRenderOptions options = new ItemRenderOptions(item, "");
-        if (
-                type == Material.LEATHER_BOOTS ||
-                type == Material.LEATHER_CHESTPLATE ||
-                type == Material.LEATHER_HELMET || 
-                type == Material.LEATHER_LEGGINGS
-        ) {
+        if (MaterialUtil.ISLEATHERARMOR.get(type)) {
             // Check 'display.color' metadata tag for custom colors
             int color = 5190175; // default brown
             CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
@@ -49,11 +47,7 @@ public class ModelInfoLookup {
         }
 
         // Similarly, the liquid inside potion bottles have a color set
-        if (
-                type == Material.POTION ||
-                type.name().equals("LINGERING_POTION") ||
-                type.name().equals("SPLASH_POTION")
-        ) {
+        if (MaterialUtil.ISPOTION.get(type)) {
             int color = getPotionColor(item.getDurability());
 
             // Check 'CustomPotionColor' metadata tag for custom colors
@@ -239,19 +233,20 @@ public class ModelInfoLookup {
             itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
 
             // Perform renames needed to get the correct item model name
-            if (type == Material.POTION) {
+            String typeName = CommonLegacyMaterials.getMaterialName(type);
+            if (LogicUtil.contains(typeName, "POTION", "LEGACY_POTION")) {
                 itemName = "bottle_drinkable";
-            } else if (type.name().equals("LINGERING_POTION")) {
+            } else if (LogicUtil.contains(typeName, "LINGERING_POTION", "LEGACY_LINGERING_POTION")) {
                 itemName = "bottle_lingering";
-            } else if (type.name().equals("SPLASH_POTION")) {
+            } else if (LogicUtil.contains(typeName, "SPLASH_POTION", "LEGACY_SPLASH_POTION")) {
                 itemName = "bottle_splash";
-            } else if (type.name().equals("WOOD_DOOR")) {
+            } else if (LogicUtil.contains(typeName, "LEGACY_WOOD_DOOR")) {
                 itemName = "oak_door";
-            } else if (type.name().equals("BOAT")) {
+            } else if (LogicUtil.contains(typeName, "LEGACY_BOAT")) {
                 itemName = "oak_boat";
-            } else if (type.name().equals("TOTEM")) {
+            } else if (LogicUtil.contains(typeName, "TOTEM_OF_UNDYING", "LEGACY_TOTEM")) {
                 itemName = "totem"; // totem_of_undying otherwise
-            } else if (type.name().equals("COOKED_FISH") || type.name().equals("RAW_FISH")) {
+            } else if (LogicUtil.contains(typeName, "LEGACY_COOKED_FISH", "LEGACY_RAW_FISH")) {
                 itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
 
                 if (itemName.startsWith("item.fish.")) {
@@ -261,7 +256,7 @@ public class ModelInfoLookup {
                         itemName = "cooked_" + itemName.substring(10, itemName.length() - 7);
                     }
                 }
-            } else if (type.name().equals("INK_SACK")) {
+            } else if (LogicUtil.contains(typeName, "INK_SAC", "LEGACY_INK_SACK")) {
                 // For dyes we must parse the color from the internal name, then stick dye_ in front of it
                 itemName = ItemHandle.T.getInternalName.invoke(itemHandle, item);
                 int lastIdx = itemName.lastIndexOf('.');

@@ -77,10 +77,37 @@ public class BlockModelState {
                 }
             }
         }
+
+        @Override
+        public String toString() {
+            return "{modelName=" + this.modelName +
+                    ", rotX=" + this.rotationX +
+                    ", rotY=" + this.rotationY +
+                    ", rotZ=" + this.rotationZ +
+                    ", uvlock=" + this.uvlock + "}";
+        }
     }
 
     public static class VariantList extends ArrayList<Variant> {
         private static final long serialVersionUID = 1L;
+
+        @Override
+        public String toString() {
+            StringBuilder result = new StringBuilder();
+            result.append('[');
+            boolean first = true;
+            for (Variant variant : this) {
+                if (first) {
+                    first = false;
+                } else {
+                    result.append(", ");
+                }
+                result.append('\n');
+                result.append(variant.toString());
+            }
+            result.append("\n]");
+            return result.toString();
+        }
     }
 
     /**
@@ -167,7 +194,7 @@ public class BlockModelState {
                     }
                     result.append(condition.toString());
                 }
-                result.append("{");
+                result.append("}");
                 return result.toString();
             }
         }
