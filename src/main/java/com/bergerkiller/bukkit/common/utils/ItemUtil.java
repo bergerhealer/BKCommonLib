@@ -698,7 +698,14 @@ public class ItemUtil {
      */
     public static CommonTagCompound getMetaTag(org.bukkit.inventory.ItemStack stack, boolean create) {
         if (CraftItemStackHandle.T.isAssignableFrom(stack)) {
-            Object handle = HandleConversion.toItemStackHandle(stack);
+            Object handle = CraftItemStackHandle.T.handle.get(stack);
+            if (handle == null) {
+                if (create) {
+                    throw new IllegalArgumentException("Input item is empty and can not have a metadata tag");
+                } else {
+                    return null;
+                }
+            }
             CommonTagCompound tag = ItemStackHandle.T.tagField.get(handle);
             if (tag == null && create) {
                 tag = new CommonTagCompound();
@@ -706,7 +713,7 @@ public class ItemUtil {
             }
             return tag;
         } else if (create) {
-            throw new RuntimeException("This item is not a CraftItemStack! Please create one using createCraftItem()");
+            throw new IllegalArgumentException("This item is not a CraftItemStack! Please create one using createCraftItem()");
         } else {
             return null; // no tags are stored in Bukkit ItemStacks
         }
@@ -817,7 +824,11 @@ public class ItemUtil {
     public static List<Material> getItemTypes() {
         List<Material> result = new ArrayList<Material>(500);
         for (Object itemRawHandle : ItemHandle.REGISTRY) {
-            result.add(WrapperConversion.toMaterialFromItemHandle(itemRawHandle));
+            Material type = WrapperConversion.toMaterialFromItemHandle(itemRawHandle);
+            if (type == Material.AIR) {
+                continue;
+            }
+            result.add(type);
         }
         return result;
     }
