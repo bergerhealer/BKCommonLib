@@ -76,8 +76,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
+    @Template.Readonly
     public abstract List<EntityHandle> getEntityList();
-    public abstract void setEntityList(List<EntityHandle> value);
     public abstract Collection<EntityHandle> getEntityRemoveQueue();
     public abstract void setEntityRemoveQueue(Collection<EntityHandle> value);
     public abstract List<EntityHumanHandle> getPlayers();
@@ -99,6 +99,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
+        @Template.Readonly
         public final Template.Field.Converted<List<EntityHandle>> entityList = new Template.Field.Converted<List<EntityHandle>>();
         public final Template.Field.Converted<Collection<EntityHandle>> entityRemoveQueue = new Template.Field.Converted<Collection<EntityHandle>>();
         @Template.Optional
