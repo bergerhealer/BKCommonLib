@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -33,6 +34,29 @@ public class DataWatcherTest {
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, ChatText.fromMessage("new"));
         assertEquals("new", dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME).getMessage());
 
+        // Verify that when setting to null, it sets to Optional.empty correctly (MC 1.13)
+        if (Common.evaluateMCVersion(">=", "1.13")) {
+            // Using converter
+            Object raw = EntityHandle.DATA_CUSTOM_NAME.getType().getConverter().convertReverse(null);
+            checkCustomNameOptional(raw);
+
+            // Set and get
+            dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME, null);
+            raw = DataWatcher.Item.getRawValue(dataWatcher.getItem(EntityHandle.DATA_CUSTOM_NAME));
+            checkCustomNameOptional(raw);
+
+            // Reset DW and watch using entry from old DW
+            DataWatcher dataWatcher_copy = new DataWatcher();
+            for (DataWatcher.Item<?> old_item : dataWatcher.getWatchedItems()) {
+                //System.out.println("TYPE: " + old_item.getKey().getType());
+                //System.out.println("VALUE: " + old_item.getValue());
+                //System.out.println("VALUE_FIX: " + old_item.getKey().getType().getConverter().convertReverse(old_item.getValue()));
+                dataWatcher_copy.watch(old_item);
+            }
+            raw = DataWatcher.Item.getRawValue(dataWatcher_copy.getItem(EntityHandle.DATA_CUSTOM_NAME));
+            checkCustomNameOptional(raw);
+        }
+
         // Now do a run with an Integer type
         dataWatcher.watch(EntityHandle.DATA_AIR_TICKS, 300);
         assertEquals(300, dataWatcher.get(EntityHandle.DATA_AIR_TICKS).intValue());
@@ -46,6 +70,16 @@ public class DataWatcherTest {
         assertEquals(true, dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME_VISIBLE).booleanValue());
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME_VISIBLE, false);
         assertEquals(false, dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME_VISIBLE).booleanValue());
+    }
+
+    private static void checkCustomNameOptional(Object raw) {
+        if (raw == null) {
+            System.err.println(EntityHandle.DATA_CUSTOM_NAME);
+            fail("Internal stored type for DATA_CUSTOM_NAME is null instead of Optional.empty when setting to null");
+        }
+        if (!CommonNMS.isDWROptionalType(raw.getClass())) {
+            fail("Internal stored type for DATA_CUSTOM_NAME is not Optional: " + raw);
+        }
     }
 
     @Test

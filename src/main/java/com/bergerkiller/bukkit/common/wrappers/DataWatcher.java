@@ -25,7 +25,6 @@ import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.inventory.ItemStack;
@@ -291,13 +290,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             return this.handle.isChanged();
         }
 
-        @SuppressWarnings("unchecked")
         public V getValue() {
-            if (this.key != null) {
-                return this.key.getType().getConverter().convert(this.handle.getValue());
-            } else {
-                return (V) this.handle.getValue();
-            }
+            return this.getKey().getType().getConverter().convert(this.handle.getValue());
         }
 
         public void setChanged(boolean changed) {
@@ -426,11 +420,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             setHandle(DataWatcherObjectHandle.createHandle(handle));
             Object token = this.handle.getSerializer();
             DataSerializerRegistry.InternalType internalType = DataSerializerRegistry.getInternalTypeFromToken(token);
+
             if (internalType == null) {
                 throw new RuntimeException("Token serializer not found: " + token);
             }
             if (serializer == null) {
-                serializer = Type.getForType((Class<V>) internalType.type);
+                serializer = Type.getForType(CommonUtil.unsafeCast(internalType.type));
             }
 
             this._serializer = serializer.setInternalOptional(internalType.optional);
@@ -691,6 +686,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 return this._converter.output.type;
             }
 
+            @Override
+            public String toString() {
+                return "Type{internal=" + this._converter.input.toString(true) + ", " +
+                       "external=" + this._converter.output + "}";
+            }
+
             /**
              * Retrieves the Serializer that is used to externally expose a particular type.
              * 
@@ -862,7 +863,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             @Override
             public String toString() {
-                String s = this.type.toString();
+                String s = this.type.getName();
                 if (this.optional) {
                     s = "Optional<" + s + ">";
                 }
@@ -882,14 +883,33 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         @Override
         public T convertInput(Object value) {
             value = CommonNMS.unwrapDWROptional(value);
-            return this._baseConverter.convertInput(value);
+            if (value == null && !this._baseConverter.acceptsNullInput()) {
+                return null;
+            } else {
+                return this._baseConverter.convertInput(value);
+            }
         }
 
         @Override
         public Object convertOutput(T value) {
-            Object result = this._baseConverter.convertOutput(value);
+            Object result;
+            if (value != null || this._baseConverter.acceptsNullOutput()) {
+                result = this._baseConverter.convertOutput(value);
+            } else {
+                result = null;
+            }
             result = CommonNMS.wrapDWROptional(result);
             return result;
+        }
+
+        @Override
+        public boolean acceptsNullInput() {
+            return true;
+        }
+
+        @Override
+        public boolean acceptsNullOutput() {
+            return true;
         }
 
         private static TypeDeclaration makeOptional(TypeDeclaration type) {
