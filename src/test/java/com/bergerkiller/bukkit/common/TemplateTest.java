@@ -4,12 +4,16 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
@@ -237,6 +241,29 @@ public class TemplateTest {
         assertNotNull(output);
         assertEquals(nmstype, output.getClass());
         assertEquals("LIGHT_BLOCKING", output.name());
+    }
+
+    @Test
+    public void testChatColorConversion() {
+        testChatColor(ChatColor.BLACK, 0);
+        testChatColor(ChatColor.RED, 12);
+        testChatColor(ChatColor.RESET, -1);
+    }
+
+    private static void testChatColor(ChatColor expectedColor, int expectedIndex) {
+        String token = Character.toString(StringUtil.CHAT_STYLE_CHAR) + Character.toString(expectedColor.getChar());
+        Object nmsEnumChatFormat = HandleConversion.chatColorToEnumChatFormatHandle(expectedColor);
+        assertNotNull(nmsEnumChatFormat);
+        assertEquals(token, nmsEnumChatFormat.toString());
+        ChatColor color = WrapperConversion.chatColorFromEnumChatFormatHandle(nmsEnumChatFormat);
+        assertNotNull(color);
+        assertEquals(expectedColor, color);
+
+        int index = HandleConversion.chatColorToEnumChatFormatIndex(expectedColor);
+        assertEquals(expectedIndex, index);
+        color = WrapperConversion.chatColorFromEnumChatFormatIndex(index);
+        assertNotNull(color);
+        assertEquals(expectedColor, color);
     }
 
     @Test

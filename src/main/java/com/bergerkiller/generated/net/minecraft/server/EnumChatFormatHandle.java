@@ -44,9 +44,11 @@ public abstract class EnumChatFormatHandle extends Template.Handle {
     }
 
     public static EnumChatFormatHandle byId(int id) {
-        for (EnumChatFormatHandle format : VALUES) {
-            if (format.getId() == id) {
-                return format;
+        if (id >= 0) {
+            for (EnumChatFormatHandle format : VALUES) {
+                if (format.getId() == id) {
+                    return format;
+                }
             }
         }
         return RESET;
