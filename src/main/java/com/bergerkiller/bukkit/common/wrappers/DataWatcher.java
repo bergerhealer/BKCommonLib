@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
@@ -19,6 +20,7 @@ import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -63,9 +65,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     public <V> void set(Key<V> key, V value) {
         if (key == null) {
             throw new IllegalArgumentException("Key is null");
-        }
-
-        if (isWatched(key)) {
+        } else if (key instanceof Key.Disabled) {
+            // Pass. Do nothing.
+        } else if (isWatched(key)) {
             handle.set(key, value);
         } else {
             watch(key, value);
@@ -81,6 +83,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     public <V> V get(Key<V> key) {
         if (key == null) {
             throw new IllegalArgumentException("Key is null");
+        } else if (key instanceof Key.Disabled) {
+            return ((Key.Disabled<V>) key).getDefaultValue();
         }
 
         Object rawItem;
@@ -410,13 +414,16 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     public static class Key<V> extends BasicWrapper<DataWatcherObjectHandle> {
         private final Type<V> _serializer;
 
+        protected Key(Type<V> serializer) {
+            this._serializer = serializer;
+        }
+
         public Key(Object handle) {
             this(handle, null);
         }
 
         public Key(Object handle, Type<V> serializer) {
             setHandle(DataWatcherObjectHandle.createHandle(handle));
-            
             Object token = this.handle.getSerializer();
             DataSerializerRegistry.InternalType internalType = DataSerializerRegistry.getInternalTypeFromToken(token);
             if (internalType == null) {
@@ -634,7 +641,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public Key<T> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
                 if (CommonCapabilities.DATAWATCHER_OBJECTS) {
                     if (!tokenField.isAvailable()) {
-                        return null;
+                        return new Key.Disabled<T>(this);
                     } else {
                         return new Key<T>(tokenField.raw.get(), this);
                     }
@@ -643,7 +650,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     handle = new com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject<T>(alternativeId, this._token);
                     return new Key<T>(handle, this);
                 } else {
-                    return null;
+                    return new Key.Disabled<T>(this);
                 }
             }
 
@@ -702,6 +709,37 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     byTypeMapping.put(externalType, result);
                 }
                 return (Type<V>) result;
+            }
+        }
+
+        /**
+         * A disabled key for a datawatcher object that doesn't actually exist anymore.
+         * Attempts to set a datawatcher value of this key will result in a No-Op.
+         * Getting will return the default value for the value type (0, false, null).
+         * 
+         * @param <T> key type
+         */
+        public static final class Disabled<T> extends Key<T> {
+            private final T _defaultValue;
+
+            public Disabled(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key.Type<T> keyType) {
+                super(keyType);
+
+                Object internalValue = null;
+                Class<?> type = LogicUtil.getUnboxedType(this.getType().getInternalType());
+                if (type != null) {
+                    internalValue = BoxedType.getDefaultValue(type);
+                }
+                this._defaultValue = this.getType().getConverter().convert(internalValue);
+            }
+
+            /**
+             * Gets the default value that will be returned by get calls
+             * 
+             * @return default value
+             */
+            public T getDefaultValue() {
+                return this._defaultValue;
             }
         }
     }
