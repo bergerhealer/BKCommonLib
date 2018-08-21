@@ -7,9 +7,12 @@ public class DataWatcherObject<T> {
     private final int id;
     private final Object serializer;
 
-    public DataWatcherObject(int id, Object serializer) {
+    public DataWatcherObject(int id, Object token) {
+        if (!(token instanceof Integer)) {
+            throw new IllegalArgumentException("Legacy DataWatcherObject must use Integer typeId tokens!");
+        }
         this.id = id;
-        this.serializer = serializer;
+        this.serializer = token;
     }
 
     public int getId() {

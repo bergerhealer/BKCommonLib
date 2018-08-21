@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.EquipmentSlot;
@@ -44,6 +45,7 @@ import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
@@ -58,6 +60,7 @@ import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
@@ -484,5 +487,25 @@ public class HandleConversion {
     @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>", output="net.minecraft.server.VoxelShape", optional=true)
     public static Object voxelShapeFromAxisAlignedBBList(List<?> axisAlignedBBHandles) {
         return VoxelShapeHandle.createRawFromAABB(axisAlignedBBHandles);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.EnumChatFormat")
+    public static Object chatColorToEnumChatFormatHandle(ChatColor color) {
+        return EnumChatFormatHandle.byChar(color.getChar()).getRaw();
+    }
+
+    @ConverterMethod
+    public static int chatColorToEnumChatFormatIndex(ChatColor color) {
+        return EnumChatFormatHandle.byChar(color.getChar()).getId();
+    }
+
+    @ConverterMethod
+    public static String artToInternalName(org.bukkit.Art art) {
+        return CraftArtHandle.NotchToInternalName(CraftArtHandle.BukkitToNotch(art));
+    }
+
+    @ConverterMethod
+    public static int artToInternalId(org.bukkit.Art art) {
+        return CraftArtHandle.NotchToInternalId(CraftArtHandle.BukkitToNotch(art));
     }
 }

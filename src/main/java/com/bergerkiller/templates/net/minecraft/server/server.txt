@@ -73,8 +73,6 @@ interface IPlayerFileData {
 }
 
 class LocaleLanguage {
-    private static unknown final Logger a;
-    private static unknown final Pattern b;
     private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
 
     public synchronized String get:a(String s);

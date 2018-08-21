@@ -392,16 +392,21 @@ class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
 class PacketPlayOutSpawnEntityPainting extends Packet {
     private int entityId:a;
 
-#if version >= 1.9
+#if version >= 1.13
     private optional UUID entityUUID:entityUUID:b;
     private (IntVector3) BlockPosition position:c;
     private (BlockFace) EnumDirection facing:d;
-    private String art:e;
+    private (org.bukkit.Art) int art:e;
+#elseif version >= 1.9
+    private optional UUID entityUUID:entityUUID:b;
+    private (IntVector3) BlockPosition position:c;
+    private (BlockFace) EnumDirection facing:d;
+    private (org.bukkit.Art) String art:e;
 #else
     private optional UUID entityUUID:entityUUID:###;
     private (IntVector3) BlockPosition position:b;
     private (BlockFace) EnumDirection facing:c;
-    private String art:d;
+    private (org.bukkit.Art) String art:d;
 #endif
 
     <code>

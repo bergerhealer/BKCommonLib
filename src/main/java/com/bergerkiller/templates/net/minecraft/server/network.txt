@@ -3,12 +3,13 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class NetworkManager {
-    private final unknown EnumProtocolDirection h;
 
 #if version >= 1.8.4
     public io.netty.channel.Channel channel;
-#else
+#elseif version >= 1.8.3
     public io.netty.channel.Channel channel:k;
+#else
+    private io.netty.channel.Channel channel:i;
 #endif
 
 #if version >= 1.9

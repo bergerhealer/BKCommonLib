@@ -563,7 +563,11 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
 // Since MC 1.9
 optional class PacketPlayOutCustomSoundEffect extends Packet {
+#if version >= 1.13
+    private (ResourceKey) MinecraftKey sound:a;
+#else
     private (ResourceKey) String sound:a;
+#endif
     private (String) SoundCategory category:b;
     private int x:c;
     private int y:d;
@@ -718,15 +722,21 @@ class PacketPlayOutScoreboardTeam extends Packet {
     private (ChatText) String suffix:d;
 #endif
     private String visibility:e;
-#if version >= 1.9
+#if version >= 1.13
     private optional String collisionRule:f;
-    private int chatFormat:g;
+    private (org.bukkit.ChatColor) EnumChatFormat color:g;
+    private final Collection<String> players:h;
+    private int mode:i;
+    private int friendlyFire:j;
+#elseif version >= 1.9
+    private optional String collisionRule:f;
+    private (org.bukkit.ChatColor) int color:g;
     private final Collection<String> players:h;
     private int mode:i;
     private int friendlyFire:j;
 #else
     private optional String collisionRule:###;
-    private int chatFormat:f;
+    private (org.bukkit.ChatColor) int color:f;
     private final Collection<String> players:g;
     private int mode:h;
     private int friendlyFire:i;

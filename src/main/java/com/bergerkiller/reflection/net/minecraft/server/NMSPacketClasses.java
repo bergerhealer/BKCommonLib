@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -1314,7 +1315,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<ChatText> suffix = PacketPlayOutScoreboardTeamHandle.T.suffix.toFieldAccessor();
         public final FieldAccessor<String> visibility = PacketPlayOutScoreboardTeamHandle.T.visibility.toFieldAccessor();
         public final FieldAccessor<String> collisionRule = PacketPlayOutScoreboardTeamHandle.T.collisionRule.toFieldAccessor().ignoreInvalid("");
-        public final FieldAccessor<Integer> chatFormat = PacketPlayOutScoreboardTeamHandle.T.chatFormat.toFieldAccessor();
+        public final FieldAccessor<ChatColor> color = PacketPlayOutScoreboardTeamHandle.T.color.toFieldAccessor();
         public final FieldAccessor<Collection<String>> players = PacketPlayOutScoreboardTeamHandle.T.players.toFieldAccessor();
         public final FieldAccessor<Integer> mode = PacketPlayOutScoreboardTeamHandle.T.mode.toFieldAccessor();
         public final FieldAccessor<Integer> friendlyFire = PacketPlayOutScoreboardTeamHandle.T.friendlyFire.toFieldAccessor();
@@ -1612,7 +1613,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<UUID> entityUUID = PacketPlayOutSpawnEntityPaintingHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new UUID(0L, 0L));
         public final TranslatorFieldAccessor<IntVector3> postion = PacketPlayOutSpawnEntityPaintingHandle.T.position.toFieldAccessor();
         public final FieldAccessor<BlockFace> facing = PacketPlayOutSpawnEntityPaintingHandle.T.facing.toFieldAccessor();
-        public final FieldAccessor<String> art = PacketPlayOutSpawnEntityPaintingHandle.T.art.toFieldAccessor();
+        public final FieldAccessor<org.bukkit.Art> art = PacketPlayOutSpawnEntityPaintingHandle.T.art.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutSpawnEntityWeather extends NMSPacket {

@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import org.bukkit.ChatColor;
 import java.util.Collection;
 
 /**
@@ -47,8 +48,8 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     public abstract void setSuffix(ChatText value);
     public abstract String getVisibility();
     public abstract void setVisibility(String value);
-    public abstract int getChatFormat();
-    public abstract void setChatFormat(int value);
+    public abstract ChatColor getColor();
+    public abstract void setColor(ChatColor value);
     public abstract Collection<String> getPlayers();
     public abstract void setPlayers(Collection<String> value);
     public abstract int getMode();
@@ -67,7 +68,7 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
         public final Template.Field<String> visibility = new Template.Field<String>();
         @Template.Optional
         public final Template.Field<String> collisionRule = new Template.Field<String>();
-        public final Template.Field.Integer chatFormat = new Template.Field.Integer();
+        public final Template.Field.Converted<ChatColor> color = new Template.Field.Converted<ChatColor>();
         public final Template.Field<Collection<String>> players = new Template.Field<Collection<String>>();
         public final Template.Field.Integer mode = new Template.Field.Integer();
         public final Template.Field.Integer friendlyFire = new Template.Field.Integer();

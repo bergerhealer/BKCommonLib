@@ -40,14 +40,23 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
 
     public <T> void register(Key<T> key, T defaultValue) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
         T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));
     }
 
     public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
         T.set.invoke(getRaw(), key, key.getType().getConverter().convertReverse(value));
     }
 
     public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
         Object rawValue;
         if (T.get.isAvailable()) {
             rawValue = T.get.invoke(getRaw(), key);

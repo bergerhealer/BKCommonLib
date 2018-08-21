@@ -252,6 +252,15 @@ public class Common {
                 remappings.put(nms_root + ".VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
             }
 
+            // EnumArt has seen many places...
+            if (Common.evaluateMCVersion("<=", "1.8")) {
+                remappings.put(nms_root + ".Paintings", nms_root + ".EnumArt");
+            } else if (Common.evaluateMCVersion("<", "1.13")) {
+                remappings.put(nms_root + ".Paintings", nms_root + ".EntityPainting$EnumArt");
+            } else {
+                // Located at net.minecraft.server.Paintings like normal.
+            }
+
             // Some classes were moved after 1.13
             if (Common.evaluateMCVersion(">=", "1.13")) {
                 remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");

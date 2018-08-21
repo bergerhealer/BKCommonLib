@@ -516,6 +516,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
+                if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
+                    throw new IllegalArgumentException("Legacy type serializer tokens must be Integers!");
+                }
                 this._token = token;
                 this._converter = converter;
             }
@@ -531,6 +534,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 }
                 if (token == null) {
                     throw new RuntimeException("No token found for internal type " + internalType.getName());
+                }
+                if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
+                    throw new RuntimeException("Legacy type serializer tokens must be Integers!");
                 }
 
                 this._token = token;
@@ -703,8 +709,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     // Stores the internal type Serializer mapping, and how exposed types (IntVector3) are internally stored (BlockPosition)
     private static class DataSerializerRegistry {
         private static final HashMap<Object, InternalType> tokenRegistryRev = new HashMap<Object, InternalType>();
-        private static final HashMap<Class<?>, InternalType> tokenRegistry = new HashMap<Class<?>, InternalType>();
-        private static final HashMap<Class<?>, InternalType> tokenRegistry_optional = new HashMap<Class<?>, InternalType>();
+        private static final HashMap<Class<?>, Object> tokenRegistry = new HashMap<Class<?>, Object>();
+        private static final HashMap<Class<?>, Object> tokenRegistry_optional = new HashMap<Class<?>, Object>();
         private static final HashMap<Class<?>, Class<?>> typeMapping = new HashMap<Class<?>, Class<?>>();
 
         static {
@@ -786,9 +792,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
         private static void register(InternalType type) {
             if (type.optional) {
-                tokenRegistry_optional.put(type.type, type);
+                tokenRegistry_optional.put(type.type, type.token);
             } else {
-                tokenRegistry.put(type.type, type);
+                tokenRegistry.put(type.type, type.token);
             }
             tokenRegistryRev.put(type.token, type);
         }
@@ -814,6 +820,15 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 this.token = token;
                 this.type = type;
                 this.optional = optional;
+            }
+
+            @Override
+            public String toString() {
+                String s = this.type.toString();
+                if (this.optional) {
+                    s = "Optional<" + s + ">";
+                }
+                return s + ":" + this.token;
             }
         }
     }

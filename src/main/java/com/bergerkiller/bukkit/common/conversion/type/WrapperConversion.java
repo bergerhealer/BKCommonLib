@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -47,6 +48,7 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
@@ -62,6 +64,7 @@ import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
@@ -474,12 +477,12 @@ public class WrapperConversion {
         return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcherObject<?>")
+    @ConverterMethod(input="net.minecraft.server.DataWatcherObject")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> toKey(Object nmsDataWatcherObjectHandle) {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T>(nmsDataWatcherObjectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcher.Item<?>")
+    @ConverterMethod(input="net.minecraft.server.DataWatcher.Item")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
         DataWatcherHandle.ItemHandle handle = DataWatcherHandle.ItemHandle.createHandle(nmsDataWatcherItemHandle);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
@@ -652,5 +655,30 @@ public class WrapperConversion {
     @ConverterMethod(input="org.bukkit.block.data.BlockData", output="net.minecraft.server.IBlockData", optional=true)
     public static Object iblockdataHandleFromBukkit(Object bukkitBlockData) {
         return CraftBlockDataHandle.T.getState.raw.invoke(bukkitBlockData);
+    }
+
+    @ConverterMethod(input="net.minecraft.server.EnumChatFormat")
+    public static ChatColor chatColorFromEnumChatFormatHandle(Object nmsEnumChatFormat) {
+        String s = nmsEnumChatFormat.toString();
+        if (s.length() >= 2) {
+            return ChatColor.getByChar(s.charAt(1));
+        } else {
+            return ChatColor.RESET;
+        }
+    }
+
+    @ConverterMethod
+    public static ChatColor chatColorFromEnumChatFormatIndex(int nmsEnumChatFormatIndex) {
+        return chatColorFromEnumChatFormatHandle(EnumChatFormatHandle.byId(nmsEnumChatFormatIndex).getRaw());
+    }
+
+    @ConverterMethod
+    public static org.bukkit.Art artFromInternalName(String internalName) {
+        return CraftArtHandle.NotchToBukkit(CraftArtHandle.NotchFromInternalName(internalName));
+    }
+
+    @ConverterMethod
+    public static org.bukkit.Art artFromInternalId(int internalId) {
+        return CraftArtHandle.NotchToBukkit(CraftArtHandle.NotchFromInternalId(internalId));
     }
 }

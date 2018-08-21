@@ -263,10 +263,7 @@ class Entity {
     #endif
     #if version >= 1.13
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aD;
-
-        //TODO: Is now Optional<IChatBaseComponent>
-        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aE;
-
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aE;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aF;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aG;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aH;

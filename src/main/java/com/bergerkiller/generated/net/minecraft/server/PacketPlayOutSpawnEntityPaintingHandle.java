@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import org.bukkit.Art;
 import org.bukkit.block.BlockFace;
 import java.util.UUID;
 
@@ -36,8 +37,8 @@ public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandl
     public abstract void setPosition(IntVector3 value);
     public abstract BlockFace getFacing();
     public abstract void setFacing(BlockFace value);
-    public abstract String getArt();
-    public abstract void setArt(String value);
+    public abstract Art getArt();
+    public abstract void setArt(Art value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntityPainting</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -48,7 +49,7 @@ public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandl
         public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();
         public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Converted<BlockFace> facing = new Template.Field.Converted<BlockFace>();
-        public final Template.Field<String> art = new Template.Field<String>();
+        public final Template.Field.Converted<Art> art = new Template.Field.Converted<Art>();
 
     }
 
