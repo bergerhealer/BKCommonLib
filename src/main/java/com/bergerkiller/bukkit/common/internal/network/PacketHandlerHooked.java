@@ -180,19 +180,20 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     }
 
     @Override
-    public void receivePacket(final Player player, final Object packet) {
+    public void receivePacket(final Player player, final PacketType type, final Object packet) {
         // If not main thread, schedule a next-tick task to run it
         if (!CommonUtil.isMainThread()) {
             CommonUtil.nextTick(new Runnable() {
                 @Override
                 public void run() {
-                    receivePacket(player, packet);
+                    receivePacket(player, type, packet);
                 }
             });
             return;
         }
 
         // Handle receiving (main thread)
+        type.preprocess(packet);
         SafeMethod<?> method = this.receiverMethods.get(packet);
         if (method == null) {
         	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
@@ -208,7 +209,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     }
 
     @Override
-    public void sendPacket(Player player, Object packet, boolean throughListeners) {
+    public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
+        type.preprocess(packet);
         Object connection = getPlayerConnection(player);
         if (connection == null) {
             return;

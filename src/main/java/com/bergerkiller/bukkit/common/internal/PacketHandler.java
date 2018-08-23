@@ -30,9 +30,9 @@ public interface PacketHandler {
 
     public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types);
 
-    public void sendPacket(Player player, Object packet, boolean throughListeners);
+    public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners);
 
-    public void receivePacket(Player player, Object packet);
+    public void receivePacket(Player player, PacketType type, Object packet);
 
     public Collection<Plugin> getListening(PacketType packetType);
 

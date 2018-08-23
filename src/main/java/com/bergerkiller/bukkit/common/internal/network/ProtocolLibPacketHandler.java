@@ -92,11 +92,12 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     }
 
     @Override
-    public void receivePacket(Player player, Object packet) {
+    public void receivePacket(Player player, PacketType type, Object packet) {
         if (PacketHandlerHooked.getPlayerConnection(player) == null) {
             return; // NPC player is not connected
         }
 
+        type.preprocess(packet);
         PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
         try {
             ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
@@ -108,11 +109,13 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     }
 
     @Override
-    public void sendPacket(Player player, Object packet, boolean throughListeners) {
+    public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
         Object connection = PacketHandlerHooked.getPlayerConnection(player);
         if (connection == null) {
             return; // Player is an NPC or isn't connected
         }
+
+        type.preprocess(packet);
 
         // Simplified logic for sending normally
         if (throughListeners) {

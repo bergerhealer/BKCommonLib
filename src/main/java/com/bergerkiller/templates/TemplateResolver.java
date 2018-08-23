@@ -1,7 +1,10 @@
 package com.bergerkiller.templates;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -11,7 +14,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassDeclarationResolver;
 
 public class TemplateResolver implements ClassDeclarationResolver {
-    private HashMap<Class<?>, ClassDeclaration> classes = new HashMap<Class<?>, ClassDeclaration>();
+    private HashMap<Class<?>, List<ClassDeclaration>> classes = new HashMap<Class<?>, List<ClassDeclaration>>();
     private boolean classes_loaded = false;
     private String version = "UNKNOWN";
     private String pre_version = null;
@@ -26,8 +29,26 @@ public class TemplateResolver implements ClassDeclarationResolver {
     };
 
     @Override
-    public ClassDeclaration resolveClassDeclaration(Class<?> type) {
-        return classes.get(type);
+    public ClassDeclaration resolveClassDeclaration(String classPath, Class<?> type) {
+        List<ClassDeclaration> allByType = classes.get(type);
+        if (allByType == null || allByType.isEmpty()) {
+            return null;
+        } else if (allByType.size() == 1) {
+            return allByType.get(0);
+        } else {
+            // Poor man's method of selecting the right packet using Class Simple Name
+            String name = classPath;
+            int name_endidx = name.lastIndexOf('.');
+            if (name_endidx != -1) {
+                name = name.substring(name_endidx + 1);
+            }
+            for (ClassDeclaration dec : allByType) {
+                if (dec.type.typeName.equals(name)) {
+                    return dec;
+                }
+            }
+            return allByType.get(0);
+        }
     }
 
     /**
@@ -36,7 +57,11 @@ public class TemplateResolver implements ClassDeclarationResolver {
      * @return all class declarations
      */
     public Collection<ClassDeclaration> all() {
-        return classes.values();
+        List<ClassDeclaration> all = new ArrayList<ClassDeclaration>(classes.size() + 10);
+        for (List<ClassDeclaration> ls : classes.values()) {
+            all.addAll(ls);
+        }
+        return all;
     }
 
     /**
@@ -44,7 +69,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
      */
     public void unload() {
         this.classes_loaded = false;
-        this.classes = new HashMap<Class<?>, ClassDeclaration>(0);
+        this.classes = new HashMap<Class<?>, List<ClassDeclaration>>(0);
     }
 
     /**
@@ -78,7 +103,15 @@ public class TemplateResolver implements ClassDeclarationResolver {
     }
 
     private final void register(ClassDeclaration cdec) {
-        classes.put(cdec.type.type, cdec);
+        List<ClassDeclaration> old_list = classes.get(cdec.type.type);
+        if (old_list == null) {
+            classes.put(cdec.type.type, Collections.singletonList(cdec));
+        } else {
+            ArrayList<ClassDeclaration> new_list = new ArrayList<ClassDeclaration>(old_list);
+            new_list.add(cdec);
+            new_list.trimToSize();
+            classes.put(cdec.type.type, new_list);
+        }
         for (ClassDeclaration subcdec : cdec.subclasses) {
             register(subcdec);
         }

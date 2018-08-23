@@ -35,7 +35,11 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandl
 class Packet {
     <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
-        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw());
+        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
+    }
+
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.getType(getRaw());
     }
     </code>
 
@@ -209,20 +213,22 @@ class PacketPlayInUseEntity extends Packet {
     }
 }
 
-optional class PacketPlayInUseItem extends Packet {
-    private (IntVector3) BlockPosition position:a;
-    private (org.bukkit.block.BlockFace) EnumDirection direction:b;
-    private (Object) EnumHand enumHand:c;
-    private float deltaX:d;
-    private float deltaY:e;
-    private float deltaZ:f;
-#if version >= 1.10.2
-    public optional long timestamp;
+class PacketPlayInBlockPlace extends Packet {
+#if version >= 1.9
+    private optional (Object) EnumHand enumHand:a;
 #else
-    public optional long timestamp:###;
+    private optional (Object) EnumHand enumHand:###;
 #endif
 
+    // Spigot only
+    public optional long timestamp;
+
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
+    }
+
     public void setTimestamp(long timestamp) {
         if (T.timestamp.isAvailable()) {
             T.timestamp.setLong(getRaw(), timestamp);
@@ -235,6 +241,72 @@ optional class PacketPlayInUseItem extends Packet {
 
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
         internalSetHand(T.enumHand, humanEntity, hand);
+    }
+    </code>
+}
+
+// PacketPlayInBlockPlace on MC 1.8.8 and before when int direction == 255
+class PacketPlayInUseItem extends Packet {
+#if version >= 1.9
+    private (IntVector3) BlockPosition position:a;
+    private optional (Object) EnumDirection opt_direction_face:b;
+    private optional int opt_direction_index:###;
+    private optional (Object) EnumHand opt_enumHand:c;
+    private float deltaX:d;
+    private float deltaY:e;
+    private float deltaZ:f;
+#else
+    private (IntVector3) BlockPosition position:b;
+    private optional (Object) EnumDirection opt_direction_face:###;
+    private optional int opt_direction_index:c;
+    private optional (Object) EnumHand opt_enumHand:###;
+    private unknown ItemStack d;
+    private float deltaX:e;
+    private float deltaY:f;
+    private float deltaZ:g;
+#endif
+
+    // Spigot
+    public optional long timestamp;
+
+#if version >= 1.9
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+        return (EnumDirection) com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_face.get(instance);
+    }
+
+    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_face.set(instance, direction);
+    }
+#else
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+        int index = com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(instance);
+        return EnumDirection.fromType1(index);
+    }
+
+    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+        int index = direction.a();
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_index.setInteger(instance, index);
+    }
+#endif
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_USE_ITEM;
+    }
+
+    public void setTimestamp(long timestamp) {
+        if (T.timestamp.isAvailable()) {
+            T.timestamp.setLong(getRaw(), timestamp);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return internalGetHand(T.opt_enumHand, humanEntity);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        internalSetHand(T.opt_enumHand, humanEntity, hand);
     }
     </code>
 }
@@ -304,33 +376,6 @@ class PacketPlayInArmAnimation extends Packet {
 #endif
 
     <code>
-    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.enumHand, humanEntity);
-    }
-
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.enumHand, humanEntity, hand);
-    }
-    </code>
-}
-
-class PacketPlayInBlockPlace extends Packet {
-#if version >= 1.9
-    private optional (Object) EnumHand enumHand:a;
-#else
-    private optional (Object) EnumHand enumHand:###;
-#endif
-
-    // Spigot only
-    public optional long timestamp;
-
-    <code>
-    public void setTimestamp(long timestamp) {
-        if (T.timestamp.isAvailable()) {
-            T.timestamp.setLong(getRaw(), timestamp);
-        }
-    }
-
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
         return internalGetHand(T.enumHand, humanEntity);
     }

@@ -23,7 +23,11 @@ public abstract class PacketHandle extends Template.Handle {
 
 
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
-        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw());
+        return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
+    }
+
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.getType(getRaw());
     }
 
 

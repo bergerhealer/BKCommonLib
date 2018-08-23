@@ -12,13 +12,14 @@ public class CommonPacket {
     private Object packet;
     private PacketType type;
 
+    @Deprecated
     public CommonPacket(int id, boolean outGoing) {
         this(PacketType.getType(id, outGoing));
     }
 
     public CommonPacket(PacketType packetType) {
         this.type = packetType;
-        this.packet = this.type.createPacketHandle();
+        this.packet = this.type.newInstance();
     }
 
     public CommonPacket(Object packetHandle) {

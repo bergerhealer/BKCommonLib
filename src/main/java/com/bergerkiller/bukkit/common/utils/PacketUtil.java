@@ -81,7 +81,7 @@ public class PacketUtil {
      */
     public static void receivePacket(Player player, PacketHandle packet) {
         if (packet != null) {
-            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getRaw());
+            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getPacketType(), packet.getRaw());
         }
     }
 
@@ -93,7 +93,7 @@ public class PacketUtil {
      */
     public static void receivePacket(Player player, CommonPacket packet) {
         if (packet != null) {
-            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getHandle());
+            CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet.getType(), packet.getHandle());
         }
     }
 
@@ -114,7 +114,7 @@ public class PacketUtil {
         if (packet == null) {
             return;
         }
-        CommonPlugin.getInstance().getPacketHandler().receivePacket(player, packet);
+        CommonPlugin.getInstance().getPacketHandler().receivePacket(player, PacketType.getType(packet), packet);
     }
 
     public static void sendPacket(Player player, CommonPacket packet) {
@@ -125,7 +125,7 @@ public class PacketUtil {
         if (packet != null) {
             Object rawPacket = packet.getHandle();
             if (rawPacket != null) {
-                CommonPlugin.getInstance().getPacketHandler().sendPacket(player, rawPacket, throughListeners);
+                CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getType(), rawPacket, throughListeners);
             }
         }
     }
@@ -136,7 +136,7 @@ public class PacketUtil {
 
     public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
         if (packet != null) {
-            CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getRaw(), throughListeners);
+            CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
         }
     }
 
@@ -170,7 +170,7 @@ public class PacketUtil {
         if (packet == null) {
             return;
         }
-        CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet, throughListeners);
+        CommonPlugin.getInstance().getPacketHandler().sendPacket(player, PacketType.getType(packet), packet, throughListeners);
     }
 
     public static void broadcastBlockPacket(Block block, Object packet, boolean throughListeners) {

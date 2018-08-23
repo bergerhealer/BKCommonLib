@@ -203,6 +203,9 @@ public class Common {
                 remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".DataWatcher$WatchableObject");
                 remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
+                // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
+                remappings.put(nms_root + ".PacketPlayInUseItem", nms_root + ".PacketPlayInBlockPlace");
+
                 // We proxy a bunch of classes, because they don't exist in 1.8.8
                 // Writing custom wrappers with switches would be too tiresome
                 // This allows continued use of the same API without trouble

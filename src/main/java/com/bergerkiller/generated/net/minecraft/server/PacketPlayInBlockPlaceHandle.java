@@ -22,6 +22,11 @@ public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.IN_BLOCK_PLACE;
+    }
+
     public void setTimestamp(long timestamp) {
         if (T.timestamp.isAvailable()) {
             T.timestamp.setLong(getRaw(), timestamp);

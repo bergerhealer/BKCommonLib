@@ -14,6 +14,11 @@ public class CommonCapabilities {
     public static final boolean VEHICLES_COLLIDE_WITH_PASSENGERS = Common.evaluateMCVersion("<=", "1.8.8");
 
     /**
+     * Minecraft 1.8-1.8.8 had PacketPlayInUseItem and PacketPlayInBlockPlace merged as one
+     */
+    public static final boolean PLACE_PACKETS_MERGED = Common.evaluateMCVersion("<=", "1.8.8");
+
+    /**
      * Since Minecraft 1.9, effect names changed from simple names to longer keys with namespace
      * to improve mapping and sound system handling. As a result, random.fizz turned into block.fire.extinguish.
      */

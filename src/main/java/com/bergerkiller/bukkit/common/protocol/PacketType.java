@@ -7,16 +7,20 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
 
-    private static final ClassMap<PacketType> typesByPacketClass = new ClassMap<PacketType>();
+    private static final ClassMap<List<PacketType>> typesByPacketClass = new ClassMap<List<PacketType>>();
 
     /*
      * ========================
@@ -143,6 +147,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInTransaction IN_WINDOW_TRANSACTION = new NMSPacketPlayInTransaction();
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 
+    private final String name;
     private final int id;
     private final boolean outgoing;
     private final FieldAccessor<DataWatcher> dataWatcherField;
@@ -155,18 +160,29 @@ public class PacketType extends ClassTemplate<Object> {
      * Constructor used in PacketTypeClasses to construct by name
      */
     public PacketType() {
-        this(null);
+        this((String) null);
     }
 
     public void init() {
 
     }
 
-    @SuppressWarnings("unchecked")
+    protected PacketType(String packetClassName) {
+        this(packetClassName, null);
+    }
+
     protected PacketType(Class<?> packetClass) {
+        this(packetClass.getSimpleName(), packetClass);
+    }
+
+    @SuppressWarnings("unchecked")
+    protected PacketType(String packetClassName, Class<?> packetClass) {
         // If not specified, resort to using the PacketType class name to obtain the Class
+        this.name = (packetClassName != null) ? packetClassName : getClass().getSimpleName().substring(3);
+
+        // If not specified, find NMS Packet Class Type
         if (packetClass == null) {
-            packetClass = CommonUtil.getNMSClass(getClass().getSimpleName().substring(3));
+            packetClass = CommonUtil.getNMSClass(this.name);
         }
 
         if (packetClass == null) {
@@ -177,7 +193,18 @@ public class PacketType extends ClassTemplate<Object> {
             return;
         }
 
-        typesByPacketClass.put(packetClass, this);
+        // Store in mapping (ignore raw Packet type!)
+        if (!packetClass.equals(PacketHandle.T.getType())) {
+            List<PacketType> types_old = typesByPacketClass.get(packetClass);
+            if (types_old == null || types_old.isEmpty()) {
+                typesByPacketClass.put(packetClass, Collections.singletonList(this));
+            } else {
+                ArrayList<PacketType> new_list = new ArrayList<PacketType>(types_old);
+                new_list.add(0, this);
+                new_list.trimToSize();
+                typesByPacketClass.put(packetClass, new_list);
+            }
+        }
 
         // Apply the packet class
         this.setClass((Class<Object>) packetClass);
@@ -217,13 +244,33 @@ public class PacketType extends ClassTemplate<Object> {
         return this.id;
     }
 
-    public Object createPacketHandle() {
-        return super.newInstance();
-    }
-
     @Override
     public String toString() {
-        return super.getType().getSimpleName();
+        return this.name;
+    }
+
+    /**
+     * When multiple packet types match the same packet class, this method allows these
+     * different types to be differentiated. For example, on MC 1.8 to 1.8.8 PacketPlayInBlockPlace
+     * and PacketPlayInUseItem share the same packet class, using a field in the packet to select
+     * between them.<br>
+     * <br>
+     * By default this method returns always true.
+     * 
+     * @param packetHandle
+     * @return True if matching
+     */
+    protected boolean matchPacket(Object packetHandle) {
+        return true;
+    }
+
+    /**
+     * Called before sending or receiving a packet downstream. Allows a Packet Type to make modifications
+     * before the packet is actually handled by the server or client.
+     * 
+     * @param packetHandle
+     */
+    public void preprocess(Object packetHandle) {
     }
 
     public FieldAccessor<DataWatcher> getMetaDataField() {
@@ -233,43 +280,51 @@ public class PacketType extends ClassTemplate<Object> {
         return dataWatcherField;
     }
 
-    public int getPacketSize(Object packetHandle) {
-        return 1;
-    }
-
-    protected static PacketType getType(Class<?> packetHandleClass) {
-        if (packetHandleClass == null) {
-            throw new IllegalArgumentException("Null packets can not be used");
-        }
-        PacketType type = typesByPacketClass.get(packetHandleClass);
-        if (type == null) {
-            type = new PacketType(packetHandleClass);
-        }
-        return type;
-    }
-
+    /**
+     * Figures out the PacketType of a NMS Packet instance
+     * 
+     * @param packetHandle
+     * @return Packet Type
+     */
     public static PacketType getType(Object packetHandle) {
         if (packetHandle == null) {
             throw new IllegalArgumentException("Null packets can not be used");
         }
-        PacketType type = typesByPacketClass.get(packetHandle);
-        if (type == null) {
-            type = new PacketType(packetHandle.getClass());
+        List<PacketType> types = typesByPacketClass.get(packetHandle);
+        if (types == null || types.isEmpty()) {
+            // Packet class has no known type
+            return new PacketType(packetHandle.getClass());
+        } else if (types.size() == 1) {
+            // Packet class has only one possible type
+            return types.get(0);
+        } else {
+            // Multiple packet classes are possible, use method to filter
+            for (PacketType type : types) {
+                if (type.matchPacket(packetHandle)) {
+                    return type;
+                }
+            }
+            // Weird?
+            return new PacketType(packetHandle.getClass());
         }
-        return type;
     }
 
+    @Deprecated
     public static PacketType getType(int packetId, boolean outGoing) {
-        final Class<?> type;
+        final Class<?> packetHandleClass;
         if (outGoing) {
-            type = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
+            packetHandleClass = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
         } else {
-            type = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
+            packetHandleClass = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
         }
-        if (type == null) {
+        if (packetHandleClass == null) {
             return null;
         } else {
-            return getType(type);
+            List<PacketType> types = typesByPacketClass.get(packetHandleClass);
+            if (types == null || types.isEmpty()) {
+                types = Collections.singletonList(new PacketType(packetHandleClass));
+            }
+            return types.get(0);
         }
     }
 }

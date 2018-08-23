@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -189,10 +190,26 @@ public class NMSPacketClasses {
         public final FieldAccessor<Object> face = nextFieldSignature("private EnumDirection b");
         public final FieldAccessor<Object> status = nextFieldSignature("private EnumPlayerDigType c");
     }
-    
+
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
 
         public final FieldAccessor<Long> timestamp = PacketPlayInBlockPlaceHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
+
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.PLACE_PACKETS_MERGED) {
+                return PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(packetHandle) == 255;
+            } else {
+                return true;
+            }
+        }
+
+        @Override
+        public void preprocess(Object packetHandle) {
+            if (CommonCapabilities.PLACE_PACKETS_MERGED) {
+                PacketPlayInUseItemHandle.T.opt_direction_index.setInteger(packetHandle, 255);
+            }
+        }
 
         /**
          * Sets the hand that placed the block
@@ -223,7 +240,66 @@ public class NMSPacketClasses {
             }
         }
     }
-    
+
+    public static class NMSPacketPlayInUseItem extends NMSPacket {
+
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayInUseItemHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<BlockFace> direction = new SafeDirectField<BlockFace>() {
+            @Override
+            public BlockFace get(Object instance) {
+                return PacketPlayInUseItemHandle.T.getDirection.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, BlockFace value) {
+                PacketPlayInUseItemHandle.T.setDirection.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Float> deltaX = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
+        public final FieldAccessor<Float> deltaY = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
+        public final FieldAccessor<Float> deltaZ = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
+        public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
+
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.PLACE_PACKETS_MERGED) {
+                return PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(packetHandle) != 255;
+            } else {
+                return true;
+            }
+        }
+
+        /**
+         * Sets the hand that used the item
+         * 
+         * @param packet to write to
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @param humanHand to set to
+         */
+        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
+            if (PacketPlayInUseItemHandle.T.opt_enumHand.isAvailable()) {
+                PacketPlayInUseItemHandle.T.opt_enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
+            }
+        }
+
+        /**
+         * Gets the hand that used the item
+         * 
+         * @param packet to read from
+         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
+         * @return humanHand
+         */
+        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
+            if (PacketPlayInUseItemHandle.T.opt_enumHand.isAvailable()) {
+                Object enumHand = PacketPlayInUseItemHandle.T.opt_enumHand.get(packet.getHandle());
+                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
+            } else {
+                return HumanHand.RIGHT;
+            }
+        }
+    }
+
     public static class NMSPacketPlayInBoatMove extends NMSPacket {
         
         public final FieldAccessor<Boolean> leftPaddle = PacketPlayInBoatMoveHandle.T.leftPaddle.toFieldAccessor();
@@ -387,52 +463,6 @@ public class NMSPacketClasses {
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
             if (PacketPlayInUseEntityHandle.T.enumHand.isAvailable()) {
                 Object enumHand = PacketPlayInUseEntityHandle.T.enumHand.get(packet.getHandle());
-                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
-            } else {
-                return HumanHand.RIGHT;
-            }
-        }
-    }
-
-    public static class NMSPacketPlayInUseItem extends NMSPacket {
-
-        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayInUseItemHandle.T.position.toFieldAccessor();
-        public final FieldAccessor<BlockFace> direction = PacketPlayInUseItemHandle.T.direction.toFieldAccessor();
-        public final FieldAccessor<Float> deltaX = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
-        public final FieldAccessor<Float> deltaY = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
-        public final FieldAccessor<Float> deltaZ = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
-        public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
-
-        @Deprecated
-        public final FieldAccessor<Float> unknown1 = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
-        @Deprecated
-        public final FieldAccessor<Float> unknown2 = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
-        @Deprecated
-        public final FieldAccessor<Float> unknown3 = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
-
-        /**
-         * Sets the hand that used the item
-         * 
-         * @param packet to write to
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @param humanHand to set to
-         */
-        public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            if (PacketPlayInUseItemHandle.T.enumHand.isAvailable()) {
-                PacketPlayInUseItemHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
-            }
-        }
-
-        /**
-         * Gets the hand that used the item
-         * 
-         * @param packet to read from
-         * @param humanEntity used for translating the hand from MAIN/OFF to LEFT/RIGHT, can be null
-         * @return humanHand
-         */
-        public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            if (PacketPlayInUseItemHandle.T.enumHand.isAvailable()) {
-                Object enumHand = PacketPlayInUseItemHandle.T.enumHand.get(packet.getHandle());
                 return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
             } else {
                 return HumanHand.RIGHT;
