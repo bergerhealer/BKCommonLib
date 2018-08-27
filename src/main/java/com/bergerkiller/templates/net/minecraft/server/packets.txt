@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
@@ -410,11 +411,36 @@ class PacketPlayOutLogin extends Packet {
     private int playerId:a;
     private boolean hardcore:b;
     private (org.bukkit.GameMode) EnumGamemode gameMode:c;
-    private int dimension:d;
+#if version >= 1.13.1
+    private (Dimension) DimensionManager dimension:d;
+#else
+    private (Dimension) int dimension:d;
+#endif
     private (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
     private int maxPlayers:f;
     private (org.bukkit.WorldType) WorldType worldType:g;
     private boolean unknown1:h;
+}
+
+class PacketPlayOutRespawn extends Packet {
+#if version >= 1.13.1
+    private (Dimension) DimensionManager dimension:a;
+#else
+    private (Dimension) int dimension:a;
+#endif
+    private (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
+    private (org.bukkit.GameMode) EnumGamemode gamemode:c;
+    private (org.bukkit.WorldType) WorldType worldType:d;
+}
+
+class PacketPlayOutPlayerListHeaderFooter extends Packet {
+#if version >= 1.13.1
+    private (ChatText) IChatBaseComponent header:header;
+    private (ChatText) IChatBaseComponent footer:footer;
+#else
+    private (ChatText) IChatBaseComponent header:a;
+    private (ChatText) IChatBaseComponent footer:b;
+#endif
 }
 
 class PacketPlayOutMap extends Packet {

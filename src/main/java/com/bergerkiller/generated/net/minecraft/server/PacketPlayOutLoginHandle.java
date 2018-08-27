@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.WorldType;
@@ -30,8 +31,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     public abstract void setHardcore(boolean value);
     public abstract GameMode getGameMode();
     public abstract void setGameMode(GameMode value);
-    public abstract int getDimension();
-    public abstract void setDimension(int value);
+    public abstract Dimension getDimension();
+    public abstract void setDimension(Dimension value);
     public abstract Difficulty getDifficulty();
     public abstract void setDifficulty(Difficulty value);
     public abstract int getMaxPlayers();
@@ -48,7 +49,7 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         public final Template.Field.Integer playerId = new Template.Field.Integer();
         public final Template.Field.Boolean hardcore = new Template.Field.Boolean();
         public final Template.Field.Converted<GameMode> gameMode = new Template.Field.Converted<GameMode>();
-        public final Template.Field.Integer dimension = new Template.Field.Integer();
+        public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
         public final Template.Field.Converted<WorldType> worldType = new Template.Field.Converted<WorldType>();

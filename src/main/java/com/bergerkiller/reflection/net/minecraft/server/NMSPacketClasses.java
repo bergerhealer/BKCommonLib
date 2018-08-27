@@ -38,6 +38,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
@@ -83,8 +84,10 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerListHeaderFooterHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRespawnHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardObjectiveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetCooldownHandle;
@@ -1002,7 +1005,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
-        public final FieldAccessor<Integer> dimension = PacketPlayOutLoginHandle.T.dimension.toFieldAccessor();
+        public final FieldAccessor<Dimension> dimension = PacketPlayOutLoginHandle.T.dimension.toFieldAccessor();
         public final TranslatorFieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor();
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
         public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutLoginHandle.T.worldType.toFieldAccessor();
@@ -1265,8 +1268,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutPlayerListHeaderFooter extends NMSPacket {
 
-        public final FieldAccessor<Object> titleTop = nextField("private IChatBaseComponent a");
-        public final FieldAccessor<Object> titleBottom = nextFieldSignature("private IChatBaseComponent b");
+        public final FieldAccessor<ChatText> header = PacketPlayOutPlayerListHeaderFooterHandle.T.header.toFieldAccessor();
+        public final FieldAccessor<ChatText> footer = PacketPlayOutPlayerListHeaderFooterHandle.T.footer.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutPosition extends NMSPacket {
@@ -1309,10 +1312,10 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
-        public final FieldAccessor<Integer> dimension = nextField("private int a");
-        public final FieldAccessor<Difficulty> difficulty = nextFieldSignature("private EnumDifficulty b").translate(DuplexConversion.difficulty);
-        public final TranslatorFieldAccessor<GameMode> gamemode = nextFieldSignature("private EnumGamemode c").translate(DuplexConversion.gameMode);
-        public final TranslatorFieldAccessor<WorldType> worldType = nextFieldSignature("private WorldType d").translate(DuplexConversion.worldType);
+        public final FieldAccessor<Dimension> dimension = PacketPlayOutRespawnHandle.T.dimension.toFieldAccessor();
+        public final FieldAccessor<Difficulty> difficulty = PacketPlayOutRespawnHandle.T.difficulty.toFieldAccessor();
+        public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
+        public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutRespawnHandle.T.worldType.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {

@@ -21,19 +21,31 @@ class EntityTypes {
     private static optional final (Map<Class<?>, Integer>) Map opt_typeIdMap_1_8:f;
 #endif
 
-#if version >= 1.13
-    public static optional final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_registry:REGISTRY;
+#if version >= 1.13.1
+    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
+        return IRegistry.ENTITY_TYPE;
+    }
+#elseif version >= 1.13
+    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
+        return EntityTypes.REGISTRY;
+    }
 #elseif version >= 1.11
-    public static optional final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_registry:b;
+    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
+        return EntityTypes.b;
+    }
 #else
-    public static optional final (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, Class<? extends Entity>> opt_registry:###;
+    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry:###();
 #endif
 
 #if version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
 
     public static optional (EntityTypesHandle) EntityTypes fromEntityClass(Class<?> entityType) {
+#if version >= 1.13.1
+        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+#else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
+#endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (type.c() == entityType) {
@@ -59,7 +71,11 @@ class EntityTypes {
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
+#if version >= 1.13.1
+        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+#else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
+#endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (type.c() == entityType) {
@@ -73,11 +89,19 @@ class EntityTypes {
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
+#if version >= 1.13.1
+        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+#else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
+#endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (type.c() == entityType) {
+#if version >= 1.13.1
+                return IRegistry.ENTITY_TYPE.a((Object) type);
+#else
                 return EntityTypes.REGISTRY.a((Object) type);
+#endif
             }
         }
         return -1;

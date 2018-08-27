@@ -59,9 +59,12 @@ public class BlockDataImpl extends BlockData {
     public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
 
     static {
+        // Retrieve
+        Iterable<?> REGISTRY = BlockHandle.getRegistry();
+
         // Fill BY_MATERIAL and BY_BLOCK mapping with all existing Block types
         AIR = new BlockDataConstant(BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(Material.AIR)));
-        for (Object rawBlock : BlockHandle.REGISTRY) {
+        for (Object rawBlock : REGISTRY) {
             BlockHandle block = BlockHandle.createHandle(rawBlock);
             Material material = CraftMagicNumbersHandle.getMaterialFromBlock(rawBlock);
             BlockDataConstant blockConst = (material == Material.AIR) ? AIR : new BlockDataConstant(block);
@@ -291,7 +294,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public String getBlockName() {
-        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.REGISTRY, this.getBlockRaw());
+        Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.getRegistry(), this.getBlockRaw());
         return MinecraftKeyHandle.T.name.get(minecraftKey);
     }
 

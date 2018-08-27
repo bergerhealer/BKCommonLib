@@ -94,6 +94,10 @@ public class Common {
      */
     public static void bootstrap() {
         // Nothing. The static block will be executed, where the magic happens.
+
+        if (!Common.IS_COMPATIBLE) {
+            throw new UnsupportedOperationException("Minecraft " + Common.MC_VERSION + " is not supported!");
+        }
     }
 
     static {

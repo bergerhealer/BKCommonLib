@@ -823,7 +823,7 @@ public class ItemUtil {
      */
     public static List<Material> getItemTypes() {
         List<Material> result = new ArrayList<Material>(500);
-        for (Object itemRawHandle : ItemHandle.REGISTRY) {
+        for (Object itemRawHandle : ItemHandle.getRegistry()) {
             Material type = WrapperConversion.toMaterialFromItemHandle(itemRawHandle);
             if (type == Material.AIR) {
                 continue;

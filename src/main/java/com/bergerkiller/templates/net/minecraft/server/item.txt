@@ -3,7 +3,13 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 
 class Item {
-    public static final rawtype (Iterable) RegistryMaterials<MinecraftKey, Item> REGISTRY;
+    public static Iterable<?> getRegistry() {
+#if version >= 1.13.1
+        return IRegistry.ITEM;
+#else
+        return Item.REGISTRY;
+#endif
+    }
 
     public int getMaxStackSize();
 

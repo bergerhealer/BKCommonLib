@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -46,7 +47,9 @@ class Entity {
     public optional (EntityHandle) Entity opt_passenger:passenger;
 #endif
 
-#if version >= 1.13
+#if version >= 1.13.1
+    private (EntityHandle) Entity vehicle:vehicle;
+#elseif version >= 1.13
     private (EntityHandle) Entity vehicle:ax;
 #elseif version >= 1.10.2
     private (EntityHandle) Entity vehicle:au;
@@ -390,7 +393,11 @@ class Entity {
     protected unknown int al;
 #endif
 
-    public int dimension;
+#if version >= 1.13.1
+    public (Dimension) DimensionManager dimension;
+#else
+    public (Dimension) int dimension;
+#endif
 
 #if version >= 1.13
     optional private final double[] move_SomeArray:aL;

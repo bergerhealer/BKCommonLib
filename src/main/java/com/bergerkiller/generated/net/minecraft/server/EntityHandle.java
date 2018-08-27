@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -325,8 +326,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setPortalCooldown(int value);
     public abstract boolean isAllowTeleportation();
     public abstract void setAllowTeleportation(boolean value);
-    public abstract int getDimension();
-    public abstract void setDimension(int value);
+    public abstract Dimension getDimension();
+    public abstract void setDimension(Dimension value);
     public abstract boolean isValid();
     public abstract void setValid(boolean value);
     /**
@@ -403,7 +404,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
-        public final Template.Field.Integer dimension = new Template.Field.Integer();
+        public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
         @Template.Optional
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         @Template.Optional

@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.MinecraftServer</b>.
@@ -35,15 +34,11 @@ public abstract class MinecraftServerHandle extends Template.Handle {
         }
         return _cached_instance;
     }
-    public abstract List<WorldServerHandle> getWorlds();
-    public abstract void setWorlds(List<WorldServerHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.MinecraftServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MinecraftServerClass extends Template.Class<MinecraftServerHandle> {
-        public final Template.Field.Converted<List<WorldServerHandle>> worlds = new Template.Field.Converted<List<WorldServerHandle>>();
-
         public final Template.Method<Boolean> isRunning = new Template.Method<Boolean>();
         public final Template.Method<String> getResourcePack = new Template.Method<String>();
         public final Template.Method<String> getResourcePackHash = new Template.Method<String>();

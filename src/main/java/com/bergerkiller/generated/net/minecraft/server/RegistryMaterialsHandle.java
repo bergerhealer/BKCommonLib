@@ -24,17 +24,16 @@ public abstract class RegistryMaterialsHandle extends Template.Handle {
 
     public abstract Object get(Object key);
     public abstract Object getKey(Object value);
-    public abstract Map<Object, Object> getInverseLookupField();
-    public abstract void setInverseLookupField(Map<Object, Object> value);
     /**
      * Stores class members for <b>net.minecraft.server.RegistryMaterials</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RegistryMaterialsClass extends Template.Class<RegistryMaterialsHandle> {
-        public final Template.Field<Map<Object, Object>> inverseLookupField = new Template.Field<Map<Object, Object>>();
+        @Template.Optional
+        public final Template.Field<Map<Object, Object>> opt_inverseLookupField = new Template.Field<Map<Object, Object>>();
 
-        public final Template.Method<Object> get = new Template.Method<Object>();
-        public final Template.Method<Object> getKey = new Template.Method<Object>();
+        public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
+        public final Template.Method.Converted<Object> getKey = new Template.Method.Converted<Object>();
 
     }
 

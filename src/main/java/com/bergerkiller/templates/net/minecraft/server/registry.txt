@@ -14,13 +14,27 @@ class RegistryID {
 }
 
 class RegistryMaterials {
-    protected final Map<V, K> inverseLookupField:b;
-
-    public V get(K key);
-
-#if version >= 1.9
-    public K getKey:b(V value);
+#if version >= 1.13
+    protected optional final Map<V, K> opt_inverseLookupField:###;
 #else
-    public K getKey:c(V value);
+    protected optional final Map<V, K> opt_inverseLookupField:b;
 #endif
+
+#if version >= 1.13.1
+    public V get((Object) MinecraftKey key);
+    public (Object) MinecraftKey getKey:getKey(V value);
+#elseif version >= 1.9
+    public V get((Object) K key);
+    public (Object) K getKey:b(V value);
+#else
+    public V get((Object) K key);
+    public (Object) K getKey:c(V value);
+#endif
+}
+
+// Since MC 1.13.1
+optional class DimensionManager {
+    public int getId:getDimensionID();
+
+    public static (Object) DimensionManager fromId:a(int i);
 }

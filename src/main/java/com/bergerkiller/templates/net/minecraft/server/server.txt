@@ -1,5 +1,6 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
@@ -9,15 +10,15 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 
 class MinecraftServer {
-    public (List<WorldServerHandle>) List<WorldServer> worlds;
-
     public boolean isRunning();
 
     public String getResourcePack();
 
     public String getResourcePackHash();
 
-#if version >= 1.13
+#if version >= 1.13.1
+    public int getTicks:ah();
+#elseif version >= 1.13
     public int getTicks:aj();
 #elseif version >= 1.11
     public int getTicks:aq();
@@ -52,10 +53,12 @@ class PlayerList {
 
     public void savePlayers();
 
-#if version >= 1.9
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet<?> packet);
+#if version >= 1.13.1
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) DimensionManager dimension, (CommonPacket) Packet<?> packet);
+#elseif version >= 1.9
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) int dimension, (CommonPacket) Packet<?> packet);
 #else
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, int dimension, (CommonPacket) Packet packet);
+    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) int dimension, (CommonPacket) Packet packet);
 #endif
 
 }

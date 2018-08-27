@@ -28,6 +28,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -42,6 +43,7 @@ import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
@@ -508,4 +510,27 @@ public class HandleConversion {
     public static int artToInternalId(org.bukkit.Art art) {
         return CraftArtHandle.NotchToInternalId(CraftArtHandle.BukkitToNotch(art));
     }
+
+    @ConverterMethod
+    public static Dimension dimensionFromId(int dimensionId) {
+        return Dimension.fromId(dimensionId);
+    }
+
+    @ConverterMethod
+    public static int dimensionToId(Dimension dimension) {
+        return dimension.getId();
+    }
+
+    // Since MC 1.13.1
+    @ConverterMethod(input="net.minecraft.server.DimensionManager", optional=true)
+    public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
+        return Dimension.fromId(DimensionManagerHandle.T.getId.invoke(nmsDimensionManagerHandle).intValue());
+    }
+
+    // Since MC 1.13.1
+    @ConverterMethod(output="net.minecraft.server.DimensionManager", optional=true)
+    public static Object dimensionManagerFromId(Dimension dimension) {
+        return DimensionManagerHandle.fromId(dimension.getId());
+    }
+
 }

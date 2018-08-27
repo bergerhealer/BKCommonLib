@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.WorldType</b>.
@@ -25,7 +26,7 @@ public abstract class WorldTypeHandle extends Template.Handle {
         return T.getType.invoke(name);
     }
 
-    public abstract int getDimension();
+    public abstract Dimension getDimension();
     public abstract String getName();
     public abstract void setName(String value);
     /**
@@ -37,7 +38,7 @@ public abstract class WorldTypeHandle extends Template.Handle {
 
         public final Template.StaticMethod.Converted<WorldTypeHandle> getType = new Template.StaticMethod.Converted<WorldTypeHandle>();
 
-        public final Template.Method<Integer> getDimension = new Template.Method<Integer>();
+        public final Template.Method.Converted<Dimension> getDimension = new Template.Method.Converted<Dimension>();
 
     }
 

@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
@@ -321,9 +322,18 @@ class ChunkProviderServer {
     public boolean isLoaded:isChunkLoaded(int cx, int cz);
 #endif
 
-    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
+#if version >= 1.13.1
+    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz) {
+        return instance.getChunkAt(cx, cz, false, false);
+    }
 
+    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
+        return instance.getChunkAt(cx, cz, true, true);
+    }
+#else
+    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
+#endif
 
     // Removed (no longer supported?) since MC 1.13
     // There is an async method for generating, but it is not interesting at all.
@@ -360,12 +370,12 @@ class WorldType {
 
 #if version >= 1.13
     #if pre == 7
-        public int getDimension:h();
+        public (Dimension) int getDimension:h();
     #else
-        public int getDimension:i();
+        public (Dimension) int getDimension:i();
     #endif
 #else
-    public int getDimension:g();
+    public (Dimension) int getDimension:g();
 #endif
 
     public static (WorldTypeHandle) WorldType getType(String name)

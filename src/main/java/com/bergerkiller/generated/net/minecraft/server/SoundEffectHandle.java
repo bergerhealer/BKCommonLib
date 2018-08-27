@@ -27,9 +27,9 @@ public abstract class SoundEffectHandle extends Template.Handle {
 
 
     public static SoundEffectHandle byName(String name) {
-        if (T.REGISTRY.isAvailable()) {
+        if (T.opt_getRegistry.isAvailable()) {
             Object mc_key_raw = MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
-            return createHandle(T.REGISTRY.get().get(mc_key_raw));
+            return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
         } else {
             return createNew(MinecraftKeyHandle.createNew(name));
         }
@@ -43,10 +43,10 @@ public abstract class SoundEffectHandle extends Template.Handle {
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
         public final Template.Constructor.Converted<SoundEffectHandle> constr_minecraftkey = new Template.Constructor.Converted<SoundEffectHandle>();
 
-        @Template.Optional
-        public final Template.StaticField.Converted<RegistryMaterialsHandle> REGISTRY = new Template.StaticField.Converted<RegistryMaterialsHandle>();
-
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
+
+        @Template.Optional
+        public final Template.StaticMethod.Converted<RegistryMaterialsHandle> opt_getRegistry = new Template.StaticMethod.Converted<RegistryMaterialsHandle>();
 
     }
 

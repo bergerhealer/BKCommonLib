@@ -573,9 +573,9 @@ public class WrapperConversion {
 
     @ConverterMethod(output="net.minecraft.server.SoundEffect")
     public static Object soundEffectFromResourceKey(ResourceKey soundKey) {
-        if (SoundEffectHandle.T.REGISTRY.isAvailable()) {
+        if (SoundEffectHandle.T.opt_getRegistry.isAvailable()) {
             Object mcKey = soundKey.toMinecraftKey().getRaw();
-            Object effect = SoundEffectHandle.T.REGISTRY.get().get(mcKey);
+            Object effect = SoundEffectHandle.T.opt_getRegistry.invoke().get(mcKey);
             if (effect == null) {
                 effect = SoundEffectHandle.T.constr_minecraftkey.raw.newInstance(mcKey);
             }

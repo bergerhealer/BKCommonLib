@@ -17,8 +17,6 @@ public abstract class BlockHandle extends Template.Handle {
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block");
 
     @SuppressWarnings("rawtypes")
-    public static final Iterable REGISTRY = T.REGISTRY.getSafe();
-    @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();
     /* ============================================================================== */
 
@@ -27,6 +25,10 @@ public abstract class BlockHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public static Iterable<?> getRegistry() {
+        return T.getRegistry.invoke();
+    }
 
     public static IBlockDataHandle getByCombinedId(int combinedId) {
         return T.getByCombinedId.invoke(combinedId);
@@ -62,13 +64,12 @@ public abstract class BlockHandle extends Template.Handle {
      */
     public static final class BlockClass extends Template.Class<BlockHandle> {
         @SuppressWarnings("rawtypes")
-        public final Template.StaticField.Converted<Iterable> REGISTRY = new Template.StaticField.Converted<Iterable>();
-        @SuppressWarnings("rawtypes")
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
         @Template.Optional
         public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_soundType = new Template.Field.Converted<SoundEffectTypeHandle>();
 
+        public final Template.StaticMethod<Iterable<?>> getRegistry = new Template.StaticMethod<Iterable<?>>();
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
 

@@ -235,7 +235,7 @@ public class ModelInfoLookup {
             }
         } else {
             Object itemHandle = HandleConversion.toItemHandle(type);
-            Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.REGISTRY, itemHandle);
+            Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(ItemHandle.getRegistry(), itemHandle);
             itemName = MinecraftKeyHandle.T.name.get(minecraftKey);
 
             // Perform renames needed to get the correct item model name

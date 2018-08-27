@@ -45,9 +45,9 @@ public abstract class EntityTypesHandle extends Template.Handle {
         public final Template.StaticField.Converted<Map<Class<?>, String>> opt_typeNameMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<Class<?>, Integer>> opt_typeIdMap_1_8 = new Template.StaticField.Converted<Map<Class<?>, Integer>>();
-        @Template.Optional
-        public final Template.StaticField.Converted<RegistryMaterialsHandle> opt_registry = new Template.StaticField.Converted<RegistryMaterialsHandle>();
 
+        @Template.Optional
+        public final Template.StaticMethod.Converted<RegistryMaterialsHandle> opt_getRegistry = new Template.StaticMethod.Converted<RegistryMaterialsHandle>();
         @Template.Optional
         public final Template.StaticMethod.Converted<EntityTypesHandle> fromEntityClass = new Template.StaticMethod.Converted<EntityTypesHandle>();
         public final Template.StaticMethod<Class<?>> getEntityClass = new Template.StaticMethod<Class<?>>();

@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
@@ -44,7 +45,6 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
@@ -261,23 +261,6 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Removes a world from all global locations where worlds are mapped
-     *
-     * @param world to remove
-     */
-    public static void removeWorld(org.bukkit.World world) {
-        // Remove the world from the Bukkit worlds mapping
-        Iterator<org.bukkit.World> iter = getWorlds().iterator();
-        while (iter.hasNext()) {
-            if (iter.next() == world) {
-                iter.remove();
-            }
-        }
-        // Remove the world from the MinecraftServer worlds mapping
-        CommonNMS.getMCServer().getWorlds().remove(WorldServerHandle.fromBukkit(world));
-    }
-
-    /**
      * Obtains the internally stored collection of worlds<br>
      * Gets the values from the CraftServer.worlds map
      *
@@ -413,12 +396,12 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Gets the dimension Id of a world
+     * Gets the dimension of a world
      *
      * @param world to get from
-     * @return world dimension Id
+     * @return world dimension
      */
-    public static int getDimension(org.bukkit.World world) {
+    public static Dimension getDimension(org.bukkit.World world) {
         return WorldHandle.fromBukkit(world).getWorldData().getType().getDimension();
     }
 

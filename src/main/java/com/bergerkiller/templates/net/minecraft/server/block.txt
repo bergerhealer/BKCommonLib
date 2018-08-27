@@ -17,7 +17,14 @@ import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
-    public static final rawtype (Iterable) RegistryBlocks<MinecraftKey, Block> REGISTRY;
+
+    public static final Iterable<?> getRegistry() {
+#if version >= 1.13.1
+        return IRegistry.BLOCK;
+#else
+        return Block.REGISTRY;
+#endif
+    }
 
 #if version >= 1.9
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
@@ -85,7 +92,9 @@ class Block {
     }
 #endif
 
-#if version >= 1.13
+#if version >= 1.13.1
+    public float getDamageResillience:getDurability();
+#elseif version >= 1.13
     #if pre <= 7
         public float getDamageResillience:j();
     #else
