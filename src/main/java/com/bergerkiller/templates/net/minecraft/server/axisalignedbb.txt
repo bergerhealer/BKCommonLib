@@ -150,10 +150,6 @@ class VoxelShape {
         return VoxelShapes.a(a, b);
     }
 
-    public double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double coordinate) {
-        return VoxelShapes.a(axis, boundingBox, instance, coordinate);
-    }
-
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
 
     public boolean isEmpty:b();
@@ -196,20 +192,54 @@ class VoxelShape {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(java.util.Arrays.asList(arr));
     }
 
-    public double traceAxis((EnumAxisHandle) net.minecraft.server.EnumDirection.EnumAxis axis, AxisAlignedBBHandle boundingBox, double coordinate) {
-        if (axis == net.minecraft.server.EnumDirection.EnumAxis.X) {
-            return instance.traceXAxis(boundingBox, coordinate);
-        } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Y) {
-            return instance.traceYAxis(boundingBox, coordinate);
-        } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Z) {
-            return instance.traceZAxis(boundingBox, coordinate);
-        }
-        return coordinate;
-    }
-
     public (AxisAlignedBBHandle) AxisAlignedBBHandle getBoundingBox();
 
     public boolean isEmpty();
 #endif
+
+    public static double traceAxis((EnumAxisHandle) net.minecraft.server.EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) net.minecraft.server.AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<net.minecraft.server.VoxelShape> voxels, double coordinate) {
+
+#if version >= 1.13.1
+        // Official API as of 1.13.1
+        return VoxelShapes.a(axis, boundingBox, voxels, coordinate);
+#elseif version >= 1.13
+        // Call the method for every item in the stream
+        java.util.Iterator iter = voxels.iterator();
+        while (iter.hasNext()) {
+            VoxelShape voxel = (VoxelShape) iter.next();
+            coordinate = net.minecraft.server.VoxelShapes.a(axis, boundingBox, voxel, coordinate);
+
+            // Shortcut, see implementation of 1.13.1
+            if (Math.abs(coordinate) <= 1.0E-7D) {
+                return 0.0;
+            }
+        }
+        return coordinate;
+#else
+        // Custom implementation for 1.12.2 and before (fallback)
+        // Our custom proxy type accepts AxisAlignedBBHandle for performance reasons, really
+        com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle boundingBoxHandle;
+        boundingBoxHandle = com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle.createHandle(boundingBox);
+
+        java.util.Iterator iter = voxels.iterator();
+        while (iter.hasNext()) {
+            net.minecraft.server.VoxelShape voxel = (net.minecraft.server.VoxelShape) iter.next();
+            if (axis == net.minecraft.server.EnumDirection.EnumAxis.X) {
+                coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
+            } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Y) {
+                coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
+            } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Z) {
+                coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
+            }
+
+            // Shortcut, see implementation of 1.13.1
+            if (Math.abs(coordinate) <= 1.0E-7D) {
+                return 0.0;
+            }
+        }
+        return coordinate;
+#endif
+
+    }
 
 }

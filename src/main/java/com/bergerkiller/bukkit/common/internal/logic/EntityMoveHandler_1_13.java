@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
 
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -56,16 +57,16 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
     }
 
     @Override
-    protected VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double mx, double my, double mz) {
+    protected Stream<VoxelShapeHandle> world_getCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
         // If all collision is disabled, simply return an empty shape
         if (!this.blockCollisionEnabled && !this.entityCollisionEnabled) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         // MC 1.13: Combine voxel shapes from block collision and entity collision logic
-        VoxelShapeHandle shape_blockCollisions = world_getBlockCollisionShape(entity, mx, my, mz);
-        VoxelShapeHandle shape_entityCollisions = world_getEntityCollisionShape(entity, mx, my, mz);
-        return VoxelShapeHandle.merge(shape_blockCollisions, shape_entityCollisions);
+        Stream<VoxelShapeHandle> shape_blockCollisions = world_getBlockCollisionShapes(entity, mx, my, mz);
+        Stream<VoxelShapeHandle> shape_entityCollisions = world_getEntityCollisionShapes(entity, mx, my, mz);
+        return Stream.concat(shape_blockCollisions, shape_entityCollisions);
     }
 
     // Called from getBlockCollisions_method
@@ -86,9 +87,9 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         return controller.onBlockCollision(block, hitFace);
     }
 
-    private VoxelShapeHandle world_getBlockCollisionShape(EntityHandle entity, double mx, double my, double mz) {
+    private Stream<VoxelShapeHandle> world_getBlockCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
         if (!this.blockCollisionEnabled || !isBlockCollisionsMethodInitialized()) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         AxisAlignedBBHandle entityBounds = this.getBlockBoundingBox(entity);
@@ -99,7 +100,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.transformB(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
 
         if (voxelshapeBounds.isEmpty()) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         // Check and update that the entity is within the world border
@@ -109,12 +110,17 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             entity.setOutsideWorldBorder(!inWorldBorder);
         }
 
-        return VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
+        VoxelShapeHandle shape = VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
+        if (shape.isEmpty()) {
+            return Stream.empty();
+        } else {
+            return Stream.of(shape);
+        }
     }
 
-    private VoxelShapeHandle world_getEntityCollisionShape(EntityHandle entity, double mx, double my, double mz) {
+    private Stream<VoxelShapeHandle> world_getEntityCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
         if (!this.entityCollisionEnabled) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         AxisAlignedBBHandle entityBounds = entity.getBoundingBox();
@@ -124,7 +130,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         VoxelShapeHandle voxelshapeBounds = VoxelShapeHandle.mergeOnlyFirst(VoxelShapeHandle.fromAABB(entityBounds.transformB(mx, my, mz).growUniform(MIN_MOVE)), voxelshapeAABBMoved);
 
         if (voxelshapeBounds.isEmpty()) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         // default VoxelShape IWorldReader::a(@Nullable Entity entity, VoxelShape voxelshape, boolean flag, Set<Entity> set)
@@ -174,6 +180,6 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             }
         }
 
-        return shape;
+        return Stream.of(shape);
     }
 }

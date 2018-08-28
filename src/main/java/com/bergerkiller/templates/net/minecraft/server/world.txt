@@ -131,14 +131,16 @@ class World extends IBlockAccess {
     private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
 #endif
 
-#if version >= 1.13
-    public (VoxelShapeHandle) VoxelShape getCollisionShape:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+#if version >= 1.13.1
+    public (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+#elseif version >= 1.13
+    public (java.util.stream.Stream<VoxelShapeHandle>) VoxelShape getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
 #elseif version >= 1.11
-    public (VoxelShapeHandle) List<AxisAlignedBB> getCollisionShape((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
         return instance.getCubes(entity, boundingBox.b(dx, dy, dz));
     }
 #else
-    public (VoxelShapeHandle) List<AxisAlignedBB> getCollisionShape((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    public (java.util.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
         return instance.getCubes(entity, boundingBox.a(dx, dy, dz));
     }
 #endif

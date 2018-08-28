@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import java.util.stream.Stream;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.VoxelShape</b>.
@@ -42,7 +43,10 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         return T.merge.invoke(a, b);
     }
 
-    public abstract double traceAxis(EnumAxisHandle axis, AxisAlignedBBHandle boundingBox, double coordinate);
+    public static double traceAxis(EnumAxisHandle axis, AxisAlignedBBHandle boundingBox, Stream<VoxelShapeHandle> voxels, double coordinate) {
+        return T.traceAxis.invoke(axis, boundingBox, voxels, coordinate);
+    }
+
     public abstract AxisAlignedBBHandle getBoundingBox();
     public abstract boolean isEmpty();
     /**
@@ -55,8 +59,8 @@ public abstract class VoxelShapeHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<VoxelShapeHandle> fromAABB = new Template.StaticMethod.Converted<VoxelShapeHandle>();
         public final Template.StaticMethod.Converted<VoxelShapeHandle> mergeOnlyFirst = new Template.StaticMethod.Converted<VoxelShapeHandle>();
         public final Template.StaticMethod.Converted<VoxelShapeHandle> merge = new Template.StaticMethod.Converted<VoxelShapeHandle>();
+        public final Template.StaticMethod.Converted<Double> traceAxis = new Template.StaticMethod.Converted<Double>();
 
-        public final Template.Method.Converted<Double> traceAxis = new Template.Method.Converted<Double>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
 

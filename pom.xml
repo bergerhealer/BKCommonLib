@@ -15,7 +15,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.mcversion>1.13.1</project.mcversion>
         <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
-        <project.mountiplexversion>1.42</project.mountiplexversion>
+        <project.mountiplexversion>1.44</project.mountiplexversion>
         <junit.version>4.11</junit.version>
         <project.cibuild/>
     </properties>

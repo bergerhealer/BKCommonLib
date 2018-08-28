@@ -6,7 +6,9 @@ class CraftArt {
     public static (Object) net.minecraft.server.Paintings BukkitToNotch(org.bukkit.Art art);
 
     public static (Object) net.minecraft.server.Paintings NotchFromInternalId(int internalId) {
-#if version >= 1.13
+#if version >= 1.13.1
+        return net.minecraft.server.IRegistry.MOTIVE.fromId(internalId);
+#elseif version >= 1.13
         return net.minecraft.server.Paintings.a.getId(internalId);
 #else
         net.minecraft.server.Paintings[] values = net.minecraft.server.Paintings.values();
@@ -18,7 +20,9 @@ class CraftArt {
     }
 
     public static int NotchToInternalId((Object) net.minecraft.server.Paintings art) {
-#if version >= 1.13
+#if version >= 1.13.1
+        return net.minecraft.server.IRegistry.MOTIVE.a(art);
+#elseif version >= 1.13
         return net.minecraft.server.Paintings.a.a(art);
 #else
         return art.ordinal();
@@ -26,7 +30,10 @@ class CraftArt {
     }
 
     public static (Object) net.minecraft.server.Paintings NotchFromInternalName(String internalName) {
-#if version >= 1.13
+#if version >= 1.13.1
+        net.minecraft.server.MinecraftKey key = new net.minecraft.server.MinecraftKey(internalName);
+        return net.minecraft.server.IRegistry.MOTIVE.get(key);
+#elseif version >= 1.13
         net.minecraft.server.MinecraftKey key = new net.minecraft.server.MinecraftKey(internalName);
         return net.minecraft.server.Paintings.a.get(key);
 #else
@@ -41,7 +48,14 @@ class CraftArt {
     }
 
     public static String NotchToInternalName((Object) net.minecraft.server.Paintings art) {
-#if version >= 1.13
+#if version >= 1.13.1
+        net.minecraft.server.MinecraftKey key = (net.minecraft.server.MinecraftKey) net.minecraft.server.IRegistry.MOTIVE.getKey(art);
+        if (key == null) {
+            return null;
+        } else {
+            return key.getKey();
+        }
+#elseif version >= 1.13
         net.minecraft.server.MinecraftKey key = (net.minecraft.server.MinecraftKey) net.minecraft.server.Paintings.a.b(art);
         if (key == null) {
             return null;

@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 /**
  * Tests isometric rendering of blocks
@@ -28,8 +29,8 @@ public class MapIsometricTest {
         MapResourcePack texturePack = MapResourcePack.VANILLA;
 
         MapTexture sprite1 = renderSprite(texturePack.getBlockModel(Material.DIRT));
-        MapTexture sprite2 = renderSprite(texturePack.getBlockModel(Material.GRASS_BLOCK));
-        MapTexture sprite3 = renderSprite(texturePack.getBlockModel(Material.LEGACY_SIGN_POST));
+        MapTexture sprite2 = renderSprite(texturePack.getBlockModel(MaterialUtil.getMaterial("LEGACY_GRASS")));
+        MapTexture sprite3 = renderSprite(texturePack.getBlockModel(MaterialUtil.getMaterial("LEGACY_SIGN_POST")));
 
         MapTexture tile = MapTexture.createEmpty(128, 128);
         //tile.fill(MapColorPalette.COLOR_RED);

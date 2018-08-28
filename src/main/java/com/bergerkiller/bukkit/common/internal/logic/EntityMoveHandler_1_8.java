@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.stream.Stream;
 
 import org.bukkit.block.BlockFace;
 
@@ -25,15 +26,15 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
     private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
 
     @Override
-    protected VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double mx, double my, double mz) {
+    protected Stream<VoxelShapeHandle> world_getCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
         // If all collision is disabled, simply return an empty shape
         if (!this.blockCollisionEnabled && !this.entityCollisionEnabled) {
-            return VoxelShapeHandle.empty();
+            return Stream.empty();
         }
 
         // Use legacy logic on 1.12.2 and earlier
         List<AxisAlignedBBHandle> cubes = world_getCubes(entity, mx, my, mz);
-        return VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes));
+        return Stream.of(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
     }
 
     /**

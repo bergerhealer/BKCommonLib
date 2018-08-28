@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.block.BlockFace;
@@ -14,6 +15,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.io.StreamAccumulator;
 import com.bergerkiller.bukkit.common.resources.CommonSounds;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -46,6 +48,7 @@ public abstract class EntityMoveHandler {
     protected EntityController<?> controller;
     protected EntityHandle that;
     private CommonEntity<?> entity;
+    private final StreamAccumulator<VoxelShapeHandle> shapeAccumulator = new StreamAccumulator<VoxelShapeHandle>();
 
     protected EntityMoveHandler() {
     }
@@ -104,9 +107,9 @@ public abstract class EntityMoveHandler {
      * @param dx movement
      * @param dy movement
      * @param dz movement
-     * @return collision shape
+     * @return stream of collision shapes
      */
-    protected abstract VoxelShapeHandle world_getCollisionShape(EntityHandle entity, double dx, double dy, double dz);
+    protected abstract Stream<VoxelShapeHandle> world_getCollisionShapes(EntityHandle entity, double dx, double dy, double dz);
 
     /**
      * This is the move function based on the original move function in the nms.Entity class.
@@ -265,23 +268,23 @@ public abstract class EntityMoveHandler {
             if (d0 != 0.0D || d1 != 0.0D || d2 != 0.0D) {
                 // BKCommonLib start
                 // collision event handler
-                VoxelShapeHandle shape = world_getCollisionShape(that, d0, d1, d2);
+                shapeAccumulator.open(world_getCollisionShapes(that, d0, d1, d2));
                 // BKCommonLib end
 
                 if (d1 != 0.0D) {
-                    d1 = shape.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), d1);
+                    d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
                     that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 }
 
                 if (d0 != 0.0D) {
-                    d2 = shape.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), d2);
+                    d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d2);
                     if (d0 != 0.0D) {
                         that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
                     }
                 }
 
                 if (d2 != 0.0D) {
-                    d2 = shape.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), d2);
+                    d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
                     if (d2 != 0.0D) {
                         that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
                     }
@@ -301,26 +304,26 @@ public abstract class EntityMoveHandler {
 
                 // BKCommonLib start
                 // collision event handler
-                VoxelShapeHandle shape = world_getCollisionShape(that, d7, d1, d9);
+                shapeAccumulator.open(world_getCollisionShapes(that, d7, d1, d9));
                 // BKCommonLib end
 
                 AxisAlignedBBHandle axisalignedbb2 = that.getBoundingBox();
                 AxisAlignedBBHandle axisalignedbb3 = axisalignedbb2.transformB(d7, 0.0D, d9);
 
                 double d11 = d1;
-                d11 = shape.traceAxis(EnumAxisHandle.Y, axisalignedbb3, d11);
+                d11 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, axisalignedbb3, shapeAccumulator.stream(), d11);
                 if (d11 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(0.0D, d11, 0.0D);
                 }
 
                 double d15 = d7;
-                d15 = shape.traceAxis(EnumAxisHandle.X, axisalignedbb2, d15);
+                d15 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, axisalignedbb2, shapeAccumulator.stream(), d15);
                 if (d15 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(d15, 0.0D, 0.0D);
                 }
 
                 double d16 = d9;
-                d16 = shape.traceAxis(EnumAxisHandle.Z, axisalignedbb2, d16);
+                d16 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, axisalignedbb2, shapeAccumulator.stream(), d16);
                 if (d16 != 0.0D) {
                     axisalignedbb2 = axisalignedbb2.translate(0.0D, 0.0D, d16);
                 }
@@ -328,19 +331,19 @@ public abstract class EntityMoveHandler {
                 AxisAlignedBBHandle axisalignedbb4 = that.getBoundingBox();
 
                 double d17 = d1;
-                d17 = shape.traceAxis(EnumAxisHandle.Y, axisalignedbb4, d17);
+                d17 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, axisalignedbb4, shapeAccumulator.stream(), d17);
                 if (d17 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(0.0D, d17, 0.0D);
                 }
 
                 double d18 = d7;
-                d18 = shape.traceAxis(EnumAxisHandle.X, axisalignedbb4, d18);
+                d18 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, axisalignedbb4, shapeAccumulator.stream(), d18);
                 if (d18 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(d18, 0.0D, 0.0D);
                 }
 
                 double d19 = d9;
-                d19 = shape.traceAxis(EnumAxisHandle.Z, axisalignedbb4, d19);
+                d19 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, axisalignedbb4, shapeAccumulator.stream(), d19);
                 if (d19 != 0.0D) {
                     axisalignedbb4 = axisalignedbb4.translate(0.0D, 0.0D, d19);
                 }
@@ -360,7 +363,7 @@ public abstract class EntityMoveHandler {
                     that.setBoundingBox(axisalignedbb4);
                 }
 
-                d1 = shape.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), d1);
+                d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
                 if (d1 != 0.0D) {
                     that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                 }

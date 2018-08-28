@@ -533,4 +533,9 @@ public class HandleConversion {
         return DimensionManagerHandle.fromId(dimension.getId());
     }
 
+    @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>")
+    public static java.util.stream.Stream<VoxelShapeHandle> axisAlignedBBListToVoxelShapeStream(List<?> axisAlignedBBList) {
+        return java.util.stream.Stream.of(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
+    }
+
 }
