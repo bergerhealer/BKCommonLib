@@ -14,19 +14,28 @@ import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.mountiplex.conversion.Conversion;
+import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Logic for MC 1.13 and onwards
  */
 public class EntityMoveHandler_1_13 extends EntityMoveHandler {
-    private static FastMethod<Object> getBlockCollisions_method = new FastMethod<Object>();
+    private static final FastMethod<java.util.stream.Stream<?>> getBlockCollisions_method = new FastMethod<java.util.stream.Stream<?>>();
+    private static final Converter<java.util.stream.Stream<?>, Stream<VoxelShapeHandle>> streamConverter;
     private static final boolean getBlockCollisions_method_init;
 
     static {
+        // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
+        streamConverter = CommonUtil.unsafeCast(Conversion.find(
+                TypeDeclaration.createGeneric(Stream.class, CommonUtil.getNMSClass("VoxelShape")),
+                TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
+
         boolean success = true;
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
@@ -110,12 +119,8 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             entity.setOutsideWorldBorder(!inWorldBorder);
         }
 
-        VoxelShapeHandle shape = VoxelShapeHandle.createHandle(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
-        if (shape.isEmpty()) {
-            return Stream.empty();
-        } else {
-            return Stream.of(shape);
-        }
+        // Execute generated method and convert to Stream<VoxelShapeHandle>
+        return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false, inWorldBorder));
     }
 
     private Stream<VoxelShapeHandle> world_getEntityCollisionShapes(EntityHandle entity, double mx, double my, double mz) {

@@ -9,7 +9,7 @@
 // flag = always false
 // flag1 = inWorldBorder
 
-public VoxelShape getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag, boolean flag1) {
+public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag, boolean flag1) {
     int i = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.X)) - 1;
     int j = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.X)) + 1;
     int k = MathHelper.floor(voxelshape.b(EnumDirection.EnumAxis.Y)) - 1;
@@ -109,12 +109,12 @@ public VoxelShape getBlockCollisions(com.bergerkiller.bukkit.common.internal.log
     }
 
     if (flag) {
-        return VoxelShapes.a();
+        return java.util.stream.Stream.empty();
     } else {
         voxelshape2 = voxelshape2.c();
         VoxelShapeWorldRegion voxelshapeworldregion = new VoxelShapeWorldRegion(voxelshapebitset, i, k, i1);
 
         voxelshape2 = VoxelShapes.b(voxelshape2, voxelshapeworldregion, OperatorBoolean.OR);
-        return voxelshape2;
+        return java.util.stream.Stream.of(voxelshape2);
     }
 }
