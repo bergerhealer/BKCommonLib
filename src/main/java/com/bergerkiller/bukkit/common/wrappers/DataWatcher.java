@@ -636,6 +636,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public Key<T> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
                 if (CommonCapabilities.DATAWATCHER_OBJECTS) {
                     if (!tokenField.isAvailable()) {
+                        if (alternativeId != -1) {
+                            // This can not be! It should really exist if it also existed on 1.8.x...
+                            System.err.println("DataWatcher key not found: " + tokenField.getElementName());
+                        }
                         return new Key.Disabled<T>(this);
                     } else {
                         return new Key<T>(tokenField.raw.get(), this);

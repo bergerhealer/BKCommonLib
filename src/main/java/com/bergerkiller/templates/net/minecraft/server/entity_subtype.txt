@@ -327,7 +327,9 @@ class EntityInsentient extends EntityLiving {
 }
 
 class EntityItem extends Entity {
-#if version >= 1.9
+#if version >= 1.13
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:b;
+#elseif version >= 1.9
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
 #else
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;

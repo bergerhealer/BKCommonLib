@@ -2,13 +2,17 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 
 public class DataWatcherTest {
 
@@ -102,5 +106,15 @@ public class DataWatcherTest {
         //for (DataWatcher.Item<?> item : dataWatcher.getWatchedItems()) {
         //    System.out.println(item.toString());
         //}
+    }
+
+    @Test
+    public void testItemItemStack() {
+        Material itemType = MaterialUtil.getFirst("STONE", "LEGACY_STONE");
+        DataWatcher metadata = new DataWatcher();
+        metadata.set(EntityItemHandle.DATA_ITEM, new ItemStack(itemType, 1));
+        ItemStack stored = metadata.get(EntityItemHandle.DATA_ITEM);
+        assertNotNull(stored);
+        assertEquals(itemType, stored.getType());
     }
 }
