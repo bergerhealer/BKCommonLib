@@ -548,12 +548,28 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return entity.getLocation();
     }
 
-    public Location getLastLocation() {
-        return last.toLocation();
-    }
-
     public Location getLocation(Location arg0) {
         return entity.getLocation(arg0);
+    }
+
+    public Location getLastLocation() {
+        EntityHandle h = this.handle;
+        return new Location(getWorld(),
+                h.getLastX(), h.getLastY(), h.getLastZ(),
+                h.getLastYaw(), h.getLastPitch());
+    }
+
+    public Location getLastLocation(Location loc) {
+        if (loc != null) {
+            EntityHandle h = this.handle;
+            loc.setWorld(getWorld());
+            loc.setX(h.getLastX());
+            loc.setY(h.getLastY());
+            loc.setZ(h.getLastZ());
+            loc.setYaw(h.getLastYaw());
+            loc.setPitch(h.getLastPitch());
+        }
+        return loc;
     }
 
     public int getMaxFireTicks() {
