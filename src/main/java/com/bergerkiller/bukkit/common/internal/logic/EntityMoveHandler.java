@@ -277,7 +277,7 @@ public abstract class EntityMoveHandler {
                 }
 
                 if (d0 != 0.0D) {
-                    d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d2);
+                    d0 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
                     if (d0 != 0.0D) {
                         that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
                     }
