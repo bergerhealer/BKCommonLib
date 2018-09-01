@@ -435,7 +435,7 @@ public class MapWidget implements MapDisplayEvents {
     /**
      * Removes all previously added widgets
      */
-    public final void clearWidgets() {
+    public void clearWidgets() {
         MapWidget[] old_children = this._children;
         for (MapWidget old_child : old_children) {
             old_child.handleDetach();

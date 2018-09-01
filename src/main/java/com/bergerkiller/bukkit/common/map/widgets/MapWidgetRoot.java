@@ -92,6 +92,15 @@ public class MapWidgetRoot extends MapWidget {
         }
     }
 
+    @Override
+    public void clearWidgets() {
+        super.clearWidgets();
+        this._focusedWidget = null;
+        this._activatedWidget = this;
+        this._focusChangeFrom = this;
+        this._focusHistory.clear();
+    }
+
     public MapWidget getActivatedWidget() {
         return this._activatedWidget;
     }

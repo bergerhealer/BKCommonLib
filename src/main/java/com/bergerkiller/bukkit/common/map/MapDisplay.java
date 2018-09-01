@@ -143,6 +143,7 @@ public class MapDisplay implements MapDisplayEvents {
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
         this.layerStack = new Layer(this);
+        this.clip.markEverythingDirty();
     }
 
     /**
