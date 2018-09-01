@@ -22,6 +22,7 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -388,6 +389,59 @@ public class ItemMaterialTest {
         assertTrue(itemTypes.contains(Material.ARMOR_STAND));
         assertFalse(itemTypes.contains(getFirst("NETHER_PORTAL", "LEGACY_PORTAL")));
         assertFalse(itemTypes.contains(getFirst("END_PORTAL", "LEGACY_ENDER_PORTAL")));
+    }
+
+    @Test
+    public void testItemParser() {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // Can also test 1.13 and later material names
+            // Data value specified, should match red wool, both legacy and new
+            testItemParser("WOOL:RED", new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+                    ItemUtil.createItem(getMaterial("RED_WOOL"), 1),
+            }, new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
+                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+            });
+            // Data value set to 'any', which should guarantee parsing to any type of wool
+            testItemParser("WOOL:", new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
+                    ItemUtil.createItem(getMaterial("RED_WOOL"), 1)
+            }, new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+            });
+        } else {
+            // Only legacy material names work
+            // Data value specified, should match red wool only
+            testItemParser("WOOL:RED", new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+            }, new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1),
+                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+            });
+            // Data value set to 'any', which should guarantee parsing to any type of wool
+            testItemParser("WOOL:", new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 14, 1),
+                    ItemUtil.createItem(getMaterial("LEGACY_WOOL"), 10, 1)
+            }, new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
+            });
+        }
+    }
+
+    private static void testItemParser(String fullname, ItemStack[] items_yes, ItemStack[] items_no) {
+        ItemParser parser = ItemParser.parse(fullname);
+        for (ItemStack item : items_yes) {
+            if (!parser.match(item)) {
+                fail("Item " + item + " should match " + parser + " but it did not!");
+            }
+        }
+        for (ItemStack item : items_no) {
+            if (parser.match(item)) {
+                fail("Item " + item + " should not match " + parser + " but it did!");
+            }
+        }
     }
 
     private static void testEQIgnoreAmount(ItemStack item) {

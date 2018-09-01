@@ -1,6 +1,11 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.*;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
@@ -85,16 +90,37 @@ public class ItemParser {
         }
     }
 
+    /**
+     * Parses from name. If dataname is non-null, this parses legacy materials using
+     * legacy data name information
+     * 
+     * @param name
+     * @param dataname
+     * @param amount
+     * @return ItemParser
+     */
+    @Deprecated
     public static ItemParser parse(String name, String dataname, String amount) {
         ItemParser parser = new ItemParser();
+
         // parse amount
         parser.amount = ParseUtil.parseInt(amount, -1);
+
         // parse material from name
         if (LogicUtil.nullOrEmpty(name)) {
             parser.type = null;
+        } else if (dataname == null) {
+            // First try non-legacy. Then try legacy.
+            parser.type = ParseUtil.parseMaterial(name, Material.AIR, false);
+            if (parser.type == null) {
+                parser.type = ParseUtil.parseMaterial(name, Material.AIR, true);
+            }
         } else {
-            parser.type = ParseUtil.parseMaterial(name, Material.AIR);
+            // Data is specified, which isn't used on 1.13 and later
+            // Only legacy material names are valid here
+            parser.type = ParseUtil.parseMaterial(name, Material.AIR, true);
         }
+
         // parse material data from name if needed
         if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname)) {
             parser.data = ParseUtil.parseMaterialData(dataname, parser.type, -1);
@@ -103,27 +129,78 @@ public class ItemParser {
         return parser;
     }
 
+    /**
+     * Checks whether an ItemStack matches this Item Parser
+     * 
+     * @param stack
+     * @return True if it matches
+     */
     public boolean match(ItemStack stack) {
         if (stack == null) {
             return false;
         }
-        return this.match(stack.getType(), MaterialUtil.getRawData(stack));
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // No data is ever used and ItemStack type will guaranteed never be legacy
+            return this.match(stack.getType(), 0);
+        } else {
+            // 1.12.2 or before, supply durability also
+            return this.match(stack.getType(), stack.getDurability());
+        }
     }
 
+    /**
+     * Matches a Material type and matching data. This only supports legacy materials
+     * and should not be used anymore, because it is <b>deprecated</b>.
+     * 
+     * @param type
+     * @param data
+     * @return True if matching
+     */
+    @Deprecated
     public boolean match(Material type, int data) {
-        if (this.hasType() && type != this.getType()) {
-            return false;
-        }
-        if (!this.hasData() || data == this.getData()) {
-            return true;
+        Material self = this.type;
+        if (self != null) {
+            // If legacy differs between input and self, we need to convert it somehow
+            boolean typeIsLegacy = MaterialUtil.isLegacyType(type);
+            boolean selfIsLegacy = MaterialUtil.isLegacyType(self);
+            if (typeIsLegacy != selfIsLegacy) {
+                // Convert whichever is not legacy, to legacy
+                if (!typeIsLegacy) {
+                    // Input type -> legacy. Update data parameter doing so if a Block.
+                    if (type.isBlock()) {
+                        BlockData block = BlockData.fromMaterial(type);
+                        type = block.getLegacyType();
+                        data = block.getRawData();
+                    } else {
+                        type = CraftMagicNumbersHandle.toLegacy(type);
+                        data = 0;
+                    }
+                } else {
+                    // Self type -> legacy. This shouldn't really be used, ever.
+                    self = CraftMagicNumbersHandle.toLegacy(self);
+                }
+            }
+
+            // Type must match
+            if (type != self) {
+                return false;
+            }
         }
 
-        // Take in account certain items/blocks with bit fields (<= 1.12.2)
-        if (this.getType() != null && this.getType().name().equals("LEAVES")) {
-            return (data & 0x3) == this.getData();
+        // Data must match (if legacy)
+        if (this.hasData() && MaterialUtil.isLegacyType(type)) {
+            // For legacy leaves, use a 0x3 bitfield mask
+            if (this.hasType() && CommonLegacyMaterials.getMaterialName(this.getType()).equals("LEGACY_LEAVES")) {
+                data &= 0x3;
+            }
+
+            // Data must match
+            if (data != this.getData()) {
+                return false;
+            }
         }
 
-        return false;
+        return true;
     }
 
     /**
@@ -140,6 +217,7 @@ public class ItemParser {
      *
      * @return True if there is data, False if not
      */
+    @Deprecated
     public boolean hasData() {
         return this.data >= 0;
     }
@@ -191,10 +269,22 @@ public class ItemParser {
         if (amount <= 0) {
             amount = this.getMaxStackSize();
         }
-        if (this.hasData()) {
-            return new ItemStack(this.type, amount, (short) this.data);
+        if (this.type.isBlock()) {
+            // For Block items, use BlockData that supports the legacy Material data API
+            BlockData block;
+            if (this.hasData()) {
+                block = BlockData.fromMaterialData(this.type, this.data);
+            } else {
+                block = BlockData.fromMaterial(this.type);
+            }
+            return block.createItem(amount);
         } else {
-            return new ItemStack(this.type, amount);
+            // For items, rely on standard constructor. Data is durability.
+            if (this.hasData()) {
+                return new ItemStack(this.type, amount, (short) this.data);
+            } else {
+                return new ItemStack(this.type, amount);
+            }
         }
     }
 

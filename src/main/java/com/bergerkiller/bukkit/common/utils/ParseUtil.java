@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import org.bukkit.DyeColor;
 import org.bukkit.GrassSpecies;
@@ -16,6 +17,7 @@ import org.bukkit.material.*;
 import java.util.Locale;
 
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
+import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getMaterial;
 
 public class ParseUtil {
 
@@ -34,7 +36,7 @@ public class ParseUtil {
 
         // Material by name mapping
         for (Material material : Material.values()) {
-            MAT_NAME_MAP.putUpper(material.toString(), material);
+            MAT_NAME_MAP.putUpper(CommonLegacyMaterials.getMaterialName(material), material);
         }
         MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"));
         MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
@@ -49,6 +51,21 @@ public class ParseUtil {
         MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
         MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
         MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+
+        // Legacy names
+        MAT_NAME_MAP.put("LEGACY_REDSTONE_TORCH", getMaterial("LEGACY_REDSTONE_TORCH_ON"));
+        MAT_NAME_MAP.put("LEGACY_STONE_BUTTON", getMaterial("LEGACY_STONE_BUTTON"));
+        MAT_NAME_MAP.put("LEGACY_PISTON", getMaterial("LEGACY_PISTON_BASE"));
+        MAT_NAME_MAP.put("LEGACY_STICKPISTON", getMaterial("LEGACY_PISTON_STICKY_BASE"));
+        MAT_NAME_MAP.put("LEGACY_MOSSSTONE", getMaterial("LEGACY_MOSSY_COBBLESTONE"));
+        MAT_NAME_MAP.put("LEGACY_STONESTAIR", getMaterial("LEGACY_COBBLESTONE_STAIRS"));
+        MAT_NAME_MAP.put("LEGACY_SANDSTAIR", getMaterial("LEGACY_SANDSTONE_STAIRS"));
+        MAT_NAME_MAP.put("LEGACY_GOLDAPPLE", getMaterial("LEGACY_GOLDEN_APPLE"));
+        MAT_NAME_MAP.put("LEGACY_APPLEGOLD", getMaterial("LEGACY_GOLDEN_APPLE"));
+        MAT_NAME_MAP.put("LEGACY_COBBLEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("LEGACY_STONEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("LEGACY_COBBLEWALL", getMaterial("LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("LEGACY_STONEWALL", getMaterial("LEGACY_COBBLE_WALL"));
 
         // Material by name aliases
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
@@ -397,21 +414,44 @@ public class ParseUtil {
      * @param def to return on failure
      * @return Parsed or default value
      */
-    @SuppressWarnings("deprecation")
     public static Material parseMaterial(String text, Material def) {
+        return parseMaterial(text, def, false);
+    }
+
+    /**
+     * Tries to parse the text to one of the values in the Material class.
+     * When legacy is specified and set to True, only legacy material types will be parsed
+     * from name.<br>
+     * <b>Deprecated: legacy Material API is deprecated will be removed</b>
+     * 
+     * @param text
+     * @param def
+     * @param legacy
+     * @return Parsed or default value
+     */
+    @Deprecated
+    public static Material parseMaterial(String text, Material def, boolean legacy) {
         if (LogicUtil.nullOrEmpty(text)) {
             return def;
         }
 
         // From ID
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+        if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             try {
                 return LogicUtil.fixNull(CommonLegacyMaterials.getMaterialFromId(Integer.parseInt(text)), def);
             } catch (Exception ex) {
             }
         }
+
         // Replace aliases and find the corresponding Material
         String matName = MAT_ALIASES.replace(text.trim().toUpperCase(Locale.ENGLISH));
+
+        // Stick LEGACY_ in front, if needed
+        String matName_legacy = matName;
+        if (legacy) {
+            matName = "LEGACY_" + matName;
+        }
+
         Material mat;
         while (true) {
             // First consult the name mapping (faster)
@@ -419,14 +459,23 @@ public class ParseUtil {
             if (mat != null) {
                 return mat;
             }
+
             // Parse it (slower)
-            mat = parseEnum(Material.class, matName, null);
+            if (legacy && !CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+                // 1.12.2 or before; enum values don't start with LEGACY_
+                mat = parseEnum(Material.class, matName_legacy, null);
+            } else {
+                // 1.13 or later; enum values start with LEGACY_ and replacement logic applies
+                mat = parseEnum(Material.class, matName, null);
+            }
             if (mat != null) {
                 return mat;
             }
+
             // Handle a 'multiple' in the name (sadly, no ES)
             if (matName.endsWith("S")) {
                 matName = matName.substring(0, matName.length() - 1);
+                matName_legacy = matName_legacy.substring(0, matName_legacy.length() - 1);
             } else {
                 return def;
             }
@@ -435,7 +484,8 @@ public class ParseUtil {
 
     /**
      * Old version of parseMaterialData - please use the int version, as data is
-     * more than a byte
+     * more than a byte<br>
+     * <b>Deprecated: data values are part of legacy Material API and will be removed</b>
      */
     @Deprecated
     public static Byte parseMaterialData(String text, Material material, Byte def) {
@@ -448,26 +498,32 @@ public class ParseUtil {
     }
 
     /**
-     * Tries to parse the text to a data value for a Material
+     * Tries to parse the text to a data value for a Material.<br>
+     * <b>Deprecated: data values are part of legacy Material API and will be removed</b>
      *
      * @param text to parse
      * @param material to parse the text against
      * @param def to return on failure (hint: use -1)
      * @return Parsed or default value
      */
-    @SuppressWarnings("deprecation")
+    @Deprecated
     public static int parseMaterialData(String text, Material material, int def) {
+        // If material is not legacy, this method is invalid so return def here all the time.
+        if (!MaterialUtil.isLegacyType(material)) {
+            return def;
+        }
+
         try {
             return Integer.parseInt(text);
         } catch (NumberFormatException ex) {
-            if (material != null && material.name().equals("WOOD")) { //TODO: BROKEN on 1.13
+            if (material != null && CommonLegacyMaterials.getMaterialName(material).equals("LEGACY_WOOD")) {
                 TreeSpecies ts = parseTreeSpecies(text, null);
                 if (ts != null) {
-                    return MaterialUtil.getRawData(ts);
+                    return ts.getData();
                 }
                 return def;
             } else {
-                MaterialData dat = MaterialUtil.getData(material, 0);
+                MaterialData dat = BlockData.fromMaterialData(material, 0).getMaterialData();
                 if (dat instanceof TexturedMaterial) {
                     TexturedMaterial tdat = (TexturedMaterial) dat;
                     Material mat = parseMaterial(text, null);
@@ -506,7 +562,7 @@ public class ParseUtil {
                 } else {
                     return def;
                 }
-                return MaterialUtil.getRawData(dat);
+                return dat.getData();
             }
         }
     }
