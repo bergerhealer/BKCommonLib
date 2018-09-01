@@ -149,6 +149,22 @@ public class ItemParser {
     }
 
     /**
+     * Checks whether the BlockData of a Block matches the Item of this Item Parser.
+     * 
+     * @param blockData
+     * @return True if it matches
+     */
+    public boolean match(BlockData blockData) {
+        if (this.hasType() && !blockData.isType(this.getType())) {
+            return false;
+        }
+        if (this.hasData() && blockData.getRawData() != this.getData()) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * Matches a Material type and matching data. This only supports legacy materials
      * and should not be used anymore, because it is <b>deprecated</b>.
      * 
