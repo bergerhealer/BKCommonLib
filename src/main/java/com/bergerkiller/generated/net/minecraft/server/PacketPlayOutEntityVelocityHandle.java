@@ -31,6 +31,11 @@ public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_VELOCITY;
+    }
+
     public double getMotX() {
         return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }

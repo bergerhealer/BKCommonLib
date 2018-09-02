@@ -115,6 +115,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
         /* ============================================================================== */
 
 
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
+        }
+
         public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
             handle.setEntityId(entityId);
@@ -157,6 +162,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
 
         /* ============================================================================== */
 
+
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE;
+        }
 
         public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = createNew();
@@ -201,6 +211,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
 
         /* ============================================================================== */
 
+
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE_LOOK;
+        }
 
         public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();

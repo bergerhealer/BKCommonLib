@@ -28,6 +28,11 @@ public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_METADATA;
+    }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
     public abstract List<Item<Object>> getMetadataItems();

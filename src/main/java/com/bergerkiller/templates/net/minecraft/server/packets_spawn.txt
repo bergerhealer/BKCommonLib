@@ -40,6 +40,11 @@ class PacketPlayOutSpawnEntity extends Packet {
 #endif
 
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN;
+    }
+
     public void setEntityUUID(UUID uuid) {
         if (T.entityUUID.isAvailable()) {
             T.entityUUID.set(getRaw(), uuid);
@@ -159,6 +164,11 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 #endif
 
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_NAMED;
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }
@@ -259,6 +269,11 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) EntityLiving entity);
 
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_LIVING;
+    }
+
     public void setEntityUUID(UUID uuid) {
         if (T.entityUUID.isAvailable()) {
             T.entityUUID.set(getRaw(), uuid);

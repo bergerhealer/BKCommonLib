@@ -27,6 +27,11 @@ public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_NAMED;
+    }
+
     public double getPosX() {
         return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
     }

@@ -31,6 +31,11 @@ public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_TELEPORT;
+    }
+
     public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
         PacketPlayOutEntityTeleportHandle handle = createNew();
         handle.setEntityId(entityId);

@@ -35,6 +35,11 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     /* ============================================================================== */
 
 
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_LIVING;
+    }
+
     public void setEntityUUID(UUID uuid) {
         if (T.entityUUID.isAvailable()) {
             T.entityUUID.set(getRaw(), uuid);

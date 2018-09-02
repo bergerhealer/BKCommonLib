@@ -890,6 +890,13 @@ class PacketPlayOutEntityMetadata extends Packet {
 #endif
 
     public (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher, boolean includeUnchangedData);
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_METADATA;
+    }
+    </code>
 }
 
 class PacketPlayInUpdateSign extends Packet {

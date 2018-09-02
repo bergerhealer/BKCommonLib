@@ -51,6 +51,11 @@ class PacketPlayOutEntityTeleport extends Packet {
     public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport((org.bukkit.entity.Entity) Entity entity);
 
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_TELEPORT;
+    }
+
     public static PacketPlayOutEntityTeleportHandle createNew(int entityId, double posX, double posY, double posZ, float yaw, float pitch, boolean onGround) {
         PacketPlayOutEntityTeleportHandle handle = createNew();
         handle.setEntityId(entityId);
@@ -121,6 +126,11 @@ class PacketPlayOutEntityVelocity extends Packet {
     public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity((org.bukkit.entity.Entity) Entity entity);
 
     <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_VELOCITY;
+    }
+
     public double getMotX() {
         return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
@@ -216,6 +226,11 @@ class PacketPlayOutEntity extends Packet {
         public (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook();
 
         <code>
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
+        }
+
         public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
             handle.setEntityId(entityId);
@@ -231,6 +246,11 @@ class PacketPlayOutEntity extends Packet {
         public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove();
 
         <code>
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE;
+        }
+
         public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle createNew(int entityId, double dx, double dy, double dz, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle handle = createNew();
             handle.setEntityId(entityId);
@@ -247,6 +267,11 @@ class PacketPlayOutEntity extends Packet {
         public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();
 
         <code>
+        @Override
+        public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+            return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE_LOOK;
+        }
+
         public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
             handle.setEntityId(entityId);
