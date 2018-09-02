@@ -29,6 +29,15 @@ public class StreamAccumulator<T> {
     }
 
     /**
+     * Checks whether anything will be accumulated inside this accumulator.
+     * 
+     * @return True if empty
+     */
+    public boolean isEmpty() {
+        return this.buffer.isEmpty() && !this.iterator.hasNext();
+    }
+
+    /**
      * Retrieves a new stream, starting with the first elements found in the stream that was previously opened.
      * That is, this method can be called multiple times, each time the same elements are traversed.
      * 

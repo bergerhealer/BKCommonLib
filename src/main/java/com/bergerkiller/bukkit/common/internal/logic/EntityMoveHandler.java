@@ -5,7 +5,6 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
@@ -18,6 +17,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.io.StreamAccumulator;
 import com.bergerkiller.bukkit.common.resources.CommonSounds;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -271,28 +271,32 @@ public abstract class EntityMoveHandler {
                 shapeAccumulator.open(world_getCollisionShapes(that, d0, d1, d2));
                 // BKCommonLib end
 
-                if (d1 != 0.0D) {
-                    d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
-                    that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
-                }
-
-                if (d0 != 0.0D) {
-                    d0 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
-                    if (d0 != 0.0D) {
-                        that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
+                // BKCommonLib: add isEmpty() optimization
+                if (!shapeAccumulator.isEmpty()) {
+                    if (d1 != 0.0D) {
+                        d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
+                        that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
                     }
-                }
 
-                if (d2 != 0.0D) {
-                    d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
+                    if (d0 != 0.0D) {
+                        d0 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
+                        if (d0 != 0.0D) {
+                            that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
+                        }
+                    }
+
                     if (d2 != 0.0D) {
-                        that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
+                        d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
+                        if (d2 != 0.0D) {
+                            that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
+                        }
                     }
                 }
             }
 
             boolean flag = that.isOnGround() || d1 != d8 && d1 < 0.0D; // CraftBukkit - decompile error
 
+            // NB: This code only executes with entities that are tall (have a head), like players
             if (that.getHeightOffset() > 0.0F && flag && (d7 != d0 || d9 != d2)) {
                 double d12 = d0;
                 double d13 = d1;
@@ -374,7 +378,7 @@ public abstract class EntityMoveHandler {
                     d2 = d14;
                     that.setBoundingBox(axisalignedbb1);
                 }
-            }
+            } // NB: This code only executes with entities that are tall (have a head), like players
 
             world.getMethodProfiler().end();
             world.getMethodProfiler().begin("rest");
@@ -384,6 +388,7 @@ public abstract class EntityMoveHandler {
             that.setVerticalMovementImpaired(d1 != d8); // CraftBukkit - decompile error
             that.setOnGround(that.isVerticalMovementImpaired() && d8 < 0.0);
             that.setMovementImpaired(that.isHorizontalMovementImpaired() || that.isVerticalMovementImpaired());
+
             int l = MathUtil.floor(that.getLocX());
             int k4 = MathUtil.floor(that.getLocY() - 0.2);
             int l4 = MathUtil.floor(that.getLocZ());
@@ -391,7 +396,7 @@ public abstract class EntityMoveHandler {
 
             BlockData iblockdata = world.getBlockData(blockposition);
 
-            if (iblockdata.getType() == org.bukkit.Material.AIR) {
+            if (iblockdata.isType(org.bukkit.Material.AIR)) {
                 IntVector3 blockposition1 = blockposition.add(0, -1, 0);
                 BlockData iblockdata1 = world.getBlockData(blockposition1);
 
@@ -412,14 +417,14 @@ public abstract class EntityMoveHandler {
                 that.setMotZ(0.0);
             }
 
-            BlockHandle block1 = iblockdata.getBlock();
-
             if (d8 != d1) {
-                block1.entityHitVertical(world, that);
+                iblockdata.getBlock().entityHitVertical(world, that);
             }
 
             // CraftBukkit start
             if (that.isHorizontalMovementImpaired() && that.getBukkitEntity() instanceof Vehicle) {
+
+                /*
                 Vehicle vehicle = (Vehicle) that.getBukkitEntity();
                 org.bukkit.block.Block bl = entity.getWorld().getBlockAt(MathUtil.floor(that.getLocX()), MathUtil.floor(that.getLocY()), MathUtil.floor(that.getLocZ()));
 
@@ -437,14 +442,41 @@ public abstract class EntityMoveHandler {
                     VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, bl);
                     Bukkit.getPluginManager().callEvent(event);
                 }
+                */
+
+                // BKCommonLib: avoid creating an extra Block with getRelative if we don't have to!
+                // Similarly, we don't have to create this Block when the block is air...
+                org.bukkit.World bl_world = entity.getWorld();
+                int bl_x = MathUtil.floor(that.getLocX());
+                int bl_y = MathUtil.floor(that.getLocY());
+                int bl_z = MathUtil.floor(that.getLocZ());
+                if (d6 > d0) {
+                    bl_x++;
+                } else if (d6 < d0) {
+                    bl_x--;
+                } else if (d8 > d2) {
+                    bl_z++;
+                } else if (d8 < d2) {
+                    bl_z--;
+                }
+                if (!WorldUtil.getBlockData(bl_world, bl_x, bl_y, bl_z).isType(org.bukkit.Material.AIR)) {
+                    org.bukkit.block.Block bl = bl_world.getBlockAt(bl_x, bl_y, bl_z);
+                    Vehicle vehicle = (Vehicle) that.getBukkitEntity();
+                    VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, bl);
+                    Bukkit.getPluginManager().callEvent(event);
+                }
+                // BKCommonLib end
+
             }
             // CraftBukkit end
 
             if (that.hasMovementSound() && (!that.isOnGround() || !that.isSneaking() || !that.isInstanceOf(EntityHumanHandle.T)) && !that.isPassenger()) {
                 double d22 = that.getLocX() - d4;
                 double d23 = that.getLocY() - d5;
-
                 double d11 = that.getLocZ() - d6;
+
+                BlockHandle block1 = iblockdata.getBlock();
+
                 if (block1.getRaw() != BlocksHandle.LADDER) {
                     d23 = 0.0D;
                 }
