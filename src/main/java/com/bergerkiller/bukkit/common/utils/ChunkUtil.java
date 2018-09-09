@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
@@ -289,6 +290,13 @@ public class ChunkUtil {
         }
 
         // Fallback.
+        com.bergerkiller.bukkit.common.internal.CommonChunkLoaderPool pool = CommonPlugin.getInstance().getChunkLoaderPool();
+        if (pool != null) {
+            pool.queueChunkLoad(world, x, z, runnable);
+            return;
+        }
+
+        // Fallback 2.
         world.getChunkAt(x, z);
         runnable.run();
     }

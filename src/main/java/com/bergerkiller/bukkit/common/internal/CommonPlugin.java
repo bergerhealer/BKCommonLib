@@ -79,6 +79,7 @@ public class CommonPlugin extends PluginBase {
     private CommonMapController mapController = null;
     private CommonEntityBlacklist entityBlacklist = null;
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
+    private CommonChunkLoaderPool chunkLoaderPool = null;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -272,6 +273,16 @@ public class CommonPlugin extends PluginBase {
         return packetHandler;
     }
 
+    /**
+     * Gets a helper class dealing with the asynchronous chunk loading not supported on later versions
+     * of Minecraft natively.
+     * 
+     * @return chunk loader pool
+     */
+    public CommonChunkLoaderPool getChunkLoaderPool() {
+        return this.chunkLoaderPool;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -411,6 +422,12 @@ public class CommonPlugin extends PluginBase {
             t.printStackTrace();
         }
 
+        // Shut down the chunk loader pool, allowing tasks to complete first
+        // Set to null to not allow new tasks to be queued
+        CommonChunkLoaderPool oldPool = chunkLoaderPool;
+        chunkLoaderPool = null;
+        oldPool.disable();
+
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
 
@@ -486,6 +503,9 @@ public class CommonPlugin extends PluginBase {
         // Initialize NBTBase createHandle() - workaround for a reported error
         // The error this potentially fixes is related to a linkageerror when generating the class
         NBTBaseHandle.T.createHandle(null, true);
+
+        // Initialize chunk loader pool
+        chunkLoaderPool = new CommonChunkLoaderPool();
 
         // Initialize immutable player set manager
         immutablePlayerSetManager = new CommonImmutablePlayerSetManager();
