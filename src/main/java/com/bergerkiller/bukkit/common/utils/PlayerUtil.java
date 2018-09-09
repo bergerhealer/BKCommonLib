@@ -345,9 +345,7 @@ public class PlayerUtil extends EntityUtil {
     public static void spawnDustParticles(Player player, Vector position, Color color) {
         if (CommonCapabilities.PARTICLE_OPTIONS) {
             // Official Bukkit API introduced in MC 1.13
-            player.spawnParticle(Particle.REDSTONE,
-                    position.getX(), position.getY(), position.getZ(),
-                    1, new Particle.DustOptions(color, 1.0f));
+            spawnDustParticles_1_13(player, position, color);
         } else {
             // This is a legacy fallback used on Minecraft 1.12.2 and before
             // The color is a close approximation
@@ -366,6 +364,16 @@ public class PlayerUtil extends EntityUtil {
                 }
             }
             player.spawnParticle(Particle.REDSTONE, position.getX(), position.getY(), position.getZ(), 0, red, green, blue, 1.0);
+        }
+    }
+
+    private static void spawnDustParticles_1_13(Player player, Vector position, Color color) {
+        try {
+            // Official Bukkit API introduced in MC 1.13
+            player.spawnParticle(Particle.REDSTONE,
+                    position.getX(), position.getY(), position.getZ(),
+                    1, new Particle.DustOptions(color, 1.0f));
+        } catch (NoClassDefFoundError err) {
         }
     }
 
