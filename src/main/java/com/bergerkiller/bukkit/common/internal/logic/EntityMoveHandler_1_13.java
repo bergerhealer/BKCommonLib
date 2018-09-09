@@ -14,6 +14,7 @@ import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -185,6 +186,10 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             }
         }
 
-        return Stream.of(shape);
+        if (shape.isEmpty()) {
+            return Stream.empty();
+        } else {
+            return MountiplexUtil.toStream(shape);
+        }
     }
 }

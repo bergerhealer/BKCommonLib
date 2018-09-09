@@ -71,6 +71,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventor
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
@@ -535,7 +536,7 @@ public class HandleConversion {
 
     @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>")
     public static java.util.stream.Stream<VoxelShapeHandle> axisAlignedBBListToVoxelShapeStream(List<?> axisAlignedBBList) {
-        return java.util.stream.Stream.of(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
+        return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
     }
 
 }

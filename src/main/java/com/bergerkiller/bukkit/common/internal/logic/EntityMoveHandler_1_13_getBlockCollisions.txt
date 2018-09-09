@@ -115,6 +115,6 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
         VoxelShapeWorldRegion voxelshapeworldregion = new VoxelShapeWorldRegion(voxelshapebitset, i, k, i1);
 
         voxelshape2 = VoxelShapes.b(voxelshape2, voxelshapeworldregion, OperatorBoolean.OR);
-        return java.util.stream.Stream.of(voxelshape2);
+        return com.bergerkiller.mountiplex.MountiplexUtil.toStream(voxelshape2);
     }
 }

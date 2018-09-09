@@ -140,7 +140,7 @@ class World extends IBlockAccess {
         return instance.getCubes(entity, boundingBox.b(dx, dy, dz));
     }
 #else
-    public (java.util.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
         return instance.getCubes(entity, boundingBox.a(dx, dy, dz));
     }
 #endif

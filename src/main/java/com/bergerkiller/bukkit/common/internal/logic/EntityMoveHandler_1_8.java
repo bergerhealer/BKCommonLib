@@ -17,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 
 /**
  * Logic for MC 1.8 - 1.11
@@ -34,7 +35,7 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
 
         // Use legacy logic on 1.12.2 and earlier
         List<AxisAlignedBBHandle> cubes = world_getCubes(entity, mx, my, mz);
-        return Stream.of(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
+        return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
     }
 
     /**
