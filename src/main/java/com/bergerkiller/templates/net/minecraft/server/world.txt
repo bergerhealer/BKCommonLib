@@ -339,7 +339,17 @@ class ChunkProviderServer {
 
     // Removed (no longer supported?) since MC 1.13
     // There is an async method for generating, but it is not interesting at all.
-    public optional (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
+#if version >= 1.13
+    public (ChunkHandle) Chunk getChunkAtAsync(int cx, int cz, Runnable runnable) {
+        Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
+        com.bergerkiller.bukkit.common.collections.RunnableConsumer consumer;
+        consumer = com.bergerkiller.bukkit.common.collections.RunnableConsumer.create(runnable);
+        instance.a(iterable, consumer);
+        return (Chunk) consumer.getValue();
+    }
+#else
+    public (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
+#endif
 
     // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
     public optional void saveChunk_old:saveChunk((ChunkHandle) Chunk chunk);

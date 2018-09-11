@@ -28,6 +28,7 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public abstract boolean isLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkIfLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkAt(int cx, int cz);
+    public abstract ChunkHandle getChunkAtAsync(int cx, int cz, Runnable runnable);
 
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
@@ -52,7 +53,6 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
-        @Template.Optional
         public final Template.Method.Converted<ChunkHandle> getChunkAtAsync = new Template.Method.Converted<ChunkHandle>();
         @Template.Optional
         public final Template.Method.Converted<Void> saveChunk_old = new Template.Method.Converted<Void>();
