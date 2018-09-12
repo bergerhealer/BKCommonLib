@@ -350,14 +350,17 @@ public class ChunkUtil {
      * @return True if the entity has been removed, False if not (not found)
      */
     public static boolean removeEntity(org.bukkit.Chunk chunk, org.bukkit.entity.Entity entity) {
-        final List<Object>[] slices = CommonNMS.getHandle(chunk).getEntitySlices();
+        final ChunkHandle chunkHandle = CommonNMS.getHandle(chunk);
+        final List<Object>[] slices = chunkHandle.getEntitySlices();
         final int sliceY = MathUtil.clamp(MathUtil.toChunk(EntityUtil.getLocY(entity)), 0, slices.length - 1);
         final Object handle = HandleConversion.toEntityHandle(entity);
         if (slices[sliceY].remove(handle)) {
+            chunkHandle.markDirty();
             return true;
         } else {
             for (int y = 0; y < slices.length; y++) {
                 if (y != sliceY && slices[y].remove(handle)) {
+                    chunkHandle.markDirty();
                     return true;
                 }
             }
