@@ -32,16 +32,16 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
 
     @HookMethod("public void track(List<EntityHuman> list)")
     public void track(List<?> list) {
-        Object handle = instance();
-        updateTrackers(list);
-        EntityTrackerEntryHandle.T.timeSinceLocationSync.setInteger(handle, EntityTrackerEntryHandle.T.timeSinceLocationSync.getInteger(handle) + 1);
+        EntityTrackerEntryHandle handle = EntityTrackerEntryHandle.createHandle(instance());
+        updateTrackers(handle, list);
+        handle.setTimeSinceLocationSync(handle.getTimeSinceLocationSync() + 1);
         try {
             controller.onTick();
         } catch (Throwable t) {
             Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
             t.printStackTrace();
         }
-        EntityTrackerEntryHandle.T.tickCounter.setInteger(handle, EntityTrackerEntryHandle.T.tickCounter.getInteger(handle) + 1);
+        handle.setTickCounter(handle.getTickCounter() + 1);
     }
 
     @HookMethod("public void hideForAll:???()")
@@ -97,24 +97,25 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
         }
     }
 
-    private void updateTrackers(List<?> list) {
-        EntityHandle entityHandle = EntityHandle.createHandle(controller.getEntity().getHandle());
-        EntityTrackerEntryHandle handle = EntityTrackerEntryHandle.createHandle(instance());
-
-        if (handle.isSynched()) {
-            double lastSyncX = handle.getPrevX();
-            double lastSyncY = handle.getPrevY();
-            double lastSyncZ = handle.getPrevZ();
-            double distance = entityHandle.calculateDistance(lastSyncX, lastSyncY, lastSyncZ);
-            if (distance <= 16.0) {
-                return;
+    private void updateTrackers(EntityTrackerEntryHandle handle, List<?> list) {
+        EntityHandle entityHandle = handle.getTracker();
+        if (entityHandle != null) {
+            if (handle.isSynched()) {
+                double lastSyncX = handle.getPrevX();
+                double lastSyncY = handle.getPrevY();
+                double lastSyncZ = handle.getPrevZ();
+                double distance = entityHandle.calculateDistance(lastSyncX, lastSyncY, lastSyncZ);
+                if (distance <= 16.0) {
+                    return;
+                }
             }
+
+            // Update tracking data
+            handle.setPrevX(entityHandle.getLocX());
+            handle.setPrevY(entityHandle.getLocY());
+            handle.setPrevZ(entityHandle.getLocZ());
         }
 
-        // Update tracking data
-        handle.setPrevX(entityHandle.getLocX());
-        handle.setPrevY(entityHandle.getLocY());
-        handle.setPrevZ(entityHandle.getLocZ());
         handle.setSynched(true);
         scanPlayers(list);
     }
