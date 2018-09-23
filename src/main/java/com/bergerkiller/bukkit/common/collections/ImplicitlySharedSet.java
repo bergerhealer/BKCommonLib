@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Collection;
-import java.util.ConcurrentModificationException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -21,14 +20,13 @@ import java.util.TreeSet;
  * the {@link #cloneAsIterable()} can be used. All elements should be iterated for best performance.
  * If the iteration result in a <i>break</i>, then try-with-resources is a better alternative.
  */
-public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
-    private ReferencedSet<E> ref;
+public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> implements Set<E> {
 
     /**
      * Creates a new implicitly shared set, backed by a HashSet
      */
     public ImplicitlySharedSet() {
-        this(new HashSet<E>());
+        super(new HashSet<E>());
     }
 
     /**
@@ -37,7 +35,7 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
      * @param set to use internally
      */
     public ImplicitlySharedSet(Set<E> set) {
-        this(new ReferencedSet<E>(set));
+        super(set);
     }
 
     /**
@@ -47,51 +45,28 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
      * @param sharedSet to access for reading contents
      */
     public ImplicitlySharedSet(ImplicitlySharedSet<E> sharedSet) {
-        this(sharedSet.ref);
-    }
-
-    private ImplicitlySharedSet(ReferencedSet<E> referencedSet) {
-        this.ref = referencedSet;
-        this.ref.ctr++;
-    }
-
-    /**
-     * Assigns the contents of an implicitly shared set to this shared set.
-     * Future read calls will now read from the set instead of the contents that existed before.
-     * The moment this shared set is about to be modified, a detached copy is created.
-     * 
-     * @param sharedSet to assign
-     */
-    public void assign(ImplicitlySharedSet<E> sharedSet) {
-        this.close();
-        this.ref = sharedSet.ref;
-        this.ref.ctr++;
-    }
-
-    /**
-     * Gets whether this shared set references the exact same backing set
-     * as another shared set.
-     * 
-     * @param sharedSet
-     * @return True if referencing the same set
-     */
-    public boolean refEquals(ImplicitlySharedSet<E> sharedSet) {
-        return sharedSet != null && sharedSet.ref == this.ref;
+        super(sharedSet.ref);
     }
 
     @Override
     public int size() {
-        return read().size();
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.size();
+        }
     }
 
     @Override
     public boolean isEmpty() {
-        return read().isEmpty();
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.isEmpty();
+        }
     }
 
     @Override
     public boolean contains(Object o) {
-        return read().contains(o);
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.contains(o);
+        }
     }
 
     @Override
@@ -101,47 +76,71 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
 
     @Override
     public Object[] toArray() {
-        return read().toArray();
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.toArray();
+        }
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return read().toArray(a);
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.toArray(a);
+        }
     }
 
     @Override
     public boolean add(E e) {
-        return write().add(e);
+        try (Reference<Set<E>> ref = write()) {
+            return ref.val.add(e);
+        }
     }
 
     @Override
     public boolean remove(Object o) {
-        return write().remove(o);
+        try (Reference<Set<E>> ref = write()) {
+            return ref.val.remove(o);
+        }
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return read().containsAll(c);
+        try (Reference<Set<E>> ref = read()) {
+            return ref.val.containsAll(c);
+        }
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return write().addAll(c);
+        try (Reference<Set<E>> ref = write()) {
+            return ref.val.addAll(c);
+        }
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return !this.isEmpty() && write().retainAll(c);
+        if (this.isEmpty()) {
+            return false;
+        }
+        try (Reference<Set<E>> ref = write()) {
+            return ref.val.retainAll(c);
+        }
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return !c.isEmpty() && write().removeAll(c);
+        if (c.isEmpty()) {
+            return false;
+        }
+        try (Reference<Set<E>> ref = write()) {
+            return ref.val.removeAll(c);
+        }
     }
 
     @Override
     public void clear() {
-        write().clear();
+        try (Reference<Set<E>> ref = write()) {
+            ref.val.clear();
+        }
     }
 
     /**
@@ -171,29 +170,18 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
         return new ImplicitlySharedSet<E>(this);
     }
 
-    private final Set<E> write() {
-        if (this.ref.ctr > 1) {
-            this.ref.ctr--;
-            this.ref = this.ref.clone();
-            this.ref.ctr++;
-        }
-        return this.ref.set;
-    }
-
-    private final Set<E> read() {
-        return this.ref.set;
-    }
-
-    /**
-     * Closes this shared set, so that it no longer holds access to the shared set contents.
-     * If this shared set was created mirroring another shared set, this call enables
-     * that set to modify the contents without copying.
-     */
     @Override
-    public void close() {
-        if (this.ref != null) {
-            this.ref.ctr--;
-            this.ref = null;
+    @SuppressWarnings("unchecked")
+    protected final Set<E> cloneValue(Set<E> input) {
+        // Java clone() is poor. Handle the generic cases and hope for the best.
+        if (input instanceof TreeSet) {
+            return (Set<E>) ((TreeSet<E>) input).clone();
+        } else if (input instanceof LinkedHashSet) {
+            return new LinkedHashSet<E>(input);
+        } else if (input instanceof HashSet) {
+            return (Set<E>) ((HashSet<E>) input).clone();
+        } else {
+            return new HashSet<E>(input);
         }
     }
 
@@ -225,90 +213,51 @@ public class ImplicitlySharedSet<E> implements Set<E>, AutoCloseable {
         public void remove() {
             // Does nothing. It's a copy.
         }
-
-        @Override
-        protected void finalize() throws Throwable {
-            try {
-                this.copy.close();
-            } finally {
-                super.finalize();
-            }
-        }
     }
 
     private final class ReferencedSetIterator implements Iterator<E> {
-        private ReferencedSet<E> ref;
+        private Reference<Set<E>> ref;
         private Iterator<E> baseIter;
-        private int numNextCalls;
+        private boolean hasLastElement;
+        private E lastElement;
 
         public ReferencedSetIterator() {
             this.ref = ImplicitlySharedSet.this.ref;
-            this.baseIter = read().iterator();
-            this.numNextCalls = 0;
+            this.baseIter = this.ref.val.iterator();
+            this.hasLastElement = false;
+            this.lastElement = null;
         }
 
         @Override
         public boolean hasNext() {
-            return baseIter.hasNext();
+            return this.baseIter.hasNext();
         }
 
         @Override
         public E next() {
-            this.checkConcurrent();
-            E result = baseIter.next();
-            this.numNextCalls++;
+            E result = this.baseIter.next();
+            this.lastElement = result;
+            this.hasLastElement = true;
             return result;
         }
 
         @Override
         public void remove() {
-            this.checkConcurrent();
-            if (ref.ctr > 1) {
-                // We need to make a copy of the set to modify it
-                // However, we are iterating over one as well!
-                // So we must skip the elements we have iterated and continue.
-                this.baseIter = write().iterator();
-                for (int i = 0; i < this.numNextCalls; i++) {
-                    this.baseIter.next();
+            if (this.hasLastElement) {
+                this.hasLastElement = false;
+            } else {
+                throw new IllegalStateException("next() must be called before remove() is valid");
+            }
+
+            try (Reference<Set<E>> ref_writable = write()) {
+                if (ref_writable == this.ref) {
+                    // Can write to the same thing we are iterating over
+                    this.baseIter.remove();
+                } else {
+                    // Remove from the writable set, we can not modify what we are iterating over
+                    ImplicitlySharedSet.this.remove(this.lastElement);
                 }
             }
-            this.baseIter.remove();
-        }
-
-        // Check if we modified the set while iterating
-        private final void checkConcurrent() {
-            if (ImplicitlySharedSet.this.ref != this.ref) {
-                throw new ConcurrentModificationException("Set was modified while iterating");
-            }
-        }
-    }
-
-    private static class ReferencedSet<T> {
-        public final Set<T> set;
-        public int ctr;
-
-        public ReferencedSet(Set<T> set) {
-            this.set = set;
-            this.ctr = 0;
-        }
-
-        @Override
-        public ReferencedSet<T> clone() {
-            // Java clone() is poor. Handle the generic cases and hope for the best.
-            if (this.set instanceof TreeSet) {
-                return create(((TreeSet<T>) this.set).clone());
-            } else if (this.set instanceof LinkedHashSet) {
-                return create(new LinkedHashSet<T>(this.set));
-            } else if (this.set instanceof HashSet) {
-                return create(((HashSet<T>) this.set).clone());
-            } else {
-                return create(new HashSet<T>(this.set));
-            }
-        }
-
-        @SuppressWarnings("unchecked")
-        private static final <T> ReferencedSet<T> create(Object set) {
-            return new ReferencedSet<T>((Set<T>) set);
         }
     }
 

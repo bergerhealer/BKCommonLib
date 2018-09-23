@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Vector;
 
 /**
@@ -21,14 +22,13 @@ import java.util.Vector;
  * the {@link #cloneAsIterable()} can be used. All elements should be iterated for best performance.
  * If the iteration result in a <i>break</i>, then try-with-resources is a better alternative.
  */
-public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>, AutoCloseable {
-    private ReferencedList<E> ref;
+public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> implements List<E>, AutoCloseable {
 
     /**
      * Creates a new implicitly shared list, backed by an ArrayList
      */
     public ImplicitlySharedList() {
-        this(new ArrayList<E>());
+        super(new ArrayList<E>());
     }
 
     /**
@@ -37,7 +37,7 @@ public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>,
      * @param list to use internally
      */
     public ImplicitlySharedList(List<E> list) {
-        this(new ReferencedList<E>(list));
+        super(list);
     }
 
     /**
@@ -47,131 +47,146 @@ public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>,
      * @param sharedList to access for reading contents
      */
     public ImplicitlySharedList(ImplicitlySharedList<E> sharedList) {
-        this(sharedList.ref);
-    }
-
-    private ImplicitlySharedList(ReferencedList<E> referencedList) {
-        this.ref = referencedList;
-        this.ref.ctr++;
-    }
-
-    /**
-     * Assigns the contents of an implicitly shared list to this shared list.
-     * Future read calls will now read from the list instead of the contents that existed before.
-     * The moment this shared list is about to be modified, a detached copy is created.
-     * 
-     * @param sharedList to assign
-     */
-    public void assign(ImplicitlySharedList<E> sharedList) {
-        this.close();
-        this.ref = sharedList.ref;
-        this.ref.ctr++;
-    }
-
-    /**
-     * Gets whether this shared list references the exact same backing list
-     * as another shared list.
-     * 
-     * @param sharedList
-     * @return True if referencing the same list
-     */
-    public boolean refEquals(ImplicitlySharedList<?> sharedList) {
-        return sharedList != null && sharedList.ref == this.ref;
+        super(sharedList.ref);
     }
 
     @Override
     public int size() {
-        return read().size();
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.size();
+        }
     }
 
     @Override
     public boolean isEmpty() {
-        return read().isEmpty();
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.isEmpty();
+        }
     }
 
     @Override
     public boolean contains(Object o) {
-        return read().contains(o);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.contains(o);
+        }
     }
 
     @Override
     public Object[] toArray() {
-        return read().toArray();
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.toArray();
+        }
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return read().toArray(a);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.toArray(a);
+        }
     }
 
     @Override
     public boolean add(E e) {
-        return write().add(e);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.add(e);
+        }
     }
 
     @Override
     public boolean remove(Object o) {
-        return write().remove(o);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.remove(o);
+        }
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return read().containsAll(c);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.containsAll(c);
+        }
     }
 
     @Override
     public boolean addAll(Collection<? extends E> c) {
-        return write().addAll(c);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.addAll(c);
+        }
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return !this.isEmpty() && write().retainAll(c);
+        if (this.isEmpty()) {
+            return false;
+        }
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.retainAll(c);
+        }
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return !c.isEmpty() && write().removeAll(c);
+        if (c.isEmpty()) {
+            return false;
+        }
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.removeAll(c);
+        }
     }
 
     @Override
     public void clear() {
-        write().clear();
+        try (Reference<List<E>> ref = write()) {
+            ref.val.clear();
+        }
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends E> c) {
-        return write().addAll(index, c);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.addAll(c);
+        }
     }
 
     @Override
     public E get(int index) {
-        return read().get(index);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.get(index);
+        }
     }
 
     @Override
     public E set(int index, E element) {
-        return write().set(index, element);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.set(index, element);
+        }
     }
 
     @Override
     public void add(int index, E element) {
-        write().add(index, element);
+        try (Reference<List<E>> ref = write()) {
+            ref.val.add(index, element);
+        }
     }
 
     @Override
     public E remove(int index) {
-        return write().remove(index);
+        try (Reference<List<E>> ref = write()) {
+            return ref.val.remove(index);
+        }
     }
 
     @Override
     public int indexOf(Object o) {
-        return read().indexOf(o);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.indexOf(o);
+        }
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return read().lastIndexOf(o);
+        try (Reference<List<E>> ref = read()) {
+            return ref.val.lastIndexOf(o);
+        }
     }
 
     /**
@@ -199,32 +214,6 @@ public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>,
     @Override
     public ImplicitlySharedList<E> clone() {
         return new ImplicitlySharedList<E>(this);
-    }
-
-    private final List<E> write() {
-        if (this.ref.ctr > 1) {
-            this.ref.ctr--;
-            this.ref = this.ref.clone();
-            this.ref.ctr++;
-        }
-        return this.ref.list;
-    }
-
-    private final List<E> read() {
-        return this.ref.list;
-    }
-
-    /**
-     * Closes this shared list, so that it no longer holds access to the shared list contents.
-     * If this shared list was created mirroring another shared list, this call enables
-     * that list to modify the contents without copying.
-     */
-    @Override
-    public void close() {
-        if (this.ref != null) {
-            this.ref.ctr--;
-            this.ref = null;
-        }
     }
 
     private static final class ReferencedListCopyIterator<E> implements Iterator<E> {
@@ -255,43 +244,191 @@ public class ImplicitlySharedList<E> extends AbstractList<E> implements List<E>,
         public void remove() {
             // Does nothing. It's a copy.
         }
+    }
 
-        @Override
-        protected void finalize() throws Throwable {
-            try {
-                this.copy.close();
-            } finally {
-                super.finalize();
+    @Override
+    public Iterator<E> iterator() {
+        return new ReferencedListIterator();
+    }
+
+    private final AbstractList<E> createAbstractList() {
+        return new AbstractList<E>() {
+            @Override
+            public int size() {
+                return ImplicitlySharedList.this.size();
             }
+
+            @Override
+            public boolean isEmpty() {
+                return ImplicitlySharedList.this.isEmpty();
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return ImplicitlySharedList.this.contains(o);
+            }
+
+            @Override
+            public Object[] toArray() {
+                return ImplicitlySharedList.this.toArray();
+            }
+
+            @Override
+            public <T> T[] toArray(T[] a) {
+                return ImplicitlySharedList.this.toArray(a);
+            }
+
+            @Override
+            public boolean add(E e) {
+                return ImplicitlySharedList.this.add(e);
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                return ImplicitlySharedList.this.remove(o);
+            }
+
+            @Override
+            public boolean containsAll(Collection<?> c) {
+                return ImplicitlySharedList.this.containsAll(c);
+            }
+
+            @Override
+            public boolean addAll(Collection<? extends E> c) {
+                return ImplicitlySharedList.this.addAll(c);
+            }
+
+            @Override
+            public boolean retainAll(Collection<?> c) {
+                return ImplicitlySharedList.this.retainAll(c);
+            }
+
+            @Override
+            public boolean removeAll(Collection<?> c) {
+                return ImplicitlySharedList.this.removeAll(c);
+            }
+
+            @Override
+            public void clear() {
+                ImplicitlySharedList.this.clear();
+            }
+
+            @Override
+            public boolean addAll(int index, Collection<? extends E> c) {
+                return ImplicitlySharedList.this.addAll(index, c);
+            }
+
+            @Override
+            public E get(int index) {
+                return ImplicitlySharedList.this.get(index);
+            }
+
+            @Override
+            public E set(int index, E element) {
+                return ImplicitlySharedList.this.set(index, element);
+            }
+
+            @Override
+            public void add(int index, E element) {
+                ImplicitlySharedList.this.add(index, element);
+            }
+
+            @Override
+            public E remove(int index) {
+                return ImplicitlySharedList.this.remove(index);
+            }
+
+            @Override
+            public int indexOf(Object o) {
+                return ImplicitlySharedList.this.indexOf(o);
+            }
+
+            @Override
+            public int lastIndexOf(Object o) {
+                return ImplicitlySharedList.this.lastIndexOf(o);
+            }
+
+            @Override
+            public Iterator<E> iterator() {
+                return ImplicitlySharedList.this.iterator();
+            }
+        };
+    }
+
+    @Override
+    public ListIterator<E> listIterator() {
+        return createAbstractList().listIterator();
+    }
+
+    @Override
+    public ListIterator<E> listIterator(int index) {
+        return createAbstractList().listIterator(index);
+    }
+
+    @Override
+    public List<E> subList(int fromIndex, int toIndex) {
+        return createAbstractList().subList(fromIndex, toIndex);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected final List<E> cloneValue(List<E> input) {
+        // Java clone() is poor. Handle the generic cases and hope for the best.
+        if (input instanceof ArrayList) {
+            return (List<E>) ((ArrayList<E>) input).clone();
+        } else if (input instanceof LinkedList) {
+            return new LinkedList<E>(input);
+        } else if (input instanceof Vector) {
+            return (List<E>) ((Vector<E>) input).clone();
+        } else {
+            return new ArrayList<E>(input);
         }
     }
 
-    private static class ReferencedList<T> {
-        public final List<T> list;
-        public int ctr;
+    private final class ReferencedListIterator implements Iterator<E> {
+        private Reference<List<E>> ref;
+        private Iterator<E> baseIter;
+        private int index;
+        private boolean hasLastElement;
 
-        public ReferencedList(List<T> list) {
-            this.list = list;
-            this.ctr = 0;
+        public ReferencedListIterator() {
+            this.ref = ImplicitlySharedList.this.ref;
+            this.baseIter = this.ref.val.iterator();
+            this.index = -1;
+            this.hasLastElement = false;
         }
 
         @Override
-        public ReferencedList<T> clone() {
-            // Java clone() is poor. Handle the generic cases and hope for the best.
-            if (this.list instanceof ArrayList) {
-                return create(((ArrayList<T>) this.list).clone());
-            } else if (this.list instanceof LinkedList) {
-                return create(new LinkedList<T>(this.list));
-            } else if (this.list instanceof Vector) {
-                return create(((Vector<T>) this.list).clone());
-            } else {
-                return create(new ArrayList<T>(this.list));
-            }
+        public boolean hasNext() {
+            return this.baseIter.hasNext();
         }
 
-        @SuppressWarnings("unchecked")
-        private static final <T> ReferencedList<T> create(Object list) {
-            return new ReferencedList<T>((List<T>) list);
+        @Override
+        public E next() {
+            E result = this.baseIter.next();
+            this.index++;
+            this.hasLastElement = true;
+            return result;
+        }
+
+        @Override
+        public void remove() {
+            if (this.hasLastElement) {
+                this.hasLastElement = false;
+            } else {
+                throw new IllegalStateException("next() must be called before remove() is valid");
+            }
+
+            try (Reference<List<E>> ref_writable = write()) {
+                if (ref_writable == this.ref) {
+                    // Can write to the same thing we are iterating over
+                    this.baseIter.remove();
+                } else {
+                    // Remove from the writable set, we can not modify what we are iterating over
+                    ImplicitlySharedList.this.remove(this.index);
+                }
+                this.index--;
+            }
         }
     }
 
