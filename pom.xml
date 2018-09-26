@@ -1,6 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.bergerkiller.bukkit</groupId>
@@ -12,13 +13,16 @@
     <url>https://github.com/bergerhealer/bkcommonlib/</url>
 
     <properties>
-        <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
+        <!-- Project build properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.mcversion>1.13.1</project.mcversion>
-        <project.cbversion>${project.mcversion}-R0.1-SNAPSHOT</project.cbversion>
-        <project.mountiplexversion>1.46</project.mountiplexversion>
+        <jdk.version>1.8</jdk.version>
+        <project.buildNumber/>
+        <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
+        <!-- Library versions -->
+        <minecraft.version>1.13.1</minecraft.version>
+        <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
+        <mountiplex.version>1.46</mountiplex.version>
         <junit.version>4.12</junit.version>
-        <project.cibuild/>
     </properties>
 
     <profiles>
@@ -30,7 +34,7 @@
                 </property>
             </activation>
             <properties>
-                <project.cibuild>${env.BUILD_NUMBER}</project.cibuild>
+                <project.buildNumber>${env.BUILD_NUMBER}</project.buildNumber>
             </properties>
         </profile>
     </profiles>
@@ -42,7 +46,7 @@
             <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
         </repository>
 
-        <!-- Repo for Mountiplex -->
+        <!-- Repo for the Mountiplex library -->
         <repository>
             <id>mg-repo</id>
             <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
@@ -65,10 +69,16 @@
             <id>aikar</id>
             <url>https://repo.aikar.co/nexus/content/repositories/aikar-releases</url>
         </repository>
+
+        <!-- NMS repository -->
+        <repository>
+            <id>nms-repo</id>
+            <url>https://repo.codemc.org/repository/nms-local/</url>
+        </repository>
     </repositories>
 
     <pluginRepositories>
-        <!-- Repository for Mountiplex -->
+        <!-- Repository for the Mountiplex maven plugin -->
         <pluginRepository>
             <id>mg-repo</id>
             <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
@@ -76,12 +86,12 @@
     </pluginRepositories>
 
     <dependencies>
+        <!-- Server dependencies -->
         <!-- Spigot API includes the Bukkit API and is what plugins generally use -->
-        <!-- We also depend on netty for the network logic, which is available in public repo -->
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>${project.cbversion}</version>
+            <version>${minecraft.serverVersion}</version>
             <scope>provided</scope>
             <exclusions>
                 <exclusion>
@@ -102,6 +112,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- We also depend on netty for the network logic, which is available in public repo -->
         <dependency>
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
@@ -109,21 +120,56 @@
             <scope>provided</scope>
         </dependency>
 
-        <!-- The full server jar is only used during test; it should not be exposed as a dependency -->
-        <dependency>
-            <groupId>org.spigotmc</groupId>
-            <artifactId>spigot</artifactId>
-            <version>${project.cbversion}</version>
-            <scope>test</scope>
-        </dependency>
-
+        <!-- Included dependencies -->
+        <!-- Reflection library-->
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
-            <version>${project.mountiplexversion}</version>
-            <scope>compile</scope>
+            <version>${mountiplex.version}</version>
+            <optional>true</optional>
+            <exclusions>
+                <!-- Exclude dependencies of the maven plugin, this is a temp fix and needs to be corrected -->
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-nodep</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.objenesis</groupId>
+                    <artifactId>objenesis</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.javassist</groupId>
+                    <artifactId>javassist</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.maven</groupId>
+                    <artifactId>maven-plugin-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings -->
+        <dependency>
+            <groupId>co.aikar</groupId>
+            <artifactId>minecraft-timings</artifactId>
+            <version>1.0.4</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.jetbrains</groupId>
+                    <artifactId>annotations</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- GSON isn't available in spigot versions prior to 1.8, shade it in order to keep 1.7 compatibility -->
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.0</version>
+            <optional>true</optional>
         </dependency>
 
+        <!-- Provided dependencies -->
+        <!-- Vault hook -->
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
@@ -136,6 +182,7 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!-- SCS hook -->
         <dependency>
             <groupId>com.kellerkindt</groupId>
             <artifactId>ShowCaseStandalone</artifactId>
@@ -143,6 +190,7 @@
             <scope>system</scope>
             <systemPath>${project.basedir}/lib/ShowCaseStandalone.jar</systemPath>
         </dependency>
+        <!-- ProtocolLib hook -->
         <dependency>
             <groupId>com.comphenix.protocol</groupId>
             <artifactId>ProtocolLib-API</artifactId>
@@ -160,70 +208,112 @@
             </exclusions>
         </dependency>
 
+        <!-- Test dependencies -->
+        <!-- The full server jar is only used during test; it should not be exposed as a dependency -->
         <dependency>
-            <groupId>org.mockito</groupId>
-            <artifactId>mockito-core</artifactId>
-            <version>2.22.0</version>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>${minecraft.serverVersion}</version>
             <scope>test</scope>
         </dependency>
+        <!-- Test engine -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
-
-        <!-- Aikar's minecraft timings library -->
-        <!-- https://github.com/aikar/minecraft-timings -->
+        <!-- Mock object library -->
         <dependency>
-            <groupId>co.aikar</groupId>
-            <artifactId>minecraft-timings</artifactId>
-            <version>1.0.4</version>
-            <optional>true</optional>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.22.0</version>
+            <scope>test</scope>
         </dependency>
-
-        <!-- Google GSON is not available <= MC 1.8, shade it in -->
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.8.0</version>
-            <scope>compile</scope>
-        </dependency>
-
     </dependencies>
 
     <!-- Build -->
     <build>
-        <finalName>${project.finalNameBase}</finalName>
-        <defaultGoal>package</defaultGoal>
+        <!-- Little hack to prevent maven from uploading the shaded jar as main artifact, while keeping the original jar name -->
+        <finalName>${project.finalNameBase}-noshade</finalName>
+        <defaultGoal>clean package</defaultGoal>
 
         <!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
         <resources>
             <resource>
-                <directory>src/main/java</directory>
+                <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
                     <include>plugin.yml</include>
                 </includes>
             </resource>
             <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                    <include>**/*.txt</include>
-                    <include>**/*.json</include>
-                    <include>**/*.png</include>
-                    <include>**/*.bub</include>
-                </includes>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>plugin.yml</exclude>
+                </excludes>
+            </resource>
+            <!-- Include reflection templates -->
+            <resource>
+                <directory>src/main/java/com/bergerkiller/templates</directory>
+                <targetPath>com/bergerkiller/templates</targetPath>
             </resource>
         </resources>
 
         <!-- Plugins -->
         <plugins>
+            <!-- Enforce build environment -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>1.4.1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-environment</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireMavenVersion>
+                                    <version>3.3.9</version>
+                                </requireMavenVersion>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Clean the target folder content -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <!-- Include resource files -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
             <!-- Turns the reflection template files into Java source code -->
             <plugin>
                 <groupId>com.bergerkiller.mountiplex</groupId>
                 <artifactId>Mountiplex</artifactId>
-                <version>${project.mountiplexversion}</version>
+                <version>${mountiplex.version}</version>
+                <configuration>
+                    <source_root>src/main/java</source_root>
+                    <target_root>src/main/java</target_root>
+                    <generatorActions>
+                        <generatorAction>
+                            <source>com/bergerkiller/templates/init.txt</source>
+                            <target>com/bergerkiller/generated</target>
+                            <variables>
+                                <version>${minecraft.version}</version>
+                            </variables>
+                        </generatorAction>
+                    </generatorActions>
+                </configuration>
                 <executions>
                     <execution>
                         <id>Generate reflection templates</id>
@@ -231,30 +321,69 @@
                             <goal>create-reflection</goal>
                         </goals>
                         <phase>generate-sources</phase>
-
-                        <configuration>
-                            <source_root>src/main/java</source_root>
-                            <target_root>src/main/java</target_root>
-                            <generatorActions>
-                                <generatorAction>
-                                    <source>com/bergerkiller/templates/init.txt</source>
-                                    <target>com/bergerkiller/generated</target>
-                                    <variables>
-                                        <version>${project.mcversion}</version>
-                                    </variables>
-                                </generatorAction>
-                            </generatorActions>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
+            <!-- Compile and include classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
+            </plugin>
+            <!-- Surefire plugin for running the PostTestHandler after running all the tests -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.22.0</version>
+                <configuration>
+                    <trimStackTrace>false</trimStackTrace>
+                    <properties>
+                        <property>
+                            <name>listener</name>
+                            <value>com.bergerkiller.bukkit.common.PostTestHandler</value>
+                        </property>
+                    </properties>
+                </configuration>
+            </plugin>
+            <!-- Generate a jar containing classes and resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+            <!-- Generate a jar containing the source javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <finalName>${project.finalNameBase}</finalName>
+                    <failOnError>false</failOnError>
+                    <doclint>none</doclint>
+                </configuration>
+            </plugin>
+            <!-- Generate a jar containing the java sources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.0.1</version>
+                <configuration>
+                    <finalName>${project.finalNameBase}</finalName>
+                </configuration>
+            </plugin>
             <!-- Needed for shading in Mountiplex, CGLib and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <finalName>${project.finalNameBase}</finalName>
+                    <shadedArtifactAttached>true</shadedArtifactAttached>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
                         <relocation>
                             <pattern>co.aikar.timings.lib</pattern>
@@ -272,151 +401,48 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <shadedArtifactAttached>false</shadedArtifactAttached>
-                            <createDependencyReducedPom>false</createDependencyReducedPom>
-                            <artifactSet>
-                                <includes>
-                                    <include>com.bergerkiller.mountiplex</include>
-                                    <include>co.aikar</include>
-                                    <include>com.google.code.gson</include>
-                                </includes>
-                            </artifactSet>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Clean up (this is to make testing easier) -->
+            <!-- Invoke ANT tasks -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>2.4.1</version>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>1.8</version>
                 <executions>
+                    <!-- Prepare the version-less output jar -->
                     <execution>
-                        <id>auto-clean</id>
-                        <phase>install</phase>
-                        <goals>
-                            <goal>clean</goal>
-                        </goals>
-                        <configuration>
-                            <excludeDefaultDirectories>true</excludeDefaultDirectories>
-                            <filesets>
-                                <fileset>
-                                    <directory>${project.build.directory}</directory>
-                                    <includes>
-                                        <include>original-*.jar</include>
-                                        <include>*-shaded.jar</include>
-                                    </includes>
-                                    <followSymlinks>false</followSymlinks>
-                                </fileset>
-                            </filesets>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Copy artifacts to non-versioned jar name -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy</id>
+                        <id>version-less-jar</id>
                         <phase>package</phase>
                         <goals>
-                            <goal>copy</goal>
+                            <goal>run</goal>
                         </goals>
                         <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>com.bergerkiller.bukkit</groupId>
-                                    <artifactId>BKCommonLib</artifactId>
-                                    <version>${project.version}</version>
-                                    <type>jar</type>
-                                    <overWrite>true</overWrite>
-                                    <outputDirectory>${project.build.directory}</outputDirectory>
-                                    <destFileName>${project.name}.jar</destFileName>
-                                </artifactItem>
-                            </artifactItems>
-                            <overWriteReleases>false</overWriteReleases>
-                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <target>
+                                <copy file="target/${project.finalNameBase}.jar" tofile="target/${project.name}.jar"/>
+                            </target>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
-            <!-- Compiler plugin -->
+            <!-- Install the jars as artifacts into the local repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
-                    <showWarnings>true</showWarnings>
-                    <showDeprecation>false</showDeprecation>
-                </configuration>
+                <artifactId>maven-install-plugin</artifactId>
+                <version>2.5.2</version>
             </plugin>
-
-            <!-- Surefire plugin for running the PostTestHandler after running all the tests -->
+            <!-- Deploy the jars as artifacts into the remote repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-                <configuration>
-                    <properties>
-                        <property>
-                            <name>listener</name>
-                            <value>com.bergerkiller.bukkit.common.PostTestHandler</value>
-                        </property>
-                    </properties>
-                </configuration>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
             </plugin>
-
-            <!-- Generate a jar containing the source javadoc -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <finalName>${project.finalNameBase}</finalName>
-                    <failOnError>false</failOnError>
-                    <doclint>none</doclint>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadoc</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Generate a jar containing the java sources -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
-                <configuration>
-                    <finalName>${project.finalNameBase}</finalName>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
 
         <!-- This section here is purely to stop lifecycle errors from happening in Eclipse IDE -->
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+                <!-- This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
                     <artifactId>lifecycle-mapping</artifactId>
@@ -434,7 +460,20 @@
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>
-                                        <ignore></ignore>
+                                        <ignore/>
+                                    </action>
+                                </pluginExecution>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-antrun-plugin</artifactId>
+                                        <versionRange>[1.8,)</versionRange>
+                                        <goals>
+                                            <goal>run</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore/>
                                     </action>
                                 </pluginExecution>
                             </pluginExecutions>
