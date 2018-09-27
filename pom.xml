@@ -253,10 +253,8 @@
                     <exclude>plugin.yml</exclude>
                 </excludes>
             </resource>
-            <!-- Include reflection templates -->
             <resource>
-                <directory>src/main/java/com/bergerkiller/templates</directory>
-                <targetPath>com/bergerkiller/templates</targetPath>
+                <directory>src/main/templates</directory>
             </resource>
         </resources>
 
@@ -302,7 +300,7 @@
                 <artifactId>Mountiplex</artifactId>
                 <version>${mountiplex.version}</version>
                 <configuration>
-                    <source_root>src/main/java</source_root>
+                    <source_root>src/main/templates</source_root>
                     <target_root>src/main/java</target_root>
                     <generatorActions>
                         <generatorAction>
