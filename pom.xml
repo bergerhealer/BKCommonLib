@@ -69,12 +69,6 @@
             <id>aikar</id>
             <url>https://repo.aikar.co/nexus/content/repositories/aikar-releases</url>
         </repository>
-
-        <!-- NMS repository -->
-        <repository>
-            <id>nms-repo</id>
-            <url>https://repo.codemc.org/repository/nms-local/</url>
-        </repository>
     </repositories>
 
     <pluginRepositories>
