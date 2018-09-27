@@ -344,7 +344,11 @@ class ChunkProviderServer {
         Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
         com.bergerkiller.bukkit.common.collections.RunnableConsumer consumer;
         consumer = com.bergerkiller.bukkit.common.collections.RunnableConsumer.create(runnable);
+  #if methodexists net.minecraft.server.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.server.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.server.Chunk> consumer)
+        instance.loadAllChunks(iterable, consumer);
+  #else
         instance.a(iterable, consumer);
+  #endif
         return (Chunk) consumer.getValue();
     }
 #else

@@ -21,7 +21,7 @@
         <!-- Library versions -->
         <minecraft.version>1.13.1</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>1.46</mountiplex.version>
+        <mountiplex.version>1.47</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
