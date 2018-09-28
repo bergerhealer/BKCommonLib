@@ -54,6 +54,7 @@ class Block {
 
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+    public boolean canSupportTop:r((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -62,6 +63,7 @@ class Block {
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+    public boolean canSupportTop:k((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.8.3
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -76,6 +78,25 @@ class Block {
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata) {
+        Block block = iblockdata.getBlock();
+        if (block.getMaterial().k() && block.d()) {
+            return true;
+        }
+        if (block instanceof BlockStairs) {
+            return iblockdata.get(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP;
+        }
+        if (block instanceof BlockStepAbstract) {
+            return iblockdata.get(BlockStepAbstract.HALF) == BlockStepAbstract.EnumSlabHalf.TOP;
+        }
+        if (block instanceof BlockHopper) {
+            return true;
+        }
+        if (block instanceof BlockSnow) {
+            return ((Integer) iblockdata.get(BlockSnow.LAYERS)).intValue() == 7;
+        }
+        return false;
+    }
 #else
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -89,6 +110,25 @@ class Block {
     }
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
+    }
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata) {
+        Block block = iblockdata.getBlock();
+        if (block.getMaterial().k() && block.d()) {
+            return true;
+        }
+        if (block instanceof BlockStairs) {
+            return iblockdata.get(BlockStairs.HALF) == EnumHalf.TOP;
+        }
+        if (block instanceof BlockStepAbstract) {
+            return iblockdata.get(BlockStepAbstract.HALF) == EnumSlabHalf.TOP;
+        }
+        if (block instanceof BlockHopper) {
+            return true;
+        }
+        if (block instanceof BlockSnow) {
+            return ((Integer) iblockdata.get(BlockSnow.LAYERS)).intValue() == 7;
+        }
+        return false;
     }
 #endif
 

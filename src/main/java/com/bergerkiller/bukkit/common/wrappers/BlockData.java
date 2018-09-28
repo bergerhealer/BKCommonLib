@@ -388,6 +388,13 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract float getDamageResilience();
 
     /**
+     * Gets whether this Block is capable of supporting other blocks on top, like torches and minecart track.
+     * 
+     * @return True if supporting blocks on top
+     */
+    public abstract boolean canSupportTop();
+
+    /**
      * Gets the bounding box of a block of this Block Data type/
      * For convenience it is better to use {@link BlockUtil#getBoundingBox} instead.
      * 

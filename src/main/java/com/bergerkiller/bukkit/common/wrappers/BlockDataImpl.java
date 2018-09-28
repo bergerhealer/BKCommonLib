@@ -405,6 +405,11 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public final boolean canSupportTop() {
+        return this.block.canSupportTop(this.data);
+    }
+
+    @Override
     public final void dropNaturally(org.bukkit.World world, int x, int y, int z, float yield, int chance) {
         this.block.dropNaturally(this.data, world, new IntVector3(x, y, z), yield, chance);
     }
