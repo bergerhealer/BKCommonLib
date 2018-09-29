@@ -30,8 +30,8 @@ public abstract class BlockRenderProvider {
 
     static {
         String tex_root = Common.evaluateMCVersion(">=",  "1.13") ? "block/" : "blocks/";
-        register(new FluidRenderingProvider(tex_root + "water_overlay", tex_root + "water_still", MaterialUtil.ISWATER.getMaterials()));
-        register(new FluidRenderingProvider(tex_root + "lava_still", tex_root + "lava_still", MaterialUtil.ISLAVA.getMaterials()));
+        register(new FluidRenderingProvider(tex_root + "water_overlay", tex_root + "water_still", "#456ef5", MaterialUtil.ISWATER.getMaterials()));
+        register(new FluidRenderingProvider(tex_root + "lava_still", tex_root + "lava_still", null, MaterialUtil.ISLAVA.getMaterials()));
         register(new GrassRenderingProvider());
         register(new RedstoneWireRenderingProvider());
     }

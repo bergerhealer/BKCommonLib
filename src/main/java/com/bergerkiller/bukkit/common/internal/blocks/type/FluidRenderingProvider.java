@@ -21,11 +21,13 @@ import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 public class FluidRenderingProvider extends BlockRenderProvider {
     private final List<Material> fluidMaterials;
     private final String fluidTexture1, fluidTexture2;
+    private final String tint;
 
-    public FluidRenderingProvider(String texture1, String texture2, Collection<Material> fluidMaterials) {
+    public FluidRenderingProvider(String texture1, String texture2, String tint, Collection<Material> fluidMaterials) {
         this.fluidTexture1 = texture1;
         this.fluidTexture2 = texture2;
         this.fluidMaterials = new ArrayList<Material>(fluidMaterials);
+        this.tint = tint;
     }
 
     @Override
@@ -43,7 +45,11 @@ public class FluidRenderingProvider extends BlockRenderProvider {
         storeWaterBlock(options, "neigh_sw", world, x, y, z, BlockFace.SOUTH_WEST);
         storeWaterBlock(options, "neigh_ww", world, x, y, z, BlockFace.WEST);
         storeWaterBlock(options, "neigh_nw", world, x, y, z, BlockFace.NORTH_WEST);
-        options.put("tint", "#456ef5");
+
+        // Tint color for water
+        if (this.tint != null) {
+            options.put("tint", this.tint);
+        }
     }
 
     @Override
@@ -85,7 +91,9 @@ public class FluidRenderingProvider extends BlockRenderProvider {
             // On the top, we always show the flowing texture
             //TODO!
             face.texture = FaceUtil.isVertical(blockFace) ? waterTexture : waterSide;
-            face.tintindex = 0;
+            if (this.tint != null) {
+                face.tintindex = 0;
+            }
             face.buildBlock(options);
             water.faces.put(blockFace, face);
         }
@@ -100,7 +108,9 @@ public class FluidRenderingProvider extends BlockRenderProvider {
             topFace.quad.p1.y = calcLevel(self, neigh_ss, neigh_sw, neigh_ww);
             topFace.quad.p2.y = calcLevel(self, neigh_ee, neigh_se, neigh_ss);
             topFace.quad.p3.y = calcLevel(self, neigh_nn, neigh_ne, neigh_ee);
-            topFace.tintindex = 0;
+            if (this.tint != null) {
+                topFace.tintindex = 0;
+            }
             topFace.buildBlock(options);
         }
 
