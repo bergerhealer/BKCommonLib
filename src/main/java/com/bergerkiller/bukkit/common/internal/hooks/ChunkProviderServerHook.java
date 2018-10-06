@@ -24,9 +24,13 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         Object cps = getCPS(world);
         ChunkProviderServerHook hook = ChunkProviderServerHook.get(cps, ChunkProviderServerHook.class);
         if (hook == null) {
-            hook = new ChunkProviderServerHook();
-            cps = hook.hook(cps);
-            setCPS(world, ChunkProviderServerHandle.createHandle(cps));
+            try {
+                hook = new ChunkProviderServerHook();
+                cps = hook.hook(cps);
+                setCPS(world, ChunkProviderServerHandle.createHandle(cps));
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
@@ -34,8 +38,12 @@ public class ChunkProviderServerHook extends ClassHook<ChunkProviderServerHook> 
         Object cps = getCPS(world);
         ChunkProviderServerHook hook = ChunkProviderServerHook.get(cps, ChunkProviderServerHook.class);
         if (hook != null) {
-            cps = ChunkProviderServerHook.unhook(cps);
-            setCPS(world, ChunkProviderServerHandle.createHandle(cps));
+            try {
+                cps = ChunkProviderServerHook.unhook(cps);
+                setCPS(world, ChunkProviderServerHandle.createHandle(cps));
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
