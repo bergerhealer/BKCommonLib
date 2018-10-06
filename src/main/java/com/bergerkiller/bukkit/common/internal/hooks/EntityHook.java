@@ -231,8 +231,10 @@ public class EntityHook extends ClassHook<EntityHook> {
             return EntityHandle.T.getCustomName.invoke(instance).getMessage();
         }
 
+        // Only used MC 1.11 to 1.12.2 inclusively
         // Retrieve MinecraftKey of this entity class, and the String internal name from that
-        String name = this.getSavedName();
+        int typeId = EntityTypesHandle.getEntityTypeId(this.instanceBaseType());
+        String name = EntityTypesHandle.T.opt_typeIdToName_1_11.get().get(typeId);
         if (name == null) {
             name = "generic";
         }

@@ -13,6 +13,16 @@ class EntityTypes {
     private static optional final (Map<Class<?>, String>) Map<Class<? extends Entity>, String> opt_typeNameMap_1_10_2:d;
 #endif
 
+    // Between MC 1.11 and 1.12.2 inclusively, this is used to find the 'name' of an entity by type id
+#if version >= 1.11
+#if version <= 1.12.2
+    private static optional final List<String> opt_typeIdToName_1_11:g;
+#else
+    private static optional final List<String> opt_typeIdToName_1_11:###;
+#else
+    private static optional final List<String> opt_typeIdToName_1_11:###;
+#endif
+
 #if version >= 1.11
     private static optional final (Map<Class<?>, Integer>) Map<Class<? extends Entity>, Integer> opt_typeIdMap_1_8:###;
 #elseif version >= 1.8.3
@@ -81,7 +91,7 @@ class EntityTypes {
             if (type.c() == entityType) {
                 MinecraftKey key = EntityTypes.getName(type);
                 if (key != null) {
-                    return key.getKey();
+                    return key.toString();
                 }
             }
         }
@@ -116,7 +126,7 @@ class EntityTypes {
         if (key == null) {
             return null;
         } else {
-            return EntityTypes.a(key);
+            return key.toString();
         }
     }
 

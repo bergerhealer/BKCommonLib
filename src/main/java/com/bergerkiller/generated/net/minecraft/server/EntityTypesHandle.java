@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -43,6 +44,8 @@ public abstract class EntityTypesHandle extends Template.Handle {
         public final Template.StaticField.Converted<Map<String, Class<?>>> opt_nameTypeMap_1_10_2 = new Template.StaticField.Converted<Map<String, Class<?>>>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<Class<?>, String>> opt_typeNameMap_1_10_2 = new Template.StaticField.Converted<Map<Class<?>, String>>();
+        @Template.Optional
+        public final Template.StaticField<List<String>> opt_typeIdToName_1_11 = new Template.StaticField<List<String>>();
         @Template.Optional
         public final Template.StaticField.Converted<Map<Class<?>, Integer>> opt_typeIdMap_1_8 = new Template.StaticField.Converted<Map<Class<?>, Integer>>();
 
