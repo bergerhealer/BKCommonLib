@@ -41,7 +41,7 @@ public class HeightMapProxy_1_12_2 {
 
     // getHeight(x, z)
     public int a(int x, int z) {
-        return this.heightMap[z << 4 | x] + 1;
+        return this.heightMap[z << 4 | x];
     }
 
     public static enum Type {
