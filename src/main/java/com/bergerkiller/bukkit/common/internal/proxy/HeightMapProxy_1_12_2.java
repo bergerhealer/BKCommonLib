@@ -22,7 +22,7 @@ public class HeightMapProxy_1_12_2 {
         World world = chunkHandle.getBukkitChunk().getWorld();
         int baseX = chunkHandle.getLocX() << 4;
         int baseZ = chunkHandle.getLocZ() << 4;
-        int highestY = 0;
+        int highestY = chunkHandle.getTopSliceY();
         for (int x = 0; x < 16; ++x) {
             for (int z = 0; z < 16; ++z) {
                 int y = highestY + 16;
