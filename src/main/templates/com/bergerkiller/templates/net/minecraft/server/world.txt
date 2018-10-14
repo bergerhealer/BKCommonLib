@@ -378,7 +378,11 @@ class ChunkProviderServer {
 class WorldData {
     public (WorldTypeHandle) WorldType getType();
 
+#if version >= 1.13
+    public void setClearTimer:g(int ticks);
+#else
     public void setClearTimer:i(int ticks);
+#endif
 }
 
 class WorldType {
