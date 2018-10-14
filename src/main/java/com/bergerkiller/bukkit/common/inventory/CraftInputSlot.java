@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import java.util.List;
 
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -59,6 +60,37 @@ public class CraftInputSlot {
             }
         }
         return null;
+    }
+
+    /**
+     * Attempts to take all the items from an inventory to fill this input slot.
+     * The input inventory is modified at all times.
+     * 
+     * @param inventory
+     * @return True if all items could be taken
+     */
+    public boolean takeFrom(Inventory inventory) {
+        int amountRemaining = Integer.MAX_VALUE;
+        for (int i = 0; i < inventory.getSize() && amountRemaining > 0; i++) {
+            ItemStack item = inventory.getItem(i);
+            ItemStack match = this.match(item);
+            if (match == null || match.getAmount() <= 0 || item.getAmount() <= 0) {
+                continue;
+            }
+            if (amountRemaining == Integer.MAX_VALUE) {
+                amountRemaining = match.getAmount();
+            }
+
+            if (amountRemaining >= item.getAmount()) {
+                amountRemaining -= item.getAmount();
+                inventory.setItem(i, null);
+            } else {
+                item.setAmount(item.getAmount() - amountRemaining);
+                inventory.setItem(i, item);
+                amountRemaining = 0;
+            }
+        }
+        return amountRemaining == 0;
     }
 
     @Override

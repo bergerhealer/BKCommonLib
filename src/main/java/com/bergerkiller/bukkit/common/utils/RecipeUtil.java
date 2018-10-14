@@ -12,7 +12,6 @@ import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
-import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

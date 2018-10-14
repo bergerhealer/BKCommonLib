@@ -235,45 +235,17 @@ public class CraftRecipe {
     // attempts to craft this recipe using the items in an inventory
     // if this fails, false is returned. Inventory will always lose items.
     private boolean testCraftOnce(Inventory inventory, boolean addOutputItems) {
-        int size = inventory.getSize();
-
         // First do all input slots with only one choice (the MUST)
         for (CraftInputSlot input : this.inputSlots) {
-            if (input.getChoices().length == 1) {
-                boolean found = false;
-                for (int i = 0; i < size; i++) {
-                    ItemStack item = inventory.getItem(i);
-                    ItemStack match = input.match(item);
-                    if (match != null && item.getAmount() >= match.getAmount()) {
-                        item.setAmount(item.getAmount() - match.getAmount());
-                        inventory.setItem(i, item);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    return false;
-                }
+            if (input.getChoices().length == 1 && !input.takeFrom(inventory)) {
+                return false;
             }
         }
 
         // Then do all the input slots with more than one choice
         for (CraftInputSlot input : this.inputSlots) {
-            if (input.getChoices().length > 1) {
-                boolean found = false;
-                for (int i = 0; i < size; i++) {
-                    ItemStack item = inventory.getItem(i);
-                    ItemStack match = input.match(item);
-                    if (match != null && item.getAmount() >= match.getAmount()) {
-                        item.setAmount(item.getAmount() - match.getAmount());
-                        inventory.setItem(i, item);
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    return false;
-                }
+            if (input.getChoices().length > 1 && !input.takeFrom(inventory)) {
+                return false;
             }
         }
 
