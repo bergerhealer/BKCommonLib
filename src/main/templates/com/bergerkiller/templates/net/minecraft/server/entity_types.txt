@@ -22,6 +22,7 @@ class EntityTypes {
 #else
     private static optional final List<String> opt_typeIdToName_1_11:###;
 #endif
+#endif
 
 #if version >= 1.11
     private static optional final (Map<Class<?>, Integer>) Map<Class<? extends Entity>, Integer> opt_typeIdMap_1_8:###;
