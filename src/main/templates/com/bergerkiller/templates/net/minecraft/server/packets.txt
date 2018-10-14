@@ -644,7 +644,31 @@ optional class PacketPlayOutCustomSoundEffect extends Packet {
     private int y:d;
     private int z:e;
     private float volume:f;
-    private float pitch:g;
+#if version >= 1.10.2
+    private optional float opt_pitch_float:g;
+    private optional int opt_pitch_integer:###;
+#else
+    private optional float opt_pitch_float:###;
+    private optional int opt_pitch_integer:g;
+#endif
+
+    <code>
+    public void setPitch(float pitch) {
+        if (T.opt_pitch_float.isAvailable()) {
+            T.opt_pitch_float.setFloat(getRaw(), pitch);
+        } else {
+            T.opt_pitch_integer.setInteger(getRaw(), (int) (pitch * 63.0f));
+        }
+    }
+
+    public float getPitch() {
+        if (T.opt_pitch_float.isAvailable()) {
+            return T.opt_pitch_float.getFloat(getRaw());
+        } else {
+            return (float) T.opt_pitch_integer.getInteger(getRaw()) / 63.0f;
+        }
+    }
+    </code>
 }
 
 class PacketPlayOutPosition extends Packet {

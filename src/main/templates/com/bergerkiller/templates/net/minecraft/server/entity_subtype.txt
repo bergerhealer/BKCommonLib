@@ -329,8 +329,10 @@ class EntityInsentient extends EntityLiving {
 class EntityItem extends Entity {
 #if version >= 1.13
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:b;
-#elseif version >= 1.9
+#elseif version >= 1.11
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+#elseif version >= 1.9
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
 #else
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
 #endif
@@ -481,11 +483,13 @@ class EntityMinecartMobSpawner extends EntityMinecartAbstract {
 
 class EntityItemFrame extends Entity {
 #if version >= 1.13
-    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;
+#elseif version >= 1.11
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
 #elseif version >= 1.9
-    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
 #else
-    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
 #endif
 
     <code>

@@ -23,6 +23,22 @@ public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle 
 
     /* ============================================================================== */
 
+
+    public void setPitch(float pitch) {
+        if (T.opt_pitch_float.isAvailable()) {
+            T.opt_pitch_float.setFloat(getRaw(), pitch);
+        } else {
+            T.opt_pitch_integer.setInteger(getRaw(), (int) (pitch * 63.0f));
+        }
+    }
+
+    public float getPitch() {
+        if (T.opt_pitch_float.isAvailable()) {
+            return T.opt_pitch_float.getFloat(getRaw());
+        } else {
+            return (float) T.opt_pitch_integer.getInteger(getRaw()) / 63.0f;
+        }
+    }
     public abstract ResourceKey getSound();
     public abstract void setSound(ResourceKey value);
     public abstract String getCategory();
@@ -35,8 +51,6 @@ public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle 
     public abstract void setZ(int value);
     public abstract float getVolume();
     public abstract void setVolume(float value);
-    public abstract float getPitch();
-    public abstract void setPitch(float value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutCustomSoundEffect</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -48,7 +62,10 @@ public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle 
         public final Template.Field.Integer y = new Template.Field.Integer();
         public final Template.Field.Integer z = new Template.Field.Integer();
         public final Template.Field.Float volume = new Template.Field.Float();
-        public final Template.Field.Float pitch = new Template.Field.Float();
+        @Template.Optional
+        public final Template.Field.Float opt_pitch_float = new Template.Field.Float();
+        @Template.Optional
+        public final Template.Field.Integer opt_pitch_integer = new Template.Field.Integer();
 
     }
 

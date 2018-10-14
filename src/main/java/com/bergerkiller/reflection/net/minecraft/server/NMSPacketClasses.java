@@ -639,7 +639,18 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> y = PacketPlayOutCustomSoundEffectHandle.T.y.toFieldAccessor();
         public final FieldAccessor<Integer> z = PacketPlayOutCustomSoundEffectHandle.T.z.toFieldAccessor();
         public final FieldAccessor<Float> volume = PacketPlayOutCustomSoundEffectHandle.T.volume.toFieldAccessor();
-        public final FieldAccessor<Float> pitch = PacketPlayOutCustomSoundEffectHandle.T.pitch.toFieldAccessor();
+        public final FieldAccessor<Float> pitch = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return Float.valueOf(PacketPlayOutCustomSoundEffectHandle.createHandle(instance).getPitch());
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayOutCustomSoundEffectHandle.createHandle(instance).setPitch(value.floatValue());
+                return true;
+            }
+        };
     }
 
     /// ====================== NMSPacketPlayOutEntity and derivatives ===========================

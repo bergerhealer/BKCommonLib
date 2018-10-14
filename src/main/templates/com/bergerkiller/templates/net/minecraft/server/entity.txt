@@ -603,6 +603,9 @@ class Entity {
 #elseif version >= 1.10.2
     public boolean isOutsideWorldBorder:br();
     public void setOutsideWorldBorder:k(boolean outside);
+#elseif version >= 1.9.4
+    public boolean isOutsideWorldBorder:bp();
+    public void setOutsideWorldBorder:j(boolean outside);
 #elseif version >= 1.9
     public boolean isOutsideWorldBorder:bo();
     public void setOutsideWorldBorder:j(boolean outside);
