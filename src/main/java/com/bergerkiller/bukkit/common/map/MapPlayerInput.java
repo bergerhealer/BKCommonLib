@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.map;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -18,6 +19,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
 /**
@@ -481,6 +483,18 @@ public class MapPlayerInput implements Tickable {
 
             // Despawn the mount
             PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(this._fakeMountId));
+
+            // Resend current player position to the player
+            Location loc = this.player.getLocation();
+            PacketPlayOutPositionHandle positionPacket = PacketPlayOutPositionHandle.T.newHandleNull();
+            positionPacket.setTeleportFlags(new HashSet<Object>());
+            positionPacket.setTeleportWaitTimer(0);
+            positionPacket.setYaw(loc.getYaw());
+            positionPacket.setPitch(loc.getPitch());
+            positionPacket.setX(loc.getX());
+            positionPacket.setY(loc.getY());
+            positionPacket.setZ(loc.getZ());
+            PacketUtil.sendPacket(player, positionPacket);
             return;
         }
 
@@ -504,8 +518,8 @@ public class MapPlayerInput implements Tickable {
                 packet.setEntityUUID(UUID.randomUUID());
                 packet.setEntityType(EntityType.CHICKEN);
                 packet.setPosX(loc.getX());
-                packet.setPosY(loc.getY() - 0.15);
-                packet.setPosZ(loc.getZ());
+                packet.setPosY(loc.getY() + 0.002);
+                packet.setPosZ(loc.getZ() + 0.1);
                 packet.setDataWatcher(data);
                 PacketUtil.sendPacket(player, packet);
             }
