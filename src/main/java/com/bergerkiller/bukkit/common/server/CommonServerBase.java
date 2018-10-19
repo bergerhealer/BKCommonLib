@@ -87,12 +87,12 @@ public abstract class CommonServerBase implements CommonServer {
             return tmp;
         }
         // Nether
-        tmp = new File(mainFolder, "DIM-1" + File.pathSeparator + "region");
+        tmp = new File(mainFolder, "DIM-1" + File.separator + "region");
         if (tmp.exists()) {
             return tmp;
         }
         // The End
-        tmp = new File(mainFolder, "DIM1" + File.pathSeparator + "region");
+        tmp = new File(mainFolder, "DIM1" + File.separator + "region");
         if (tmp.exists()) {
             return tmp;
         }
