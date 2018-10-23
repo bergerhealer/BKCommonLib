@@ -41,10 +41,18 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                             if (flag1 && !worldborder.a((BlockPosition) blockposition_b)) {
                                 voxelshape5 = VoxelShapes.b();
                             } else {
+#if version >= 1.13.2
+                                voxelshape5 = this.getType(blockposition_b).getCollisionShape(this, blockposition_b);
+#else
                                 voxelshape5 = this.getType(blockposition_b).h(this, blockposition_b);
+#endif
                             }
 
+#if version >= 1.13.2
+                            if (!voxelshape5.isEmpty()) {
+#else
                             if (!voxelshape5.b()) {
+#endif
                                 VoxelShape voxelshape6;
                                 VoxelShape voxelshape7;
 

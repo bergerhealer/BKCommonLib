@@ -6,7 +6,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.13.1-v5-SNAPSHOT</version>
+    <version>1.13.2-v1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -19,7 +19,7 @@
         <project.buildNumber/>
         <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
         <!-- Library versions -->
-        <minecraft.version>1.13.1</minecraft.version>
+        <minecraft.version>1.13.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>1.50</mountiplex.version>
         <junit.version>4.12</junit.version>

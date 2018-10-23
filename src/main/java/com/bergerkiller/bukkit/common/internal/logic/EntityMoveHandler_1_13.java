@@ -8,6 +8,7 @@ import java.util.stream.Stream;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -45,11 +46,15 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
             try (InputStream input = EntityMoveHandler_1_13.class.getResourceAsStream(method_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");
-                    String method_body = scanner.next();
+                    String set_str = "#set version " + Common.MC_VERSION + "\n";
+                    String method_body = set_str + scanner.next();
+
                     method_body = SourceDeclaration.preprocess(method_body);
                     method_body = method_body.replaceAll("this", "instance");
                     method_body = method_body.replaceAll("BlockPosition\\.b", "BlockPosition\\$b");
+                    method_body = method_body.replace(set_str, ""); // Note: this should be fixed!
                     method_body = method_body.trim();
+
                     getBlockCollisions_method.init(new MethodDeclaration(resolver, method_body));
                     getBlockCollisions_method.forceInitialization();
                 }

@@ -5,12 +5,21 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumA
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 
 class AxisAlignedBB {
+#if version >= 1.13.2
+    public final double minX;
+    public final double minY;
+    public final double minZ;
+    public final double maxX;
+    public final double maxY;
+    public final double maxZ;
+#else
     public final double minX:a;
     public final double minY:b;
     public final double minZ:c;
     public final double maxX:d;
     public final double maxY:e;
     public final double maxZ:f;
+#endif
 
     public (AxisAlignedBBHandle) AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
 
@@ -40,7 +49,72 @@ class AxisAlignedBB {
     public boolean bbTransformA:b((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
 #endif
 
-#if version >= 1.13
+#if version >= 1.13.2
+    // These methods were removed in MC 1.13, and min/max x/y/z fields changed names on 1.13.2
+    public double calcSomeX((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.maxY > instance.minY && axisalignedbb.minY < instance.maxY && axisalignedbb.maxZ > instance.minZ && axisalignedbb.minZ < instance.maxZ) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.maxX <= instance.minX) {
+                d1 = instance.minX - axisalignedbb.maxX;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.minX >= instance.maxX) {
+                d1 = instance.maxX - axisalignedbb.minX;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+    public double calcSomeY((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.maxX > instance.minX && axisalignedbb.minX < instance.maxX && axisalignedbb.maxZ > instance.minZ && axisalignedbb.minZ < instance.maxZ) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.maxY <= instance.minY) {
+                d1 = instance.minY - axisalignedbb.maxY;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.minY >= instance.maxY) {
+                d1 = instance.maxY - axisalignedbb.minY;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+    public double calcSomeZ((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
+        if (axisalignedbb.maxX > instance.minX && axisalignedbb.minX < instance.maxX && axisalignedbb.maxY > instance.minY && axisalignedbb.minY < instance.maxY) {
+            double d1;
+
+            if (d0 > 0.0D && axisalignedbb.maxZ <= instance.minZ) {
+                d1 = instance.minZ - axisalignedbb.maxZ;
+                if (d1 < d0) {
+                    d0 = d1;
+                }
+            } else if (d0 < 0.0D && axisalignedbb.minZ >= instance.maxZ) {
+                d1 = instance.maxZ - axisalignedbb.minZ;
+                if (d1 > d0) {
+                    d0 = d1;
+                }
+            }
+
+            return d0;
+        } else {
+            return d0;
+        }
+    }
+#elseif version >= 1.13
     // These methods were removed in MC 1.13
     public double calcSomeX((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb, double d0) {
         if (axisalignedbb.e > instance.b && axisalignedbb.b < instance.e && axisalignedbb.f > instance.c && axisalignedbb.c < instance.f) {
@@ -152,7 +226,12 @@ class VoxelShape {
 
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
 
+#if version >= 1.13.2
+    public boolean isEmpty();
+#else
     public boolean isEmpty:b();
+#endif
+
 #else
     public static (VoxelShapeHandle) net.minecraft.server.VoxelShape empty() {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.EMPTY;

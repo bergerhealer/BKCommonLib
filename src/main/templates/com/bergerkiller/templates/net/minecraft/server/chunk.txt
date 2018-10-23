@@ -45,7 +45,9 @@ class Chunk {
 
     // Since MC 1.13 updateFlags are used (See World.java setTypeAndData)
     public (BlockData) IBlockData setBlockData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags) {
-#if version >= 1.13
+#if version >= 1.13.2
+        return instance.setType(blockposition, iblockdata, (updateFlags & 64) != 0);
+#elseif version >= 1.13
         return instance.a(blockposition, iblockdata, (updateFlags & 64) != 0);
 #else
         return instance.a(blockposition, iblockdata);

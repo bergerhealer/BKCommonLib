@@ -23,7 +23,11 @@ class EnumDifficulty {
 class EnumItemSlot {
     public int getIndex:c();
 
+#if version >= 1.13.2
+    public String getName:getSlotName();
+#else
     public String getName:d();
+#endif
 
     <code>
     public static Object fromIndexRaw(int index) {

@@ -193,7 +193,11 @@ class Block {
 #if version >= 1.13
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition);
+#if version >= 1.13.2
+        if (shape.isEmpty()) {
+#else
         if (shape.b()) {
+#endif
             return null;
         } else {
             return shape.a();
