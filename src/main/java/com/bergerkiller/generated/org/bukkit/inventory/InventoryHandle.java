@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Location;
 import org.bukkit.inventory.ItemStack;
+import java.util.HashMap;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.inventory.Inventory</b>.
@@ -34,6 +35,8 @@ public abstract class InventoryHandle extends Template.Handle {
         public final Template.Method<ItemStack[]> getStorageContents = new Template.Method<ItemStack[]>();
         @Template.Optional
         public final Template.Method<Void> setStorageContents = new Template.Method<Void>();
+        @Template.Optional
+        public final Template.Method<HashMap<Integer, ItemStack>> removeItemAnySlot = new Template.Method<HashMap<Integer, ItemStack>>();
 
     }
 

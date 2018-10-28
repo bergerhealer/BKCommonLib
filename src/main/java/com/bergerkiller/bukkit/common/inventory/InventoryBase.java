@@ -252,6 +252,15 @@ public abstract class InventoryBase implements Inventory {
         return cbProxy.removeItem(items);
     }
 
+    //@Override // Only on Paperspigot (it seems?)
+    public HashMap<Integer, ItemStack> removeItemAnySlot(final ItemStack... items) throws IllegalArgumentException {
+        if (InventoryHandle.T.removeItemAnySlot.isAvailable()) {
+            return InventoryHandle.T.removeItemAnySlot.invoke(this.cbProxy);
+        } else {
+            return new HashMap<Integer, ItemStack>();
+        }
+    }
+
     @Override
     public int hashCode() {
         return cbProxy.hashCode();
