@@ -13,6 +13,7 @@ import org.bukkit.material.MaterialData;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -197,6 +198,33 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
              .setDataValues(0, 1)
              .build();
         }
+
+        // Redstone Wire has north/east/south/west metadata too, which also have to be registered
+        // Format: minecraft:redstone_wire[east=side,north=none,power=12,south=none,west=none]
+        {
+            final String[] SIDE_VALUES = {"up", "side", "none"};
+            IBlockDataHandle wire_data = getIBlockData(MaterialUtil.getMaterial("REDSTONE_WIRE"));
+            for (int power = 0; power <= 15; power++) {
+                org.bukkit.material.RedstoneWire wire = new org.bukkit.material.RedstoneWire();
+                wire.setData((byte) power);
+
+                // Ugh. For loops.
+                wire_data = wire_data.set("power", power);
+                for (String side_north : SIDE_VALUES) {
+                    wire_data = wire_data.set("north", side_north);
+                    for (String side_east : SIDE_VALUES) {
+                        wire_data = wire_data.set("east", side_east);
+                        for (String side_south : SIDE_VALUES) {
+                            wire_data = wire_data.set("south", side_south);
+                            for (String side_west : SIDE_VALUES) {
+                                wire_data = wire_data.set("west", side_west);
+                                storeMaterialData(wire, wire_data);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private static void storeMaterialDataGen(String legacyTypeName, int data_start, int data_end) {
@@ -265,6 +293,10 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         }
     }
 
+    private static IBlockDataHandle getIBlockData(Material type) {
+        return BlockHandle.T.getBlockData.invoke(CraftMagicNumbersHandle.getBlockFromMaterial(type));
+    }
+
     private static interface MaterialDataBuilder {
         MaterialData create(Material legacy_data_type, byte legacy_data_value);
     }
@@ -314,7 +346,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             for (Material type : this.types) {
                 materialdata_builders.put(type, this);
                 T materialdata = this.create(type, (byte) this.data_values[0]);
-                IBlockDataHandle iblockdata = BlockHandle.T.getBlockData.invoke(CraftMagicNumbersHandle.getBlockFromMaterial(type));
+                IBlockDataHandle iblockdata = getIBlockData(type);
                 for (int data_value : this.data_values) {
                     materialdata.setData((byte) data_value);
                     storeMaterialData(materialdata, this.createState(iblockdata, materialdata));
