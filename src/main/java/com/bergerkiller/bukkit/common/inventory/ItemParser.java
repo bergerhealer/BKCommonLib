@@ -2,9 +2,14 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -15,6 +20,7 @@ import org.bukkit.inventory.ItemStack;
  */
 public class ItemParser {
 
+    public static final char METADATA_CHAR = '$';
     public static final char STACK_MULTIPLIER = '^';
     public static final char[] MULTIPLIER_SIGNS = {'x', 'X', '*', ' ', '@', STACK_MULTIPLIER};
 
@@ -48,17 +54,35 @@ public class ItemParser {
         this.amount = amount;
         this.data = data;
         this.type = type;
+        this.rules = Collections.emptyList();
+    }
+
+    /**
+     * Constructs a new Item Parser
+     *
+     * @param type to match, null for any type
+     * @param amount to use, -1 for infinite
+     * @param data to match, -1 for any data
+     * @param metaRules for matching metadata in items
+     */
+    public ItemParser(Material type, int amount, int data, List<ItemParserMetaRule> metaRules) {
+        this.amount = amount;
+        this.data = data;
+        this.type = type;
+        this.rules = metaRules;
     }
 
     private ItemParser() {
         this.data = -1;
         this.type = null;
         this.amount = 1;
+        this.rules = Collections.emptyList();
     }
 
     private int data;
     private Material type;
     private int amount;
+    private List<ItemParserMetaRule> rules;
 
     /**
      * Supported formats: typedata: [type]:[data] [typeid]:[data] [typeid]
@@ -68,25 +92,39 @@ public class ItemParser {
      */
     public static ItemParser parse(String fullname) {
         fullname = fullname.trim();
+
+        // Parse amount (multiplier) part of name. Amount should be a valid number.
+        String amountStr = null;
+        boolean isStackMultiplier = false;
         int index = StringUtil.firstIndexOf(fullname, MULTIPLIER_SIGNS);
-        if (index == -1) {
-            return parse(fullname, null);
-        } else {
-            ItemParser parser = parse(fullname.substring(index + 1), fullname.substring(0, index));
-            if (fullname.charAt(index) == STACK_MULTIPLIER) {
-                parser = parser.multiplyAmount(parser.getMaxStackSize());
+        if (index != -1) {
+            amountStr = fullname.substring(0, index);
+            try {
+                Integer.parseInt(amountStr); // Throws if invalid
+                isStackMultiplier = fullname.charAt(index) == STACK_MULTIPLIER;
+                fullname = fullname.substring(index + 1);
+            } catch (NumberFormatException ex) {
+                amountStr = null;
             }
-            return parser;
         }
+
+        ItemParser parser = parse(fullname, amountStr);
+        if (isStackMultiplier) {
+            parser = parser.multiplyAmount(parser.getMaxStackSize());
+        }
+        return parser;
     }
 
     public static ItemParser parse(String name, String amount) {
-        int index = name.indexOf(':');
-
+        int index = StringUtil.firstIndexOf(name, ':', METADATA_CHAR);
         if (index == -1) {
             return parse(name, null, amount);
         } else {
-            return parse(name.substring(0, index), name.substring(index + 1), amount);
+            int data_index = index;
+            if (name.charAt(index) == ':') {
+                data_index++;
+            }
+            return parse(name.substring(0, index), name.substring(data_index), amount);
         }
     }
 
@@ -106,10 +144,24 @@ public class ItemParser {
         // parse amount
         parser.amount = ParseUtil.parseInt(amount, -1);
 
+        // split dataname into data and metadata
+        String dataname_data = dataname;
+        String dataname_meta = null;
+        if (dataname_data != null) {
+            int index = dataname_data.indexOf(METADATA_CHAR);
+            if (index == 0) {
+                dataname_meta = dataname_data.substring(1);
+                dataname_data = null;
+            } else if (index > 0) {
+                dataname_meta = dataname_data.substring(index + 1);
+                dataname_data = dataname_data.substring(0, index);
+            }
+        }
+
         // parse material from name
         if (LogicUtil.nullOrEmpty(name)) {
             parser.type = null;
-        } else if (dataname == null) {
+        } else if (dataname_data == null) {
             // First try non-legacy. Then try legacy.
             parser.type = ParseUtil.parseMaterial(name, Material.AIR, false);
             if (parser.type == null) {
@@ -122,8 +174,26 @@ public class ItemParser {
         }
 
         // parse material data from name if needed
-        if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname)) {
-            parser.data = ParseUtil.parseMaterialData(dataname, parser.type, -1);
+        if (parser.hasType() && !LogicUtil.nullOrEmpty(dataname_data)) {
+            parser.data = ParseUtil.parseMaterialData(dataname_data, parser.type, -1);
+        }
+
+        // add metadata rules
+        if (!LogicUtil.nullOrEmpty(dataname_meta)) {
+            parser.rules = new ArrayList<ItemParserMetaRule>(4);
+            int index = 0;
+            do {
+                String ruleStr;
+                int end_index = dataname_meta.indexOf(',', index);
+                if (end_index == -1) {
+                    ruleStr = dataname_meta.substring(index);
+                    index = -1;
+                } else {
+                    ruleStr = dataname_meta.substring(index, end_index);
+                    index = end_index + 1;
+                }
+                parser.rules.add(ItemParserMetaRule.parse(ruleStr));
+            } while (index != -1);
         }
 
         return parser;
@@ -139,13 +209,32 @@ public class ItemParser {
         if (stack == null) {
             return false;
         }
+
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             // No data is ever used and ItemStack type will guaranteed never be legacy
-            return this.match(stack.getType(), 0);
+            if (!this.match(stack.getType(), 0))
+                return false;
         } else {
             // 1.12.2 or before, supply durability also
-            return this.match(stack.getType(), stack.getDurability());
+            if (!this.match(stack.getType(), stack.getDurability()))
+                return false;
         }
+
+        // Metadata rules
+        if (!this.rules.isEmpty()) {
+            CommonTagCompound meta = ItemUtil.getMetaTag(stack, false);
+            if (meta == null) {
+                meta = new CommonTagCompound();
+            }
+
+            for (ItemParserMetaRule rule : this.rules) {
+                if (!rule.match(meta)) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -274,6 +363,15 @@ public class ItemParser {
         return this.type;
     }
 
+    /**
+     * Gets a list of metadata rules for matching the items
+     * 
+     * @return metadata rules
+     */
+    public List<ItemParserMetaRule> getMetaRules() {
+        return Collections.unmodifiableList(this.rules);
+    }
+
     public ItemStack getItemStack() {
         return this.getItemStack(this.amount);
     }
@@ -316,7 +414,9 @@ public class ItemParser {
      * @return new ItemParser with the new data
      */
     public ItemParser setData(int data) {
-        return new ItemParser(this.type, this.amount, data);
+        ItemParser clone = this.cloneParser();
+        this.data = data;
+        return clone;
     }
 
     /**
@@ -327,7 +427,21 @@ public class ItemParser {
      * @return new ItemParser with the new amount
      */
     public ItemParser setAmount(int amount) {
-        return new ItemParser(this.type, amount, this.data);
+        ItemParser clone = this.cloneParser();
+        clone.amount = amount;
+        return clone;
+    }
+
+    /**
+     * Creates a new ItemParser with the type, data and amount of this parser, but with
+     * different metadata rules.
+     * 
+     * @param metadata rules
+     */
+    public ItemParser setMetaRules(List<ItemParserMetaRule> rules) {
+        ItemParser clone = this.cloneParser();
+        clone.rules = (rules.isEmpty() ? Collections.emptyList() : new ArrayList<ItemParserMetaRule>(rules));
+        return clone;
     }
 
     /**
@@ -345,6 +459,11 @@ public class ItemParser {
         return this.setAmount(amount);
     }
 
+    private ItemParser cloneParser() {
+        return new ItemParser(this.type, this.amount, this.data, 
+                (this.rules.isEmpty() ? Collections.emptyList() : new ArrayList<ItemParserMetaRule>(this.rules)));
+    }
+
     @Override
     public String toString() {
         StringBuilder rval = new StringBuilder();
@@ -358,6 +477,15 @@ public class ItemParser {
             }
         } else {
             rval.append("any type");
+        }
+        if (!this.rules.isEmpty()) {
+            rval.append(METADATA_CHAR);
+            for (int i = 0; i < this.rules.size(); i++) {
+                if (i > 0) {
+                    rval.append(',');
+                }
+                rval.append(this.rules.get(i).toString());
+            }
         }
         return rval.toString();
     }
