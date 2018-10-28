@@ -184,7 +184,7 @@ public class ItemParser {
             int index = 0;
             do {
                 String ruleStr;
-                int end_index = dataname_meta.indexOf(',', index);
+                int end_index = dataname_meta.indexOf(METADATA_CHAR, index);
                 if (end_index == -1) {
                     ruleStr = dataname_meta.substring(index);
                     index = -1;
@@ -481,9 +481,7 @@ public class ItemParser {
         if (!this.rules.isEmpty()) {
             rval.append(METADATA_CHAR);
             for (int i = 0; i < this.rules.size(); i++) {
-                if (i > 0) {
-                    rval.append(',');
-                }
+                rval.append(METADATA_CHAR);
                 rval.append(this.rules.get(i).toString());
             }
         }
