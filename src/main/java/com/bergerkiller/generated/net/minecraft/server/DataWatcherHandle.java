@@ -109,6 +109,8 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         /* ============================================================================== */
 
+        public abstract Object getValue();
+        public abstract void setValue(Object value);
 
         public DataWatcherHandle.ItemHandle cloneHandle() {
             Object clone;
@@ -123,8 +125,6 @@ public abstract class DataWatcherHandle extends Template.Handle {
             T.changed.copy(getRaw(), clone);
             return createHandle(clone);
         }
-        public abstract Object getValue();
-        public abstract void setValue(Object value);
         public abstract boolean isChanged();
         public abstract void setChanged(boolean value);
         /**
@@ -143,8 +143,12 @@ public abstract class DataWatcherHandle extends Template.Handle {
             public final Template.Field.Integer keyId = new Template.Field.Integer();
             @Template.Optional
             public final Template.Field.Converted<Key<?>> key = new Template.Field.Converted<Key<?>>();
+            @Template.Optional
             public final Template.Field<Object> value = new Template.Field<Object>();
             public final Template.Field.Boolean changed = new Template.Field.Boolean();
+
+            public final Template.Method<Object> getValue = new Template.Method<Object>();
+            public final Template.Method<Void> setValue = new Template.Method<Void>();
 
         }
 

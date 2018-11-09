@@ -95,7 +95,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
-            Object rawValue = DataWatcherHandle.ItemHandle.T.value.get(rawItem);
+            Object rawValue = DataWatcherHandle.ItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
     }

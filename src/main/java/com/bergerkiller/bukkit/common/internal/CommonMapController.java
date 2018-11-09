@@ -1086,6 +1086,9 @@ public class CommonMapController implements PacketListener, Listener {
         private ItemStack lastFrameItem = null; // performance optimization to simplify item change detection
         private ItemStack lastFrameItemUpdate = null; // to detect a change in item in updateItem()
 
+        // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
+        private EntityTrackerEntryHandle lastEntityTrackerEntry = null; // Network synchronization entity tracker entry, to detect viewers
+
         public ItemFrameInfo(ItemFrame itemFrame) {
             this.itemFrame = itemFrame;
             this.itemFrameHandle = EntityItemFrameHandle.fromBukkit(itemFrame);
@@ -1101,11 +1104,20 @@ public class CommonMapController implements PacketListener, Listener {
 
         public void updateItem() {
             // Avoid expensive conversion and creation of CraftItemStack by detecting changes
+            boolean raw_item_changed = false;
             Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
             raw_item = CommonNMS.unwrapDWROptional(raw_item); // May be needed
             if (this.lastFrameRawItem != raw_item) {
                 this.lastFrameRawItem = raw_item;
                 this.lastFrameItem = WrapperConversion.toItemStack(this.lastFrameRawItem);
+                raw_item_changed = true;
+            }
+
+            // If the raw item has not changed, and the item is not a map, don't bother checking
+            // The equality check for ItemStack is very slow, because of the deep NBT check that occurs
+            // When the item in the item frame is not a map item, there is no use wasting time here
+            if (!raw_item_changed && lastMapUUID == null && !CommonMapUUIDStore.isMap(this.lastFrameItem)) {
+                return;
             }
 
             // Check item changed
@@ -1334,15 +1346,18 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
-                    EntityTrackerEntryHandle trackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
-                    if (trackerEntry == null) {
+                    if (info.lastEntityTrackerEntry == null) {
+                        info.lastEntityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+
                         // Item Frame isn't tracked on the server, so no players can view it
-                        info.remove();
-                        itemFrames.remove(entry.getKey());
-                        continue;
+                        if (info.lastEntityTrackerEntry == null) {
+                            info.remove();
+                            itemFrames.remove(entry.getKey());
+                            continue;
+                        }
                     }
 
-                    Collection<Player> liveViewers = trackerEntry.getViewers();
+                    Collection<Player> liveViewers = info.lastEntityTrackerEntry.getViewers();
                     boolean changes = LogicUtil.synchronizeList(info.viewers, liveViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
                         @Override
                         public boolean isItem(Player item, Player value) {

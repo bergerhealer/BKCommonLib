@@ -101,14 +101,24 @@ class DataWatcher {
         private optional final int typeId:###;
         private optional final int keyId:###;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
-        private T value:b;
+        private optional T value:b;
         private boolean changed:c;
 #else
         private optional final int typeId:a;
         private optional final int keyId:b;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:###;
-        private Object value:c;
+        private optional Object value:c;
         private boolean changed:d;
+#endif
+
+        // Get/set value, use public methods for faster access
+        // TODO: Verify it is actually faster than using reflection on the value field (!)
+#if version >= 1.9
+        public T getValue:b();
+        public void setValue:a(T value);
+#else
+        public Object getValue:b();
+        public void setValue:a(Object value);
 #endif
 
         // constructor for 1.9
