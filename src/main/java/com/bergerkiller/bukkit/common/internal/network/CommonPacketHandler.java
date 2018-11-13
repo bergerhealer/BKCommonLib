@@ -46,18 +46,6 @@ public class CommonPacketHandler extends PacketHandlerHooked {
             }
         }
 
-        // Initialize queued packet logic for silent sending
-        Class<?>[] possible = NetworkManagerHandle.T.getType().getDeclaredClasses();
-        Class<?> qp = null;
-        for (Class<?> p : possible) {
-            if (p.getName().endsWith("QueuedPacket")) {
-                qp = p;
-            }
-        }
-        if (qp == null) {
-            return false;
-        }
-
         // Bind and done
         for (Player player : Bukkit.getOnlinePlayers()) {
             CommonChannelListener.bind(player);

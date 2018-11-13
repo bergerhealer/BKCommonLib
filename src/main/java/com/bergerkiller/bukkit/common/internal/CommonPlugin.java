@@ -303,11 +303,13 @@ public class CommonPlugin extends PluginBase {
             if (this.packetHandler != null) {
                 this.packetHandler.transfer(handler);
                 if (!this.packetHandler.onDisable()) {
+                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to disable the previous " + this.packetHandler.getName() + " packet handler!");
                     return false;
                 }
             }
             this.packetHandler = handler;
             if (!this.packetHandler.onEnable()) {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to enable the " + this.packetHandler.getName() + " packet handler!");
                 return false;
             }
             Logging.LOGGER_NETWORK.log(Level.INFO, "Now using " + handler.getName() + " to provide Packet Listener and Monitor support");
