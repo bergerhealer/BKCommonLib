@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
+
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 /**
@@ -11,11 +14,15 @@ public class ItemParserMetaRule {
     private String _name;
     private String _operator;
     private String _value;
+    private boolean _valuePatternCheck;
+    private Pattern _valuePattern;
 
     public ItemParserMetaRule(String name, String operator, String value) {
         this._name = name;
         this._operator = operator;
         this._value = value;
+        this._valuePatternCheck = false; // not yet checked
+        this._valuePattern = null; // lazy
     }
 
     public String getName() {
@@ -40,7 +47,6 @@ public class ItemParserMetaRule {
         Object value = tag.getValue(this._name);
         if (value == null) {
             // 'not exists' match
-            System.out.println("KEY BY " + this._name + " NOT FOUND");
             return "!=".equals(this._operator);
         } else if (this._value == null) {
             // 'exists' check
@@ -95,18 +101,73 @@ public class ItemParserMetaRule {
         // String
         if (value instanceof String) {
             String str_value = (String) value;
-            if (this._operator.equals("=") || this._operator.equals("==")) {
-                return this._value.equals(str_value);
-            } else if (this._operator.equals("!=")) {
-                return !this._value.equals(str_value);
-            } else {
-                int compare = str_value.compareTo(this._value);
-                switch (this._operator) {
-                case ">=": return compare >= 0;
-                case "<=": return compare <= 0;
-                case ">": return compare > 0;
-                case "<": return compare < 0;
+
+            boolean isNotEquals = this._operator.equals("!=");
+            if (isNotEquals || this._operator.equals("=") || this._operator.equals("==")) {
+                // Check if this._value contains wildcard character
+                // If so, we must use regex to do all this
+                if (!this._valuePatternCheck) {
+                    this._valuePatternCheck = true;
+                    this._valuePattern = null;
+                    int wildcardIndex = this._value.indexOf('*');
+                    if (wildcardIndex != -1) {
+                        // Turn this._value into a regex pattern (and cache it)
+                        StringBuilder regexStr = new StringBuilder();
+                        int startIndex = 0;
+                        while (true) {
+                            // Add all text prior as a quoted string
+                            if (wildcardIndex > startIndex) {
+                                regexStr.append(Pattern.quote(this._value.substring(startIndex, wildcardIndex)));
+                            }
+
+                            // Add wildcard, or if double-*, as an escaped *
+                            if (wildcardIndex < (this._value.length()-1) && this._value.charAt(wildcardIndex+1) == '*') {
+                                regexStr.append("\\*\\*");
+                                wildcardIndex += 2;
+                            } else {
+                                regexStr.append(".*");
+                                wildcardIndex++;
+                            }
+
+                            // Look from past startIndex
+                            startIndex = wildcardIndex;
+
+                            // Find next wildcard
+                            wildcardIndex = this._value.indexOf('*', startIndex);
+                            if (wildcardIndex == -1) {
+                                // Stop. Add what remains as quoted string
+                                regexStr.append(Pattern.quote(this._value.substring(startIndex)));
+                                break;
+                            }
+                        }
+
+                        // This should never fail to compile, but just in case, try-catch it.
+                        try {
+                            this._valuePattern = Pattern.compile(regexStr.toString());
+                        } catch (PatternSyntaxException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
                 }
+
+                // Handling of regex patterns (or not)
+                boolean isValueEqual;
+                if (this._valuePattern != null) {
+                    isValueEqual = this._valuePattern.matcher(str_value).matches();
+                } else {
+                    isValueEqual = this._value.equals(str_value);
+                }
+
+                return isValueEqual != isNotEquals;
+            }
+
+            // Other cases
+            int compare = str_value.compareTo(this._value);
+            switch (this._operator) {
+            case ">=": return compare >= 0;
+            case "<=": return compare <= 0;
+            case ">": return compare > 0;
+            case "<": return compare < 0;
             }
             return false;
         }
