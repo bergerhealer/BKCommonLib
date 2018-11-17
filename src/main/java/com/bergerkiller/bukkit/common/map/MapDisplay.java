@@ -142,7 +142,7 @@ public class MapDisplay implements MapDisplayEvents {
         this.height = (maxTileY - minTileY + 1) * 128;
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
-        this.layerStack = new Layer(this);
+        this.layerStack = new Layer(this, this.width, this.height);
         this.clip.markEverythingDirty();
     }
 
@@ -840,23 +840,26 @@ public class MapDisplay implements MapDisplayEvents {
         private Layer previous, next;
         private byte z_index;
         private final MapDisplay map;
+        private final int width, height;
         private final byte[] buffer;
         private final MapClip clip = new MapClip();
 
-        private Layer(MapDisplay map) {
-            this.buffer = new byte[map.getWidth() * map.getHeight()];
+        private Layer(MapDisplay map, int width, int height) {
+            this.width = width;
+            this.height = height;
+            this.buffer = new byte[this.width * this.height];
             this.map = map;
             this.z_index = 0;
         }
 
         @Override
         public final int getWidth() {
-            return map.getWidth();
+            return this.width;
         }
 
         @Override
         public final int getHeight() {
-            return map.getHeight();
+            return this.height;
         }
 
         @Override
@@ -872,7 +875,7 @@ public class MapDisplay implements MapDisplayEvents {
          */
         public Layer next() {
             if (this.next == null) {
-                this.next = new Layer(this.map);
+                this.next = new Layer(this.map, this.width, this.height);
                 this.next.z_index = (byte) (this.z_index + 1);
                 this.next.previous = this;
             }
@@ -887,7 +890,7 @@ public class MapDisplay implements MapDisplayEvents {
          */
         public Layer previous() {
             if (this.previous == null) {
-                this.previous = new Layer(this.map);
+                this.previous = new Layer(this.map, this.width, this.height);
                 this.previous.next = this;
 
                 // All z-indices are offset by one
