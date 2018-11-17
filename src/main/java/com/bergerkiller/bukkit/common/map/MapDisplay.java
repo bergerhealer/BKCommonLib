@@ -1093,7 +1093,7 @@ public class MapDisplay implements MapDisplayEvents {
         public final byte readPixel(int x, int y) {
             if (x >= 0 && y < this.getHeight()) {
                 int index = x + (y * this.getWidth());
-                if (index >= 0 || index < buffer.length) {
+                if (index >= 0 && index < buffer.length) {
                     Layer layer = this;
                     byte color;
                     do {
@@ -1109,7 +1109,7 @@ public class MapDisplay implements MapDisplayEvents {
         private final byte readBasePixel(int x, int y) {
             if (x >= 0 && y < this.getHeight()) {
                 int index = x + (y * this.getWidth());
-                if (index >= 0 || index < buffer.length) {
+                if (index >= 0 && index < buffer.length) {
                     return buffer[index];
                 }
             }
