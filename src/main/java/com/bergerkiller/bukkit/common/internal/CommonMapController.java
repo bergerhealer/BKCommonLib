@@ -1087,7 +1087,7 @@ public class CommonMapController implements PacketListener, Listener {
         private ItemStack lastFrameItemUpdate = null; // to detect a change in item in updateItem()
 
         // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
-        private EntityTrackerEntryHandle lastEntityTrackerEntry = null; // Network synchronization entity tracker entry, to detect viewers
+        private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
         public ItemFrameInfo(ItemFrame itemFrame) {
             this.itemFrame = itemFrame;
@@ -1346,19 +1346,20 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
-                    if (info.lastEntityTrackerEntry == null) {
-                        info.lastEntityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+                    if (info.entityTrackerViewers == null) {
+                        EntityTrackerEntryHandle entityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
 
                         // Item Frame isn't tracked on the server, so no players can view it
-                        if (info.lastEntityTrackerEntry == null) {
+                        if (entityTrackerEntry == null) {
                             info.remove();
                             itemFrames.remove(entry.getKey());
                             continue;
                         }
+
+                        info.entityTrackerViewers = entityTrackerEntry.getViewers();
                     }
 
-                    Collection<Player> liveViewers = info.lastEntityTrackerEntry.getViewers();
-                    boolean changes = LogicUtil.synchronizeList(info.viewers, liveViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
+                    boolean changes = LogicUtil.synchronizeList(info.viewers, info.entityTrackerViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
                         @Override
                         public boolean isItem(Player item, Player value) {
                             return item == value;
