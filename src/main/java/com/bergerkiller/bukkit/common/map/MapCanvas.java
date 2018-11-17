@@ -160,7 +160,8 @@ public abstract class MapCanvas {
         int w_end = (x + w);
         int px = x;
         int py = y;
-        for (int i = 0; i < colorData.length; i++) {
+        int pixel_count = Math.min(colorData.length , w * h);
+        for (int i = 0; i < pixel_count; i++) {
             writePixel(px, py, colorData[i]);
             if (++px >= w_end) {
                 px = x;
@@ -244,6 +245,11 @@ public abstract class MapCanvas {
         }
 
         if (colorData == null) {
+            // Invalid width/height
+            if (w <= 0 || h <= 0) {
+                return this;
+            }
+
             // No data, fill with the color
             //TODO: Make this more efficient without a new array allocation!
             colorData = new byte[w * h];
@@ -338,7 +344,7 @@ public abstract class MapCanvas {
                     if (px < 0 || py < 0 || px >= this.getWidth() || py >= this.getHeight()) {
                         continue;
                     }
-                    
+
                     int depthIndex = px + this.getWidth() * py;
                     short depth = this.depthBuffer[depthIndex];
 

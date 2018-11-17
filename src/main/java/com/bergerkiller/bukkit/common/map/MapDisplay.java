@@ -904,6 +904,14 @@ public class MapDisplay implements MapDisplayEvents {
         }
 
         @Override
+        public MapCanvas writePixels(int x, int y, int w, int h, byte[] colorData) {
+            // TODO: This needs to be optimized!
+            // We are dealing with a transparent depth buffer making this difficult
+            // Look into this at some point to speed up drawing of images!
+            return super.writePixels(x, y, w, h, colorData);
+        }
+
+        @Override
         public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
             // Out of bounds
             if (x >= this.getWidth() || y >= this.getHeight()) {
@@ -926,6 +934,9 @@ public class MapDisplay implements MapDisplayEvents {
                 }
                 if ((y + h) > this.getHeight()) {
                     h = (this.getHeight() - y);
+                }
+                if (w <= 0 || h <= 0) {
+                    return this; // Out of bounds top/left
                 }
             }
 

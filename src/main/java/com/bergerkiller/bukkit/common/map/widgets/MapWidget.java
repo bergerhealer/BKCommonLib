@@ -772,7 +772,7 @@ public class MapWidget implements MapDisplayEvents {
         absoluteY += this._y;
 
         // Only do this when the widget has been drawn before
-        if (this.layer != null && this._lastWidth != 0 && this._lastHeight != 0) {
+        if (this.layer != null && this._lastWidth > 0 && this._lastHeight > 0) {
 
             // Detect changes in bounds and invalidate when it happens
             if (this._lastWidth != this._width ||
