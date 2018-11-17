@@ -707,9 +707,13 @@ public class CommonMapController implements PacketListener, Listener {
 
         // Adjust px/py based on item frame tile information
         ItemFrameInfo frameInfo = this.itemFrames.get(itemFrame.getEntityId());
-        if (frameInfo != null && frameInfo.lastMapUUID != null) {
-            px += 128 * frameInfo.lastMapUUID.getTileX();
-            py += 128 * frameInfo.lastMapUUID.getTileY();
+        if (frameInfo != null) {
+            frameInfo.updateItem();
+            frameInfo.lastFrameItemUpdateNeeded = true; // post-click refresh
+            if (frameInfo.lastMapUUID != null) {
+                px += 128 * frameInfo.lastMapUUID.getTileX();
+                py += 128 * frameInfo.lastMapUUID.getTileY();
+            }
         }
 
         MapClickEvent event = new MapClickEvent(player, itemFrame, stack.stack.getLast(), action, px, py);
@@ -1085,6 +1089,7 @@ public class CommonMapController implements PacketListener, Listener {
         private Object lastFrameRawItem = null; // performance optimization to avoid conversion
         private ItemStack lastFrameItem = null; // performance optimization to simplify item change detection
         private ItemStack lastFrameItemUpdate = null; // to detect a change in item in updateItem()
+        public boolean lastFrameItemUpdateNeeded = true; // tells the underlying system to refresh the item
 
         // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
         private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
@@ -1103,6 +1108,9 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         public void updateItem() {
+            // Reset flag
+            this.lastFrameItemUpdateNeeded = false;
+
             // Avoid expensive conversion and creation of CraftItemStack by detecting changes
             boolean raw_item_changed = false;
             Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
@@ -1342,7 +1350,9 @@ public class CommonMapController implements PacketListener, Listener {
                 }
 
                 // Refreshes cached information about this item frame's item
-                info.updateItem();
+                if (info.lastFrameItemUpdateNeeded) {
+                    info.updateItem();
+                }
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
