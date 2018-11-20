@@ -21,7 +21,7 @@
         <!-- Library versions -->
         <minecraft.version>1.13.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>1.50</mountiplex.version>
+        <mountiplex.version>1.51</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -120,7 +120,6 @@
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
             <version>${mountiplex.version}</version>
-            <optional>true</optional>
             <exclusions>
                 <!-- Exclude dependencies of the maven plugin, this is a temp fix and needs to be corrected -->
                 <exclusion>
