@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle;
@@ -90,15 +89,11 @@ public class EntityUtil extends EntityPropertyUtil {
     }
 
     /**
-     * Checks whether a given Entity should be ignored when working with it<br>
-     * This could be because another plugin is operating on it, or for Virtual
-     * items
-     *
-     * @param entity to check
-     * @return True if the entity should be ignored, False if not
+     * <b>Deprecated: there are no plans to support this</b>
      */
+    @Deprecated
     public static boolean isIgnored(org.bukkit.entity.Entity entity) {
-        return CommonPlugin.getInstance().getEntityBlacklist().isFiltered(entity);
+        return false;
     }
 
     /*

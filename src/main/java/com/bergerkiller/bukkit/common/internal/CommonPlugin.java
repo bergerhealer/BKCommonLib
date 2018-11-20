@@ -77,7 +77,6 @@ public class CommonPlugin extends PluginBase {
     private PermissionHandler permissionHandler = null;
     private CommonTabController tabController = null;
     private CommonMapController mapController = null;
-    private CommonEntityBlacklist entityBlacklist = null;
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
 
@@ -205,17 +204,6 @@ public class CommonPlugin extends PluginBase {
     }
 
     /**
-     * Obtains the Entity Blacklist that filters out Entities that are part of
-     * other plugin's logic. This includes entities that represent particles or
-     * virtual items.
-     *
-     * @return entity blacklist
-     */
-    public CommonEntityBlacklist getEntityBlacklist() {
-        return entityBlacklist;
-    }
-
-    /**
      * Obtains the Tab Controller that is responsible for the creation and
      * updating of tabs
      *
@@ -340,7 +328,6 @@ public class CommonPlugin extends PluginBase {
             packetHandler.removePacketListeners(plugin);
         }
         this.mapController.updateDependency(plugin, pluginName, enabled);
-        this.entityBlacklist.updateDependency(plugin, pluginName, enabled);
         this.permissionHandler.updateDependency(plugin, pluginName, enabled);
         if (!this.updatePacketHandler()) {
             this.onCriticalFailure();
@@ -520,9 +507,6 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize entity map (needs to be here because of CommonPlugin instance needed)
         playerVisibleChunks = new EntityMap<Player, CommonPlayerMeta>();
-
-        // Initialize Entity Blacklist
-        entityBlacklist = new CommonEntityBlacklist();
 
         // Register events and tasks, initialize
         register(listener = new CommonListener());
