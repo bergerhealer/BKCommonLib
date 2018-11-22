@@ -24,6 +24,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
@@ -931,6 +932,32 @@ public class CommonUtil {
         } catch (Throwable t) {
         }
         throw new RuntimeException("Class '" + eventClass.getName() + "' does not have a handler list");
+    }
+
+    /**
+     * Removes an Event Listener as a recipient from all events declared inside.
+     * 
+     * @param listener to unregister
+     */
+    public static void unregisterListener(Listener listener) {
+        // Query all event types listened to by this listener
+        Set<java.lang.Class<?>> eventTypes = new HashSet<java.lang.Class<?>>();
+        {
+            Set<java.lang.reflect.Method> methods = new HashSet<java.lang.reflect.Method>();
+            methods.addAll(Arrays.asList(listener.getClass().getMethods()));
+            methods.addAll(Arrays.asList(listener.getClass().getDeclaredMethods()));
+            for (java.lang.reflect.Method method : methods) {
+                if (method.getAnnotation(EventHandler.class) == null) continue;
+                Class<?>[] params = method.getParameterTypes();
+                if (params.length != 1 || !Event.class.isAssignableFrom(params[0])) continue;
+                eventTypes.add(params[0]);
+            }
+        }
+
+        // For all event types, retrieve the handler list and remove the listener
+        for (java.lang.Class<?> eventType : eventTypes) {
+            getEventHandlerList(eventType).unregister(listener);
+        }
     }
 
     /**
