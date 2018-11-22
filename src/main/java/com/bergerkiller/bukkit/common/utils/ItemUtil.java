@@ -751,7 +751,8 @@ public class ItemUtil {
 
     /**
      * Gets the current display name of an Item. If no name is set, the default
-     * Material name is returned instead.
+     * Material name is returned instead. If the item is null or empty, an illegal argument exception
+     * is thrown.
      *
      * @param stack to get the display name of
      * @return display name
@@ -762,12 +763,16 @@ public class ItemUtil {
 
     /**
      * Gets the current display name of an Item as a {@link ChatText} object. If no name is set, the default
-     * Material name is returned instead.
+     * Material name is returned instead. If the item is null or empty, an illegal argument exception
+     * is thrown.
      *
      * @param stack to get the display name of
      * @return display name ChatText
      */
     public static ChatText getDisplayChatText(org.bukkit.inventory.ItemStack stack) {
+        if (ItemUtil.isEmpty(stack)) {
+            throw new IllegalArgumentException("Input item is null, empty or air");
+        }
         return CommonNMS.getHandle(stack).getName();
     }
 
