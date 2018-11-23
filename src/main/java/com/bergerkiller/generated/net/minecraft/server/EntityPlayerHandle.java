@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.InventoryView;
 import java.util.List;
 
 /**
@@ -22,6 +23,11 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
     /* ============================================================================== */
 
+    public abstract InventoryView openAnvilWindow();
+
+    public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
+    }
     public abstract Object getPlayerConnection();
     public abstract void setPlayerConnection(Object value);
     public abstract double getChunkSyncX();
@@ -41,6 +47,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         @Template.Optional
         public final Template.Field<List<Integer>> removeQueue = new Template.Field<List<Integer>>();
         public final Template.Field.Integer ping = new Template.Field.Integer();
+
+        public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();
 
     }
 

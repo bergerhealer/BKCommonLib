@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.server.ContainerAnvilHandle;
 
 class Container {
 #if version >= 1.12.2
@@ -17,7 +19,39 @@ class Container {
     public (List<SlotHandle>) List<Slot> slots:c;
 #endif
 
+    public int windowId;
+
     public abstract org.bukkit.inventory.InventoryView getBukkitView();
+
+    public static ContainerHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
+        if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
+            net.minecraft.server.Container handle;
+            handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
+            return com.bergerkiller.generated.net.minecraft.server.ContainerHandle.createHandle(handle);
+        } else {
+            return null;
+        }
+    }
+}
+
+class ContainerAnvil extends Container {
+#if version >= 1.12
+    public String renameText;
+#elseif version >= 1.11
+    public String renameText:l;
+#else
+    private String renameText:l;
+#endif
+
+    public static ContainerAnvilHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
+        if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
+            net.minecraft.server.Container handle;
+            handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
+            return com.bergerkiller.generated.net.minecraft.server.ContainerAnvilHandle.createHandle(handle);
+        } else {
+            return null;
+        }
+    }
 }
 
 class Slot {

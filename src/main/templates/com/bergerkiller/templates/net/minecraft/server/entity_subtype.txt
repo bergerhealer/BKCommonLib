@@ -10,6 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -306,6 +307,42 @@ class EntityPlayer extends EntityHuman {
     public double chunkSyncZ:e;
     public final optional List<Integer> removeQueue;
     public int ping;
+
+    public org.bukkit.inventory.InventoryView openAnvilWindow() {
+#if version >= 1.13
+        IChatBaseComponent title = new ChatMessage(Blocks.ANVIL.m(), new Object[0]);
+#else
+        IChatBaseComponent title = new ChatMessage(Blocks.ANVIL.a() + ".name", new Object[0]);
+#endif
+        String windowName = "minecraft:anvil";
+        PlayerInventory playerInventory = instance.inventory;
+        World world = instance.getWorld();
+        BlockPosition position = instance.getChunkCoordinates();
+
+        ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, instance);
+        container.checkReachable = false;
+        container.windowId = instance.nextContainerCounter();
+
+        // Hook required so we can track when the text changes
+#if version < 1.9
+        com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook hook;
+        hook = new com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook();
+        container = (ContainerAnvil) hook.hook(container);
+#endif
+
+        instance.activeContainer = container;
+        instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(container.windowId, windowName, title));
+
+        instance.activeContainer.addSlotListener(instance);
+
+        return container.getBukkitView();
+    }
+
+    <code>
+    public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
+    }
+    </code>
 }
 
 class EntityInsentient extends EntityLiving {

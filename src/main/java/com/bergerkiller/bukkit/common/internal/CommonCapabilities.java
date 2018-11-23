@@ -87,4 +87,17 @@ public class CommonCapabilities {
      * Since Minecraft 1.13 lists of AxisAlignedBB objects were replaced with VoxelShape
      */
     public static final boolean HAS_VOXELSHAPE_LOGIC = Common.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.9 a prepare anvil event exists. Versions before that require a packet listener
+     * to intercept and handle these packets.
+     */
+    public static final boolean HAS_PREPARE_ANVIL_EVENT = Common.evaluateMCVersion(">=", "1.9");
+
+    /**
+     * Since Minecraft 1.13 items can have an empty String as a display name, and it will show
+     * an empty spot instead of the item's default name. This can be used with the Anvil GUI
+     * to set the text box to an empty default.
+     */
+    public static final boolean EMPTY_ITEM_NAME = Common.evaluateMCVersion(">=", "1.13");
 }

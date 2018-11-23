@@ -24,11 +24,17 @@ public abstract class ContainerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static ContainerHandle fromBukkit(InventoryView bukkitView) {
+        return T.fromBukkit.invoke(bukkitView);
+    }
+
     public abstract InventoryView getBukkitView();
     public abstract List<ItemStack> getOldItems();
     public abstract void setOldItems(List<ItemStack> value);
     public abstract List<SlotHandle> getSlots();
     public abstract void setSlots(List<SlotHandle> value);
+    public abstract int getWindowId();
+    public abstract void setWindowId(int value);
     /**
      * Stores class members for <b>net.minecraft.server.Container</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,6 +42,9 @@ public abstract class ContainerHandle extends Template.Handle {
     public static final class ContainerClass extends Template.Class<ContainerHandle> {
         public final Template.Field.Converted<List<ItemStack>> oldItems = new Template.Field.Converted<List<ItemStack>>();
         public final Template.Field.Converted<List<SlotHandle>> slots = new Template.Field.Converted<List<SlotHandle>>();
+        public final Template.Field.Integer windowId = new Template.Field.Integer();
+
+        public final Template.StaticMethod<ContainerHandle> fromBukkit = new Template.StaticMethod<ContainerHandle>();
 
         public final Template.Method<InventoryView> getBukkitView = new Template.Method<InventoryView>();
 
