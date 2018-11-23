@@ -19,7 +19,7 @@ public class MapWidgetNavigator {
 
     public static void addFocusableWidgets(List<MapWidget> result, MapWidget widget) {
         for (MapWidget child : widget.getWidgets()) {
-            if (child.isFocusable() && child.isEnabled()) {
+            if (child.isFocusable() && child.isEnabled() && child.getWidth() > 0 && child.getHeight() > 0) {
                 result.add(child);
             } else {
                 addFocusableWidgets(result, child);
