@@ -722,8 +722,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public World getWorld() {
-        WorldHandle wHandle = handle.getWorld();
-        return wHandle != null ? wHandle.getWorld() : null;
+        try {
+            return entity.getWorld();
+        } catch (Throwable t) {
+            // Come on, this really never happens! It is also slower.
+            WorldHandle wHandle = handle.getWorld();
+            return wHandle != null ? wHandle.getWorld() : null;
+        }
     }
 
     public boolean isDead() {
