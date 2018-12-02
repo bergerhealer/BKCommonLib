@@ -827,14 +827,17 @@ public class MapWidget implements MapDisplayEvents {
 
             // If the attached widget can be focused, and no widget is focused yet, focus it
             // Only do this if this current widget has an activated parent
-            if (this.root.getFocusedWidget() == null && this.isNavigableFocus()) {
+            if (this.root != null && this.root.getFocusedWidget() == null && this.isNavigableFocus()) {
                 this.focus();
             }
         }
 
         // Also attach (new) children
-        for (MapWidget child : this._children) {
-            child.handleAttach();
+        // During onAttached() or focus() it can get detached again - so check that here
+        if (this._attached) {
+            for (MapWidget child : this._children) {
+                child.handleAttach();
+            }
         }
     }
 
