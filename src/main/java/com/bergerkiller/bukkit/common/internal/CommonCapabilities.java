@@ -100,4 +100,9 @@ public class CommonCapabilities {
      * to set the text box to an empty default.
      */
     public static final boolean EMPTY_ITEM_NAME = Common.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.13.1 the dimension id field was replaced with a DimensionManager instance
+     */
+    public static final boolean HAS_DIMENSION_MANAGER = Common.evaluateMCVersion(">=", "1.13.1");
 }

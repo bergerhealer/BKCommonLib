@@ -338,8 +338,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setWorld(World world) {
-        this.handle.setWorld(WorldHandle.createHandle(Conversion.toWorldHandle.convert(world)));
-        this.handle.setDimension(this.handle.getWorld().getWorldData().getType().getDimension());
+        if (world == null) {
+            throw new IllegalArgumentException("Can not set a null World for Entity");
+        }
+        this.handle.setWorld(WorldHandle.fromBukkit(world));
+        this.handle.setDimension(WorldUtil.getDimension(world));
     }
 
     public void setDead(boolean dead) {

@@ -402,7 +402,12 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension
      */
     public static Dimension getDimension(org.bukkit.World world) {
-        return WorldHandle.fromBukkit(world).getWorldData().getType().getDimension();
+        //  WorldHandle.fromBukkit(world).getWorldData().getType().getDimension();
+        Dimension dimension = WorldServerHandle.fromBukkit(world).getDimension();
+        if (dimension == null) {
+            throw new IllegalStateException("World '" + world.getName() + "' has no valid dimension");
+        }
+        return dimension;
     }
 
     /**

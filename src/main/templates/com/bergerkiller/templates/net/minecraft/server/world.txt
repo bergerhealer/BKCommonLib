@@ -264,6 +264,12 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
+#if version >= 1.13.1
+    public final (Dimension) DimensionManager dimension;
+#else
+    public final (Dimension) int dimension;
+#endif
+
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 
     // Only available >= MC 1.9

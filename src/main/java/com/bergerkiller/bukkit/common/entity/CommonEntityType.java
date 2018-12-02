@@ -8,9 +8,11 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonHumanEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -236,6 +238,9 @@ public class CommonEntityType {
         double x = location.getX();
         double y = location.getY();
         double z = location.getZ();
+        if (world == null) {
+            throw new IllegalArgumentException("Location has a null World");
+        }
 
         EntityHook hook = new EntityHook();
         hook.setStack(new Throwable());
@@ -245,6 +250,14 @@ public class CommonEntityType {
 
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
         entity.loc.set(entity.last.set(location));
+
+        // Debug: verify the 'dimension' field is set for the Entity
+        if (CommonCapabilities.HAS_DIMENSION_MANAGER) {
+            Object raw_dim = EntityHandle.T.dimension.raw.get(entity.getHandle());
+            if (raw_dim == null) {
+                throw new IllegalStateException("Entity dimension field is null");
+            }
+        }
 
         DefaultEntityController controller = new DefaultEntityController();
         controller.bind(entity, false);

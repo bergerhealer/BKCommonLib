@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import java.util.Map;
 import java.util.UUID;
@@ -59,6 +60,8 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract void setPlayerChunkMapField(PlayerChunkMapHandle value);
     public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
     public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
+    public abstract Dimension getDimension();
+    public abstract void setDimension(Dimension value);
     /**
      * Stores class members for <b>net.minecraft.server.WorldServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -70,6 +73,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
+        public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         @Template.Optional
