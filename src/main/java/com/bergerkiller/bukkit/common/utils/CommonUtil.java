@@ -85,7 +85,7 @@ public class CommonUtil {
      * @return True if the server is shutting down
      */
     public static boolean isShuttingDown() {
-        return !CommonNMS.getMCServer().isRunning();
+        return CommonNMS.getMCServer().isHasStopped();
     }
 
     /**
@@ -1093,6 +1093,20 @@ public class CommonUtil {
      * @return True if this is the main thread
      */
     public static boolean isMainThread() {
-        return MinecraftServerHandle.instance().isMainThread();
+        if (MinecraftServerHandle.instance().isMainThread()) {
+            return true;
+        }
+
+        // When shutting down, this may be the Spigot WatchDog thread
+        // This is used when the server freezes and needs to be shut down for a restart
+        // At that point this thread 'acts' as a main thread, despite it not being one
+        if (Common.IS_SPIGOT_SERVER) {
+            Class<?> threadClass = Thread.currentThread().getClass();
+            if (threadClass.getName().equals("org.spigotmc.WatchdogThread")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

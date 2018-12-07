@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 
 class MinecraftServer {
-    public boolean isRunning();
+    private boolean hasStopped;
 
     public String getResourcePack();
 

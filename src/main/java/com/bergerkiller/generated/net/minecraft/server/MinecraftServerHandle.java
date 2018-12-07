@@ -21,7 +21,6 @@ public abstract class MinecraftServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract boolean isRunning();
     public abstract String getResourcePack();
     public abstract String getResourcePackHash();
     public abstract int getTicks();
@@ -34,12 +33,15 @@ public abstract class MinecraftServerHandle extends Template.Handle {
         }
         return _cached_instance;
     }
+    public abstract boolean isHasStopped();
+    public abstract void setHasStopped(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.MinecraftServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MinecraftServerClass extends Template.Class<MinecraftServerHandle> {
-        public final Template.Method<Boolean> isRunning = new Template.Method<Boolean>();
+        public final Template.Field.Boolean hasStopped = new Template.Field.Boolean();
+
         public final Template.Method<String> getResourcePack = new Template.Method<String>();
         public final Template.Method<String> getResourcePackHash = new Template.Method<String>();
         public final Template.Method<Integer> getTicks = new Template.Method<Integer>();
