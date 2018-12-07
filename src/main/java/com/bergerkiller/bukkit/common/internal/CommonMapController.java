@@ -1552,9 +1552,10 @@ public class CommonMapController implements PacketListener, Listener {
      * @param itemFrame
      */
     private final List<IntVector3> findNeighbours(ItemFrame itemFrame) {
+        Location itemFrameLocation = itemFrame.getLocation(); // re-used
         HashSet<IntVector3> neighbours = new HashSet<IntVector3>();
         BlockFace facing = itemFrame.getFacing();
-        IntVector3 itemFramePos = new IntVector3(itemFrame.getLocation());
+        IntVector3 itemFramePos = new IntVector3(itemFrameLocation);
         UUID itemFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
         if (itemFrameMapUUID == null) {
             return Collections.emptyList(); // no neighbours
@@ -1572,7 +1573,8 @@ public class CommonMapController implements PacketListener, Listener {
             if (otherFrame.getFacing() != facing) {
                 continue;
             }
-            IntVector3 otherFramePos = new IntVector3(otherFrame.getLocation());
+            otherFrame.getLocation(itemFrameLocation);
+            IntVector3 otherFramePos = new IntVector3(itemFrameLocation);
             if (FaceUtil.isAlongX(facing)) {
                 if (otherFramePos.x != itemFramePos.x) {
                     continue;
