@@ -856,7 +856,11 @@ class PacketPlayOutScoreboardTeam extends Packet {
 
 class PacketPlayInSettings extends Packet {
     private String lang:a;
+#if fieldexists net.minecraft.server.PacketPlayInSettings public int viewDistance
+    public int view:viewDistance;
+#else
     private int view:b;
+#endif
     private (Object) EntityHuman.EnumChatVisibility chatVisibility:c;
     private boolean enableColors:d;
     private int modelPartFlags:e;
