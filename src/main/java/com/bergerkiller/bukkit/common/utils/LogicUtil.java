@@ -740,4 +740,59 @@ public class LogicUtil {
         return has_changes;
     }
 
+    /**
+     * Synchronizes the contents of a collection by taking over the items in another collection of values.
+     * The items will not necessarily be inserted into the collection in the same order as the collection.
+     * Unlike {@link #synchronizeList(list, values, synchronizer)} this method will not call the values
+     * {@link Collection#iterator()} method unless absolutely needed.<br>
+     * <br>
+     * Because this logic depends
+     * on the {@link Collection#contains(o)} method, the {@link ItemSynchronizer#isItem(o1, o2)} is not used.
+     * The input collection and values collection must hold the same value types.
+     * 
+     * @param collection to synchronize
+     * @param values to synchronize in the collection, iterator() call is avoided when possible
+     * @param synchronizer to use when synchronizing the collection with the collection
+     * @return True if the synchronized collection changed, False if not
+     */
+    public static <E> boolean synchronizeUnordered(Collection<E> collection, Collection<E> values, ItemSynchronizer<E, E> synchronizer) {
+        boolean changed = false;
+
+        // If values are empty, clear the set and do nothing more
+        if (values.isEmpty()) {
+            if (!collection.isEmpty()) {
+                for (E old_value : collection) {
+                    synchronizer.onRemoved(old_value);
+                }
+                collection.clear();
+                return true;
+            }
+            return false;
+        }
+
+        // Remove elements from the set that do not exist in the values
+        Iterator<E> iter = collection.iterator();
+        while (iter.hasNext()) {
+            E old_value = iter.next();
+            if (!values.contains(old_value)) {
+                synchronizer.onRemoved(old_value);
+                iter.remove();
+                changed = true;
+            }
+        }
+
+        // If the values set is larger than the Set, add the new items to the Set
+        if (values.size() > collection.size()) {
+            for (E new_value : values) {
+                if (!collection.contains(new_value)) {
+                    collection.add(synchronizer.onAdded(new_value));
+                    changed = true;
+                }
+            }
+        }
+
+        // Done.
+        return changed;
+    }
+
 }

@@ -1077,7 +1077,7 @@ public class CommonMapController implements PacketListener, Listener {
         public final ItemFrame itemFrame;
         public final EntityItemFrameHandle itemFrameHandle;
         public final DataWatcher.Item<?> itemFrame_dw_item;
-        public final ArrayList<Player> viewers;
+        public final HashSet<Player> viewers;
         public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
         public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
         public boolean isDisplayTile; // item frame is part of a larger set of tiles making up a map display
@@ -1098,7 +1098,7 @@ public class CommonMapController implements PacketListener, Listener {
             this.itemFrame = itemFrame;
             this.itemFrameHandle = EntityItemFrameHandle.fromBukkit(itemFrame);
             this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
-            this.viewers = new ArrayList<Player>();
+            this.viewers = new HashSet<Player>();
             this.removed = false;
             this.lastMapUUID = null;
             this.displayInfo = null;
@@ -1334,6 +1334,26 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public class FramedMapUpdater extends Task {
 
+        private ItemFrameInfo info = null;
+        private final LogicUtil.ItemSynchronizer<Player, Player> synchronizer = new LogicUtil.ItemSynchronizer<Player, Player>() {
+            @Override
+            public boolean isItem(Player item, Player value) {
+                return item == value;
+            }
+
+            @Override
+            public Player onAdded(Player player) {
+                handleMapShowEvent(new MapShowEvent(player, info.itemFrame));
+                return player;
+            }
+
+            @Override
+            public void onRemoved(Player player) {
+                //TODO!!!
+                //CommonUtil.callEvent(new HideFramedMapEvent(player, info.itemFrame));
+            }
+        };
+
         public FramedMapUpdater(JavaPlugin plugin) {
             super(plugin);
         }
@@ -1341,7 +1361,7 @@ public class CommonMapController implements PacketListener, Listener {
         @Override
         public void run() {
             for (IntHashMap.Entry<ItemFrameInfo> entry : itemFrames.entries()) {
-                final ItemFrameInfo info = entry.getValue();
+                info = entry.getValue();
                 if (info.removed) {
                     // Remove all players that have been set as viewers
                     info.remove();
@@ -1369,24 +1389,7 @@ public class CommonMapController implements PacketListener, Listener {
                         info.entityTrackerViewers = entityTrackerEntry.getViewers();
                     }
 
-                    boolean changes = LogicUtil.synchronizeList(info.viewers, info.entityTrackerViewers, new LogicUtil.ItemSynchronizer<Player, Player>() {
-                        @Override
-                        public boolean isItem(Player item, Player value) {
-                            return item == value;
-                        }
-
-                        @Override
-                        public Player onAdded(Player player) {
-                            handleMapShowEvent(new MapShowEvent(player, info.itemFrame));
-                            return player;
-                        }
-
-                        @Override
-                        public void onRemoved(Player player) {
-                            //TODO!!!
-                            //CommonUtil.callEvent(new HideFramedMapEvent(player, info.itemFrame));
-                        }
-                    });
+                    boolean changes = LogicUtil.synchronizeUnordered(info.viewers, info.entityTrackerViewers, synchronizer);
 
                     if (changes && info.displayInfo != null) {
                         info.displayInfo.hasFrameViewerChanges = true;
