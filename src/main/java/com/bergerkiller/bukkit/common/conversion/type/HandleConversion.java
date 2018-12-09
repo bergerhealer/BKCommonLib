@@ -43,7 +43,6 @@ import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
@@ -525,13 +524,13 @@ public class HandleConversion {
     // Since MC 1.13.1
     @ConverterMethod(input="net.minecraft.server.DimensionManager", optional=true)
     public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
-        return Dimension.fromId(DimensionManagerHandle.T.getId.invoke(nmsDimensionManagerHandle).intValue());
+        return Dimension.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
     // Since MC 1.13.1
     @ConverterMethod(output="net.minecraft.server.DimensionManager", optional=true)
-    public static Object dimensionManagerFromId(Dimension dimension) {
-        return DimensionManagerHandle.fromId(dimension.getId());
+    public static Object dimensionManagerFromDimension(Dimension dimension) {
+        return dimension.getDimensionManagerHandle();
     }
 
     @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>")
