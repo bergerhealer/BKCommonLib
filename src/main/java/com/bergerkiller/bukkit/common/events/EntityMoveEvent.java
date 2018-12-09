@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.events;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
@@ -36,6 +37,36 @@ public class EntityMoveEvent extends EntityEvent {
      */
     public World getWorld() {
         return this.entity.getWorld();
+    }
+
+    /**
+     * Gets the old from position and rotation and stores it into the input Location.
+     * With how often this is called, it is recommended to re-use the Location object.
+     * 
+     * @param from to update with the from position and rotation
+     * @return from
+     */
+    public Location getFrom(Location from) {
+        if (from != null) {
+            from.setWorld(this.entity.getWorld());
+            from.setX(this.entityHandle.getLastX());
+            from.setY(this.entityHandle.getLastY());
+            from.setZ(this.entityHandle.getLastZ());
+            from.setYaw(this.entityHandle.getLastYaw());
+            from.setPitch(this.entityHandle.getLastPitch());
+        }
+        return from;
+    }
+
+    /**
+     * Gets the new to position and rotation and stores it into the input Location.
+     * With how often this is called, it is recommended to re-use the Location object.
+     * 
+     * @param to to update with the new position and rotation
+     * @return to
+     */
+    public Location getTo(Location to) {
+        return this.entity.getLocation(to);
     }
 
     /**
