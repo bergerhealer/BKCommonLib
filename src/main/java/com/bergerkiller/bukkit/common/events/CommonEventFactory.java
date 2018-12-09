@@ -8,11 +8,13 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.google.common.collect.Iterables;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -31,6 +33,35 @@ public class CommonEventFactory {
         }
     };
 
+    // Concatenates all world entity lists into one long iterable
+    @SuppressWarnings("unchecked")
+    private Iterable<Object> getAllServerEntities() {
+        Collection<World> worlds = WorldUtil.getWorlds();
+        List<Iterable<Object>> world_entity_lists = new ArrayList<Iterable<Object>>(worlds.size());
+        for (World world : worlds) {
+            Object worldHandle = WorldHandle.fromBukkit(world).getRaw();
+            world_entity_lists.add((Iterable<Object>) WorldHandle.T.entityList.raw.get(worldHandle));
+        }
+        return Iterables.concat(world_entity_lists);
+    }
+
+    // Used for handleEntityMove() LogicUtil.synchronizeList
+    private final LogicUtil.ItemSynchronizer<Object, EntityHandle> entity_move_synchronizer = new LogicUtil.ItemSynchronizer<Object, EntityHandle>() {
+        @Override
+        public boolean isItem(EntityHandle item, Object value) {
+            return item.getRaw() == value;
+        }
+
+        @Override
+        public EntityHandle onAdded(Object value) {
+            return EntityHandle.createHandle(value);
+        }
+
+        @Override
+        public void onRemoved(EntityHandle item) {
+        }
+    };
+
     /**
      * Fires Entity Move events for all entities that moved on the server
      */
@@ -38,9 +69,11 @@ public class CommonEventFactory {
         if (!CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
             return;
         }
-        for (World world : WorldUtil.getWorlds()) {
-            entityMoveEntities.addAll(WorldHandle.fromBukkit(world).getEntityList());
-        }
+
+        // Keeps a list of all raw entity handles synchronized with EntityHandle wrappers
+        LogicUtil.synchronizeList(this.entityMoveEntities, getAllServerEntities(), this.entity_move_synchronizer);
+
+        // Fire all events
         for (EntityHandle entity : entityMoveEntities) {
             if (entity.getLocX() != entity.getLastX() || entity.getLocY() != entity.getLastY() || entity.getLocZ() != entity.getLastZ()
                     || entity.getYaw() != entity.getLastYaw() || entity.getPitch() != entity.getLastPitch()) {
@@ -49,7 +82,6 @@ public class CommonEventFactory {
                 CommonUtil.callEvent(entityMoveEvent);
             }
         }
-        entityMoveEntities.clear();
     }
 
     /**

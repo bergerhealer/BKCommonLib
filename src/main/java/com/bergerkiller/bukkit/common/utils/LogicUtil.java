@@ -685,6 +685,19 @@ public class LogicUtil {
      * @return True if the synchronized list changed, False if not
      */
     public static <V, E> boolean synchronizeList(List<E> list, Collection<V> values, ItemSynchronizer<V, E> synchronizer) {
+        return synchronizeList(list, (Iterable<V>) values, synchronizer);
+    }
+
+    /**
+     * Synchronizes the contents of a list by taking over the items in an iterable of values.
+     * The items will be inserted into the list in the same order as the collection.
+     * 
+     * @param list to synchronize
+     * @param values to synchronize in the list, iterated only ones
+     * @param synchronizer to use when synchronizing the collection with the list
+     * @return True if the synchronized list changed, False if not
+     */
+    public static <V, E> boolean synchronizeList(List<E> list, Iterable<V> values, ItemSynchronizer<V, E> synchronizer) {
         boolean has_changes = false;
         Iterator<V> value_iter = values.iterator();
         ListIterator<E> item_iter = list.listIterator();
