@@ -79,6 +79,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
+import gnu.trove.map.hash.TIntObjectHashMap;
+
 public class CommonMapController implements PacketListener, Listener {
     // Temporary ItemFrame buffer to avoid memory allocations / list resizes
     private World itemFrameCacheWorld = null;
@@ -99,7 +101,7 @@ public class CommonMapController implements PacketListener, Listener {
     // Stores player map input (through Vehicle Steer packets)
     private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     // Tracks all item frames loaded on the server
-    private final IntHashMap<ItemFrameInfo> itemFrames = new IntHashMap<ItemFrameInfo>();
+    private final TIntObjectHashMap<ItemFrameInfo> itemFrames = new TIntObjectHashMap<ItemFrameInfo>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
     // This counter is incremented every time a new map Id is added to the mapping
@@ -151,8 +153,8 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @return item frames
      */
-    public List<ItemFrameInfo> getItemFrames() {
-        return itemFrames.values();
+    public Collection<ItemFrameInfo> getItemFrames() {
+        return itemFrames.valueCollection();
     }
 
     /**
@@ -1360,12 +1362,13 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
-            for (IntHashMap.Entry<ItemFrameInfo> entry : itemFrames.entries()) {
-                info = entry.getValue();
+            Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.valueCollection().iterator();
+            while (itemFrames_iter.hasNext()) {
+                info = itemFrames_iter.next();
                 if (info.removed) {
                     // Remove all players that have been set as viewers
                     info.remove();
-                    itemFrames.remove(entry.getKey());
+                    itemFrames_iter.remove();
                     continue;
                 }
 
@@ -1382,7 +1385,7 @@ public class CommonMapController implements PacketListener, Listener {
                         // Item Frame isn't tracked on the server, so no players can view it
                         if (entityTrackerEntry == null) {
                             info.remove();
-                            itemFrames.remove(entry.getKey());
+                            itemFrames_iter.remove();
                             continue;
                         }
 
