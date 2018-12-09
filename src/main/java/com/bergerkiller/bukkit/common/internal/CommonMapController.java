@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -11,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -104,6 +106,13 @@ public class CommonMapController implements PacketListener, Listener {
     private final TIntObjectHashMap<ItemFrameInfo> itemFrames = new TIntObjectHashMap<ItemFrameInfo>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
+    // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
+    private final HashSet<IntVector3> neighbourCacheSet = new HashSet<IntVector3>();
+    // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
+    private final Queue<IntVector3> neighbourPendingList = new ArrayDeque<IntVector3>();
+    // Neighbours of item frames to check for either x-aligned or z-aligned
+    private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
+    private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Z = {BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST};
     // This counter is incremented every time a new map Id is added to the mapping
     // Every 1000 map ids we do a cleanup to free up slots for maps that no longer exist on the server
     // This is required, otherwise we can run out of the 32K map Ids we have available given enough uptime
@@ -1559,7 +1568,6 @@ public class CommonMapController implements PacketListener, Listener {
      */
     private final List<IntVector3> findNeighbours(ItemFrame itemFrame) {
         Location itemFrameLocation = itemFrame.getLocation(); // re-used
-        HashSet<IntVector3> neighbours = new HashSet<IntVector3>();
         BlockFace facing = itemFrame.getFacing();
         IntVector3 itemFramePos = new IntVector3(itemFrameLocation);
         UUID itemFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
@@ -1567,58 +1575,76 @@ public class CommonMapController implements PacketListener, Listener {
             return Collections.emptyList(); // no neighbours
         }
 
-        // Find all item frames that:
-        // - Are on the same world as this item frame
-        // - Facing the same way
-        // - Along the same x/z (facing)
-        // - Same ItemStack map UUID
-        for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
-            if (otherFrame == itemFrame) {
-                continue;
-            }
-            if (otherFrame.getFacing() != facing) {
-                continue;
-            }
-            otherFrame.getLocation(itemFrameLocation);
-            IntVector3 otherFramePos = new IntVector3(itemFrameLocation);
+        try {
+            // Find all item frames that:
+            // - Are on the same world as this item frame
+            // - Facing the same way
+            // - Along the same x/z (facing)
+            // - Same ItemStack map UUID
+            BlockFace[] neighbourAxis;
             if (FaceUtil.isAlongX(facing)) {
-                if (otherFramePos.x != itemFramePos.x) {
-                    continue;
+                // Along X, compare the x-coordinates
+                neighbourAxis = NEIGHBOUR_AXIS_ALONG_X;
+                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
+                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
+                        continue;
+                    }
+
+                    otherFrame.getLocation(itemFrameLocation);
+                    int block_x = itemFrameLocation.getBlockX();
+                    if (block_x != itemFramePos.x) {
+                        continue;
+                    }
+
+                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
+                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                        continue;
+                    }
+                    this.neighbourCacheSet.add(new IntVector3(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ()));
                 }
             } else {
-                if (otherFramePos.z != itemFramePos.z) {
-                    continue;
+                // Along Z, compare the z-coordinates
+                neighbourAxis = NEIGHBOUR_AXIS_ALONG_Z;
+                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
+                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
+                        continue;
+                    }
+
+                    otherFrame.getLocation(itemFrameLocation);
+                    int block_z = itemFrameLocation.getBlockZ();
+                    if (block_z != itemFramePos.z) {
+                        continue;
+                    }
+
+                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
+                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                        continue;
+                    }
+                    this.neighbourCacheSet.add(new IntVector3(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z));
                 }
             }
-            UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
-            if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
-                continue;
-            }
-            neighbours.add(otherFramePos);
+
+            // Make sure the neighbours result are a single contiguous blob
+            // Islands (can not reach the input item frame) are removed
+            List<IntVector3> result = new ArrayList<IntVector3>(this.neighbourCacheSet.size());
+            this.neighbourPendingList.add(itemFramePos);
+            do {
+                IntVector3 pending = this.neighbourPendingList.poll();
+                for (BlockFace side : neighbourAxis) {
+                    IntVector3 sidePoint = pending.add(side);
+                    if (this.neighbourCacheSet.remove(sidePoint)) {
+                        this.neighbourPendingList.add(sidePoint);
+                        result.add(sidePoint);
+                    }
+                }
+            } while (!this.neighbourPendingList.isEmpty());
+
+            return result;
+        } finally {
+            // Cleanup
+            this.neighbourCacheSet.clear();
+            this.neighbourPendingList.clear();
         }
-
-        // Make sure the neighbours result are a single contiguous blob
-        // Islands (can not reach the input item frame) are removed
-        BlockFace[] sides = {
-                BlockFace.UP, BlockFace.DOWN,
-                FaceUtil.rotate(facing, 2),
-                FaceUtil.rotate(facing, -2)
-        };
-        List<IntVector3> pendingList = new ArrayList<IntVector3>(5);
-        List<IntVector3> result = new ArrayList<IntVector3>(neighbours.size());
-        pendingList.add(itemFramePos);
-        do {
-            IntVector3 pending = pendingList.remove(pendingList.size() - 1);
-            for (BlockFace side : sides) {
-                IntVector3 sidePoint = pending.add(side);
-                if (neighbours.remove(sidePoint)) {
-                    pendingList.add(sidePoint);
-                    result.add(sidePoint);
-                }
-            }
-        } while (!pendingList.isEmpty());
-
-        return result;
     }
 
     private final void resetItemFrameCache(World world) {
