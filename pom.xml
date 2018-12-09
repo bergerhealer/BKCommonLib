@@ -194,6 +194,15 @@
             </exclusions>
         </dependency>
 
+        <!-- Trove is available in the server, this is here so that CI understands -->
+        <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
+        <dependency>
+            <groupId>net.sf.trove4j</groupId>
+            <artifactId>trove4j</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
         <!-- Test dependencies -->
         <!-- The full server jar is only used during test; it should not be exposed as a dependency -->
         <dependency>
