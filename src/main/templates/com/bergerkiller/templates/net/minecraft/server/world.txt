@@ -481,7 +481,11 @@ class RegionFile {
 
     public (RegionFileHandle) RegionFile(java.io.File file);
 
+#if methodexists net.minecraft.server.RegionFile public void close()
+    public void close();
+#else
     public void close:c();
+#endif
 
 #if version >= 1.13
     #if pre <= 7
@@ -495,7 +499,11 @@ class RegionFile {
 }
 
 class RegionFileCache {
+#if fieldexists net.minecraft.server.RegionFileCache public static final Map<java.io.File, RegionFile> cache
+    public static final (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> FILES:cache;
+#else
     public static final (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> FILES:a;
+#endif
 }
 
 class ChunkRegionLoader {

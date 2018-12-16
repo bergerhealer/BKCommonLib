@@ -6,9 +6,15 @@ import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
 
 class MethodProfiler {
 
+#if methodexists net.minecraft.server.MethodProfiler public void enter(String label)
+    public void begin:enter(String label);
+#else
     public void begin:a(String label);
+#endif
 
-#if version >= 1.13
+#if methodexists net.minecraft.server.MethodProfiler public void enter(String label)
+    public void end:exit();
+#elseif version >= 1.13
     public void end:e();
 #else
     public void end:b();

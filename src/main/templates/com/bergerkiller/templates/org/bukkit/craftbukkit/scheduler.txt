@@ -1,0 +1,11 @@
+package org.bukkit.craftbukkit.scheduler;
+
+class CraftTask {
+#if fieldexists org.bukkit.craftbukkit.scheduler.CraftTask private final Runnable rTask
+    private final Runnable task:rTask;
+#else
+    private final Runnable task;
+#endif
+
+    private final org.bukkit.plugin.Plugin plugin;
+}

@@ -331,9 +331,15 @@ class Entity {
 
 #if version >= 1.13
     public boolean isLoaded:inChunk;
-    public int chunkX:ae;
-    public int chunkY:af;
-    public int chunkZ:ag;
+  #if fieldexists net.minecraft.server.Entity public int chunkX
+      public int chunkX;
+      public int chunkY;
+      public int chunkZ;
+  #else
+      public int chunkX:ae;
+      public int chunkY:af;
+      public int chunkZ:ag;
+  #endif
     public unknown boolean ak;
     public boolean positionChanged:impulse;
 #elseif version >= 1.11

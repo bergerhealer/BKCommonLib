@@ -8,7 +8,12 @@ class EntityTracker {
     private final (org.bukkit.World) WorldServer world;
     private final (Set<EntityTrackerEntryHandle>) Set<EntityTrackerEntry> entries:c;
     public final (com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>) IntHashMap<EntityTrackerEntry> trackedEntities;
+
+#if fieldexists net.minecraft.server.EntityTracker private int trackingDistance
+    private int viewDistance:trackingDistance;
+#else
     private int viewDistance:e;
+#endif
 
 #if version >= 1.9
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);

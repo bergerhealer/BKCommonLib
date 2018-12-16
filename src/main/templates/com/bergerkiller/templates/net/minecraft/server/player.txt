@@ -49,7 +49,12 @@ class PlayerAbilities {
 class PlayerChunk {
 #if version >= 1.9
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
-    public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
+
+  #if fieldexists net.minecraft.server.PlayerChunk public final List<EntityPlayer> players
+      public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players;
+  #else
+      public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
+  #endif
 #else
     private final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:b;
 #endif

@@ -30,12 +30,18 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                 boolean flag2 = k1 == i || k1 == j - 1;
                 boolean flag3 = l1 == i1 || l1 == j1 - 1;
 
-                if ((!flag2 || !flag3) && this.isLoaded(blockposition_b.f(k1, 64, l1))) {
+                if (flag2 && flag3) {
+                    continue;
+                }
+
+                blockposition_b.c(k1, 64, l1);
+
+                if (this.isLoaded(blockposition_b)) {
                     VoxelShape voxelshape4 = VoxelShapes.a();
 
                     for (int i2 = k; i2 < l; ++i2) {
                         if (!flag2 && !flag3 || i2 != l - 1) {
-                            blockposition_b.f(k1, i2, l1);
+                            blockposition_b.c(k1, i2, l1);
                             VoxelShape voxelshape5;
 
                             if (flag1 && !worldborder.a((BlockPosition) blockposition_b)) {

@@ -18,6 +18,7 @@
 #include /org/bukkit/craftbukkit/util.txt
 #include /org/bukkit/craftbukkit/sound.txt
 #include /org/bukkit/craftbukkit/art.txt
+#include /org/bukkit/craftbukkit/scheduler.txt
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
 #include /net/minecraft/server/sound.txt
