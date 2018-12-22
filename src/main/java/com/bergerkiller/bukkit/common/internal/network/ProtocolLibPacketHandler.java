@@ -234,16 +234,33 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private static class CommonPacketListener extends CommonPacketAdapter {
 
         public final PacketListener listener;
+        private final Class<?> temporaryPlayerClass;
 
         public CommonPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
             super(plugin, ListenerPriority.NORMAL, types);
             this.listener = listener;
+
+            Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
+            try {
+                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
+            } catch (Throwable t) {
+                Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+            }
+            this.temporaryPlayerClass = tempPlayerClass;
         }
 
         @Override
         public void onPacketReceiving(PacketEvent event) {
+            // If coming from a pre-authenticated client, ignore the packet
+            // ProtocolLib uses a TemporaryPlayer for that, which throws errors for certain properties
+            // We rather not expose plugins to these problems.
+            Player player = event.getPlayer();
+            if (player == null || this.temporaryPlayerClass.isAssignableFrom(player.getClass())) {
+                return;
+            }
+
             CommonPacket packet = new CommonPacket(event.getPacket().getHandle());
-            PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), packet);
+            PacketReceiveEvent receiveEvent = new PacketReceiveEvent(player, packet);
             receiveEvent.setCancelled(event.isCancelled());
             listener.onPacketReceive(receiveEvent);
             event.setCancelled(receiveEvent.isCancelled());
