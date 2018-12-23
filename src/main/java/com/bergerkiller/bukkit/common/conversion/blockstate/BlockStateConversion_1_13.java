@@ -15,13 +15,13 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -167,6 +167,13 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                         @Override
                         public Object invoke(Object instance, Object... args) {
                             return input_state.block.getZ();
+                        }
+                    };
+                } else if (name.equals("getPosition")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return CraftBlockHandle.getBlockPosition(input_state.block);
                         }
                     };
                 } else if (name.equals("getNMS")) {

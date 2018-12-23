@@ -22,4 +22,15 @@ class CraftBlock {
 #else
     private optional (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:###();
 #endif
+
+    public static Object getBlockPosition(org.bukkit.block.Block block) {
+#if version >= 1.13.1
+        if (block instanceof org.bukkit.craftbukkit.block.CraftBlock) {
+            return ((org.bukkit.craftbukkit.block.CraftBlock) block).getPosition();
+        } else
+#endif
+        {
+            return new net.minecraft.server.BlockPosition(block.getX(), block.getY(), block.getZ());
+        }
+    }
 }
