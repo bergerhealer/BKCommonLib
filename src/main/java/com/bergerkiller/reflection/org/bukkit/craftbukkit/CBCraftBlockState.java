@@ -20,9 +20,6 @@ public class CBCraftBlockState {
     public static final ClassTemplate<?> T = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
     @Deprecated public static final FieldAccessor<World> world  = CraftBlockStateHandle.T.world.toFieldAccessor();
     @Deprecated public static final FieldAccessor<Chunk> chunk  = CraftBlockStateHandle.T.chunk.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<Integer> x         = CraftBlockStateHandle.T.x.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<Integer> y         = CraftBlockStateHandle.T.y.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<Integer> z         = CraftBlockStateHandle.T.z.toFieldAccessor();
 
     public static Object toTileEntity(BlockState state) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(state);

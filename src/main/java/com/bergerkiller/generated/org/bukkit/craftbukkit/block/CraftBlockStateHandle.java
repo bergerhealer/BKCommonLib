@@ -33,12 +33,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
     public abstract void setWorld(World value);
     public abstract Chunk getChunk();
     public abstract void setChunk(Chunk value);
-    public abstract int getX();
-    public abstract void setX(int value);
-    public abstract int getY();
-    public abstract void setY(int value);
-    public abstract int getZ();
-    public abstract void setZ(int value);
     public abstract int getFlag();
     public abstract void setFlag(int value);
     /**
@@ -50,9 +44,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
 
         public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
         public final Template.Field.Converted<Chunk> chunk = new Template.Field.Converted<Chunk>();
-        public final Template.Field.Integer x = new Template.Field.Integer();
-        public final Template.Field.Integer y = new Template.Field.Integer();
-        public final Template.Field.Integer z = new Template.Field.Integer();
         public final Template.Field.Integer flag = new Template.Field.Integer();
 
     }
