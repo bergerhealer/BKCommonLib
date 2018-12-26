@@ -26,22 +26,11 @@ public abstract class WorldServerHandle extends WorldHandle {
     /* ============================================================================== */
 
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract void saveLevel();
 
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
-    }
-
-    public ChunkProviderServerHandle getChunkProviderServer() {
-        if (T.getChunkProviderServer.isAvailable()) {
-            return T.getChunkProviderServer.invoke(getRaw());
-        } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
-            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(getRaw()));
-        } else if (T.field_chunkProviderServer.isAvailable()) {
-            return T.field_chunkProviderServer.get(getRaw());   
-        } else {
-            throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
-        }
     }
 
     public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
@@ -76,7 +65,6 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
-        @Template.Optional
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 

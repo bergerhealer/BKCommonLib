@@ -272,9 +272,13 @@ class WorldServer extends World {
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 
-    // Only available >= MC 1.9
-    // For MC 1.8.8, we use field access
-    public optional (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+#if version >= 1.9
+        return (ChunkProviderServer) instance.getChunkProvider();
+#else
+        return instance.chunkProviderServer;
+#endif
+    }
 
 #if version >= 1.13
     public void saveLevel() {
@@ -287,18 +291,6 @@ class WorldServer extends World {
     <code>
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
-    }
-
-    public ChunkProviderServerHandle getChunkProviderServer() {
-        if (T.getChunkProviderServer.isAvailable()) {
-            return T.getChunkProviderServer.invoke(getRaw());
-        } else if (WorldHandle.T.getChunkProvider.isAvailable()) {
-            return ChunkProviderServerHandle.createHandle(WorldHandle.T.getChunkProvider.invoke(getRaw()));
-        } else if (T.field_chunkProviderServer.isAvailable()) {
-            return T.field_chunkProviderServer.get(getRaw());   
-        } else {
-            throw new UnsupportedOperationException("Chunk Provider Server can not be accessed for worlds on this server");
-        }
     }
 
     public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
