@@ -224,7 +224,11 @@ class VoxelShape {
         return VoxelShapes.a(a, b);
     }
 
+#if methodexists net.minecraft.server.VoxelShape public AxisAlignedBB getBoundingBox()
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+#else
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
+#endif
 
 #if version >= 1.13.2
     public boolean isEmpty();

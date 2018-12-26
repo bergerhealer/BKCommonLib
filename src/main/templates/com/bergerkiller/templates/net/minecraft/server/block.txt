@@ -200,7 +200,11 @@ class Block {
 #endif
             return null;
         } else {
+#if methodexists net.minecraft.server.VoxelShape public AxisAlignedBB getBoundingBox();
+            return shape.getBoundingBox();
+#else
             return shape.a();
+#endif
         }
     }
 #elseif version >= 1.9
@@ -278,7 +282,13 @@ interface IBlockData {
         return instance;
     }
 
-#if version >= 1.13
+#if version >= 1.13.2
+  #if methodexists net.minecraft.server.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();
+      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
+  #else
+      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+  #endif
+#elseif version >= 1.13
     public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
 #elseif version >= 1.12
     public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
