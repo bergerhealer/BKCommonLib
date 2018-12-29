@@ -81,8 +81,6 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
-import gnu.trove.map.hash.TIntObjectHashMap;
-
 public class CommonMapController implements PacketListener, Listener {
     // Temporary ItemFrame buffer to avoid memory allocations / list resizes
     private World itemFrameCacheWorld = null;
@@ -103,7 +101,8 @@ public class CommonMapController implements PacketListener, Listener {
     // Stores player map input (through Vehicle Steer packets)
     private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     // Tracks all item frames loaded on the server
-    private final TIntObjectHashMap<ItemFrameInfo> itemFrames = new TIntObjectHashMap<ItemFrameInfo>();
+    // Note: we are not using an IntHashMap because we need to iterate over the values, which is too slow with IntHashMap
+    private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<Integer, ItemFrameInfo>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
     // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
@@ -163,7 +162,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @return item frames
      */
     public Collection<ItemFrameInfo> getItemFrames() {
-        return itemFrames.valueCollection();
+        return itemFrames.values();
     }
 
     /**
@@ -674,7 +673,7 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private void onAddItemFrame(ItemFrame frame) {
-        if (itemFrames.contains(frame.getEntityId())) {
+        if (itemFrames.containsKey(frame.getEntityId())) {
             return;
         }
 
@@ -1371,7 +1370,7 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
-            Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.valueCollection().iterator();
+            Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
             while (itemFrames_iter.hasNext()) {
                 info = itemFrames_iter.next();
                 if (info.removed) {
