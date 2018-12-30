@@ -8,9 +8,10 @@ import java.util.Map;
 
 import org.bukkit.Material;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Helper methods for all legacy Material API
@@ -21,8 +22,24 @@ public class CommonLegacyMaterials {
     private static final Map<String, Material> allMaterialValuesByName = new HashMap<String, Material>();
     private static final Material[] allMaterialValues;
     private static final Material[] allLegacyMaterialValues;
+    private static final FastMethod<Boolean> isLegacyMethod = new FastMethod<Boolean>();
 
     static {
+        // This method gets whether a material is legacy, or not
+        // On 1.12.2 and before, it always returns true
+        // We do it this way so we don't have to initialize all templates to get this to work
+        {
+            String template = "public boolean isLegacy() {\n";
+            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+                template += "return instance.isLegacy();\n}";
+            } else {
+                template += "return true;\n}";
+            }
+            ClassResolver resolver = new ClassResolver();
+            resolver.setDeclaredClass(Material.class);
+            isLegacyMethod.init(new MethodDeclaration(resolver, template));
+        }
+
         // Retrieve all Material values through reflection
         {
             Material[] values = null;
@@ -36,7 +53,7 @@ public class CommonLegacyMaterials {
             // On MC 1.8 there is a LOCKED_CHEST Material that does not actually exist
             // It throws tests off the rails because of the Type Id clash it causes
             // By removing this rogue element from the array we can avoid these problems.
-            if (values != null && Common.evaluateMCVersion("==", "1.8")) {
+            if (values != null && CommonBootstrap.evaluateMCVersion("==", "1.8")) {
                 for (int index = 0; index < values.length; index++) {
                     if (getMaterialName(values[index]).equals("LEGACY_LOCKED_CHEST")) {
                         values = LogicUtil.removeArrayElement(values, index);
@@ -49,7 +66,9 @@ public class CommonLegacyMaterials {
         }
 
         // Filter by only the legacy Material values
-        {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // Material names that start with LEGACY_ are legacy material values
+            // We do not use isLegacy() on purpose when under test to avoid initialization of templates
             List<Material> legacyMaterials = new ArrayList<Material>();
             for (Material material : allMaterialValues) {
                 if (isLegacy(material)) {
@@ -57,6 +76,9 @@ public class CommonLegacyMaterials {
                 }
             }
             allLegacyMaterialValues = LogicUtil.toArray(legacyMaterials, Material.class);
+        } else {
+            // All material values are legacy materials
+            allLegacyMaterialValues = allMaterialValues;
         }
 
         // Fill the allMaterialValuesByName map with LEGACY_ names and new names
@@ -95,7 +117,7 @@ public class CommonLegacyMaterials {
      * @return True if this is a legacy Material
      */
     public static boolean isLegacy(Material material) {
-        return CraftMagicNumbersHandle.isLegacy(material);
+        return isLegacyMethod.invoke(material);
     }
 
     /**

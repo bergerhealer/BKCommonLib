@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.MaterialBlockProperty;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
 import com.bergerkiller.bukkit.common.MaterialTypeProperty;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -39,7 +39,7 @@ public class MaterialUtil {
             try (InputStream input = MaterialUtil.class.getResourceAsStream(mat_cat_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");
-                    material_categories_str = "#set version " + Common.TEMPLATE_RESOLVER.getVersion() + "\n" +
+                    material_categories_str = "#set version " + CommonBootstrap.getCommonServer().getMinecraftVersionMajor() + "\n" +
                                               scanner.next();
                     material_categories_str = SourceDeclaration.preprocess(material_categories_str);
                 }
@@ -155,7 +155,7 @@ public class MaterialUtil {
      * @return True if the type is legacy
      */
     public static boolean isLegacyType(Material type) {
-        return CraftMagicNumbersHandle.isLegacy(type);
+        return CommonLegacyMaterials.isLegacy(type);
     }
 
     /**

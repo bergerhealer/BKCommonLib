@@ -103,7 +103,7 @@ public class BlockDataImpl extends BlockData {
 
             BlockDataConstant blockConst = BY_MATERIAL.get(mat);
             if (blockConst == null) {
-                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && CraftMagicNumbersHandle.isLegacy(mat)) {
+                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && CommonLegacyMaterials.isLegacy(mat)) {
                     // Legacy Material -> IBlockData logic
                     MaterialData materialData = IBlockDataToMaterialData.createMaterialData(mat);
                     blockConst = findConstant(MaterialDataToIBlockData.getIBlockData(materialData));
@@ -120,7 +120,7 @@ public class BlockDataImpl extends BlockData {
             }
 
             // Only store by MaterialData information for Legacy Materials
-            if (!CraftMagicNumbersHandle.isLegacy(mat)) {
+            if (!CommonLegacyMaterials.isLegacy(mat)) {
                 continue;
             }
 
@@ -145,7 +145,7 @@ public class BlockDataImpl extends BlockData {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
                 // Skip legacy materials
-                if (CraftMagicNumbersHandle.isLegacy(mat)) {
+                if (CommonLegacyMaterials.isLegacy(mat)) {
                     continue;
                 }
 

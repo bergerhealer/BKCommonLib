@@ -11,7 +11,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 public class BlockDataRegistry {
 
@@ -76,7 +75,7 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromItemStack(ItemStack itemStack) {
-        if (CraftMagicNumbersHandle.isLegacy(itemStack.getType())) {
+        if (CommonLegacyMaterials.isLegacy(itemStack.getType())) {
             return fromMaterialData(itemStack.getType(), itemStack.getDurability());
         } else {
             return fromMaterial(itemStack.getType());

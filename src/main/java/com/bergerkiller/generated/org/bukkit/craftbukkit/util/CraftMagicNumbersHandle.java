@@ -38,10 +38,6 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         return T.getBlockFromMaterial.invoke(material);
     }
 
-    public static boolean isLegacy(Material type) {
-        return T.isLegacy.invoke(type);
-    }
-
     public static Material toLegacy(Material type) {
         return T.toLegacy.invoke(type);
     }
@@ -55,7 +51,6 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Material> getMaterialFromItem = new Template.StaticMethod.Converted<Material>();
         public final Template.StaticMethod.Converted<Object> getItemFromMaterial = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<Object> getBlockFromMaterial = new Template.StaticMethod.Converted<Object>();
-        public final Template.StaticMethod<Boolean> isLegacy = new Template.StaticMethod<Boolean>();
         public final Template.StaticMethod<Material> toLegacy = new Template.StaticMethod<Material>();
 
     }

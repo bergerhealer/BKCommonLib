@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 
 import java.io.File;
 import java.util.Collection;
@@ -108,6 +109,30 @@ public interface CommonServer {
      * @return Minecraft version
      */
     public String getMinecraftVersion();
+
+    /**
+     * Gets the major Minecraft version, removing any -pre postfixes from the version.
+     * 
+     * @return major minecraft version
+     */
+    public String getMinecraftVersionMajor();
+
+    /**
+     * Gets the pre-release version name from the Minecraft version. Is null if this
+     * is not a pre-release version.
+     * 
+     * @return pre release minecraft version
+     */
+    public String getMinecraftVersionPre();
+
+    /**
+     * Checks if the Minecraft version matches a version condition
+     * 
+     * @param operand to evaluate with, for example ">=" and "!="
+     * @param version the operand is applied to (right side)
+     * @return True if the version matches, False if not
+     */
+    public boolean evaluateMCVersion(String operand, String version);
 
     /**
      * Gets the File Location where the regions of a world are contained

@@ -65,10 +65,6 @@ class CraftMagicNumbers {
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
 
 #if version >= 1.13
-    public static boolean isLegacy(org.bukkit.Material type) {
-        return type.isLegacy();
-    }
-
     public static org.bukkit.Material toLegacy(org.bukkit.Material type) {
         if (type.isLegacy() && type.isBlock()) {
             return com.bergerkiller.bukkit.common.wrappers.BlockDataRegistry.fromMaterial(type).getLegacyType();
@@ -76,10 +72,6 @@ class CraftMagicNumbers {
         return CraftLegacy.toLegacy(type);
     }
 #else
-    public static boolean isLegacy(org.bukkit.Material type) {
-        return true;
-    }
-
     public static org.bukkit.Material toLegacy(org.bukkit.Material type) {
         return type;
     }

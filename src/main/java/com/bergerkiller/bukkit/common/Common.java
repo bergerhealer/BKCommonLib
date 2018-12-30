@@ -16,9 +16,7 @@ import com.bergerkiller.templates.TemplateResolver;
 
 import org.bukkit.Bukkit;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -103,49 +101,10 @@ public class Common {
         // Depends on whether Bukkit server is initialized
         LOGGER = Logging.LOGGER;
 
-        // Find out what server software we are running on
-        CommonServer runningServer = new UnknownServer();
-        boolean compatible = false;
-        String mc_version = "UNKNOWN";
-
-        // Get all available server types
-        if (IS_TEST_MODE) {
-            // Always Spigot server
-            runningServer = new SpigotServer();
-            runningServer.init();
-            runningServer.postInit();
-            compatible = runningServer.isCompatible();
-            mc_version = runningServer.getMinecraftVersion();
-        } else {
-            // Autodetect most likely server type
-            List<CommonServer> servers = new ArrayList<>();
-            servers.add(new MCPCPlusServer());
-            servers.add(new PaperSpigotServer());
-            servers.add(new SpigotServer());
-            servers.add(new SportBukkitServer());
-            servers.add(new CraftBukkitServer());
-            servers.add(new UnknownServer());
-
-            // Use the first one that initializes correctly
-            for (CommonServer server : servers) {
-                try {
-                    if (server.init()) {
-                        server.postInit();
-                        compatible = server.isCompatible();
-                        mc_version = server.getMinecraftVersion();
-                        runningServer = server;
-                        break;
-                    }
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
-                }
-            }
-        }
-
         // Set up the constants
-        SERVER = runningServer;
-        IS_COMPATIBLE = compatible;
-        MC_VERSION = mc_version;
+        SERVER = CommonBootstrap.getCommonServer();
+        IS_COMPATIBLE = SERVER.isCompatible();
+        MC_VERSION = SERVER.getMinecraftVersion();
         IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
 
@@ -278,6 +237,11 @@ public class Common {
 
         // Only do these things when we are compatible
         if (Common.IS_COMPATIBLE) {
+            // Debug
+            if (CommonBootstrap.WARN_WHEN_INIT_TEMPLATES) {
+                Logging.LOGGER.log(Level.WARNING, "WARN_WHEN_INIT_TEMPLATES", new RuntimeException("Initializing templates"));
+            }
+
             // This must be initialized AFTER we have registered the Class path resolvers!
             TEMPLATE_RESOLVER.load();
             Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);
@@ -363,6 +327,6 @@ public class Common {
      * @return True if the version matches, False if not
      */
     public static boolean evaluateMCVersion(String operand, String version) {
-        return MountiplexUtil.evaluateText(MC_VERSION, operand, version);
+        return CommonBootstrap.evaluateMCVersion(operand, version);
     }
 }

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -11,6 +10,8 @@ import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 import org.bukkit.Bukkit;
 
 public class CraftBukkitServer extends CommonServerBase {
+    private static final String CB_ROOT = "org.bukkit.craftbukkit";
+    private static final String NMS_ROOT = "net.minecraft.server";
 
     /**
      * Defines the Package Version
@@ -38,18 +39,18 @@ public class CraftBukkitServer extends CommonServerBase {
 
         // Find out what package version is used
         String serverPath = SERVER_CLASS.getName();
-        if (!serverPath.startsWith(Common.CB_ROOT)) {
+        if (!serverPath.startsWith(CB_ROOT)) {
             return false;
         }
-        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(Common.CB_ROOT.length() + 1), ".");
+        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(CB_ROOT.length() + 1), ".");
 
         // Obtain the versioned roots
         if (PACKAGE_VERSION.isEmpty()) {
-            NMS_ROOT_VERSIONED = Common.NMS_ROOT;
-            CB_ROOT_VERSIONED = Common.CB_ROOT;
+            NMS_ROOT_VERSIONED = NMS_ROOT;
+            CB_ROOT_VERSIONED = CB_ROOT;
         } else {
-            NMS_ROOT_VERSIONED = Common.NMS_ROOT + "." + PACKAGE_VERSION;
-            CB_ROOT_VERSIONED = Common.CB_ROOT + "." + PACKAGE_VERSION;
+            NMS_ROOT_VERSIONED = NMS_ROOT + "." + PACKAGE_VERSION;
+            CB_ROOT_VERSIONED = CB_ROOT + "." + PACKAGE_VERSION;
         }
 
         // Figure out the MC version from the server
@@ -93,11 +94,11 @@ public class CraftBukkitServer extends CommonServerBase {
 
     @Override
     public String getClassName(String path) {
-        if (path.startsWith(Common.NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
-            return NMS_ROOT_VERSIONED + path.substring(Common.NMS_ROOT.length());
+        if (path.startsWith(NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
+            return NMS_ROOT_VERSIONED + path.substring(NMS_ROOT.length());
         }
-        if (path.startsWith(Common.CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
-            return CB_ROOT_VERSIONED + path.substring(Common.CB_ROOT.length());
+        if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
+            return CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
         }
         return path;
     }

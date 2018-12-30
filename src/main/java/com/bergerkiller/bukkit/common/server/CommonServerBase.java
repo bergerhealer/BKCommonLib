@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 
 import org.bukkit.Bukkit;
@@ -103,6 +104,31 @@ public abstract class CommonServerBase implements CommonServer {
     @Override
     public boolean isCompatible() {
         return Common.TEMPLATE_RESOLVER.isSupported(this.getMinecraftVersion());
+    }
+
+    @Override
+    public String getMinecraftVersionMajor() {
+        String clean_version = this.getMinecraftVersion();
+        int pre_idx = clean_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            clean_version = clean_version.substring(0, pre_idx);
+        }
+        return clean_version;
+    }
+
+    @Override
+    public String getMinecraftVersionPre() {
+        String mc_version = this.getMinecraftVersion();
+        int pre_idx = mc_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            return mc_version.substring(pre_idx + 4);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean evaluateMCVersion(String operand, String version) {
+        return MountiplexUtil.evaluateText(this.getMinecraftVersion(), operand, version);
     }
 
     @Override
