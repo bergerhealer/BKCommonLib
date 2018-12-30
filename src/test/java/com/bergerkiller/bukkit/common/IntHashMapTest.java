@@ -11,10 +11,6 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 public class IntHashMapTest {
 
-    static {
-        CommonUtil.bootstrap();
-    }
-    
     @Test
     public void testHashMap() {
         IntHashMap<String> test = new IntHashMap<String>();

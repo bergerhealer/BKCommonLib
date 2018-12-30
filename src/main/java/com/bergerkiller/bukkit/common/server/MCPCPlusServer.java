@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;

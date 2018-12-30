@@ -5,13 +5,8 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class PacketTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testPacketDirection() {

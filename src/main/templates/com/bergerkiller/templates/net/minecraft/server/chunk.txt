@@ -200,9 +200,12 @@ class EnumSkyBlock {
 }
 
 class HeightMap {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     public void initialize:a();
 
     public int getHeight:a(int x, int z);
 
+    class HeightMap.Type {
+    }
 }

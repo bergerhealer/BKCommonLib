@@ -17,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     public static final Iterable<?> getRegistry() {
 #if version >= 1.13.1
@@ -229,6 +230,8 @@ class Block {
 }
 
 class Blocks {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
     public static final (Object) Block LADDER;
 }
 

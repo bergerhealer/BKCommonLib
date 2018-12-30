@@ -8,7 +8,6 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
@@ -19,10 +18,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 // Tests the EntitySlice <> List conversion that occurs on CraftBukkit
 public class CBEntitySliceTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testSliceConverter() {

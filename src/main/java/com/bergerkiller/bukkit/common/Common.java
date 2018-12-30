@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.conversion.CommonConverters;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.map.MapResourcePack;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -57,10 +57,6 @@ public class Common {
      */
     public static final CommonServer SERVER;
     /**
-     * Description text of the server, logged during startup
-     */
-    public static final String SERVER_DESCRIPTION;
-    /**
      * Resolves template Class Declarations at runtime
      */
     public static final TemplateResolver TEMPLATE_RESOLVER = new TemplateResolver();
@@ -101,12 +97,8 @@ public class Common {
     }
 
     static {
-        // We MUST have an instantiated Bukkit server to perform tests
-        // This here initializes a test server as required
-        IS_TEST_MODE = (Bukkit.getServer() == null);
-        if (IS_TEST_MODE) {
-            TestServerFactory.initTestServer();
-        }
+        // Used to detect whether running in a live environment, or under test
+        IS_TEST_MODE = CommonBootstrap.isTestMode();
 
         // Depends on whether Bukkit server is initialized
         LOGGER = Logging.LOGGER;
@@ -117,26 +109,36 @@ public class Common {
         String mc_version = "UNKNOWN";
 
         // Get all available server types
-        List<CommonServer> servers = new ArrayList<>();
-        servers.add(new MCPCPlusServer());
-        servers.add(new PaperSpigotServer());
-        servers.add(new SpigotServer());
-        servers.add(new SportBukkitServer());
-        servers.add(new CraftBukkitServer());
-        servers.add(new UnknownServer());
+        if (IS_TEST_MODE) {
+            // Always Spigot server
+            runningServer = new SpigotServer();
+            runningServer.init();
+            runningServer.postInit();
+            compatible = runningServer.isCompatible();
+            mc_version = runningServer.getMinecraftVersion();
+        } else {
+            // Autodetect most likely server type
+            List<CommonServer> servers = new ArrayList<>();
+            servers.add(new MCPCPlusServer());
+            servers.add(new PaperSpigotServer());
+            servers.add(new SpigotServer());
+            servers.add(new SportBukkitServer());
+            servers.add(new CraftBukkitServer());
+            servers.add(new UnknownServer());
 
-        // Use the first one that initializes correctly
-        for (CommonServer server : servers) {
-            try {
-                if (server.init()) {
-                    server.postInit();
-                    compatible = server.isCompatible();
-                    mc_version = server.getMinecraftVersion();
-                    runningServer = server;
-                    break;
+            // Use the first one that initializes correctly
+            for (CommonServer server : servers) {
+                try {
+                    if (server.init()) {
+                        server.postInit();
+                        compatible = server.isCompatible();
+                        mc_version = server.getMinecraftVersion();
+                        runningServer = server;
+                        break;
+                    }
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
                 }
-            } catch (Throwable t) {
-                Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
             }
         }
 
@@ -146,18 +148,6 @@ public class Common {
         MC_VERSION = mc_version;
         IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
-
-        // Create server description token
-        final StringBuilder serverDesc = new StringBuilder(300);
-        serverDesc.append(SERVER.getServerName()).append(" (");
-        serverDesc.append(SERVER.getServerDescription());
-        serverDesc.append(") : ").append(SERVER.getServerVersion());
-        SERVER_DESCRIPTION = serverDesc.toString();
-
-        // Under test, log server information
-        if (Common.IS_TEST_MODE) {
-            Logging.LOGGER.log(Level.INFO, "Test running on " + SERVER_DESCRIPTION);
-        }
 
         // Register server to handle field, method and class resolving
         //TODO! Implement these functions in SERVER directly
@@ -256,6 +246,7 @@ public class Common {
             if (Common.evaluateMCVersion("<", "1.13")) {
                 remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
                 remappings.put(nms_root + ".HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
+                remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
                 remappings.put(nms_root + ".VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
             }
 
@@ -298,11 +289,6 @@ public class Common {
                 CommonUtil.loadClass(DuplexConversion.class);
             } catch (Throwable t) {
                 Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
-            }
-
-            // On the test server, automatically load the Minecraft client jar
-            if (IS_TEST_MODE) {
-                MapResourcePack.VANILLA.load();
             }
         }
 

@@ -7,7 +7,6 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -15,10 +14,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 
 public class DataWatcherTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testConstruction() {

@@ -32,10 +32,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 public class TemplateTest {
 
-    static {
-        CommonUtil.bootstrap();
-    }
-
     @Test
     public void testTemplate() {
         boolean fullySuccessful = true;

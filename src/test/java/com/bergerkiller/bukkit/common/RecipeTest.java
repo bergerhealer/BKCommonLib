@@ -10,14 +10,9 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.RecipeUtil;
 
 public class RecipeTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testFurnaceRecipes() {

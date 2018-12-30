@@ -6,14 +6,9 @@ import org.bukkit.ChatColor;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 public class ChatTextTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testChatText() {

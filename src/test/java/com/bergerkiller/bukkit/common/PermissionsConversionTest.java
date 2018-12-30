@@ -6,13 +6,8 @@ import org.bukkit.permissions.PermissionDefault;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class PermissionsConversionTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testPermissionDefaultConversion() {

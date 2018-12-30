@@ -10,17 +10,12 @@ import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 
 /**
  * Tests isometric rendering of blocks
  */
 public class MapIsometricTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Ignore
     @Test

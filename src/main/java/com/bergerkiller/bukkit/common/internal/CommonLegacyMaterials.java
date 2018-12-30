@@ -10,14 +10,13 @@ import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 /**
  * Helper methods for all legacy Material API
  */
 public class CommonLegacyMaterials {
-    private static final IntHashMap<Material> idToMaterial = new IntHashMap<Material>();
+    private static final HashMap<Integer, Material> idToMaterial = new HashMap<Integer, Material>();
     private static final EnumMap<Material, Integer> materialToId = new EnumMap<Material, Integer>(Material.class);
     private static final Map<String, Material> allMaterialValuesByName = new HashMap<String, Material>();
     private static final Material[] allMaterialValues;

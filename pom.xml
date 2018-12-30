@@ -21,7 +21,7 @@
         <!-- Library versions -->
         <minecraft.version>1.13.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>1.54</mountiplex.version>
+        <mountiplex.version>1.56</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -123,18 +123,6 @@
             <exclusions>
                 <!-- Exclude dependencies of the maven plugin, this is a temp fix and needs to be corrected -->
                 <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib-nodep</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.objenesis</groupId>
-                    <artifactId>objenesis</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.javassist</groupId>
-                    <artifactId>javassist</artifactId>
-                </exclusion>
-                <exclusion>
                     <groupId>org.apache.maven</groupId>
                     <artifactId>maven-plugin-api</artifactId>
                 </exclusion>
@@ -192,15 +180,6 @@
                     <artifactId>BukkitExecutors</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <!-- Trove is available in the server, this is here so that CI understands -->
-        <!-- https://mvnrepository.com/artifact/net.sf.trove4j/trove4j -->
-        <dependency>
-            <groupId>net.sf.trove4j</groupId>
-            <artifactId>trove4j</artifactId>
-            <version>3.0.3</version>
-            <scope>provided</scope>
         </dependency>
 
         <!-- Test dependencies -->
@@ -374,6 +353,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <minimizeJar>true</minimizeJar>
                     <finalName>${project.finalNameBase}</finalName>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
@@ -386,7 +366,34 @@
                             <pattern>com.google.gson</pattern>
                             <shadedPattern>com.bergerkiller.bukkit.common.dep.gson</shadedPattern>
                         </relocation>
+                        <relocation>
+                            <pattern>net.sf.cglib</pattern>
+                            <shadedPattern>com.bergerkiller.mountiplex.dep.net.sf.cglib</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.objectweb.asm</pattern>
+                            <shadedPattern>com.bergerkiller.mountiplex.dep.org.objectweb.asm</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>org.objenesis</pattern>
+                            <shadedPattern>com.bergerkiller.mountiplex.dep.org.objenesis</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>javassist</pattern>
+                            <shadedPattern>com.bergerkiller.mountiplex.dep.javassist</shadedPattern>
+                        </relocation>
                     </relocations>
+                    <artifactSet>
+                        <includes>
+                            <include>org.ow2.asm</include>
+                            <include>cglib</include>
+                            <include>org.objenesis</include>
+                            <include>org.javassist</include>
+                            <include>com.bergerkiller.mountiplex</include>
+                            <include>com.google.code.gson</include>
+                            <include>co.aikar</include>
+                        </includes>
+                    </artifactSet>
                 </configuration>
                 <executions>
                     <execution>

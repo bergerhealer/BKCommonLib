@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
 
 /**
@@ -73,30 +72,37 @@ public class HeightMap extends BasicWrapper<HeightMapHandle> {
          */
         WORLD_SURFACE;
 
-        private final Object _handle;
+        private Object _handle;
+        private boolean _handleInit;
 
         private Type() {
-            Enum<?>[] values = (Enum<?>[]) CommonUtil.getNMSClass("HeightMap.Type").getEnumConstants();
-            Object handle = null;
-            for (Enum<?> value : values) {
-                if (value.name().equals("LIGHT_BLOCKING")) {
-                    handle = value;
-                }
-                if (value.name().equals(this.name())) {
-                    handle = value;
-                    break;
-                }
-            }
-            this._handle = handle;
+            this._handle = null;
+            this._handleInit = false;
         }
 
         /**
          * Gets the net.minecraft.server.Heightmap$Type handle of this Type.
-         * If it does not exist (1.12.2 and before), this returns null.
+         * If it does not exist (1.12.2 and before), this returns an internal LIGHT_BLOCKING constant.
          * 
          * @return handle
          */
         public Object getHandle() {
+            if (!this._handleInit) {
+                this._handleInit = true;
+
+                Enum<?>[] values = (Enum<?>[]) HeightMapHandle.TypeHandle.T.getType().getEnumConstants();
+                Object handle = null;
+                for (Enum<?> value : values) {
+                    if (value.name().equals("LIGHT_BLOCKING")) {
+                        handle = value;
+                    }
+                    if (value.name().equals(this.name())) {
+                        handle = value;
+                        break;
+                    }
+                }
+                this._handle = handle;
+            }
             return this._handle;
         }
 

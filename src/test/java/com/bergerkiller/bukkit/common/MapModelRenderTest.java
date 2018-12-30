@@ -26,7 +26,6 @@ import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector2;
 import com.bergerkiller.bukkit.common.math.Vector3;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
@@ -36,10 +35,6 @@ public class MapModelRenderTest
 
     public static final int RES_WIDTH = 1280;
     public static final int RES_HEIGHT = 720;
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Ignore
     @Test

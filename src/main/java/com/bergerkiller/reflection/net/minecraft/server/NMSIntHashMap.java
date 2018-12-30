@@ -1,12 +1,13 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
+import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 
 public class NMSIntHashMap {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("IntHashMap");
+    public static final ClassTemplate<?> T = ClassTemplate.create(IntHashMapHandle.T.getType());
     public static final SafeConstructor<?> constructor = T.getConstructor();
     public static final FieldAccessor<Object[]> entries = T.selectField("private transient IntHashMapEntry<V>[] a");
     public static final MethodAccessor<Object> get = T.selectMethod("public V get(int paramInt)");

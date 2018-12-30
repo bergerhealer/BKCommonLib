@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 
 import org.bukkit.Bukkit;
 
@@ -57,15 +60,32 @@ public class CraftBukkitServer extends CommonServerBase {
     @Override
     public void postInit() {
         try {
-            // Obtain MinecraftServer instance from server
-            Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
-            MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
-            Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
+            // Find getVersion() method using reflection
+            Class<?> minecraftServerType = Class.forName(NMS_ROOT_VERSIONED + ".MinecraftServer", false, this.getClass().getClassLoader());
+            java.lang.reflect.Method getVersionMethod = minecraftServerType.getMethod("getVersion");
 
-            // Use MinecraftServer instance to obtain the version
-            Class<?> mcServer = minecraftServerInstance.getClass();
-            MethodAccessor<String> getVersion = new SafeMethod<String>(mcServer, "getVersion");
-            MC_VERSION = getVersion.invoke(minecraftServerInstance);
+            if (Bukkit.getServer() != null) {
+                // Obtain MinecraftServer instance from server
+                Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
+                MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
+                Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
+
+                // Use getVersion() on this instance
+                MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
+            } else {
+                // No server instance is available, fastest way is to inspect the bytecode using ASM
+                // Creating an instance, even without calling constructors, takes a long while to initialize
+                MC_VERSION = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
+
+                // Create an instance of Minecraft Server without calling any constructors
+                // This is a bit slower, but works as a reliable fallback
+                if (MC_VERSION == null) {
+                    Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
+                    ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                    Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
+                    MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
+                }
+            }
         } catch (Throwable t) {
             t.printStackTrace();
         }
@@ -113,4 +133,5 @@ public class CraftBukkitServer extends CommonServerBase {
     public String getServerName() {
         return "CraftBukkit";
     }
+
 }

@@ -36,6 +36,14 @@ public interface CommonServer {
     public void disable(CommonPlugin plugin);
 
     /**
+     * Combines all server information available into a single detailed description.
+     * This is the message displayed when the plugin is enabled.
+     * 
+     * @return server details String
+     */
+    public String getServerDetails();
+
+    /**
      * Gets the versioning information of the server
      *
      * @return server versioning description

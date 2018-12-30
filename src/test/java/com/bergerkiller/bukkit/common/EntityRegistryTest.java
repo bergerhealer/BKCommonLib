@@ -11,10 +11,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class EntityRegistryTest {
 
-    static {
-        CommonUtil.bootstrap();
-    }
-
     @Test
     public void loadCommonEntityTypes() {
         // Initialize the entity lists first

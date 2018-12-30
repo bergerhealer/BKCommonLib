@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import com.bergerkiller.reflection.net.minecraft.server.*;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
@@ -16,10 +15,6 @@ import static com.bergerkiller.bukkit.common.utils.CommonUtil.loadClass;
 import org.junit.Test;
 
 public class ReflectionTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     /*
     @Test

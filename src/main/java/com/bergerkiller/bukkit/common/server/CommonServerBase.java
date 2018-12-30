@@ -106,6 +106,16 @@ public abstract class CommonServerBase implements CommonServer {
     }
 
     @Override
+    public String getServerDetails() {
+        // Create server description token
+        final StringBuilder serverDesc = new StringBuilder(300);
+        serverDesc.append(getServerName()).append(" (");
+        serverDesc.append(getServerDescription());
+        serverDesc.append(") : ").append(getServerVersion());
+        return serverDesc.toString();
+    }
+
+    @Override
     public void enable(CommonPlugin plugin) {
     }
 

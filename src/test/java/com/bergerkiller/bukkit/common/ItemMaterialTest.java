@@ -36,10 +36,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  */
 public class ItemMaterialTest {
 
-    static {
-        CommonUtil.bootstrap();
-    }
-
     @Test
     public void testMaterialProperties() {
         testProperty(MaterialUtil.ISSOLID, "ISSOLID")

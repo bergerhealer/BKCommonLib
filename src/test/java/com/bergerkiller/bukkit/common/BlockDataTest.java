@@ -14,15 +14,10 @@ import org.bukkit.material.MaterialData;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 public class BlockDataTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testMaterialData() {

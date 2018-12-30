@@ -13,16 +13,11 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
  * Tests BasicConfiguration YAML stuff
  */
 public class ConfigTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Test
     public void testYAMLLoadSave() {

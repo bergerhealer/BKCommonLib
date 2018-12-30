@@ -1,3 +1,5 @@
+#resolver com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER
+
 #include /com/mojang/authlib/gameprofile.txt
 #include /com/mojang/authlib/properties.txt
 #include /org/bukkit/plugin.txt

@@ -11,14 +11,12 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapFont;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.bukkit.common.map.util.Model;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -26,10 +24,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * These test the various texture/model loading routines of the Map Resource Pack
  */
 public class MapResourcePackTest {
-
-    static {
-        CommonUtil.bootstrap();
-    }
 
     @Ignore
     @Test
