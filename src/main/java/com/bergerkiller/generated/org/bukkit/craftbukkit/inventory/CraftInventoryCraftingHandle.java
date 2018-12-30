@@ -12,7 +12,7 @@ import org.bukkit.inventory.CraftingInventory;
 public abstract class CraftInventoryCraftingHandle extends Template.Handle {
     /** @See {@link CraftInventoryCraftingClass} */
     public static final CraftInventoryCraftingClass T = new CraftInventoryCraftingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryCraftingHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryCrafting");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryCraftingHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryCrafting", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

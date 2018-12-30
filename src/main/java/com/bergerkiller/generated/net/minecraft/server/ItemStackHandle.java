@@ -15,7 +15,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class ItemStackHandle extends Template.Handle {
     /** @See {@link ItemStackClass} */
     public static final ItemStackClass T = new ItemStackClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ItemStackHandle.class, "net.minecraft.server.ItemStack", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

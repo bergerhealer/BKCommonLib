@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 public abstract class CraftChatMessageHandle extends Template.Handle {
     /** @See {@link CraftChatMessageClass} */
     public static final CraftChatMessageClass T = new CraftChatMessageClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChatMessageHandle.class, "org.bukkit.craftbukkit.util.CraftChatMessage");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChatMessageHandle.class, "org.bukkit.craftbukkit.util.CraftChatMessage", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

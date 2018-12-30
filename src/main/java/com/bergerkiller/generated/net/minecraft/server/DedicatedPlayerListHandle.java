@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class DedicatedPlayerListHandle extends PlayerListHandle {
     /** @See {@link DedicatedPlayerListClass} */
     public static final DedicatedPlayerListClass T = new DedicatedPlayerListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DedicatedPlayerListHandle.class, "net.minecraft.server.DedicatedPlayerList");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DedicatedPlayerListHandle.class, "net.minecraft.server.DedicatedPlayerList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

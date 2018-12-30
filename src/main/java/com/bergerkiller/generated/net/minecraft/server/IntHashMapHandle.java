@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IntHashMapHandle extends Template.Handle {
     /** @See {@link IntHashMapClass} */
     public static final IntHashMapClass T = new IntHashMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapHandle.class, "net.minecraft.server.IntHashMap");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapHandle.class, "net.minecraft.server.IntHashMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

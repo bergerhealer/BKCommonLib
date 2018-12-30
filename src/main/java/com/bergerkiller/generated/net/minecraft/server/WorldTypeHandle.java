@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.Dimension;
 public abstract class WorldTypeHandle extends Template.Handle {
     /** @See {@link WorldTypeClass} */
     public static final WorldTypeClass T = new WorldTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldTypeHandle.class, "net.minecraft.server.WorldType");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldTypeHandle.class, "net.minecraft.server.WorldType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

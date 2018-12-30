@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class ShapelessRecipesHandle extends IRecipeHandle {
     /** @See {@link ShapelessRecipesClass} */
     public static final ShapelessRecipesClass T = new ShapelessRecipesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ShapelessRecipesHandle.class, "net.minecraft.server.ShapelessRecipes");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ShapelessRecipesHandle.class, "net.minecraft.server.ShapelessRecipes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

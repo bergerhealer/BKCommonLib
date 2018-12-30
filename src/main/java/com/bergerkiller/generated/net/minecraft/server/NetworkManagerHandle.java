@@ -12,7 +12,7 @@ import io.netty.channel.Channel;
 public abstract class NetworkManagerHandle extends Template.Handle {
     /** @See {@link NetworkManagerClass} */
     public static final NetworkManagerClass T = new NetworkManagerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NetworkManagerHandle.class, "net.minecraft.server.NetworkManager");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(NetworkManagerHandle.class, "net.minecraft.server.NetworkManager", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

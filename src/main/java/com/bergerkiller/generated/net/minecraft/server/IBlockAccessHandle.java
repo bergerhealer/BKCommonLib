@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IBlockAccessHandle extends Template.Handle {
     /** @See {@link IBlockAccessClass} */
     public static final IBlockAccessClass T = new IBlockAccessClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockAccessHandle.class, "net.minecraft.server.IBlockAccess");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockAccessHandle.class, "net.minecraft.server.IBlockAccess", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

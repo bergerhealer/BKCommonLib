@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 public abstract class FoodMetaDataHandle extends Template.Handle {
     /** @See {@link FoodMetaDataClass} */
     public static final FoodMetaDataClass T = new FoodMetaDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(FoodMetaDataHandle.class, "net.minecraft.server.FoodMetaData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(FoodMetaDataHandle.class, "net.minecraft.server.FoodMetaData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

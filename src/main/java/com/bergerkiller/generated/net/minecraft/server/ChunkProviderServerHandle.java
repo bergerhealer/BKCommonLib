@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class ChunkProviderServerHandle extends Template.Handle {
     /** @See {@link ChunkProviderServerClass} */
     public static final ChunkProviderServerClass T = new ChunkProviderServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkProviderServerHandle.class, "net.minecraft.server.ChunkProviderServer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkProviderServerHandle.class, "net.minecraft.server.ChunkProviderServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

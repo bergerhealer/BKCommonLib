@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class AxisAlignedBBHandle extends Template.Handle {
     /** @See {@link AxisAlignedBBClass} */
     public static final AxisAlignedBBClass T = new AxisAlignedBBClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(AxisAlignedBBHandle.class, "net.minecraft.server.AxisAlignedBB");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(AxisAlignedBBHandle.class, "net.minecraft.server.AxisAlignedBB", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

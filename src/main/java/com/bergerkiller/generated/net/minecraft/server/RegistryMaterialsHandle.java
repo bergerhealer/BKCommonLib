@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class RegistryMaterialsHandle extends Template.Handle {
     /** @See {@link RegistryMaterialsClass} */
     public static final RegistryMaterialsClass T = new RegistryMaterialsClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryMaterialsHandle.class, "net.minecraft.server.RegistryMaterials");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryMaterialsHandle.class, "net.minecraft.server.RegistryMaterials", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

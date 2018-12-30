@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EntityMinecartRideableHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartRideableClass} */
     public static final EntityMinecartRideableClass T = new EntityMinecartRideableClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartRideableHandle.class, "net.minecraft.server.EntityMinecartRideable");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartRideableHandle.class, "net.minecraft.server.EntityMinecartRideable", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

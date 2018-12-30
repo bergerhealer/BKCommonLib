@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutTitleHandle extends PacketHandle {
     /** @See {@link PacketPlayOutTitleClass} */
     public static final PacketPlayOutTitleClass T = new PacketPlayOutTitleClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutTitleHandle.class, "net.minecraft.server.PacketPlayOutTitle");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutTitleHandle.class, "net.minecraft.server.PacketPlayOutTitle", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -37,7 +37,7 @@ public abstract class PacketPlayOutTitleHandle extends PacketHandle {
     public abstract static class EnumTitleActionHandle extends Template.Handle {
         /** @See {@link EnumTitleActionClass} */
         public static final EnumTitleActionClass T = new EnumTitleActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumTitleActionHandle.class, "net.minecraft.server.PacketPlayOutTitle.EnumTitleAction");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumTitleActionHandle.class, "net.minecraft.server.PacketPlayOutTitle.EnumTitleAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         public static final EnumTitleActionHandle TITLE = T.TITLE.getSafe();
         public static final EnumTitleActionHandle SUBTITLE = T.SUBTITLE.getSafe();

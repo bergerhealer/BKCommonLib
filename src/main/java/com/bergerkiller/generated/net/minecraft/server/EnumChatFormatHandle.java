@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumChatFormatHandle extends Template.Handle {
     /** @See {@link EnumChatFormatClass} */
     public static final EnumChatFormatClass T = new EnumChatFormatClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumChatFormatHandle.class, "net.minecraft.server.EnumChatFormat");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumChatFormatHandle.class, "net.minecraft.server.EnumChatFormat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumChatFormatHandle RESET = T.RESET.getSafe();
     /* ============================================================================== */

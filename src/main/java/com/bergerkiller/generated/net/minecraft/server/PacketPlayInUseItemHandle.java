@@ -13,7 +13,7 @@ import org.bukkit.block.BlockFace;
 public abstract class PacketPlayInUseItemHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseItemClass} */
     public static final PacketPlayInUseItemClass T = new PacketPlayInUseItemClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseItemHandle.class, "net.minecraft.server.PacketPlayInUseItem");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseItemHandle.class, "net.minecraft.server.PacketPlayInUseItem", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

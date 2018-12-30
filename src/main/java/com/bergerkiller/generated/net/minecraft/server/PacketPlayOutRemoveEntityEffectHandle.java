@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
     /** @See {@link PacketPlayOutRemoveEntityEffectClass} */
     public static final PacketPlayOutRemoveEntityEffectClass T = new PacketPlayOutRemoveEntityEffectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRemoveEntityEffectHandle.class, "net.minecraft.server.PacketPlayOutRemoveEntityEffect");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRemoveEntityEffectHandle.class, "net.minecraft.server.PacketPlayOutRemoveEntityEffect", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

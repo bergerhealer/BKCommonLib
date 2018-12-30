@@ -14,7 +14,7 @@ import org.bukkit.World;
 public abstract class CraftTravelAgentHandle extends PortalTravelAgentHandle {
     /** @See {@link CraftTravelAgentClass} */
     public static final CraftTravelAgentClass T = new CraftTravelAgentClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTravelAgentHandle.class, "org.bukkit.craftbukkit.CraftTravelAgent");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTravelAgentHandle.class, "org.bukkit.craftbukkit.CraftTravelAgent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

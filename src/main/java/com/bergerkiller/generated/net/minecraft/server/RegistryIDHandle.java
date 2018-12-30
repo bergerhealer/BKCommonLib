@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class RegistryIDHandle extends Template.Handle {
     /** @See {@link RegistryIDClass} */
     public static final RegistryIDClass T = new RegistryIDClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryIDHandle.class, "net.minecraft.server.RegistryID");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RegistryIDHandle.class, "net.minecraft.server.RegistryID", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

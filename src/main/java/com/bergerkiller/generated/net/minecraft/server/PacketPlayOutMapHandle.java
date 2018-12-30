@@ -12,7 +12,7 @@ import org.bukkit.map.MapCursor;
 public abstract class PacketPlayOutMapHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapClass} */
     public static final PacketPlayOutMapClass T = new PacketPlayOutMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapHandle.class, "net.minecraft.server.PacketPlayOutMap");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapHandle.class, "net.minecraft.server.PacketPlayOutMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

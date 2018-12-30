@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayInTeleportAcceptHandle extends PacketHandle {
     /** @See {@link PacketPlayInTeleportAcceptClass} */
     public static final PacketPlayInTeleportAcceptClass T = new PacketPlayInTeleportAcceptClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInTeleportAcceptHandle.class, "net.minecraft.server.PacketPlayInTeleportAccept");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInTeleportAcceptHandle.class, "net.minecraft.server.PacketPlayInTeleportAccept", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

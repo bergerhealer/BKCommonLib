@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity;
 public abstract class CraftEntityHandle extends Template.Handle {
     /** @See {@link CraftEntityClass} */
     public static final CraftEntityClass T = new CraftEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftEntityHandle.class, "org.bukkit.craftbukkit.entity.CraftEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftEntityHandle.class, "org.bukkit.craftbukkit.entity.CraftEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

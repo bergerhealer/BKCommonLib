@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityWeatherClass} */
     public static final PacketPlayOutSpawnEntityWeatherClass T = new PacketPlayOutSpawnEntityWeatherClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityWeatherHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityWeather");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityWeatherHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityWeather", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class SimplePluginManagerHandle extends Template.Handle {
     /** @See {@link SimplePluginManagerClass} */
     public static final SimplePluginManagerClass T = new SimplePluginManagerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SimplePluginManagerHandle.class, "org.bukkit.plugin.SimplePluginManager");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(SimplePluginManagerHandle.class, "org.bukkit.plugin.SimplePluginManager", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class MinecraftKeyHandle extends Template.Handle {
     /** @See {@link MinecraftKeyClass} */
     public static final MinecraftKeyClass T = new MinecraftKeyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftKeyHandle.class, "net.minecraft.server.MinecraftKey");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftKeyHandle.class, "net.minecraft.server.MinecraftKey", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

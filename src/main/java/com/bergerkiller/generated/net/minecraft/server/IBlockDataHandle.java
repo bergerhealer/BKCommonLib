@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class IBlockDataHandle extends Template.Handle {
     /** @See {@link IBlockDataClass} */
     public static final IBlockDataClass T = new IBlockDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockDataHandle.class, "net.minecraft.server.IBlockData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockDataHandle.class, "net.minecraft.server.IBlockData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

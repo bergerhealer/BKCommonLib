@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 public abstract class ChunkSectionHandle extends Template.Handle {
     /** @See {@link ChunkSectionClass} */
     public static final ChunkSectionClass T = new ChunkSectionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkSectionHandle.class, "net.minecraft.server.ChunkSection");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkSectionHandle.class, "net.minecraft.server.ChunkSection", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import org.bukkit.inventory.BrewerInventory;
 public abstract class CraftInventoryBrewerHandle extends Template.Handle {
     /** @See {@link CraftInventoryBrewerClass} */
     public static final CraftInventoryBrewerClass T = new CraftInventoryBrewerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBrewerHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBrewer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBrewerHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBrewer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

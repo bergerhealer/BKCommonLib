@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayInArmAnimationHandle extends PacketHandle {
     /** @See {@link PacketPlayInArmAnimationClass} */
     public static final PacketPlayInArmAnimationClass T = new PacketPlayInArmAnimationClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInArmAnimationHandle.class, "net.minecraft.server.PacketPlayInArmAnimation");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInArmAnimationHandle.class, "net.minecraft.server.PacketPlayInArmAnimation", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

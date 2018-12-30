@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class CreativeModeTabHandle extends Template.Handle {
     /** @See {@link CreativeModeTabClass} */
     public static final CreativeModeTabClass T = new CreativeModeTabClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CreativeModeTabHandle.class, "net.minecraft.server.CreativeModeTab");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CreativeModeTabHandle.class, "net.minecraft.server.CreativeModeTab", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final CreativeModeTabHandle SEARCH = T.SEARCH.getSafe();
     /* ============================================================================== */

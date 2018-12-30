@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IBlockStateHandle extends Template.Handle {
     /** @See {@link IBlockStateClass} */
     public static final IBlockStateClass T = new IBlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockStateHandle.class, "net.minecraft.server.IBlockState");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockStateHandle.class, "net.minecraft.server.IBlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

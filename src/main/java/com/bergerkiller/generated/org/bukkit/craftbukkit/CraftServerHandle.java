@@ -14,7 +14,7 @@ import org.bukkit.command.SimpleCommandMap;
 public abstract class CraftServerHandle extends Template.Handle {
     /** @See {@link CraftServerClass} */
     public static final CraftServerClass T = new CraftServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftServerHandle.class, "org.bukkit.craftbukkit.CraftServer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftServerHandle.class, "org.bukkit.craftbukkit.CraftServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

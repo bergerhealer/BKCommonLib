@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class MobEffectListHandle extends Template.Handle {
     /** @See {@link MobEffectListClass} */
     public static final MobEffectListClass T = new MobEffectListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectListHandle.class, "net.minecraft.server.MobEffectList");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectListHandle.class, "net.minecraft.server.MobEffectList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutWorldParticlesHandle extends Template.Handle {
     /** @See {@link PacketPlayOutWorldParticlesClass} */
     public static final PacketPlayOutWorldParticlesClass T = new PacketPlayOutWorldParticlesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWorldParticlesHandle.class, "net.minecraft.server.PacketPlayOutWorldParticles");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWorldParticlesHandle.class, "net.minecraft.server.PacketPlayOutWorldParticles", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

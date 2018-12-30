@@ -12,7 +12,7 @@ import org.bukkit.entity.Entity;
 public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityTeleportClass} */
     public static final PacketPlayOutEntityTeleportClass T = new PacketPlayOutEntityTeleportClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityTeleportHandle.class, "net.minecraft.server.PacketPlayOutEntityTeleport");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityTeleportHandle.class, "net.minecraft.server.PacketPlayOutEntityTeleport", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutUnloadChunkClass} */
     public static final PacketPlayOutUnloadChunkClass T = new PacketPlayOutUnloadChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUnloadChunkHandle.class, "net.minecraft.server.PacketPlayOutUnloadChunk");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUnloadChunkHandle.class, "net.minecraft.server.PacketPlayOutUnloadChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

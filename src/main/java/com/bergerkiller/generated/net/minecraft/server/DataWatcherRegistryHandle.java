@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class DataWatcherRegistryHandle extends Template.Handle {
     /** @See {@link DataWatcherRegistryClass} */
     public static final DataWatcherRegistryClass T = new DataWatcherRegistryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherRegistryHandle.class, "net.minecraft.server.DataWatcherRegistry");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherRegistryHandle.class, "net.minecraft.server.DataWatcherRegistry", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

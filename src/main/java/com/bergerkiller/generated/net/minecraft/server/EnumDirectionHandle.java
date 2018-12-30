@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumDirectionHandle extends Template.Handle {
     /** @See {@link EnumDirectionClass} */
     public static final EnumDirectionClass T = new EnumDirectionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDirectionHandle.class, "net.minecraft.server.EnumDirection");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDirectionHandle.class, "net.minecraft.server.EnumDirection", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumDirectionHandle DOWN = T.DOWN.getSafe();
     public static final EnumDirectionHandle UP = T.UP.getSafe();
@@ -50,7 +50,7 @@ public abstract class EnumDirectionHandle extends Template.Handle {
     public abstract static class EnumAxisHandle extends Template.Handle {
         /** @See {@link EnumAxisClass} */
         public static final EnumAxisClass T = new EnumAxisClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumAxisHandle.class, "net.minecraft.server.EnumDirection.EnumAxis");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumAxisHandle.class, "net.minecraft.server.EnumDirection.EnumAxis", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         public static final EnumAxisHandle X = T.X.getSafe();
         public static final EnumAxisHandle Y = T.Y.getSafe();

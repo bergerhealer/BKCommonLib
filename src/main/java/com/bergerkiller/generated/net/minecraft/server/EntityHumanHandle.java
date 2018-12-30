@@ -15,7 +15,7 @@ import org.bukkit.entity.Entity;
 public abstract class EntityHumanHandle extends EntityLivingHandle {
     /** @See {@link EntityHumanClass} */
     public static final EntityHumanClass T = new EntityHumanClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHumanHandle.class, "net.minecraft.server.EntityHuman");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHumanHandle.class, "net.minecraft.server.EntityHuman", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

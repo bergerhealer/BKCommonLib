@@ -13,7 +13,7 @@ import java.io.RandomAccessFile;
 public abstract class RegionFileHandle extends Template.Handle {
     /** @See {@link RegionFileClass} */
     public static final RegionFileClass T = new RegionFileClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileHandle.class, "net.minecraft.server.RegionFile");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileHandle.class, "net.minecraft.server.RegionFile", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

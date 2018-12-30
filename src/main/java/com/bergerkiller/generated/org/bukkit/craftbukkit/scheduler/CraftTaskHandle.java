@@ -12,7 +12,7 @@ import org.bukkit.plugin.Plugin;
 public abstract class CraftTaskHandle extends Template.Handle {
     /** @See {@link CraftTaskClass} */
     public static final CraftTaskClass T = new CraftTaskClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTaskHandle.class, "org.bukkit.craftbukkit.scheduler.CraftTask");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftTaskHandle.class, "org.bukkit.craftbukkit.scheduler.CraftTask", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

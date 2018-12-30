@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class ContainerHandle extends Template.Handle {
     /** @See {@link ContainerClass} */
     public static final ContainerClass T = new ContainerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerHandle.class, "net.minecraft.server.Container");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerHandle.class, "net.minecraft.server.Container", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

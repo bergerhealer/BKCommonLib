@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class EntityItemFrameHandle extends EntityHandle {
     /** @See {@link EntityItemFrameClass} */
     public static final EntityItemFrameClass T = new EntityItemFrameClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemFrameHandle.class, "net.minecraft.server.EntityItemFrame");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemFrameHandle.class, "net.minecraft.server.EntityItemFrame", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

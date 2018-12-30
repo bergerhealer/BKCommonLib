@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class TileEntityFurnaceHandle extends TileEntityHandle {
     /** @See {@link TileEntityFurnaceClass} */
     public static final TileEntityFurnaceClass T = new TileEntityFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityFurnaceHandle.class, "net.minecraft.server.TileEntityFurnace");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityFurnaceHandle.class, "net.minecraft.server.TileEntityFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityExperienceOrbClass} */
     public static final PacketPlayOutSpawnEntityExperienceOrbClass T = new PacketPlayOutSpawnEntityExperienceOrbClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityExperienceOrbHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityExperienceOrbHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

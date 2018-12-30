@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IChatBaseComponentHandle extends Template.Handle {
     /** @See {@link IChatBaseComponentClass} */
     public static final IChatBaseComponentClass T = new IChatBaseComponentClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IChatBaseComponentHandle.class, "net.minecraft.server.IChatBaseComponent");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IChatBaseComponentHandle.class, "net.minecraft.server.IChatBaseComponent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -37,7 +37,7 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
     public abstract static class ChatSerializerHandle extends Template.Handle {
         /** @See {@link ChatSerializerClass} */
         public static final ChatSerializerClass T = new ChatSerializerClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ChatSerializerHandle.class, "net.minecraft.server.IChatBaseComponent.ChatSerializer");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(ChatSerializerHandle.class, "net.minecraft.server.IChatBaseComponent.ChatSerializer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

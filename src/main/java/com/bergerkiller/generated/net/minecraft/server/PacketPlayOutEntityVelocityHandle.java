@@ -12,7 +12,7 @@ import org.bukkit.entity.Entity;
 public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityVelocityClass} */
     public static final PacketPlayOutEntityVelocityClass T = new PacketPlayOutEntityVelocityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityVelocityHandle.class, "net.minecraft.server.PacketPlayOutEntityVelocity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityVelocityHandle.class, "net.minecraft.server.PacketPlayOutEntityVelocity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

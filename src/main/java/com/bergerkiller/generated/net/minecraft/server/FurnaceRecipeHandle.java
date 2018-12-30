@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 public abstract class FurnaceRecipeHandle extends IRecipeHandle {
     /** @See {@link FurnaceRecipeClass} */
     public static final FurnaceRecipeClass T = new FurnaceRecipeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(FurnaceRecipeHandle.class, "net.minecraft.server.FurnaceRecipe");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(FurnaceRecipeHandle.class, "net.minecraft.server.FurnaceRecipe", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

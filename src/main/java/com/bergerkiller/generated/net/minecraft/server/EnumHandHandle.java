@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumHandHandle extends Template.Handle {
     /** @See {@link EnumHandClass} */
     public static final EnumHandClass T = new EnumHandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumHandHandle.class, "net.minecraft.server.EnumHand");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumHandHandle.class, "net.minecraft.server.EnumHand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumHandHandle MAIN_HAND = T.MAIN_HAND.getSafe();
     public static final EnumHandHandle OFF_HAND = T.OFF_HAND.getSafe();

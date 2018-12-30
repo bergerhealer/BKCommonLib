@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class PlayerInventoryHandle extends InventoryHandle {
     /** @See {@link PlayerInventoryClass} */
     public static final PlayerInventoryClass T = new PlayerInventoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "org.bukkit.inventory.PlayerInventory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "org.bukkit.inventory.PlayerInventory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

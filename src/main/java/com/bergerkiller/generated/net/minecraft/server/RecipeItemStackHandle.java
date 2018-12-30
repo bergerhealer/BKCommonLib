@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class RecipeItemStackHandle extends Template.Handle {
     /** @See {@link RecipeItemStackClass} */
     public static final RecipeItemStackClass T = new RecipeItemStackClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RecipeItemStackHandle.class, "net.minecraft.server.RecipeItemStack");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RecipeItemStackHandle.class, "net.minecraft.server.RecipeItemStack", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

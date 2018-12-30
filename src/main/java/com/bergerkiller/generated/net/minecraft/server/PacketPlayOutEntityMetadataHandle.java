@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityMetadataClass} */
     public static final PacketPlayOutEntityMetadataClass T = new PacketPlayOutEntityMetadataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityMetadataHandle.class, "net.minecraft.server.PacketPlayOutEntityMetadata");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityMetadataHandle.class, "net.minecraft.server.PacketPlayOutEntityMetadata", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

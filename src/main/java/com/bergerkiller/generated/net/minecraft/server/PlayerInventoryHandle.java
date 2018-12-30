@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 public abstract class PlayerInventoryHandle extends IInventoryHandle {
     /** @See {@link PlayerInventoryClass} */
     public static final PlayerInventoryClass T = new PlayerInventoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "net.minecraft.server.PlayerInventory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInventoryHandle.class, "net.minecraft.server.PlayerInventory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

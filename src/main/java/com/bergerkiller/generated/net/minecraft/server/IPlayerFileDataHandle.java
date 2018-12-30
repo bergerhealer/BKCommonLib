@@ -13,7 +13,7 @@ import org.bukkit.entity.HumanEntity;
 public abstract class IPlayerFileDataHandle extends Template.Handle {
     /** @See {@link IPlayerFileDataClass} */
     public static final IPlayerFileDataClass T = new IPlayerFileDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IPlayerFileDataHandle.class, "net.minecraft.server.IPlayerFileData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IPlayerFileDataHandle.class, "net.minecraft.server.IPlayerFileData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

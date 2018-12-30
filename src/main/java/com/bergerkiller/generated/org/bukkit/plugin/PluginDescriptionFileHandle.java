@@ -12,7 +12,7 @@ import java.util.Map;
 public abstract class PluginDescriptionFileHandle extends Template.Handle {
     /** @See {@link PluginDescriptionFileClass} */
     public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

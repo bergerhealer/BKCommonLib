@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class ChunkRegionLoaderHandle extends Template.Handle {
     /** @See {@link ChunkRegionLoaderClass} */
     public static final ChunkRegionLoaderClass T = new ChunkRegionLoaderClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkRegionLoaderHandle.class, "net.minecraft.server.ChunkRegionLoader");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkRegionLoaderHandle.class, "net.minecraft.server.ChunkRegionLoader", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

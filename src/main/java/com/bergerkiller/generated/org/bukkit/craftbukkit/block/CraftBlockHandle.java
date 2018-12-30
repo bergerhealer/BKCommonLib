@@ -13,7 +13,7 @@ import org.bukkit.block.Block;
 public abstract class CraftBlockHandle extends Template.Handle {
     /** @See {@link CraftBlockClass} */
     public static final CraftBlockClass T = new CraftBlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockHandle.class, "org.bukkit.craftbukkit.block.CraftBlock");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockHandle.class, "org.bukkit.craftbukkit.block.CraftBlock", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayInBlockPlaceHandle extends PacketHandle {
     /** @See {@link PacketPlayInBlockPlaceClass} */
     public static final PacketPlayInBlockPlaceClass T = new PacketPlayInBlockPlaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBlockPlaceHandle.class, "net.minecraft.server.PacketPlayInBlockPlace");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBlockPlaceHandle.class, "net.minecraft.server.PacketPlayInBlockPlace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

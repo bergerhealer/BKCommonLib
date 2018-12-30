@@ -15,7 +15,7 @@ import org.bukkit.WorldType;
 public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
     /** @See {@link PacketPlayOutRespawnClass} */
     public static final PacketPlayOutRespawnClass T = new PacketPlayOutRespawnClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRespawnHandle.class, "net.minecraft.server.PacketPlayOutRespawn");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRespawnHandle.class, "net.minecraft.server.PacketPlayOutRespawn", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

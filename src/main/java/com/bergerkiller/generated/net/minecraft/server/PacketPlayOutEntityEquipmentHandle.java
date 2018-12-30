@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityEquipmentClass} */
     public static final PacketPlayOutEntityEquipmentClass T = new PacketPlayOutEntityEquipmentClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityEquipmentHandle.class, "net.minecraft.server.PacketPlayOutEntityEquipment");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityEquipmentHandle.class, "net.minecraft.server.PacketPlayOutEntityEquipment", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

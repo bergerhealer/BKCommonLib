@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 public abstract class EntityMinecartMobSpawnerHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartMobSpawnerClass} */
     public static final EntityMinecartMobSpawnerClass T = new EntityMinecartMobSpawnerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartMobSpawnerHandle.class, "net.minecraft.server.EntityMinecartMobSpawner");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartMobSpawnerHandle.class, "net.minecraft.server.EntityMinecartMobSpawner", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

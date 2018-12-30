@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class EntityHandle extends Template.Handle {
     /** @See {@link EntityClass} */
     public static final EntityClass T = new EntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "org.bukkit.entity.Entity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "org.bukkit.entity.Entity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketHandle extends Template.Handle {
     /** @See {@link PacketClass} */
     public static final PacketClass T = new PacketClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketHandle.class, "net.minecraft.server.Packet");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketHandle.class, "net.minecraft.server.Packet", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

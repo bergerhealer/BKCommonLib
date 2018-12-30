@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class SoundCategoryHandle extends Template.Handle {
     /** @See {@link SoundCategoryClass} */
     public static final SoundCategoryClass T = new SoundCategoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundCategoryHandle.class, "net.minecraft.server.SoundCategory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundCategoryHandle.class, "net.minecraft.server.SoundCategory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

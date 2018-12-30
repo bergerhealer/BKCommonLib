@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IWorldAccessHandle extends Template.Handle {
     /** @See {@link IWorldAccessClass} */
     public static final IWorldAccessClass T = new IWorldAccessClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IWorldAccessHandle.class, "net.minecraft.server.IWorldAccess");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IWorldAccessHandle.class, "net.minecraft.server.IWorldAccess", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

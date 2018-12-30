@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public abstract class PacketPlayInUpdateSignHandle extends PacketHandle {
     /** @See {@link PacketPlayInUpdateSignClass} */
     public static final PacketPlayInUpdateSignClass T = new PacketPlayInUpdateSignClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUpdateSignHandle.class, "net.minecraft.server.PacketPlayInUpdateSign");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUpdateSignHandle.class, "net.minecraft.server.PacketPlayInUpdateSign", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PropertyHandle extends Template.Handle {
     /** @See {@link PropertyClass} */
     public static final PropertyClass T = new PropertyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PropertyHandle.class, "com.mojang.authlib.properties.Property");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PropertyHandle.class, "com.mojang.authlib.properties.Property", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutVehicleMoveHandle extends PacketHandle {
     /** @See {@link PacketPlayOutVehicleMoveClass} */
     public static final PacketPlayOutVehicleMoveClass T = new PacketPlayOutVehicleMoveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutVehicleMoveHandle.class, "net.minecraft.server.PacketPlayOutVehicleMove");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutVehicleMoveHandle.class, "net.minecraft.server.PacketPlayOutVehicleMove", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

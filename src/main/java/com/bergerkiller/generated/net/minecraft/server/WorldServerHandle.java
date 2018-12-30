@@ -15,7 +15,7 @@ import java.util.UUID;
 public abstract class WorldServerHandle extends WorldHandle {
     /** @See {@link WorldServerClass} */
     public static final WorldServerClass T = new WorldServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

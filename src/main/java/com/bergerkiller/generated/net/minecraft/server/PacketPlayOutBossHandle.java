@@ -13,7 +13,7 @@ import java.util.UUID;
 public abstract class PacketPlayOutBossHandle extends PacketHandle {
     /** @See {@link PacketPlayOutBossClass} */
     public static final PacketPlayOutBossClass T = new PacketPlayOutBossClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutBossHandle.class, "net.minecraft.server.PacketPlayOutBoss");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutBossHandle.class, "net.minecraft.server.PacketPlayOutBoss", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

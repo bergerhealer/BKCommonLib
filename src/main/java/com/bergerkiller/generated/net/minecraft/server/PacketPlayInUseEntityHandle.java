@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseEntityClass} */
     public static final PacketPlayInUseEntityClass T = new PacketPlayInUseEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -59,7 +59,7 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
     public abstract static class EnumEntityUseActionHandle extends Template.Handle {
         /** @See {@link EnumEntityUseActionClass} */
         public static final EnumEntityUseActionClass T = new EnumEntityUseActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumEntityUseActionHandle.class, "net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumEntityUseActionHandle.class, "net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         public static final EnumEntityUseActionHandle INTERACT = T.INTERACT.getSafe();
         public static final EnumEntityUseActionHandle ATTACK = T.ATTACK.getSafe();

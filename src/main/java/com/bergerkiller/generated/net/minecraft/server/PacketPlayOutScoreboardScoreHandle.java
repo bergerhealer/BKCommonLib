@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardScoreClass} */
     public static final PacketPlayOutScoreboardScoreClass T = new PacketPlayOutScoreboardScoreClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardScoreHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardScoreHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -37,7 +37,7 @@ public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
     public abstract static class EnumScoreboardActionHandle extends Template.Handle {
         /** @See {@link EnumScoreboardActionClass} */
         public static final EnumScoreboardActionClass T = new EnumScoreboardActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumScoreboardActionHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumScoreboardActionHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         public static final EnumScoreboardActionHandle CHANGE = T.CHANGE.getSafe();
         public static final EnumScoreboardActionHandle REMOVE = T.REMOVE.getSafe();

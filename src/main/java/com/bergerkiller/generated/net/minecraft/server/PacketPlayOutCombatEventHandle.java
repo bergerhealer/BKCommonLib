@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public abstract class PacketPlayOutCombatEventHandle extends Template.Handle {
     /** @See {@link PacketPlayOutCombatEventClass} */
     public static final PacketPlayOutCombatEventClass T = new PacketPlayOutCombatEventClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutCombatEventHandle.class, "net.minecraft.server.PacketPlayOutCombatEvent");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutCombatEventHandle.class, "net.minecraft.server.PacketPlayOutCombatEvent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

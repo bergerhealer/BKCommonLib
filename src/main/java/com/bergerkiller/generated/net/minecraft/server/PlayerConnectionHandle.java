@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 public abstract class PlayerConnectionHandle extends Template.Handle {
     /** @See {@link PlayerConnectionClass} */
     public static final PlayerConnectionClass T = new PlayerConnectionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerConnectionHandle.class, "net.minecraft.server.PlayerConnection");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerConnectionHandle.class, "net.minecraft.server.PlayerConnection", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

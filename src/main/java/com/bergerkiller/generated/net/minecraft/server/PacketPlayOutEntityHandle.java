@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityClass} */
     public static final PacketPlayOutEntityClass T = new PacketPlayOutEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityHandle.class, "net.minecraft.server.PacketPlayOutEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityHandle.class, "net.minecraft.server.PacketPlayOutEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -100,7 +100,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     public abstract static class PacketPlayOutEntityLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutEntityLookClass} */
         public static final PacketPlayOutEntityLookClass T = new PacketPlayOutEntityLookClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutEntityLook");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutEntityLook", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 
@@ -148,7 +148,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     public abstract static class PacketPlayOutRelEntityMoveHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveClass} */
         public static final PacketPlayOutRelEntityMoveClass T = new PacketPlayOutRelEntityMoveClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMove");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMove", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 
@@ -197,7 +197,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     public abstract static class PacketPlayOutRelEntityMoveLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveLookClass} */
         public static final PacketPlayOutRelEntityMoveLookClass T = new PacketPlayOutRelEntityMoveLookClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

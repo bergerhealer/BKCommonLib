@@ -12,7 +12,7 @@ import java.util.Collection;
 public abstract class AttributeMapServerHandle extends Template.Handle {
     /** @See {@link AttributeMapServerClass} */
     public static final AttributeMapServerClass T = new AttributeMapServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeMapServerHandle.class, "net.minecraft.server.AttributeMapServer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeMapServerHandle.class, "net.minecraft.server.AttributeMapServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

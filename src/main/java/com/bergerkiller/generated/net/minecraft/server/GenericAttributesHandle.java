@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 public abstract class GenericAttributesHandle extends Template.Handle {
     /** @See {@link GenericAttributesClass} */
     public static final GenericAttributesClass T = new GenericAttributesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(GenericAttributesHandle.class, "net.minecraft.server.GenericAttributes");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(GenericAttributesHandle.class, "net.minecraft.server.GenericAttributes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final Object FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
     public static final Object MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();

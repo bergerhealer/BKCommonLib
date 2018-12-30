@@ -12,7 +12,7 @@ import com.bergerkiller.generated.org.bukkit.WorldHandle;
 public abstract class CraftWorldHandle extends WorldHandle {
     /** @See {@link CraftWorldClass} */
     public static final CraftWorldClass T = new CraftWorldClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftWorldHandle.class, "org.bukkit.craftbukkit.CraftWorld");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftWorldHandle.class, "org.bukkit.craftbukkit.CraftWorld", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

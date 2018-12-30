@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class ChatMessageTypeHandle extends Template.Handle {
     /** @See {@link ChatMessageTypeClass} */
     public static final ChatMessageTypeClass T = new ChatMessageTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChatMessageTypeHandle.class, "net.minecraft.server.ChatMessageType");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ChatMessageTypeHandle.class, "net.minecraft.server.ChatMessageType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

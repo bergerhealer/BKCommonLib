@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class WorldDataHandle extends Template.Handle {
     /** @See {@link WorldDataClass} */
     public static final WorldDataClass T = new WorldDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldDataHandle.class, "net.minecraft.server.WorldData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldDataHandle.class, "net.minecraft.server.WorldData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

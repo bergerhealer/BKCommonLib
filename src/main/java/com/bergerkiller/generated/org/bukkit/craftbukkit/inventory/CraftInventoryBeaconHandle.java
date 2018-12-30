@@ -12,7 +12,7 @@ import org.bukkit.inventory.BeaconInventory;
 public abstract class CraftInventoryBeaconHandle extends Template.Handle {
     /** @See {@link CraftInventoryBeaconClass} */
     public static final CraftInventoryBeaconClass T = new CraftInventoryBeaconClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBeaconHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBeacon");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBeaconHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBeacon", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

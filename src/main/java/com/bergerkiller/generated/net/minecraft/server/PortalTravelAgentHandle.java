@@ -14,7 +14,7 @@ import org.bukkit.util.Vector;
 public abstract class PortalTravelAgentHandle extends Template.Handle {
     /** @See {@link PortalTravelAgentClass} */
     public static final PortalTravelAgentClass T = new PortalTravelAgentClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PortalTravelAgentHandle.class, "net.minecraft.server.PortalTravelAgent");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PortalTravelAgentHandle.class, "net.minecraft.server.PortalTravelAgent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

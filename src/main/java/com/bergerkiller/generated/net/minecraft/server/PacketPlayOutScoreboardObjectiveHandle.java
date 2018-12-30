@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public abstract class PacketPlayOutScoreboardObjectiveHandle extends Template.Handle {
     /** @See {@link PacketPlayOutScoreboardObjectiveClass} */
     public static final PacketPlayOutScoreboardObjectiveClass T = new PacketPlayOutScoreboardObjectiveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardObjectiveHandle.class, "net.minecraft.server.PacketPlayOutScoreboardObjective");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardObjectiveHandle.class, "net.minecraft.server.PacketPlayOutScoreboardObjective", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

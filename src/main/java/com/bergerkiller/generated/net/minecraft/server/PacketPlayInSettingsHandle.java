@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 public abstract class PacketPlayInSettingsHandle extends PacketHandle {
     /** @See {@link PacketPlayInSettingsClass} */
     public static final PacketPlayInSettingsClass T = new PacketPlayInSettingsClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSettingsHandle.class, "net.minecraft.server.PacketPlayInSettings");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSettingsHandle.class, "net.minecraft.server.PacketPlayInSettings", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

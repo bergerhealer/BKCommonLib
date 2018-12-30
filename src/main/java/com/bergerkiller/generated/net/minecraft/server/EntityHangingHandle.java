@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 public abstract class EntityHangingHandle extends EntityHandle {
     /** @See {@link EntityHangingClass} */
     public static final EntityHangingClass T = new EntityHangingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHangingHandle.class, "net.minecraft.server.EntityHanging");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHangingHandle.class, "net.minecraft.server.EntityHanging", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

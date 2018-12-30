@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
     /** @See {@link PacketPlayInSetCreativeSlotClass} */
     public static final PacketPlayInSetCreativeSlotClass T = new PacketPlayInSetCreativeSlotClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSetCreativeSlotHandle.class, "net.minecraft.server.PacketPlayInSetCreativeSlot");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSetCreativeSlotHandle.class, "net.minecraft.server.PacketPlayInSetCreativeSlot", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

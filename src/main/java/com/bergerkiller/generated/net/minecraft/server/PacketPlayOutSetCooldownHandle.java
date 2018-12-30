@@ -13,7 +13,7 @@ import org.bukkit.Material;
 public abstract class PacketPlayOutSetCooldownHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSetCooldownClass} */
     public static final PacketPlayOutSetCooldownClass T = new PacketPlayOutSetCooldownClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSetCooldownHandle.class, "net.minecraft.server.PacketPlayOutSetCooldown");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSetCooldownHandle.class, "net.minecraft.server.PacketPlayOutSetCooldown", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

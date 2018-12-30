@@ -13,7 +13,7 @@ import java.util.Set;
 public abstract class LongObjectHashMapHandle extends Template.Handle {
     /** @See {@link LongObjectHashMapClass} */
     public static final LongObjectHashMapClass T = new LongObjectHashMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LongObjectHashMapHandle.class, "org.bukkit.craftbukkit.util.LongObjectHashMap");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(LongObjectHashMapHandle.class, "org.bukkit.craftbukkit.util.LongObjectHashMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

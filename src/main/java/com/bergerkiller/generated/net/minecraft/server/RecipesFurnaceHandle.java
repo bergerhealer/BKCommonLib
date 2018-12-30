@@ -14,7 +14,7 @@ import java.util.Map;
 public abstract class RecipesFurnaceHandle extends Template.Handle {
     /** @See {@link RecipesFurnaceClass} */
     public static final RecipesFurnaceClass T = new RecipesFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RecipesFurnaceHandle.class, "net.minecraft.server.RecipesFurnace");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RecipesFurnaceHandle.class, "net.minecraft.server.RecipesFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

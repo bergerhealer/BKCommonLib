@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public abstract class PacketPlayOutChatHandle extends PacketHandle {
     /** @See {@link PacketPlayOutChatClass} */
     public static final PacketPlayOutChatClass T = new PacketPlayOutChatClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutChatHandle.class, "net.minecraft.server.PacketPlayOutChat");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutChatHandle.class, "net.minecraft.server.PacketPlayOutChat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

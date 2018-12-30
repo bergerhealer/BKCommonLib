@@ -13,7 +13,7 @@ import org.bukkit.entity.Entity;
 public abstract class ExplosionHandle extends Template.Handle {
     /** @See {@link ExplosionClass} */
     public static final ExplosionClass T = new ExplosionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ExplosionHandle.class, "net.minecraft.server.Explosion");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ExplosionHandle.class, "net.minecraft.server.Explosion", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -17,7 +17,7 @@ import org.bukkit.World;
 public abstract class TileEntityHandle extends Template.Handle {
     /** @See {@link TileEntityClass} */
     public static final TileEntityClass T = new TileEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHandle.class, "net.minecraft.server.TileEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHandle.class, "net.minecraft.server.TileEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

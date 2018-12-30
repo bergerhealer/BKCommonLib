@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class Vec3DHandle extends Template.Handle {
     /** @See {@link Vec3DClass} */
     public static final Vec3DClass T = new Vec3DClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(Vec3DHandle.class, "net.minecraft.server.Vec3D");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(Vec3DHandle.class, "net.minecraft.server.Vec3D", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

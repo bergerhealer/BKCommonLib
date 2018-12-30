@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class MainHandHandle extends Template.Handle {
     /** @See {@link MainHandClass} */
     public static final MainHandClass T = new MainHandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MainHandHandle.class, "org.bukkit.inventory.MainHand");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MainHandHandle.class, "org.bukkit.inventory.MainHand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final MainHandHandle LEFT = T.LEFT.getSafe();
     public static final MainHandHandle RIGHT = T.RIGHT.getSafe();

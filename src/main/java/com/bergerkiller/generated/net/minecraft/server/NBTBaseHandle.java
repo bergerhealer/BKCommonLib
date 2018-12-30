@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class NBTBaseHandle extends Template.Handle {
     /** @See {@link NBTBaseClass} */
     public static final NBTBaseClass T = new NBTBaseClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTBaseHandle.class, "net.minecraft.server.NBTBase");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTBaseHandle.class, "net.minecraft.server.NBTBase", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

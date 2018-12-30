@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class TileEntityHopperHandle extends TileEntityHandle {
     /** @See {@link TileEntityHopperClass} */
     public static final TileEntityHopperClass T = new TileEntityHopperClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHopperHandle.class, "net.minecraft.server.TileEntityHopper");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHopperHandle.class, "net.minecraft.server.TileEntityHopper", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

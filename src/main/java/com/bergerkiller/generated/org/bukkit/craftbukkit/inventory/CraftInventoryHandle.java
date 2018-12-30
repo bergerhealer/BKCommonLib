@@ -14,7 +14,7 @@ import org.bukkit.inventory.Inventory;
 public abstract class CraftInventoryHandle extends InventoryHandle {
     /** @See {@link CraftInventoryClass} */
     public static final CraftInventoryClass T = new CraftInventoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

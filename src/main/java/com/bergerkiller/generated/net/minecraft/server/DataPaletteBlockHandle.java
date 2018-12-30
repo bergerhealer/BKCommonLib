@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 public abstract class DataPaletteBlockHandle extends Template.Handle {
     /** @See {@link DataPaletteBlockClass} */
     public static final DataPaletteBlockClass T = new DataPaletteBlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DataPaletteBlockHandle.class, "net.minecraft.server.DataPaletteBlock");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DataPaletteBlockHandle.class, "net.minecraft.server.DataPaletteBlock", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

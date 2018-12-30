@@ -15,7 +15,7 @@ import java.util.UUID;
 public abstract class GameProfileHandle extends Template.Handle {
     /** @See {@link GameProfileClass} */
     public static final GameProfileClass T = new GameProfileClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(GameProfileHandle.class, "com.mojang.authlib.GameProfile");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(GameProfileHandle.class, "com.mojang.authlib.GameProfile", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

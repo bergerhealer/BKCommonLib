@@ -12,7 +12,7 @@ import org.bukkit.Art;
 public abstract class CraftArtHandle extends Template.Handle {
     /** @See {@link CraftArtClass} */
     public static final CraftArtClass T = new CraftArtClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftArtHandle.class, "org.bukkit.craftbukkit.CraftArt");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftArtHandle.class, "org.bukkit.craftbukkit.CraftArt", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumProtocolDirectionHandle extends Template.Handle {
     /** @See {@link EnumProtocolDirectionClass} */
     public static final EnumProtocolDirectionClass T = new EnumProtocolDirectionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolDirectionHandle.class, "net.minecraft.server.EnumProtocolDirection");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolDirectionHandle.class, "net.minecraft.server.EnumProtocolDirection", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumProtocolDirectionHandle SERVERBOUND = T.SERVERBOUND.getSafe();
     public static final EnumProtocolDirectionHandle CLIENTBOUND = T.CLIENTBOUND.getSafe();

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PlayerAbilitiesHandle extends Template.Handle {
     /** @See {@link PlayerAbilitiesClass} */
     public static final PlayerAbilitiesClass T = new PlayerAbilitiesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerAbilitiesHandle.class, "net.minecraft.server.PlayerAbilities");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerAbilitiesHandle.class, "net.minecraft.server.PlayerAbilities", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

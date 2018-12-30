@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class PlayerChunkHandle extends Template.Handle {
     /** @See {@link PlayerChunkClass} */
     public static final PlayerChunkClass T = new PlayerChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkHandle.class, "net.minecraft.server.PlayerChunk");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkHandle.class, "net.minecraft.server.PlayerChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

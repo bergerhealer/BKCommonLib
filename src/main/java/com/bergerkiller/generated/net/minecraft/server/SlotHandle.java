@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class SlotHandle extends Template.Handle {
     /** @See {@link SlotClass} */
     public static final SlotClass T = new SlotClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SlotHandle.class, "net.minecraft.server.Slot");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(SlotHandle.class, "net.minecraft.server.Slot", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

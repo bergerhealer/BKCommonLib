@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumGamemodeHandle extends Template.Handle {
     /** @See {@link EnumGamemodeClass} */
     public static final EnumGamemodeClass T = new EnumGamemodeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumGamemodeHandle.class, "net.minecraft.server.EnumGamemode");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumGamemodeHandle.class, "net.minecraft.server.EnumGamemode", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

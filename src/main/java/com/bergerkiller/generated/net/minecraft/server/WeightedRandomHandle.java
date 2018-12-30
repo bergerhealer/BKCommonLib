@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class WeightedRandomHandle extends Template.Handle {
     /** @See {@link WeightedRandomClass} */
     public static final WeightedRandomClass T = new WeightedRandomClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomHandle.class, "net.minecraft.server.WeightedRandom");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomHandle.class, "net.minecraft.server.WeightedRandom", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -37,7 +37,7 @@ public abstract class WeightedRandomHandle extends Template.Handle {
     public abstract static class WeightedRandomChoiceHandle extends Template.Handle {
         /** @See {@link WeightedRandomChoiceClass} */
         public static final WeightedRandomChoiceClass T = new WeightedRandomChoiceClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomChoiceHandle.class, "net.minecraft.server.WeightedRandom.WeightedRandomChoice");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(WeightedRandomChoiceHandle.class, "net.minecraft.server.WeightedRandom.WeightedRandomChoice", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class BlockFenceGateHandle extends Template.Handle {
     /** @See {@link BlockFenceGateClass} */
     public static final BlockFenceGateClass T = new BlockFenceGateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockFenceGateHandle.class, "net.minecraft.server.BlockFenceGate");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockFenceGateHandle.class, "net.minecraft.server.BlockFenceGate", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

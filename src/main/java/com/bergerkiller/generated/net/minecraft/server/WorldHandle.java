@@ -21,7 +21,7 @@ import java.util.stream.Stream;
 public abstract class WorldHandle extends IBlockAccessHandle {
     /** @See {@link WorldClass} */
     public static final WorldClass T = new WorldClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -17,7 +17,7 @@ import java.util.Set;
 public abstract class EntityTrackerEntryHandle extends Template.Handle {
     /** @See {@link EntityTrackerEntryClass} */
     public static final EntityTrackerEntryClass T = new EntityTrackerEntryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryHandle.class, "net.minecraft.server.EntityTrackerEntry");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryHandle.class, "net.minecraft.server.EntityTrackerEntry", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

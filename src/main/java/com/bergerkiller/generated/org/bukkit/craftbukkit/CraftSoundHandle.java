@@ -12,7 +12,7 @@ import org.bukkit.Sound;
 public abstract class CraftSoundHandle extends Template.Handle {
     /** @See {@link CraftSoundClass} */
     public static final CraftSoundClass T = new CraftSoundClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftSoundHandle.class, "org.bukkit.craftbukkit.CraftSound");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftSoundHandle.class, "org.bukkit.craftbukkit.CraftSound", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

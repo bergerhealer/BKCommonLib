@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapChunkClass} */
     public static final PacketPlayOutMapChunkClass T = new PacketPlayOutMapChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapChunkHandle.class, "net.minecraft.server.PacketPlayOutMapChunk");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapChunkHandle.class, "net.minecraft.server.PacketPlayOutMapChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -120,7 +120,7 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     public abstract static class ChunkMapHandle extends Template.Handle {
         /** @See {@link ChunkMapClass} */
         public static final ChunkMapClass T = new ChunkMapClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkMapHandle.class, "net.minecraft.server.PacketPlayOutMapChunk.ChunkMap");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkMapHandle.class, "net.minecraft.server.PacketPlayOutMapChunk.ChunkMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 public abstract class EntityArmorStandHandle extends EntityLivingHandle {
     /** @See {@link EntityArmorStandClass} */
     public static final EntityArmorStandClass T = new EntityArmorStandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityArmorStandHandle.class, "net.minecraft.server.EntityArmorStand");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityArmorStandHandle.class, "net.minecraft.server.EntityArmorStand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

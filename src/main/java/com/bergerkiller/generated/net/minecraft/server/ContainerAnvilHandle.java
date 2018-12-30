@@ -12,7 +12,7 @@ import org.bukkit.inventory.InventoryView;
 public abstract class ContainerAnvilHandle extends ContainerHandle {
     /** @See {@link ContainerAnvilClass} */
     public static final ContainerAnvilClass T = new ContainerAnvilClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerAnvilHandle.class, "net.minecraft.server.ContainerAnvil");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerAnvilHandle.class, "net.minecraft.server.ContainerAnvil", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

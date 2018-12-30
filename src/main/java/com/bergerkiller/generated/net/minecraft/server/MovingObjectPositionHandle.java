@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
 public abstract class MovingObjectPositionHandle extends Template.Handle {
     /** @See {@link MovingObjectPositionClass} */
     public static final MovingObjectPositionClass T = new MovingObjectPositionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MovingObjectPositionHandle.class, "net.minecraft.server.MovingObjectPosition");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MovingObjectPositionHandle.class, "net.minecraft.server.MovingObjectPosition", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

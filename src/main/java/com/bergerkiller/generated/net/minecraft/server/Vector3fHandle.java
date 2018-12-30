@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class Vector3fHandle extends Template.Handle {
     /** @See {@link Vector3fClass} */
     public static final Vector3fClass T = new Vector3fClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(Vector3fHandle.class, "net.minecraft.server.Vector3f");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(Vector3fHandle.class, "net.minecraft.server.Vector3f", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

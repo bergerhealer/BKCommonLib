@@ -12,7 +12,7 @@ import java.util.List;
 public abstract class NBTTagListHandle extends NBTBaseHandle {
     /** @See {@link NBTTagListClass} */
     public static final NBTTagListClass T = new NBTTagListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagListHandle.class, "net.minecraft.server.NBTTagList");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagListHandle.class, "net.minecraft.server.NBTTagList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

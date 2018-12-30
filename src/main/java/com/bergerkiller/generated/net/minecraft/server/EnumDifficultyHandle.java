@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumDifficultyHandle extends Template.Handle {
     /** @See {@link EnumDifficultyClass} */
     public static final EnumDifficultyClass T = new EnumDifficultyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDifficultyHandle.class, "net.minecraft.server.EnumDifficulty");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDifficultyHandle.class, "net.minecraft.server.EnumDifficulty", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

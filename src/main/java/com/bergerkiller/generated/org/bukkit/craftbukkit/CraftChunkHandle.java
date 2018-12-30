@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class CraftChunkHandle extends Template.Handle {
     /** @See {@link CraftChunkClass} */
     public static final CraftChunkClass T = new CraftChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChunkHandle.class, "org.bukkit.craftbukkit.CraftChunk");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChunkHandle.class, "org.bukkit.craftbukkit.CraftChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -15,7 +15,7 @@ import java.util.Queue;
 public abstract class PlayerChunkMapHandle extends Template.Handle {
     /** @See {@link PlayerChunkMapClass} */
     public static final PlayerChunkMapClass T = new PlayerChunkMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkMapHandle.class, "net.minecraft.server.PlayerChunkMap");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerChunkMapHandle.class, "net.minecraft.server.PlayerChunkMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class BlockPositionHandle extends BaseBlockPositionHandle {
     /** @See {@link BlockPositionClass} */
     public static final BlockPositionClass T = new BlockPositionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockPositionHandle.class, "net.minecraft.server.BlockPosition");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockPositionHandle.class, "net.minecraft.server.BlockPosition", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

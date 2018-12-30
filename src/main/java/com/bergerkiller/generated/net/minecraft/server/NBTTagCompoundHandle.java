@@ -13,7 +13,7 @@ import java.util.Set;
 public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
     /** @See {@link NBTTagCompoundClass} */
     public static final NBTTagCompoundClass T = new NBTTagCompoundClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagCompoundHandle.class, "net.minecraft.server.NBTTagCompound");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagCompoundHandle.class, "net.minecraft.server.NBTTagCompound", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

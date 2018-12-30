@@ -14,7 +14,7 @@ import org.bukkit.event.block.BlockCanBuildEvent;
 public abstract class BlockCanBuildEventHandle extends Template.Handle {
     /** @See {@link BlockCanBuildEventClass} */
     public static final BlockCanBuildEventClass T = new BlockCanBuildEventClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCanBuildEventHandle.class, "org.bukkit.event.block.BlockCanBuildEvent");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCanBuildEventHandle.class, "org.bukkit.event.block.BlockCanBuildEvent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

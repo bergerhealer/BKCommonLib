@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class MethodProfilerHandle extends Template.Handle {
     /** @See {@link MethodProfilerClass} */
     public static final MethodProfilerClass T = new MethodProfilerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MethodProfilerHandle.class, "net.minecraft.server.MethodProfiler");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MethodProfilerHandle.class, "net.minecraft.server.MethodProfiler", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class DataWatcherHandle extends Template.Handle {
     /** @See {@link DataWatcherClass} */
     public static final DataWatcherClass T = new DataWatcherClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -99,7 +99,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract static class ItemHandle extends Template.Handle {
         /** @See {@link ItemClass} */
         public static final ItemClass T = new ItemClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

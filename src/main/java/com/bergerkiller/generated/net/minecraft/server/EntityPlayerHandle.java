@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class EntityPlayerHandle extends EntityHumanHandle {
     /** @See {@link EntityPlayerClass} */
     public static final EntityPlayerClass T = new EntityPlayerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

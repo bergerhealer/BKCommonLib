@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class ReportedExceptionHandle extends Template.Handle {
     /** @See {@link ReportedExceptionClass} */
     public static final ReportedExceptionClass T = new ReportedExceptionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ReportedExceptionHandle.class, "net.minecraft.server.ReportedException");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ReportedExceptionHandle.class, "net.minecraft.server.ReportedException", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

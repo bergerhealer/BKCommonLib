@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class DataWatcherObjectHandle extends Template.Handle {
     /** @See {@link DataWatcherObjectClass} */
     public static final DataWatcherObjectClass T = new DataWatcherObjectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherObjectHandle.class, "net.minecraft.server.DataWatcherObject");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherObjectHandle.class, "net.minecraft.server.DataWatcherObject", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

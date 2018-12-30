@@ -15,7 +15,7 @@ import java.util.UUID;
 public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityPaintingClass} */
     public static final PacketPlayOutSpawnEntityPaintingClass T = new PacketPlayOutSpawnEntityPaintingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityPaintingHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityPainting");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityPaintingHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityPainting", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -15,7 +15,7 @@ import org.bukkit.WorldType;
 public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     /** @See {@link PacketPlayOutLoginClass} */
     public static final PacketPlayOutLoginClass T = new PacketPlayOutLoginClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutLoginHandle.class, "net.minecraft.server.PacketPlayOutLogin");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutLoginHandle.class, "net.minecraft.server.PacketPlayOutLogin", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class HumanEntityHandle extends EntityHandle {
     /** @See {@link HumanEntityClass} */
     public static final HumanEntityClass T = new HumanEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(HumanEntityHandle.class, "org.bukkit.entity.HumanEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(HumanEntityHandle.class, "org.bukkit.entity.HumanEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

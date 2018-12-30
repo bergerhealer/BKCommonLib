@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class NonNullListHandle extends Template.Handle {
     /** @See {@link NonNullListClass} */
     public static final NonNullListClass T = new NonNullListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NonNullListHandle.class, "net.minecraft.server.NonNullList");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(NonNullListHandle.class, "net.minecraft.server.NonNullList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class ShapedRecipesHandle extends IRecipeHandle {
     /** @See {@link ShapedRecipesClass} */
     public static final ShapedRecipesClass T = new ShapedRecipesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ShapedRecipesHandle.class, "net.minecraft.server.ShapedRecipes");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ShapedRecipesHandle.class, "net.minecraft.server.ShapedRecipes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 public abstract class PacketPlayOutPlayerListHeaderFooterHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPlayerListHeaderFooterClass} */
     public static final PacketPlayOutPlayerListHeaderFooterClass T = new PacketPlayOutPlayerListHeaderFooterClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerListHeaderFooterHandle.class, "net.minecraft.server.PacketPlayOutPlayerListHeaderFooter");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerListHeaderFooterHandle.class, "net.minecraft.server.PacketPlayOutPlayerListHeaderFooter", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

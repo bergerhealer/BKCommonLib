@@ -12,7 +12,7 @@ import org.bukkit.Material;
 public abstract class CraftMagicNumbersHandle extends Template.Handle {
     /** @See {@link CraftMagicNumbersClass} */
     public static final CraftMagicNumbersClass T = new CraftMagicNumbersClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftMagicNumbersHandle.class, "org.bukkit.craftbukkit.util.CraftMagicNumbers");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftMagicNumbersHandle.class, "org.bukkit.craftbukkit.util.CraftMagicNumbers", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

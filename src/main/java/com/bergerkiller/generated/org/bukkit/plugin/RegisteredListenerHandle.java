@@ -12,7 +12,7 @@ import org.bukkit.plugin.EventExecutor;
 public abstract class RegisteredListenerHandle extends Template.Handle {
     /** @See {@link RegisteredListenerClass} */
     public static final RegisteredListenerClass T = new RegisteredListenerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegisteredListenerHandle.class, "org.bukkit.plugin.RegisteredListener");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RegisteredListenerHandle.class, "org.bukkit.plugin.RegisteredListener", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class PacketPlayOutWindowItemsHandle extends PacketHandle {
     /** @See {@link PacketPlayOutWindowItemsClass} */
     public static final PacketPlayOutWindowItemsClass T = new PacketPlayOutWindowItemsClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWindowItemsHandle.class, "net.minecraft.server.PacketPlayOutWindowItems");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWindowItemsHandle.class, "net.minecraft.server.PacketPlayOutWindowItems", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

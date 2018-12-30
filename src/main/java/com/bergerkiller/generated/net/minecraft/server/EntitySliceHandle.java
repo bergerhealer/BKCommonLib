@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class EntitySliceHandle extends Template.Handle {
     /** @See {@link EntitySliceClass} */
     public static final EntitySliceClass T = new EntitySliceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntitySliceHandle.class, "net.minecraft.server.EntitySlice");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntitySliceHandle.class, "net.minecraft.server.EntitySlice", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

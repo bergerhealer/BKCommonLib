@@ -14,7 +14,7 @@ import java.util.List;
 public abstract class IInventoryHandle extends Template.Handle {
     /** @See {@link IInventoryClass} */
     public static final IInventoryClass T = new IInventoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IInventoryHandle.class, "net.minecraft.server.IInventory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IInventoryHandle.class, "net.minecraft.server.IInventory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

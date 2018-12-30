@@ -14,7 +14,7 @@ import java.util.Collection;
 public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardTeamClass} */
     public static final PacketPlayOutScoreboardTeamClass T = new PacketPlayOutScoreboardTeamClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardTeamHandle.class, "net.minecraft.server.PacketPlayOutScoreboardTeam");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardTeamHandle.class, "net.minecraft.server.PacketPlayOutScoreboardTeam", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

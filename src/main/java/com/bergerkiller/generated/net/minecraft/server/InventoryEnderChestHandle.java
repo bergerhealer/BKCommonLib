@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 public abstract class InventoryEnderChestHandle extends IInventoryHandle {
     /** @See {@link InventoryEnderChestClass} */
     public static final InventoryEnderChestClass T = new InventoryEnderChestClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryEnderChestHandle.class, "net.minecraft.server.InventoryEnderChest");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryEnderChestHandle.class, "net.minecraft.server.InventoryEnderChest", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

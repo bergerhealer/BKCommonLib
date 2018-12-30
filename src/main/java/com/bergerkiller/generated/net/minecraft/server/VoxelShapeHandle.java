@@ -13,7 +13,7 @@ import java.util.stream.Stream;
 public abstract class VoxelShapeHandle extends Template.Handle {
     /** @See {@link VoxelShapeClass} */
     public static final VoxelShapeClass T = new VoxelShapeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(VoxelShapeHandle.class, "net.minecraft.server.VoxelShape");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(VoxelShapeHandle.class, "net.minecraft.server.VoxelShape", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 public abstract class EntityItemHandle extends EntityHandle {
     /** @See {@link EntityItemClass} */
     public static final EntityItemClass T = new EntityItemClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemHandle.class, "net.minecraft.server.EntityItem");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemHandle.class, "net.minecraft.server.EntityItem", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

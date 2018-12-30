@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartHopperClass} */
     public static final EntityMinecartHopperClass T = new EntityMinecartHopperClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartHopperHandle.class, "net.minecraft.server.EntityMinecartHopper");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartHopperHandle.class, "net.minecraft.server.EntityMinecartHopper", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

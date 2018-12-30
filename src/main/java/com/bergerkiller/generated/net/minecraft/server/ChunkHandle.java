@@ -19,7 +19,7 @@ import java.util.Map;
 public abstract class ChunkHandle extends Template.Handle {
     /** @See {@link ChunkClass} */
     public static final ChunkClass T = new ChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

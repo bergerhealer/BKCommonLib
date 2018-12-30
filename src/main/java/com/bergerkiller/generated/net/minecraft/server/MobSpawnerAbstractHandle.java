@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class MobSpawnerAbstractHandle extends Template.Handle {
     /** @See {@link MobSpawnerAbstractClass} */
     public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

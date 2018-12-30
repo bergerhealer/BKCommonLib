@@ -26,7 +26,7 @@ import java.util.UUID;
 public abstract class EntityHandle extends Template.Handle {
     /** @See {@link EntityClass} */
     public static final EntityClass T = new EntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "net.minecraft.server.Entity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

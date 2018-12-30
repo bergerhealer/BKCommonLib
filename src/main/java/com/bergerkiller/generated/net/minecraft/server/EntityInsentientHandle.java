@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 public abstract class EntityInsentientHandle extends EntityLivingHandle {
     /** @See {@link EntityInsentientClass} */
     public static final EntityInsentientClass T = new EntityInsentientClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityInsentientHandle.class, "net.minecraft.server.EntityInsentient");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityInsentientHandle.class, "net.minecraft.server.EntityInsentient", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

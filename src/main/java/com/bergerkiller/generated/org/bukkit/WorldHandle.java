@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class WorldHandle extends Template.Handle {
     /** @See {@link WorldClass} */
     public static final WorldClass T = new WorldClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "org.bukkit.World");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "org.bukkit.World", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

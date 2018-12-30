@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class MobSpawnerDataHandle extends Template.Handle {
     /** @See {@link MobSpawnerDataClass} */
     public static final MobSpawnerDataClass T = new MobSpawnerDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerDataHandle.class, "net.minecraft.server.MobSpawnerData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerDataHandle.class, "net.minecraft.server.MobSpawnerData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

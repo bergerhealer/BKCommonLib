@@ -13,7 +13,7 @@ import org.bukkit.map.MapCursor;
 public abstract class MapIconHandle extends Template.Handle {
     /** @See {@link MapIconClass} */
     public static final MapIconClass T = new MapIconClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MapIconHandle.class, "net.minecraft.server.MapIcon");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MapIconHandle.class, "net.minecraft.server.MapIcon", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -66,7 +66,7 @@ public abstract class MapIconHandle extends Template.Handle {
     public abstract static class TypeHandle extends Template.Handle {
         /** @See {@link TypeClass} */
         public static final TypeClass T = new TypeClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(TypeHandle.class, "net.minecraft.server.MapIcon.Type");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(TypeHandle.class, "net.minecraft.server.MapIcon.Type", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

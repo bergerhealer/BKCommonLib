@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayInResourcePackStatusHandle extends PacketHandle {
     /** @See {@link PacketPlayInResourcePackStatusClass} */
     public static final PacketPlayInResourcePackStatusClass T = new PacketPlayInResourcePackStatusClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInResourcePackStatusHandle.class, "net.minecraft.server.PacketPlayInResourcePackStatus");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInResourcePackStatusHandle.class, "net.minecraft.server.PacketPlayInResourcePackStatus", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

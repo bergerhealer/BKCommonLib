@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.Weig
 public abstract class BiomeBaseHandle extends Template.Handle {
     /** @See {@link BiomeBaseClass} */
     public static final BiomeBaseClass T = new BiomeBaseClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -38,7 +38,7 @@ public abstract class BiomeBaseHandle extends Template.Handle {
     public abstract static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
         /** @See {@link BiomeMetaClass} */
         public static final BiomeMetaClass T = new BiomeMetaClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 

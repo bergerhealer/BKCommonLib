@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutAttachEntityClass} */
     public static final PacketPlayOutAttachEntityClass T = new PacketPlayOutAttachEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutAttachEntityHandle.class, "net.minecraft.server.PacketPlayOutAttachEntity");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutAttachEntityHandle.class, "net.minecraft.server.PacketPlayOutAttachEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

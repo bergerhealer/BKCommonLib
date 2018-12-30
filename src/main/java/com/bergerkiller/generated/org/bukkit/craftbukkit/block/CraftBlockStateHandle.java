@@ -15,7 +15,7 @@ import org.bukkit.block.BlockState;
 public abstract class CraftBlockStateHandle extends Template.Handle {
     /** @See {@link CraftBlockStateClass} */
     public static final CraftBlockStateClass T = new CraftBlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

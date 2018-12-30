@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutKeepAliveHandle extends PacketHandle {
     /** @See {@link PacketPlayOutKeepAliveClass} */
     public static final PacketPlayOutKeepAliveClass T = new PacketPlayOutKeepAliveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutKeepAliveHandle.class, "net.minecraft.server.PacketPlayOutKeepAlive");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutKeepAliveHandle.class, "net.minecraft.server.PacketPlayOutKeepAlive", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

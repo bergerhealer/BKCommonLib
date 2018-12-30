@@ -12,7 +12,7 @@ import java.util.Set;
 public abstract class PacketPlayOutPositionHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPositionClass} */
     public static final PacketPlayOutPositionClass T = new PacketPlayOutPositionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPositionHandle.class, "net.minecraft.server.PacketPlayOutPosition");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPositionHandle.class, "net.minecraft.server.PacketPlayOutPosition", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

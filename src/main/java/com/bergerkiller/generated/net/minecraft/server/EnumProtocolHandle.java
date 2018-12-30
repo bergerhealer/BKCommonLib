@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class EnumProtocolHandle extends Template.Handle {
     /** @See {@link EnumProtocolClass} */
     public static final EnumProtocolClass T = new EnumProtocolClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolHandle.class, "net.minecraft.server.EnumProtocol");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolHandle.class, "net.minecraft.server.EnumProtocol", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumProtocolHandle PLAY = T.PLAY.getSafe();
     /* ============================================================================== */

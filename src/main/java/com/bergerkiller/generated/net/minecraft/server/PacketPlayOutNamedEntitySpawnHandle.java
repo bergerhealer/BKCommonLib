@@ -16,7 +16,7 @@ import java.util.UUID;
 public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
     /** @See {@link PacketPlayOutNamedEntitySpawnClass} */
     public static final PacketPlayOutNamedEntitySpawnClass T = new PacketPlayOutNamedEntitySpawnClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutNamedEntitySpawnHandle.class, "net.minecraft.server.PacketPlayOutNamedEntitySpawn");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutNamedEntitySpawnHandle.class, "net.minecraft.server.PacketPlayOutNamedEntitySpawn", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

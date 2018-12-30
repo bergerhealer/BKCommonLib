@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumSkyBlockHandle extends Template.Handle {
     /** @See {@link EnumSkyBlockClass} */
     public static final EnumSkyBlockClass T = new EnumSkyBlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumSkyBlockHandle.class, "net.minecraft.server.EnumSkyBlock");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumSkyBlockHandle.class, "net.minecraft.server.EnumSkyBlock", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumSkyBlockHandle SKY = T.SKY.getSafe();
     public static final EnumSkyBlockHandle BLOCK = T.BLOCK.getSafe();

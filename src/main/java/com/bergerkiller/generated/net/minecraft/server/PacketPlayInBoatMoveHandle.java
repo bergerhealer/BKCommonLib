@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayInBoatMoveHandle extends Template.Handle {
     /** @See {@link PacketPlayInBoatMoveClass} */
     public static final PacketPlayInBoatMoveClass T = new PacketPlayInBoatMoveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBoatMoveHandle.class, "net.minecraft.server.PacketPlayInBoatMove");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBoatMoveHandle.class, "net.minecraft.server.PacketPlayInBoatMove", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

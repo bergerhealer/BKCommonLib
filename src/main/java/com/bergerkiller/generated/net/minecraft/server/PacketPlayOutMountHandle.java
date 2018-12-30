@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class PacketPlayOutMountHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMountClass} */
     public static final PacketPlayOutMountClass T = new PacketPlayOutMountClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMountHandle.class, "net.minecraft.server.PacketPlayOutMount");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMountHandle.class, "net.minecraft.server.PacketPlayOutMount", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

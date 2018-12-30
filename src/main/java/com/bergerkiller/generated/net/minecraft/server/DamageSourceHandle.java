@@ -16,7 +16,7 @@ import org.bukkit.entity.LivingEntity;
 public abstract class DamageSourceHandle extends Template.Handle {
     /** @See {@link DamageSourceClass} */
     public static final DamageSourceClass T = new DamageSourceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

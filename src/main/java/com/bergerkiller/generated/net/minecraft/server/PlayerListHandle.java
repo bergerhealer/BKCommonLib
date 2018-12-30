@@ -16,7 +16,7 @@ import java.util.List;
 public abstract class PlayerListHandle extends Template.Handle {
     /** @See {@link PlayerListClass} */
     public static final PlayerListClass T = new PlayerListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerListHandle.class, "net.minecraft.server.PlayerList");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerListHandle.class, "net.minecraft.server.PlayerList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

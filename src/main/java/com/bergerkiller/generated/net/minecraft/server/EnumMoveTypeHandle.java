@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class EnumMoveTypeHandle extends Template.Handle {
     /** @See {@link EnumMoveTypeClass} */
     public static final EnumMoveTypeClass T = new EnumMoveTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumMoveTypeHandle.class, "net.minecraft.server.EnumMoveType");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumMoveTypeHandle.class, "net.minecraft.server.EnumMoveType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final EnumMoveTypeHandle SELF = T.SELF.getSafe();
     public static final EnumMoveTypeHandle PLAYER = T.PLAYER.getSafe();

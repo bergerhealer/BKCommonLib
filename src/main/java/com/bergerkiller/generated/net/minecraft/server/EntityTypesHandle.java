@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class EntityTypesHandle extends Template.Handle {
     /** @See {@link EntityTypesClass} */
     public static final EntityTypesClass T = new EntityTypesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

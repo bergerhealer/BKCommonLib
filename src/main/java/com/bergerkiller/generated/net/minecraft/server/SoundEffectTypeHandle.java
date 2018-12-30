@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class SoundEffectTypeHandle extends Template.Handle {
     /** @See {@link SoundEffectTypeClass} */
     public static final SoundEffectTypeClass T = new SoundEffectTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectTypeHandle.class, "net.minecraft.server.SoundEffectType");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectTypeHandle.class, "net.minecraft.server.SoundEffectType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 public abstract class MobEffectHandle extends Template.Handle {
     /** @See {@link MobEffectClass} */
     public static final MobEffectClass T = new MobEffectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectHandle.class, "net.minecraft.server.MobEffect");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectHandle.class, "net.minecraft.server.MobEffect", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

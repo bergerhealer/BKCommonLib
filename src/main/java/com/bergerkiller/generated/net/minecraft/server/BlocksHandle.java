@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class BlocksHandle extends Template.Handle {
     /** @See {@link BlocksClass} */
     public static final BlocksClass T = new BlocksClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlocksHandle.class, "net.minecraft.server.Blocks");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlocksHandle.class, "net.minecraft.server.Blocks", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final Object LADDER = T.LADDER.getSafe();
     /* ============================================================================== */

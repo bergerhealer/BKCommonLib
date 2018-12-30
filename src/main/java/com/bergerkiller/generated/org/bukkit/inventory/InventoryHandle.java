@@ -14,7 +14,7 @@ import java.util.HashMap;
 public abstract class InventoryHandle extends Template.Handle {
     /** @See {@link InventoryClass} */
     public static final InventoryClass T = new InventoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryHandle.class, "org.bukkit.inventory.Inventory");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryHandle.class, "org.bukkit.inventory.Inventory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

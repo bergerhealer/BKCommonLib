@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class AttributeInstanceHandle extends Template.Handle {
     /** @See {@link AttributeInstanceClass} */
     public static final AttributeInstanceClass T = new AttributeInstanceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeInstanceHandle.class, "net.minecraft.server.AttributeInstance");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeInstanceHandle.class, "net.minecraft.server.AttributeInstance", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

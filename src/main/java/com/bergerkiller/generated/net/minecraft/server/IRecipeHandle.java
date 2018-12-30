@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class IRecipeHandle extends Template.Handle {
     /** @See {@link IRecipeClass} */
     public static final IRecipeClass T = new IRecipeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IRecipeHandle.class, "net.minecraft.server.IRecipe");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IRecipeHandle.class, "net.minecraft.server.IRecipe", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

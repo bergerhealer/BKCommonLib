@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPlayerInfoClass} */
     public static final PacketPlayOutPlayerInfoClass T = new PacketPlayOutPlayerInfoClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerInfoHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerInfoHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
@@ -54,7 +54,7 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     public abstract static class PlayerInfoDataHandle extends Template.Handle {
         /** @See {@link PlayerInfoDataClass} */
         public static final PlayerInfoDataClass T = new PlayerInfoDataClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInfoDataHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInfoDataHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         /* ============================================================================== */
 
@@ -97,7 +97,7 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     public abstract static class EnumPlayerInfoActionHandle extends Template.Handle {
         /** @See {@link EnumPlayerInfoActionClass} */
         public static final EnumPlayerInfoActionClass T = new EnumPlayerInfoActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerInfoActionHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.EnumPlayerInfoAction");
+        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerInfoActionHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.EnumPlayerInfoAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
         public static final EnumPlayerInfoActionHandle ADD_PLAYER = T.ADD_PLAYER.getSafe();
         public static final EnumPlayerInfoActionHandle UPDATE_GAME_MODE = T.UPDATE_GAME_MODE.getSafe();

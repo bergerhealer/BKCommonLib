@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class CrashReportHandle extends Template.Handle {
     /** @See {@link CrashReportClass} */
     public static final CrashReportClass T = new CrashReportClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CrashReportHandle.class, "net.minecraft.server.CrashReport");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CrashReportHandle.class, "net.minecraft.server.CrashReport", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

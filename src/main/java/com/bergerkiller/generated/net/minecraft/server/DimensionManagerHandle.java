@@ -12,7 +12,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class DimensionManagerHandle extends Template.Handle {
     /** @See {@link DimensionManagerClass} */
     public static final DimensionManagerClass T = new DimensionManagerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DimensionManagerHandle.class, "net.minecraft.server.DimensionManager");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(DimensionManagerHandle.class, "net.minecraft.server.DimensionManager", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

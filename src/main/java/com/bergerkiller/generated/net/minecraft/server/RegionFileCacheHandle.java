@@ -13,7 +13,7 @@ import java.util.Map;
 public abstract class RegionFileCacheHandle extends Template.Handle {
     /** @See {@link RegionFileCacheClass} */
     public static final RegionFileCacheClass T = new RegionFileCacheClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileCacheHandle.class, "net.minecraft.server.RegionFileCache");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(RegionFileCacheHandle.class, "net.minecraft.server.RegionFileCache", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final Map<File, RegionFileHandle> FILES = T.FILES.getSafe();
     /* ============================================================================== */

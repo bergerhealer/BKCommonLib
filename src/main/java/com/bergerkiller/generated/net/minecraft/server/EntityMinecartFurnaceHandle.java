@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartFurnaceClass} */
     public static final EntityMinecartFurnaceClass T = new EntityMinecartFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

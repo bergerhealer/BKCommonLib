@@ -16,7 +16,7 @@ import java.util.Map;
 public abstract class EntityLivingHandle extends EntityHandle {
     /** @See {@link EntityLivingClass} */
     public static final EntityLivingClass T = new EntityLivingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityLivingHandle.class, "net.minecraft.server.EntityLiving");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityLivingHandle.class, "net.minecraft.server.EntityLiving", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 public abstract class CraftBlockDataHandle extends Template.Handle {
     /** @See {@link CraftBlockDataClass} */
     public static final CraftBlockDataClass T = new CraftBlockDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockDataHandle.class, "org.bukkit.craftbukkit.block.data.CraftBlockData");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockDataHandle.class, "org.bukkit.craftbukkit.block.data.CraftBlockData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

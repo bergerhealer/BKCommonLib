@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class IDataManagerHandle extends Template.Handle {
     /** @See {@link IDataManagerClass} */
     public static final IDataManagerClass T = new IDataManagerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IDataManagerHandle.class, "net.minecraft.server.IDataManager");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(IDataManagerHandle.class, "net.minecraft.server.IDataManager", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

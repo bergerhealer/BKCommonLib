@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 public abstract class EntityBatHandle extends EntityInsentientHandle {
     /** @See {@link EntityBatClass} */
     public static final EntityBatClass T = new EntityBatClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityBatHandle.class, "net.minecraft.server.EntityBat");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityBatHandle.class, "net.minecraft.server.EntityBat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

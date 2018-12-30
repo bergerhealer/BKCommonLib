@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle {
     /** @See {@link PacketPlayOutCustomSoundEffectClass} */
     public static final PacketPlayOutCustomSoundEffectClass T = new PacketPlayOutCustomSoundEffectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutCustomSoundEffectHandle.class, "net.minecraft.server.PacketPlayOutCustomSoundEffect");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutCustomSoundEffectHandle.class, "net.minecraft.server.PacketPlayOutCustomSoundEffect", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -15,7 +15,7 @@ import org.bukkit.World;
 public abstract class PacketPlayOutUpdateSignHandle extends Template.Handle {
     /** @See {@link PacketPlayOutUpdateSignClass} */
     public static final PacketPlayOutUpdateSignClass T = new PacketPlayOutUpdateSignClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUpdateSignHandle.class, "net.minecraft.server.PacketPlayOutUpdateSign");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUpdateSignHandle.class, "net.minecraft.server.PacketPlayOutUpdateSign", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class BlockCobbleWallHandle extends Template.Handle {
     /** @See {@link BlockCobbleWallClass} */
     public static final BlockCobbleWallClass T = new BlockCobbleWallClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCobbleWallHandle.class, "net.minecraft.server.BlockCobbleWall");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCobbleWallHandle.class, "net.minecraft.server.BlockCobbleWall", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

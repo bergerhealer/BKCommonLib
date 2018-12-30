@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     /** @See {@link EntityMinecartAbstractClass} */
     public static final EntityMinecartAbstractClass T = new EntityMinecartAbstractClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartAbstractHandle.class, "net.minecraft.server.EntityMinecartAbstract");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartAbstractHandle.class, "net.minecraft.server.EntityMinecartAbstract", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

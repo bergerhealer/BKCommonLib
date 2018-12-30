@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffect;
 public abstract class CraftPotionUtilHandle extends Template.Handle {
     /** @See {@link CraftPotionUtilClass} */
     public static final CraftPotionUtilClass T = new CraftPotionUtilClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftPotionUtilHandle.class, "org.bukkit.craftbukkit.potion.CraftPotionUtil");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftPotionUtilHandle.class, "org.bukkit.craftbukkit.potion.CraftPotionUtil", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

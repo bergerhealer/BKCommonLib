@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 public abstract class LocaleLanguageHandle extends Template.Handle {
     /** @See {@link LocaleLanguageClass} */
     public static final LocaleLanguageClass T = new LocaleLanguageClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LocaleLanguageHandle.class, "net.minecraft.server.LocaleLanguage");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(LocaleLanguageHandle.class, "net.minecraft.server.LocaleLanguage", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     public static final LocaleLanguageHandle INSTANCE = T.INSTANCE.getSafe();
     /* ============================================================================== */

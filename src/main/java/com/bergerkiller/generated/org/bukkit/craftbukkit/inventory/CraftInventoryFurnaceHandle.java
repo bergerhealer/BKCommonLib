@@ -12,7 +12,7 @@ import org.bukkit.inventory.FurnaceInventory;
 public abstract class CraftInventoryFurnaceHandle extends Template.Handle {
     /** @See {@link CraftInventoryFurnaceClass} */
     public static final CraftInventoryFurnaceClass T = new CraftInventoryFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryFurnaceHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryFurnace");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryFurnaceHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

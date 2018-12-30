@@ -13,7 +13,7 @@ import org.bukkit.inventory.ItemStack;
 public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
     /** @See {@link PacketPlayInWindowClickClass} */
     public static final PacketPlayInWindowClickClass T = new PacketPlayInWindowClickClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInWindowClickHandle.class, "net.minecraft.server.PacketPlayInWindowClick");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInWindowClickHandle.class, "net.minecraft.server.PacketPlayInWindowClick", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

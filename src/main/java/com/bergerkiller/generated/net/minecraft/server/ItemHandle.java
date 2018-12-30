@@ -13,7 +13,7 @@ import java.util.List;
 public abstract class ItemHandle extends Template.Handle {
     /** @See {@link ItemClass} */
     public static final ItemClass T = new ItemClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 

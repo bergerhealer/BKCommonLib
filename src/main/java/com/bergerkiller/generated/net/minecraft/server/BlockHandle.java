@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity;
 public abstract class BlockHandle extends Template.Handle {
     /** @See {@link BlockClass} */
     public static final BlockClass T = new BlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();

@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 public abstract class BlockStateHandle extends Template.Handle {
     /** @See {@link BlockStateClass} */
     public static final BlockStateClass T = new BlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockStateHandle.class, "org.bukkit.block.BlockState");
+    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockStateHandle.class, "org.bukkit.block.BlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
     /* ============================================================================== */
 
