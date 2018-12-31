@@ -66,10 +66,19 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             throw new IllegalArgumentException("Key is null");
         } else if (key instanceof Key.Disabled) {
             // Pass. Do nothing.
-        } else if (isWatched(key)) {
-            handle.set(key, value);
         } else {
-            watch(key, value);
+            // Note: throws a NPE when the key is not watched inside the datawatcher
+            // When this occurs, and after verifying it is indeed not watched, watch() it instead.
+            // This preserves performance of the most common set case
+            try {
+                handle.set(key, value);
+            } catch (NullPointerException ex) {
+                if (isWatched(key)) {
+                    throw ex;
+                } else {
+                    watch(key, value);
+                }
+            }
         }
     }
 

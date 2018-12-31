@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 /**
- * A list of server capabilities relevant for BKCommonBootstrapLib to know about.
+ * A list of server capabilities relevant for BKCommonLib to know about.
  * Storing them in booleans instead of evaluating frequently helps performance a bit.
  */
 public class CommonCapabilities {
