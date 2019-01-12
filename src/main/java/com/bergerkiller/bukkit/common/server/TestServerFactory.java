@@ -55,6 +55,17 @@ public class TestServerFactory {
             ClassTemplate<?> mc_server_t = ClassTemplate.create(dedicatedType);
             Object mc_server = mc_server_t.newInstanceNull();
 
+            // Assign logger, nms Server instance and primary thread (current thread) to avoid NPE's during test
+            setField(server, "logger",  MountiplexUtil.LOGGER);
+            setField(server, "console", mc_server);
+            setField(mc_server, "primaryThread", Thread.currentThread());
+            setField(mc_server, "serverThread", Thread.currentThread());
+
+            // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
+            Field bkServerField = Bukkit.class.getDeclaredField("server");
+            bkServerField.setAccessible(true);
+            bkServerField.set(null, server);
+
             // Create data converter registry manager object - used for serialization/deserialization
             // Only used >= MC 1.10.2
             Class<?> dataConverterRegistryClass = null;
@@ -158,15 +169,6 @@ public class TestServerFactory {
                 m.setAccessible(true);
                 m.invoke(mc_server, serverDir, worldData);                
             }
-
-            // Initialize some of the fields so they don't result into NPE during test
-            setField(server, "console", mc_server);
-            setField(server, "logger",  MountiplexUtil.LOGGER);
-
-            // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
-            Field bkServerField = Bukkit.class.getDeclaredField("server");
-            bkServerField.setAccessible(true);
-            bkServerField.set(null, server);
         } catch (Throwable t) {
             System.err.println("Failed to initialize server under test");
             System.out.println("Detected server class under test: " + CommonServerBase.SERVER_CLASS);
