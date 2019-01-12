@@ -59,11 +59,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        if (CraftBlockHandle.T.getBlockData.isAvailable()) {
-            return CraftBlockHandle.T.getBlockData.invoke(block);
-        } else {
-            return ChunkUtil.getBlockData(block.getChunk(), block.getX(), block.getY(), block.getZ());
-        }
+        return CraftBlockHandle.T.getBlockData.invoke(block);
     }
 
     /**

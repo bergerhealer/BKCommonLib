@@ -27,6 +27,7 @@ public abstract class CraftBlockHandle extends Template.Handle {
         return T.getBlockPosition.invoke(block);
     }
 
+    public abstract BlockData getBlockData();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.block.CraftBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -34,7 +35,6 @@ public abstract class CraftBlockHandle extends Template.Handle {
     public static final class CraftBlockClass extends Template.Class<CraftBlockHandle> {
         public final Template.StaticMethod<Object> getBlockPosition = new Template.StaticMethod<Object>();
 
-        @Template.Optional
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
     }

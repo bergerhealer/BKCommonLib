@@ -17,10 +17,22 @@ class CraftBlockState {
 }
 
 class CraftBlock {
-#if version >= 1.13
-    private optional (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getData0();
+
+#if version >= 1.13.1
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData:getNMS();
+#elseif version >= 1.13
+    protected (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData:getNMS();
 #else
-    private optional (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:###();
+    // 1.8 -> 1.12.2 only, this code is unlikely to change
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData() {
+        net.minecraft.server.Chunk chunk = ((org.bukkit.craftbukkit.CraftChunk) instance.getChunk()).getHandle();
+
+  #if version >= 1.9
+        return chunk.a(instance.getX(), instance.getY(), instance.getZ());
+  #else
+        return chunk.getBlockData(new net.minecraft.server.BlockPosition(instance.getX(), instance.getY(), instance.getZ()));
+  #endif
+    }
 #endif
 
     public static Object getBlockPosition(org.bukkit.block.Block block) {
