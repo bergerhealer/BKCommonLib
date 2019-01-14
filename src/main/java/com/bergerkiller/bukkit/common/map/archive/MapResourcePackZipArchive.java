@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map.archive;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Locale;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.ZipEntry;
@@ -23,12 +24,31 @@ public class MapResourcePackZipArchive implements MapResourcePackArchive {
 
     @Override
     public void load(boolean lazy) {
+        boolean preferZip = this.zipFile.getName().toLowerCase(Locale.ENGLISH).endsWith(".zip");
+
+        // First try preferred open mode, if this fails the error matters
+        IOException error = null;
         try {
-            this.archive = new JarFile(this.zipFile);
+            this.open(preferZip);
+            return;
         } catch (IOException ex) {
+            error = ex;
             this.archive = null;
-            Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + this.zipFile.getAbsolutePath(), ex);
         }
+
+        // Try non-preferred mode just in case
+        try {
+            this.open(!preferZip);
+            return;
+        } catch (IOException ex) {
+        }
+
+        // Log preferred mode error
+        Logging.LOGGER.log(Level.SEVERE, "Failed to load resource pack " + this.zipFile.getAbsolutePath(), error);
+    }
+
+    private void open(boolean useZip) throws IOException {
+        this.archive = useZip ? (new ZipFile(this.zipFile)) : (new JarFile(this.zipFile));
     }
 
     @Override
