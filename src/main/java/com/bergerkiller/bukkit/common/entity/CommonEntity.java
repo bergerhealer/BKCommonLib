@@ -358,8 +358,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (CommonCapabilities.HAS_DIMENSION_MANAGER) {
             Object raw_dim = EntityHandle.T.dimension.raw.get(newInstance.getRaw());
             if (raw_dim == null) {
-                newInstance.setDimension(WorldUtil.getDimension(this.getWorld()));
-                Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
+                newInstance.setDimension(WorldUtil.getDimension(newInstance.getWorld().getWorld()));
+                // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
             }
         }
 
