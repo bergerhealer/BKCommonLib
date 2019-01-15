@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
@@ -353,6 +354,15 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new RuntimeException("Can not replace an entity with itself!");
         }
 
+        // Verify a valid dimension is set, otherwise, correct this
+        if (CommonCapabilities.HAS_DIMENSION_MANAGER) {
+            Object raw_dim = EntityHandle.T.dimension.raw.get(newInstance.getRaw());
+            if (raw_dim == null) {
+                newInstance.setDimension(WorldUtil.getDimension(this.getWorld()));
+                Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
+            }
+        }
+
         // Reset entity state
         newInstance.setDead(oldInstance.isDead());
         oldInstance.setDead(true);
@@ -624,6 +634,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             this.handle.getWorld().removeEntity(this.handle);
             this.handle.setDead(false);
             this.handle.setWorld(newworld);
+            this.handle.setDimension(WorldUtil.getDimension(newworld.getWorld()));
             this.handle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
             if (hasNetworkController) {
