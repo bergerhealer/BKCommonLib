@@ -21,22 +21,17 @@ public abstract class WorldProviderHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
-    public boolean hasSkyLight() {
-        return !isDarkWorld();
-    }
+    public abstract boolean hasSkyLight();
 
     public boolean isDarkWorld() {
-        return isDarkWorldField();
+        return !hasSkyLight();
     }
-    public abstract boolean isDarkWorldField();
-    public abstract void setIsDarkWorldField(boolean value);
     /**
      * Stores class members for <b>net.minecraft.server.WorldProvider</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldProviderClass extends Template.Class<WorldProviderHandle> {
-        public final Template.Field.Boolean isDarkWorldField = new Template.Field.Boolean();
+        public final Template.Method<Boolean> hasSkyLight = new Template.Method<Boolean>();
 
     }
 

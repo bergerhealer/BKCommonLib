@@ -400,19 +400,27 @@ class WorldType {
 }
 
 class WorldProvider {
+    // See: Chunk initLighting()
+    // if (this.world.worldProvider.m()) {
+    //     l = 15;
+    //     ...
 #if version >= 1.13
-    protected boolean isDarkWorldField:d;
+    public boolean hasSkyLight:g();
+#elseif version >= 1.11
+    public boolean hasSkyLight:m();
+#elseif version >= 1.9
+    public boolean hasSkyLight() {
+        return !instance.m();
+    }
 #else
-    protected boolean isDarkWorldField:e;
+    public boolean hasSkyLight() {
+        return !instance.o();
+    }
 #endif
 
 <code>
-    public boolean hasSkyLight() {
-        return !isDarkWorld();
-    }
-
     public boolean isDarkWorld() {
-        return isDarkWorldField();
+        return !hasSkyLight();
     }
 </code>
 }
