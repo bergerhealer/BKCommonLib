@@ -392,16 +392,17 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Gets the dimension of a world
+     * Gets the dimension of a world, which is guaranteed to be non-null and have a valid
+     * registration in the server. This dimension will be OVERWORLD for all normal-type worlds,
+     * THE_END for end worlds, etc.
      *
      * @param world to get from
      * @return world dimension
      */
     public static Dimension getDimension(org.bukkit.World world) {
-        //  WorldHandle.fromBukkit(world).getWorldData().getType().getDimension();
-        Dimension dimension = WorldServerHandle.fromBukkit(world).getDimension();
-        if (dimension == null) {
-            throw new IllegalStateException("World '" + world.getName() + "' has no valid dimension");
+        Dimension dimension = WorldServerHandle.fromBukkit(world).getWorldProvider().getDimension();
+        if (dimension == null || !dimension.isSerializable()) {
+            dimension = Dimension.OVERWORLD;
         }
         return dimension;
     }

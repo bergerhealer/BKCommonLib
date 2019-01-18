@@ -2,9 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
-import org.bukkit.entity.HumanEntity;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import java.util.List;
 
@@ -27,7 +25,7 @@ public abstract class PlayerListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract void savePlayers();
-    public abstract void sendPacketNearby(HumanEntity human, double x, double y, double z, double radius, Dimension dimension, CommonPacket packet);
+    public abstract void sendRawPacketNearby(World world, double x, double y, double z, double radius, Object packet);
     public abstract List<Player> getPlayers();
     public abstract void setPlayers(List<Player> value);
     public abstract IPlayerFileDataHandle getPlayerFileData();
@@ -44,7 +42,7 @@ public abstract class PlayerListHandle extends Template.Handle {
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
 
         public final Template.Method<Void> savePlayers = new Template.Method<Void>();
-        public final Template.Method.Converted<Void> sendPacketNearby = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> sendRawPacketNearby = new Template.Method.Converted<Void>();
 
     }
 

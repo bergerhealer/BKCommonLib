@@ -53,14 +53,15 @@ class PlayerList {
 
     public void savePlayers();
 
-#if version >= 1.13.1
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) DimensionManager dimension, (CommonPacket) Packet<?> packet);
-#elseif version >= 1.9
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) int dimension, (CommonPacket) Packet<?> packet);
+#if version >= 1.9
+    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
+    }
 #else
-    public void sendPacketNearby((org.bukkit.entity.HumanEntity) EntityHuman human, double x, double y, double z, double radius, (Dimension) int dimension, (CommonPacket) Packet packet);
+    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
+    }
 #endif
-
 }
 
 class DedicatedPlayerList extends PlayerList {

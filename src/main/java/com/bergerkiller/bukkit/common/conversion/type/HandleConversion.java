@@ -521,13 +521,13 @@ public class HandleConversion {
         return dimension.getId();
     }
 
-    // Since MC 1.13.1
+    // Since MC 1.9
     @ConverterMethod(input="net.minecraft.server.DimensionManager", optional=true)
     public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return Dimension.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
-    // Since MC 1.13.1
+    // Since MC 1.9
     @ConverterMethod(output="net.minecraft.server.DimensionManager", optional=true)
     public static Object dimensionManagerFromDimension(Dimension dimension) {
         return dimension.getDimensionManagerHandle();

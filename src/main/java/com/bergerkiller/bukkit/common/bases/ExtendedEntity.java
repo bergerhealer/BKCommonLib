@@ -341,6 +341,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         if (world == null) {
             throw new IllegalArgumentException("Can not set a null World for Entity");
         }
+        if (world == this.getWorld()) {
+            return;
+        }
         this.handle.setWorld(WorldHandle.fromBukkit(world));
         this.handle.setDimension(WorldUtil.getDimension(world));
     }

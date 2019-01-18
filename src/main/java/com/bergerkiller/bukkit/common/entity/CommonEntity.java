@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
@@ -354,15 +355,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new RuntimeException("Can not replace an entity with itself!");
         }
 
-        // Verify a valid dimension is set, otherwise, correct this
-        if (CommonCapabilities.HAS_DIMENSION_MANAGER) {
-            Object raw_dim = EntityHandle.T.dimension.raw.get(newInstance.getRaw());
-            if (raw_dim == null) {
-                newInstance.setDimension(WorldUtil.getDimension(newInstance.getWorld().getWorld()));
-                // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
-            }
-        }
-
         // Reset entity state
         newInstance.setDead(oldInstance.isDead());
         oldInstance.setDead(true);
@@ -386,6 +378,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // *** Give the old entity a new Bukkit Entity ***
         oldInstance.setBukkitEntityField(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
         this.handle = newInstance;
+
+        // *** Fix invalid dimension that occurred during 1.13.2 rollout ***
+        this.fixInvalidDimension();
 
         // *** Replace entity in passenger and vehicle fields ***
         EntityHandle vehicle = newInstance.getVehicle();
@@ -421,6 +416,24 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (this.isHooked()) {
             DefaultEntityController controller = new DefaultEntityController();
             controller.bind(this, true);
+        }
+    }
+
+    /**
+     * Spigot used a dimension for flat worlds that is not part of the internal dimension lookup table.
+     * This caused very buggy behavior when saving entities, as an Id is saved it cannot restore from
+     * the table again. This method detects this occurring and corrects the dimension.
+     */
+    private void fixInvalidDimension() {
+        // Since MC 1.13.1 this is an issue
+        if (!CommonCapabilities.ENTITY_USES_DIMENSION_MANAGER) {
+            return;
+        }
+
+        Object raw_dim = EntityHandle.T.dimension.raw.get(this.handle.getRaw());
+        if (raw_dim == null || !Dimension.fromDimensionManagerHandle(raw_dim).isSerializable()) {
+            this.handle.setDimension(WorldUtil.getDimension(this.handle.getWorld().getWorld()));
+            // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
         }
     }
 

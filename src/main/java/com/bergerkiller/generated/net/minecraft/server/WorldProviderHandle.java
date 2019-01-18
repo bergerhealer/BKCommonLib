@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.WorldProvider</b>.
@@ -22,6 +23,7 @@ public abstract class WorldProviderHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean hasSkyLight();
+    public abstract Dimension getDimension();
 
     public boolean isDarkWorld() {
         return !hasSkyLight();
@@ -32,6 +34,7 @@ public abstract class WorldProviderHandle extends Template.Handle {
      */
     public static final class WorldProviderClass extends Template.Class<WorldProviderHandle> {
         public final Template.Method<Boolean> hasSkyLight = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Dimension> getDimension = new Template.Method.Converted<Dimension>();
 
     }
 

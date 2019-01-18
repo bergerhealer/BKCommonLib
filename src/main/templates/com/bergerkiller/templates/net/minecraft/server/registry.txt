@@ -32,7 +32,7 @@ class RegistryMaterials {
 #endif
 }
 
-// Since MC 1.13.1
+// Since MC 1.9
 optional class DimensionManager {
     public int getId:getDimensionID();
 

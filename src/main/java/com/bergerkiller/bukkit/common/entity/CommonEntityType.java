@@ -8,10 +8,10 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonHumanEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -252,7 +252,7 @@ public class CommonEntityType {
         entity.loc.set(entity.last.set(location));
 
         // Debug: verify the 'dimension' field is set for the Entity
-        if (CommonCapabilities.HAS_DIMENSION_MANAGER) {
+        if (DimensionManagerHandle.T.isAvailable()) {
             Object raw_dim = EntityHandle.T.dimension.raw.get(entity.getHandle());
             if (raw_dim == null) {
                 throw new IllegalStateException("Entity dimension field is null");

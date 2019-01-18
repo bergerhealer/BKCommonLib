@@ -304,18 +304,33 @@ public class PacketUtil {
         CommonPlugin.getInstance().getPacketHandler().removePacketMonitor(monitor);
     }
 
+    public static void broadcastPacketNearby(Location location, double radius, CommonPacket packet) {
+        broadcastPacketNearby(location, radius, packet.getHandle());
+    }
+
+    public static void broadcastPacketNearby(Location location, double radius, PacketHandle packet) {
+        broadcastPacketNearby(location, radius, packet.getRaw());
+    }
+
+    public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, CommonPacket packet) {
+        broadcastPacketNearby(world, x, y, z, radius, packet.getHandle());
+    }
+
+    public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, PacketHandle packet) {
+        broadcastPacketNearby(world, x, y, z, radius, packet.getRaw());
+    }
+
+    @Deprecated
     public static void broadcastPacketNearby(Location location, double radius, Object packet) {
         broadcastPacketNearby(location.getWorld(), location.getX(), location.getY(), location.getZ(), radius, packet);
     }
 
+    @Deprecated
     public static void broadcastPacketNearby(org.bukkit.World world, double x, double y, double z, double radius, Object packet) {
-        CommonPacket packetWrap;
         if (packet instanceof CommonPacket) {
-            packetWrap = (CommonPacket) packet;
-        } else {
-            packetWrap = new CommonPacket(packet);
+            packet = ((CommonPacket) packet).getHandle();
         }
-        CommonNMS.getPlayerList().sendPacketNearby(null, x, y, z, radius, WorldUtil.getDimension(world), packetWrap);
+        CommonNMS.getPlayerList().sendRawPacketNearby(world, x, y, z, radius, packet);
     }
 
     /**

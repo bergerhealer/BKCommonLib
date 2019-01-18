@@ -264,12 +264,6 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.13.1
-    public final (Dimension) DimensionManager dimension;
-#else
-    public final (Dimension) int dimension;
-#endif
-
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
@@ -349,6 +343,7 @@ class ChunkProviderServer {
   #endif
         return (Chunk) consumer.getValue();
     }
+
 #else
     public (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
 #endif
@@ -423,6 +418,16 @@ class WorldProvider {
         return !hasSkyLight();
     }
 </code>
+
+#if version >= 1.9
+    public (Dimension) DimensionManager getDimension() {
+        return instance.getDimensionManager();
+    }
+#else
+    public (Dimension) int getDimension() {
+        return instance.getDimension();
+    }
+#endif
 }
 
 class WeightedRandom {

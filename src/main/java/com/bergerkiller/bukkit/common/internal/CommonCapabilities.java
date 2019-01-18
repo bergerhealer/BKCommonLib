@@ -100,7 +100,13 @@ public class CommonCapabilities {
     public static final boolean EMPTY_ITEM_NAME = CommonBootstrap.evaluateMCVersion(">=", "1.13");
 
     /**
-     * Since Minecraft 1.13.1 the dimension id field was replaced with a DimensionManager instance
+     * Since Minecraft 1.13.1 the dimension field of Entity is a dimension manager, instead of an int
      */
-    public static final boolean HAS_DIMENSION_MANAGER = CommonBootstrap.evaluateMCVersion(">=", "1.13.1");
+    public static final boolean ENTITY_USES_DIMENSION_MANAGER = CommonBootstrap.evaluateMCVersion(">=", "1.13.1");
+
+    /**
+     * Deprecated: use ENTITY_USES_DIMENSION_MANAGER instead
+     */
+    @Deprecated
+    public static final boolean HAS_DIMENSION_MANAGER = ENTITY_USES_DIMENSION_MANAGER;
 }
