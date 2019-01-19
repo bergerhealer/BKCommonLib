@@ -10,7 +10,7 @@ class Inventory {
     public optional void setStorageContents(org.bukkit.inventory.ItemStack[] items);
 
     // Paperspigot only, it seems
-    public optional java.util.HashMap<Integer, org.bukkit.inventory.ItemStack> removeItemAnySlot(org.bukkit.inventory.ItemStack[] items);
+    public transient optional java.util.HashMap<Integer, org.bukkit.inventory.ItemStack> removeItemAnySlot(org.bukkit.inventory.ItemStack[] items);
 }
 
 optional class MainHand {
