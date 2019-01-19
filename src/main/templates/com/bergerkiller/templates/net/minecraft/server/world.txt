@@ -420,13 +420,9 @@ class WorldProvider {
 </code>
 
 #if version >= 1.9
-    public (Dimension) DimensionManager getDimension() {
-        return instance.getDimensionManager();
-    }
+    public (Dimension) DimensionManager getDimension:getDimensionManager();
 #else
-    public (Dimension) int getDimension() {
-        return instance.getDimension();
-    }
+    public (Dimension) int getDimension();
 #endif
 }
 
