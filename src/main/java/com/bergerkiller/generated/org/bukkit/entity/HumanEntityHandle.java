@@ -2,6 +2,7 @@ package com.bergerkiller.generated.org.bukkit.entity;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.entity.HumanEntity</b>.
@@ -21,13 +22,13 @@ public abstract class HumanEntityHandle extends EntityHandle {
 
     /* ============================================================================== */
 
+    public abstract HumanHand getMainHumanHand();
     /**
      * Stores class members for <b>org.bukkit.entity.HumanEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class HumanEntityClass extends Template.Class<HumanEntityHandle> {
-        @Template.Optional
-        public final Template.Method.Converted<Object> getMainHand = new Template.Method.Converted<Object>();
+        public final Template.Method<HumanHand> getMainHumanHand = new Template.Method<HumanHand>();
 
     }
 

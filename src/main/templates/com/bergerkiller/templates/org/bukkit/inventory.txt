@@ -19,13 +19,20 @@ optional class MainHand {
 }
 
 class PlayerInventory extends Inventory {
-    // New hand API >= 1.10.2
-    public optional abstract ItemStack getItemInMainHand()
-    public optional abstract ItemStack getItemInOffHand()
     public optional abstract void setItemInMainHand(ItemStack item);
     public optional abstract void setItemInOffHand(ItemStack item)
 
     // Deprecated <= 1.8.8
     public optional abstract ItemStack getItemInHand()
     public optional abstract void setItemInHand(ItemStack stack)
+
+#if version >= 1.9
+    public ItemStack getItemInMainHand();
+    public ItemStack getItemInOffHand();
+#else
+    public ItemStack getItemInMainHand:getItemInHand();
+    public ItemStack getItemInOffHand() {
+        return null;
+    }
+#endif
 }

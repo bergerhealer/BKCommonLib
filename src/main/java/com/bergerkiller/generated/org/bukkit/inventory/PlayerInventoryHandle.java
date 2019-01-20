@@ -22,15 +22,13 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
 
     /* ============================================================================== */
 
+    public abstract ItemStack getItemInMainHand();
+    public abstract ItemStack getItemInOffHand();
     /**
      * Stores class members for <b>org.bukkit.inventory.PlayerInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerInventoryClass extends Template.Class<PlayerInventoryHandle> {
-        @Template.Optional
-        public final Template.Method<ItemStack> getItemInMainHand = new Template.Method<ItemStack>();
-        @Template.Optional
-        public final Template.Method<ItemStack> getItemInOffHand = new Template.Method<ItemStack>();
         @Template.Optional
         public final Template.Method<Void> setItemInMainHand = new Template.Method<Void>();
         @Template.Optional
@@ -39,6 +37,8 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
         public final Template.Method<ItemStack> getItemInHand = new Template.Method<ItemStack>();
         @Template.Optional
         public final Template.Method<Void> setItemInHand = new Template.Method<Void>();
+        public final Template.Method<ItemStack> getItemInMainHand = new Template.Method<ItemStack>();
+        public final Template.Method<ItemStack> getItemInOffHand = new Template.Method<ItemStack>();
 
     }
 

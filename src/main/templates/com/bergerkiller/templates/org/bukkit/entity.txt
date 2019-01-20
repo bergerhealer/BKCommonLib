@@ -17,5 +17,18 @@ class Entity {
 }
 
 class HumanEntity extends Entity {
-    public optional (Object) org.bukkit.inventory.MainHand getMainHand();
+#if version >= 1.9
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getMainHumanHand() {
+        org.bukkit.inventory.MainHand bukkitHand = instance.getMainHand();
+        if (bukkitHand == org.bukkit.inventory.MainHand.LEFT) {
+            return com.bergerkiller.bukkit.common.wrappers.HumanHand.LEFT;
+        } else {
+            return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
+        }
+    }
+#else
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getMainHumanHand() {
+        return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
+    }
+#endif
 }

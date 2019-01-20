@@ -82,11 +82,7 @@ public enum HumanHand {
      * @return main human hand
      */
     public static HumanHand getMainHand(HumanEntity humanEntity) {
-        if (humanEntity != null && HumanEntityHandle.T.getMainHand.isAvailable()) {
-            return fromMainHand(HumanEntityHandle.T.getMainHand.invoke(humanEntity));
-        } else {
-            return RIGHT;
-        }
+        return HumanEntityHandle.T.getMainHumanHand.invoke(humanEntity);
     }
 
     /**
@@ -98,8 +94,7 @@ public enum HumanHand {
      * @return off human hand
      */
     public static HumanHand getOffHand(HumanEntity humanEntity) {
-        HumanHand mainHand = getMainHand(humanEntity);
-        return (mainHand == LEFT) ? RIGHT : LEFT;
+        return getMainHand(humanEntity).opposite();
     }
 
     /**
@@ -215,16 +210,7 @@ public enum HumanHand {
      * @return held item
      */
     public static ItemStack getItemInMainHand(HumanEntity humanEntity) {
-        if (humanEntity == null) {
-            throw new IllegalArgumentException("humanEntity can not be null");
-        }
-        if (PlayerInventoryHandle.T.getItemInMainHand.isAvailable()) {
-            return PlayerInventoryHandle.T.getItemInMainHand.invoke(humanEntity.getInventory());
-        } else if (PlayerInventoryHandle.T.getItemInHand.isAvailable()) {
-            return PlayerInventoryHandle.T.getItemInHand.invoke(humanEntity.getInventory());
-        } else {
-            return null;
-        }
+        return PlayerInventoryHandle.T.getItemInMainHand.invoke(humanEntity.getInventory());
     }
 
     /**
@@ -235,14 +221,7 @@ public enum HumanHand {
      * @return held item
      */
     public static ItemStack getItemInOffHand(HumanEntity humanEntity) {
-        if (humanEntity == null) {
-            throw new IllegalArgumentException("humanEntity can not be null");
-        }
-        if (PlayerInventoryHandle.T.getItemInOffHand.isAvailable()) {
-            return PlayerInventoryHandle.T.getItemInOffHand.invoke(humanEntity.getInventory());
-        } else {
-            return null; // No OFF hand item holding <= MC 1.8.8
-        }
+        return PlayerInventoryHandle.T.getItemInOffHand.invoke(humanEntity.getInventory());
     }
 
     /**
