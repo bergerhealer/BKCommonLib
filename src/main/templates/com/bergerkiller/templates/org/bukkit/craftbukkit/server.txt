@@ -14,8 +14,12 @@ class CraftServer {
     public (MinecraftServerHandle) net.minecraft.server.MinecraftServer getServer();
 
     <code>
+    private static CraftServerHandle _instance = null;
     public static CraftServerHandle instance() {
-        return createHandle(org.bukkit.Bukkit.getServer());
+        if (_instance == null) {
+            _instance = createHandle(org.bukkit.Bukkit.getServer());
+        }
+        return _instance;
     }
     </code>
 }

@@ -684,8 +684,8 @@ public class LogicUtil {
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
-    public static <V, E> boolean synchronizeList(List<E> list, Collection<V> values, ItemSynchronizer<V, E> synchronizer) {
-        return synchronizeList(list, (Iterable<V>) values, synchronizer);
+    public static <V, E> boolean synchronizeList(List<E> list, Collection<? extends V> values, ItemSynchronizer<V, E> synchronizer) {
+        return synchronizeList(list, (Iterable<? extends V>) values, synchronizer);
     }
 
     /**
@@ -697,9 +697,9 @@ public class LogicUtil {
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
-    public static <V, E> boolean synchronizeList(List<E> list, Iterable<V> values, ItemSynchronizer<V, E> synchronizer) {
+    public static <V, E> boolean synchronizeList(List<E> list, Iterable<? extends V> values, ItemSynchronizer<V, E> synchronizer) {
         boolean has_changes = false;
-        Iterator<V> value_iter = values.iterator();
+        Iterator<? extends V> value_iter = values.iterator();
         ListIterator<E> item_iter = list.listIterator();
         while (value_iter.hasNext()) {
             V value = value_iter.next();

@@ -28,8 +28,12 @@ public abstract class CraftServerHandle extends Template.Handle {
     public abstract DedicatedPlayerListHandle getPlayerList();
     public abstract MinecraftServerHandle getServer();
 
+    private static CraftServerHandle _instance = null;
     public static CraftServerHandle instance() {
-        return createHandle(org.bukkit.Bukkit.getServer());
+        if (_instance == null) {
+            _instance = createHandle(org.bukkit.Bukkit.getServer());
+        }
+        return _instance;
     }
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.CraftServer</b>.

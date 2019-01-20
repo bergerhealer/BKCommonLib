@@ -244,7 +244,8 @@ public class CommonUtil {
      * @return online players
      */
     public static Collection<Player> getOnlinePlayers() {
-        return CommonNMS.getPlayerList().getPlayers();
+        return CommonUtil.unsafeCast(Bukkit.getOnlinePlayers());
+        // return CommonNMS.getPlayerList().getPlayers();
     }
 
     /**
