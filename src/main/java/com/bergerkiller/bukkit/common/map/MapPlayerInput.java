@@ -7,6 +7,7 @@ import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.TickTracker;
 import com.bergerkiller.bukkit.common.controller.Tickable;
@@ -19,6 +20,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
@@ -31,8 +33,10 @@ public class MapPlayerInput implements Tickable {
     private int curr_dx, curr_dy, curr_dz;
     private int recv_dx, recv_dy, recv_dz;
     private int key_repeat_timer;
+    private int ticks_without_input = 0;
     private boolean has_input;
     private int _fakeMountId = -1;
+    private Vector _fakeMountLastPos = new Vector();
     private boolean _fakeMountShown = false;
     private boolean _isIntercepting = false;
     private boolean _newInterceptState = false;
@@ -362,6 +366,17 @@ public class MapPlayerInput implements Tickable {
     @Override
     public void onTick() {
         this._inputTickTracker.update();
+
+        // When too much time passes by without input from the player, something went really wrong
+        // This is a timeout of about 2 seconds. We do this to prevent players being locked out.
+        // When this timeout is reached, reset all inputs to 'none' (0/0/0)
+        // Not doing so will cause the last input to repeat indefinitely.
+        if (++this.ticks_without_input == 40) {
+            if (this.curr_dx != 0 || this.curr_dy != 0 || this.curr_dz != 0) {
+                this.receiveInput(0, 0, 0);
+            }
+            this.ticks_without_input = 500; // Stop
+        }
     }
 
     /**
@@ -441,6 +456,7 @@ public class MapPlayerInput implements Tickable {
         recv_dy = dy;
         recv_dz = dz;
         has_input = true;
+        ticks_without_input = 0;
         if (dx != 0 || dy != 0 || dz != 0) {
             key_repeat_timer++;
         } else {
@@ -498,45 +514,64 @@ public class MapPlayerInput implements Tickable {
             return;
         }
 
-        if (intercept && !_fakeMountShown) {
-            _fakeMountShown = true;
+        if (intercept) {
+            // Get expected position of the mount
+            Vector pos = player.getLocation().toVector();
+            pos.setZ(pos.getZ() + 0.1);
+            pos.setY(pos.getY() + 0.002);
 
-            // Generate unique mount Id (we can re-use it)
-            if (this._fakeMountId == -1) {
-                this._fakeMountId = EntityUtil.getUniqueEntityId();
-            }
+            if (!_fakeMountShown) {
+                _fakeMountShown = true;
 
-            // Spawn the mount
-            Location loc = player.getLocation();
-            {
-                DataWatcher data = new DataWatcher();
-                data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
-                data.set(EntityLivingHandle.DATA_HEALTH, 10.0F);
+                // Generate unique mount Id (we can re-use it)
+                if (this._fakeMountId == -1) {
+                    this._fakeMountId = EntityUtil.getUniqueEntityId();
+                }
 
-                PacketPlayOutSpawnEntityLivingHandle packet = PacketPlayOutSpawnEntityLivingHandle.createNew();
-                packet.setEntityId(this._fakeMountId);
-                packet.setEntityUUID(UUID.randomUUID());
-                packet.setEntityType(EntityType.CHICKEN);
-                packet.setPosX(loc.getX());
-                packet.setPosY(loc.getY() + 0.002);
-                packet.setPosZ(loc.getZ() + 0.1);
-                packet.setDataWatcher(data);
-                PacketUtil.sendPacket(player, packet);
-            }
-            {
-                if (PacketType.OUT_MOUNT.getType() != null) {
-                    CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
-                    packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
-                    packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
-                    PacketUtil.sendPacket(player, packet);
-                } else {
-                    CommonPacket packet = PacketType.OUT_ENTITY_ATTACH.newInstance();
-                    packet.write(PacketType.OUT_ENTITY_ATTACH.vehicleId, this._fakeMountId);
-                    packet.write(PacketType.OUT_ENTITY_ATTACH.passengerId, player.getEntityId());
+                // Store initial position
+                this._fakeMountLastPos = pos;
+
+                // Spawn the mount
+                {
+                    DataWatcher data = new DataWatcher();
+                    data.set(EntityHandle.DATA_FLAGS, (byte) (EntityHandle.DATA_FLAG_INVISIBLE));
+                    data.set(EntityLivingHandle.DATA_HEALTH, 10.0F);
+
+                    PacketPlayOutSpawnEntityLivingHandle packet = PacketPlayOutSpawnEntityLivingHandle.createNew();
+                    packet.setEntityId(this._fakeMountId);
+                    packet.setEntityUUID(UUID.randomUUID());
+                    packet.setEntityType(EntityType.CHICKEN);
+                    packet.setPosX(pos.getX());
+                    packet.setPosY(pos.getY());
+                    packet.setPosZ(pos.getZ());
+                    packet.setDataWatcher(data);
                     PacketUtil.sendPacket(player, packet);
                 }
+                {
+                    if (PacketType.OUT_MOUNT.getType() != null) {
+                        CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
+                        packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
+                        packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
+                        PacketUtil.sendPacket(player, packet);
+                    } else {
+                        CommonPacket packet = PacketType.OUT_ENTITY_ATTACH.newInstance();
+                        packet.write(PacketType.OUT_ENTITY_ATTACH.vehicleId, this._fakeMountId);
+                        packet.write(PacketType.OUT_ENTITY_ATTACH.passengerId, player.getEntityId());
+                        PacketUtil.sendPacket(player, packet);
+                    }
+                }
             }
-            return;
+
+            // When player position changes, refresh mount position with a simple teleport packet
+            if (this._fakeMountId != -1 && !pos.equals(this._fakeMountLastPos)) {
+                this._fakeMountLastPos = pos;
+
+                PacketPlayOutEntityTeleportHandle tp_packet = PacketPlayOutEntityTeleportHandle.createNew(
+                        this._fakeMountId,
+                        pos.getX(), pos.getY(), pos.getZ(),
+                        0.0f, 0.0f, false);
+                PacketUtil.sendPacket(player, tp_packet);
+            }
         }
     }
 
