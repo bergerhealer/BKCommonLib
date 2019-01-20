@@ -106,23 +106,27 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.ItemStack", acceptsNull = true)
     public static Object toItemStackHandle(org.bukkit.inventory.ItemStack itemStack) {
-        if (itemStack == null) {
-            return ItemStackHandle.EMPTY_ITEM.getRaw();
-        } else if (CraftItemStackHandle.T.isAssignableFrom(itemStack)) {
-            return CraftItemStackHandle.T.handle.get(itemStack);
-        } else {
-            org.bukkit.inventory.ItemStack stack = (org.bukkit.inventory.ItemStack) itemStack;
-            Object rval = Common.IS_TEST_MODE ? null : CraftItemStackHandle.asNMSCopy(stack);
-            if (rval == null) {
-                // Fallback under test - does not go into production!
-                ItemStackHandle handle = ItemStackHandle.newInstance();
-                handle.setTypeField(stack.getType());
-                handle.setAmountField(stack.getAmount());
-                handle.setDurability(stack.getDurability());
-                rval = handle.getRaw();
+        Object raw_handle = null;
+        if (itemStack != null) {
+            if (CraftItemStackHandle.T.isAssignableFrom(itemStack)) {
+                raw_handle = CraftItemStackHandle.T.handle.get(itemStack);
+            } else {
+                if (Common.IS_TEST_MODE) {
+                    // Fallback under test - does not go into production!
+                    ItemStackHandle handle = ItemStackHandle.newInstance();
+                    handle.setTypeField(itemStack.getType());
+                    handle.setAmountField(itemStack.getAmount());
+                    handle.setDurability(itemStack.getDurability());
+                    return handle.getRaw();
+                }
+
+                raw_handle = CraftItemStackHandle.asNMSCopy(itemStack);
             }
-            return rval;
         }
+        if (raw_handle == null && CommonCapabilities.ITEMSTACK_EMPTY_STATE) {
+            raw_handle = ItemStackHandle.EMPTY_ITEM.getRaw();
+        }
+        return raw_handle;
     }
 
     @ConverterMethod(output="T extends net.minecraft.server.TileEntity")
