@@ -182,6 +182,7 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
         URLConnection con;
         try {
             con = this.resourcePackURL.openConnection();
+            con.addRequestProperty("User-Agent", "BKCommonLib/" + CommonPlugin.getInstance().getVersion());
             con.setReadTimeout(10000);
         } catch (IOException ex) {
             log.log(Level.SEVERE, "Failed to start download for " + this.resourcePackURL, ex);
