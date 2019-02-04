@@ -13,6 +13,7 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
@@ -27,6 +28,7 @@ import java.lang.reflect.Modifier;
 import java.util.HashMap;
 import java.util.List;
 
+import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
@@ -525,6 +527,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
+            public static final Type<BlockFace> DIRECTION = getForType(BlockFace.class);
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
                 if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
@@ -832,6 +835,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
             // Bukkit ItemStack -> nms ItemStack
             typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
+            // Bukkit BlockFace -> nms EnumDirection
+            typeMapping.put(BlockFace.class, EnumDirectionHandle.T.getType());
         }
 
         private static void register(Class<?> type, Object token) {
