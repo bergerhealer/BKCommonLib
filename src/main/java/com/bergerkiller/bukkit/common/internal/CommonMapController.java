@@ -45,8 +45,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedList;
+import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
@@ -105,6 +107,8 @@ public class CommonMapController implements PacketListener, Listener {
     private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<Integer, ItemFrameInfo>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
+    // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
+    private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
     // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
     private final HashSet<IntVector3> neighbourCacheSet = new HashSet<IntVector3>();
     // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
@@ -677,20 +681,27 @@ public class CommonMapController implements PacketListener, Listener {
             return;
         }
 
+        // Add Item Frame Info
         itemFrames.put(frame.getEntityId(), new ItemFrameInfo(frame));
 
-        // Load the chunk to the left/right of this item frame
+        // If the item frame does not store a map item, we don't have to load the neighbouring chunks
+        if (!CommonMapUUIDStore.isMap(getItemFrameItem(frame))) {
+            return;
+        }
+
+        // Queue chunks left/right of this item frame for loading
         // If the display crosses chunk boundaries, this ensures those are loaded
-        // TODO: Is onEntityAdded really the right place for this? Could cause recursive loading.
+        World world = frame.getWorld();
         BlockFace left_right = FaceUtil.rotate(frame.getFacing(), 2);
         IntVector3 pos = new IntVector3(frame.getLocation());
-        IntVector3 pos_left = pos.add(left_right);
-        IntVector3 pos_right = pos.subtract(left_right);
-        if (pos.getChunkX() != pos_left.getChunkX() || pos.getChunkZ() != pos_left.getChunkZ()) {
-            frame.getWorld().getChunkAt(pos_left.getChunkX(), pos_left.getChunkZ());
+        IntVector2 chunk = pos.toChunkCoordinates();
+        PendingChunkLoad chunk_left = new PendingChunkLoad(world, pos.add(left_right));
+        PendingChunkLoad chunk_right = new PendingChunkLoad(world, pos.subtract(left_right));
+        if (chunk.x != chunk_left.x || chunk.z != chunk_left.z) {
+            neighbourChunkQueue.add(chunk_left);
         }
-        if (pos.getChunkX() != pos_right.getChunkX() || pos.getChunkZ() != pos_right.getChunkZ()) {
-            frame.getWorld().getChunkAt(pos_right.getChunkX(), pos_right.getChunkZ());
+        if (chunk.x != chunk_right.x || chunk.z != chunk_right.z) {
+            neighbourChunkQueue.add(chunk_right);
         }
     }
 
@@ -1370,6 +1381,24 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
+            // Load neighbouring chunks
+            while (!neighbourChunkQueue.isEmpty()) {
+                try (ImplicitlySharedSet<PendingChunkLoad> copy = neighbourChunkQueue.clone()) {
+                    // Load all the chunks
+                    for (PendingChunkLoad chunk : copy) {
+                        chunk.world.getChunkAt(chunk.x, chunk.z);
+                    }
+
+                    // If the set is unchanged, then we can clear it, otherwise we must remove what we did
+                    if (neighbourChunkQueue.refEquals(copy)) {
+                        neighbourChunkQueue.clear();
+                    } else {
+                        neighbourChunkQueue.removeAll(copy);
+                    }
+                }
+            }
+
+            // Iterate all tracked item frames and update them
             Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
             while (itemFrames_iter.hasNext()) {
                 info = itemFrames_iter.next();
@@ -1557,6 +1586,38 @@ public class CommonMapController implements PacketListener, Listener {
         public CachedMapItem(ItemStack item) {
             this.item = item;
             this.life = CACHED_ITEM_MAX_LIFE;
+        }
+    }
+
+    private static class PendingChunkLoad {
+        public final World world;
+        public final int x;
+        public final int z;
+
+        public PendingChunkLoad(World world, IntVector3 pos) {
+            this.world = world;
+            this.x = pos.getChunkX();
+            this.z = pos.getChunkZ();
+        }
+
+        @Override
+        public int hashCode() {
+            int result = 1;
+            result = 31 * result + this.world.hashCode();
+            result = 31 * result + this.x;
+            result = 31 * result + this.z;
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (o instanceof PendingChunkLoad) {
+                PendingChunkLoad other = (PendingChunkLoad) o;
+                return this.world == other.world &&
+                       this.x == other.x &&
+                       this.z == other.z;
+            }
+            return false;
         }
     }
 
