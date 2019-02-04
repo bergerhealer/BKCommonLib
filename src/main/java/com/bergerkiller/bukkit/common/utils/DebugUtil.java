@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import com.bergerkiller.bukkit.common.TypedValue;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.mountiplex.reflection.util.SecureField;
 
@@ -162,8 +163,19 @@ public class DebugUtil {
      * @param value default
      * @return value of the variable
      */
-    public static float getShortValue(String name, int value) {
+    public static short getShortValue(String name, int value) {
         return getVariableValue(name, Integer.valueOf(value)).shortValue();
+    }
+
+    /**
+     * Gets the value of a int debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static int getIntValue(String name, int value) {
+        return getVariableValue(name, Integer.valueOf(value)).intValue();
     }
 
     /**
@@ -179,6 +191,21 @@ public class DebugUtil {
         return new Vector(getDoubleValue(name + "x", value.getX()),
                           getDoubleValue(name + "y", value.getY()),
                           getDoubleValue(name + "z", value.getZ()));
+    }
+
+    /**
+     * Gets the value of an IntVector debug variable that can be changed using the /debug command.
+     * The x/y/z values can be specified after name. If name is 'test', then 'testx', 'testy' and 'testz'
+     * are added as debug variables.
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static IntVector3 getIntVectorValue(String name, IntVector3 value) {
+        return new IntVector3(getIntValue(name + "x", value.x),
+                              getIntValue(name + "y", value.y),
+                              getIntValue(name + "z", value.z));
     }
 
     /**
