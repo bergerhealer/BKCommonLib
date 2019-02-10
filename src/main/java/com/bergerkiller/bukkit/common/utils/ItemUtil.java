@@ -208,14 +208,13 @@ public class ItemUtil {
             if (LogicUtil.nullOrEmpty(item)) {
                 continue;
             }
-            if (LogicUtil.nullOrEmpty(to)) {
-                // Parser matching
-                if (parser != null && !parser.match(item)) {
-                    continue;
-                }
-                // Set item info to this item
-                transferInfo(item, to);
+
+            // If the target is null or empty, use parser to verify the item
+            if (LogicUtil.nullOrEmpty(to) && parser != null && !parser.match(item)) {
+                continue;
             }
+
+            // Perform the transfer. If to is empty (but not null) it will be copied in full.
             amountToTransfer -= transfer(item, to, amountToTransfer);
             from.setItem(i, item);
         }
