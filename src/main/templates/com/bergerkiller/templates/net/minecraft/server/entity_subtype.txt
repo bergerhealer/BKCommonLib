@@ -591,3 +591,18 @@ class EntityBat extends EntityInsentient {
     public static final int DATA_BAT_FLAG_HANGING = (1 << 0);
     </code>
 }
+
+// Since MC 1.9
+optional class EntityShulker extends EntityInsentient {
+    protected static optional final (DataWatcher.Key<org.bukkit.block.BlockFace>)DataWatcherObject<EnumDirection> DATA_FACE_DIRECTION:a;
+    protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<BlockPosition> DATA_AP:b;
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PEEK:c;
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_COLOR:COLOR;
+
+    <code>
+    public static final Key<org.bukkit.block.BlockFace> DATA_FACE_DIRECTION = Key.Type.DIRECTION.createKey(T.DATA_FACE_DIRECTION, -1);
+    public static final Key<IntVector3> DATA_AP = Key.Type.BLOCK_POSITION.createKey(T.DATA_AP, -1);
+    public static final Key<Byte> DATA_PEEK = Key.Type.BYTE.createKey(T.DATA_PEEK, -1);
+    public static final Key<Byte> DATA_COLOR = Key.Type.BYTE.createKey(T.DATA_COLOR, -1);
+    </code>
+}
