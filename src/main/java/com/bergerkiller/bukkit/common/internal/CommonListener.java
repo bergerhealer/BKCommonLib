@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockDataImpl;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 import org.bukkit.entity.Entity;
@@ -17,6 +18,7 @@ import org.bukkit.entity.Vehicle;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -103,6 +105,13 @@ class CommonListener implements Listener {
                 ct.send(player);
             }
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected void onBlockPhysics(BlockPhysicsEvent event) {
+        // When block physics events occur while looking up the render options
+        // for a block, log a warning of this (once).
+        BlockDataImpl.RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = true;
     }
 
     /*

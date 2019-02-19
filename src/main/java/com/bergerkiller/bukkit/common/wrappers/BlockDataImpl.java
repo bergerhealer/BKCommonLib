@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -18,6 +20,7 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
@@ -57,6 +60,13 @@ public class BlockDataImpl extends BlockData {
     // Index into it by taking data x 1024 | mat.ordinal()
     public static final int BY_LEGACY_MAT_DATA_SHIFT = 11; // (1<<11 == 2048)
     public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
+
+    // When retrieving render options for a block, block physics events are not allowed to occur.
+    // This checks that such an event occurred to log a warning (and add to the blacklist post-haste)
+    public static boolean RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
+
+    // These Material types do not support Block.updateState, as they cause issues with block physics events being fired
+    private static final EnumSet<Material> BLOCK_UPDATE_STATE_BLACKLIST = EnumSet.noneOf(Material.class);
 
     static {
         // Retrieve
@@ -157,6 +167,27 @@ public class BlockDataImpl extends BlockData {
                     int index_b = CommonLegacyMaterials.getOrdinal(legacyType);
                     index_b |= (data << BY_LEGACY_MAT_DATA_SHIFT);
                     BY_LEGACY_MAT_DATA[index_a] = BY_LEGACY_MAT_DATA[index_b];
+                }
+            }
+        }
+
+        // Do not allow updateState() on these block types
+        // Some materials do not exist on all MC versions, hence the hack with the enum names
+        {
+            String[] blocked_types =new String[] {
+                    "BlockPlant",
+                    "BlockObserver",
+                    "BlockBubbleColumn",
+                    "BlockConcretePowder"
+            };
+            for (String nmsBlockTypeName : blocked_types) {
+                Class<?> nmsBlockType = CommonUtil.getNMSClass(nmsBlockTypeName);
+                if (nmsBlockType != null) {
+                    for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
+                        Object raw_block = BY_MATERIAL.get(mat).getBlockRaw();
+                        if (raw_block != null && nmsBlockType.isAssignableFrom(raw_block.getClass()))
+                            BLOCK_UPDATE_STATE_BLACKLIST.add(mat);
+                    }
                 }
             }
         }
@@ -304,8 +335,10 @@ public class BlockDataImpl extends BlockData {
             return new BlockRenderOptions(this, "");
         }
 
+        RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
+
         Object stateData;
-        if (world == null) {
+        if (world == null || BLOCK_UPDATE_STATE_BLACKLIST.contains(this.getType())) {
             //TODO: We should call updateState() with an IBlockAccess that returns all Air.
             // Right now, it will return the options of the last-modified block
             stateData = this.data.getRaw();
@@ -319,20 +352,22 @@ public class BlockDataImpl extends BlockData {
             );
         }
 
-        // Not sure if this can happen; but we handle it!
-        if (stateData == null) {
-            return new BlockRenderOptions(this, new HashMap<String, String>(0));
-        }
+        BlockRenderOptions options;
 
-        // Serialize all tokens into String key-value pairs
-        Map<IBlockStateHandle, Comparable<?>> states = IBlockDataHandle.T.getStates.invoke(stateData);
-        Map<String, String> statesStr = new HashMap<String, String>(states.size());
-        for (Map.Entry<IBlockStateHandle, Comparable<?>> state : states.entrySet()) {
-            String key = state.getKey().getKeyToken();
-            String value = state.getKey().getValueToken(state.getValue());
-            statesStr.put(key, value);
+        if (stateData == null) {
+            // Not sure if this can happen; but we handle it!
+            options = new BlockRenderOptions(this, new HashMap<String, String>(0));
+        } else {
+            // Serialize all tokens into String key-value pairs
+            Map<IBlockStateHandle, Comparable<?>> states = IBlockDataHandle.T.getStates.invoke(stateData);
+            Map<String, String> statesStr = new HashMap<String, String>(states.size());
+            for (Map.Entry<IBlockStateHandle, Comparable<?>> state : states.entrySet()) {
+                String key = state.getKey().getKeyToken();
+                String value = state.getKey().getValueToken(state.getValue());
+                statesStr.put(key, value);
+            }
+            options = new BlockRenderOptions(this, statesStr);
         }
-        BlockRenderOptions options = new BlockRenderOptions(this, statesStr);
 
         // Add additional options not provided by the server
         // This handles the display parameters for blocks like Water and Lava
@@ -345,6 +380,16 @@ public class BlockDataImpl extends BlockData {
         // This offers performance benefits
         if (options.isEmpty()) {
             this.hasRenderOptions = false;
+        }
+
+        // Block physics events ruin things, if they occur, disable the type and log it
+        if (RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS) {
+            RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
+            BLOCK_UPDATE_STATE_BLACKLIST.add(this.getType());
+
+            Logging.LOGGER.warning("[BlockData] Block physics are occurring when reading state of " + 
+                    CommonLegacyMaterials.getMaterialName(this.getType()) +
+                    " data=" + this.toString() + " options=" + options);
         }
 
         return options;
