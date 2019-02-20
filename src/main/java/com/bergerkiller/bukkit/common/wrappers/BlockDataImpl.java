@@ -173,7 +173,7 @@ public class BlockDataImpl extends BlockData {
 
         // Do not allow updateState() on these block types
         // Some materials do not exist on all MC versions, hence the hack with the enum names
-        {
+        try {
             String[] blocked_types =new String[] {
                     "BlockPlant",
                     "BlockObserver",
@@ -193,6 +193,9 @@ public class BlockDataImpl extends BlockData {
                     }
                 }
             }
+        } catch (Throwable t) {
+            // This happens sometimes?
+            t.printStackTrace();
         }
     }
 

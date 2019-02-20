@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
 /**
  * Stores a reference to net.minecraft.server.Block and IBlockData objects,
@@ -62,7 +63,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return Block
      */
     public final Object getBlockRaw() {
-        return getBlock().getRaw();
+        return Handle.getRaw(getBlock());
     }
 
     /**
