@@ -184,9 +184,12 @@ public class BlockDataImpl extends BlockData {
                 Class<?> nmsBlockType = CommonUtil.getNMSClass(nmsBlockTypeName);
                 if (nmsBlockType != null) {
                     for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
-                        Object raw_block = BY_MATERIAL.get(mat).getBlockRaw();
-                        if (raw_block != null && nmsBlockType.isAssignableFrom(raw_block.getClass()))
-                            BLOCK_UPDATE_STATE_BLACKLIST.add(mat);
+                        BlockDataConstant blockData = BY_MATERIAL.get(mat);
+                        if (blockData != null) {
+                            Object raw_block = blockData.getBlockRaw();
+                            if (raw_block != null && nmsBlockType.isAssignableFrom(raw_block.getClass()))
+                                BLOCK_UPDATE_STATE_BLACKLIST.add(mat);
+                        }
                     }
                 }
             }
