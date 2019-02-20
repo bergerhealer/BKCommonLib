@@ -9,7 +9,6 @@ import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockDataImpl;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 import org.bukkit.entity.Entity;
@@ -30,7 +29,11 @@ import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 
-class CommonListener implements Listener {
+public class CommonListener implements Listener {
+    /**
+     * This is used by BlockData to detect block physics occurring
+     */
+    public static boolean BLOCK_PHYSICS_FIRED = false;
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginEnable(final PluginEnableEvent event) {
@@ -111,7 +114,7 @@ class CommonListener implements Listener {
     protected void onBlockPhysics(BlockPhysicsEvent event) {
         // When block physics events occur while looking up the render options
         // for a block, log a warning of this (once).
-        BlockDataImpl.RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = true;
+        BLOCK_PHYSICS_FIRED = true;
     }
 
     /*

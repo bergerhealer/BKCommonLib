@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.internal.CommonListener;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
@@ -60,10 +61,6 @@ public class BlockDataImpl extends BlockData {
     // Index into it by taking data x 1024 | mat.ordinal()
     public static final int BY_LEGACY_MAT_DATA_SHIFT = 11; // (1<<11 == 2048)
     public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
-
-    // When retrieving render options for a block, block physics events are not allowed to occur.
-    // This checks that such an event occurred to log a warning (and add to the blacklist post-haste)
-    public static boolean RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
 
     // These Material types do not support Block.updateState, as they cause issues with block physics events being fired
     private static final EnumSet<Material> BLOCK_UPDATE_STATE_BLACKLIST = EnumSet.noneOf(Material.class);
@@ -341,7 +338,7 @@ public class BlockDataImpl extends BlockData {
             return new BlockRenderOptions(this, "");
         }
 
-        RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
+        CommonListener.BLOCK_PHYSICS_FIRED = false;
 
         Object stateData;
         if (world == null || BLOCK_UPDATE_STATE_BLACKLIST.contains(this.getType())) {
@@ -389,8 +386,8 @@ public class BlockDataImpl extends BlockData {
         }
 
         // Block physics events ruin things, if they occur, disable the type and log it
-        if (RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS) {
-            RENDER_OPTIONS_LOOKUP_BLOCK_PHYSICS = false;
+        if (CommonListener.BLOCK_PHYSICS_FIRED) {
+            CommonListener.BLOCK_PHYSICS_FIRED = false;
             BLOCK_UPDATE_STATE_BLACKLIST.add(this.getType());
 
             Logging.LOGGER.warning("[BlockData] Block physics are occurring when reading state of " + 
