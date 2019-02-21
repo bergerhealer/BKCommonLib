@@ -9,6 +9,7 @@ import java.util.Map;
 
 import org.bukkit.block.BlockFace;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
@@ -62,16 +63,30 @@ public class Model {
 
         // Build all textures, turning paths into absolute paths
         boolean hasChanges;
+        int loop_limit = 100;
+        String loop_last_changed = null;
         do {
             hasChanges = false;
             for (Map.Entry<String, String> textureEntry : this.textures.entrySet()) {
-                if (textureEntry.getValue().startsWith("#")) {
-                    String texture = this.textures.get(textureEntry.getValue().substring(1));
-                    if (texture != null) {
+                String oldTextureValue = textureEntry.getValue();
+                if (oldTextureValue.startsWith("#")) {
+                    String texture = this.textures.get(oldTextureValue.substring(1));
+                    if (texture != null && !texture.equals(oldTextureValue)) {
                         textureEntry.setValue(texture);
+                        loop_last_changed = texture;
                         hasChanges = true;
                     }
                 }
+            }
+
+            // When a cyclical texture dependency exists, this could loop forever
+            // Allow for a maximum of 100 loops, then log a cyclical texture loop error
+            if (--loop_limit <= 0) {
+                if (loop_last_changed != null) {
+                    Logging.LOGGER_MAPDISPLAY.warning("Texture loop error for model " +
+                        this.name + " texture " + loop_last_changed);
+                }
+                break;
             }
         } while (hasChanges);
 
