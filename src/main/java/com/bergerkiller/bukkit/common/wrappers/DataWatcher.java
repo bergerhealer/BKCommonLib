@@ -772,7 +772,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             Class<?> registryClass = CommonUtil.getNMSClass("DataWatcherRegistry");
             Class<?> serializerClass = CommonUtil.getNMSClass("DataWatcherSerializer");
             if (registryClass != null && serializerClass != null) {
-                // Use MC 1.10.2 serializer registry for this
+                // Since MC 1.9
                 for (Field f : registryClass.getDeclaredFields()) {
                     if (f.getType().equals(serializerClass) && Modifier.isStatic(f.getModifiers())) {
                         try {
@@ -800,8 +800,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
                 // ChatText -> IChatbaseComponent
                 typeMapping.put(ChatText.class, IChatBaseComponentHandle.T.getType());
+
+                // Bukkit BlockFace -> nms EnumDirection
+                typeMapping.put(BlockFace.class, EnumDirectionHandle.T.getType());
             } else {
-                // Use our own kind of tokens
+                // Use our own kind of tokens on MC 1.8.8 and before
                 register(Byte.class, 0);
                 register(Short.class, 1);
                 register(Integer.class, 2);
@@ -819,6 +822,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
                 // ChatText -> String
                 typeMapping.put(ChatText.class, String.class);
+
+                // Bukkit BlockFace -> int (not really used anywhere)
+                typeMapping.put(BlockFace.class, Integer.class);
             }
 
             // Add all type mappings to self
@@ -835,8 +841,6 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
             // Bukkit ItemStack -> nms ItemStack
             typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
-            // Bukkit BlockFace -> nms EnumDirection
-            typeMapping.put(BlockFace.class, EnumDirectionHandle.T.getType());
         }
 
         private static void register(Class<?> type, Object token) {
