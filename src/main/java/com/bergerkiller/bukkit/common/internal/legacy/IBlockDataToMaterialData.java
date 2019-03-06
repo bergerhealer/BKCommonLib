@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common.internal.legacy;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -13,7 +16,7 @@ import org.bukkit.material.MaterialData;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
@@ -157,23 +160,21 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                 }
 
                 @Override
-                public IBlockDataHandle createState(IBlockDataHandle iblockdata, org.bukkit.material.Button button) {
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Button button) {
+                    iblockdata = iblockdata.set("powered", button.isPowered());
+
                     BlockFace facing = button.getFacing();
-                    String face;
-                    if (facing == BlockFace.DOWN) {
-                        face = "CEILING";
-                        facing = BlockFace.NORTH;
-                    } else if (facing == BlockFace.UP) {
-                        face = "FLOOR";
-                        facing = BlockFace.NORTH;
-                    } else {
-                        face = "WALL";
-                        facing = BlockFace.NORTH;
+                    if (!FaceUtil.isVertical(facing)) {
+                        return Arrays.asList(iblockdata
+                                .set("face", "WALL")
+                                .set("facing", facing));
                     }
-                    return iblockdata
-                            .set("face", face)
-                            .set("facing", facing)
-                            .set("powered", button.isPowered());
+
+                    iblockdata = iblockdata.set("face", (facing == BlockFace.UP) ? "FLOOR" : "CEILING");
+                    return Arrays.asList(iblockdata.set("facing", BlockFace.NORTH),
+                                         iblockdata.set("facing", BlockFace.EAST),
+                                         iblockdata.set("facing", BlockFace.SOUTH),
+                                         iblockdata.set("facing", BlockFace.WEST));
                 }
             }.setTypes("JUNGLE_BUTTON", "SPRUCE_BUTTON", "ACACIA_BUTTON",
                        "BIRCH_BUTTON", "DARK_OAK_BUTTON")
@@ -190,8 +191,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                 }
 
                 @Override
-                public IBlockDataHandle createState(IBlockDataHandle iblockdata, org.bukkit.material.PressurePlate plate) {
-                    return iblockdata.set("powered", plate.isPressed());
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.PressurePlate plate) {
+                    return Arrays.asList(iblockdata.set("powered", plate.isPressed()));
                 }
             }.setTypes("JUNGLE_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "ACACIA_PRESSURE_PLATE",
                        "BIRCH_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE")
@@ -202,28 +203,35 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         // Redstone Wire has north/east/south/west metadata too, which also have to be registered
         // Format: minecraft:redstone_wire[east=side,north=none,power=12,south=none,west=none]
         {
-            final String[] SIDE_VALUES = {"up", "side", "none"};
-            IBlockDataHandle wire_data = getIBlockData(MaterialUtil.getMaterial("REDSTONE_WIRE"));
-            for (int power = 0; power <= 15; power++) {
-                org.bukkit.material.RedstoneWire wire = new org.bukkit.material.RedstoneWire();
-                wire.setData((byte) power);
+            new CustomMaterialDataBuilder<org.bukkit.material.RedstoneWire>() {
+                @Override
+                public org.bukkit.material.RedstoneWire create(Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.RedstoneWire(legacy_data_type, legacy_data_value);
+                }
 
-                // Ugh. For loops.
-                wire_data = wire_data.set("power", power);
-                for (String side_north : SIDE_VALUES) {
-                    wire_data = wire_data.set("north", side_north);
-                    for (String side_east : SIDE_VALUES) {
-                        wire_data = wire_data.set("east", side_east);
-                        for (String side_south : SIDE_VALUES) {
-                            wire_data = wire_data.set("south", side_south);
-                            for (String side_west : SIDE_VALUES) {
-                                wire_data = wire_data.set("west", side_west);
-                                storeMaterialData(wire, wire_data);
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle wire_data, org.bukkit.material.RedstoneWire wire) {
+                    final String[] SIDE_VALUES = {"up", "side", "none"};
+                    ArrayList<IBlockDataHandle> variants = new ArrayList<IBlockDataHandle>(3*3*3*3);
+                    wire_data = wire_data.set("power", wire.getData());
+                    for (String side_north : SIDE_VALUES) {
+                        wire_data = wire_data.set("north", side_north);
+                        for (String side_east : SIDE_VALUES) {
+                            wire_data = wire_data.set("east", side_east);
+                            for (String side_south : SIDE_VALUES) {
+                                wire_data = wire_data.set("south", side_south);
+                                for (String side_west : SIDE_VALUES) {
+                                    wire_data = wire_data.set("west", side_west);
+                                    variants.add(wire_data);
+                                }
                             }
                         }
                     }
+                    return variants;
                 }
-            }
+            }.setTypes("LEGACY_REDSTONE_WIRE")
+             .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+             .build();
         }
     }
 
@@ -309,13 +317,13 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         public abstract T create(Material legacy_data_type, byte legacy_data_value);
 
         /**
-         * Creates a single IBlockData state of this MaterialData
+         * Creates all possible IBlockDatas state matching with this MaterialData
          * 
          * @param iblockdata of the default Material state
          * @param materialdata input state data
          * @return IBlockData state
          */
-        public abstract IBlockDataHandle createState(IBlockDataHandle iblockdata, T materialdata);
+        public abstract List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, T materialdata);
 
         /**
          * Sets all possible Material types of this MaterialData
@@ -349,7 +357,9 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                 IBlockDataHandle iblockdata = getIBlockData(type);
                 for (int data_value : this.data_values) {
                     materialdata.setData((byte) data_value);
-                    storeMaterialData(materialdata, this.createState(iblockdata, materialdata));
+                    for (IBlockDataHandle iBlockData : this.createStates(iblockdata, materialdata)) {
+                        storeMaterialData(materialdata, iBlockData);
+                    }
                 }
             }
         }
