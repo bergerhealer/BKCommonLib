@@ -3,9 +3,12 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
@@ -1325,6 +1328,44 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public static <T extends MapDisplay> Collection<T> getAllDisplays(Class<T> displayClass) {
         return CommonPlugin.getInstance().getMapController().getDisplays(displayClass);
+    }
+
+    /**
+     * Gets all display instances currently displayed on the map inside an item frame.
+     * This can be more than one if different displays are displayed for different players.
+     * A guarantee is made that no duplicate instances shall be returned.
+     * 
+     * @param itemFrame
+     * @return collection of Map Displays displayed
+     */
+    public static Collection<MapDisplay> getAllDisplays(ItemFrame itemFrame) {
+        return getAllDisplaysFromInfo(CommonPlugin.getInstance().getMapController().getInfo(itemFrame));
+    }
+
+    /**
+     * Gets all display instances currently displayed for an item in a player's hand or
+     * seated in an item frame. This can be more than one if different displays
+     * are displayed for different players. A guarantee is made that no duplicate
+     * instances shall be returned.
+     * 
+     * @param item
+     * @return collection of Map Displays displayed
+     */
+    public static Collection<MapDisplay> getAllDisplays(ItemStack item) {
+        return getAllDisplaysFromInfo(CommonPlugin.getInstance().getMapController().getInfo(item));
+    }
+
+    private static Collection<MapDisplay> getAllDisplaysFromInfo(MapDisplayInfo info) {
+        if (info != null) {
+            HashSet<MapDisplay> uniqueDisplays = new HashSet<MapDisplay>(info.sessions.size());
+            for (MapSession session : info.sessions) {
+                if (session.display != null) {
+                    uniqueDisplays.add(session.display);
+                }
+            }
+            return uniqueDisplays;
+        }
+        return Collections.emptySet();
     }
 
     /**
