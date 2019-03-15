@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -143,20 +144,16 @@ public class Model {
                         for (BlockFace bface : FaceUtil.BLOCK_SIDES) {
                             // If pixel on this face is not transparent, do not add one there
                             if (!FaceUtil.isVertical(bface)) {
-                                int x2 = x - bface.getModX();
-                                int y2 = y - bface.getModZ();
-                                if (result.readPixel(x2, y2) == MapColorPalette.COLOR_TRANSPARENT) {
+                                int x2 = x + bface.getModX();
+                                int y2 = y + bface.getModZ();
+                                if (result.readPixel(x2, y2) != MapColorPalette.COLOR_TRANSPARENT) {
                                     continue;
                                 }
                             }
-                            
-                            
+
                             Face face = new Face();
-                            
-                            MapTexture tex = MapTexture.createEmpty(1, 1);
-                            tex.writePixel(0, 0, color);
-                            
-                            face.texture = tex;
+
+                            face.texture = SinglePixelTexture.get(color);
                             element.faces.put(bface, face);
                         }
                         this.elements.add(element);
@@ -349,46 +346,43 @@ public class Model {
                     this.texture = resourcePack.getTexture(this.textureName);
                 }
                 if (uv != null) {
-                    int[] i_uv = new int[uv.length];
-                    for (int i = 0; i < uv.length; i++) {
-                        i_uv[i] = (int) Math.ceil(uv[i]);
-                    }
+                    int x1 = (int) ((double) uv[0] * (double) this.texture.getWidth() / 16.0);
+                    int x2 = (int) ((double) uv[2] * (double) this.texture.getWidth() / 16.0);
+                    int y1 = (int) ((double) uv[1] * (double) this.texture.getHeight() / 16.0);
+                    int y2 = (int) ((double) uv[3] * (double) this.texture.getHeight() / 16.0);
 
-                    int dx = i_uv[2] - i_uv[0];
-                    int dy = i_uv[3] - i_uv[1];
-                    int sx = (dx >= 1) ? 1 : -1;
-                    int sy = (dy >= 1) ? 1 : -1;
-                    int ox = (dx >= 1) ? 0 : 1;
-                    int oy = (dy >= 1) ? 0 : 1;
-                    MapTexture texture_uv = MapTexture.createEmpty(Math.abs(dx), Math.abs(dy));
-                    byte[] buffer = texture_uv.getBuffer();
-                    int index = 0;
-                    for (int y = i_uv[1]; y != i_uv[3]; y += sy) {
-                        for (int x = i_uv[0]; x != i_uv[2]; x += sx) {
-                            int px = x - ox;
-                            int py = y - oy;
-                            if (px < 0 || py < 0 || px >= this.texture.getWidth() || py >= this.texture.getHeight()) {
-                                buffer[index] = MapColorPalette.COLOR_GREEN;
-                            } else {
-                                int a = x - ox;
-                                int b = y - oy;
-                                if (sx == -1) {
-                                    a = texture.getWidth() - a - 1;
-                                }
-                                if (sy == -1) {
-                                    b = texture.getHeight() - b - 1;
-                                }
-                                
-                                buffer[index] = this.texture.readPixel(a, b);
-                            }
-                            index++;
-                        }
+                    if (x1 == x2 && y1 == y2) {
+                        // Optimization for single-pixel color textures (voxels)
+                        this.texture = SinglePixelTexture.get(this.texture.readPixel(x1, y1));
+                    } else {
+                        // Cut UV area from texture
+                        int dx = (x2 - x1);
+                        int dy = (y2 - y1);
+
+                        MapTexture texture_uv = MapTexture.createEmpty(Math.abs(dx)+1, Math.abs(dy)+1);
+                        byte[] buffer = texture_uv.getBuffer();
+
+                        int sx = (dx >= 1) ? 1 : -1;
+                        int sy = (dy >= 1) ? 1 : -1;
+
+                        int i = 0;
+                        int y = y1 - sy;
+                        do {
+                            y += sy;
+
+                            int x = x1 - sx;
+                            do {
+                                x += sx;
+                                buffer[i++] = this.texture.readPixel(x, y);
+                            } while (x != x2);
+                        } while (y != y2);
+
+                        this.texture = texture_uv;
                     }
-                    this.texture = texture_uv;
                 }
 
                 // By default a rotation of 180 is used. This rotation can be altered by specifying it.
-                if (this.rotation != 180) {
+                if (this.rotation != 180 && (this.texture.getWidth() > 1 || this.texture.getHeight() > 1)) {
                     this.texture = MapTexture.rotate(this.texture, this.rotation + 180);
                 }
             }

@@ -1402,37 +1402,102 @@ public abstract class MapCanvas {
             light += this.directionalLightFact * dot;
         }
 
-        Vector3 p = new Vector3();
-        for (int y = minY; y <= maxY; y++)
-        {
-            for (int x = minX; x <= maxX; x++)
-            {
-                p.x = x;
-                p.z = y;
-                p.y = 1.0;
-                mInv.transformPoint(p);
+        if (canvas.getWidth() == 1 && canvas.getHeight() == 1) {
+            // Optimization for single-pixel color textures. Used for voxel-based models.
+            byte color = canvas.readPixel(0, 0);
+            if (color != MapColorPalette.COLOR_TRANSPARENT) {
+                // Shows specular brightness based on distance from camera (debug)
+                color = MapColorPalette.getSpecular(color, light);
 
-                double ax = p.x;
-                double ay = p.z;
+                Vector3 p = new Vector3();
+                for (int y = minY; y <= maxY; y++)
+                {
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        p.x = x;
+                        p.z = y;
+                        p.y = 1.0;
+                        mInv.transformPoint(p);
 
-                // Half parameter makes it draw only one half (triangle)
-                if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {
-                    continue;
+                        double ax = p.x;
+                        double ay = p.z;
+
+                        // Half parameter makes it draw only one half (triangle)
+                        if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {
+                            continue;
+                        }
+
+                        //float depth = p.y;
+
+                        if (ax >= 0.0 && ay >= 0.0 && ax < 1.0 && ay < 1.0) {
+                            temp.writePixel(x - minX, y - minY, color);
+                        }
+                    }
                 }
+                
+                /*
+                Vector3 p = new Vector3();
+                for (int y = minY; y <= maxY; y++)
+                {
+                    for (int x = minX; x <= maxX; x++)
+                    {
+                        p.x = x;
+                        p.z = y;
+                        p.y = 1.0;
+                        mInv.transformPoint(p);
 
-                //float depth = p.y;
+                        double ax = p.x;
+                        double ay = p.z;
 
-                if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
-                    byte color = canvas.readPixel((int) ax, (int) ay);
-                    if (color != MapColorPalette.COLOR_TRANSPARENT) {
-                        // Shows specular brightness based on distance from camera (debug)
-                        color = MapColorPalette.getSpecular(color, light);
+                        // Half parameter makes it draw only one half (triangle)
+                        if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {
+                            continue;
+                        }
 
-                        temp.writePixel(x - minX, y - minY, color);
+                        //float depth = p.y;
+
+                        if (ax >= 0.0f && ay >= 0.0f && ax <= 0.5f && ay <= 0.5f) {
+                            temp.writePixel(x - minX, y - minY, color);
+                        }
+                    }
+                }
+                */
+            }
+        } else {
+            // Standard textures
+            Vector3 p = new Vector3();
+            for (int y = minY; y <= maxY; y++)
+            {
+                for (int x = minX; x <= maxX; x++)
+                {
+                    p.x = x;
+                    p.z = y;
+                    p.y = 1.0;
+                    mInv.transformPoint(p);
+
+                    double ax = p.x;
+                    double ay = p.z;
+
+                    // Half parameter makes it draw only one half (triangle)
+                    if ((half > 0 && ax > ay) || (half < 0 && ax <= ay)) {
+                        continue;
+                    }
+
+                    //float depth = p.y;
+
+                    if (ax >= 0.0f && ay >= 0.0f && ax <= (canvas.getWidth()) && ay <= (canvas.getHeight())) {
+                        byte color = canvas.readPixel((int) ax, (int) ay);
+                        if (color != MapColorPalette.COLOR_TRANSPARENT) {
+                            // Shows specular brightness based on distance from camera (debug)
+                            color = MapColorPalette.getSpecular(color, light);
+
+                            temp.writePixel(x - minX, y - minY, color);
+                        }
                     }
                 }
             }
         }
+
         return this.draw(temp, minX, minY);
     }
 

@@ -140,9 +140,13 @@ public class MapResourcePack {
 
         // Server-defined. Take over the options from the server.properties
         if (resourcePackPath != null && resourcePackPath.equalsIgnoreCase("server")) {
-            MinecraftServerHandle mcs = MinecraftServerHandle.instance();
-            resourcePackPath = mcs.getResourcePack();
-            resourcePackHash = mcs.getResourcePackHash();
+            if (Common.IS_TEST_MODE) {
+                resourcePackPath = "vanilla";
+            } else {
+                MinecraftServerHandle mcs = MinecraftServerHandle.instance();
+                resourcePackPath = mcs.getResourcePack();
+                resourcePackHash = mcs.getResourcePackHash();
+            }
         }
 
         // Vanilla Minecraft client, without any other resource packs applied

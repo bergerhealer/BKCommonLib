@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
@@ -115,12 +116,12 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterialData(Material.TORCH, 5).getDefaultRenderOptions();
-        opt.put("west",  "side");
+        //BlockRenderOptions opt = BlockData.fromMaterialData(Material.TORCH, 5).getDefaultRenderOptions();
+        //opt.put("west",  "side");
 
-        System.out.println(opt);
+        //System.out.println(opt);
 
-        ItemStack item = ItemUtil.createItem(Material.TORCH, 0, 1);
+        ItemStack item = ItemUtil.createItem(Material.GOLDEN_PICKAXE, 15, 1);
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
         Model model = textures.getItemModel(item); //textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
@@ -133,7 +134,7 @@ class Pseudo3DImagePanel extends JPanel
         transform.rotateY(yaw);
         transform.translate(-8, -8, -8);
 
-        //image.drawModel(textures.getBlockModel(Material.QUARTZ_BLOCK), transform);
+        // image.drawModel(textures.getBlockModel(Material.QUARTZ_BLOCK), transform);
 
         transform.translate(20, 0 ,0);
         
