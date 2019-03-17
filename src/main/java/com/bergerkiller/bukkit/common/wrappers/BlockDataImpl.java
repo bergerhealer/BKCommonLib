@@ -175,7 +175,9 @@ public class BlockDataImpl extends BlockData {
                     "BlockPlant",
                     "BlockObserver",
                     "BlockBubbleColumn",
-                    "BlockConcretePowder"
+                    "BlockConcretePowder",
+                    "BlockLeaves",
+                    "BlockDirtSnow"
             };
             for (String nmsBlockTypeName : blocked_types) {
                 Class<?> nmsBlockType = CommonUtil.getNMSClass(nmsBlockTypeName);
