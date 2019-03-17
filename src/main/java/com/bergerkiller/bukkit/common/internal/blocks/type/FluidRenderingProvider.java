@@ -76,12 +76,12 @@ public class FluidRenderingProvider extends BlockRenderProvider {
         // Cut out only the first animation block from the texture
         // This is the 'side' of the water where no water animations show
         MapTexture waterSide = resources.getTexture(this.fluidTexture1);
-        waterSide = waterSide.getView(0, 0, waterSide.getWidth(), waterSide.getWidth()).clone();
+        // waterSide = waterSide.getView(0, 0, waterSide.getWidth(), waterSide.getWidth()).clone();
 
         // Cut out only the first animation block from the texture
         // For now, we don't do animations in this renderer.
         MapTexture waterTexture = resources.getTexture(this.fluidTexture2);
-        waterTexture = waterTexture.getView(0, 0, waterTexture.getWidth(), waterTexture.getWidth()).clone();
+        // waterTexture = waterTexture.getView(0, 0, waterTexture.getWidth(), waterTexture.getWidth()).clone();
 
         for (BlockFace blockFace : FaceUtil.BLOCK_SIDES) {
             Model.Element.Face face = new Model.Element.Face();

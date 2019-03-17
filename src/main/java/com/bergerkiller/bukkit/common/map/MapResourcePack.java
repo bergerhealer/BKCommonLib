@@ -7,6 +7,7 @@ import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.logging.Level;
 
@@ -381,6 +382,24 @@ public class MapResourcePack {
                 }
                 result = this.createPlaceholderTexture();
             }
+
+            // Animated textures: when height is a multiple of width
+            // Find the mcmeta. If one does not exist, fail.
+            // Otherwise, load the first frame (wxw) area.
+            int num_frames = result.getHeight() / result.getWidth();
+            if (num_frames > 1 && ((num_frames * result.getWidth()) == result.getHeight())) {
+                InputStream metaStream = openFileStream(ResourceType.TEXTURES_META, path);
+                if (metaStream == null) {
+                    Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load animated texture (missing mcmeta): " + path);
+                    result = this.createPlaceholderTexture();
+                } else {
+                    result = result.getView(0, 0, result.getWidth(), result.getWidth()).clone();
+                    try {
+                        metaStream.close();
+                    } catch (IOException e) {}
+                }
+            }
+
             textureCache.put(path, result);
         }
         return result;
@@ -589,6 +608,9 @@ public class MapResourcePack {
             if (this.archive != null) {
                 try {
                     InputStream stream = this.archive.openFileStream(fullPath);
+                    if (stream == null) {
+                        stream = this.archive.openFileStream(fullPath.toLowerCase(Locale.ENGLISH));
+                    }
                     if (stream != null) {
                         return stream;
                     }
@@ -670,7 +692,8 @@ public class MapResourcePack {
     public static enum ResourceType {
         MODELS("models/", ".json"),
         BLOCKSTATES("blockstates/", ".json"),
-        TEXTURES("textures/", ".png");
+        TEXTURES("textures/", ".png"),
+        TEXTURES_META("textures/", ".png.mcmeta");
 
         private final String root;
         private final String ext;
