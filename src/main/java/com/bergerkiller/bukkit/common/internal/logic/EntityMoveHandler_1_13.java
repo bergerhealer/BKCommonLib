@@ -52,6 +52,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
                     method_body = SourceDeclaration.preprocess(method_body);
                     method_body = method_body.replaceAll("this", "instance");
                     method_body = method_body.replaceAll("BlockPosition\\.b", "BlockPosition\\$b");
+                    method_body = method_body.replaceAll("BlockPosition\\.PooledBlockPosition", "BlockPosition\\$PooledBlockPosition");
                     method_body = method_body.replace(set_str, ""); // Note: this should be fixed!
                     method_body = method_body.trim();
 

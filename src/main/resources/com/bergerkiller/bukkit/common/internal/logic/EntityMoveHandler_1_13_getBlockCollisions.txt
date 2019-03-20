@@ -19,7 +19,11 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
     WorldBorder worldborder = this.getWorldBorder();
     VoxelShape voxelshape2 = VoxelShapes.a();
     VoxelShapeBitSet voxelshapebitset = new VoxelShapeBitSet(j - i, l - k, j1 - i1);
+#if classexists net.minecraft.server.BlockPosition$PooledBlockPosition
+    BlockPosition.PooledBlockPosition blockposition_b = BlockPosition.PooledBlockPosition.r();
+#else
     BlockPosition.b blockposition_b = BlockPosition.b.r();
+#endif
     Throwable throwable = null;
 
     try {
