@@ -933,7 +933,7 @@ public class CommonMapController implements PacketListener, Listener {
             if (pluginName != null && displayClassName != null) {
                 Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
                 Class<?> displayClass = null;
-                if (plugin != null) {
+                if (plugin != null && plugin.isEnabled()) {
                     try {
                         displayClass = plugin.getClass().getClassLoader().loadClass(displayClassName);
                         if (!MapDisplay.class.isAssignableFrom(displayClass)) {
