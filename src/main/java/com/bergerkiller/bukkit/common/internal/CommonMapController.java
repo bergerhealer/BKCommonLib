@@ -32,6 +32,7 @@ import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
@@ -632,6 +633,17 @@ public class CommonMapController implements PacketListener, Listener {
         MapPlayerInput input = this.playerInputs.remove(event.getPlayer());
         if (input != null) {
             input.onDisconnected();
+        }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected synchronized void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        for (MapDisplayInfo display : maps.values()) {
+            for (MapSession session : display.sessions) {
+                for (MapSession.Owner owner : session.onlineOwners) {
+                    owner.clip.markEverythingDirty();
+                }
+            }
         }
     }
 
