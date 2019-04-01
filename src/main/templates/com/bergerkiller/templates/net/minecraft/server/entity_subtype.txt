@@ -606,3 +606,17 @@ optional class EntityShulker extends EntityInsentient {
     public static final Key<Byte> DATA_COLOR = Key.Type.BYTE.createKey(T.DATA_COLOR, -1);
     </code>
 }
+
+class EntityEnderCrystal extends Entity {
+    #if version >= 1.13
+      private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_BEAM_TARGET:b;
+    #elseif version >= 1.9
+      private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<com.google.common.base.Optional<BlockPosition>> DATA_BEAM_TARGET:b;
+    #else
+      private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_BEAM_TARGET:###;
+    #endif
+
+    <code>
+    public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET, -1);
+    </code>
+}
