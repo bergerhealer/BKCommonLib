@@ -15,7 +15,6 @@ public abstract class EntityEnderCrystalHandle extends EntityHandle {
     public static final EntityEnderCrystalClass T = new EntityEnderCrystalClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(EntityEnderCrystalHandle.class, "net.minecraft.server.EntityEnderCrystal", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
-    public static final Key<IntVector3> DATA_BEAM_TARGET_LOC = T.DATA_BEAM_TARGET_LOC.getSafe();
     /* ============================================================================== */
 
     public static EntityEnderCrystalHandle createHandle(Object handleInstance) {
@@ -25,13 +24,14 @@ public abstract class EntityEnderCrystalHandle extends EntityHandle {
     /* ============================================================================== */
 
 
-    public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET_LOC, -1);
+    public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET, -1);
     /**
      * Stores class members for <b>net.minecraft.server.EntityEnderCrystal</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityEnderCrystalClass extends Template.Class<EntityEnderCrystalHandle> {
-        public final Template.StaticField.Converted<Key<IntVector3>> DATA_BEAM_TARGET_LOC = new Template.StaticField.Converted<Key<IntVector3>>();
+        @Template.Optional
+        public final Template.StaticField.Converted<Key<IntVector3>> DATA_BEAM_TARGET = new Template.StaticField.Converted<Key<IntVector3>>();
 
     }
 

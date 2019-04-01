@@ -617,6 +617,6 @@ class EntityEnderCrystal extends Entity {
     #endif
 
     <code>
-    public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET_LOC, -1);
+    public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET, -1);
     </code>
 }
