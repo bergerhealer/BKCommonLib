@@ -19,7 +19,6 @@ import org.bukkit.inventory.ItemStack;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapResourcePack;
 import com.bergerkiller.bukkit.common.map.MapTexture;
@@ -116,14 +115,13 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        //BlockRenderOptions opt = BlockData.fromMaterialData(Material.TORCH, 5).getDefaultRenderOptions();
-        //opt.put("west",  "side");
+        BlockRenderOptions opt = BlockData.fromMaterialData(Material.RAIL, 6).getDefaultRenderOptions();
 
         //System.out.println(opt);
 
         ItemStack item = ItemUtil.createItem(Material.GOLDEN_PICKAXE, 15, 1);
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);
-        Model model = textures.getItemModel(item); //textures.getBlockModel(opt);
+        Model model = textures.getBlockModel(opt);
         Matrix4x4 transform = new Matrix4x4();
 
         //image.draw(textures.getItemTexture(item, 32, 32), 0, 0);

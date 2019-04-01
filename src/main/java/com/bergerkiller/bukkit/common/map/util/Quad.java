@@ -52,18 +52,17 @@ public class Quad implements Comparable<Quad>, Cloneable {
         }
         if (face == BlockFace.DOWN) {
             p1.x = from.x;
-            p1.z = to.z;
+            p1.z = from.z;
 
             p2.x = to.x;
-            p2.z = to.z;
+            p2.z = from.z;
 
             p3.x = to.x;
-            p3.z = from.z;
+            p3.z = to.z;
 
             p0.x = from.x;
-            p0.z = from.z;
-            
-            
+            p0.z = to.z;
+
             p0.y = p1.y = p2.y = p3.y = from.y;
         }
         if (face == BlockFace.SOUTH) {

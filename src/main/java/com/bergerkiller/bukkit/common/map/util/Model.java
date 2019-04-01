@@ -18,7 +18,6 @@ import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -350,6 +349,18 @@ public class Model {
                     int x2 = (int) ((double) uv[2] * (double) this.texture.getWidth() / 16.0);
                     int y1 = (int) ((double) uv[1] * (double) this.texture.getHeight() / 16.0);
                     int y2 = (int) ((double) uv[3] * (double) this.texture.getHeight() / 16.0);
+
+                    // Correct X
+                    if (x2 > x1)
+                        --x2;
+                    else if (x1 > x2)
+                        --x1;
+
+                    // Correct Y
+                    if (y2 > y1)
+                        --y2;
+                    else if (y1 > y2)
+                        --y1;
 
                     if (x1 == x2 && y1 == y2) {
                         // Optimization for single-pixel color textures (voxels)
