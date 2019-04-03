@@ -362,12 +362,21 @@ public class MapDisplay implements MapDisplayEvents {
             // Done updating, reset the dirty state
             this.clip.clearDirty();
 
-        } else if (session.hasNewViewers) {
+        } else {
+            // Send full changes to new dirty viewers
+            if (session.hasNewViewers) {
+                for (MapSession.Owner owner : session.onlineOwners) {
+                    if (owner.isNewViewer()) {
+                        owner.updateMap(getUpdatePackets(owner.clip));
+                    }
+                }
+            }
 
-            // Send full changes to the dirty viewers
-            for (MapSession.Owner owner : session.onlineOwners) {
-                if (owner.isNewViewer()) {
-                    owner.updateMap(getUpdatePackets(owner.clip));
+            // Check all viewers to see if any of them have dirty areas that need to be refreshed
+            // When players rejoin or change worlds, they may not know the map
+            for (MapSession.Owner owner : this.session.onlineOwners) {
+                if (owner.viewing && owner.clip.dirty) {
+                    owner.updateMap(this.getUpdatePackets(owner.clip));
                 }
             }
         }
