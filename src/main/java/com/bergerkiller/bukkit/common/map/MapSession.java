@@ -177,8 +177,23 @@ public class MapSession {
     }
 
     public void updatePlayerOnline(Player player) {
-        if (this.mode == MapSessionMode.FOREVER && this.owners.contains(player.getUniqueId())) {
-            if (!this.onlineOwners.contains(player)) {
+        UUID playerUUID = player.getUniqueId();
+        if (this.mode == MapSessionMode.FOREVER && this.owners.contains(playerUUID)) {
+            // Check Owner does not already exist
+            // If it does, merely set clip to all dirty
+            boolean ownerFound = false;
+            for (Owner owner : this.onlineOwners) {
+                if (owner.playerUUID.equals(playerUUID)) {
+                    owner.wasViewing = false;
+                    owner.player = player;
+                    owner.clip.markEverythingDirty();
+                    ownerFound = true;
+                    break;
+                }
+            }
+
+            // Add a new Owner if not found
+            if (!ownerFound) {
                 Owner owner = new Owner(player, this.display);
                 this.onlineOwners.add(owner);
                 this.onOwnerAdded(owner);
@@ -187,10 +202,11 @@ public class MapSession {
     }
 
     public static class Owner {
-        public final Player player;
+        public final UUID playerUUID;
         public final MapDisplay display;
         public final MapClip clip = new MapClip();
         public final MapPlayerInput input;
+        public Player player;
         public boolean interceptInput = false; /* Input is intercepted */
         public boolean wasViewing; /* Was viewing previously */
         public boolean viewing; /* Viewing in his hands, or on item frames */
@@ -198,12 +214,13 @@ public class MapSession {
         public boolean controlling; /* Holding in his main hand */
 
         public Owner(Player player, MapDisplay display) {
-            this.player = player;
+            this.playerUUID = player.getUniqueId();
             this.display = display;
             this.controlling = false;
             this.viewing = false;
             this.holding = false;
             this.wasViewing = false;
+            this.player = player;
             this.input = CommonPlugin.getInstance().getMapController().getPlayerInput(this.player);
             this.clip.markEverythingDirty();
         }

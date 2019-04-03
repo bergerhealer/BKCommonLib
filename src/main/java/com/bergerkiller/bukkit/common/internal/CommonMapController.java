@@ -733,7 +733,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Find the Display this player is sees on this map
-        ViewStack stack = info.views.get(player);
+        ViewStack stack = info.views.get(player.getUniqueId());
         if (stack == null || stack.stack.isEmpty()) {
             return false; // no visible display for this player
         }
@@ -1005,7 +1005,7 @@ public class CommonMapController implements PacketListener, Listener {
         public final ArrayList<MapSession> sessions = new ArrayList<MapSession>();
 
         // Maps the display view stack by player
-        public final HashMap<Player, ViewStack> views = new HashMap<Player, ViewStack>();
+        public final HashMap<UUID, ViewStack> views = new HashMap<UUID, ViewStack>();
 
         public MapDisplayInfo(UUID uuid) {
             this.uuid = uuid;
@@ -1028,10 +1028,11 @@ public class CommonMapController implements PacketListener, Listener {
          * @return view stack
          */
         public ViewStack getStack(Player player) {
-            ViewStack stack = views.get(player);
+            UUID playerUUID = player.getUniqueId();
+            ViewStack stack = views.get(playerUUID);
             if (stack == null) {
                 stack = new ViewStack();
-                views.put(player, stack);
+                views.put(playerUUID, stack);
             }
             return stack;
         }
@@ -1044,12 +1045,13 @@ public class CommonMapController implements PacketListener, Listener {
          * @param viewing
          */
         public void setViewing(Player player, MapDisplay display, boolean viewing) {
-            ViewStack stack = views.get(player);
+            UUID playerUUID = player.getUniqueId();
+            ViewStack stack = views.get(playerUUID);
             if (viewing) {
                 if (stack == null) {
                     stack = new ViewStack();
                     stack.stack.add(display);
-                    views.put(player, stack);
+                    views.put(playerUUID, stack);
                 } else {
                     // Make sure the display is at the very end of the list
                     stack.stack.remove(display);
@@ -1067,7 +1069,7 @@ public class CommonMapController implements PacketListener, Listener {
          * @return map display, null if no display is set for this Player
          */
         public MapDisplay getViewing(Player player) {
-            ViewStack stack = views.get(player);
+            ViewStack stack = views.get(player.getUniqueId());
             return (stack == null || stack.stack.isEmpty()) ? null : stack.stack.getLast();
         }
 
