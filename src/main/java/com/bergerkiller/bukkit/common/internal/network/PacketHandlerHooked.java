@@ -41,7 +41,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
     private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
     private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
-    private final LinkedList<SilentPacket> silentQueue = new LinkedList<SilentPacket>();
+    private final SilentPacketQueue silentQueue = new SilentPacketQueue();
 
     @Override
     public boolean onEnable() {
@@ -217,9 +217,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         }
 
         if (!throughListeners) {
-            synchronized (silentQueue) {
-                silentQueue.addLast(new SilentPacket(player, packet));
-            }
+            this.silentQueue.add(player, packet);
         }
 
         PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
@@ -291,22 +289,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         }
 
         // Check if silent
-        boolean is_silent = false;
-        if (!silentQueue.isEmpty()) {
-            long time = System.currentTimeMillis();
-            synchronized (silentQueue) {
-                ListIterator<SilentPacket> iter = silentQueue.listIterator();
-                while (iter.hasNext()) {
-                    SilentPacket sp = iter.next();
-                    if (time >= sp.timeout) {
-                        iter.remove();
-                    } else if (sp.player == player && sp.packet == packet) {
-                        is_silent = true;
-                        iter.remove();
-                    }
-                }
-            }
-        }
+        boolean is_silent = this.silentQueue.take(player, packet);
 
         // Handle listeners
         PacketType type = PacketType.getType(packet);
@@ -398,15 +381,4 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         return connection;
     }
 
-    private static class SilentPacket {
-        public final Player player;
-        public final Object packet;
-        public final long timeout;
-
-        public SilentPacket(Player player, Object packet) {
-            this.player = player;
-            this.packet = packet;
-            this.timeout = System.currentTimeMillis() + 5000; // remove after 5s
-        }
-    }
 }

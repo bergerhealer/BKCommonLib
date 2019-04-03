@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -30,6 +33,9 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     public static final String LIB_ROOT = "com.comphenix.protocol.";
     private final List<CommonPacketMonitor> monitors = new ArrayList<CommonPacketMonitor>();
     private final List<CommonPacketListener> listeners = new ArrayList<CommonPacketListener>();
+    private final SilentPacketQueue silentPacketQueueFallback = new SilentPacketQueue();
+    private final SilentQueueCleanupTask silentQueueCleanupTask = new SilentQueueCleanupTask();
+    private boolean useSilentPacketQueue = false;
 
     @Override
     public void onPlayerJoin(Player player) {
@@ -42,6 +48,18 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         Class<?> packetContainer = CommonUtil.getClass(LIB_ROOT + "events.PacketContainer");
         if (manager == null || packetContainer == null) {
             return false;
+        }
+
+        // There is a bug with protocollib where sending a silent packet one tick after the player
+        // joins the server, ProtocolLib still notifies the packet listeners.
+        // This here is a workaround for that, at least for BKCommonLib Packet Listeners.
+        // See: https://github.com/PaperMC/Paper/issues/1934
+        this.useSilentPacketQueue = false;
+        if (Common.IS_PAPERSPIGOT_SERVER) {
+            //TODO: This should only be done when anti-xray is enabled in (one of) the world configurations
+            //      I have no idea how to (or if I should) hack into the paperspigot code to read this
+            //      The field can be found in PaperWorldConfig but no idea where the mapping for it is
+            this.useSilentPacketQueue = true;
         }
         return true;
     }
@@ -56,6 +74,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
         this.monitors.clear();
         this.listeners.clear();
+        this.silentQueueCleanupTask.disable();
         if (!CommonUtil.isShuttingDown()) {
             Logging.LOGGER_NETWORK.warning("Reload detected! ProtocolLib does not officially support reloading the server!");
             if (!Bukkit.getOnlinePlayers().isEmpty()) {
@@ -123,10 +142,16 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             return;
         }
 
+        // See: onEnable()
+        if (this.useSilentPacketQueue) {
+            this.silentPacketQueueFallback.add(player, packet);
+            this.silentQueueCleanupTask.kick();
+        }
+
         // Silent - do not send it through listeners, only through monitors
         try {
             PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, false);
         } catch (PlayerLoggedOutException ex) {
             // Ignore
         } catch (Throwable t) {
@@ -181,7 +206,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
-        CommonPacketListener commonListener = new CommonPacketListener(plugin, listener, types);
+        CommonPacketListener commonListener = new CommonPacketListener(this, plugin, listener, types);
         ProtocolLibrary.getProtocolManager().addPacketListener(commonListener);
         this.listeners.add(commonListener);
     }
@@ -235,9 +260,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         public final PacketListener listener;
         private final Class<?> temporaryPlayerClass;
+        private final ProtocolLibPacketHandler packetHandler;
 
-        public CommonPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
+        public CommonPacketListener(ProtocolLibPacketHandler packetHandler, Plugin plugin, PacketListener listener, PacketType[] types) {
             super(plugin, ListenerPriority.NORMAL, types);
+            this.packetHandler = packetHandler;
             this.listener = listener;
 
             Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
@@ -268,7 +295,16 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         @Override
         public void onPacketSending(PacketEvent event) {
-            CommonPacket packet = new CommonPacket(event.getPacket().getHandle());
+            // Check not silent
+            // See: onEnable why this is here.
+            Object raw_packet = event.getPacket().getHandle();
+            if (this.packetHandler.useSilentPacketQueue &&
+                this.packetHandler.silentPacketQueueFallback.take(event.getPlayer(), raw_packet))
+            {
+                return;
+            }
+
+            CommonPacket packet = new CommonPacket(raw_packet);
             PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), packet);
             sendEvent.setCancelled(event.isCancelled());
             listener.onPacketSend(sendEvent);
@@ -321,6 +357,36 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         @Override
         public ListeningWhitelist getSendingWhitelist() {
             return sending;
+        }
+    }
+
+    private final class SilentQueueCleanupTask extends Task {
+        private boolean _isScheduled = false;
+
+        public SilentQueueCleanupTask() {
+            super(CommonPlugin.getInstance());
+        }
+
+        @Override
+        public synchronized void run() {
+            if (ProtocolLibPacketHandler.this.silentPacketQueueFallback.cleanup()) {
+                this._isScheduled = false;
+                this.stop();
+            }
+        }
+
+        public synchronized void disable() {
+            if (this._isScheduled) {
+                this._isScheduled = false;
+                this.stop();
+            }
+        }
+
+        public synchronized void kick() {
+            if (!this._isScheduled) {
+                this.start(20, 20);
+                this._isScheduled = true;
+            }
         }
     }
 }
