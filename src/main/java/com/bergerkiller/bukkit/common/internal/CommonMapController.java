@@ -38,6 +38,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
@@ -184,6 +185,27 @@ public class CommonMapController implements PacketListener, Listener {
             playerInputs.put(player, input);
         }
         return input;
+    }
+
+    /**
+     * Invalidates all map display data that is visible for a player,
+     * causing it to be sent again to the player as soon as possible.
+     * 
+     * @param player
+     */
+    public synchronized void resendMapData(Player player) {
+        UUID playerUUID = player.getUniqueId();
+        for (MapDisplayInfo display : maps.values()) {
+            if (display.views.containsKey(playerUUID)) {
+                for (MapSession session : display.sessions) {
+                    for (MapSession.Owner owner : session.onlineOwners) {
+                        if (owner.player == player) {
+                            owner.clip.markEverythingDirty();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -637,14 +659,13 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
-    protected synchronized void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
-        for (MapDisplayInfo display : maps.values()) {
-            for (MapSession session : display.sessions) {
-                for (MapSession.Owner owner : session.onlineOwners) {
-                    owner.clip.markEverythingDirty();
-                }
-            }
-        }
+    protected void onPlayerRespawn(PlayerRespawnEvent event) {
+        this.resendMapData(event.getPlayer());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    protected void onPlayerChangedWorld(PlayerChangedWorldEvent event) {
+        this.resendMapData(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
