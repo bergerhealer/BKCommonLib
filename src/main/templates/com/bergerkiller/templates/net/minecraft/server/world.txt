@@ -29,7 +29,7 @@ import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 class World extends IBlockAccess {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
-#if classexists com.destroystokyo.paper.PaperWorldEntityList
+#if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public final readonly (List<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList entityList;
 #else
     public final readonly (List<EntityHandle>) List<Entity> entityList;
