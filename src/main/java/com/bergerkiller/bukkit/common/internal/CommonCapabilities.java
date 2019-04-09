@@ -109,4 +109,10 @@ public class CommonCapabilities {
      */
     @Deprecated
     public static final boolean HAS_DIMENSION_MANAGER = ENTITY_USES_DIMENSION_MANAGER;
+
+    /**
+     * Since Minecraft 1.13 the slab ('step') Block has its own Block type.
+     * Before that all slabs were a 'stone' slab Block type, with different variants.
+     */
+    public static final boolean BLOCK_SLAB_HAS_OWN_BLOCK = CommonBootstrap.evaluateMCVersion(">=", "1.13");
 }

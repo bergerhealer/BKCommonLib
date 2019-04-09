@@ -5,6 +5,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -108,13 +109,17 @@ public class ModelInfoLookup {
         }
 
         // Not all slabs are equal
-        if (name.equals("purpur_slab") || name.equals("purpur_double_slab")) {
+        if (CommonCapabilities.BLOCK_SLAB_HAS_OWN_BLOCK) {
             variant = null;
-        } else if (name.contains("_slab")) {
-            if (variant == null) {
-                variant = "stone";
+        } else {
+            if (name.equals("purpur_slab") || name.equals("purpur_double_slab")) {
+                variant = null;
+            } else if (name.contains("_slab")) {
+                if (variant == null) {
+                    variant = "stone";
+                }
+                name = "slab";
             }
-            name = "slab";
         }
 
         // Taxonomy is pretty important
