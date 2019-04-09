@@ -44,6 +44,7 @@ public class BlockDataImpl extends BlockData {
     private MaterialData materialData;
     private Material type;
     private boolean hasRenderOptions;
+    private int combinedId;
 
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
@@ -280,6 +281,7 @@ public class BlockDataImpl extends BlockData {
         this.hasRenderOptions = true;
         this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
         this.materialData = IBlockDataToMaterialData.getMaterialData(this.data);
+        this.combinedId = BlockHandle.getCombinedId(this.data);
     }
 
     @Override
@@ -314,7 +316,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final int getCombinedId() {
-        return BlockHandle.getCombinedId(this.data);
+        return this.combinedId;
     }
 
     @Override

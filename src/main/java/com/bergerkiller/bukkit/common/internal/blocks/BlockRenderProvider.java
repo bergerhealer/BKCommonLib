@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.blocks;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -26,7 +27,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
  * Some blocks are handled on the server-side, but blocks like Water lack this required information.
  */
 public abstract class BlockRenderProvider {
-    private static final Map<Material, BlockRenderProvider> providers = new HashMap<Material, BlockRenderProvider>();
+    private static final Map<Material, BlockRenderProvider> providers = new EnumMap<Material, BlockRenderProvider>(Material.class);
 
     static {
         String tex_root = Common.evaluateMCVersion(">=",  "1.13") ? "block/" : "blocks/";
