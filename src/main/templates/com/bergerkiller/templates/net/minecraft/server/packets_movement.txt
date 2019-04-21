@@ -286,3 +286,14 @@ class PacketPlayOutEntity extends Packet {
         </code>
     }
 }
+
+class PacketPlayInFlying extends Packet {
+    protected double x;
+    protected double y;
+    protected double z;
+    protected float yaw;
+    protected float pitch;
+    protected boolean onGround:f;
+    protected boolean hasPos;
+    protected boolean hasLook;
+}

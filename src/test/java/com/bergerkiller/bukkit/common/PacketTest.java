@@ -12,7 +12,7 @@ public class PacketTest {
     public void testPacketDirection() {
         assertFalse(PacketType.IN_CHAT.isOutGoing());
         assertFalse(PacketType.IN_STEER_VEHICLE.isOutGoing());
-        assertFalse(PacketType.IN_FLYING.isOutGoing());
+        assertFalse(PacketType.IN_POSITION_LOOK.isOutGoing());
         assertFalse(PacketType.IN_ENTITY_ANIMATION.isOutGoing());
         assertTrue(PacketType.OUT_BLOCK_CHANGE.isOutGoing());
         assertTrue(PacketType.OUT_CHAT.isOutGoing());

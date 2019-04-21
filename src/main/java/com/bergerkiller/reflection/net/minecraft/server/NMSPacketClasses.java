@@ -54,6 +54,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBoatMoveHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayInFlyingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInSetCreativeSlotHandle;
@@ -345,14 +346,36 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInFlying extends NMSPacket {
 
-        public final FieldAccessor<Double> x = nextField("protected double x");
-        public final FieldAccessor<Double> y = nextField("protected double y");
-        public final FieldAccessor<Double> z = nextField("protected double z");
-        public final FieldAccessor<Float> yaw = nextField("protected float yaw");
-        public final FieldAccessor<Float> pitch = nextField("protected float pitch");
-        public final FieldAccessor<Boolean> onGround = nextFieldSignature("protected boolean f");
-        public final FieldAccessor<Boolean> hasPos = nextField("protected boolean hasPos");
-        public final FieldAccessor<Boolean> hasLook = nextField("protected boolean hasLook");
+        protected NMSPacketPlayInFlying(String subType) {
+            super(CommonUtil.getNMSClass("PacketPlayInFlying." + subType));
+        }
+
+        public final FieldAccessor<Double> x = PacketPlayInFlyingHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Double> y = PacketPlayInFlyingHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Double> z = PacketPlayInFlyingHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> yaw = PacketPlayInFlyingHandle.T.yaw.toFieldAccessor();
+        public final FieldAccessor<Float> pitch = PacketPlayInFlyingHandle.T.pitch.toFieldAccessor();
+        public final FieldAccessor<Boolean> onGround = PacketPlayInFlyingHandle.T.onGround.toFieldAccessor();
+        public final FieldAccessor<Boolean> hasPos = PacketPlayInFlyingHandle.T.hasPos.toFieldAccessor();
+        public final FieldAccessor<Boolean> hasLook = PacketPlayInFlyingHandle.T.hasLook.toFieldAccessor();
+    }
+
+    public static class NMSPacketPlayInLook extends NMSPacketPlayInFlying {
+        public NMSPacketPlayInLook() {
+            super("PacketPlayInLook");
+        }
+    }
+
+    public static class NMSPacketPlayInPosition extends NMSPacketPlayInFlying {
+        public NMSPacketPlayInPosition() {
+            super("PacketPlayInPosition");
+        }
+    }
+
+    public static class NMSPacketPlayInPositionLook extends NMSPacketPlayInFlying {
+        public NMSPacketPlayInPositionLook() {
+            super("PacketPlayInPositionLook");
+        }
     }
 
     public static class NMSPacketPlayInHeldItemSlot extends NMSPacket {

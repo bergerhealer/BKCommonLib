@@ -126,7 +126,9 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInClientCommand IN_CLIENT_COMMAND = new NMSPacketPlayInClientCommand();
     public static final NMSPacketPlayInCustomPayload IN_CUSTOM_PAYLOAD = new NMSPacketPlayInCustomPayload();
     public static final NMSPacketPlayInEntityAction IN_ENTITY_ACTION = new NMSPacketPlayInEntityAction();
-    public static final NMSPacketPlayInFlying IN_FLYING = new NMSPacketPlayInFlying();
+    public static final NMSPacketPlayInLook IN_LOOK = new NMSPacketPlayInLook();
+    public static final NMSPacketPlayInPosition IN_POSITION = new NMSPacketPlayInPosition();
+    public static final NMSPacketPlayInPositionLook IN_POSITION_LOOK = new NMSPacketPlayInPositionLook();
     public static final NMSPacketPlayInHeldItemSlot IN_HELD_ITEM_SLOT = new NMSPacketPlayInHeldItemSlot();
     public static final NMSPacketPlayInKeepAlive IN_KEEP_ALIVE = new NMSPacketPlayInKeepAlive();
     public static final NMSPacketPlayInSpectate IN_SPECTATE = new NMSPacketPlayInSpectate();

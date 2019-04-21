@@ -198,6 +198,9 @@ public class Common {
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMove", nms_root + ".PacketPlayOutRelEntityMove");
                 remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
+                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInLook", nms_root + ".PacketPlayInLook");
+                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPosition", nms_root + ".PacketPlayInPosition");
+                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPositionLook", nms_root + ".PacketPlayInPositionLook");
                 remappings.put(nms_root + ".IChatBaseComponent$ChatSerializer", nms_root + ".ChatSerializer");
             }
 
