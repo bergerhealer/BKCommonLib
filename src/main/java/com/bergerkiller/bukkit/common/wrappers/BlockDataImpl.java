@@ -457,8 +457,8 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final boolean canSupportTop() {
-        return this.block.canSupportTop(this.data);
+    public final boolean canSupportTop(Block block) {
+        return this.block.canSupportTop(this.data, block);
     }
 
     @Override

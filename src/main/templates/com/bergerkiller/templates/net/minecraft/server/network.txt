@@ -27,4 +27,11 @@ class PlayerConnection {
 #else
     public void sendPacket((CommonPacket) Packet packet);
 #endif
+
+    public void sendPos(double x, double y, double z) {
+        java.util.HashSet flags = new java.util.HashSet();
+        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.X_ROT);
+        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.Y_ROT);
+        instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
+    }
 }

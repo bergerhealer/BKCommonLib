@@ -3,7 +3,16 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 class TileEntityFurnace extends TileEntity {
-#if version >= 1.13
+#if version >= 1.14
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
+        if (itemstack.isEmpty()) {
+            return 0;
+        } else {
+            Item item = itemstack.getItem();
+            return TileEntityFurnace.f().getOrDefault(item, 0);
+        }
+    }
+#elseif version >= 1.13
     private static int fuelTime((ItemStackHandle) ItemStack itemstack);
 #else
     public static int fuelTime((ItemStackHandle) ItemStack itemstack);

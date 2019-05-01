@@ -30,9 +30,22 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         return base.getSize();
     }
 
-    @Override
+    // Gone since MC 1.14
     public String getName() {
-        return base.getName();
+        if (InventoryHandle.T.getName.isAvailable()) {
+            return InventoryHandle.T.getName.invoke(base);
+        } else {
+            return "";
+        }
+    }
+
+    // Gone since MC 1.14
+    public String getTitle() {
+        if (InventoryHandle.T.getTitle.isAvailable()) {
+            return InventoryHandle.T.getTitle.invoke(base);
+        } else {
+            return "";
+        }
     }
 
     @Override
@@ -200,11 +213,6 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
     @Override
     public List<HumanEntity> getViewers() {
         return base.getViewers();
-    }
-
-    @Override
-    public String getTitle() {
-        return base.getTitle();
     }
 
     @Override

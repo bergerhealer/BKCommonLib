@@ -20,48 +20,62 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 
 class EntityLiving extends Entity {
 
-#if version >= 1.13
+#if version >= 1.14
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ar;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:f;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:g;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bs;
+#elseif version >= 1.13
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:aw;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bx;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #elseif version >= 1.12
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #elseif version >= 1.11
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bq;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #elseif version >= 1.10.2
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #elseif version >= 1.9.4
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #elseif version >= 1.9
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:as;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #else
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:###;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:###;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:###;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
 #endif
 
     <code>
@@ -70,8 +84,8 @@ class EntityLiving extends Entity {
     public static final Key<Integer> DATA_PARTICLES_TIMER = Key.Type.INTEGER.createKey(T.DATA_PARTICLES_TIMER, 7);
     public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
     public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
+    public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
     </code>
-
 
 #if version >= 1.11
     private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
@@ -93,7 +107,13 @@ class EntityLiving extends Entity {
 
     public float lastDamage;
 
-#if version >= 1.13
+#if version >= 1.14
+    protected unknown boolean jumping;
+    public float sideMovement:bb;
+    public unknown float bc;
+    public float forwardMovement:bd;
+    public unknown float be;
+#elseif version >= 1.13
     protected unknown boolean bg;
     public float sideMovement:bh;
     public unknown float bi;
@@ -179,9 +199,7 @@ class EntityHuman extends EntityLiving {
     public (ContainerHandle) Container activeContainer;
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
-    public boolean sleeping;
 #if version >= 1.9
-    public (IntVector3) BlockPosition bedPosition;
 #elseif version >= 1.8.3
     public (IntVector3) BlockPosition bedPosition:bx;
 #else
@@ -189,7 +207,11 @@ class EntityHuman extends EntityLiving {
 #endif
     public int sleepTicks;
 
-#if version >= 1.13
+#if version >= 1.14
+    protected unknown boolean bM;
+    private (IntVector3) BlockPosition spawnCoord:f;
+    private boolean spawnForced:g;
+#elseif version >= 1.13
     public unknown float bS;
     public unknown float bT;
     private unknown boolean d;
@@ -244,14 +266,19 @@ class EntityHuman extends EntityLiving {
     public int expTotal;
     public float exp;
 
-#if version >= 1.13
+#if version >= 1.14
+    protected unknown int bR;
+    protected unknown final float bS;
+    private unknown int bU;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bV;
+#elseif version >= 1.13
     protected unknown int bZ;
-    protected unknown float ca = 0.02F;
+    protected unknown float ca;
     private unknown int g;
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:h;
 #elseif version >= 1.12
     protected unknown int bS;
-    protected unknown float bT = 0.02F;
+    protected unknown float bT;
     private unknown int f;
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:g;
 #elseif version >= 1.11
@@ -355,6 +382,8 @@ class EntityInsentient extends EntityLiving {
 #else
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:###;
 #endif
+
+    public boolean isSleeping();
 
     <code>
     public static final Key<Byte> DATA_INSENTIENT_FLAGS = Key.Type.BYTE.createKey(T.DATA_INSENTIENT_FLAGS, 11);

@@ -34,10 +34,6 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
     public abstract void setActiveContainer(ContainerHandle value);
     public abstract Object getFoodDataRaw();
     public abstract void setFoodDataRaw(Object value);
-    public abstract boolean isSleeping();
-    public abstract void setSleeping(boolean value);
-    public abstract IntVector3 getBedPosition();
-    public abstract void setBedPosition(IntVector3 value);
     public abstract int getSleepTicks();
     public abstract void setSleepTicks(int value);
     public abstract IntVector3 getSpawnCoord();
@@ -65,8 +61,6 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
         public final Template.Field.Converted<Object> enderChestRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<ContainerHandle> activeContainer = new Template.Field.Converted<ContainerHandle>();
         public final Template.Field.Converted<Object> foodDataRaw = new Template.Field.Converted<Object>();
-        public final Template.Field.Boolean sleeping = new Template.Field.Boolean();
-        public final Template.Field.Converted<IntVector3> bedPosition = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Integer sleepTicks = new Template.Field.Integer();
         public final Template.Field.Converted<IntVector3> spawnCoord = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Boolean spawnForced = new Template.Field.Boolean();

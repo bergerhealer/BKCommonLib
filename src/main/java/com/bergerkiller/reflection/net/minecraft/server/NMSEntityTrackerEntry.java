@@ -27,15 +27,7 @@ public class NMSEntityTrackerEntry {
     public static final FieldAccessor<Integer> viewDistance = EntityTrackerEntryHandle.T.viewDistance.toFieldAccessor();
     public static final FieldAccessor<Integer> updateInterval = EntityTrackerEntryHandle.T.updateInterval.toFieldAccessor();
 
-    public static final FieldAccessor<Double> xVel = EntityTrackerEntryHandle.T.xVel.toFieldAccessor();
-    public static final FieldAccessor<Double> yVel = EntityTrackerEntryHandle.T.yVel.toFieldAccessor();
-    public static final FieldAccessor<Double> zVel = EntityTrackerEntryHandle.T.zVel.toFieldAccessor();
-
     public static final FieldAccessor<Integer> tickCounter = EntityTrackerEntryHandle.T.tickCounter.toFieldAccessor();
-
-    public static final FieldAccessor<Double> prevX = EntityTrackerEntryHandle.T.prevX.toFieldAccessor();
-    public static final FieldAccessor<Double> prevY = EntityTrackerEntryHandle.T.prevY.toFieldAccessor();
-    public static final FieldAccessor<Double> prevZ = EntityTrackerEntryHandle.T.prevZ.toFieldAccessor();
 
     public static final FieldAccessor<Boolean> synched = EntityTrackerEntryHandle.T.synched.toFieldAccessor();
     public static final FieldAccessor<Boolean> isMobile = EntityTrackerEntryHandle.T.isMobile.toFieldAccessor();

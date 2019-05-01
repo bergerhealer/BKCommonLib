@@ -24,6 +24,20 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     /* ============================================================================== */
 
 
+    public CommonTagCompound getMetadata() {
+        if (T.metadata.isAvailable()) {
+            return T.metadata.get(getRaw());
+        } else {
+            return new CommonTagCompound();
+        }
+    }
+
+    public void setMetadata(CommonTagCompound metadata) {
+        if (T.metadata.isAvailable()) {
+            T.metadata.set(getRaw(), metadata);
+        }
+    }
+
     public int getSectionsMask() {
         if (T.sectionsMask.isAvailable()) {
             return T.sectionsMask.get(getRaw());
@@ -100,6 +114,8 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
         public final Template.Field.Integer z = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Integer sectionsMask = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Converted<CommonTagCompound> metadata = new Template.Field.Converted<CommonTagCompound>();
         @Template.Optional
         public final Template.Field<byte[]> data = new Template.Field<byte[]>();
         @Template.Optional

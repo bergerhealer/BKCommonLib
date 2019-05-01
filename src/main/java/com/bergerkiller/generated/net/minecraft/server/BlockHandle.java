@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 
 /**
@@ -43,7 +44,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract int getEmission(IBlockDataHandle iblockdata);
     public abstract boolean isOccluding(IBlockDataHandle iblockdata);
     public abstract boolean isPowerSource(IBlockDataHandle iblockdata);
-    public abstract boolean canSupportTop(IBlockDataHandle iblockdata);
+    public abstract boolean canSupportTop(IBlockDataHandle iblockdata, Block block);
     public abstract float getDamageResillience();
     public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
     public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);

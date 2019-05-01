@@ -23,6 +23,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract void sendPacket(CommonPacket packet);
+    public abstract void sendPos(double x, double y, double z);
     public abstract Object getNetworkManager();
     public abstract void setNetworkManager(Object value);
     /**
@@ -33,6 +34,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
         public final Template.Field.Converted<Object> networkManager = new Template.Field.Converted<Object>();
 
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> sendPos = new Template.Method<Void>();
 
     }
 

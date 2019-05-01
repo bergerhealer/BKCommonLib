@@ -17,6 +17,7 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.Entity</b>.
@@ -35,14 +36,6 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
-
-    public static int entityCount() {
-        return T.entityCount.getInteger();
-    }
-
-    public static void entityCount_set(int value) {
-        T.entityCount.setInteger(value);
-    }
 
     public abstract void updateBlockCollision();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
@@ -335,7 +328,10 @@ public abstract class EntityHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityClass extends Template.Class<EntityHandle> {
-        public final Template.StaticField.Integer entityCount = new Template.StaticField.Integer();
+        @Template.Optional
+        public final Template.StaticField<AtomicInteger> opt_atomic_entityCount = new Template.StaticField<AtomicInteger>();
+        @Template.Optional
+        public final Template.StaticField.Integer opt_int_entityCount = new Template.StaticField.Integer();
         @Template.Optional
         public final Template.StaticField.Converted<Key<Byte>> DATA_FLAGS = new Template.StaticField.Converted<Key<Byte>>();
         @Template.Optional

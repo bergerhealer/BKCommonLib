@@ -391,9 +391,10 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Gets whether this Block is capable of supporting other blocks on top, like torches and minecart track.
      * 
+     * @param block position where this BlockData exists
      * @return True if supporting blocks on top
      */
-    public abstract boolean canSupportTop();
+    public abstract boolean canSupportTop(Block block);
 
     /**
      * Gets the bounding box of a block of this Block Data type/

@@ -81,6 +81,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             return handle.getZVel();
         }
 
+        public VectorAbstract set(double x, double y, double z) {
+            handle.setVelocity(x, y, z);
+            return this;
+        }
+
         public VectorAbstract setX(double x) {
             handle.setXVel(x);
             return this;

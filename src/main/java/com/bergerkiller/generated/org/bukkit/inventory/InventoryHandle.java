@@ -36,6 +36,10 @@ public abstract class InventoryHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method<Void> setStorageContents = new Template.Method<Void>();
         @Template.Optional
+        public final Template.Method<String> getName = new Template.Method<String>();
+        @Template.Optional
+        public final Template.Method<String> getTitle = new Template.Method<String>();
+        @Template.Optional
         public final Template.Method<HashMap<Integer, ItemStack>> removeItemAnySlot = new Template.Method<HashMap<Integer, ItemStack>>();
 
     }

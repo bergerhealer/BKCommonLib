@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,6 +33,99 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void scanPlayers(List<Player> playerList);
     public abstract void updatePlayer(Player player);
     public abstract CommonPacket getSpawnPacket();
+
+    public double getXVel() {
+        if (T.opt_xVel.isAvailable()) {
+            return T.opt_xVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+        }
+    }
+
+    public double getYVel() {
+        if (T.opt_yVel.isAvailable()) {
+            return T.opt_yVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+        }
+    }
+
+    public double getZVel() {
+        if (T.opt_zVel.isAvailable()) {
+            return T.opt_zVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+        }
+    }
+
+    public void setXVel(double x) {
+        if (T.opt_xVel.isAvailable()) {
+            T.opt_xVel.setDouble(getRaw(), x);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public void setYVel(double y) {
+        if (T.opt_yVel.isAvailable()) {
+            T.opt_yVel.setDouble(getRaw(), y);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public void setZVel(double z) {
+        if (T.opt_zVel.isAvailable()) {
+            T.opt_zVel.setDouble(getRaw(), z);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public org.bukkit.util.Vector getVelocity() {
+        if (T.opt_velocity.isAvailable()) {
+            return T.opt_velocity.get(getRaw());
+        } else {
+            double x = T.opt_xVel.getDouble(getRaw());
+            double y = T.opt_yVel.getDouble(getRaw());
+            double z = T.opt_zVel.getDouble(getRaw());
+            return new org.bukkit.util.Vector(x, y, z);
+        }
+    }
+
+    public void setVelocity(org.bukkit.util.Vector velocity) {
+        if (T.opt_velocity.isAvailable()) {
+            T.opt_velocity.set(getRaw(), velocity);
+        } else {
+            T.opt_xVel.setDouble(getRaw(), velocity.getX());
+            T.opt_yVel.setDouble(getRaw(), velocity.getY());
+            T.opt_zVel.setDouble(getRaw(), velocity.getZ());
+        }
+    }
+
+    public void setVelocity(double x, double y, double z) {
+        if (T.opt_velocity.isAvailable()) {
+            Object vel = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+            T.opt_velocity.raw.set(getRaw(), vel);
+        } else {
+            T.opt_xVel.setDouble(getRaw(), x);
+            T.opt_yVel.setDouble(getRaw(), y);
+            T.opt_zVel.setDouble(getRaw(), z);
+        }
+    }
+
 
     public static EntityTrackerEntryHandle createNew(org.bukkit.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
         if (T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.isAvailable()) {
@@ -204,18 +298,14 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void setViewDistance(int value);
     public abstract int getUpdateInterval();
     public abstract void setUpdateInterval(int value);
+    public abstract boolean isMobile();
+    public abstract void setIsMobile(boolean value);
     public abstract int getRaw_xRot();
     public abstract void setRaw_xRot(int value);
     public abstract int getRaw_yRot();
     public abstract void setRaw_yRot(int value);
     public abstract int getRaw_headYaw();
     public abstract void setRaw_headYaw(int value);
-    public abstract double getXVel();
-    public abstract void setXVel(double value);
-    public abstract double getYVel();
-    public abstract void setYVel(double value);
-    public abstract double getZVel();
-    public abstract void setZVel(double value);
     public abstract int getTickCounter();
     public abstract void setTickCounter(int value);
     public abstract double getPrevX();
@@ -226,8 +316,6 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void setPrevZ(double value);
     public abstract boolean isSynched();
     public abstract void setSynched(boolean value);
-    public abstract boolean isMobile();
-    public abstract void setIsMobile(boolean value);
     public abstract int getTimeSinceLocationSync();
     public abstract void setTimeSinceLocationSync(int value);
     /**
@@ -245,6 +333,7 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Integer playerViewDistance = new Template.Field.Integer();
         public final Template.Field.Integer updateInterval = new Template.Field.Integer();
+        public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         @Template.Optional
         public final Template.Field.Long long_xLoc = new Template.Field.Long();
         @Template.Optional
@@ -260,15 +349,19 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Integer raw_xRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_yRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_headYaw = new Template.Field.Integer();
-        public final Template.Field.Double xVel = new Template.Field.Double();
-        public final Template.Field.Double yVel = new Template.Field.Double();
-        public final Template.Field.Double zVel = new Template.Field.Double();
+        @Template.Optional
+        public final Template.Field.Double opt_xVel = new Template.Field.Double();
+        @Template.Optional
+        public final Template.Field.Double opt_yVel = new Template.Field.Double();
+        @Template.Optional
+        public final Template.Field.Double opt_zVel = new Template.Field.Double();
+        @Template.Optional
+        public final Template.Field.Converted<Vector> opt_velocity = new Template.Field.Converted<Vector>();
         public final Template.Field.Integer tickCounter = new Template.Field.Integer();
         public final Template.Field.Double prevX = new Template.Field.Double();
         public final Template.Field.Double prevY = new Template.Field.Double();
         public final Template.Field.Double prevZ = new Template.Field.Double();
         public final Template.Field.Boolean synched = new Template.Field.Boolean();
-        public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Converted<List<Entity>> opt_passengers = new Template.Field.Converted<List<Entity>>();

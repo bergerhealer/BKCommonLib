@@ -411,15 +411,28 @@ class PacketPlayOutLogin extends Packet {
     private int playerId:a;
     private boolean hardcore:b;
     private (org.bukkit.GameMode) EnumGamemode gameMode:c;
+
 #if version >= 1.13.1
     private (Dimension) DimensionManager dimension:d;
 #else
     private (Dimension) int dimension:d;
 #endif
-    private (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
+
+    // Difficulty field only exists <= 1.13.2
+    // View distance field only exists >= 1.14
+#if version >= 1.14
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+    private int maxPlayers:e;
+    private (org.bukkit.WorldType) WorldType worldType:f;
+    private optional int viewDistance:g;
+#else
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
     private int maxPlayers:f;
     private (org.bukkit.WorldType) WorldType worldType:g;
-    private boolean unknown1:h;
+    private optional int viewDistance:###;
+#endif
+
+    private boolean reducedDebugInfo:h;
 }
 
 class PacketPlayOutRespawn extends Packet {
@@ -428,9 +441,18 @@ class PacketPlayOutRespawn extends Packet {
 #else
     private (Dimension) int dimension:a;
 #endif
-    private (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
+
+    // Difficulty field only exists <= 1.13.2
+#if version >= 1.14
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+    private (org.bukkit.GameMode) EnumGamemode gamemode:b;
+    private (org.bukkit.WorldType) WorldType worldType:c;
+#else
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
     private (org.bukkit.WorldType) WorldType worldType:d;
+#endif
+
 }
 
 class PacketPlayOutPlayerListHeaderFooter extends Packet {
@@ -447,8 +469,18 @@ class PacketPlayOutMap extends Packet {
     private int itemId:a;
     private byte scale:b;
 
-#if version >= 1.9
+#if version >= 1.14
     private optional boolean track:c;
+    private optional boolean locked:d;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:e;
+    private int xmin:f;
+    private int ymin:g;
+    private int width:h;
+    private int height:i;
+    private byte[] pixels:j;
+#elseif version >= 1.9
+    private optional boolean track:c;
+    private optional boolean locked:###;
     private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
     private int xmin:e;
     private int ymin:f;
@@ -457,6 +489,7 @@ class PacketPlayOutMap extends Packet {
     private byte[] pixels:i;
 #else
     private optional boolean track:###;
+    private optional boolean locked:###;
     private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
     private int xmin:d;
     private int ymin:e;
@@ -470,20 +503,30 @@ class PacketPlayOutMapChunk extends Packet {
     private int x:a;
     private int z:b;
 
-#if version >= 1.9.4
+#if version >= 1.14
     private optional int sectionsMask:c;
+    private optional (CommonTagCompound) NBTTagCompound metadata:d;
+    private optional byte[] data:e;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:f;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
+    private boolean hasBiomeData:g;
+#elseif version >= 1.9.4
+    private optional int sectionsMask:c;
+    private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
     private boolean hasBiomeData:f;
 #elseif version >= 1.9
     private optional int sectionsMask:c;
+    private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
     private boolean hasBiomeData:e;
 #else
     private optional int sectionsMask:###;
+    private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:###;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:c;
@@ -491,6 +534,20 @@ class PacketPlayOutMapChunk extends Packet {
 #endif
 
     <code>
+    public CommonTagCompound getMetadata() {
+        if (T.metadata.isAvailable()) {
+            return T.metadata.get(getRaw());
+        } else {
+            return new CommonTagCompound();
+        }
+    }
+
+    public void setMetadata(CommonTagCompound metadata) {
+        if (T.metadata.isAvailable()) {
+            T.metadata.set(getRaw(), metadata);
+        }
+    }
+
     public int getSectionsMask() {
         if (T.sectionsMask.isAvailable()) {
             return T.sectionsMask.get(getRaw());

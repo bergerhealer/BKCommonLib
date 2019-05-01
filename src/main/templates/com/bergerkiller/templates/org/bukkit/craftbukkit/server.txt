@@ -11,7 +11,11 @@ class CraftServer {
 
     public (DedicatedPlayerListHandle) net.minecraft.server.DedicatedPlayerList getPlayerList:getHandle();
 
+#if version >= 1.14
+    public (MinecraftServerHandle) net.minecraft.server.DedicatedServer getServer();
+#else
     public (MinecraftServerHandle) net.minecraft.server.MinecraftServer getServer();
+#endif
 
     <code>
     private static CraftServerHandle _instance = null;

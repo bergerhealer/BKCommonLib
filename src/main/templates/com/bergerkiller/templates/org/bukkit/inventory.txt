@@ -9,6 +9,10 @@ class Inventory {
     public optional org.bukkit.inventory.ItemStack[] getStorageContents();
     public optional void setStorageContents(org.bukkit.inventory.ItemStack[] items);
 
+    // These functions disappeared in MC 1.14
+    public optional String getName();
+    public optional String getTitle();
+
     // Paperspigot only, it seems
     public transient optional java.util.HashMap<Integer, org.bukkit.inventory.ItemStack> removeItemAnySlot(org.bukkit.inventory.ItemStack[] items);
 }

@@ -11,7 +11,11 @@ class NBTTagList extends NBTBase {
     private (List<NBTBaseHandle>) List<NBTBase> list;
     private byte type;
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean add((NBTBaseHandle) NBTBase value) {
+        return instance.b(instance.size(), value);
+    }
+#elseif version >= 1.13
     public boolean add((NBTBaseHandle) NBTBase value);
 #else
     public boolean add((NBTBaseHandle) NBTBase value) {
@@ -22,7 +26,9 @@ class NBTTagList extends NBTBase {
 
     public int size();
 
-#if version >= 1.13
+#if version >= 1.14
+    public (NBTBaseHandle) NBTBase get(int index);
+#elseif version >= 1.13
     public (NBTBaseHandle) NBTBase get:c(int index);
 #elseif version >= 1.12
     public (NBTBaseHandle) NBTBase get:i(int index);
@@ -43,7 +49,15 @@ class NBTTagCompound extends NBTBase {
 #endif
 
     public void remove(String key);
+
+#if version >= 1.14
+    public void set(String key, (NBTBaseHandle) NBTBase value) {
+        instance.set(key, value); // discard return value
+    }
+#else
     public void set(String key, (NBTBaseHandle) NBTBase value);
+#endif
+
     public (NBTBaseHandle) NBTBase get(String key);
     public boolean contains:hasKey(String key);
     public boolean isEmpty();

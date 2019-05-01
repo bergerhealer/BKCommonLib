@@ -38,6 +38,8 @@ import java.util.logging.Level;
 public class CommonEntityType {
     private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
+    private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<Integer, CommonEntityType>();
+    private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<Object, CommonEntityType>();
     private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
     public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
@@ -50,6 +52,7 @@ public class CommonEntityType {
     public final int entityTypeId;
     public final int objectTypeId;
     public final int objectExtraData;
+    public final EntityTypesHandle nmsEntityType;
 
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
         // Properties first
@@ -60,6 +63,7 @@ public class CommonEntityType {
         if (objectInfo != null) {
             this.objectTypeId = objectInfo.typeId;
             this.objectExtraData = objectInfo.extraData;
+            byObjectTypeId.put(this.objectTypeId, this);
         } else {
             this.objectTypeId = -1;
             this.objectExtraData = -1;
@@ -72,6 +76,7 @@ public class CommonEntityType {
             this.bukkitType = ClassTemplate.create(Entity.class);
             this.commonConstructor = this.commonType.getConstructor(Entity.class);
             this.entityTypeId = -1;
+            this.nmsEntityType = null;
             return;
         }
 
@@ -115,15 +120,17 @@ public class CommonEntityType {
                 nmsName = "EntityDolphin";
             } else if (entityTypeEnumName.equals("DROWNED")) {
                 nmsName = "EntityDrowned";
+            } else if (entityTypeEnumName.equals("WEATHER")) {
+                nmsName = "EntityWeather";
+            } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
+                nmsName = "EntityComplexPart";
 
                 // Standard types
             } else {
                 switch (entityType) {
                 case PLAYER: nmsName = "EntityPlayer"; break;
-                case WEATHER: nmsName = "EntityWeather"; break;
                 case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
                 case LIGHTNING: nmsName = "EntityLightning"; break;
-                case COMPLEX_PART: nmsName = "EntityComplexPart"; break;
                 default: nmsName = null; break;
                 }
             }
@@ -209,6 +216,14 @@ public class CommonEntityType {
         this.commonType = ClassTemplate.create(commonType);
         this.commonConstructor = this.commonType.getConstructor(entityClass);
         this.entityTypeId = EntityTypesHandle.getEntityTypeId(this.nmsType.getType());
+        if (EntityTypesHandle.T.fromEntityClass.isAvailable() && nmsType != null) {
+            this.nmsEntityType = EntityTypesHandle.T.fromEntityClass.invoke(nmsType);
+            if (this.nmsEntityType != null) {
+                byNMSEntityType.put(this.nmsEntityType.getRaw(), this);
+            }
+        } else {
+            this.nmsEntityType = null;
+        }
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntity(T entity) {
@@ -288,6 +303,26 @@ public class CommonEntityType {
 
     public static CommonEntityType byNMSEntity(Object entityHandle) {
         return LogicUtil.fixNull(byNMS.get(entityHandle), UNKNOWN);
+    }
+
+    public static CommonEntityType byObjectTypeId(int objectTypeId) {
+        return LogicUtil.fixNull(byObjectTypeId.get(objectTypeId), UNKNOWN);
+    }
+
+    public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {
+        if (handle != null) {
+            CommonEntityType type = byNMSEntityType.get(handle.getRaw());
+            if (type != null) {
+                return type;
+            }
+
+            // Try by class instead
+            if (EntityTypesHandle.T.getEntityClassInst.isAvailable()) {
+                Class<?> nmsType = EntityTypesHandle.T.getEntityClassInst.invoke(handle.getRaw());
+                return byNMSEntityClass(nmsType);
+            }
+        }
+        return UNKNOWN;
     }
 
     private static void registerObjectType(String entityTypeName, int objectId, int extraData) {

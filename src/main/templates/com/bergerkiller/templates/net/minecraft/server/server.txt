@@ -16,7 +16,9 @@ class MinecraftServer {
 
     public String getResourcePackHash();
 
-#if version >= 1.13.1
+#if version >= 1.14
+    public int getTicks:ai();
+#elseif version >= 1.13.1
     public int getTicks:ah();
 #elseif version >= 1.13
     public int getTicks:aj();
@@ -73,7 +75,17 @@ interface IPlayerFileData {
 
     public (CommonTagCompound) NBTTagCompound load((org.bukkit.entity.HumanEntity) EntityHuman human);
 
+#if version >= 1.14
+    public String[] getSeenPlayers() {
+        if (this instanceof net.minecraft.server.WorldNBTStorage) {
+            return ((net.minecraft.server.WorldNBTStorage) this).getSeenPlayers();
+        } else {
+            return new String[0];
+        }
+    }
+#else
     public String[] getSeenPlayers();
+#endif
 }
 
 class LocaleLanguage {

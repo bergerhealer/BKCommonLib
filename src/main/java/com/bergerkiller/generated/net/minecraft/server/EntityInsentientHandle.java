@@ -24,6 +24,7 @@ public abstract class EntityInsentientHandle extends EntityLivingHandle {
 
     public abstract EntityHandle getLeashHolder();
     public abstract Object getNavigation();
+    public abstract boolean isSleeping();
 
     public static final Key<Byte> DATA_INSENTIENT_FLAGS = Key.Type.BYTE.createKey(T.DATA_INSENTIENT_FLAGS, 11);
     public static final int DATA_INSENTIENT_FLAG_NOAI = (1 << 0);
@@ -38,6 +39,7 @@ public abstract class EntityInsentientHandle extends EntityLivingHandle {
 
         public final Template.Method.Converted<EntityHandle> getLeashHolder = new Template.Method.Converted<EntityHandle>();
         public final Template.Method.Converted<Object> getNavigation = new Template.Method.Converted<Object>();
+        public final Template.Method<Boolean> isSleeping = new Template.Method<Boolean>();
 
     }
 

@@ -27,8 +27,6 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
 
     public abstract Dimension getDimension();
     public abstract void setDimension(Dimension value);
-    public abstract Difficulty getDifficulty();
-    public abstract void setDifficulty(Difficulty value);
     public abstract GameMode getGamemode();
     public abstract void setGamemode(GameMode value);
     public abstract WorldType getWorldType();
@@ -39,6 +37,7 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
      */
     public static final class PacketPlayOutRespawnClass extends Template.Class<PacketPlayOutRespawnHandle> {
         public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
+        @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Converted<GameMode> gamemode = new Template.Field.Converted<GameMode>();
         public final Template.Field.Converted<WorldType> worldType = new Template.Field.Converted<WorldType>();

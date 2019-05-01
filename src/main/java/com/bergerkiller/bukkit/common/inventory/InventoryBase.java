@@ -107,12 +107,12 @@ public abstract class InventoryBase implements Inventory {
         return InventoryType.CHEST;
     }
 
-    @Override
+    // Gone since MC 1.14
     public String getName() {
         return getClass().getSimpleName();
     }
 
-    @Override
+    // Gone since MC 1.14
     public String getTitle() {
         return getName();
     }

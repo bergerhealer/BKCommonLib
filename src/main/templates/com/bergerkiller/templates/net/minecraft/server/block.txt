@@ -41,7 +41,26 @@ class Block {
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    // Since 1.13 getOpacity has a BlockPosition argument
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return iblockdata.b(world, new BlockPosition(x, y, z));
+    }
+
+    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.CraftBlock block) {
+        if (iblockdata.a(TagsBlock.LEAVES)) {
+            return false;
+        }
+
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        VoxelShape shape = iblockdata.getCollisionShape(iblockaccess, blockposition);
+        return !VoxelShapes.c(shape.a(EnumDirection.UP), Block.c, OperatorBoolean.ONLY_SECOND);
+    }
+#elseif version >= 1.13
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return iblockdata.b(world, new BlockPosition(x, y, z));
@@ -55,7 +74,9 @@ class Block {
 
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop:r((IBlockDataHandle) IBlockData iblockdata);
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
+        return instance.r(iblockdata);
+    }
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -64,7 +85,9 @@ class Block {
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
     public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop:k((IBlockDataHandle) IBlockData iblockdata);
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
+        return instance.k(iblockdata);
+    }
 #elseif version >= 1.8.3
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -79,7 +102,7 @@ class Block {
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata) {
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
         Block block = iblockdata.getBlock();
         if (block.getMaterial().k() && block.d()) {
             return true;
@@ -112,7 +135,7 @@ class Block {
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata) {
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
         Block block = iblockdata.getBlock();
         if (block.getMaterial().k() && block.d()) {
             return true;

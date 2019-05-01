@@ -22,10 +22,20 @@ class Entity {
 #if version >= 1.9
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
-    private static int entityCount;
+
+#if version >= 1.14
+    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:entityCount;
+    private static optional int opt_int_entityCount:###;
+#else
+    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:###;
+    private static optional int opt_int_entityCount:entityCount;
+#endif
+
     private int idField:id;
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean preventBlockPlace:i;
+#elseif version >= 1.13
     public boolean preventBlockPlace:j;
 #elseif version >= 1.9
     public boolean preventBlockPlace:i;
@@ -34,7 +44,11 @@ class Entity {
 #endif
 
     /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
-#if version >= 1.13
+#if version >= 1.14
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:###;
+    protected unknown int j;
+#elseif version >= 1.13
     public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
     public optional (EntityHandle) Entity opt_passenger:###;
     protected unknown int k;
@@ -126,7 +140,12 @@ class Entity {
     public boolean onGround;
     public boolean horizontalMovementImpaired:positionChanged;
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean verticalMovementImpaired:y;
+    public boolean movementImpaired:z;
+    public boolean velocityChanged;
+    protected boolean justLanded:###; // ????
+#elseif version >= 1.13
     public boolean verticalMovementImpaired:C;
     public boolean movementImpaired:D;
     public boolean velocityChanged;
@@ -143,23 +162,28 @@ class Entity {
     protected boolean justLanded:H;
 #endif
 
-#if version >= 1.13
-    private unknown boolean outsideWorldBorderField:az;
-#elseif version >= 1.10.2
-    private unknown boolean outsideWorldBorderField:aw;
-#elseif version >= 1.9.4
-    private unknown boolean outsideWorldBorderField:av;
-#elseif version >= 1.9
-    private unknown boolean outsideWorldBorderField:au;
-#else
-    private unknown boolean outsideWorldBorderField:g;
-#endif
+    // Seems unused.
+    // #if version >= 1.13
+    //     private unknown boolean outsideWorldBorderField:az;
+    // #elseif version >= 1.10.2
+    //     private unknown boolean outsideWorldBorderField:aw;
+    // #elseif version >= 1.9.4
+    //     private unknown boolean outsideWorldBorderField:av;
+    // #elseif version >= 1.9
+    //     private unknown boolean outsideWorldBorderField:au;
+    // #else
+    //     private unknown boolean outsideWorldBorderField:g;
+    // #endif
 
     public boolean dead;
     public float width;
     public float length;
 
-#if version >= 1.13
+#if version >= 1.14
+    public unknown float D;
+    public float walkedDistanceXZ:E;
+    public float walkedDistanceXYZ:F;
+#elseif version >= 1.13
     public unknown float J;
     public float walkedDistanceXZ:K;
     public float walkedDistanceXYZ:L;

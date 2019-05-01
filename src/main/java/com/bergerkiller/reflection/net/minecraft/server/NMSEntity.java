@@ -30,7 +30,6 @@ public class NMSEntity {
     /* ================================================================================================================ */
 
     public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntityField.toFieldAccessor();
-    public static final FieldAccessor<Integer> globalEntityCount = EntityHandle.T.entityCount.toFieldAccessor();
     public static final TranslatorFieldAccessor<Entity> vehicleField = EntityHandle.T.vehicle.raw.toFieldAccessor().translate(DuplexConversion.entity);
     public static final FieldAccessor<Boolean> ignoreChunkCheck = EntityHandle.T.ignoreChunkCheck.toFieldAccessor();
     public static final TranslatorFieldAccessor<World>  world = EntityHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);

@@ -29,7 +29,28 @@ class EntityTracker {
 }
 
 class EntityTrackerEntry {
-#if version >= 1.9
+#if version >= 1.14
+    private final (EntityHandle) Entity tracker;
+
+    // ======== Note: gone 1.14 =============
+    private final int viewDistance:e;
+    private optional int playerViewDistance:f;
+    // ======================================
+
+    private final int updateInterval:d;
+    private final boolean isMobile:e;
+
+    private optional long long_xLoc:xLoc;
+    private optional long long_yLoc:yLoc;
+    private optional long long_zLoc:zLoc;
+    private optional int int_xLoc:###;
+    private optional int int_yLoc:###;
+    private optional int int_zLoc:###;
+
+    public int raw_xRot:yRot;
+    public int raw_yRot:xRot;
+    public int raw_headYaw:headYaw;
+#elseif version >= 1.9
     private final (EntityHandle) Entity tracker;
 
     private final int viewDistance:e;
@@ -46,12 +67,6 @@ class EntityTrackerEntry {
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
     public int raw_headYaw:headYaw;
-
-    private double xVel:n;
-    private double yVel:o;
-    private double zVel:p;
-
-    public int tickCounter:a;
 #else
     public final (EntityHandle) Entity tracker;
 
@@ -69,12 +84,136 @@ class EntityTrackerEntry {
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
     public int raw_headYaw:i;
+#endif
 
-    public double xVel:j;
-    public double yVel:k;
-    public double zVel:l;
+#if version >= 1.14
+    private optional double opt_xVel:###;
+    private optional double opt_yVel:###;
+    private optional double opt_zVel:###;
+    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:m;
+
+    public int tickCounter:n;
+#elseif version >= 1.9
+    private optional double opt_xVel:n;
+    private optional double opt_yVel:o;
+    private optional double opt_zVel:p;
+    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
+
+    public int tickCounter:a;
+#else
+    public optional double opt_xVel:j;
+    public optional double opt_yVel:k;
+    public optional double opt_zVel:l;
+    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
 
     public int tickCounter:m;
+#endif
+
+    <code>
+    public double getXVel() {
+        if (T.opt_xVel.isAvailable()) {
+            return T.opt_xVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+        }
+    }
+
+    public double getYVel() {
+        if (T.opt_yVel.isAvailable()) {
+            return T.opt_yVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+        }
+    }
+
+    public double getZVel() {
+        if (T.opt_zVel.isAvailable()) {
+            return T.opt_zVel.getDouble(getRaw());
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+        }
+    }
+
+    public void setXVel(double x) {
+        if (T.opt_xVel.isAvailable()) {
+            T.opt_xVel.setDouble(getRaw(), x);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public void setYVel(double y) {
+        if (T.opt_yVel.isAvailable()) {
+            T.opt_yVel.setDouble(getRaw(), y);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public void setZVel(double z) {
+        if (T.opt_zVel.isAvailable()) {
+            T.opt_zVel.setDouble(getRaw(), z);
+        } else {
+            Object vel = T.opt_velocity.raw.get(getRaw());
+            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            setVelocity(x, y, z);
+        }
+    }
+
+    public org.bukkit.util.Vector getVelocity() {
+        if (T.opt_velocity.isAvailable()) {
+            return T.opt_velocity.get(getRaw());
+        } else {
+            double x = T.opt_xVel.getDouble(getRaw());
+            double y = T.opt_yVel.getDouble(getRaw());
+            double z = T.opt_zVel.getDouble(getRaw());
+            return new org.bukkit.util.Vector(x, y, z);
+        }
+    }
+
+    public void setVelocity(org.bukkit.util.Vector velocity) {
+        if (T.opt_velocity.isAvailable()) {
+            T.opt_velocity.set(getRaw(), velocity);
+        } else {
+            T.opt_xVel.setDouble(getRaw(), velocity.getX());
+            T.opt_yVel.setDouble(getRaw(), velocity.getY());
+            T.opt_zVel.setDouble(getRaw(), velocity.getZ());
+        }
+    }
+
+    public void setVelocity(double x, double y, double z) {
+        if (T.opt_velocity.isAvailable()) {
+            Object vel = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+            T.opt_velocity.raw.set(getRaw(), vel);
+        } else {
+            T.opt_xVel.setDouble(getRaw(), x);
+            T.opt_yVel.setDouble(getRaw(), y);
+            T.opt_zVel.setDouble(getRaw(), z);
+        }
+    }
+    </code>
+
+    // Note: stopped existing since 1.14
+    // ====================================
+    private double prevX:q;
+    private double prevY:r;
+    private double prevZ:s;
+    private boolean synched:isMoving;
+    // ====================================
+
+    // Moved to top on MC 1.14
+#if version <= 1.13.2
+    private final boolean isMobile:u;
 #endif
 
     // Constructors, with a helper method to choose the right one (difference between MC 1.8.8 and 1.9 onwards)
@@ -92,7 +231,6 @@ class EntityTrackerEntry {
         }
     }
     </code>
-
 
     <code>
     // Minimal change of x/y/z position or rotation that is supported
@@ -225,18 +363,16 @@ class EntityTrackerEntry {
     }
     </code>
 
-    private double prevX:q;
-    private double prevY:r;
-    private double prevZ:s;
-
-    private boolean synched:isMoving;
-    private final boolean isMobile:u;
+#if version >= 1.14
+    private int timeSinceLocationSync:o;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:p;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;
+#elseif version >= 1.9
     private int timeSinceLocationSync:v;
-
-#if version >= 1.9
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:w;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;
 #else
+    private int timeSinceLocationSync:v;
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:###;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:w;
 #endif

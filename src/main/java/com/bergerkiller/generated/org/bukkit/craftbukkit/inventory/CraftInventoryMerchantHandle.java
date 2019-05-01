@@ -20,18 +20,18 @@ public abstract class CraftInventoryMerchantHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final MerchantInventory createNew(Object nmsInventoryMerchant) {
-        return T.constr_nmsInventoryMerchant.newInstance(nmsInventoryMerchant);
-    }
-
     /* ============================================================================== */
+
+    public static MerchantInventory createNew(Object nmsInventoryMerchant) {
+        return T.createNew.invoke(nmsInventoryMerchant);
+    }
 
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftInventoryMerchant</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftInventoryMerchantClass extends Template.Class<CraftInventoryMerchantHandle> {
-        public final Template.Constructor.Converted<MerchantInventory> constr_nmsInventoryMerchant = new Template.Constructor.Converted<MerchantInventory>();
+        public final Template.StaticMethod.Converted<MerchantInventory> createNew = new Template.StaticMethod.Converted<MerchantInventory>();
 
     }
 

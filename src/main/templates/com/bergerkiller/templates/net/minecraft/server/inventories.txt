@@ -57,11 +57,17 @@ class PlayerInventory extends IInventory {
 class InventoryEnderChest extends IInventory {
     public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 
-#if version >= 1.11
+#if version >= 1.14
+    public (CommonTagList) NBTTagList saveToNBT:f()
+#elseif version >= 1.11
     public (CommonTagList) NBTTagList saveToNBT:i()
 #else
     public (CommonTagList) NBTTagList saveToNBT:h()
 #endif
+}
+
+class InventoryMerchant extends IInventory {
+    private final (Object) IMerchant merchant;
 }
 
 class CreativeModeTab {

@@ -4,6 +4,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 
 class EntityTypes {
+
     // 1.10.2 and before used a Map<String, Class> and Map<Class, String> to store name to entity class information
 #if version >= 1.11
     private static optional final (Map<String, Class<?>>) Map<String, Class<? extends Entity>> opt_nameTypeMap_1_10_2:###;

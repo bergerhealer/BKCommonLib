@@ -3,6 +3,7 @@ package net.minecraft.server;
 import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
 #if version >= 1.9
@@ -19,7 +20,15 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional int motZ_raw:h;
     private optional int pitch_raw:i;
     private optional int yaw_raw:j;
-    private int entityTypeId:k;
+
+#if version >= 1.14
+    private optional int opt_entityTypeId:###;
+    private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:k;
+#else
+    private optional int opt_entityTypeId:k;
+    private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:###;
+#endif
+
     private int extraData:l;
 #else
     private int entityId:a;
@@ -35,7 +44,8 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional int motZ_raw:g;
     private optional int pitch_raw:h;
     private optional int yaw_raw:i;
-    private int entityTypeId:j;
+    private optional int opt_entityTypeId:j;
+    private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:###;
     private int extraData:k;
 #endif
 
@@ -51,14 +61,57 @@ class PacketPlayOutSpawnEntity extends Packet {
         }
     }
 
-    public void setEntityType(org.bukkit.entity.EntityType type) {
-        com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType;
-        commonEntityType = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type);
-        if (commonEntityType.objectTypeId != -1) {
-            setEntityTypeId(commonEntityType.objectTypeId);
+    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            return;
+        }
+        if (T.opt_entityTypeId.isAvailable()) {
+            if (commonEntityType.objectTypeId != -1) {
+                T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
+            }
+        } else {
+            if (commonEntityType.nmsEntityType != null) {
+                T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
+            }
         }
         if (commonEntityType.objectExtraData != -1) {
             setExtraData(commonEntityType.objectExtraData);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
+        if (T.opt_entityTypeId.isAvailable()) {
+            int id = T.opt_entityTypeId.getInteger(getRaw());
+            return com.bergerkiller.bukkit.common.entity.CommonEntityType.byObjectTypeId(id);
+        } else {
+            EntityTypesHandle nmsType = T.opt_entityType.get(getRaw());
+            return com.bergerkiller.bukkit.common.entity.CommonEntityType.byNMSEntityType(nmsType);
+        }
+    }
+
+    public void setEntityType(org.bukkit.entity.EntityType type) {
+        setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
+    }
+
+    public org.bukkit.entity.EntityType getEntityType() {
+        return getCommonEntityType().entityType;
+    }
+
+    @Deprecated
+    public void setEntityTypeId(int typeId) {
+        if (T.opt_entityTypeId.isAvailable()) {
+            T.opt_entityTypeId.setInteger(getRaw(), typeId);
+        } else {
+            setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byObjectTypeId(typeId));
+        }
+    }
+
+    @Deprecated
+    public int getEntityTypeId() {
+        if (T.opt_entityTypeId.isAvailable()) {
+            return T.opt_entityTypeId.getInteger(getRaw());
+        } else {
+            return getCommonEntityType().objectTypeId;
         }
     }
 

@@ -34,14 +34,57 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         }
     }
 
-    public void setEntityType(org.bukkit.entity.EntityType type) {
-        com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType;
-        commonEntityType = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type);
-        if (commonEntityType.objectTypeId != -1) {
-            setEntityTypeId(commonEntityType.objectTypeId);
+    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            return;
+        }
+        if (T.opt_entityTypeId.isAvailable()) {
+            if (commonEntityType.objectTypeId != -1) {
+                T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
+            }
+        } else {
+            if (commonEntityType.nmsEntityType != null) {
+                T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
+            }
         }
         if (commonEntityType.objectExtraData != -1) {
             setExtraData(commonEntityType.objectExtraData);
+        }
+    }
+
+    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
+        if (T.opt_entityTypeId.isAvailable()) {
+            int id = T.opt_entityTypeId.getInteger(getRaw());
+            return com.bergerkiller.bukkit.common.entity.CommonEntityType.byObjectTypeId(id);
+        } else {
+            EntityTypesHandle nmsType = T.opt_entityType.get(getRaw());
+            return com.bergerkiller.bukkit.common.entity.CommonEntityType.byNMSEntityType(nmsType);
+        }
+    }
+
+    public void setEntityType(org.bukkit.entity.EntityType type) {
+        setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
+    }
+
+    public org.bukkit.entity.EntityType getEntityType() {
+        return getCommonEntityType().entityType;
+    }
+
+    @Deprecated
+    public void setEntityTypeId(int typeId) {
+        if (T.opt_entityTypeId.isAvailable()) {
+            T.opt_entityTypeId.setInteger(getRaw(), typeId);
+        } else {
+            setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byObjectTypeId(typeId));
+        }
+    }
+
+    @Deprecated
+    public int getEntityTypeId() {
+        if (T.opt_entityTypeId.isAvailable()) {
+            return T.opt_entityTypeId.getInteger(getRaw());
+        } else {
+            return getCommonEntityType().objectTypeId;
         }
     }
 
@@ -114,8 +157,6 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract int getEntityTypeId();
-    public abstract void setEntityTypeId(int value);
     public abstract int getExtraData();
     public abstract void setExtraData(int value);
     /**
@@ -148,7 +189,10 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         public final Template.Field.Integer pitch_raw = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Integer yaw_raw = new Template.Field.Integer();
-        public final Template.Field.Integer entityTypeId = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Integer opt_entityTypeId = new Template.Field.Integer();
+        @Template.Optional
+        public final Template.Field.Converted<EntityTypesHandle> opt_entityType = new Template.Field.Converted<EntityTypesHandle>();
         public final Template.Field.Integer extraData = new Template.Field.Integer();
 
     }

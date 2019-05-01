@@ -16,6 +16,7 @@ import org.bukkit.World;
 import org.bukkit.WorldType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EquipmentSlot;
@@ -1040,10 +1041,49 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
         public final FieldAccessor<Dimension> dimension = PacketPlayOutLoginHandle.T.dimension.toFieldAccessor();
-        public final TranslatorFieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor();
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
         public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutLoginHandle.T.worldType.toFieldAccessor();
-        public final FieldAccessor<Boolean> unknown1 = PacketPlayOutLoginHandle.T.unknown1.toFieldAccessor();
+        public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
+
+        public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
+            @Override
+            public Difficulty get(Object instance) {
+                if (PacketPlayOutLoginHandle.T.difficulty.isAvailable()) {
+                    return  PacketPlayOutLoginHandle.T.difficulty.get(instance);
+                } else {
+                    return Difficulty.NORMAL;
+                }
+            }
+
+            @Override
+            public boolean set(Object instance, Difficulty value) {
+                if (PacketPlayOutLoginHandle.T.difficulty.isAvailable()) {
+                    PacketPlayOutLoginHandle.T.difficulty.set(instance, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
+        public final FieldAccessor<Integer> viewDistance = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                if (PacketPlayOutLoginHandle.T.viewDistance.isAvailable()) {
+                    return PacketPlayOutLoginHandle.T.viewDistance.get(instance);
+                }
+                return 10;
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                if (PacketPlayOutLoginHandle.T.viewDistance.isAvailable()) {
+                    PacketPlayOutLoginHandle.T.viewDistance.set(instance, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
@@ -1056,6 +1096,27 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> width = PacketPlayOutMapHandle.T.width.toFieldAccessor();
         public final FieldAccessor<Integer> height = PacketPlayOutMapHandle.T.height.toFieldAccessor();
         public final FieldAccessor<byte[]> pixels = PacketPlayOutMapHandle.T.pixels.toFieldAccessor();
+
+        public final FieldAccessor<Boolean> locked = new SafeDirectField<Boolean>() {
+            @Override
+            public Boolean get(Object instance) {
+                if (PacketPlayOutMapHandle.T.locked.isAvailable()) {
+                    return PacketPlayOutMapHandle.T.locked.get(instance);
+                } else {
+                    return false;
+                }
+            }
+
+            @Override
+            public boolean set(Object instance, Boolean value) {
+                if (PacketPlayOutMapHandle.T.locked.isAvailable()) {
+                    PacketPlayOutMapHandle.T.locked.set(instance, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
 
         public final FieldAccessor<Boolean> track = new SafeDirectField<Boolean>() {
             @Override
@@ -1092,6 +1153,18 @@ public class NMSPacketClasses {
             @Override
             public boolean set(Object instance, Integer value) {
                 PacketPlayOutMapChunkHandle.createHandle(instance).setSectionsMask(value.intValue());
+                return true;
+            }
+        };
+        public final FieldAccessor<CommonTagCompound> metadata = new SafeDirectField<CommonTagCompound>() {
+            @Override
+            public CommonTagCompound get(Object instance) {
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getMetadata();
+            }
+
+            @Override
+            public boolean set(Object instance, CommonTagCompound value) {
+                PacketPlayOutMapChunkHandle.createHandle(instance).setMetadata(value);
                 return true;
             }
         };
@@ -1347,9 +1420,29 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
         public final FieldAccessor<Dimension> dimension = PacketPlayOutRespawnHandle.T.dimension.toFieldAccessor();
-        public final FieldAccessor<Difficulty> difficulty = PacketPlayOutRespawnHandle.T.difficulty.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
         public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutRespawnHandle.T.worldType.toFieldAccessor();
+
+        public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
+            @Override
+            public Difficulty get(Object instance) {
+                if (PacketPlayOutRespawnHandle.T.difficulty.isAvailable()) {
+                    return PacketPlayOutRespawnHandle.T.difficulty.get(instance);
+                } else {
+                    return Difficulty.NORMAL;
+                }
+            }
+
+            @Override
+            public boolean set(Object instance, Difficulty value) {
+                if (PacketPlayOutRespawnHandle.T.difficulty.isAvailable()) {
+                    PacketPlayOutRespawnHandle.T.difficulty.set(instance, value);
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        };
     }
 
     public static class NMSPacketPlayOutScoreboardDisplayObjective extends NMSPacket {
@@ -1507,8 +1600,38 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        public final FieldAccessor<Integer> entityType = PacketPlayOutSpawnEntityHandle.T.entityTypeId.toFieldAccessor();
+
         public final FieldAccessor<Integer> extraData = PacketPlayOutSpawnEntityHandle.T.extraData.toFieldAccessor();
+
+        /**
+         * Deprecated: use the bukkitEntityType instead (safer)
+         */
+        @Deprecated
+        public final FieldAccessor<Integer> entityType = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutSpawnEntityHandle.createHandle(instance).getEntityTypeId();
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutSpawnEntityHandle.createHandle(instance).setEntityTypeId(value.intValue());
+                return true;
+            }
+        };
+
+        public final FieldAccessor<EntityType> bukkitEntityType = new SafeDirectField<EntityType>() {
+            @Override
+            public EntityType get(Object instance) {
+                return PacketPlayOutSpawnEntityHandle.createHandle(instance).getEntityType();
+            }
+
+            @Override
+            public boolean set(Object instance, EntityType value) {
+                PacketPlayOutSpawnEntityHandle.createHandle(instance).setEntityType(value);
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutSpawnEntityExperienceOrb extends NMSPacket {

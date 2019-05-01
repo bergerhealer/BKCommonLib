@@ -22,8 +22,6 @@ public class NMSEntityHuman extends NMSEntityLiving {
 
     public static final FieldAccessor<Object> foodData = EntityHumanHandle.T.foodDataRaw.toFieldAccessor();
 
-    public static final FieldAccessor<Boolean> sleeping = EntityHumanHandle.T.sleeping.toFieldAccessor();
-    public static final FieldAccessor<IntVector3> bedPosition = EntityHumanHandle.T.bedPosition.toFieldAccessor();
     public static final FieldAccessor<Integer> sleepTicks = EntityHumanHandle.T.sleepTicks.toFieldAccessor();
 
     public static final TranslatorFieldAccessor<IntVector3> spawnCoord = EntityHumanHandle.T.spawnCoord.toFieldAccessor();
