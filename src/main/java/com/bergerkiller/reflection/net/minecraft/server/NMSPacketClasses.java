@@ -76,6 +76,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipm
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityVelocityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
@@ -951,19 +952,19 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityVelocity extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Integer> motX = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> motY = nextFieldSignature("private int c");
-        public final FieldAccessor<Integer> motZ = nextFieldSignature("private int d");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType());
-        private final SafeConstructor<CommonPacket> constructor2 = getPacketConstructor(int.class, double.class, double.class, double.class);
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityVelocityHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<Integer> motX = PacketPlayOutEntityVelocityHandle.T.motX_raw.toFieldAccessor();
+        public final FieldAccessor<Integer> motY = PacketPlayOutEntityVelocityHandle.T.motY_raw.toFieldAccessor();
+        public final FieldAccessor<Integer> motZ = PacketPlayOutEntityVelocityHandle.T.motZ_raw.toFieldAccessor();
 
+        @Deprecated
         public CommonPacket newInstance(org.bukkit.entity.Entity entity) {
-            return constructor1.newInstance(Conversion.toEntityHandle.convert(entity));
+            return PacketPlayOutEntityVelocityHandle.createNew(entity).toCommonPacket();
         }
 
+        @Deprecated
         public CommonPacket newInstance(int entityId, double motX, double motY, double motZ) {
-            return constructor2.newInstance(entityId, motX, motY, motZ);
+            return PacketPlayOutEntityVelocityHandle.createNew(entityId, motX, motY, motZ).toCommonPacket();
         }
 
         public CommonPacket newInstance(int entityId, Vector velocity) {

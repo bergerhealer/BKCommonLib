@@ -13,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -232,6 +233,45 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             }.setTypes("LEGACY_REDSTONE_WIRE")
              .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
              .build();
+        }
+
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            // LEGACY_WALL_SIGN is broken on 1.14
+            {
+                new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
+                    @Override
+                    public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
+                        return new org.bukkit.material.Sign(legacy_data_type, legacy_data_value);
+                    }
+
+                    @Override
+                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                        IBlockDataHandle base = iblockdata.set("facing", sign.getFacing());
+                        return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                    }
+                }.setTypes("ACACIA_WALL_SIGN", "BIRCH_WALL_SIGN", "DARK_OAK_WALL_SIGN", "JUNGLE_WALL_SIGN", "OAK_WALL_SIGN", "SPRUCE_WALL_SIGN",
+                           "LEGACY_WALL_SIGN")
+                 .setDataValues(2, 3, 4, 5)
+                 .build();
+            }
+
+            // Register new SIGN_POST types as well
+            {
+                new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
+                    @Override
+                    public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
+                        return new org.bukkit.material.Sign(legacy_data_type, legacy_data_value);
+                    }
+
+                    @Override
+                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                        IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
+                        return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                    }
+                }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN")
+                 .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+                 .build();
+            }
         }
     }
 

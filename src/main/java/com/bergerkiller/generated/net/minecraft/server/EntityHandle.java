@@ -14,6 +14,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -37,6 +38,14 @@ public abstract class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract Vector getMot();
+    public abstract void setMot(double x, double y, double z);
+    public abstract void setMotX(double x);
+    public abstract void setMotY(double y);
+    public abstract void setMotZ(double z);
+    public abstract double getMotX();
+    public abstract double getMotY();
+    public abstract double getMotZ();
     public abstract void updateBlockCollision();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
@@ -253,12 +262,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocY(double value);
     public abstract double getLocZ();
     public abstract void setLocZ(double value);
-    public abstract double getMotX();
-    public abstract void setMotX(double value);
-    public abstract double getMotY();
-    public abstract void setMotY(double value);
-    public abstract double getMotZ();
-    public abstract void setMotZ(double value);
     public abstract float getYaw();
     public abstract void setYaw(float value);
     public abstract float getPitch();
@@ -361,9 +364,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Double locX = new Template.Field.Double();
         public final Template.Field.Double locY = new Template.Field.Double();
         public final Template.Field.Double locZ = new Template.Field.Double();
-        public final Template.Field.Double motX = new Template.Field.Double();
-        public final Template.Field.Double motY = new Template.Field.Double();
-        public final Template.Field.Double motZ = new Template.Field.Double();
         public final Template.Field.Float yaw = new Template.Field.Float();
         public final Template.Field.Float pitch = new Template.Field.Float();
         public final Template.Field.Float lastYaw = new Template.Field.Float();
@@ -407,6 +407,14 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
+        public final Template.Method<Vector> getMot = new Template.Method<Vector>();
+        public final Template.Method<Void> setMot = new Template.Method<Void>();
+        public final Template.Method<Void> setMotX = new Template.Method<Void>();
+        public final Template.Method<Void> setMotY = new Template.Method<Void>();
+        public final Template.Method<Void> setMotZ = new Template.Method<Void>();
+        public final Template.Method<Double> getMotX = new Template.Method<Double>();
+        public final Template.Method<Double> getMotY = new Template.Method<Double>();
+        public final Template.Method<Double> getMotZ = new Template.Method<Double>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();

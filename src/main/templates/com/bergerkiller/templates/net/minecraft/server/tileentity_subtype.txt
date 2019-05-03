@@ -9,7 +9,12 @@ class TileEntityFurnace extends TileEntity {
             return 0;
         } else {
             Item item = itemstack.getItem();
-            return TileEntityFurnace.f().getOrDefault(item, 0);
+            Integer fuelTime = (Integer) TileEntityFurnace.f().get(item);
+            if (fuelTime == null) {
+                return 0;
+            } else {
+                return fuelTime.intValue();
+            }
         }
     }
 #elseif version >= 1.13

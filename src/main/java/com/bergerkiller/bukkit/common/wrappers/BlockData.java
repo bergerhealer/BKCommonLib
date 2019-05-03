@@ -363,16 +363,29 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Gets whether this Block is fully occluding, not allowing light to pass through
      * 
+     * @param block where this BlockData is used
      * @return True if fully occluding, False if not
      */
-    public abstract boolean isOccluding();
+    public abstract boolean isOccluding(Block block);
+
+    /**
+     * Gets whether this Block is fully occluding, not allowing light to pass through
+     * 
+     * @param world where this BlockData is used
+     * @param x - coordinate of the block where this BlockData is used
+     * @param y - coordinate of the block where this BlockData is used
+     * @param z - coordinate of the block where this BlockData is used
+     * @return True if fully occluding, False if not
+     */
+    public abstract boolean isOccluding(World world, int x, int y, int z);
 
     /**
      * Gets whether this Block causes suffocation damage to players inside
      * 
+     * @param block where this BlockData is used
      * @return True if suffocation occurs, False if not
      */
-    public abstract boolean isSuffocating();
+    public abstract boolean isSuffocating(Block block);
 
     /**
      * Gets whether this Block is a source of Redstone Power

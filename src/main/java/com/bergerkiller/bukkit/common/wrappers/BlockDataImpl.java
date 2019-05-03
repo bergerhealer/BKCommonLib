@@ -432,13 +432,18 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public final boolean isOccluding() {
-        return this.block.isOccluding(this.data);
+    public final boolean isOccluding(Block block) {
+        return this.block.isOccluding(this.data, block);
     }
 
     @Override
-    public final boolean isSuffocating() {
-        return this.block.isOccluding(this.data);
+    public boolean isOccluding(World world, int x, int y, int z) {
+        return this.block.isOccluding_at(this.data, world, x, y, z);
+    }
+
+    @Override
+    public final boolean isSuffocating(Block block) {
+        return this.block.isOccluding(this.data, block);
     }
 
     @Override

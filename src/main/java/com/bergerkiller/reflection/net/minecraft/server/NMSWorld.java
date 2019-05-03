@@ -45,15 +45,9 @@ public class NMSWorld {
 
     public static final MethodAccessor<List<?>> getEntities = WorldHandle.T.getEntities.raw.toMethodAccessor();
 
-    private static final MethodAccessor<Boolean> isChunkLoaded = WorldHandle.T.isChunkLoaded.toMethodAccessor();
-
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
     public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
-
-    public static boolean isChunkLoaded(Object worldHandle, int chunkX, int chunkZ) {
-        return isChunkLoaded.invoke(worldHandle, chunkX, chunkZ, true);
-    }
 
     public static Server getServer(Object worldHandle) {
         return getServer.invoke(worldHandle);

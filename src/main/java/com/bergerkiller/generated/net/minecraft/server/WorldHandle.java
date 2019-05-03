@@ -54,7 +54,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag);
     public abstract MovingObjectPositionHandle rayTrace2(Vector point1, Vector point2);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
-    public abstract boolean isChunkLoaded(int cx, int cz, boolean flag);
 
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
         if (T.opt_applyPhysics.isAvailable()) {
@@ -150,7 +149,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
-        public final Template.Method<Boolean> isChunkLoaded = new Template.Method<Boolean>();
 
     }
 

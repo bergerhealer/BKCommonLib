@@ -7,10 +7,17 @@ import java.util.Map;
 
 import org.bukkit.Material;
 import org.bukkit.material.MaterialData;
+import org.bukkit.material.Sign;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -55,7 +62,7 @@ public class MaterialDataToIBlockData {
         }
     }
 
-    // Only called on MC 1.13, before that everything was fine!
+    // Only called after MC 1.13, before that everything was fine!
     private static void initBuilders() {
         if (getLegacyMaterial("REDSTONE_COMPARATOR_OFF") != null) {
             iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
@@ -86,6 +93,19 @@ public class MaterialDataToIBlockData {
                 return iblockdata.set("type", "double");
             }
         });
+
+        // Post 1.14 we need a builder for LEGACY_WALL_SIGN
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            iblockdataBuilders.put(getLegacyMaterial("WALL_SIGN"), new IBlockDataBuilder<org.bukkit.material.Sign>() {
+                final IBlockDataHandle oak_sign_data = BlockHandle.T.getBlockData.invoke(CraftMagicNumbersHandle.getBlockFromMaterial(getLegacyMaterial("WALL_SIGN")));
+
+                @Override
+                public IBlockDataHandle create(IBlockDataHandle iblockdata, Sign materialdata) {
+                    IBlockDataHandle result = oak_sign_data.set("facing", materialdata.getFacing()).set("waterlogged", false);
+                    return result;
+                }
+            });
+        }
     }
 
     /**

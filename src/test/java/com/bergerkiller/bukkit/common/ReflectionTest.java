@@ -87,7 +87,6 @@ public class ReflectionTest {
             loadClass(NMSWorldType.class);
             loadClass(NMSEntityMinecart.class);
             loadClass(NMSEnumGamemode.class);
-            loadClass(NMSIntHashMap.class);
             loadClass(NMSWeightedRandomChoice.class);
             loadClass(NMSBiomeMeta.class);
             loadClass(NMSPlayerList.class);

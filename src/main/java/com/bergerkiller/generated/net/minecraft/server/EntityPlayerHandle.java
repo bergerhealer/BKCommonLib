@@ -30,10 +30,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     }
     public abstract Object getPlayerConnection();
     public abstract void setPlayerConnection(Object value);
-    public abstract double getChunkSyncX();
-    public abstract void setChunkSyncX(double value);
-    public abstract double getChunkSyncZ();
-    public abstract void setChunkSyncZ(double value);
     public abstract int getPing();
     public abstract void setPing(int value);
     /**
@@ -42,8 +38,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<Object> playerConnection = new Template.Field.Converted<Object>();
-        public final Template.Field.Double chunkSyncX = new Template.Field.Double();
-        public final Template.Field.Double chunkSyncZ = new Template.Field.Double();
         @Template.Optional
         public final Template.Field<List<Integer>> removeQueue = new Template.Field<List<Integer>>();
         public final Template.Field.Integer ping = new Template.Field.Integer();

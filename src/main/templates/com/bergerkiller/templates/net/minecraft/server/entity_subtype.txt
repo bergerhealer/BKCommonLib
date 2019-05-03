@@ -195,7 +195,6 @@ class EntityHuman extends EntityLiving {
 #else
     private (Object) InventoryEnderChest enderChestRaw:enderChest;
 #endif
-    public unknown Container defaultContainer;
     public (ContainerHandle) Container activeContainer;
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
@@ -330,8 +329,8 @@ class EntityHuman extends EntityLiving {
 
 class EntityPlayer extends EntityHuman {
     public (Object) PlayerConnection playerConnection;
-    public double chunkSyncX:d;
-    public double chunkSyncZ:e;
+    // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
+    // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
     public final optional List<Integer> removeQueue;
     public int ping;
 
@@ -458,7 +457,9 @@ class EntityMinecartRideable extends EntityMinecartAbstract {
 }
 
 class EntityMinecartFurnace extends EntityMinecartAbstract {
-#if version >= 1.9
+#if version >= 1.14
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:d;
+#elseif version >= 1.9
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:c;
 #else
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SMOKING:###;
@@ -468,14 +469,21 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     </code>
 
-#if version >= 1.9
+#if version >= 1.14
+    private int fuel:e;
+#elseif version >= 1.9
     private int fuel:d;
 #else
     private int fuel:c;
 #endif
 
+#if version >= 1.14
+    public double pushForceX:b;
+    public double pushForceZ:c;
+#else
     public double pushForceX:a;
     public double pushForceZ:b;
+#endif
 }
 
 class EntityMinecartHopper extends EntityMinecartAbstract {
@@ -485,7 +493,9 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
     private int suckingCooldown:b;
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean suckItems:C();
+#elseif version >= 1.13
     public boolean suckItems:J();
 #elseif version >= 1.12
     public boolean suckItems:H();
@@ -508,7 +518,11 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 }
 
 class EntityMinecartTNT extends EntityMinecartAbstract {
+#if version >= 1.14
+    private int fuse:b;
+#else
     private int fuse:a;
+#endif
 
 #if version >= 1.9
     protected void explode:c(double damage);
@@ -516,7 +530,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public void prime:v();
+#elseif version >= 1.13
     public void prime:f();
 #else
     public void prime:j();
@@ -544,7 +560,11 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
 }
 
 class EntityMinecartMobSpawner extends EntityMinecartAbstract {
+#if version >= 1.14
+    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) MobSpawnerAbstract mobSpawner:b;
+#else
     private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) MobSpawnerAbstract mobSpawner:a;
+#endif
 }
 
 class EntityItemFrame extends Entity {

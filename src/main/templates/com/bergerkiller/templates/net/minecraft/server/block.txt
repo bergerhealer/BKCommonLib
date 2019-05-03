@@ -48,9 +48,20 @@ class Block {
     }
 
     public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);
-    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        IBlockAccess iblockaccess = world;
+        return instance.isOccluding(iblockdata, world, new BlockPosition(x, y, z));
+    }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        return instance.isOccluding(iblockdata, iblockaccess, blockposition);
+    }
+
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.CraftBlock block) {
+    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
         if (iblockdata.a(TagsBlock.LEAVES)) {
             return false;
         }
@@ -72,7 +83,14 @@ class Block {
         public int getEmission:m((IBlockDataHandle) IBlockData iblockdata);
     #endif
 
-    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return instance.isOccluding(iblockdata);
+    }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        return instance.isOccluding(iblockdata);
+    }
+
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
     public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
         return instance.r(iblockdata);
@@ -83,7 +101,15 @@ class Block {
         return instance.m(iblockdata);
     }
     public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
-    public boolean isOccluding:isOccluding((IBlockDataHandle) IBlockData iblockdata);
+
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return instance.isOccluding(iblockdata);
+    }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        return instance.isOccluding(iblockdata);
+    }
+
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
     public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
         return instance.k(iblockdata);
@@ -96,9 +122,15 @@ class Block {
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
         return instance.r();
     }
-    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata) {
+
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.isOccluding();
     }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        return instance.isOccluding();
+    }
+
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
@@ -129,9 +161,15 @@ class Block {
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
         return instance.p();
     }
-    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata) {
+
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.isOccluding();
     }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        return instance.isOccluding();
+    }
+
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
@@ -187,7 +225,21 @@ class Block {
     }
     </code>
 
-#if version >= 1.13
+#if version >= 1.14
+    // Since 1.14 it uses a LootTableInfo to store all the properties for the dropping of items
+    // Call that one. See Explosion.java for details
+    public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
+        Block block = iblockdata.getBlock();
+        TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
+        LootTableInfo.Builder loottableinfo_builder = new LootTableInfo.Builder(world);
+        loottableinfo_builder = loottableinfo_builder.a(world.random);
+        loottableinfo_builder.set(LootContextParameters.POSITION, blockposition)
+        loottableinfo_builder.set(LootContextParameters.TOOL, ItemStack.a)
+        loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
+        loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, 1.0F / yield);
+        Block.b(iblockdata, loottableinfo_builder);
+    }
+#elseif version >= 1.13
     public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, float yield, int chance);
 #else
 

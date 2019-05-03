@@ -147,6 +147,7 @@ public class Common {
         // Register additional version-specific class remappings
         if (IS_COMPATIBLE) {
             final String nms_root = SERVER.getClassName("net.minecraft.server.Entity").replace(".Entity", "");
+            final String cb_root = SERVER.getClassName("org.bukkit.craftbukkit.CraftServer").replaceAll(".CraftServer", "");
             final Map<String, String> remappings = new HashMap<String, String>();
 
             // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
@@ -224,6 +225,16 @@ public class Common {
             // Some classes were moved after 1.13
             if (Common.evaluateMCVersion(">=", "1.13")) {
                 remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");
+            }
+
+            // Many classes disappeared or weere moved with MC 1.14
+            if (Common.evaluateMCVersion(">=", "1.14")) {
+                remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
+                remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
+                remappings.put(cb_root + ".util.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_1_14");
+                remappings.put(nms_root + ".IntHashMap", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap");
+                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
+                remappings.put("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
             }
 
             // If remappings exist, add a resolver for them

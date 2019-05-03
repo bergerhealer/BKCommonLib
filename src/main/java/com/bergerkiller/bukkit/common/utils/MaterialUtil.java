@@ -16,7 +16,6 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 
 import org.bukkit.Material;
@@ -318,16 +317,6 @@ public class MaterialUtil {
     public static final MaterialTypeProperty ISPOTION = TYPE_PROPERTIES.get("ISPOTION");
 
     /**
-     * The material causes suffocation to entities inside
-     */
-    public static final MaterialProperty<Boolean> SUFFOCATES = new MaterialBlockProperty<Boolean>() {
-        @Override
-        public Boolean get(BlockData blockData) {
-            return blockData.isSuffocating();
-        }
-    };
-
-    /**
      * The material is a type of heatable item that can be crafted using a
      * furnace
      */
@@ -345,17 +334,6 @@ public class MaterialUtil {
         @Override
         public Boolean get(Material type) {
             return RecipeUtil.isFuelItem(type);
-        }
-    };
-
-    /**
-     * The material is a solid block that lets no light through and on which
-     * other blocks can be placed
-     */
-    public static final MaterialProperty<Boolean> ISSOLID = new MaterialBooleanProperty() {
-        @Override
-        public Boolean get(Material type) {
-            return BlockData.fromMaterial(type).isOccluding();
         }
     };
 

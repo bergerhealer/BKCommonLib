@@ -73,6 +73,19 @@ class EntityTypes {
 #endif
 
 #if version >= 1.13
+
+#if version >= 1.14
+    public static Class<?> getEntityClass(String internalEntityName) {
+        java.util.Optional opt = EntityTypes.a(internalEntityName);
+        if (opt.isPresent()) {
+            EntityTypes type = (EntityTypes) opt.get();
+            Object entity = type.a((World) null);
+            return entity.getClass();
+        } else {
+            return null;
+        }
+    }
+#else
     public static Class<?> getEntityClass(String internalEntityName) {
         EntityTypes type = EntityTypes.a(internalEntityName);
         if (type == null) {
@@ -81,6 +94,7 @@ class EntityTypes {
             return type.c();
         }
     }
+#endif
 
     public static String getEntityInternalName(Class<?> entityType) {
 #if version >= 1.13.1

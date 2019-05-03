@@ -1,11 +1,9 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
 
 /**
  * Wrapper class for the nms.IntHashMap implementation
@@ -15,7 +13,7 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSIntHashMap;
 public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
 
     public IntHashMap() {
-        this(NMSIntHashMap.constructor.newInstance());
+        this.setHandle(IntHashMapHandle.createNew());
     }
 
     public IntHashMap(Object handle) {
@@ -30,7 +28,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      */
     @SuppressWarnings("unchecked")
     public T get(int key) {
-        return (T) NMSIntHashMap.get.invoke(handle.getRaw(), key);
+        return (T) this.handle.get(key);
     }
 
     /**
@@ -40,7 +38,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      * @return True if the key is stored, False if not
      */
     public boolean contains(int key) {
-        return NMSIntHashMap.contains.invoke(handle.getRaw(), key);
+        return this.handle.containsKey(key);
     }
 
     /**
@@ -51,7 +49,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      */
     @SuppressWarnings("unchecked")
     public T remove(int key) {
-        return (T) NMSIntHashMap.remove.invoke(handle.getRaw(), key);
+        return (T) this.handle.remove(key);
     }
 
     /**
@@ -61,14 +59,14 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      * @param value Value
      */
     public void put(int key, Object value) {
-        NMSIntHashMap.put.invoke(handle.getRaw(), key, value);
+        this.handle.put(key, value);
     }
 
     /**
      * Clear the map
      */
     public void clear() {
-        NMSIntHashMap.clear.invoke(handle.getRaw());
+        this.handle.clear();
     }
 
     /**
@@ -79,7 +77,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      * @return entry at the key, or null if not found
      */
     public Entry<T> getEntry(int key) {
-        Object entryHandle = NMSIntHashMap.getEntry.invoke(handle.getRaw(), key);
+        Object entryHandle = this.handle.getEntry(key);
         if (entryHandle == null) {
             return null;
         } else {
@@ -94,14 +92,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      * @return list of hashmap entries
      */
     public List<Entry<T>> entries() {
-        Object[] handles = NMSIntHashMap.entries.get(handle.getRaw());
-        ArrayList<Entry<T>> result = new ArrayList<Entry<T>>(handles.length);
-        for (Object entryHandle : handles) {
-            if (entryHandle != null) {
-                result.add(new Entry<T>(entryHandle));
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return CommonUtil.unsafeCast(this.handle.getEntries());
     }
 
     /**
@@ -112,14 +103,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      */
     @SuppressWarnings("unchecked")
     public List<T> values() {
-        Object[] handles = NMSIntHashMap.entries.get(handle.getRaw());
-        ArrayList<T> result = new ArrayList<T>(handles.length);
-        for (Object entryHandle : handles) {
-            if (entryHandle != null) {
-                result.add((T) NMSIntHashMap.Entry.value.get(entryHandle));
-            }
-        }
-        return Collections.unmodifiableList(result);
+        return (List<T>) this.handle.getValues();
     }
 
     /**
@@ -127,11 +111,10 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
      * 
      * @param <T> hashmap value type
      */
-    public static final class Entry<T> {
-        private final Object handle;
+    public static final class Entry<T> extends BasicWrapper<IntHashMapHandle.IntHashMapEntryHandle> {
 
         public Entry(Object handle) {
-            this.handle = handle;
+            this.setHandle(IntHashMapHandle.IntHashMapEntryHandle.createHandle(handle));
         }
 
         /**
@@ -140,7 +123,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
          * @return entry key
          */
         public int getKey() {
-            return NMSIntHashMap.Entry.key.get(this.handle);
+            return this.handle.getKey();
         }
 
         /**
@@ -150,7 +133,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
          */
         @SuppressWarnings("unchecked")
         public T getValue() {
-            return (T) NMSIntHashMap.Entry.value.get(this.handle);
+            return (T) this.handle.getValue();
         }
 
         /**
@@ -159,7 +142,7 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
          * @param value to set to
          */
         public void setValue(T value) {
-            NMSIntHashMap.Entry.value.set(this.handle, value);
+            this.handle.setValue(value);
         }
     }
 }

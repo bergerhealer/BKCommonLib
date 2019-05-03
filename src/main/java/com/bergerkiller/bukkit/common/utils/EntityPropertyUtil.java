@@ -53,27 +53,27 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     }
 
     public static double getMotX(Entity entity) {
-        return EntityHandle.T.motX.getDouble(h(entity));
+        return EntityHandle.T.getMotX.invoke(h(entity));
     }
 
     public static void setMotX(Entity entity, double value) {
-        EntityHandle.T.motX.setDouble(h(entity), value);
+        EntityHandle.T.setMotX.invoke(h(entity), value);
     }
 
     public static double getMotY(Entity entity) {
-        return EntityHandle.T.motY.getDouble(h(entity));
+        return EntityHandle.T.getMotY.invoke(h(entity));
     }
 
     public static void setMotY(Entity entity, double value) {
-        EntityHandle.T.motY.setDouble(h(entity), value);
+        EntityHandle.T.setMotY.invoke(h(entity), value);
     }
 
     public static double getMotZ(Entity entity) {
-        return EntityHandle.T.motZ.getDouble(h(entity));
+        return EntityHandle.T.getMotZ.invoke(h(entity));
     }
 
     public static void setMotZ(Entity entity, double value) {
-        EntityHandle.T.motZ.setDouble(h(entity), value);
+        EntityHandle.T.setMotZ.invoke(h(entity), value);
     }
 
     public static double getLastX(Entity entity) {

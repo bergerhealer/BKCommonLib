@@ -129,9 +129,82 @@ class Entity {
     public double locX;
     public double locY;
     public double locZ;
-    public double motX;
-    public double motY;
-    public double motZ;
+
+    // motX/Y/Z is private 'mot' field on 1.14
+    // For performance reasons, use the getMot/setMot methods
+    // Reflection to access the private mot Vec3D is likely slower.
+#if version >= 1.14
+    public org.bukkit.util.Vector getMot() {
+        Vec3D mot = instance.getMot();
+        return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
+    }
+
+    public void setMot(double x, double y, double z) {
+        instance.setMot(new Vec3D(x, y, z));
+    }
+
+    public void setMotX(double x) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(x, mot.y, mot.z));
+    }
+
+    public void setMotY(double y) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(mot.x, y, mot.z));
+    }
+
+    public void setMotZ(double z) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(mot.x, mot.y, z));
+    }
+
+    public double getMotX() {
+        return instance.getMot().x;
+    }
+
+    public double getMotY() {
+        return instance.getMot().y;
+    }
+
+    public double getMotZ() {
+        return instance.getMot().z;
+    }
+#else
+    public org.bukkit.util.Vector getMot() {
+        return new org.bukkit.util.Vector(instance.motX, instance.motY, instance.motZ);
+    }
+
+    public void setMot(double x, double y, double z) {
+        instance.motX = x;
+        instance.motY = y;
+        instance.motZ = z;
+    }
+
+    public void setMotX(double x) {
+        instance.motX = x;
+    }
+
+    public void setMotY(double y) {
+        instance.motY = y;
+    }
+
+    public void setMotZ(double z) {
+        instance.motZ = z;
+    }
+
+    public double getMotX() {
+        return instance.motX;
+    }
+
+    public double getMotY() {
+        return instance.motY;
+    }
+
+    public double getMotZ() {
+        return instance.motZ;
+    }
+#endif
+
     public float yaw;
     public float pitch;
     public float lastYaw;
@@ -275,7 +348,18 @@ class Entity {
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
-#if version >= 1.9
+#if version >= 1.14
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:W;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:az;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aC;
+
+    // TODO: New Pose datawatcher entry since 1.14
+    // protected static final DataWatcherObject<EntityPose> X = DataWatcher.a(Entity.class, DataWatcherRegistry.s);
+
+#elseif version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
     #if version >= 1.13
         protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;

@@ -122,7 +122,14 @@ class PacketPlayOutEntityVelocity extends Packet {
     private int motY_raw:c;
     private int motZ_raw:d;
 
-    public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity(int entityId, double motX, double motY, double motZ);
+    public static (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity createNew(int entityId, double motX, double motY, double motZ) {
+#if version >= 1.14
+        return new PacketPlayOutEntityVelocity(entityId, new Vec3D(motX, motY, motZ));
+#else
+        return new PacketPlayOutEntityVelocity(entityId, motX, motY, motZ);
+#endif
+    }
+
     public (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity((org.bukkit.entity.Entity) Entity entity);
 
     <code>

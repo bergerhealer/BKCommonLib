@@ -39,9 +39,6 @@ public class NMSEntity {
     public static final FieldAccessor<Double> locX  = EntityHandle.T.locX.toFieldAccessor();
     public static final FieldAccessor<Double> locY  = EntityHandle.T.locY.toFieldAccessor();
     public static final FieldAccessor<Double> locZ  = EntityHandle.T.locZ.toFieldAccessor();
-    public static final FieldAccessor<Double> motX  = EntityHandle.T.motX.toFieldAccessor();
-    public static final FieldAccessor<Double> motY  = EntityHandle.T.motY.toFieldAccessor();
-    public static final FieldAccessor<Double> motZ  = EntityHandle.T.motZ.toFieldAccessor();
     public static final FieldAccessor<Float>  yaw   = EntityHandle.T.yaw.toFieldAccessor();
     public static final FieldAccessor<Float>  pitch = EntityHandle.T.pitch.toFieldAccessor();
     public static final FieldAccessor<Float>   lastYaw     = EntityHandle.T.lastYaw.toFieldAccessor();

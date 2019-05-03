@@ -20,15 +20,15 @@ public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityVelocityHandle createNew(int entityId, double motX, double motY, double motZ) {
-        return T.constr_entityId_motX_motY_motZ.newInstance(entityId, motX, motY, motZ);
-    }
-
     public static final PacketPlayOutEntityVelocityHandle createNew(Entity entity) {
         return T.constr_entity.newInstance(entity);
     }
 
     /* ============================================================================== */
+
+    public static PacketPlayOutEntityVelocityHandle createNew(int entityId, double motX, double motY, double motZ) {
+        return T.createNew.invoke(entityId, motX, motY, motZ);
+    }
 
 
     @Override
@@ -72,13 +72,14 @@ public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityVelocityClass extends Template.Class<PacketPlayOutEntityVelocityHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityVelocityHandle> constr_entityId_motX_motY_motZ = new Template.Constructor.Converted<PacketPlayOutEntityVelocityHandle>();
         public final Template.Constructor.Converted<PacketPlayOutEntityVelocityHandle> constr_entity = new Template.Constructor.Converted<PacketPlayOutEntityVelocityHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         public final Template.Field.Integer motX_raw = new Template.Field.Integer();
         public final Template.Field.Integer motY_raw = new Template.Field.Integer();
         public final Template.Field.Integer motZ_raw = new Template.Field.Integer();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityVelocityHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityVelocityHandle>();
 
     }
 

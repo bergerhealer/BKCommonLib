@@ -31,6 +31,10 @@ public class CraftBukkitServer extends CommonServerBase {
      * Defines the org.bukkit.craftbukkit root path
      */
     public String CB_ROOT_VERSIONED;
+    /**
+     * Defines the org.bukkit.craftbukkit.libs root path
+     */
+    public String CB_ROOT_LIBS;
 
     @Override
     public boolean init() {
@@ -54,6 +58,7 @@ public class CraftBukkitServer extends CommonServerBase {
             NMS_ROOT_VERSIONED = NMS_ROOT + "." + PACKAGE_VERSION;
             CB_ROOT_VERSIONED = CB_ROOT + "." + PACKAGE_VERSION;
         }
+        CB_ROOT_LIBS = CB_ROOT + ".libs";
 
         // Figure out the MC version from the server
         MC_VERSION = PACKAGE_VERSION;
@@ -77,14 +82,13 @@ public class CraftBukkitServer extends CommonServerBase {
                 MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
             } else {
                 try {
-                    // Since MC 1.14 SharedConstants exists, so we no longer have to use ASM to get it
+                    // Since MC 1.14 SharedConstants exists with a get version method, so we no longer have to use ASM to get it
                     Class<?> sharedConstantsClass = Class.forName(NMS_ROOT_VERSIONED + ".SharedConstants");
                     Method getGameVersionMethod = sharedConstantsClass.getDeclaredMethod("a");
                     Object gameVersion = getGameVersionMethod.invoke(null);
                     MC_VERSION = gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
 
-                } catch (ClassNotFoundException ex) {
-
+                } catch (ClassNotFoundException | NoSuchMethodException ex) {
                     // No server instance is available, fastest way is to inspect the bytecode using ASM
                     // Creating an instance, even without calling constructors, takes a long while to initialize
                     MC_VERSION = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
@@ -109,7 +113,7 @@ public class CraftBukkitServer extends CommonServerBase {
         if (path.startsWith(NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
             return NMS_ROOT_VERSIONED + path.substring(NMS_ROOT.length());
         }
-        if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
+        if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
             return CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
         }
         return path;

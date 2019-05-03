@@ -62,7 +62,17 @@ class CraftMagicNumbers {
 
     public static (Object) net.minecraft.server.Item getItemFromMaterial:getItem(org.bukkit.Material material);
 
+#if version >= 1.14
+    // Bug on MC 1.14: WALL_SIGN does not work
+    public static (Object) net.minecraft.server.Block getBlockFromMaterial(org.bukkit.Material material) {
+        if (material == org.bukkit.Material.LEGACY_WALL_SIGN) {
+            return net.minecraft.server.Blocks.OAK_WALL_SIGN;
+        }
+        return CraftMagicNumbers.getBlock(material);
+    }
+#else
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
+#endif
 
 #if version >= 1.13
     public static org.bukkit.Material toLegacy(org.bukkit.Material type) {
