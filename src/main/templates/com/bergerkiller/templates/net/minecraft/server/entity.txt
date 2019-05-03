@@ -249,8 +249,22 @@ class Entity {
     // #endif
 
     public boolean dead;
-    public float width;
-    public float length;
+
+#if version >= 1.14
+    public float getWidth();
+    public float getLength();
+#else
+    public unknown float width;
+    public unknown float length;
+
+    public float getWidth() {
+        return instance.width;
+    }
+
+    public float getLength() {
+        return instance.length;
+    }
+#endif
 
 #if version >= 1.14
     public unknown float D;
@@ -773,7 +787,9 @@ class Entity {
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.12
+#if version >= 1.14
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
+#elseif version >= 1.12
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
 #elseif version >= 1.10.2
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
@@ -831,7 +847,12 @@ class Entity {
     }
     </code>
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean isWet:at();
+    public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+#elseif version >= 1.13
     public boolean isWet:ap();
     public optional (EntityHandle) Entity getDriverEntity:bO();
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);

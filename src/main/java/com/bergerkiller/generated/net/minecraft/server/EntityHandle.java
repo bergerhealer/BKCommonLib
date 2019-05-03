@@ -46,6 +46,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract double getMotX();
     public abstract double getMotY();
     public abstract double getMotZ();
+    public abstract float getWidth();
+    public abstract float getLength();
     public abstract void updateBlockCollision();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
@@ -286,10 +288,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setJustLanded(boolean value);
     public abstract boolean isDead();
     public abstract void setDead(boolean value);
-    public abstract float getWidth();
-    public abstract void setWidth(float value);
-    public abstract float getLength();
-    public abstract void setLength(float value);
     public abstract float getWalkedDistanceXZ();
     public abstract void setWalkedDistanceXZ(float value);
     public abstract float getWalkedDistanceXYZ();
@@ -376,8 +374,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
         public final Template.Field.Boolean justLanded = new Template.Field.Boolean();
         public final Template.Field.Boolean dead = new Template.Field.Boolean();
-        public final Template.Field.Float width = new Template.Field.Float();
-        public final Template.Field.Float length = new Template.Field.Float();
         public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
         public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
@@ -415,6 +411,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Double> getMotX = new Template.Method<Double>();
         public final Template.Method<Double> getMotY = new Template.Method<Double>();
         public final Template.Method<Double> getMotZ = new Template.Method<Double>();
+        public final Template.Method<Float> getWidth = new Template.Method<Float>();
+        public final Template.Method<Float> getLength = new Template.Method<Float>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();

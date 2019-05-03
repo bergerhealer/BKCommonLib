@@ -119,7 +119,6 @@ public class BlockDataTest {
         assertTrue(data.isType(mat));
     }
 
-    @SuppressWarnings("deprecation")
     private void assertType(Material expected, Material object) {
         if (expected != object) {
             // There are some exceptions where type information went missing on 1.13
@@ -133,7 +132,7 @@ public class BlockDataTest {
             }
 
             // Failed.
-            String msg = "Expected " + expected + " (id=" + expected.getId() + "), but got " + object + " (id=" + object.getId() + ")";
+            String msg = "Expected " + expected + ", but got " + object;
             System.err.println(msg);
             fail(msg);
         }

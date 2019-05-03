@@ -268,7 +268,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                         IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
-                }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN")
+                }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN",
+                           "LEGACY_SIGN_POST")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();
             }

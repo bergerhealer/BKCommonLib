@@ -501,14 +501,6 @@ class RegionFile {
 #endif
 }
 
-class RegionFileCache {
-#if fieldexists net.minecraft.server.RegionFileCache public static final Map<java.io.File, RegionFile> cache
-    public static final (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> FILES:cache;
-#else
-    public static final (Map<java.io.File, RegionFileHandle>) Map<java.io.File, RegionFile> FILES:a;
-#endif
-}
-
 class ChunkRegionLoader {
 #if version >= 1.12
     public optional boolean opt_chunkExists:chunkExists(int cx, int cz);

@@ -546,4 +546,33 @@ public class BlockUtil extends MaterialUtil {
         }
     }
 
+    /**
+     * Gets whether a Block is solid and occludes light from passing through
+     * 
+     * @param block
+     * @return True if solid
+     */
+    public static boolean isSolid(Block block) {
+        return WorldUtil.getBlockData(block).isOccluding(block);
+    }
+
+    /**
+     * Gets whether a Block is solid and entities inside will suffer suffocation damage
+     * 
+     * @param block
+     * @return True if the block suffocates entities inside
+     */
+    public static boolean isSuffocating(Block block) {
+        return WorldUtil.getBlockData(block).isSuffocating(block);
+    }
+
+    /**
+     * Gets whether a Block provides a platform for blocks on top, such as torches.
+     * 
+     * @param block
+     * @return True if the block supports blocks on top
+     */
+    public static boolean canSupportTop(Block block) {
+        return WorldUtil.getBlockData(block).canSupportTop(block);
+    }
 }

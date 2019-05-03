@@ -60,7 +60,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (type.c() == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
                 return type;
             }
         }
@@ -78,9 +78,7 @@ class EntityTypes {
     public static Class<?> getEntityClass(String internalEntityName) {
         java.util.Optional opt = EntityTypes.a(internalEntityName);
         if (opt.isPresent()) {
-            EntityTypes type = (EntityTypes) opt.get();
-            Object entity = type.a((World) null);
-            return entity.getClass();
+            return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(opt.get());
         } else {
             return null;
         }
@@ -91,7 +89,7 @@ class EntityTypes {
         if (type == null) {
             return null;
         } else {
-            return type.c();
+            return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type);
         }
     }
 #endif
@@ -104,7 +102,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (type.c() == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
                 MinecraftKey key = EntityTypes.getName(type);
                 if (key != null) {
                     return key.toString();
@@ -122,7 +120,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (type.c() == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
 #if version >= 1.13.1
                 return IRegistry.ENTITY_TYPE.a((Object) type);
 #else

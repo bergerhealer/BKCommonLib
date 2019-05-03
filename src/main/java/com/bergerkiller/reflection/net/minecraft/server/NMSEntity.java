@@ -48,8 +48,6 @@ public class NMSEntity {
     public static final FieldAccessor<Boolean> velocityChanged = EntityHandle.T.velocityChanged.toFieldAccessor();
     public static final FieldAccessor<Boolean> justLanded = EntityHandle.T.justLanded.toFieldAccessor();
     public static final FieldAccessor<Boolean> dead = EntityHandle.T.dead.toFieldAccessor();
-    public static final FieldAccessor<Float> width = EntityHandle.T.width.toFieldAccessor();
-    public static final FieldAccessor<Float> length = EntityHandle.T.length.toFieldAccessor();
     public static final FieldAccessor<Float> fallDistance = EntityHandle.T.fallDistance.toFieldAccessor();
 
     @Deprecated

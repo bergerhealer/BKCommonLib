@@ -380,42 +380,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.getLength();
     }
 
-    /**
-     * Deprecated: gets/sets length instead
-     * 
-     * @param height
-     */
-    @Deprecated
-    public void setHeight(float height) {
-        this.handle.setLength(height);
-    }
-
     public float getLength() {
         return this.handle.getLength();
     }
 
-    /**
-     * Deprecated: it is recommended to use {@link #setSize(float, float)} instead.
-     * 
-     * @param width
-     */
-    @Deprecated
-    public void setLength(float length) {
-        this.handle.setLength(length);
-    }
-
     public float getWidth() {
         return this.handle.getWidth();
-    }
-
-    /**
-     * Deprecated: it is recommended to use {@link #setSize(float, float)} instead.
-     * 
-     * @param width
-     */
-    @Deprecated
-    public void setWidth(float width) {
-        this.handle.setWidth(width);
     }
 
     public boolean isOnGround() {

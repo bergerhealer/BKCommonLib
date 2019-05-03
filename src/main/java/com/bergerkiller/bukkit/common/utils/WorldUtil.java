@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -27,6 +28,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
@@ -45,8 +48,12 @@ import org.bukkit.util.Vector;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
+import java.util.Map.Entry;
+import java.util.logging.Level;
 
 public class WorldUtil extends ChunkUtil {
 
@@ -916,5 +923,63 @@ public class WorldUtil extends ChunkUtil {
      */
     public static Entity getEntityById(World world, int entityId) {
         return WorldHandle.fromBukkit(world).getEntityById(entityId);
+    }
+
+    /**
+     * Closes all file streams associated with the world specified.
+     * Should only be used after a world was unloaded, to close file handles.
+     * 
+     * @param world to close
+     */
+    @SuppressWarnings("unchecked")
+    public static void closeWorldStreams(World world) {
+        // Wait until all chunks of this world are saved
+        saveToDisk(world);
+
+        // TODO: Broken on 1.14! Should we close anything?
+
+        // On MC <= 1.13.2 we must close all the RegionFiles still in the RegionFileCache
+        // Purposely does NOT use any template code, since all of this broke with MC 1.14
+        if (Common.evaluateMCVersion("<=", "1.13.2")) {
+            Class<?> regionFileClassType = CommonUtil.getNMSClass("RegionFileCache");
+            synchronized (regionFileClassType) {
+                try {
+                    Map<File, Object> cache = SafeField.get(regionFileClassType, "cache", Map.class);
+                    if (cache == null) {
+                        cache = SafeField.get(regionFileClassType, "a", Map.class);
+                    }
+                    if (cache == null) {
+                        throw new IllegalStateException("Failed to find RegionFileCache cache field");
+                    }
+
+                    Class<?> regionFileType = CommonUtil.getNMSClass("RegionFile");
+                    SafeMethod<Void> closeMethod;
+                    if (SafeMethod.contains(regionFileType, "close")) {
+                        closeMethod = new SafeMethod<Void>(regionFileType, "close");
+                    } else {
+                        closeMethod = new SafeMethod<Void>(regionFileType, "c");
+                    }
+
+                    String worldPart = "." + File.separator + world.getName();
+                    Iterator<Entry<File, Object>> iter = cache.entrySet().iterator();
+                    Entry<File, Object> entry;
+                    while (iter.hasNext()) {
+                        entry = iter.next();
+                        if (!entry.getKey().toString().startsWith(worldPart) || entry.getValue() == null) {
+                            continue;
+                        }
+                        try {
+                            closeMethod.invoke(entry.getValue());
+                            iter.remove();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                } catch (Exception ex) {
+                    Logging.LOGGER.log(Level.WARNING, "Exception while removing world reference for '" + world.getName() + "'!");
+                    ex.printStackTrace();
+                }
+            }
+        }
     }
 }
