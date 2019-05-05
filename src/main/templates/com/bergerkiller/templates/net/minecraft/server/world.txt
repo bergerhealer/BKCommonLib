@@ -490,7 +490,11 @@ class RegionFile {
     public void close:c();
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean chunkExists(int cx, int cz) {
+        return instance.d(new ChunkCoordIntPair(cx, cz));
+    }
+#elseif version >= 1.13
     #if pre <= 7
         public boolean chunkExists:c(int cx, int cz);
     #else

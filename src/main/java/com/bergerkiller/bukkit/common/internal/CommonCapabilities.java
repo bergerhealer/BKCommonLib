@@ -115,4 +115,10 @@ public class CommonCapabilities {
      * Before that all slabs were a 'stone' slab Block type, with different variants.
      */
     public static final boolean BLOCK_SLAB_HAS_OWN_BLOCK = CommonBootstrap.evaluateMCVersion(">=", "1.13");
+
+    /**
+     * Since Minecraft 1.14 the LongHashSet, LongObjectHashMap and IntHashMap collections are no longer
+     * used. Instead, a library is used for these.
+     */
+    public static final boolean UTIL_COLLECTIONS_REMOVED = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

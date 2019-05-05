@@ -109,7 +109,6 @@ public class ReflectionTest {
             loadClass(CBCraftInventory.class);
             loadClass(CBCraftTask.class);
             loadClass(CBCraftScheduler.class);
-            loadClass(CBLongHashSet.class);
 
             loadClass(WorldListenerHook.class);
             loadClass(CommonEntityType.class);

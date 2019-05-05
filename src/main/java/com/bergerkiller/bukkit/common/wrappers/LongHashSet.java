@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_14;
+import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_8_to_1_13_2;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBLongHashSet;
 
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 
 /**
  * A wrapper around the internal LongHashSet implementation. This type of
@@ -30,7 +32,7 @@ public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iter
     }
 
     public boolean add(int msw, int lsw) {
-        return handle.addPair(msw, lsw);
+        return handle.add(MathUtil.toLong(msw, lsw));
     }
 
     public boolean add(long value) {
@@ -38,15 +40,15 @@ public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iter
     }
 
     public boolean contains(int msw, int lsw) {
-        return handle.containsPair(msw, lsw);
+        return handle.contains(MathUtil.toLong(msw, lsw));
     }
 
     public boolean contains(long value) {
         return handle.contains(value);
     }
 
-    public void remove(int msw, int lsw) {
-        handle.removePair(msw, lsw);
+    public boolean remove(int msw, int lsw) {
+        return handle.remove(MathUtil.toLong(msw, lsw));
     }
 
     public boolean remove(long value) {
@@ -62,23 +64,15 @@ public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iter
     }
 
     public long popFirst() {
-        return handle.popFirst();
+        return handle.popFirstElement();
     }
 
     public long[] popAll() {
         return handle.popAll();
     }
 
-    public int hash(long value) {
-        return CBLongHashSet.hash.invoke(handle, value);
-    }
-
-    public void rehash() {
-        handle.rehash();
-    }
-
-    public void rehash(int newCapacity) {
-        handle.rehashResize(newCapacity);
+    public void trim() {
+        handle.trim();
     }
 
     public boolean isEmpty() {
@@ -101,62 +95,19 @@ public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iter
      * @return long iterator
      */
     public LongIterator longIterator() {
-        return new LongIterator(this);
+        if (CommonCapabilities.UTIL_COLLECTIONS_REMOVED) {
+            return new LongHashSet_Iterator_1_14(this.getRawHandle());
+        } else {
+            return new LongHashSet_Iterator_1_8_to_1_13_2(this.getRawHandle());
+        }
     }
 
     /**
-     * Class pretty much cloned from CraftBukkit's util/LongHashSet class. All
-     * credits go to them (or whoever wrote it) Changes:<br>
-     * - removed modified check (would slow down too much)<br>
-     * - changed Long to long
+     * Iterates over all long values in the HashSet efficiently
      */
-    public static class LongIterator {
-
-        private int index;
-        private int lastReturned = -1;
-        private final LongHashSetHandle handle;
-        private final long[] values;
-
-        public LongIterator(LongHashSet source) {
-            this.handle = source.handle;
-            this.values = handle.getValuesField();
-            for (index = 0; index < values.length && (values[index] == CBLongHashSet.FREE || values[index] == CBLongHashSet.REMOVED); index++) {
-                // This is just to drive the index forward to the first valid entry
-            }
-        }
-
-        public boolean hasNext() {
-            return index != values.length;
-        }
-
-        public long next() {
-            int length = values.length;
-            if (index >= length) {
-                lastReturned = -2;
-                throw new NoSuchElementException();
-            }
-
-            lastReturned = index;
-            for (index += 1; index < length && (values[index] == CBLongHashSet.FREE || values[index] == CBLongHashSet.REMOVED); index++) {
-                // This is just to drive the index forward to the next valid entry
-            }
-
-            if (values[lastReturned] == CBLongHashSet.FREE) {
-                return CBLongHashSet.FREE;
-            } else {
-                return values[lastReturned];
-            }
-        }
-
-        public void remove() {
-            if (lastReturned == -1 || lastReturned == -2) {
-                throw new IllegalStateException();
-            }
-
-            if (values[lastReturned] != CBLongHashSet.FREE && values[lastReturned] != CBLongHashSet.REMOVED) {
-                values[lastReturned] = CBLongHashSet.REMOVED;
-                handle.setElementsCountField(handle.getElementsCountField() - 1);
-            }
-        }
+    public static abstract class LongIterator {
+        public abstract boolean hasNext();
+        public abstract long next();
+        public abstract void remove();
     }
 }

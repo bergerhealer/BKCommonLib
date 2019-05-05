@@ -1,13 +1,14 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -28,8 +29,6 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
@@ -47,13 +46,11 @@ import org.bukkit.util.Vector;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.Map.Entry;
-import java.util.logging.Level;
+import java.util.Set;
 
 public class WorldUtil extends ChunkUtil {
 
@@ -931,55 +928,57 @@ public class WorldUtil extends ChunkUtil {
      * 
      * @param world to close
      */
-    @SuppressWarnings("unchecked")
     public static void closeWorldStreams(World world) {
         // Wait until all chunks of this world are saved
         saveToDisk(world);
 
-        // TODO: Broken on 1.14! Should we close anything?
+        // Close streams
+        RegionHandler.INSTANCE.closeStreams(world);
+    }
 
-        // On MC <= 1.13.2 we must close all the RegionFiles still in the RegionFileCache
-        // Purposely does NOT use any template code, since all of this broke with MC 1.14
-        if (Common.evaluateMCVersion("<=", "1.13.2")) {
-            Class<?> regionFileClassType = CommonUtil.getNMSClass("RegionFileCache");
-            synchronized (regionFileClassType) {
-                try {
-                    Map<File, Object> cache = SafeField.get(regionFileClassType, "cache", Map.class);
-                    if (cache == null) {
-                        cache = SafeField.get(regionFileClassType, "a", Map.class);
-                    }
-                    if (cache == null) {
-                        throw new IllegalStateException("Failed to find RegionFileCache cache field");
-                    }
+    /**
+     * Gets the region index from a chunk index
+     * 
+     * @param chunkIndex
+     * @return region index
+     */
+    public static int chunkToRegionIndex(int chunkIndex) {
+        return chunkIndex >> 5;
+    }
 
-                    Class<?> regionFileType = CommonUtil.getNMSClass("RegionFile");
-                    SafeMethod<Void> closeMethod;
-                    if (SafeMethod.contains(regionFileType, "close")) {
-                        closeMethod = new SafeMethod<Void>(regionFileType, "close");
-                    } else {
-                        closeMethod = new SafeMethod<Void>(regionFileType, "c");
-                    }
+    /**
+     * Gets a chunk index (of the first chunk) from a region index
+     * 
+     * @param regionIndex
+     * @return chunk index
+     */
+    public static int regionToChunkIndex(int regionIndex) {
+        return regionIndex << 5;
+    }
 
-                    String worldPart = "." + File.separator + world.getName();
-                    Iterator<Entry<File, Object>> iter = cache.entrySet().iterator();
-                    Entry<File, Object> entry;
-                    while (iter.hasNext()) {
-                        entry = iter.next();
-                        if (!entry.getKey().toString().startsWith(worldPart) || entry.getValue() == null) {
-                            continue;
-                        }
-                        try {
-                            closeMethod.invoke(entry.getValue());
-                            iter.remove();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                } catch (Exception ex) {
-                    Logging.LOGGER.log(Level.WARNING, "Exception while removing world reference for '" + world.getName() + "'!");
-                    ex.printStackTrace();
-                }
-            }
-        }
+    /**
+     * Gets all the region indices that can be loaded or are loaded for a world.
+     * Regions that have not yet generated chunks are excluded.
+     * Each region has 1024 (32x32) chunks in it.
+     * 
+     * @param world
+     * @return
+     */
+    public static Set<IntVector2> getWorldRegions(World world) {
+        return RegionHandler.INSTANCE.getRegions(world);
+    }
+
+    /**
+     * Gets all the chunks in a region that have been saved to disk.
+     * These chunks are returned as a 1024-length (32x32) bitset.
+     * Chunks that are loaded but have not yet been saved are excluded from the results.
+     * 
+     * @param world
+     * @param rx - region X-coordinate
+     * @param rz - region Z-coordinate
+     * @return bitset of saved chunks in the region
+     */
+    public static BitSet getWorldSavedRegionChunks(World world, int rx, int rz) {
+        return RegionHandler.INSTANCE.getRegionChunks(world, rx, rz);
     }
 }

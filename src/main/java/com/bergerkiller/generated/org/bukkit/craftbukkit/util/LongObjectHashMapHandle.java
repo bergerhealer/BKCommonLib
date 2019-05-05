@@ -21,11 +21,11 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final LongObjectHashMapHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     /* ============================================================================== */
+
+    public static LongObjectHashMapHandle createNew() {
+        return T.createNew.invoke();
+    }
 
     public abstract void clear();
     public abstract int size();
@@ -40,7 +40,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class LongObjectHashMapClass extends Template.Class<LongObjectHashMapHandle> {
-        public final Template.Constructor.Converted<LongObjectHashMapHandle> constr = new Template.Constructor.Converted<LongObjectHashMapHandle>();
+        public final Template.StaticMethod.Converted<LongObjectHashMapHandle> createNew = new Template.StaticMethod.Converted<LongObjectHashMapHandle>();
 
         public final Template.Method<Void> clear = new Template.Method<Void>();
         public final Template.Method<Integer> size = new Template.Method<Integer>();

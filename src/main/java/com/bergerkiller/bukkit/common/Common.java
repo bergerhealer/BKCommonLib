@@ -231,7 +231,8 @@ public class Common {
             if (Common.evaluateMCVersion(">=", "1.14")) {
                 remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
                 remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
-                remappings.put(cb_root + ".util.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_1_14");
+                remappings.put(cb_root + ".util.LongHashSet", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongSet");
+                remappings.put(cb_root + ".util.LongObjectHashMap", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap");
                 remappings.put(nms_root + ".IntHashMap", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap");
                 remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
                 remappings.put("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
