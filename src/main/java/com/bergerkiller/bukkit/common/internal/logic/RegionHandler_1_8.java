@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -18,22 +19,69 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
-import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Handles region-based operations from MC 1.8 to MC 1.13.2
  */
 public class RegionHandler_1_8 extends RegionHandler {
     private final Class<?> regionFileCacheType = CommonUtil.getNMSClass("RegionFileCache");
+    private final FastMethod<Boolean> chunkExists = new FastMethod<Boolean>();
+    private final FastField<Map<File, Object>> cacheField = new FastField<Map<File, Object>>();
 
-    @SuppressWarnings("unchecked")
-    private Map<File, Object> getCache() {
-        Map<File, Object> cache = SafeField.get(regionFileCacheType, "cache", Map.class);
-        if (cache == null) {
-            cache = SafeField.get(regionFileCacheType, "a", Map.class);
+    public RegionHandler_1_8() {
+        ClassResolver resolver = new ClassResolver();
+        resolver.setDeclaredClass(CommonUtil.getNMSClass("ChunkProviderServer"));
+        resolver.setVariable("version", Common.MC_VERSION);
+
+        // chunkExists generated method
+        {
+            String source = SourceDeclaration.preprocess(
+                    "public static boolean chunkExists(ChunkProviderServer cps, int cx, int cz) {\n" +
+                    "    #require net.minecraft.server.ChunkProviderServer private final IChunkLoader chunkLoader;\n" +
+                    "    IChunkLoader loader = cps#chunkLoader;\n" +
+                    "    if (loader instanceof ChunkRegionLoader) {\n" +
+                    "        ChunkRegionLoader crl = (ChunkRegionLoader) loader;\n" +
+                    "#if version >= 1.12\n" +
+                    "        return crl.chunkExists(cx, cz);\n" +
+                    "#elseif version >= 1.11.2\n" +
+                    "        return crl.a(cx, cz);\n" +
+                    "#else\n" +
+                    "        return crl.chunkExists(cps.world, cx, cz);\n" +
+                    "#endif\n" +
+                    "    } else {\n" +
+                    "        return false;\n" +
+                    "    }\n" +
+                    "}" ,resolver);
+            MethodDeclaration chunkExistsMethod = new MethodDeclaration(resolver, source);
+            chunkExists.init(chunkExistsMethod);
         }
+
+        // cache map static field
+        try {
+            Field field;
+            try {
+                field = regionFileCacheType.getDeclaredField("cache");
+            } catch (Throwable t) {
+                field = regionFileCacheType.getDeclaredField("a");
+            }
+            this.cacheField.init(field);
+        } catch (Throwable t) {
+            throw MountiplexUtil.uncheckedRethrow(t);
+        }
+    }
+
+    private Map<File, Object> getCache() {
+        Map<File, Object> cache = this.cacheField.get(null);
         if (cache == null) {
             throw new IllegalStateException("Failed to find RegionFileCache cache field");
         }
@@ -154,4 +202,9 @@ public class RegionHandler_1_8 extends RegionHandler {
         return chunks;
     }
 
+    @Override
+    public boolean isChunkSaved(World world, int cx, int cz) {
+        Object cps = WorldServerHandle.T.getChunkProviderServer.raw.invoke(HandleConversion.toWorldHandle(world));
+        return chunkExists.invoke(null, cps, cx, cz);
+    }
 }

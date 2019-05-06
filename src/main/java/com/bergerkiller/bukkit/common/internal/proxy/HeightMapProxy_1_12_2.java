@@ -17,8 +17,8 @@ public class HeightMapProxy_1_12_2 {
         this.heightMap = heightMap;
     }
 
-    // Initialize()
-    public void a() {
+    // a()
+    public void initialize() {
         World world = chunkHandle.getBukkitChunk().getWorld();
         int baseX = chunkHandle.getLocX() << 4;
         int baseZ = chunkHandle.getLocZ() << 4;

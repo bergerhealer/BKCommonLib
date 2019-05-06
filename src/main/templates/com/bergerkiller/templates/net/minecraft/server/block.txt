@@ -44,7 +44,7 @@ class Block {
 #if version >= 1.14
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        return iblockdata.b(world, new BlockPosition(x, y, z));
+        return instance.k(iblockdata, world, new BlockPosition(x, y, z));        
     }
 
     public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);

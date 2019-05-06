@@ -3,17 +3,18 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
+import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkRegionLoaderHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
@@ -29,6 +30,10 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 /**
  * Contains utilities to get and set chunks of a world
@@ -50,6 +55,16 @@ public class ChunkUtil {
             }
         }
         return sections;
+    }
+
+    /**
+     * Initializes one or more heightmaps of a chunk.
+     * 
+     * @param chunk to initialize
+     * @param types of heightmap to initialize
+     */
+    public static void initializeHeightMap(org.bukkit.Chunk chunk, Set<HeightMap.Type> types) {
+        ChunkHandle.fromBukkit(chunk).initializeHeightMap(types);
     }
 
     /**
@@ -230,14 +245,7 @@ public class ChunkUtil {
             // Chunk is loaded into memory, True
             return true;
         } else {
-            Object chunkLoader = cps.getChunkLoader();
-            if (ChunkRegionLoaderHandle.T.isAssignableFrom(chunkLoader)) {
-                // Chunk can be loaded from file
-                return ChunkRegionLoaderHandle.createHandle(chunkLoader).chunkExists(world, x, z);
-            } else {
-                // Unable to find out...
-                return false;
-            }
+            return RegionHandler.INSTANCE.isChunkSaved(world, x, z);
         }
     }
 
@@ -272,7 +280,65 @@ public class ChunkUtil {
     }
 
     /**
-     * Gets, loads or generated a chunk without loading or generating it on the
+     * Gets, loads or generates a chunk without loading or generating it on the
+     * main thread. Allows the lazy-loading of chunks without locking the
+     * server.
+     *
+     * @param world to obtain the chunk from
+     * @param x - coordinate of the chunk
+     * @param z - coordinate of the chunk
+     * @return chunk future that is completed when the chunk is ready
+     */
+    public static CompletableFuture<org.bukkit.Chunk> getChunkAsync(World world, final int x, final int z) {
+        final CompletableFuture<org.bukkit.Chunk> result = new CompletableFuture<org.bukkit.Chunk>();
+        org.bukkit.Chunk loadedChunk = getChunk(world, x, z);
+        if (loadedChunk != null) {
+            result.complete(loadedChunk);
+        } else {
+            final ChunkProviderServerHandle cps_handle = CommonNMS.getHandle(world).getChunkProviderServer();
+            final Executor executor = cps_handle.getAsyncExecutor();
+
+            // This consumer is called from internal when the chunk is ready
+            // Null is returned when loading fails
+            // It is also a Runnable, when run() is called, the async operation is started.
+            final class AsyncConsumer implements Consumer<Object>, Runnable {
+                @Override
+                public void accept(Object value) {
+                    value = RunnableConsumer.unpack(value);
+                    if (value != null) {
+                        // Complete the request
+                        result.complete(Conversion.toChunk.convert(value));
+                    } else {
+                        // Try again
+                        // TODO: Maximum number of tries?
+                        this.run();
+                    }
+                }
+
+                @Override
+                public void run() {
+                    if (executor == null) {
+                        cps_handle.getChunkAtAsync(x, z, this);
+                    } else {
+                        CompletableFuture.runAsync(new Runnable() {
+                            @Override
+                            public void run() {
+                                cps_handle.getChunkAtAsync(x, z, AsyncConsumer.this);
+                            }
+                        }, executor);
+                    }
+                }
+            };
+
+            // Initiate the process
+            new AsyncConsumer().run();
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets, loads or generates a chunk without loading or generating it on the
      * main thread. Allows the lazy-loading of chunks without locking the
      * server.
      *
@@ -281,24 +347,9 @@ public class ChunkUtil {
      * @param z - coordinate of the chunk
      * @param runnable to execute once the chunk is loaded or obtained
      */
+    @Deprecated
     public static void getChunkAsync(World world, final int x, final int z, Runnable runnable) {
-        // Gone after MC 1.13
-        if (ChunkProviderServerHandle.T.getChunkAtAsync.isAvailable()) {
-            Object cps = CommonNMS.getHandle(world).getChunkProviderServer().getRaw();
-            ChunkProviderServerHandle.T.getChunkAtAsync.invoke(cps, x, z, runnable);
-            return;
-        }
-
-        // Fallback.
-        com.bergerkiller.bukkit.common.internal.CommonChunkLoaderPool pool = CommonPlugin.getInstance().getChunkLoaderPool();
-        if (pool != null) {
-            pool.queueChunkLoad(world, x, z, runnable);
-            return;
-        }
-
-        // Fallback 2.
-        world.getChunkAt(x, z);
-        runnable.run();
+        getChunkAsync(world, x, z).thenRun(runnable);
     }
 
     /**

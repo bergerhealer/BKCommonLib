@@ -26,6 +26,7 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean shouldUnload(int i, int j, int k, int l, int i1);
+    public abstract PlayerChunkHandle getChunk(int x, int z);
     public abstract void flagDirty(IntVector3 blockposition);
     public abstract void flagPosDirty(int x, int y, int z);
     public abstract boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ);
@@ -35,15 +36,6 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
             T.markForUpdate_1_10_2.invoke(getRaw(), playerChunk);
         } else {
             T.updateQueue_1_8_8.get(getRaw()).add(playerChunk);
-        }
-    }
-
-
-    public PlayerChunkHandle getChunk(int x, int z) {
-        if (T.getChunk_1_9.isAvailable()) {
-            return T.getChunk_1_9.invoke(getRaw(), x, z);
-        } else {
-            return T.getChunk_1_8_8.invoke(getRaw(), x, z, false);
         }
     }
     public abstract List<Player> getManagedPlayers();
@@ -63,10 +55,7 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method.Converted<Void> markForUpdate_1_10_2 = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> shouldUnload = new Template.Method<Boolean>();
-        @Template.Optional
-        public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_8_8 = new Template.Method.Converted<PlayerChunkHandle>();
-        @Template.Optional
-        public final Template.Method.Converted<PlayerChunkHandle> getChunk_1_9 = new Template.Method.Converted<PlayerChunkHandle>();
+        public final Template.Method.Converted<PlayerChunkHandle> getChunk = new Template.Method.Converted<PlayerChunkHandle>();
         public final Template.Method.Converted<Void> flagDirty = new Template.Method.Converted<Void>();
         public final Template.Method<Void> flagPosDirty = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();

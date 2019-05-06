@@ -21,14 +21,12 @@ public abstract class HeightMapHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract void initialize();
     public abstract int getHeight(int x, int z);
     /**
      * Stores class members for <b>net.minecraft.server.HeightMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class HeightMapClass extends Template.Class<HeightMapHandle> {
-        public final Template.Method<Void> initialize = new Template.Method<Void>();
         public final Template.Method<Integer> getHeight = new Template.Method<Integer>();
 
     }

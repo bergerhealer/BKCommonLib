@@ -5,6 +5,8 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ChunkProviderServer</b>.
@@ -28,7 +30,8 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public abstract boolean isLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkIfLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkAt(int cx, int cz);
-    public abstract ChunkHandle getChunkAtAsync(int cx, int cz, Runnable runnable);
+    public abstract Executor getAsyncExecutor();
+    public abstract void getChunkAtAsync(int cx, int cz, Consumer<?> consumer);
 
     public void saveLoadedChunk(ChunkHandle chunk) {
         if (T.saveChunk_new.isAvailable()) {
@@ -53,7 +56,8 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
-        public final Template.Method.Converted<ChunkHandle> getChunkAtAsync = new Template.Method.Converted<ChunkHandle>();
+        public final Template.Method<Executor> getAsyncExecutor = new Template.Method<Executor>();
+        public final Template.Method<Void> getChunkAtAsync = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<Void> saveChunk_old = new Template.Method.Converted<Void>();
         @Template.Optional

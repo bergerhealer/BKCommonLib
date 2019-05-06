@@ -298,6 +298,8 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void setViewDistance(int value);
     public abstract int getUpdateInterval();
     public abstract void setUpdateInterval(int value);
+    public abstract boolean isMobile();
+    public abstract void setIsMobile(boolean value);
     public abstract int getRaw_xRot();
     public abstract void setRaw_xRot(int value);
     public abstract int getRaw_yRot();
@@ -314,8 +316,6 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public abstract void setPrevZ(double value);
     public abstract boolean isSynched();
     public abstract void setSynched(boolean value);
-    public abstract boolean isMobile();
-    public abstract void setIsMobile(boolean value);
     public abstract int getTimeSinceLocationSync();
     public abstract void setTimeSinceLocationSync(int value);
     /**
@@ -333,6 +333,7 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Integer playerViewDistance = new Template.Field.Integer();
         public final Template.Field.Integer updateInterval = new Template.Field.Integer();
+        public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         @Template.Optional
         public final Template.Field.Long long_xLoc = new Template.Field.Long();
         @Template.Optional
@@ -361,7 +362,6 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Field.Double prevY = new Template.Field.Double();
         public final Template.Field.Double prevZ = new Template.Field.Double();
         public final Template.Field.Boolean synched = new Template.Field.Boolean();
-        public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Converted<List<Entity>> opt_passengers = new Template.Field.Converted<List<Entity>>();

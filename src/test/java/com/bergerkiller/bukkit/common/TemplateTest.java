@@ -17,7 +17,6 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
-import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
@@ -201,7 +200,6 @@ public class TemplateTest {
     // Tests optional fields/methods to make sure they exist when needed
     @Test
     public void testOptionalMembers() {
-        assertAvailable(PlayerChunkMapHandle.T.getChunk_1_8_8, PlayerChunkMapHandle.T.getChunk_1_9);
         assertAvailable(EntityTrackerEntryHandle.T.opt_passengers, EntityTrackerEntryHandle.T.opt_vehicle);
         assertAvailable(ChunkProviderServerHandle.T.saveChunk_old, ChunkProviderServerHandle.T.saveChunk_new);
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {

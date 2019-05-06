@@ -16,8 +16,25 @@ import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 class Chunk {
     private final (ChunkSectionHandle[]) ChunkSection[] sections;
     public final (WorldHandle) World world;
-    public final int locX;
-    public final int locZ;
+
+#if version >= 1.14
+    public int getLocX() {
+        return instance.getPos().x;
+    }
+
+    public int getLocZ() {
+        return instance.getPos().z;
+    }
+#else
+    public int getLocX() {
+        return instance.locX;
+    }
+
+    public int getLocZ() {
+        return instance.locZ;
+    }
+#endif
+
     public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
 #if spigot
     public final (List<Object>[]) List<Entity>[] entitySlices;
@@ -32,7 +49,16 @@ class Chunk {
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
+        BlockPosition$PooledBlockPosition blockPos = BlockPosition$PooledBlockPosition.f(x, y, z);
+        try {
+            return instance.getType(blockPos);
+        } finally {
+            blockPos.close();
+        }
+    }
+#elseif version >= 1.13
     public (BlockData) IBlockData getBlockDataAtCoord:getBlockData(int x, int y, int z);
 #elseif version >= 1.9
     public (BlockData) IBlockData getBlockDataAtCoord:a(int x, int y, int z);
@@ -57,10 +83,39 @@ class Chunk {
     public void addEntity:a((EntityHandle) Entity entity);
 
 #if version >= 1.13
+    public void initializeHeightMap(Set<com.bergerkiller.bukkit.common.wrappers.HeightMap.Type> types) {
+        java.util.Iterator iter = types.iterator();
+  #if version >= 1.14
+        java.util.EnumSet tmp_set = java.util.EnumSet.noneOf(HeightMap$Type.class);
+        while (iter.hasNext()) {
+            com.bergerkiller.bukkit.common.wrappers.HeightMap$Type type;
+            type = (com.bergerkiller.bukkit.common.wrappers.HeightMap$Type) iter.next();
+            Object handle = type.getHandle();
+            if (handle != null) {
+                tmp_set.add(handle);
+            }
+        }
+        HeightMap.a(instance, tmp_set);
+  #else
+        while (iter.hasNext()) {
+            com.bergerkiller.bukkit.common.wrappers.HeightMap$Type type;
+            type = (com.bergerkiller.bukkit.common.wrappers.HeightMap$Type) iter.next();
+            HeightMap$Type typeHandle = (HeightMap$Type) type.getHandle();
+            instance.b(typeHandle).a();
+        }
+  #endif
+    }
+
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getHeightMap:b((com.bergerkiller.bukkit.common.wrappers.HeightMap.Type) HeightMap.Type type);
 
     public int getHeight:a((com.bergerkiller.bukkit.common.wrappers.HeightMap.Type) HeightMap.Type type, int x, int z);
 #else
+    public void initializeHeightMap(Set<com.bergerkiller.bukkit.common.wrappers.HeightMap.Type> types) {
+        com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2 proxy;
+        proxy = new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
+        proxy.initialize();
+    }
+
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getHeightMap(com.bergerkiller.bukkit.common.wrappers.HeightMap.Type type) {
         return new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
     }
@@ -107,17 +162,11 @@ class Chunk {
 }
 
 class ChunkSection {
-    private (NibbleArrayHandle) NibbleArray blockLight:emittedLight;
-    private (NibbleArrayHandle) NibbleArray skyLight;
-
     public boolean isEmpty:a();
 
     public int getYPosition();
 
     public (ChunkSectionHandle) ChunkSection(int y, boolean hasSkyLight);
-
-    public (NibbleArrayHandle) NibbleArray getBlockLightArray:getEmittedLightArray();
-    public (NibbleArrayHandle) NibbleArray getSkyLightArray:getSkyLightArray();
 
 #if version >= 1.13
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
@@ -131,21 +180,6 @@ class ChunkSection {
 
     public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
     public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
-
-    public void setSkyLight:a(int x, int y, int z, int level);
-    public void setBlockLight:b(int x, int y, int z, int level);
-
-#if version >= 1.13
-    public int getSkyLight:c(int x, int y, int z);
-    public int getBlockLight:d(int x, int y, int z);
-#elseif version >= 1.9
-    public int getSkyLight:b(int x, int y, int z);
-    public int getBlockLight:c(int x, int y, int z);
-#else
-    public int getSkyLight:d(int x, int y, int z);
-    public int getBlockLight:e(int x, int y, int z);
-#endif
-
 }
 
 // This is only used on CraftBukkit servers
@@ -201,8 +235,6 @@ class EnumSkyBlock {
 
 class HeightMap {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
-
-    public void initialize:a();
 
     public int getHeight:a(int x, int z);
 

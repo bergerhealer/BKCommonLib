@@ -21,8 +21,6 @@ import java.util.Map;
 @Deprecated
 public class NMSChunk {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
-    public static final FieldAccessor<Integer> x = ChunkHandle.T.locX.toFieldAccessor();
-    public static final FieldAccessor<Integer> z = ChunkHandle.T.locZ.toFieldAccessor();
     public static final TranslatorFieldAccessor<ChunkSection[]> sections = ChunkHandle.T.sections.raw.toFieldAccessor().translate(DuplexConversion.chunkSectionArray);
 
     private static final MethodAccessor<Void> addEntities = ChunkHandle.T.addEntities.toMethodAccessor();

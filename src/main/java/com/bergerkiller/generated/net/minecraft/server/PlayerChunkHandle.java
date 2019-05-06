@@ -25,26 +25,14 @@ public abstract class PlayerChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract void markAllLightDirty();
+    public abstract List<Player> getPlayers();
     public abstract void addPlayer(Player player);
     public abstract void removePlayer(Player player);
     public abstract void sendChunk(Player player);
-
-    public org.bukkit.Chunk getChunk(org.bukkit.World world) {
-        if (T.opt_loaded_chunk.isAvailable()) {
-            return T.opt_loaded_chunk.get(getRaw());
-        } else {
-            IntVector2 loc = this.getLocation();
-            if (world.isChunkLoaded(loc.x, loc.z)) {
-                return world.getChunkAt(loc.x, loc.z);
-            } else {
-                return null;
-            }
-        }
-    }
+    public abstract Chunk getChunkIfLoaded();
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract void setPlayerChunkMap(PlayerChunkMapHandle value);
-    public abstract List<Player> getPlayers();
-    public abstract void setPlayers(List<Player> value);
     public abstract IntVector2 getLocation();
     public abstract void setLocation(IntVector2 value);
     public abstract int getDirtyCount();
@@ -59,17 +47,17 @@ public abstract class PlayerChunkHandle extends Template.Handle {
      */
     public static final class PlayerChunkClass extends Template.Class<PlayerChunkHandle> {
         public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMap = new Template.Field.Converted<PlayerChunkMapHandle>();
-        public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
         public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
-        @Template.Optional
-        public final Template.Field.Converted<Chunk> opt_loaded_chunk = new Template.Field.Converted<Chunk>();
         public final Template.Field.Integer dirtyCount = new Template.Field.Integer();
         public final Template.Field.Integer dirtySectionMask = new Template.Field.Integer();
         public final Template.Field.Boolean done = new Template.Field.Boolean();
 
+        public final Template.Method<Void> markAllLightDirty = new Template.Method<Void>();
+        public final Template.Method.Converted<List<Player>> getPlayers = new Template.Method.Converted<List<Player>>();
         public final Template.Method.Converted<Void> addPlayer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> removePlayer = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> sendChunk = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
 
     }
 

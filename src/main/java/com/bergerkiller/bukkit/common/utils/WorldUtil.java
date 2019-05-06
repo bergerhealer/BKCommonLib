@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -51,6 +52,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 public class WorldUtil extends ChunkUtil {
 
@@ -533,7 +535,22 @@ public class WorldUtil extends ChunkUtil {
      * @param world to be saved
      */
     public static synchronized void saveToDisk(org.bukkit.World world) {
-        CommonNMS.getHandle(world).saveLevel();
+        if (Common.evaluateMCVersion(">=", "1.14") && !CommonUtil.isMainThread()) {
+            // Post to main thread on 1.14, otherwise things break
+            // TODO: Is there any step of saveLevel() we could do asynchronously as well?
+            //       Like a join on some sort of queue, for example.
+            final CompletableFuture<Object> future = new CompletableFuture<Object>();
+            CommonUtil.nextTick(new Runnable() {
+                @Override
+                public void run() {
+                    CommonNMS.getHandle(world).saveLevel();
+                    future.complete(null);
+                }
+            });
+            future.join();
+        } else {
+            CommonNMS.getHandle(world).saveLevel();
+        }
     }
 
     public static void loadChunks(Location location, final int radius) {
@@ -584,6 +601,42 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Queue a chunk for resending all its lighting information to all players that are in range of it.
+     * 
+     * @param chunk
+     * @return True if players were nearby, False if not
+     */
+    public static boolean queueChunkSendLight(org.bukkit.Chunk chunk) {
+        return queueChunkSendLight(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * Queue a chunk for resending all its lighting information to all players that are in range of it.
+     * 
+     * @param world
+     * @param chunkX
+     * @param chunkZ
+     * @return True if players were nearby, False if not
+     */
+    public static boolean queueChunkSendLight(org.bukkit.World world, int chunkX, int chunkZ) {
+        if (CommonCapabilities.NEW_LIGHT_ENGINE) {
+            // Send light update packet
+            PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
+            PlayerChunkHandle playerChunk = playerChunkMap.getChunk(chunkX, chunkZ);
+            if (playerChunk == null || playerChunk.getPlayers().isEmpty() || playerChunk.getChunkIfLoaded() == null) {
+                return false;
+            }
+
+            // Force a refresh of all chunk lighting information
+            playerChunk.markAllLightDirty();
+            return true;
+        } else {
+            // Light data is sent with chunk data below MC 1.14
+            return queueChunkSend(world, chunkX, chunkZ);
+        }
+    }
+
+    /**
      * Queue a chunk for resending to all players that are in range of it.
      * This will resend the chunk block data, but not any changes to tile entities in them.
      * Use this method to update chunk data after doing changes to its raw structure.
@@ -607,40 +660,33 @@ public class WorldUtil extends ChunkUtil {
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
         PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
         PlayerChunkHandle playerChunk = playerChunkMap.getChunk(chunkX, chunkZ);
-        if (playerChunk != null && !playerChunk.getPlayers().isEmpty()) {
-            // Simply remove and re-add the players to the chunk. Does an instant chunk resend, though.
-            // This doesn't work because block updates disable in the chunk permanently
-            /*
-            List<Player> old_players = new ArrayList<Player>(NMSPlayerChunk.players.get(chunk));
-            for (Player player : old_players) {
-                NMSPlayerChunk.removePlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
-            }
-            for (Player player : old_players) {
-                NMSPlayerChunk.addPlayer.invoke(chunk, Conversion.toEntityHandle.convert(player));
-            }
-            */
-
-            // This method sends 64 block changes to trigger a chunk resend
-            // It doesn't really work because entities disappear
-            // NMSPlayerChunk.dirtySectionMask.set(chunk, 65535); // all chunk sections
-            // NMSPlayerChunk.dirtyCount.set(chunk, 64); // 64 triggers a full chunk re-send
-            // NMSPlayerChunkMap.markForUpdate.invoke(playerChunkMap, chunk); // tell main chunk map to update
-
-            // Manual resend because none of the above work without bugs
-            // We use 0x1FFFF instead of 0xFFFF to avoid sending biome data, as that despawns the entities
-            // The 0x10000 is an ignored mask as it is outside of the range of chunk slices.
-            Chunk chunk = playerChunk.getChunk(world);
-            if (chunk != null) {
-                List<Player> old_players = new ArrayList<Player>(playerChunk.getPlayers());
-                CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk, 0x1FFFF);
-                for (Player player : old_players) {
-                    PacketUtil.sendPacket(player, packet);
-                }
-            }
-            return true;
-        } else {
+        if (playerChunk == null) {
             return false;
         }
+
+        List<Player> players = new ArrayList<Player>(playerChunk.getPlayers());
+        if (players.isEmpty()) {
+            return false;
+        }
+
+        // Retrieve chunk. May be null if not loaded (yet).
+        Chunk chunk = playerChunk.getChunkIfLoaded();
+        if (chunk == null) {
+            return false;
+        }
+
+        // Send light packets first on MC 1.14 and later
+        if (CommonCapabilities.NEW_LIGHT_ENGINE) {
+            playerChunk.markAllLightDirty();
+        }
+
+        // Send chunk data itself to all the players
+        CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk, 0x1FFFF);
+        for (Player player : players) {
+            PacketUtil.sendPacket(player, packet);
+        }
+
+        return true;
     }
 
     /**
@@ -980,5 +1026,57 @@ public class WorldUtil extends ChunkUtil {
      */
     public static BitSet getWorldSavedRegionChunks(World world, int rx, int rz) {
         return RegionHandler.INSTANCE.getRegionChunks(world, rx, rz);
+    }
+
+    /**
+     * Gets the raw nibble data storing the sky light for a 16x16x16 section of the world
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @return sky light data
+     */
+    public static byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
+        return WorldHandle.fromBukkit(world).getSectionSkyLight(cx, cy, cz);
+    }
+
+    /**
+     * Gets the raw nibble data storing the block light for a 16x16x16 section of the world
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @return block light data
+     */
+    public static byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
+        return WorldHandle.fromBukkit(world).getSectionBlockLight(cx, cy, cz);
+    }
+
+    /**
+     * Sets the raw nibble data storing the sky light for a 16x16x16 section of the world
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @param data (must be 2048 length)
+     */
+    public static void setSectionSkyLight(World world, int cx, int cy, int cz, byte[] data) {
+        WorldHandle.fromBukkit(world).setSectionSkyLight(cx, cy, cz, data);
+    }
+
+    /**
+     * Sets the raw nibble data storing the block light for a 16x16x16 section of the world
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @param data (must be 2048 length)
+     */
+    public static void setSectionBlockLight(World world, int cx, int cy, int cz, byte[] data) {
+        WorldHandle.fromBukkit(world).setSectionBlockLight(cx, cy, cz, data);
     }
 }

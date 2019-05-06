@@ -77,9 +77,7 @@ public class ReflectionTest {
             loadClass(NMSEntityTypes.class);
             loadClass(NMSRecipe.class);
             loadClass(NMSMobEffect.class);
-            loadClass(NMSPlayerChunk.class);
             loadClass(NMSEnumProtocol.class);
-            loadClass(NMSPlayerChunkMap.class);
             loadClass(NMSMinecraftKey.class);
             loadClass(NMSMobSpawnerAbstract.class);
             loadClass(NMSVector.class);

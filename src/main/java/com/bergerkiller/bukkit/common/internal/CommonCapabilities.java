@@ -121,4 +121,9 @@ public class CommonCapabilities {
      * used. Instead, a library is used for these.
      */
     public static final boolean UTIL_COLLECTIONS_REMOVED = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
+     * Since Minecraft 1.14 a new light engine is used, with a new LightUpdate Packet and LightEngine storage
+     */
+    public static final boolean NEW_LIGHT_ENGINE = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

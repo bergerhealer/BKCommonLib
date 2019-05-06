@@ -247,6 +247,122 @@ class World extends IBlockAccess {
 #endif
     }
 
+#if version >= 1.9
+    #require net.minecraft.server.NibbleArray public byte[] getNibbleData:asBytes();
+#else
+    #require net.minecraft.server.NibbleArray public byte[] getNibbleData:a();
+#endif
+
+#if version >= 1.14
+    #require net.minecraft.server.LightEngine private final LightEngineLayer<?, ?> light_layer_block:a;
+    #require net.minecraft.server.LightEngine private final LightEngineLayer<?, ?> light_layer_sky:b;
+    #require net.minecraft.server.LightEngineLayer protected final (LightEngineStorage) S light_storage:c;
+    #require net.minecraft.server.LightEngineStorage protected volatile (LightEngineStorageArray) M light_storage_volatile:e;
+    #require net.minecraft.server.LightEngineStorage protected final (LightEngineStorageArray) M light_storage_live:f;
+
+    public void setSectionSkyLight(int cx, int cy, int cz, byte[] data) {
+        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
+        LightEngineLayer layer = light#light_layer_sky;
+        LightEngineStorage storage = layer#light_storage;
+        LightEngineStorageArray storage_live = storage#light_storage_live;
+        storage_live.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));
+        LightEngineStorageArray copy = storage_live.b();
+        copy.d();
+        storage#light_storage_volatile = copy;
+    }
+
+    public void setSectionBlockLight(int cx, int cy, int cz, byte[] data) {
+        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
+        LightEngineLayer layer = light#light_layer_block;
+        LightEngineStorage storage = layer#light_storage;
+        LightEngineStorageArray storage_live = storage#light_storage_live;
+        storage_live.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));
+        LightEngineStorageArray copy = storage_live.b();
+        copy.d();
+        storage#light_storage_volatile = copy;
+    }
+
+    public byte[] getSectionSkyLight(int cx, int cy, int cz) {
+        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
+        LightEngineLayer layer = light#light_layer_sky;
+        NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
+        if (array == null) {
+            return null;
+        }
+        return array#getNibbleData().clone();
+    }
+
+    public byte[] getSectionBlockLight(int cx, int cy, int cz) {
+        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
+        LightEngineLayer layer = light#light_layer_block;
+        NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
+        if (array == null) {
+            return null;
+        }
+        return array#getNibbleData().clone();
+    }
+#else
+    #require net.minecraft.server.Chunk private final ChunkSection[] sections;
+
+    public void setSectionSkyLight(int cx, int cy, int cz, byte[] data) {
+        Chunk chunk = instance.getChunkAt(cx, cz);
+        ChunkSection[] sections = chunk#sections;
+        if (cy < 0 || cy >= sections.length) {
+            return null;
+        }
+        ChunkSection section = sections[cy];
+        if (section != null) {
+            section.b(new NibbleArray(data));
+        }
+    }
+
+    public void setSectionBlockLight(int cx, int cy, int cz, byte[] data) {
+        Chunk chunk = instance.getChunkAt(cx, cz);
+        ChunkSection[] sections = chunk#sections;
+        if (cy < 0 || cy >= sections.length) {
+            return null;
+        }
+        ChunkSection section = sections[cy];
+        if (section != null) {
+            section.a(new NibbleArray(data));
+        }
+    }
+
+    public byte[] getSectionSkyLight(int cx, int cy, int cz) {
+        Chunk chunk = instance.getChunkAt(cx, cz);
+        ChunkSection[] sections = chunk#sections;
+        if (cy < 0 || cy >= sections.length) {
+            return null;
+        }
+        ChunkSection section = sections[cy];
+        if (section == null) {
+            return null;
+        }
+        NibbleArray array = section.getSkyLightArray();
+        if (array == null) {
+            return null;
+        }
+        return array#getNibbleData().clone();
+    }
+
+    public byte[] getSectionBlockLight(int cx, int cy, int cz) {
+        Chunk chunk = instance.getChunkAt(cx, cz);
+        ChunkSection[] sections = chunk#sections;
+        if (cy < 0 || cy >= sections.length) {
+            return null;
+        }
+        ChunkSection section = sections[cy];
+        if (section == null) {
+            return null;
+        }
+        NibbleArray array = section.getEmittedLightArray();
+        if (array == null) {
+            return null;
+        }
+        return array#getNibbleData().clone();
+    }
+#endif
+
     <code>
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());
@@ -266,7 +382,13 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
+#if version >= 1.14
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return instance.getChunkProvider().playerChunkMap;
+    }
+#else
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+#endif
 
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
 #if version >= 1.9
@@ -276,7 +398,13 @@ class WorldServer extends World {
 #endif
     }
 
-#if version >= 1.13
+#if version >= 1.14
+    public void saveLevel() {
+        #require net.minecraft.server.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
+        ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
+        cps.playerChunkMap#saveChunkMap(true);
+    }
+#elseif version >= 1.13
     public void saveLevel() {
         instance.getDataManager().a();
     }
@@ -331,23 +459,40 @@ class ChunkProviderServer {
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 #endif
 
-    // Removed (no longer supported?) since MC 1.13
-    // There is an async method for generating, but it is not interesting at all.
-#if version >= 1.13
-    public (ChunkHandle) Chunk getChunkAtAsync(int cx, int cz, Runnable runnable) {
+#if version >= 1.14
+    public java.util.concurrent.Executor getAsyncExecutor() {
+        #require net.minecraft.server.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a serverThreadQueue;
+        return instance#serverThreadQueue;
+    }
+#else
+    public java.util.concurrent.Executor getAsyncExecutor() {
+        return null;
+    }
+#endif
+
+#if version >= 1.14
+    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
+        #require net.minecraft.server.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<IChunkAccess, PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, ChunkStatus chunkstatus, boolean flag);
+
+        java.util.concurrent.CompletableFuture future;
+        future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
+        future.thenAccept(consumer);
+    }
+#elseif version >= 1.13
+    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
-        com.bergerkiller.bukkit.common.collections.RunnableConsumer consumer;
-        consumer = com.bergerkiller.bukkit.common.collections.RunnableConsumer.create(runnable);
   #if methodexists net.minecraft.server.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.server.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.server.Chunk> consumer)
         instance.loadAllChunks(iterable, consumer);
   #else
         instance.a(iterable, consumer);
   #endif
-        return (Chunk) consumer.getValue();
     }
-
 #else
-    public (ChunkHandle) Chunk getChunkAtAsync:getChunkAt(int cx, int cz, Runnable runnable);
+    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
+        com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy proxy;
+        proxy = new com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy(consumer, instance_raw, cx, cz);
+        instance.getChunkAt(cx, cz, proxy);
+    }
 #endif
 
     // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
@@ -479,8 +624,13 @@ class MovingObjectPosition {
 }
 
 class RegionFile {
+#if version >= 1.14
+    private final java.io.File file;
+    private java.io.RandomAccessFile stream:b;
+#else
     private final java.io.File file:b;
     private java.io.RandomAccessFile stream:c;
+#endif
 
     public (RegionFileHandle) RegionFile(java.io.File file);
 
@@ -503,25 +653,4 @@ class RegionFile {
 #else
     public boolean chunkExists:c(int cx, int cz);
 #endif
-}
-
-class ChunkRegionLoader {
-#if version >= 1.12
-    public optional boolean opt_chunkExists:chunkExists(int cx, int cz);
-#else
-    public optional boolean opt_chunkExists:a(int cx, int cz);
-#endif
-
-    // <= 1.10.2
-    public optional boolean opt_chunkExists_old:chunkExists((org.bukkit.World) World world, int cx, int cz);
-
-<code>
-    public boolean chunkExists(org.bukkit.World world, int cx, int cz) {
-        if (T.opt_chunkExists_old.isAvailable()) {
-            return T.opt_chunkExists_old.invoke(getRaw(), world, cx, cz);
-        } else {
-            return T.opt_chunkExists.invoke(getRaw(), cx, cz);
-        }
-    }
-</code>
 }

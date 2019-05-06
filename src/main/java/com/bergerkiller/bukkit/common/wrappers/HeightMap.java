@@ -13,14 +13,6 @@ public class HeightMap extends BasicWrapper<HeightMapHandle> {
     }
 
     /**
-     * Initializes this Heightmap, correcting any errors in height values
-     * that may have existed.
-     */
-    public void initialize() {
-        this.handle.initialize();
-    }
-
-    /**
      * Gets the height at an x and z coordinate according to this Heightmap.
      * 
      * @param x coordinates [ 0 ... 15 ]

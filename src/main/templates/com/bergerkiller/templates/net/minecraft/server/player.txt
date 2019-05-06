@@ -47,27 +47,61 @@ class PlayerAbilities {
 }
 
 class PlayerChunk {
+
+#if version >= 1.14
+    public void markAllLightDirty() {
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
+
+        // Set all these masks to 'all layers' (18) to refresh them
+        instance#pc_dirtyBlockLightMask = 0x3FFFF;
+        instance#pc_dirtySkyLightMask = 0x3FFFF;
+        instance#pc_layerLightMask = 0x3FFFF;
+
+        // Update now
+        Chunk chunk = instance.getChunk();
+        if (chunk != null) {
+            instance.a(chunk);
+        }
+    }
+#else
+    public void markAllLightDirty() {
+        // Unavailable < 1.14
+    }
+#endif
+
 #if version >= 1.9
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap;
+#endif
 
+#if version >= 1.14
+    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+        return instance.players.a(instance.h(), false).collect(java.util.stream.Collectors.toList());
+    }
+#else
+    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+        // Require the player list field
+#if version >= 1.9
   #if fieldexists net.minecraft.server.PlayerChunk public final List<EntityPlayer> players
-      public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players;
+        #require net.minecraft.server.PlayerChunk public final List<EntityPlayer> pc_playersField:players;
   #else
-      public final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:c;
+        #require net.minecraft.server.PlayerChunk public final List<EntityPlayer> pc_playersField:c;
   #endif
 #else
-    private final (List<org.bukkit.entity.Player>) List<EntityPlayer> players:b;
+        #require net.minecraft.server.PlayerChunk private final List<EntityPlayer> pc_playersField:b;
+#endif
+        return instance#pc_playersField;
+    }
 #endif
 
     private final (IntVector2) ChunkCoordIntPair location;
 
 #if version >= 1.9
-    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:chunk;
     private int dirtyCount;
     private int dirtySectionMask:h;
     private boolean done;
 #elseif version >= 1.8.3
-    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:###;
     private unknown short[] dirtyBlocks;
     private int dirtyCount;
     private int dirtySectionMask:f;
@@ -76,7 +110,6 @@ class PlayerChunk {
     // Nested class is appended as a hidden field at the end of the class declaration
     private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMap:this$0;
 #else
-    public optional (org.bukkit.Chunk) Chunk opt_loaded_chunk:###;
     private unknown short[] dirtyBlocks;
     private int dirtyCount;
     private int dirtySectionMask:f;
@@ -93,21 +126,33 @@ class PlayerChunk {
     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
 #endif
 
-    <code>
-    public org.bukkit.Chunk getChunk(org.bukkit.World world) {
-        if (T.opt_loaded_chunk.isAvailable()) {
-            return T.opt_loaded_chunk.get(getRaw());
+#if version >= 1.14
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getChunk();
+#elseif version >= 1.9
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded() {
+        return instance.chunk;
+    }
+#elseif version >= 1.8
+    #require net.minecraft.server.PlayerChunk private final ChunkCoordIntPair location;
+    #require net.minecraft.server.PlayerChunk private boolean loaded;
+    #if version >= 1.8.3
+        #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
+    #else
+        #require net.minecraft.server.PlayerChunk final PlayerChunkMap playerChunkMap;
+    #endif
+
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded() {
+        boolean loaded = instance#loaded;
+        if (loaded) {
+            PlayerChunkMap map = instance#playerChunkMap;
+            ChunkCoordIntPair loc = instance#location;
+            return map.a().chunkProviderServer.getChunkAt(loc.x, loc.z);
         } else {
-            // Fallback for 1.8.8: check if loaded, only then get the chunk
-            IntVector2 loc = this.getLocation();
-            if (world.isChunkLoaded(loc.x, loc.z)) {
-                return world.getChunkAt(loc.x, loc.z);
-            } else {
-                return null;
-            }
+            return null;
         }
     }
-    </code>
+#endif
+
 }
 
 class PlayerChunkMap {
@@ -143,25 +188,21 @@ class PlayerChunkMap {
 
     private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
-#if version >= 1.9.4
-    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:###(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:getChunk(int x, int z);
-#elseif version >= 1.9
-    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:###(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:b(int x, int z);
-#else
-    private optional (PlayerChunkHandle) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
-    public optional (PlayerChunkHandle) PlayerChunk getChunk_1_9:###(int x, int z);
-#endif
-    <code>
-    public PlayerChunkHandle getChunk(int x, int z) {
-        if (T.getChunk_1_9.isAvailable()) {
-            return T.getChunk_1_9.invoke(getRaw(), x, z);
-        } else {
-            return T.getChunk_1_8_8.invoke(getRaw(), x, z, false);
-        }
+#if version >= 1.14
+    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z) {
+        #require net.minecraft.server.PlayerChunkMap protected (Object) PlayerChunk getChunk_1_14:getVisibleChunk(long i);
+        return instance#getChunk_1_14(ChunkCoordIntPair.pair(x, z));
     }
-    </code>
+#elseif version >= 1.9.4
+    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z);
+#elseif version >= 1.9
+    public (PlayerChunkHandle) PlayerChunk getChunk:b(int x, int z);
+#else
+    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z) {
+        #require net.minecraft.server.PlayerChunkMap private (Object) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+        return instance#getChunk_1_8_8(x, z, false);
+    }
+#endif
 
     public void flagDirty((IntVector3) BlockPosition blockposition);
 

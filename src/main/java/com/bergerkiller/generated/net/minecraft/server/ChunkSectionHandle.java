@@ -28,19 +28,9 @@ public abstract class ChunkSectionHandle extends Template.Handle {
 
     public abstract boolean isEmpty();
     public abstract int getYPosition();
-    public abstract NibbleArrayHandle getBlockLightArray();
-    public abstract NibbleArrayHandle getSkyLightArray();
     public abstract DataPaletteBlockHandle getBlockPalette();
     public abstract BlockData getBlockData(int x, int y, int z);
     public abstract void setBlockData(int x, int y, int z, BlockData data);
-    public abstract void setSkyLight(int x, int y, int z, int level);
-    public abstract void setBlockLight(int x, int y, int z, int level);
-    public abstract int getSkyLight(int x, int y, int z);
-    public abstract int getBlockLight(int x, int y, int z);
-    public abstract NibbleArrayHandle getBlockLight();
-    public abstract void setBlockLight(NibbleArrayHandle value);
-    public abstract NibbleArrayHandle getSkyLight();
-    public abstract void setSkyLight(NibbleArrayHandle value);
     /**
      * Stores class members for <b>net.minecraft.server.ChunkSection</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -48,20 +38,11 @@ public abstract class ChunkSectionHandle extends Template.Handle {
     public static final class ChunkSectionClass extends Template.Class<ChunkSectionHandle> {
         public final Template.Constructor.Converted<ChunkSectionHandle> constr_y_hasSkyLight = new Template.Constructor.Converted<ChunkSectionHandle>();
 
-        public final Template.Field.Converted<NibbleArrayHandle> blockLight = new Template.Field.Converted<NibbleArrayHandle>();
-        public final Template.Field.Converted<NibbleArrayHandle> skyLight = new Template.Field.Converted<NibbleArrayHandle>();
-
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Integer> getYPosition = new Template.Method<Integer>();
-        public final Template.Method.Converted<NibbleArrayHandle> getBlockLightArray = new Template.Method.Converted<NibbleArrayHandle>();
-        public final Template.Method.Converted<NibbleArrayHandle> getSkyLightArray = new Template.Method.Converted<NibbleArrayHandle>();
         public final Template.Method.Converted<DataPaletteBlockHandle> getBlockPalette = new Template.Method.Converted<DataPaletteBlockHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();
-        public final Template.Method<Void> setSkyLight = new Template.Method<Void>();
-        public final Template.Method<Void> setBlockLight = new Template.Method<Void>();
-        public final Template.Method<Integer> getSkyLight = new Template.Method<Integer>();
-        public final Template.Method<Integer> getBlockLight = new Template.Method<Integer>();
 
     }
 

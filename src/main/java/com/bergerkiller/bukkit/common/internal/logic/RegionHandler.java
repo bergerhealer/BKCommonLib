@@ -78,4 +78,15 @@ public abstract class RegionHandler {
      * @return bitset of all chunks in a region that exist
      */
     public abstract BitSet getRegionChunks(World world, int rx, int rz);
+
+    /**
+     * Gets whether a particular chunk exists on disk and can be loaded,
+     * instead of generating it.
+     * 
+     * @param world
+     * @param cx
+     * @param cz
+     * @return True if the chunk is saved and can be loaded
+     */
+    public abstract boolean isChunkSaved(World world, int cx, int cz);
 }
