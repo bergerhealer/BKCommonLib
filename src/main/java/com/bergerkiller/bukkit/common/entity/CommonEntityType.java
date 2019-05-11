@@ -82,10 +82,48 @@ public class CommonEntityType {
 
         // Figure out what kind of NMS Class belongs to this EntityType by comparing with the internal NMS EntityTypes listing
         Class<?> nmsType = null;
-        final String entityTypeEnumName = entityType.name();
-        if (entityType.getTypeId() == -1) {
+
+        // Registered entity types
+        // Create minecraft key from EntityType name
+        String entityTypeName = entityType.getName();
+        String entityTypeEnumName = entityType.name();
+        if (entityType == EntityType.MINECART_FURNACE) {
+            // New naming system had a bug, DAMMIT BUKKIT
+            if (Common.evaluateMCVersion(">=", "1.11")) {
+                entityTypeName = "furnace_minecart";
+            }
+        } else if (entityType == EntityType.MINECART_MOB_SPAWNER) {
+            // Old naming system had a bug, DAMMIT BUKKIT
+            if (Common.evaluateMCVersion("<", "1.11")) {
+                entityTypeName = "MinecartSpawner";
+            }
+        } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
+            // Old naming system had a bug, DAMMIT BUKKIT
+            if (Common.evaluateMCVersion("<", "1.11")) {
+                entityTypeName = "Arrow";
+            }
+        }
+        if (entityTypeName != null) {
+            nmsType = EntityTypesHandle.getEntityClass(entityTypeName);
+        }
+
+        // Fallbacks for when nmsType cannot be resolved from EntityTypes by name
+        if (nmsType == null) {
             // Some special types that don't show up as a registered class
             String nmsName = null;
+
+            // Types without a clear mapping
+            if (entityTypeEnumName.equals("PLAYER")) {
+                nmsName = "EntityPlayer";
+            } else if (entityTypeEnumName.equals("FISHING_HOOK")) {
+                nmsName = "EntityFishingHook";
+            } else if (entityTypeEnumName.equals("LIGHTNING")) {
+                nmsName = "EntityLightning";
+            } else if (entityTypeEnumName.equals("WEATHER")) {
+                nmsName = "EntityWeather";
+            } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
+                nmsName = "EntityComplexPart";
+            }
 
             // <= 1.10.2 (now removed)
             if (entityTypeEnumName.equals("EGG")) {
@@ -94,46 +132,15 @@ public class CommonEntityType {
                 nmsName = "EntityAreaEffectCloud";
             } else if (entityTypeEnumName.equals("SPLASH_POTION")) {
                 nmsName = "EntityPotion";
+            }
 
-                // Added in >= 1.10.2
-            } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
+            // Added in >= 1.10.2
+            if (entityTypeEnumName.equals("TIPPED_ARROW")) {
                 nmsName = "EntityTippedArrow";
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
                 nmsName = "EntityPotion";
-
-                // Added in >= 1.13 (Bukkit might add type ids for these at some point!)
-            } else if (entityTypeEnumName.equals("TURTLE")) {
-                nmsName = "EntityTurtle";
-            } else if (entityTypeEnumName.equals("PHANTOM")) {
-                nmsName = "EntityPhantom";
-            } else if (entityTypeEnumName.equals("TRIDENT")) {
-                nmsName = "EntityThrownTrident";
-            } else if (entityTypeEnumName.equals("COD")) {
-                nmsName = "EntityCod";
-            } else if (entityTypeEnumName.equals("SALMON")) {
-                nmsName = "EntitySalmon";
-            } else if (entityTypeEnumName.equals("PUFFERFISH")) {
-                nmsName = "EntityPufferFish";
-            } else if (entityTypeEnumName.equals("TROPICAL_FISH")) {
-                nmsName = "EntityTropicalFish";
-            } else if (entityTypeEnumName.equals("DOLPHIN")) {
-                nmsName = "EntityDolphin";
-            } else if (entityTypeEnumName.equals("DROWNED")) {
-                nmsName = "EntityDrowned";
-            } else if (entityTypeEnumName.equals("WEATHER")) {
-                nmsName = "EntityWeather";
-            } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
-                nmsName = "EntityComplexPart";
-
-                // Standard types
-            } else {
-                switch (entityType) {
-                case PLAYER: nmsName = "EntityPlayer"; break;
-                case FISHING_HOOK: nmsName = "EntityFishingHook"; break;
-                case LIGHTNING: nmsName = "EntityLightning"; break;
-                default: nmsName = null; break;
-                }
             }
+
             if (nmsName == null) {
                 Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");
             } else {
@@ -141,36 +148,6 @@ public class CommonEntityType {
                 if (nmsType == null) {
                     Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: class not found (" + entityType.toString() + ") class=" + nmsName);
                 }
-            }
-        } else {
-            // Registered entity types
-            // Create minecraft key from EntityType name
-            String entityTypeName = entityType.getName();
-            if (entityType == EntityType.MINECART_FURNACE) {
-                // New naming system had a bug, DAMMIT BUKKIT
-                if (Common.evaluateMCVersion(">=", "1.11")) {
-                    entityTypeName = "furnace_minecart";
-                }
-            } else if (entityType == EntityType.MINECART_MOB_SPAWNER) {
-                // Old naming system had a bug, DAMMIT BUKKIT
-                if (Common.evaluateMCVersion("<", "1.11")) {
-                    entityTypeName = "MinecartSpawner";
-                }
-            } else if (entityTypeEnumName.equals("TIPPED_ARROW")) {
-                // Old naming system had a bug, DAMMIT BUKKIT
-                if (Common.evaluateMCVersion("<", "1.11")) {
-                    entityTypeName = "Arrow";
-                }
-            }
-            if (entityTypeName != null) {
-                // Lookup by name
-                nmsType = EntityTypesHandle.getEntityClass(entityTypeName);
-                if (nmsType == null) {
-                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Failed to get by name: " + entityTypeName + " (" + entityType.toString() + ")");
-                }
-            } else {
-                // EntityType without a MC name? That's not good.
-                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: no name (" + entityType.toString() + ")");
             }
         }
 

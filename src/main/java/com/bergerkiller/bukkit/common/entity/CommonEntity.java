@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
+import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -21,8 +22,6 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -32,10 +31,10 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
@@ -45,8 +44,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Map;
-import java.util.UUID;
 import java.util.logging.Level;
 
 /**
@@ -402,13 +399,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // *** Perform further replacement all over the place in the server ***
-        replaceEntityInServer(oldInstance, newInstance);
+        final World world = this.getWorld();
+        EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance);
 
         // *** Repeat the replacement in the server the next tick to make sure nothing lingers ***
         CommonUtil.nextTick(new Runnable() {
             @Override
             public void run() {
-                replaceEntityInServer(oldInstance, newInstance);
+                EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance);
             }
         });
 
@@ -434,77 +432,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (raw_dim == null || !Dimension.fromDimensionManagerHandle(raw_dim).isSerializable()) {
             this.handle.setDimension(WorldUtil.getDimension(this.handle.getWorld().getWorld()));
             // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
-        }
-    }
-
-    /**
-     * This should cover the full replacement of an entity in all internal mappings.
-     * This includes the chunk, world and network synchronization objects.
-     * 
-     * @param oldInstance to replace
-     * @param newInstance to replace with
-     */
-    private static void replaceEntityInServer(final EntityHandle oldInstance, final EntityHandle newInstance) {
-        // *** Entities By UUID Map ***
-        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(oldInstance.getWorld().getRaw());
-        entitiesByUUID.put(newInstance.getUniqueID(), newInstance);
-
-        // *** Entities by Id Map ***
-        final IntHashMap<Object> entitiesById = NMSWorld.entitiesById.get(oldInstance.getWorld().getRaw());
-        entitiesById.put(newInstance.getId(), newInstance.getRaw());
-
-        // *** EntityTrackerEntry ***
-        replaceInEntityTracker(newInstance.getId(), newInstance);
-        if (newInstance.getVehicle() != null) {
-            replaceInEntityTracker(newInstance.getVehicle().getId(), newInstance);
-        }
-        if (newInstance.getPassengers() != null) {
-            for (EntityHandle passenger : newInstance.getPassengers()) {
-                replaceInEntityTracker(passenger.getId(), newInstance);
-            }
-        }
-
-        // *** World ***
-        replaceInList(newInstance.getWorld().getEntityList(), newInstance);
-        // Fixes for PaperSpigot
-        // if (!Common.IS_PAPERSPIGOT_SERVER) {
-        //     replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
-        // }
-
-        // *** Entity Current Chunk ***
-        final int chunkX = newInstance.getChunkX();
-        final int chunkY = newInstance.getChunkY();
-        final int chunkZ = newInstance.getChunkZ();
-        Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
-        if (chunkHandle != null) {
-            final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
-            if (!replaceInList(entitySlices[chunkY], newInstance)) {
-                for (int y = 0; y < entitySlices.length; y++) {
-                    if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
-                        break;
-                    }
-                }
-            }
-        }
-
-        // See where the object is still referenced to check we aren't missing any places to replace
-        // This is SLOW, do not ever have this enabled on a release version!
-        //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldInstance.getRaw());
-    }
-
-    private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {
-        final EntityTracker trackerMap = WorldUtil.getTracker(newInstance.getWorld().getWorld());
-        EntityTrackerEntryHandle entry = trackerMap.getEntry(entityId);
-        if (entry != null) {
-
-            EntityHandle tracker = entry.getTracker();
-            if (tracker != null && tracker.getId() == newInstance.getId()) {
-                entry.setTracker(newInstance);
-            }
-
-            List<EntityHandle> passengers = new ArrayList<EntityHandle>(tracker.getPassengers());
-            replaceInList(passengers, newInstance);
-            tracker.setPassengers(passengers);
         }
     }
 

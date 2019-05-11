@@ -192,6 +192,23 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     };
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
+                } else if (name.equals("toString")) {
+                    // This does a bunch of internal lookups we really do not want to see happen.
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            // return "CraftBlock{pos=" + position + ",type=" + getType() + ",data=" + getNMS() + ",fluid=" + world.getFluid(position) + '}';
+                            StringBuilder str = new StringBuilder();
+                            str.append("CraftBlock{pos=");
+                            str.append("BlockPosition{x=").append(input_state.block.getX());
+                            str.append(",y=").append(input_state.block.getY());
+                            str.append(",z=").append(input_state.block.getY()).append('}');
+                            str.append(",type=").append(input_state.blockData.getType());
+                            str.append(",data=").append(input_state.blockData.toString());
+                            str.append('}');
+                            return str.toString();
+                        }
+                    };
                 } else if (name.equals("getState0")) {
                     return null; // Paperspigot: uses this method to abstract out state snapshotting
                 }

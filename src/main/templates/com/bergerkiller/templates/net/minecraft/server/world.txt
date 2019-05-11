@@ -29,12 +29,6 @@ import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 class World extends IBlockAccess {
     /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
 
-#if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
-    public final readonly (List<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList entityList;
-#else
-    public final readonly (List<EntityHandle>) List<Entity> entityList;
-#endif
-
 #if version >= 1.9
 
     #if paperspigot
@@ -375,9 +369,7 @@ class World extends IBlockAccess {
 }
 
 class WorldServer extends World {
-    private final (MinecraftServerHandle) MinecraftServer minecraftServer:server;
     public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker:tracker;
-    private final (PlayerChunkMapHandle) PlayerChunkMap playerChunkMapField:manager;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
@@ -397,6 +389,23 @@ class WorldServer extends World {
         return instance.chunkProviderServer;
 #endif
     }
+
+#if version >= 1.14
+    public (List<EntityHandle>) List<Entity> getEntityList() {
+        #require net.minecraft.server.WorldServer private final List<Entity> globalEntityList;
+        return instance#globalEntityList;
+    }
+#elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
+    public (List<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntityList() {
+        return instance.entityList;
+    }
+#else
+    public (List<EntityHandle>) List<Entity> getEntityList() {
+        return instance.entityList;
+    }
+#endif
+
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
 
 #if version >= 1.14
     public void saveLevel() {

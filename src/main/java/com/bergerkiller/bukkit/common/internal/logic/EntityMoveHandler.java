@@ -10,6 +10,7 @@ import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
@@ -55,7 +56,9 @@ public abstract class EntityMoveHandler {
 
     public static EntityMoveHandler create(EntityController<?> controller) {
         EntityMoveHandler handler;
-        if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            handler = new EntityMoveHandler_1_14();
+        } else if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
             handler = new EntityMoveHandler_1_13();
         } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
             handler = new EntityMoveHandler_1_11_2();

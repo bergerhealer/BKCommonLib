@@ -5,10 +5,13 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Collections;
 
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.YamlConfiguration;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -32,6 +35,7 @@ public class TestServerFactory {
         } else {
             initTestServer_pre_1_13_2();
         }
+        init_spigotConfig();
     }
 
     private static void initTestServer_pre_1_13_2() {
@@ -75,6 +79,11 @@ public class TestServerFactory {
             Field bkServerField = Bukkit.class.getDeclaredField("server");
             bkServerField.setAccessible(true);
             bkServerField.set(null, server);
+
+            // Initialize propertyManager field, which is responsible for server-wide settings like view distance
+            Object propertyManager = ClassTemplate.create(nms_root + "PropertyManager").newInstanceNull();
+            setField(mc_server, "propertyManager", propertyManager);
+            setField(propertyManager, "properties", new java.util.Properties());
 
             // Create data converter registry manager object - used for serialization/deserialization
             // Only used >= MC 1.10.2
@@ -235,6 +244,12 @@ public class TestServerFactory {
             bkServerField.setAccessible(true);
             bkServerField.set(null, server);
 
+            // Initialize propertyManager field, which is responsible for server-wide settings like view distance
+            Object propertyManager = ClassTemplate.create(nms_root + "DedicatedServerSettings").newInstanceNull();
+            setField(mc_server, "propertyManager", propertyManager);
+            setField(propertyManager, "properties", createFromCode(Class.forName(nms_root + "DedicatedServerProperties"),
+                    "return new DedicatedServerProperties(new java.util.Properties(), new joptsimple.OptionParser().parse(new String[0]));\n"));
+
             // Create data converter registry manager object - used for serialization/deserialization
             // Only used >= MC 1.10.2
             Class<?> dataConverterRegistryClass = null;
@@ -348,6 +363,17 @@ public class TestServerFactory {
         }
     }
 
+    private static void init_spigotConfig() {
+        Class<?> spigotConfigType = CommonUtil.getClass("org.spigotmc.SpigotConfig");
+        if (spigotConfigType != null) {
+            String yamlType = com.bergerkiller.bukkit.common.server.TestServerFactory.DefaultSpigotYamlConfiguration.class.getName();
+            createFromCode(spigotConfigType,
+                    "SpigotConfig.config = new " + yamlType + "();\n" +
+                    "SpigotConfig.config.set(\"world-settings.default.verbose\", Boolean.FALSE);\n" +
+                    "return null;\n");
+        }
+    }
+
     protected static void setField(Object instance, Class<?> declaringClass, String name, Object value) {
         try {
             Field field = declaringClass.getDeclaredField(name);
@@ -441,6 +467,23 @@ public class TestServerFactory {
         @HookMethod("public String getBukkitVersion()")
         public String getBukkitVersion() {
             return "DUMMY_BUKKIT";
+        }
+    }
+
+    public static class DefaultSpigotYamlConfiguration extends YamlConfiguration {
+
+        public DefaultSpigotYamlConfiguration() {
+            this.set("world-settings.default.verbose", false);
+        }
+
+        @Override
+        public void save(File file) {
+            // Denied.
+        }
+
+        @Override
+        public void save(String file) {
+            // Denied.
         }
     }
 }

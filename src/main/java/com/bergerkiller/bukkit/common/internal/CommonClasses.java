@@ -23,7 +23,9 @@ class CommonClasses {
         loadRef("EnumGamemode", "EnumProtocol");
         */
         // Internal
-        loadCommon("internal.hooks.WorldListenerHook", "internal.CommonTabController");
+        loadCommon("internal.CommonTabController");
+        // Logic
+        loadLogic("EntityAddRemoveHandler", "EntityMoveHandler", "EntityTypesClasses", "RegionHandler");
         // Utility classes (only those that interact with nms)
         loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
         loadUtil("Recipe", "Stream", "World");
@@ -31,6 +33,13 @@ class CommonClasses {
         loadCommon("entity.CommonEntityType", "collections.CollectionBasics");
         loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
         loadCommon("protocol.PacketType");
+    }
+
+    private static void loadLogic(String... classNames) {
+        for (int i = 0; i < classNames.length; i++) {
+            classNames[i] = "internal.logic." + classNames[i];
+        }
+        loadCommon(classNames);
     }
 
     private static void loadUtil(String... classNames) {

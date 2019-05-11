@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
-import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
+import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.io.ClassRewriter;
@@ -184,7 +184,7 @@ public class CommonPlugin extends PluginBase {
     }
 
     public void notifyWorldAdded(org.bukkit.World world) {
-        WorldListenerHook.hook(world);
+        EntityAddRemoveHandler.INSTANCE.hook(world);
     }
 
     /**
@@ -383,7 +383,7 @@ public class CommonPlugin extends PluginBase {
 
         // Disable listeners
         for (World world : Bukkit.getWorlds()) {
-            WorldListenerHook.unhook(world);
+            EntityAddRemoveHandler.INSTANCE.unhook(world);
         }
         HandlerList.unregisterAll(listener);
         PacketUtil.removePacketListener(this.mapController);

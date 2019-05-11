@@ -49,9 +49,17 @@ class EntityTypes {
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry:###();
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public optional (Class<?>) Class<? extends Entity> getEntityClassInst() {
+        return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(instance);
+    }
+#elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
+#else
+    public optional (Class<?>) Class<? extends Entity> getEntityClassInst:###();
+#endif
 
+#if version >= 1.13
     public static optional (EntityTypesHandle) EntityTypes fromEntityClass(Class<?> entityType) {
 #if version >= 1.13.1
         java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
@@ -67,8 +75,6 @@ class EntityTypes {
         return null;
     }
 #else
-    public optional (Class<?>) Class<? extends Entity> getEntityClassInst:###();
-
     public static optional (EntityTypesHandle) EntityTypes fromEntityClass:###(Class<?> entityType);
 #endif
 

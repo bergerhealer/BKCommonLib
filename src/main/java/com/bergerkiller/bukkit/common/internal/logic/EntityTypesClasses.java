@@ -3,15 +3,20 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import com.bergerkiller.bukkit.common.Common;
 
 public abstract class EntityTypesClasses {
-    private static final EntityTypesClasses INSTANCE;
+    private static final EntityTypesClasses INSTANCE = createInstance();
 
-    static {
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            INSTANCE = new EntityTypesClasses_1_14();
-        } else if (Common.evaluateMCVersion(">=", "1.13")) {
-            INSTANCE = new EntityTypesClasses_1_13();
-        } else {
-            INSTANCE = null; // Unused
+    private static EntityTypesClasses createInstance() {
+        try {
+            if (Common.evaluateMCVersion(">=", "1.14")) {
+                return new EntityTypesClasses_1_14();
+            } else if (Common.evaluateMCVersion(">=", "1.13")) {
+                return new EntityTypesClasses_1_13();
+            } else {
+                return null; // Unused
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+            return null;
         }
     }
 

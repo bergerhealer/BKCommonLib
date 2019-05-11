@@ -14,9 +14,7 @@ import java.util.UUID;
 @Deprecated
 public class NMSWorldServer extends NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("WorldServer");
-    
-    public static final FieldAccessor<Object> playerChunkMap = WorldServerHandle.T.playerChunkMapField.raw.toFieldAccessor();
-    public static final FieldAccessor<Object> server = WorldServerHandle.T.minecraftServer.raw.toFieldAccessor();
+
     public static final FieldAccessor<EntityTracker> entityTracker = WorldServerHandle.T.entityTracker.toFieldAccessor();
 
     @SuppressWarnings({ "rawtypes", "unchecked" })

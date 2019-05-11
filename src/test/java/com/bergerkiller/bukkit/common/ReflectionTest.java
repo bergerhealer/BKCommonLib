@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
-import com.bergerkiller.bukkit.common.internal.hooks.WorldListenerHook;
+import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses;
+import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 
 import com.bergerkiller.reflection.net.minecraft.server.*;
@@ -108,7 +110,9 @@ public class ReflectionTest {
             loadClass(CBCraftTask.class);
             loadClass(CBCraftScheduler.class);
 
-            loadClass(WorldListenerHook.class);
+            loadClass(EntityAddRemoveHandler.class);
+            loadClass(EntityTypesClasses.class);
+            loadClass(RegionHandler.class);
             loadClass(CommonEntityType.class);
 
         } catch (Throwable t) {

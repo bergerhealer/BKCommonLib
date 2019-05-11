@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -26,6 +27,8 @@ public abstract class WorldServerHandle extends WorldHandle {
 
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
+    public abstract List<EntityHandle> getEntityList();
+    public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
 
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
@@ -40,12 +43,8 @@ public abstract class WorldServerHandle extends WorldHandle {
             WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
-    public abstract MinecraftServerHandle getMinecraftServer();
-    public abstract void setMinecraftServer(MinecraftServerHandle value);
     public abstract EntityTracker getEntityTracker();
     public abstract void setEntityTracker(EntityTracker value);
-    public abstract PlayerChunkMapHandle getPlayerChunkMapField();
-    public abstract void setPlayerChunkMapField(PlayerChunkMapHandle value);
     public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
     public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
     /**
@@ -53,15 +52,15 @@ public abstract class WorldServerHandle extends WorldHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
-        public final Template.Field.Converted<MinecraftServerHandle> minecraftServer = new Template.Field.Converted<MinecraftServerHandle>();
         public final Template.Field.Converted<EntityTracker> entityTracker = new Template.Field.Converted<EntityTracker>();
-        public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMapField = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
+        public final Template.Method.Converted<List<EntityHandle>> getEntityList = new Template.Method.Converted<List<EntityHandle>>();
+        public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 
     }

@@ -7,7 +7,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.google.common.collect.Iterables;
 
 import org.bukkit.World;
@@ -39,8 +39,8 @@ public class CommonEventFactory {
         Collection<World> worlds = WorldUtil.getWorlds();
         List<Iterable<Object>> world_entity_lists = new ArrayList<Iterable<Object>>(worlds.size());
         for (World world : worlds) {
-            Object worldHandle = WorldHandle.fromBukkit(world).getRaw();
-            world_entity_lists.add((Iterable<Object>) WorldHandle.T.entityList.raw.get(worldHandle));
+            Object worldHandle = WorldServerHandle.fromBukkit(world).getRaw();
+            world_entity_lists.add((Iterable<Object>) WorldServerHandle.T.getEntityList.raw.invoke(worldHandle));
         }
         return Iterables.concat(world_entity_lists);
     }

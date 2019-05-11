@@ -280,7 +280,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return DuplexConversion.entityList.convert(WorldHandle.T.entityList.raw.get(HandleConversion.toWorldHandle(world)));
+        return DuplexConversion.entityList.convert(WorldServerHandle.T.getEntityList.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 
     /**
@@ -708,7 +708,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        PlayerChunkMapHandle playerChunkMap = WorldServerHandle.T.playerChunkMapField.get(worldHandle);
+        PlayerChunkMapHandle playerChunkMap = WorldServerHandle.T.getPlayerChunkMap.invoke(worldHandle);
         playerChunkMap.flagPosDirty(blockX, blockY, blockZ);
     }
 

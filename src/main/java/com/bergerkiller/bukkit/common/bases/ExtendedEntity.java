@@ -694,7 +694,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if the Entity is spawned, False if not
      */
     public boolean isSpawned() {
-        return handle != null && handle.getWorld() != null && handle.getWorld().getEntityList().contains(handle);
+        return handle != null && handle.getWorld() != null && handle.getWorldServer().getEntityList().contains(handle);
     }
 
     public World getWorld() {

@@ -82,6 +82,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
@@ -1764,7 +1765,7 @@ public class CommonMapController implements PacketListener, Listener {
         if (itemFrameCacheDirty) {
             itemFrameCacheDirty = false;
             itemFrameCacheWorld = world;
-            for (Object entityHandle : (List<?>) WorldHandle.T.entityList.raw.get(HandleConversion.toWorldHandle(world))) {
+            for (Object entityHandle : (List<?>) WorldServerHandle.T.getEntityList.raw.invoke(HandleConversion.toWorldHandle(world))) {
                 if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
                     itemFrameCache.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
                 }
