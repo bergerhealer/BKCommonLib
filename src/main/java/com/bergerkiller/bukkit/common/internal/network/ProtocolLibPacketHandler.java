@@ -151,7 +151,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         // Silent - do not send it through listeners, only through monitors
         try {
             PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, false);
+            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
         } catch (PlayerLoggedOutException ex) {
             // Ignore
         } catch (Throwable t) {
