@@ -3,9 +3,11 @@ package net.minecraft.server;
 import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
+
 #if version >= 1.9
     private int entityId:a;
     private optional UUID entityUUID:b;
@@ -48,6 +50,8 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:###;
     private int extraData:k;
 #endif
+
+    public (PacketPlayOutSpawnEntityHandle) PacketPlayOutSpawnEntity();
 
     <code>
     @Override

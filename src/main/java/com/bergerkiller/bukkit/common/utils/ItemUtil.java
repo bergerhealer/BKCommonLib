@@ -447,7 +447,7 @@ public class ItemUtil {
         newItemHandle.setMotY(oldItemHandle.getMotY());
         newItemHandle.setMotZ(oldItemHandle.getMotZ());
         newItemHandle.setAge(oldItemHandle.getAge());
-        newItemHandle.getWorld().addEntity(newItemHandle);
+        newItemHandle.getWorldServer().addEntity(newItemHandle);
         return Conversion.toItem.convert(newItemHandle.getRaw());
     }
 

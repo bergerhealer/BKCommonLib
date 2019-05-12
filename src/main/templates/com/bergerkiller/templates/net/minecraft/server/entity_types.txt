@@ -53,10 +53,16 @@ class EntityTypes {
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst() {
         return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(instance);
     }
+
+    public optional int getTypeId() {
+        return IRegistry.ENTITY_TYPE.a(instance_raw);
+    }
 #elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
+    public optional int getTypeId:###();
 #else
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:###();
+    public optional int getTypeId:###();
 #endif
 
 #if version >= 1.13

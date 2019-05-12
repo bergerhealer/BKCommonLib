@@ -20,6 +20,10 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
+    public static final PacketPlayOutSpawnEntityHandle createNew() {
+        return T.constr.newInstance();
+    }
+
     /* ============================================================================== */
 
 
@@ -164,6 +168,8 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutSpawnEntityClass extends Template.Class<PacketPlayOutSpawnEntityHandle> {
+        public final Template.Constructor.Converted<PacketPlayOutSpawnEntityHandle> constr = new Template.Constructor.Converted<PacketPlayOutSpawnEntityHandle>();
+
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();

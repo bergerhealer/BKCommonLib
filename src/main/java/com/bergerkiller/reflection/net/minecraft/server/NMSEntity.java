@@ -46,7 +46,6 @@ public class NMSEntity {
     public static final FieldAccessor<Object>  boundingBox = EntityHandle.T.boundingBoxField.raw.toFieldAccessor();
     public static final FieldAccessor<Boolean> onGround    = EntityHandle.T.onGround.toFieldAccessor();
     public static final FieldAccessor<Boolean> velocityChanged = EntityHandle.T.velocityChanged.toFieldAccessor();
-    public static final FieldAccessor<Boolean> justLanded = EntityHandle.T.justLanded.toFieldAccessor();
     public static final FieldAccessor<Boolean> dead = EntityHandle.T.dead.toFieldAccessor();
     public static final FieldAccessor<Float> fallDistance = EntityHandle.T.fallDistance.toFieldAccessor();
 

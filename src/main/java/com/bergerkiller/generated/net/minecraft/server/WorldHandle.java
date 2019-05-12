@@ -30,6 +30,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
 
     /* ============================================================================== */
 
+    public abstract void method_profiler_begin(String label);
+    public abstract void method_profiler_end();
     public abstract World getWorld();
     public abstract Server getServer();
     public abstract BlockData getBlockData(IntVector3 blockposition);
@@ -44,8 +46,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract TileEntityHandle getTileEntity(IntVector3 blockposition);
     public abstract WorldDataHandle getWorldData();
     public abstract boolean isBurnArea(AxisAlignedBBHandle bounds);
-    public abstract void removeEntity(EntityHandle entity);
-    public abstract boolean addEntity(EntityHandle entity);
     public abstract Entity getEntityById(int entityId);
     public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
@@ -89,8 +89,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract void setWorldProvider(WorldProviderHandle value);
     public abstract List<IWorldAccessHandle> getAccessList();
     public abstract void setAccessList(List<IWorldAccessHandle> value);
-    public abstract MethodProfilerHandle getMethodProfiler();
-    public abstract void setMethodProfiler(MethodProfilerHandle value);
     public abstract World getBukkitWorld();
     public abstract void setBukkitWorld(World value);
     public abstract boolean isKeepSpawnInMemory();
@@ -107,10 +105,11 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Field.Converted<List<IWorldAccessHandle>> accessList = new Template.Field.Converted<List<IWorldAccessHandle>>();
         @Template.Optional
         public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
-        public final Template.Field.Converted<MethodProfilerHandle> methodProfiler = new Template.Field.Converted<MethodProfilerHandle>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();
         public final Template.Field.Boolean keepSpawnInMemory = new Template.Field.Boolean();
 
+        public final Template.Method<Void> method_profiler_begin = new Template.Method<Void>();
+        public final Template.Method<Void> method_profiler_end = new Template.Method<Void>();
         public final Template.Method.Converted<World> getWorld = new Template.Method.Converted<World>();
         public final Template.Method.Converted<Server> getServer = new Template.Method.Converted<Server>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
@@ -131,8 +130,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Method<Void> makeSound = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();

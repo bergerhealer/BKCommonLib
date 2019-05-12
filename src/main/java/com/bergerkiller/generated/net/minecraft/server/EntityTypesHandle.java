@@ -59,6 +59,8 @@ public abstract class EntityTypesHandle extends Template.Handle {
 
         @Template.Optional
         public final Template.Method.Converted<Class<?>> getEntityClassInst = new Template.Method.Converted<Class<?>>();
+        @Template.Optional
+        public final Template.Method<Integer> getTypeId = new Template.Method<Integer>();
 
     }
 

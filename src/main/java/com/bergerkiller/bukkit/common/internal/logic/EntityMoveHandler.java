@@ -202,22 +202,21 @@ public abstract class EntityMoveHandler {
                 }
             }
 
-            world.getMethodProfiler().begin("move");
+            world.method_profiler_begin("move");
 
             double d4 = that.getLocX();
             double d5 = that.getLocY();
             double d6 = that.getLocZ();
 
-            if (that.isJustLanded()) {
-                that.setJustLanded(false);
+            if (that.isCollidingWithBlock()) {
                 if (this.blockCollisionEnabled) {
-                    d0 *= 0.25D;
-                    d1 *= 0.05000000074505806D;
-                    d2 *= 0.25D;
-                    that.setMotX(0.0);
-                    that.setMotY(0.0);
-                    that.setMotZ(0.0);
+                    Vector multiplier = that.getBlockCollisionMultiplier();
+                    d0 *= multiplier.getX();
+                    d1 *= multiplier.getY();
+                    d2 *= multiplier.getZ();
+                    that.setMot(0.0, 0.0, 0.0);
                 }
+                that.setNotCollidingWithBlock();
             }
 
             double d7 = d0;
@@ -383,8 +382,8 @@ public abstract class EntityMoveHandler {
                 }
             } // NB: This code only executes with entities that are tall (have a head), like players
 
-            world.getMethodProfiler().end();
-            world.getMethodProfiler().begin("rest");
+            world.method_profiler_end();
+            world.method_profiler_begin("rest");
 
             that.recalcPosition();
             that.setHorizontalMovementImpaired(d7 != d0 || d9 != d2);
@@ -549,7 +548,7 @@ public abstract class EntityMoveHandler {
                 that.setFireTicks(-that.getMaxFireTicks());
             }
 
-            world.getMethodProfiler().end();
+            world.method_profiler_end();
         }
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.stopTiming(); // Spigot
     }

@@ -543,7 +543,13 @@ class EntityTrackerEntryState {
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:w;
 #endif
 
-#if version >= 1.9
+#if version >= 1.14
+    public (CommonPacket) Packet<?> getSpawnPacket() {
+        #require net.minecraft.server.EntityTrackerEntryState public final Entity entity:tracker;
+        Entity entity = instance#entity;
+        return entity.N();
+    }
+#elseif version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();

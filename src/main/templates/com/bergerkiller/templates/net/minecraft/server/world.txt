@@ -40,7 +40,28 @@ class World extends IBlockAccess {
 #endif
 
     protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
-    public final (MethodProfilerHandle) MethodProfiler methodProfiler;
+
+    public void method_profiler_begin(String label) {
+#if version >= 1.14
+        instance.getMethodProfiler().enter(label);
+#elseif exists net.minecraft.server.MethodProfiler public void enter(String label)
+        instance.methodProfiler.enter(label);
+#else
+        instance.methodProfiler.a(label);
+#endif
+    }
+
+    public void method_profiler_end() {
+#if version >= 1.14
+        instance.getMethodProfiler().exit();
+#elseif exists net.minecraft.server.MethodProfiler public void exit()
+        instance.methodProfiler.exit();
+#elseif version >= 1.13
+        instance.methodProfiler.e();
+#else
+        instance.methodProfiler.b();
+#endif
+    }
 
     private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld bukkitWorld:world;
     public boolean keepSpawnInMemory;
@@ -153,10 +174,6 @@ class World extends IBlockAccess {
 #else
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #endif
-
-    public void removeEntity((EntityHandle) Entity entity);
-
-    public boolean addEntity((EntityHandle) Entity entity);
 
 #if version >= 1.9
     public (org.bukkit.entity.Entity) Entity getEntityById:getEntity(int entityId);
@@ -458,6 +475,10 @@ class WorldServer extends World {
         return instance.entityList;
     }
 #endif
+
+    public void removeEntity((EntityHandle) Entity entity);
+
+    public boolean addEntity((EntityHandle) Entity entity);
 
     public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
 

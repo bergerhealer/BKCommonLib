@@ -34,6 +34,8 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract WorldNBTStorageHandle getDataManager();
     public abstract List<EntityHandle> getEntityList();
+    public abstract void removeEntity(EntityHandle entity);
+    public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
 
@@ -71,6 +73,8 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<WorldNBTStorageHandle> getDataManager = new Template.Method.Converted<WorldNBTStorageHandle>();
         public final Template.Method.Converted<List<EntityHandle>> getEntityList = new Template.Method.Converted<List<EntityHandle>>();
+        public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
 

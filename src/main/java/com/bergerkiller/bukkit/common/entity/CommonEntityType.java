@@ -58,17 +58,6 @@ public class CommonEntityType {
         // Properties first
         this.entityType = entityType;
 
-        // Retrieve objectTypeId from internal mapping
-        ObjectTypeInfo objectInfo = objectTypes.get((entityType == null) ? "" : entityType.name());
-        if (objectInfo != null) {
-            this.objectTypeId = objectInfo.typeId;
-            this.objectExtraData = objectInfo.extraData;
-            byObjectTypeId.put(this.objectTypeId, this);
-        } else {
-            this.objectTypeId = -1;
-            this.objectExtraData = -1;
-        }
-
         // A type that is not supported for construction
         if (nullInitialize) {
             this.nmsType = ClassTemplate.create((Class<?>) null);
@@ -77,6 +66,8 @@ public class CommonEntityType {
             this.commonConstructor = this.commonType.getConstructor(Entity.class);
             this.entityTypeId = -1;
             this.nmsEntityType = null;
+            this.objectTypeId = -1;
+            this.objectExtraData = -1;
             return;
         }
 
@@ -200,6 +191,30 @@ public class CommonEntityType {
             }
         } else {
             this.nmsEntityType = null;
+        }
+
+        if (EntityTypesHandle.T.getTypeId.isAvailable()) {
+            if (this.nmsEntityType != null) {
+                this.objectTypeId = EntityTypesHandle.T.getTypeId.invoke(this.nmsEntityType.getRaw());
+                this.objectExtraData = 0;
+            } else {
+                this.objectTypeId = -1;
+                this.objectExtraData = -1;
+            }
+        } else {
+            // Retrieve objectTypeId from internal mapping        
+            ObjectTypeInfo objectInfo = objectTypes.get((entityType == null) ? "" : entityType.name());
+            if (objectInfo != null) {
+                // Take from mapping we have registered ourselves
+                this.objectTypeId = objectInfo.typeId;
+                this.objectExtraData = objectInfo.extraData;
+            } else {
+                this.objectTypeId = -1;
+                this.objectExtraData = -1;
+            }
+        }
+        if (this.objectTypeId != -1) {
+            byObjectTypeId.put(this.objectTypeId, this);
         }
     }
 
@@ -327,6 +342,7 @@ public class CommonEntityType {
 
     static {
         // There does not appear to be a registry for this yet. This is a workaround until one exists.
+        // This is only used on 1.13.2 and before, on 1.14 the Id can be obtained from the internal registry
         registerObjectType("BOAT", 1, -1);
         registerObjectType("DROPPED_ITEM", 2, 1);
         registerObjectType("AREA_EFFECT_CLOUD", 3, -1);

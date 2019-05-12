@@ -217,22 +217,65 @@ class Entity {
     public boolean verticalMovementImpaired:y;
     public boolean movementImpaired:z;
     public boolean velocityChanged;
-    protected boolean justLanded:###; // ????
 #elseif version >= 1.13
     public boolean verticalMovementImpaired:C;
     public boolean movementImpaired:D;
     public boolean velocityChanged;
-    protected boolean justLanded:F;
 #elseif version >= 1.9
     public boolean verticalMovementImpaired:B;
     public boolean movementImpaired:C;
     public boolean velocityChanged;
-    protected boolean justLanded:E;
 #else
     public boolean verticalMovementImpaired:E;
     public boolean movementImpaired:F;
     public boolean velocityChanged;
-    protected boolean justLanded:H;
+#endif
+
+#if version >= 1.14
+    // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
+    // If this is greater than 1.0E-7D then the factor should be applied
+    #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:B;
+
+    public boolean isCollidingWithBlock() {
+        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        return multiplier.g() > 1.0E-7;
+    }
+
+    public org.bukkit.util.Vector getBlockCollisionMultiplier() {
+        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        return new org.bukkit.util.Vector(multiplier.x, multiplier.y, multiplier.z);
+    }
+
+    public void setNotCollidingWithBlock() {
+        instance#collidingWithBlockMultiplier = Vec3D.a;
+    }
+#else
+    // On Minecraft 1.13.2 and before, there was only a 'collidingWithBlock' property
+    // This always has the effect of slowing down the entity with factor 0.25/0.05/0.25
+  #if version >= 1.13
+    #require net.minecraft.server.Entity protected boolean collidingWithBlock:F;
+  #elseif version >= 1.9
+    #require net.minecraft.server.Entity protected boolean collidingWithBlock:E;
+  #else
+    #require net.minecraft.server.Entity protected boolean collidingWithBlock:H;
+  #endif
+
+    public boolean isCollidingWithBlock() {
+        return instance#collidingWithBlock;
+    }
+
+    public org.bukkit.util.Vector getBlockCollisionMultiplier() {
+        boolean colliding = instance#collidingWithBlock;
+        if (colliding) {
+            return new org.bukkit.util.Vector(0.25, 0.05, 0.25);
+        } else {
+            return new org.bukkit.util.Vector(0.0, 0.0, 0.0);
+        }
+    }
+
+    public void setNotCollidingWithBlock() {
+        instance#collidingWithBlock = false;
+    }
 #endif
 
     // Seems unused.
@@ -326,7 +369,14 @@ class Entity {
     private unknown float ay;
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public unknown double H;
+    public unknown double I;
+    public unknown double J;
+    public float heightOffset:K;
+    public boolean noclip;
+    public unknown float M;
+#elseif version >= 1.13
     public unknown double N;
     public unknown double O;
     public unknown double P;
