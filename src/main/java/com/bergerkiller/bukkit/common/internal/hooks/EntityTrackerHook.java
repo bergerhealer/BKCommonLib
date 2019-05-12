@@ -16,7 +16,7 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         this.original = original;
     }
 
-    @HookMethod("public void track(Entity entity)")
+    @HookMethod("public void trackEntity:???(Entity entity)")
     public void track(Object nmsEntityHandle) {
         if (!ignoredEntities.contains(nmsEntityHandle)) {
             base.track(nmsEntityHandle);

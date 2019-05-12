@@ -55,7 +55,7 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
         // Remove all collisions that have to do with Entities; not Blocks.
         // This is a bit of a hacked in way for backwards <= 1.10.2 support
         // Basically, we repeat getCubes() and ignore all found bounding boxes in here
-        List<EntityHandle> list = entity.getWorld().getEntities(entity, movedBounds.growUniform(0.25D));
+        List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, movedBounds.growUniform(0.25D));
         for (int i = 0; i < list.size(); i++) {
             EntityHandle entity1 = list.get(i);
             if (CommonCapabilities.VEHICLES_COLLIDE_WITH_PASSENGERS || !entity.isInSameVehicle(entity1)) {
@@ -90,7 +90,7 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
 
     private void world_addEntityCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb) {
         if (entity != null && this.entityCollisionEnabled) {
-            List<EntityHandle> list = entity.getWorld().getEntities(entity, axisalignedbb.growUniform(0.25D));
+            List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
             for (int i = 0; i < list.size(); i++) {
                 EntityHandle entity1 = list.get(i);

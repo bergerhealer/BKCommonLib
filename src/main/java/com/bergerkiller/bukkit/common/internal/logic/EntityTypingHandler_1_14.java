@@ -5,8 +5,11 @@ import java.util.IdentityHashMap;
 
 import org.bukkit.entity.Entity;
 
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -23,6 +26,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     private final IdentityHashMap<Object, Class<?>> _cache = new IdentityHashMap<Object, Class<?>>();
     private final FastMethod<Class<?>> findEntityTypesClass = new FastMethod<Class<?>>();
+    private final FastMethod<Object> createEntry = new FastMethod<Object>();
     private final Object nmsWorldHandle;
 
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
@@ -77,6 +81,21 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         registerEntityTypes("ENDER_DRAGON", "EntityEnderDragon");
         registerEntityTypes("FIREBALL", "EntityLargeFireball");
         registerEntityTypes("WITHER", "EntityWither"); // scoreboard things
+
+        // Initialize method that creates new EntityTrackerEntry instances (which are actually PlayerChunkMap$EntityTracker)
+        {
+            ClassResolver resolver = new ClassResolver();
+            resolver.setDeclaredClass(EntityTrackerHandle.T.getType());
+            MethodDeclaration createEntryMethod = new MethodDeclaration(resolver, 
+                    "public Object createEntry(Entity entity) {\n" +
+                    "    EntityTypes entitytypes = entity.getEntityType();\n" +
+                    "    int i = entitytypes.getChunkRange() * 16;\n" +
+                    "    i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);\n" +
+                    "    int j = entitytypes.getUpdateInterval();\n" +
+                    "    return new PlayerChunkMap$EntityTracker(instance, entity, i, j, entitytypes.isDeltaTracking());\n" +
+                    "}");
+            createEntry.init(createEntryMethod);
+        }
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
@@ -117,8 +136,8 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     }
 
     @Override
-    public EntityTrackerEntryHandle createEntityTrackerEntry(Entity entity) {
-        // TODO Auto-generated method stub
-        return null;
+    public EntityTrackerEntryHandle createEntityTrackerEntry(EntityTracker entityTracker, Entity entity) {
+        Object handle = createEntry.invoke(entityTracker.getRawHandle(), HandleConversion.toEntityHandle(entity));
+        return EntityTrackerEntryHandle.createHandle(handle);
     }
 }

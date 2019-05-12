@@ -13,24 +13,21 @@ class EntityTracker {
     private final (org.bukkit.World) WorldServer world;
 #endif
 
-    public Collection<EntityTrackerEntryHandle> getEntries() {
+    public (Collection<com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
 #if version >= 1.14
-        java.util.Collection entries = instance.trackedEntities.values();
-        java.util.ArrayList result = new java.util.ArrayList(entries.size());
-        java.util.Iterator iter = entries.iterator();
-        while (iter.hasNext()) {
-            #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntry trackerEntry;
-            result.add(iter.next()#trackerEntry);
-        }
-        return result;
+        return instance.trackedEntities.values();
 #else
-        #require net.minecraft.server.EntityTracker private final (Collection<com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle>) Set<EntityTrackerEntry> trackedEntitiesSet:c;
+        #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
         return instance#trackedEntitiesSet;
 #endif
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
+#if version >= 1.14
+        return (PlayerChunkMap$EntityTracker) instance.trackedEntities.get(entityId);
+#else
         return (EntityTrackerEntry) instance.trackedEntities.get(entityId);
+#endif
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
@@ -155,7 +152,7 @@ class EntityTrackerEntry {
 
 #if version >= 1.14
     #require net.minecraft.server.PlayerChunkMap$EntityTracker private final Entity entity:tracker;
-    #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntry trackerEntry;
+    #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry;
     #require net.minecraft.server.EntityTrackerEntry private final Entity trackerEntryEntity:tracker;
 
     public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {

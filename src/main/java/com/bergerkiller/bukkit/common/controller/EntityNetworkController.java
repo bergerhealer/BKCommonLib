@@ -372,7 +372,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             this.last_passenger_1_8_8 = entity.getPassenger();
         }
 
-        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(this.state.getRaw(), EntityTrackerEntryHook.class);
+        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(this.entry.getRaw(), EntityTrackerEntryHook.class);
         if (hook != null) {
             hook.setController(this);
         }

@@ -12,6 +12,7 @@ import org.bukkit.entity.Entity;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
@@ -36,7 +37,7 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
         // This field is used by the EntityTracker to scan for players
         // We explicitly set this to an empty list to guarantee no spawn packets are produced
         this.dummyTrackerWorld = WorldServerHandle.T.newHandleNull();
-        WorldHandle.T.players.raw.set(this.dummyTrackerWorld.getRaw(), Collections.emptyList());
+        SafeField.create(WorldHandle.T.getType(), "players", List.class).set(this.dummyTrackerWorld.getRaw(), Collections.emptyList());
 
         // Initialize the dummy tracker without calling any methods/constructors
         this.entriesMap = new IntHashMap<Object>();
@@ -70,7 +71,7 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
     }
 
     @Override
-    public EntityTrackerEntryHandle createEntityTrackerEntry(Entity entity) {
+    public EntityTrackerEntryHandle createEntityTrackerEntry(EntityTracker entityTracker, Entity entity) {
         EntityTrackerEntryHandle createdEntry = null;
         try {
             // Reset

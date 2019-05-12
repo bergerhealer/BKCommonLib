@@ -59,6 +59,8 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
         public final Template.Method.Converted<Void> flagDirty = new Template.Method.Converted<Void>();
         public final Template.Method<Void> flagPosDirty = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
 
     }
 

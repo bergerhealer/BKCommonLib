@@ -507,7 +507,10 @@ class Entity {
 
     public int portalCooldown;
 
-#if version >= 1.13
+#if version >= 1.14
+    protected boolean allowTeleportation:ai;
+    protected unknown int aj;
+#elseif version >= 1.13
     protected boolean allowTeleportation:an;
     protected unknown int ao;
 #elseif version >= 1.11
@@ -771,10 +774,29 @@ class Entity {
 
     public void setPosition(double x, double y, double z);
 
-#if version >= 1.8.3
-    public void setSize(float width, float length);
+#if version >= 1.14
+    public void setSize(float width, float height) {
+        #require net.minecraft.server.Entity private EntitySize size;
+        #require net.minecraft.server.Entity private float headHeight;
+        #require net.minecraft.server.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+
+        EntityPose entitypose = instance.Z();
+        EntitySize newSize = EntitySize.b(width, height);
+
+        instance#size = newSize;
+        instance#headHeight = instance#getHeadHeight(entitypose, newSize);
+
+        double half_width = (double) width / 2.0;
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.locX - half_width, instance.locY, instance.locZ - half_width,
+            instance.locX + half_width, instance.locY + (double) height, instance.locZ + half_width);
+
+        instance.a(new_BoundingBox);
+    }
+#elseif version >= 1.8.3
+    public void setSize(float width, float height);
 #else
-    public void setSize:a(float width, float length);
+    public void setSize:a(float width, float height);
 #endif
 
     public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
@@ -966,7 +988,9 @@ class Entity {
      *     return 300;
      * }
      */
-#if version >= 1.13
+#if version >= 1.14
+    public int getPortalCooldownMaximum:aW();
+#elseif version >= 1.13
     public int getPortalCooldownMaximum:aQ();
 #elseif version >= 1.12
     public int getPortalCooldownMaximum:aM();

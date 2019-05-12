@@ -210,6 +210,27 @@ class PlayerChunkMap {
         instance.flagDirty(new BlockPosition(x, y, z));
     }
 
+#if version >= 1.14
+    public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
+        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
+        if (chunk == null || chunk.getChunk() == null) {
+            return false;
+        }
+
+        // Check Stream contains Player
+        ChunkCoordIntPair chunkCoordinates = new ChunkCoordIntPair(chunkX, chunkZ);
+        java.util.stream.Stream players = chunk.players.a(chunkCoordinates, false);
+        return players.anyMatch(java.util.function.Predicate.isEqual(entityplayer));
+    }
+#else
     public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
+#endif
+
+    // Needed to make sure the EntityTracker hook works
+#if version >= 1.14
+    protected optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
+#else
+    protected optional void trackEntity:###((org.bukkit.entity.Entity) Entity entity);
+#endif
 
 }

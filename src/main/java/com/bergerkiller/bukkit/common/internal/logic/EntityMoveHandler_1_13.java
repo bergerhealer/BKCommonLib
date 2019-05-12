@@ -150,7 +150,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         VoxelShapeHandle shape = VoxelShapeHandle.empty();
 
         if (entity != null && this.entityCollisionEnabled) {
-            List<EntityHandle> list = entity.getWorld().getEntities(entity, axisalignedbb.growUniform(0.25D));
+            List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
             for (int i = 0; i < list.size(); i++) {
                 EntityHandle entity1 = list.get(i);

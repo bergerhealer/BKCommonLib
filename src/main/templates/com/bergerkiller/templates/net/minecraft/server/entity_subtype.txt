@@ -392,7 +392,9 @@ class EntityInsentient extends EntityLiving {
 }
 
 class EntityItem extends Entity {
-#if version >= 1.13
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
+#elseif version >= 1.13
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:b;
 #elseif version >= 1.11
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
@@ -421,7 +423,14 @@ class EntityHanging extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-#if version >= 1.9
+#if version >= 1.14
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:b;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:c;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:d;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:e;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:g;
+#elseif version >= 1.9
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:a;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:b;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:c;

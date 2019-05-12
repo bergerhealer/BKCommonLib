@@ -161,7 +161,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 newEntry = storedEntry;
             } else {
                 // Create a new unmodified, default server network entry
-                newEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(entity);
+                newEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(tracker, entity);
                 // Transfer data if needed
                 if (storedEntry != null) {
                     EntityTrackerEntryHandle.T.copyHandle(storedEntry, newEntry);
@@ -181,7 +181,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else {
             EntityTrackerEntryHandle oldEntry = storedEntry;
             if (oldEntry == null) {
-                oldEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(entity);
+                oldEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(tracker, entity);
             }
 
             // Convert the original entry into a hooked entry
@@ -580,11 +580,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             if (hasNetworkController) {
                 // Hook the entity tracker to cancel track() on this Entity
                 Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
-                Object nmsEntityTrackerHandle = WorldServerHandle.T.entityTracker.raw.get(nmsWorldHandle);
+                Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
                 EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
                 if (hook == null) {
                     hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-                    WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+                    WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
                 }
                 hook.ignoredEntities.add(this.handle.getRaw());
 
@@ -595,7 +595,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                     // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
                     hook.ignoredEntities.remove(this.handle.getRaw());
                     if (hook.ignoredEntities.isEmpty()) {
-                        WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.original);
+                        WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
                     }
                 }
             } else {
@@ -685,11 +685,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (networkController != null && !(networkController instanceof DefaultEntityNetworkController)) {
             // Hook the entity tracker to cancel track() on this Entity
             Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
-            Object nmsEntityTrackerHandle = WorldServerHandle.T.entityTracker.raw.get(nmsWorldHandle);
+            Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
             EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
             if (hook == null) {
                 hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-                WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+                WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
             }
             hook.ignoredEntities.add(entity.getHandle());
 
@@ -708,7 +708,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
                 hook.ignoredEntities.remove(entity.getHandle());
                 if (hook.ignoredEntities.isEmpty()) {
-                    WorldServerHandle.T.entityTracker.raw.set(nmsWorldHandle, hook.original);
+                    WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
                 }
             }
 

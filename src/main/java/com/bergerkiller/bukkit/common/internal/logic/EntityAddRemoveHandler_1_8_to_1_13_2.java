@@ -96,7 +96,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);
 
             // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
-            Collection<?> removeQueue = (Collection<?>) WorldHandle.T.entityRemoveQueue.raw.get(HandleConversion.toWorldHandle(world));
+            Collection<?> removeQueue = (Collection<?>) WorldServerHandle.T.entityRemoveQueue.raw.get(HandleConversion.toWorldHandle(world));
             if (removeQueue != null && removeQueue.contains(entity)) {
                 CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
             }
