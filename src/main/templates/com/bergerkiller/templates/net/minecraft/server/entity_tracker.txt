@@ -2,40 +2,229 @@ package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
+// Same as PlayerChunkMap on MC 1.14 and later
 class EntityTracker {
-    private final (org.bukkit.World) WorldServer world;
-    private final (Set<EntityTrackerEntryHandle>) Set<EntityTrackerEntry> entries:c;
-    public final (com.bergerkiller.bukkit.common.wrappers.IntHashMap<Object>) IntHashMap<EntityTrackerEntry> trackedEntities;
-
-#if fieldexists net.minecraft.server.EntityTracker private int trackingDistance
-    private int viewDistance:trackingDistance;
+#if version >= 1.14
+    public final (org.bukkit.World) WorldServer world;
 #else
-    private int viewDistance:e;
+    private final (org.bukkit.World) WorldServer world;
 #endif
 
-#if version >= 1.9
+    public Collection<EntityTrackerEntryHandle> getEntries() {
+#if version >= 1.14
+        java.util.Collection entries = instance.trackedEntities.values();
+        java.util.ArrayList result = new java.util.ArrayList(entries.size());
+        java.util.Iterator iter = entries.iterator();
+        while (iter.hasNext()) {
+            #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntry trackerEntry;
+            result.add(iter.next()#trackerEntry);
+        }
+        return result;
+#else
+        #require net.minecraft.server.EntityTracker private final (Collection<com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle>) Set<EntityTrackerEntry> trackedEntitiesSet:c;
+        return instance#trackedEntitiesSet;
+#endif
+    }
+
+    public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
+        return (EntityTrackerEntry) instance.trackedEntities.get(entityId);
+    }
+
+    public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
+#if version >= 1.14
+        return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
+#else
+        #require private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
+
+        java.util.Set set = instance#trackedEntitiesSet;
+
+        // Remove any previous entry
+        EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities.d(entityId);
+        set.remove(previous);
+
+        // Add the new entry
+        if (entry != null) {
+            instance.trackedEntities.a(entityId, entry);
+            set.add(entry);
+        }
+
+        return previous;
+#endif
+    }
+
+#if version >= 1.14
+    private int trackingDistance:A;
+#elseif fieldexists net.minecraft.server.EntityTracker private int trackingDistance
+    private int trackingDistance;
+#else
+    private int trackingDistance:e;
+#endif
+
+#if version >= 1.14
+    protected void sendPacketToEntity:broadcastIncludingSelf((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
+#elseif version >= 1.9
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
 #else
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet packet);
 #endif
 
+#if version >= 1.14
+    protected void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
+    protected void untrackEntity:removeEntity((org.bukkit.entity.Entity) Entity entity);
+#else
     public void trackEntity:track((org.bukkit.entity.Entity) Entity entity);
     public void untrackEntity((org.bukkit.entity.Entity) Entity entity);
+#endif
 
-    public void untrackPlayer((org.bukkit.entity.Player) EntityPlayer player);
-    public void spawnEntities:a((org.bukkit.entity.Player) EntityPlayer entityplayer, (org.bukkit.Chunk) Chunk chunk);
+    // Also sends chunk data on 1.14 since the two got merged into one
+    // On 1.13.2 and before, it just sends all packets required for spawning the entities in the chunk
+    // public void spawnEntities:a((org.bukkit.entity.Player) EntityPlayer entityplayer, (org.bukkit.Chunk) Chunk chunk);
 }
 
+// Same as EntityTrackerEntry on 1.13.2 and before
+// PlayerChunkMap.EntityTracker on 1.14 and later
 class EntityTrackerEntry {
 #if version >= 1.14
-    private final (EntityHandle) Entity tracker;
+    private final int trackingDistance;
 
-    // ======== Note: gone 1.14 =============
-    private final int viewDistance:e;
-    private optional int playerViewDistance:f;
-    // ======================================
+    public int getPlayerViewDistance() {
+        return 10; // TODO: PlayerChunkMap.this.A
+    }
+#elseif version >= 1.9
+    private final int trackingDistance:e;
+
+    public int getPlayerViewDistance() {
+        #require net.minecraft.server.EntityTrackerEntry private int playerViewDistance:f;
+        return instance#playerViewDistance;
+    }
+#else
+    public int trackingDistance:b;
+
+    public int getPlayerViewDistance() {
+        return instance.b;
+    }
+#endif
+
+#if fieldexists net.minecraft.server.EntityTrackerEntry public final Set<EntityPlayer> trackedPlayers;
+    // Stored as a Set of players
+
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
+        return instance.trackedPlayers;
+    }
+
+    public void clearViewers() {
+        instance.trackedPlayers.clear();
+    }
+
+    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        return instance.trackedPlayers.add(viewer);
+    }
+
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        return instance.trackedPlayers.remove(viewer);
+    }
+#else
+    // Stored as a Map of players (Paperspigot)
+
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
+        return instance.trackedPlayerMap.keySet();
+    }
+
+    public void clearViewers() {
+        instance.trackedPlayerMap.clear();
+    }
+
+    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        if (instance.trackedPlayerMap.containsKey(viewer)) {
+            return false;
+        } else {
+            instance.trackedPlayerMap.put(viewer, Boolean.TRUE);
+            return true;
+        }
+    }
+
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        return instance.trackedPlayerMap.remove(viewer) != null;
+    }
+#endif
+
+#endif
+
+#if version >= 1.14
+    #require net.minecraft.server.PlayerChunkMap$EntityTracker private final Entity entity:tracker;
+    #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntry trackerEntry;
+    #require net.minecraft.server.EntityTrackerEntry private final Entity trackerEntryEntity:tracker;
+
+    public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {
+        return instance#trackerEntry;
+    }
+
+    public (EntityHandle) Entity getEntity() {
+        return instance#entity;
+    }
+
+    public void setEntity((EntityHandle) Entity entity) {
+        instance#entity = entity;
+        EntityTrackerEntry entry = instance#trackerEntry;
+        entry#trackerEntryEntity = entity;
+    }
+
+    public void scanPlayers:track((List<org.bukkit.entity.Player>) List<EntityPlayer> playerList);
+    public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
+#else
+    #require net.minecraft.server.EntityTrackerEntry private final Entity entity:tracker;
+
+    public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {
+        return instance;
+    }
+
+    public (EntityHandle) Entity getEntity() {
+        return instance#entity;
+    }
+
+    public void setEntity((EntityHandle) Entity entity) {
+        instance#entity = entity;
+    }
+
+    public void scanPlayers((List<org.bukkit.entity.Player>) List<EntityHuman> playerList);
+    public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
+#endif
+
+    public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
+    public void hideForAll:a();
+
+    // These got moved to the State class, but proxy them here to keep depending plugins compatible
+    <code>
+    @Deprecated
+    public static final boolean hasProtocolRotationChanged(float angle1, float angle2) {
+        return EntityTrackerEntryStateHandle.hasProtocolRotationChanged(angle1, angle2);
+    }
+
+    @Deprecated
+    public static final int getProtocolRotation(float angle) {
+        return EntityTrackerEntryStateHandle.getProtocolRotation(angle);
+    }
+
+    @Deprecated
+    public static final float getRotationFromProtocol(int protocol) {
+        return EntityTrackerEntryStateHandle.getRotationFromProtocol(protocol);
+    }
+
+    @Deprecated
+    public void setTimeSinceLocationSync(int time) {
+        getState().setTimeSinceLocationSync(time);
+    }
+    </code>
+}
+
+// Alias for EntityTrackerEntry, but because we're using PlayerChunkMap$EntityTracker as
+// main handle on 1.14 it is renamed to differentiate the two.
+class EntityTrackerEntryState {
+#if version >= 1.14
+    private final readonly (EntityHandle) Entity entity:tracker;
 
     private final int updateInterval:d;
     private final boolean isMobile:e;
@@ -51,10 +240,8 @@ class EntityTrackerEntry {
     public int raw_yRot:xRot;
     public int raw_headYaw:headYaw;
 #elseif version >= 1.9
-    private final (EntityHandle) Entity tracker;
+    private final readonly (EntityHandle) Entity entity:tracker;
 
-    private final int viewDistance:e;
-    private optional int playerViewDistance:f;
     private final int updateInterval:g;
 
     private optional long long_xLoc:xLoc;
@@ -68,10 +255,8 @@ class EntityTrackerEntry {
     public int raw_yRot:xRot;
     public int raw_headYaw:headYaw;
 #else
-    public final (EntityHandle) Entity tracker;
+    public final readonly (EntityHandle) Entity entity:tracker;
 
-    public int viewDistance:b;
-    public optional int playerViewDistance:###;
     public int updateInterval:c;
 
     public optional long long_xLoc:###;
@@ -215,22 +400,6 @@ class EntityTrackerEntry {
 #if version <= 1.13.2
     private final boolean isMobile:u;
 #endif
-
-    // Constructors, with a helper method to choose the right one (difference between MC 1.8.8 and 1.9 onwards)
-    // On MC 1.8.8, the playerViewDistance field is ignored.
-    public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile);
-    public optional (EntityTrackerEntryHandle) EntityTrackerEntry((org.bukkit.entity.Entity) Entity entity, int viewDistance, int updateInterval, boolean isMobile);
-    <code>
-    public static EntityTrackerEntryHandle createNew(org.bukkit.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {
-        if (T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.isAvailable()) {
-            return T.constr_entity_viewDistance_playerViewDistance_updateInterval_isMobile.newInstance(
-                entity, viewDistance, playerViewDistance, updateInterval, isMobile);
-        } else {
-            return T.constr_entity_viewDistance_updateInterval_isMobile.newInstance(
-                entity, viewDistance, updateInterval, isMobile);
-        }
-    }
-    </code>
 
     <code>
     // Minimal change of x/y/z position or rotation that is supported
@@ -377,60 +546,10 @@ class EntityTrackerEntry {
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:w;
 #endif
 
-    // Note: on PaperSpigot trackedPlayers is a HashMap instead
-    public optional (Map<org.bukkit.entity.Player, Boolean>) Map<EntityPlayer, Boolean> viewersMap:trackedPlayerMap;
-    public optional final (Set<org.bukkit.entity.Player>) Set<EntityPlayer> viewersSet:trackedPlayers;
-
-    public void hideForAll:a();
-
-    public void removeViewer:a((org.bukkit.entity.Player) EntityPlayer player);
-
-    public void scanPlayers((List<org.bukkit.entity.Player>) List<EntityHuman> playerList);
-    public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
-
 #if version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();
 #endif
 
-    <code>
-    public java.util.Collection<org.bukkit.entity.Player> getViewers() {
-        if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(getRaw()).keySet();
-        } else {
-            return T.viewersSet.get(getRaw());
-        }
-    }
-
-    public void clearViewers() {
-        if (T.viewersMap.isAvailable()) {
-            T.viewersMap.get(getRaw()).clear();
-        } else {
-            T.viewersSet.get(getRaw()).clear();
-        }
-    }
-
-    public boolean addViewerToSet(org.bukkit.entity.Player viewer) {
-        if (T.viewersMap.isAvailable()) {
-            java.util.Map<org.bukkit.entity.Player, Boolean> map = T.viewersMap.get(getRaw());
-            if (map.containsKey(viewer)) {
-                return false;
-            } else {
-                map.put(viewer, true);
-                return true;
-            }
-        } else {
-            return T.viewersSet.get(getRaw()).add(viewer);
-        }
-    }
-
-    public boolean removeViewerFromSet(org.bukkit.entity.Player viewer) {
-        if (T.viewersMap.isAvailable()) {
-            return T.viewersMap.get(getRaw()).remove(viewer) != null;
-        } else {
-            return T.viewersSet.get(getRaw()).remove(viewer);
-        }
-    }
-    </code>
 }

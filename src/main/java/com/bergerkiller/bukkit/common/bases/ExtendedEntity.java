@@ -41,6 +41,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -957,7 +958,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         // Update the passengers field
         this.handle.setPassengers(newPassengerHandles);
 
-        if (EntityTrackerEntryHandle.T.opt_passengers.isAvailable()) {
+        if (EntityTrackerEntryStateHandle.T.opt_passengers.isAvailable()) {
             // On >= MC 1.10.2 we must synchronize the passengers of this Entity
 
             // Send packets to refresh passenger information
@@ -967,9 +968,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             // Synchronize entity tracker of the vehicle to make sure it does not try to synchronize a second time
             EntityTrackerEntryHandle entry = WorldUtil.getTracker(entity.getWorld()).getEntry(entity);
             if (entry != null) {
-                EntityTrackerEntryHandle.T.opt_passengers.set(entry.getRaw(), newPassengers);
+                EntityTrackerEntryStateHandle.T.opt_passengers.set(entry.getState().getRaw(), newPassengers);
             }
-        } else if (EntityTrackerEntryHandle.T.opt_vehicle.isAvailable()) {
+        } else if (EntityTrackerEntryStateHandle.T.opt_vehicle.isAvailable()) {
             // On <= MC 1.8.8 we must synchronize the vehicle of this Entity
 
             // Detach all removed passengers
@@ -980,7 +981,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
                 // Make sure the entity tracker does not synchronize a second time
                 EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);
                 if (entry != null) {
-                    EntityTrackerEntryHandle.T.opt_vehicle.set(entry.getRaw(), null);
+                    EntityTrackerEntryStateHandle.T.opt_vehicle.set(entry.getState().getRaw(), null);
                 }
             }
 
@@ -993,7 +994,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
                 // Make sure the entity tracker does not synchronize a second time
                 EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);
                 if (entry != null) {
-                    EntityTrackerEntryHandle.T.opt_vehicle.set(entry.getRaw(), this.entity);
+                    EntityTrackerEntryStateHandle.T.opt_vehicle.set(entry.getState().getRaw(), this.entity);
                 }
             }
         }

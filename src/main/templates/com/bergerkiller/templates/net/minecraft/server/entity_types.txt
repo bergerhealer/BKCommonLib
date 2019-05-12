@@ -51,7 +51,7 @@ class EntityTypes {
 
 #if version >= 1.14
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst() {
-        return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(instance);
+        return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(instance);
     }
 #elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
@@ -68,7 +68,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
                 return type;
             }
         }
@@ -84,7 +84,7 @@ class EntityTypes {
     public static Class<?> getEntityClass(String internalEntityName) {
         java.util.Optional opt = EntityTypes.a(internalEntityName);
         if (opt.isPresent()) {
-            return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(opt.get());
+            return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(opt.get());
         } else {
             return null;
         }
@@ -95,7 +95,7 @@ class EntityTypes {
         if (type == null) {
             return null;
         } else {
-            return com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type);
+            return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type);
         }
     }
 #endif
@@ -108,7 +108,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
                 MinecraftKey key = EntityTypes.getName(type);
                 if (key != null) {
                     return key.toString();
@@ -126,7 +126,7 @@ class EntityTypes {
 #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
-            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses.get(type) == entityType) {
+            if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
 #if version >= 1.13.1
                 return IRegistry.ENTITY_TYPE.a((Object) type);
 #else

@@ -8,11 +8,11 @@ import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -161,7 +161,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 newEntry = storedEntry;
             } else {
                 // Create a new unmodified, default server network entry
-                newEntry = CommonNMS.createDummyTrackerEntry(entity);
+                newEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(entity);
                 // Transfer data if needed
                 if (storedEntry != null) {
                     EntityTrackerEntryHandle.T.copyHandle(storedEntry, newEntry);
@@ -181,7 +181,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else {
             EntityTrackerEntryHandle oldEntry = storedEntry;
             if (oldEntry == null) {
-                oldEntry = CommonNMS.createDummyTrackerEntry(entity);
+                oldEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(entity);
             }
 
             // Convert the original entry into a hooked entry

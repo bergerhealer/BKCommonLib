@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
@@ -32,7 +33,7 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
 
     @HookMethod("public void track(List<EntityHuman> list)")
     public void track(List<?> list) {
-        EntityTrackerEntryHandle handle = EntityTrackerEntryHandle.createHandle(instance());
+        EntityTrackerEntryStateHandle handle = EntityTrackerEntryHandle.createHandle(instance()).getState();
         updateTrackers(handle, list);
         handle.setTimeSinceLocationSync(handle.getTimeSinceLocationSync() + 1);
         try {
@@ -97,8 +98,8 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
         }
     }
 
-    private void updateTrackers(EntityTrackerEntryHandle handle, List<?> list) {
-        EntityHandle entityHandle = handle.getTracker();
+    private void updateTrackers(EntityTrackerEntryStateHandle handle, List<?> list) {
+        EntityHandle entityHandle = handle.getEntity();
         if (entityHandle != null) {
             if (handle.isSynched()) {
                 double lastSyncX = handle.getPrevX();

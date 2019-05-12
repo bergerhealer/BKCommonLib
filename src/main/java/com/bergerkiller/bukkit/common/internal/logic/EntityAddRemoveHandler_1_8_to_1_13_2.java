@@ -157,9 +157,9 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         EntityTrackerEntryHandle entry = trackerMap.getEntry(entityId);
         if (entry != null) {
 
-            EntityHandle tracker = entry.getTracker();
+            EntityHandle tracker = entry.getState().getEntity();
             if (tracker != null && tracker.getId() == newInstance.getId()) {
-                entry.setTracker(newInstance);
+                entry.setEntity(newInstance);
             }
 
             List<EntityHandle> passengers = new ArrayList<EntityHandle>(tracker.getPassengers());

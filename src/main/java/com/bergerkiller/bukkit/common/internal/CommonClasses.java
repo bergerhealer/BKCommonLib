@@ -25,7 +25,7 @@ class CommonClasses {
         // Internal
         loadCommon("internal.CommonTabController");
         // Logic
-        loadLogic("EntityAddRemoveHandler", "EntityMoveHandler", "EntityTypesClasses", "RegionHandler");
+        loadLogic("EntityAddRemoveHandler", "EntityMoveHandler", "EntityTypingHandler", "RegionHandler");
         // Utility classes (only those that interact with nms)
         loadUtil("Block", "Chunk", "Common", "EntityProperty", "Entity", "Item", "Material", "Native", "NBT", "Packet");
         loadUtil("Recipe", "Stream", "World");

@@ -568,7 +568,9 @@ class EntityMinecartMobSpawner extends EntityMinecartAbstract {
 }
 
 class EntityItemFrame extends Entity {
-#if version >= 1.13
+#if version >= 1.14
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
+#elseif version >= 1.13
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;
 #elseif version >= 1.11
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;

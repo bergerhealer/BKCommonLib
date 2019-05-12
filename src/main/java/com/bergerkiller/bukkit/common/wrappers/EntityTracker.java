@@ -4,9 +4,6 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 
-import java.util.Set;
-
-import org.bukkit.Chunk;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 
@@ -39,15 +36,16 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
         sendPacket(entity, new CommonPacket(packet));
     }
 
-    /**
-     * Sends spawn packets to the player for all entities contained in the chunk
-     *
-     * @param player to send spawn packets to
-     * @param chunk containing the entities to update
-     */
-    public void spawnEntities(Player player, Chunk chunk) {
-        handle.spawnEntities(player, chunk);
-    }
+    // Disabled: this method doesn't work like how it used to on 1.14
+    ///**
+    // * Sends spawn packets to the player for all entities contained in the chunk
+    // *
+    // * @param player to send spawn packets to
+    // * @param chunk containing the entities to update
+    // */
+    //public void spawnEntities(Player player, Chunk chunk) {
+    //    handle.spawnEntities(player, chunk);
+    //}
 
     /**
      * Removes a player viewer, resulting in all entities being removed for the
@@ -58,7 +56,9 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @param player to remove from this Entity Tracker
      */
     public void removeViewer(Player player) {
-        handle.untrackPlayer(player);
+        for (EntityTrackerEntryHandle entry : handle.getEntries()) {
+            entry.removeViewer(player);
+        }
     }
 
     /**
@@ -69,7 +69,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      */
     public void updateViewer(Player player) {
         for (EntityTrackerEntryHandle entry : handle.getEntries()) {
-            if (entry.getTracker().toBukkit() != player) {
+            if (entry.getEntity().toBukkit() != player) {
                 entry.updatePlayer(player);
             }
         }
@@ -103,22 +103,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @return previously set entity tracker entry, null if there was none
      */
     public EntityTrackerEntryHandle setEntry(Entity entity, EntityTrackerEntryHandle entityTrackerEntry) {
-        EntityTrackerEntryHandle previous;
-        final int id = entity.getEntityId();
-
-        // Remove the original entry from the mapping and entry set
-        IntHashMap<?> trackedMap = handle.getTrackedEntities();
-        Set<EntityTrackerEntryHandle> trackers = handle.getEntries();
-        previous = EntityTrackerEntryHandle.createHandle(trackedMap.remove(id));
-        trackers.remove(previous);
-
-        // Add the new entry
-        if (entityTrackerEntry != null) {
-            trackedMap.put(id, entityTrackerEntry.getRaw());
-            trackers.add(entityTrackerEntry);
-        }
-
-        return previous;
+        return handle.putEntry(entity.getEntityId(), entityTrackerEntry);
     }
 
     /**
@@ -128,17 +113,17 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      * @return entity tracker entry
      */
     public EntityTrackerEntryHandle getEntry(Entity entity) {
-        return EntityTrackerEntryHandle.createHandle(this.handle.getTrackedEntities().get(entity.getEntityId()));
+        return getEntry(entity.getEntityId());
     }
 
     /**
      * Gets the entity tracker entry of an entity Id
      *
-     * @param id of the entity to get the entry of
+     * @param entityId of the entity to get the entry of
      * @return entity tracker entry
      */
-    public EntityTrackerEntryHandle getEntry(int id) {
-        return EntityTrackerEntryHandle.createHandle(this.handle.getTrackedEntities().get(id));
+    public EntityTrackerEntryHandle getEntry(int entityId) {
+        return this.handle.getEntry(entityId);
     }
 
     /**

@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
-import com.bergerkiller.bukkit.common.internal.logic.EntityTypesClasses;
+import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 
@@ -66,8 +66,6 @@ public class ReflectionTest {
             loadClass(NMSNetworkManager.class);
             loadClass(NMSEntityPlayer.class);
             loadClass(NMSWorldServer.class);
-            loadClass(NMSEntityTracker.class);
-            loadClass(NMSEntityTrackerEntry.class);
             loadClass(NMSPlayerAbilities.class);
             loadClass(NMSIChatBaseComponent.class);
             loadClass(NMSDamageSource.class);
@@ -111,7 +109,7 @@ public class ReflectionTest {
             loadClass(CBCraftScheduler.class);
 
             loadClass(EntityAddRemoveHandler.class);
-            loadClass(EntityTypesClasses.class);
+            loadClass(EntityTypingHandler.class);
             loadClass(RegionHandler.class);
             loadClass(CommonEntityType.class);
 

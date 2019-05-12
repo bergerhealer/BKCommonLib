@@ -3,12 +3,9 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
-import java.util.Set;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityTracker</b>.
@@ -28,34 +25,30 @@ public abstract class EntityTrackerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract Collection<EntityTrackerEntryHandle> getEntries();
+    public abstract EntityTrackerEntryHandle getEntry(int entityId);
+    public abstract EntityTrackerEntryHandle putEntry(int entityId, EntityTrackerEntryHandle entry);
     public abstract void sendPacketToEntity(Entity entity, CommonPacket packet);
     public abstract void trackEntity(Entity entity);
     public abstract void untrackEntity(Entity entity);
-    public abstract void untrackPlayer(Player player);
-    public abstract void spawnEntities(Player entityplayer, Chunk chunk);
     public abstract World getWorld();
     public abstract void setWorld(World value);
-    public abstract Set<EntityTrackerEntryHandle> getEntries();
-    public abstract void setEntries(Set<EntityTrackerEntryHandle> value);
-    public abstract IntHashMap<Object> getTrackedEntities();
-    public abstract void setTrackedEntities(IntHashMap<Object> value);
-    public abstract int getViewDistance();
-    public abstract void setViewDistance(int value);
+    public abstract int getTrackingDistance();
+    public abstract void setTrackingDistance(int value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityTracker</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTrackerClass extends Template.Class<EntityTrackerHandle> {
         public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
-        public final Template.Field.Converted<Set<EntityTrackerEntryHandle>> entries = new Template.Field.Converted<Set<EntityTrackerEntryHandle>>();
-        public final Template.Field.Converted<IntHashMap<Object>> trackedEntities = new Template.Field.Converted<IntHashMap<Object>>();
-        public final Template.Field.Integer viewDistance = new Template.Field.Integer();
+        public final Template.Field.Integer trackingDistance = new Template.Field.Integer();
 
+        public final Template.Method<Collection<EntityTrackerEntryHandle>> getEntries = new Template.Method<Collection<EntityTrackerEntryHandle>>();
+        public final Template.Method.Converted<EntityTrackerEntryHandle> getEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();
+        public final Template.Method.Converted<EntityTrackerEntryHandle> putEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();
         public final Template.Method.Converted<Void> sendPacketToEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> untrackEntity = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> untrackPlayer = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> spawnEntities = new Template.Method.Converted<Void>();
 
     }
 

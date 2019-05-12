@@ -3,7 +3,10 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 
+import org.bukkit.entity.Entity;
+
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -17,13 +20,13 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * Class is spawned for various Entity Types. This class tracks
  * all these in a map.
  */
-public class EntityTypesClasses_1_14 extends EntityTypesClasses {
+public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     private final IdentityHashMap<Object, Class<?>> _cache = new IdentityHashMap<Object, Class<?>>();
     private final FastMethod<Class<?>> findEntityTypesClass = new FastMethod<Class<?>>();
     private final Object nmsWorldHandle;
 
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
-    public EntityTypesClasses_1_14() {
+    public EntityTypingHandler_1_14() {
         {
             ClassResolver resolver = new ClassResolver();
             resolver.setDeclaredClass(EntityTypesHandle.T.getType());
@@ -111,5 +114,11 @@ public class EntityTypesClasses_1_14 extends EntityTypesClasses {
             this._cache.put(nmsEntityTypesInstance, result);
         }
         return result;
+    }
+
+    @Override
+    public EntityTrackerEntryHandle createEntityTrackerEntry(Entity entity) {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

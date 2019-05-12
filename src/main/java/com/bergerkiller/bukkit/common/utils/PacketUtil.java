@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -8,10 +7,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -20,58 +17,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.Collection;
-import java.util.Map;
 
 public class PacketUtil {
-
-    /**
-     * Sends all the packets required to properly display a chunk to a player
-     *
-     * @param player to send to
-     * @param chunk to send the information of
-     */
-    public static void sendChunk(Player player, org.bukkit.Chunk chunk) {
-        sendChunk(player, chunk, true);
-    }
-
-    /**
-     * Sends all the packets required to properly display a chunk to a player.
-     * To only send (Tile)Entity related information, use a 'sendPayload' of
-     * False.
-     *
-     * @param player to send to
-     * @param chunk to send the information of
-     * @param sendPayload - whether the block data is sent
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public static void sendChunk(final Player player, final org.bukkit.Chunk chunk, boolean sendPayload) {
-        final Object chunkHandle = HandleConversion.toChunkHandle(chunk);
-        final Map<Object, Object> tileEntities = (Map<Object, Object>) ChunkHandle.T.tileEntities.raw.get(chunkHandle);
-
-        // Send payload
-        if (sendPayload) {
-            sendPacket(player, PacketType.OUT_MAP_CHUNK.newInstance(chunk));
-            //sendPacket(player, PacketType.OUT_MAP_CHUNK_BULK.newInstance(Arrays.asList(chunk)));
-        }
-        // Tile entities
-        CommonPacket packet;
-        for (Object tile : tileEntities.values()) {
-            if (tile == null) {
-                continue;
-            }
-            if ((packet = TileEntityHandle.T.getUpdatePacket.invoke(tile)) != null) {
-                PacketUtil.sendPacket(player, packet);
-            }
-        }
-
-        // Entity spawn messages
-        CommonUtil.nextTick(new Runnable() {
-            public void run() {
-                WorldUtil.getTracker(player.getWorld()).spawnEntities(player, chunk);
-            }
-        });
-    }
 
     /**
      * Fakes a packet sent from the Client to the Server for a certain Player.
