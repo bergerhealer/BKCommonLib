@@ -25,6 +25,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract boolean checkTrackNeeded();
     public abstract CommonPacket getSpawnPacket();
 
     public double getXVel() {
@@ -249,14 +250,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public abstract void setRaw_headYaw(int value);
     public abstract int getTickCounter();
     public abstract void setTickCounter(int value);
-    public abstract double getPrevX();
-    public abstract void setPrevX(double value);
-    public abstract double getPrevY();
-    public abstract void setPrevY(double value);
-    public abstract double getPrevZ();
-    public abstract void setPrevZ(double value);
-    public abstract boolean isSynched();
-    public abstract void setSynched(boolean value);
     public abstract int getTimeSinceLocationSync();
     public abstract void setTimeSinceLocationSync(int value);
     /**
@@ -292,16 +285,13 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Converted<Vector> opt_velocity = new Template.Field.Converted<Vector>();
         public final Template.Field.Integer tickCounter = new Template.Field.Integer();
-        public final Template.Field.Double prevX = new Template.Field.Double();
-        public final Template.Field.Double prevY = new Template.Field.Double();
-        public final Template.Field.Double prevZ = new Template.Field.Double();
-        public final Template.Field.Boolean synched = new Template.Field.Boolean();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Converted<List<Entity>> opt_passengers = new Template.Field.Converted<List<Entity>>();
         @Template.Optional
         public final Template.Field.Converted<Entity> opt_vehicle = new Template.Field.Converted<Entity>();
 
+        public final Template.Method<Boolean> checkTrackNeeded = new Template.Method<Boolean>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
 
     }

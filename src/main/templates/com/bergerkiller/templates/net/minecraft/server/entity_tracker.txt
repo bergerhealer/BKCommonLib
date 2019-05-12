@@ -385,13 +385,45 @@ class EntityTrackerEntryState {
     }
     </code>
 
-    // Note: stopped existing since 1.14
-    // ====================================
-    private double prevX:q;
-    private double prevY:r;
-    private double prevZ:s;
-    private boolean synched:isMoving;
-    // ====================================
+#if version >= 1.14
+    // On Minecraft 1.14 this resync distance check is no longer done
+    public boolean checkTrackNeeded() {
+        return true;
+    }
+#else
+    // On Minecraft 1.13.2 this tracks the last position
+    // When it changes by more than 16 blocks, rescan all players
+    public boolean checkTrackNeeded() {
+        #require net.minecraft.server.EntityTrackerEntryState private final Entity entity:tracker;
+        #require net.minecraft.server.EntityTrackerEntryState private double prevX:q;
+        #require net.minecraft.server.EntityTrackerEntryState private double prevY:r;
+        #require net.minecraft.server.EntityTrackerEntryState private double prevZ:s;
+        #require net.minecraft.server.EntityTrackerEntryState private boolean synched:isMoving;
+
+        Entity entity = instance#entity;
+        if (entity == null) {
+            return true;
+        }
+
+        boolean isSynched = instance#synched;
+        if (isSynched) {
+            double lastSyncX = instance#prevX;
+            double lastSyncY = instance#prevY;
+            double lastSyncZ = instance#prevZ;
+            double distance = entity.e(lastSyncX, lastSyncY, lastSyncZ);
+            if (distance <= 16.0) {
+                return false;
+            }
+        }
+
+        // Update tracking data
+        instance#prevX = entity.locX;
+        instance#prevY = entity.locY;
+        instance#prevZ = entity.locZ;
+        instance#synched = true;
+        return true;
+    }
+#endif
 
     // Moved to top on MC 1.14
 #if version <= 1.13.2
@@ -545,7 +577,7 @@ class EntityTrackerEntryState {
 
 #if version >= 1.14
     public (CommonPacket) Packet<?> getSpawnPacket() {
-        #require net.minecraft.server.EntityTrackerEntryState public final Entity entity:tracker;
+        #require net.minecraft.server.EntityTrackerEntryState private final Entity entity:tracker;
         Entity entity = instance#entity;
         return entity.N();
     }

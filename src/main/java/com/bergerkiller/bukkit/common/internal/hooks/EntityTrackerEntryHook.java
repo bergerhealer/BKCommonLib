@@ -10,7 +10,6 @@ import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -26,12 +25,7 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
         this.controller = controller;
     }
 
-    @HookMethod("public void scanPlayers(List<EntityHuman> list)")
-    public void scanPlayers(List<?> list) {
-        base.scanPlayers(list);
-    }
-
-    @HookMethod("public void track(List<EntityHuman> list)")
+    @HookMethod("public void track(List list)")
     public void track(List<?> list) {
         EntityTrackerEntryStateHandle handle = EntityTrackerEntryHandle.createHandle(instance()).getState();
         updateTrackers(handle, list);
@@ -99,25 +93,10 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
     }
 
     private void updateTrackers(EntityTrackerEntryStateHandle handle, List<?> list) {
-        EntityHandle entityHandle = handle.getEntity();
-        if (entityHandle != null) {
-            if (handle.isSynched()) {
-                double lastSyncX = handle.getPrevX();
-                double lastSyncY = handle.getPrevY();
-                double lastSyncZ = handle.getPrevZ();
-                double distance = entityHandle.calculateDistance(lastSyncX, lastSyncY, lastSyncZ);
-                if (distance <= 16.0) {
-                    return;
-                }
+        if (handle.checkTrackNeeded()) {
+            for (int i = 0; i < list.size(); ++i) {
+                this.updatePlayer(list.get(i));
             }
-
-            // Update tracking data
-            handle.setPrevX(entityHandle.getLocX());
-            handle.setPrevY(entityHandle.getLocY());
-            handle.setPrevZ(entityHandle.getLocZ());
         }
-
-        handle.setSynched(true);
-        scanPlayers(list);
     }
 }
