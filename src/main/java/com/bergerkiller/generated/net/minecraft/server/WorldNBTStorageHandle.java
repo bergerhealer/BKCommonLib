@@ -9,7 +9,7 @@ import java.io.File;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-public abstract class WorldNBTStorageHandle extends IDataManagerHandle {
+public abstract class WorldNBTStorageHandle extends Template.Handle {
     /** @See {@link WorldNBTStorageClass} */
     public static final WorldNBTStorageClass T = new WorldNBTStorageClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(WorldNBTStorageHandle.class, "net.minecraft.server.WorldNBTStorage", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);

@@ -166,7 +166,14 @@ class ChunkSection {
 
     public int getYPosition();
 
-    public (ChunkSectionHandle) ChunkSection(int y, boolean hasSkyLight);
+    public static (ChunkSectionHandle) ChunkSection createNew((org.bukkit.World) World world, int y) {
+#if version >= 1.14
+        return new ChunkSection(y);
+#else
+        Boolean hasSkyLight = com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle.T.hasSkyLight.invoke(world.worldProvider);
+        return new ChunkSection(y, hasSkyLight.booleanValue());
+#endif
+    }
 
 #if version >= 1.13
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
@@ -179,7 +186,12 @@ class ChunkSection {
 #endif
 
     public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
+
+#if version >= 1.14
+    public (void) IBlockData setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+#else
     public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+#endif
 }
 
 // This is only used on CraftBukkit servers

@@ -3,8 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Location;
-import org.bukkit.entity.Entity;
-import org.bukkit.util.Vector;
+import org.bukkit.World;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PortalTravelAgent</b>.
@@ -22,15 +21,28 @@ public abstract class PortalTravelAgentHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
+    public static final PortalTravelAgentHandle createNew(World world) {
+        return T.constr_world.newInstance(world);
+    }
+
     /* ============================================================================== */
 
-    public abstract void adjustExit(Entity entity, Location position, Vector velocity);
+    public abstract Location findPortal(Location startLocation);
+    public abstract boolean createPortal(double x, double y, double z);
+    @Template.Readonly
+    public abstract World getWorld();
     /**
      * Stores class members for <b>net.minecraft.server.PortalTravelAgent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PortalTravelAgentClass extends Template.Class<PortalTravelAgentHandle> {
-        public final Template.Method.Converted<Void> adjustExit = new Template.Method.Converted<Void>();
+        public final Template.Constructor.Converted<PortalTravelAgentHandle> constr_world = new Template.Constructor.Converted<PortalTravelAgentHandle>();
+
+        @Template.Readonly
+        public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
+
+        public final Template.Method<Location> findPortal = new Template.Method<Location>();
+        public final Template.Method<Boolean> createPortal = new Template.Method<Boolean>();
 
     }
 

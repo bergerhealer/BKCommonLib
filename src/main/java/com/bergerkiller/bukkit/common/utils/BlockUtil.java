@@ -521,7 +521,7 @@ public class BlockUtil extends MaterialUtil {
                 int yMax = y + radiusY;
                 int zMax = z + radiusZ;
                 Object blockPosition;
-                for (Object tile : NMSWorld.getTileList(world)) {
+                for (Object tile : WorldServerHandle.T.getTileEntityList.invoke(HandleConversion.toWorldHandle(world))) {
                     blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
 
                     // Check again - security against ghost tiles

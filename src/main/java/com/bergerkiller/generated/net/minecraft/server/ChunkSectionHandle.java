@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import org.bukkit.World;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ChunkSection</b>.
@@ -20,11 +21,11 @@ public abstract class ChunkSectionHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final ChunkSectionHandle createNew(int y, boolean hasSkyLight) {
-        return T.constr_y_hasSkyLight.newInstance(y, hasSkyLight);
-    }
-
     /* ============================================================================== */
+
+    public static ChunkSectionHandle createNew(World world, int y) {
+        return T.createNew.invoke(world, y);
+    }
 
     public abstract boolean isEmpty();
     public abstract int getYPosition();
@@ -36,7 +37,7 @@ public abstract class ChunkSectionHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkSectionClass extends Template.Class<ChunkSectionHandle> {
-        public final Template.Constructor.Converted<ChunkSectionHandle> constr_y_hasSkyLight = new Template.Constructor.Converted<ChunkSectionHandle>();
+        public final Template.StaticMethod.Converted<ChunkSectionHandle> createNew = new Template.StaticMethod.Converted<ChunkSectionHandle>();
 
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Integer> getYPosition = new Template.Method<Integer>();

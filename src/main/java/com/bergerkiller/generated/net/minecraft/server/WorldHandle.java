@@ -8,7 +8,6 @@ import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
-import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Stream;
@@ -41,14 +40,13 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract Stream<VoxelShapeHandle> getCollisionShapes(EntityHandle entity, AxisAlignedBBHandle boundingBox, double dx, double dy, double dz);
     public abstract List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
-    public abstract List<EntityHandle> getEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
+    public abstract List<EntityHandle> getNearbyEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract TileEntityHandle getTileEntity(IntVector3 blockposition);
     public abstract WorldDataHandle getWorldData();
     public abstract boolean isBurnArea(AxisAlignedBBHandle bounds);
     public abstract void removeEntity(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
     public abstract Entity getEntityById(int entityId);
-    public abstract IDataManagerHandle getDataManager();
     public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag);
@@ -58,6 +56,11 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract void setSectionBlockLight(int cx, int cy, int cz, byte[] data);
     public abstract byte[] getSectionSkyLight(int cx, int cy, int cz);
     public abstract byte[] getSectionBlockLight(int cx, int cy, int cz);
+
+    public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
+    public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
+    public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
+
 
     public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
         if (T.opt_applyPhysics.isAvailable()) {
@@ -80,10 +83,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
-    public abstract Collection<EntityHandle> getEntityRemoveQueue();
-    public abstract void setEntityRemoveQueue(Collection<EntityHandle> value);
-    public abstract List<EntityHumanHandle> getPlayers();
-    public abstract void setPlayers(List<EntityHumanHandle> value);
     public abstract Random getRandom();
     public abstract void setRandom(Random value);
     public abstract WorldProviderHandle getWorldProvider();
@@ -101,10 +100,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
-        public final Template.Field.Converted<Collection<EntityHandle>> entityRemoveQueue = new Template.Field.Converted<Collection<EntityHandle>>();
-        @Template.Optional
-        public final Template.Field.Converted<List<TileEntityHandle>> tileEntityList = new Template.Field.Converted<List<TileEntityHandle>>();
-        public final Template.Field.Converted<List<EntityHumanHandle>> players = new Template.Field.Converted<List<EntityHumanHandle>>();
         public final Template.Field<Random> random = new Template.Field<Random>();
         public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
         @Template.Optional
@@ -130,7 +125,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Stream<VoxelShapeHandle>> getCollisionShapes = new Template.Method.Converted<Stream<VoxelShapeHandle>>();
         public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
-        public final Template.Method.Converted<List<EntityHandle>> getEntities = new Template.Method.Converted<List<EntityHandle>>();
+        public final Template.Method.Converted<List<EntityHandle>> getNearbyEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
         public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();
         @Template.Optional
@@ -139,7 +134,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
-        public final Template.Method.Converted<IDataManagerHandle> getDataManager = new Template.Method.Converted<IDataManagerHandle>();
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();

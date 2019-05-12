@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
-import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -27,31 +27,6 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 
 class World extends IBlockAccess {
-    /* protected final (IntHashMap<EntityHandle>) IntHashMap<Entity> entitiesById; */
-
-#if version >= 1.9
-
-    #if paperspigot
-        #if version >= 1.13
-            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:g;
-        #else
-            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:f;
-        #endif
-    #else
-        #if version >= 1.13
-            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
-        #else
-            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:f;
-        #endif
-    #endif
-
-    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList;
-#else
-    protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
-    public optional final (List<TileEntityHandle>) List<TileEntity> tileEntityList:###;
-#endif
-
-    public final (List<EntityHumanHandle>) List<EntityHuman> players;
     public final Random random;
     public (WorldProviderHandle) WorldProvider worldProvider;
 
@@ -96,6 +71,12 @@ class World extends IBlockAccess {
         // Fallback is AIR
         return com.bergerkiller.bukkit.common.wrappers.BlockData.AIR;
     }
+
+    <code>
+    public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
+    public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
+    public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
+    </code>
 
     public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
 
@@ -150,7 +131,7 @@ class World extends IBlockAccess {
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
-    public (List<EntityHandle>) List<Entity> getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public (List<EntityHandle>) List<Entity> getNearbyEntities:getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
 
@@ -182,8 +163,6 @@ class World extends IBlockAccess {
 #else
     public (org.bukkit.entity.Entity) Entity getEntityById:a(int entityId);
 #endif
-
-    public (IDataManagerHandle) IDataManager getDataManager();
 
     public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
@@ -369,16 +348,83 @@ class World extends IBlockAccess {
 }
 
 class WorldServer extends World {
-    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker:tracker;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
+#if version >= 1.9
+
+    #if paperspigot
+        #if version >= 1.13
+            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:g;
+        #else
+            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:f;
+        #endif
+    #else
+        #if version >= 1.13
+            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
+        #else
+            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:f;
+        #endif
+    #endif
+
+    public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
+        return instance.tileEntityList;
+    }
+#else
+    protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
+
+    public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
+        // Fallback for 1.8.8 and before, which is slower, but works
+        java.util.ArrayList tiles = new java.util.ArrayList();
+
+        // Go by all the chunks and add their tile entities (slower!)
+        //TODO: Maybe do this in a smart way so no new list has to be allocated?
+        //      Iterate the chunks while iterating the list, for example.
+        java.util.Iterator iter = instance.chunkProviderServer.chunks.values().iterator();
+        while (iter.hasNext()) {
+            Chunk chunk = (Chunk) iter.next();
+            if (chunk == null) {
+                continue;
+            }
+            tiles.addAll(tileEntities.values());
+        }
+
+        return tiles;
+    }
+#endif
+
 #if version >= 1.14
+    public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers();
+#else
+    // Note: is List<EntityHuman> on 1.13.2 and before, but only stores players, so this is safe.
+    public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers() {
+        return instance.players;
+    }
+#endif
+
+#if version >= 1.14
+    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker getEntityTracker() {
+        return instance.getChunkProvider().playerChunkMap;
+    }
+
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         return instance.getChunkProvider().playerChunkMap;
     }
+
+    public void setEntityTracker((com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker) {
+        #require net.minecraft.server.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+        instance.getChunkProvider()#playerChunkMap = entityTracker;
+    }
 #else
+    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker getEntityTracker() {
+        return instance.tracker;
+    }
+
+    public void setEntityTracker((com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker) {
+        instance.tracker = entityTracker;
+    }
+
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 #endif
 
@@ -389,6 +435,14 @@ class WorldServer extends World {
         return instance.chunkProviderServer;
 #endif
     }
+
+#if version >= 1.14
+    public (WorldNBTStorageHandle) WorldNBTStorage getDataManager();
+#else
+    public (WorldNBTStorageHandle) WorldNBTStorage getDataManager() {
+        return (WorldNBTStorage) instance.getDataManager();
+    }
+#endif
 
 #if version >= 1.14
     public (List<EntityHandle>) List<Entity> getEntityList() {
@@ -619,11 +673,7 @@ interface IWorldAccess {
 interface IBlockAccess {
 }
 
-interface IDataManager {
-
-}
-
-class WorldNBTStorage extends IDataManager {
+class WorldNBTStorage {
     public java.io.File getPlayerDir();
 }
 

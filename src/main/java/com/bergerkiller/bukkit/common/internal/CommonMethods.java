@@ -22,7 +22,7 @@ public class CommonMethods {
     }
 
     public static ChunkSectionHandle ChunkSection_new(org.bukkit.World world, int y) {
-        return ChunkSectionHandle.createNew(y >> 4 << 4, CommonNMS.getHandle(world).getWorldProvider().hasSkyLight());
+        return ChunkSectionHandle.createNew(world, y >> 4 << 4);
     }
 
     public static ExplosionHandle Explosion_new(org.bukkit.World world, double x, double y, double z) {

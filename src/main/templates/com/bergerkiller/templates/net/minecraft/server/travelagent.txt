@@ -1,5 +1,132 @@
 package net.minecraft.server;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
+
 class PortalTravelAgent {
-    public void adjustExit((org.bukkit.entity.Entity) Entity entity, org.bukkit.Location position, org.bukkit.util.Vector velocity);
+    private final readonly (org.bukkit.World) WorldServer world;
+
+    public (PortalTravelAgentHandle) PortalTravelAgent((org.bukkit.World) WorldServer world);
+
+    public org.bukkit.Location findPortal(org.bukkit.Location startLocation) {
+        #require net.minecraft.server.PortalTravelAgent private final WorldServer world;
+        WorldServer world = instance#world;
+
+        double x = startLocation.getX();
+        double y = startLocation.getY();
+        double z = startLocation.getZ();
+
+#if version >= 1.14
+        // Special handling for END dimensions. This code is found in the old 1.13.2 PortalTravelAgent code.
+        // Bukkit also separated this, but with 1.14 this was removed for some reason.
+        if (world.worldProvider.getDimensionManager() == DimensionManager.THE_END) {
+            int i = MathHelper.floor(x);
+            int j = MathHelper.floor(y) - 1;
+            int k = MathHelper.floor(z);
+            byte b0 = 1;
+            byte b1 = 0;
+            for (int l = -2; l <= 2; ++l) {
+                for (int i1 = -2; i1 <= 2; ++i1) {
+                    for (int j1 = -1; j1 < 3; ++j1) {
+                        int k1 = i + i1 * b0 + l * b1;
+                        int l1 = j + j1;
+                        int i2 = k + i1 * b1 - l * b0;
+                        boolean flag = j1 < 0;
+
+                        if (world.getType(new BlockPosition(k1, l1, i2)).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+                            return null;
+                        }
+                    }
+                }
+            }
+            org.bukkit.Location location = startLocation.clone();
+            location.setX((double) i);
+            location.setY((double) j);
+            location.setZ((double) k);
+            return location;
+        }
+
+        // public ShapeDetector.c a(BlockPosition blockposition, Vec3D entityMotion, EnumDirection entityFacing, double portalOffsetX, double portalOffsetZ, boolean isHuman) {
+        BlockPosition blockPosition = new BlockPosition(x, y, z);
+        Vec3D entityMotion = Vec3D.a; // 0, 0, 0
+        EnumDirection entityFacing = EnumDirection.NORTH;
+        double portalOffsetX = 0.0;
+        double portalOffsetZ = 0.0;
+        boolean isHuman = true;
+        ShapeDetector$c result = instance.a(blockPosition, entityMotion, entityFacing, portalOffsetX, portalOffsetZ, isHuman);
+        if (result == null) {
+            return null;
+        }
+
+        // result stores position (Vec3D a), motion (Vec3D b) and rotation (int c)
+        // turn rotation into yaw. Assign x/y/z of a to location
+        org.bukkit.Location location = startLocation.clone();
+        location.setX(result.a.x);
+        location.setY(result.a.y);
+        location.setZ(result.a.z);
+        location.setYaw((float) result.c);
+        return location;
+#else
+        BlockPosition portalPosition = instance.findPortal(x, y, z, 128);
+        if (portalPosition == null) {
+            return null;
+        }
+
+        // Adjust exit now
+        // Requires an Entity parameter that cannot be null. So just null-construct a player one.
+        // Note that this will cause a NPE, this is expected behavior, so just catch it.
+        Entity entity = (Entity) com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.newInstanceNull();
+        org.bukkit.Location location = startLocation.clone();
+        org.bukkit.util.Vector velocity = new org.bukkit.util.Vector(0.0, 0.0, 0.0);
+        location.setX((double) portalPosition.getX());
+        location.setY((double) portalPosition.getY());
+        location.setZ((double) portalPosition.getZ());
+        try {
+            instance.adjustExit(entity, location, velocity);
+        } catch (NullPointerException ex) {
+        }
+        return location;
+#endif
+    }
+
+    public boolean createPortal(double x, double y, double z) {
+#if version >= 1.14
+        // Special handling for END dimensions. This code is found in EntityPlayer (where getTravelAgent() is called later)
+        // Bukkit also separated this, but with 1.14 this was removed for some reason.
+        #require net.minecraft.server.PortalTravelAgent private final WorldServer world;
+        WorldServer world = instance#world;
+        if (world.worldProvider.getDimensionManager() == DimensionManager.THE_END) {
+            int i = MathHelper.floor(x);
+            int j = MathHelper.floor(y) - 1;
+            int k = MathHelper.floor(z);
+
+            for (int l = -2; l <= 2; ++l) {
+                for (int i1 = -2; i1 <= 2; ++i1) {
+                    for (int j1 = -1; j1 < 3; ++j1) {
+                        int k1 = i + i1 * 1 + l * 0;
+                        int l1 = j + j1;
+                        int i2 = k + i1 * 0 - l * 1;
+                        boolean flag2 = j1 < 0;
+
+                        world.setTypeUpdate(new BlockPosition(k1, l1, i2), flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData());
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        // It now only accepts an Entity as parameter.
+        // The method, however, only uses the locX/locY/locZ
+        // Simply null-construct a temporary entity and set these fields
+        Entity entity = (Entity) com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.newInstanceNull();
+        entity.locX = x;
+        entity.locY = y;
+        entity.locZ = z;
+        return instance.a(entity);
+#else
+        return instance.createPortal(x, y, z, 16);
+#endif
+    }
 }

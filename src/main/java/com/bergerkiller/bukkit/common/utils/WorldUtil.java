@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
@@ -18,20 +17,16 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.IDataManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftTravelAgentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import org.bukkit.Bukkit;
@@ -55,8 +50,6 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class WorldUtil extends ChunkUtil {
-
-    private static final Object findSpawnDummyEntity = EntityPlayerHandle.T.newInstanceNull();
 
     /**
      * Gets BlockData for a particular Block
@@ -153,7 +146,8 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
-        NMSWorld.updateBlock(HandleConversion.toWorldHandle(world), x, y, z, data, NMSWorld.UPDATE_DEFAULT);
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), WorldHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -291,7 +285,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of players on the world
      */
     public static Collection<Player> getPlayers(org.bukkit.World world) {
-        return DuplexConversion.playerList.convert(WorldHandle.T.players.raw.get(HandleConversion.toWorldHandle(world)));
+        return DuplexConversion.playerList.convert(WorldServerHandle.T.getPlayers.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 
     /**
@@ -368,19 +362,15 @@ public class WorldUtil extends ChunkUtil {
      * failed
      */
     public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
-        // Use a new travel agent to designate a proper position
-        CraftTravelAgentHandle travelAgent = CraftTravelAgentHandle.createNew(startLocation.getWorld());
-        travelAgent.setCanCreatePortal(createPortals);
-        Location exit = travelAgent.findOrCreate(startLocation);
-        // Adjust the exit to make it suitable for players
-        // Note: this will raise an NPE while trying to fire the PortalExit event
-        // This is expected behavior
-        try {
-            travelAgent.adjustExit(WrapperConversion.toEntity(findSpawnDummyEntity), exit, new Vector(0, 0, 0));
-        } catch (NullPointerException ex) {
+        // Patch up the Start Location to find portals nearby to spawn at
+        PortalTravelAgentHandle travelAgent = PortalTravelAgentHandle.createNew(startLocation.getWorld());
+        Location portal = travelAgent.findPortal(startLocation);
+        if (portal == null) {
+            if (createPortals && travelAgent.createPortal(startLocation.getX(), startLocation.getY(), startLocation.getZ())) {
+                portal = travelAgent.findPortal(startLocation);
+            }
         }
-        // Done!
-        return exit;
+        return (portal == null) ? startLocation.clone() : portal;
     }
 
     /**
@@ -390,11 +380,7 @@ public class WorldUtil extends ChunkUtil {
      * @return players folder
      */
     public static File getPlayersFolder(org.bukkit.World world) {
-        IDataManagerHandle man = WorldHandle.fromBukkit(world).getDataManager();
-        if (man.isInstanceOf(WorldNBTStorageHandle.T)) {
-            return man.cast(WorldNBTStorageHandle.T).getPlayerDir();
-        }
-        return new File(getWorldFolder(world), "playerdata");
+        return WorldServerHandle.fromBukkit(world).getDataManager().getPlayerDir();
     }
 
     /**
@@ -430,7 +416,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world Entity Tracker
      */
     public static EntityTracker getTracker(org.bukkit.World world) {
-        return WorldServerHandle.T.entityTracker.get(HandleConversion.toWorldHandle(world));
+        return WorldServerHandle.T.getEntityTracker.invoke(HandleConversion.toWorldHandle(world));
     }
 
     /**
@@ -474,7 +460,7 @@ public class WorldUtil extends ChunkUtil {
         Object worldHandle = Conversion.toWorldHandle.convert(world);
         Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
         Object axisAlignedBB = NMSVector.newAxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
-        List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, ignoreHandle, axisAlignedBB);
+        List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, ignoreHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
@@ -492,7 +478,7 @@ public class WorldUtil extends ChunkUtil {
         Object entityHandle = Conversion.toEntityHandle.convert(entity);
         Object entityBounds = EntityHandle.T.getBoundingBox.raw.invoke(entityHandle);
         Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
-        List<?> entityHandles = NMSWorld.getEntities.invoke(worldHandle, entityHandle, axisAlignedBB);
+        List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, entityHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
 
@@ -774,7 +760,9 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        return new ConvertingList<BlockState>(NMSWorld.getTileList(world), DuplexConversion.blockState);
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        return new ConvertingList<BlockState>(WorldServerHandle.T.getTileEntityList.invoke(worldHandle),
+                DuplexConversion.blockState);
     }
 
     /**

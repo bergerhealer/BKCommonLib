@@ -1,6 +1,5 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -14,8 +13,6 @@ import java.util.UUID;
 @Deprecated
 public class NMSWorldServer extends NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("WorldServer");
-
-    public static final FieldAccessor<EntityTracker> entityTracker = WorldServerHandle.T.entityTracker.toFieldAccessor();
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static final FieldAccessor<Map<UUID, Object>> entitiesByUUID = (FieldAccessor) WorldServerHandle.T.entitiesByUUID.raw.toFieldAccessor();
