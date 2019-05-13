@@ -60,16 +60,6 @@ public class EntityTrackerEntryHook extends ClassHook<EntityTrackerEntryHook> {
         }
     }
 
-    @HookMethod("public void clear(EntityPlayer entityplayer)")
-    public void clear(Object entityplayer) {
-        try {
-            controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
-        } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
-            t.printStackTrace();
-        }
-    }
-
     @HookMethod("public void removeViewer:???(EntityPlayer entityplayer)")
     public void removeViewer(Object entityplayer) {
         try {

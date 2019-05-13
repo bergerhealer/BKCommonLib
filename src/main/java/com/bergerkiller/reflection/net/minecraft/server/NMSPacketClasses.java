@@ -81,6 +81,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHan
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHeadRotationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutLoginHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
@@ -724,24 +725,24 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> dyaw = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaYaw();
+                return PacketPlayOutEntityHandle.createHandle(instance).getYaw();
             }
 
             @Override
             public boolean set(Object instance, Float value) {
-                PacketPlayOutEntityHandle.createHandle(instance).setDeltaYaw(value.floatValue());
+                PacketPlayOutEntityHandle.createHandle(instance).setYaw(value.floatValue());
                 return true;
             }
         };
         public final FieldAccessor<Float> dpitch = new SafeDirectField<Float>() {
             @Override
             public Float get(Object instance) {
-                return PacketPlayOutEntityHandle.createHandle(instance).getDeltaPitch();
+                return PacketPlayOutEntityHandle.createHandle(instance).getPitch();
             }
 
             @Override
             public boolean set(Object instance, Float value) {
-                PacketPlayOutEntityHandle.createHandle(instance).setDeltaPitch(value.floatValue());
+                PacketPlayOutEntityHandle.createHandle(instance).setPitch(value.floatValue());
                 return true;
             }
         };
@@ -850,13 +851,23 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutEntityHeadRotation extends NMSPacket {
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityHeadRotationHandle.T.entityId.toFieldAccessor();
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Byte> headYaw = nextFieldSignature("private byte b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EntityHandle.T.getType(), byte.class);
+        public final FieldAccessor<Float> headYaw = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayOutEntityHeadRotationHandle.createHandle(instance).getHeadYaw();
+            }
 
-        public CommonPacket newInstance(org.bukkit.entity.Entity entity, byte headRotation) {
-            return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), headRotation);
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayOutEntityHeadRotationHandle.createHandle(instance).setHeadYaw(value.floatValue());
+                return true;
+            }
+        };
+
+        public CommonPacket newInstance(org.bukkit.entity.Entity entity, float headRotation) {
+            return PacketPlayOutEntityHeadRotationHandle.createNew(entity, headRotation).toCommonPacket();
         }
     }
 

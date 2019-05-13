@@ -5,6 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHeadRotationHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityVelocityHandle
 
 // Only >= MC 1.9
@@ -370,6 +371,35 @@ class PacketPlayOutEntity extends Packet {
             return handle;
         }
         </code>
+    }
+}
+
+class PacketPlayOutEntityHeadRotation extends Packet {
+    private int entityId:a;
+
+    public (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation();
+
+    <code>
+    public static PacketPlayOutEntityHeadRotationHandle createNew(int entityId, float headYaw) {
+        PacketPlayOutEntityHeadRotationHandle packet = createNew();
+        packet.setEntityId(entityId);
+        packet.setHeadYaw(headYaw);
+        return packet;
+    }
+    </code>
+
+    public static (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation createNew((org.bukkit.entity.Entity) Entity entity, float headYaw) {
+        return new PacketPlayOutEntityHeadRotation(entity, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(headYaw * 256.0f / 360.0f));
+    }
+
+    #require net.minecraft.server.PacketPlayOutEntityHeadRotation private byte headYaw:b;
+
+    public float getHeadYaw() {
+        return (float) instance#headYaw * 360.0f / 256.0f;   
+    }
+
+    public void setHeadYaw(float headYaw) {
+        instance#headYaw = (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(headYaw * 256.0f / 360.0f);
     }
 }
 

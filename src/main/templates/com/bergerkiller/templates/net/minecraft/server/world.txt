@@ -33,12 +33,6 @@ class World extends IBlockAccess {
     // Only available >= MC 1.9
     protected optional (Object) NavigationListener navigationListener:t;
 
-#if version >= 1.13
-    protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:v;
-#else
-    protected (List<IWorldAccessHandle>) List<IWorldAccess> accessList:u;
-#endif
-
     protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
 
     public void method_profiler_begin(String label) {
@@ -365,33 +359,35 @@ class World extends IBlockAccess {
 }
 
 class WorldServer extends World {
-    protected final (com.bergerkiller.bukkit.common.wrappers.IntHashMap) IntHashMap<Entity> entitiesById;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.9
-
+#if version >= 1.14
+    protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:###;
+#elseif version >= 1.9
     #if paperspigot
         #if version >= 1.13
-            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:g;
+            protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:g;
         #else
-            protected final (Collection<EntityHandle>) Set<Entity> entityRemoveQueue:f;
+            protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:f;
         #endif
     #else
         #if version >= 1.13
-            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
+            protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:g;
         #else
-            protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:f;
+            protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:f;
         #endif
     #endif
+#else
+    protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:g;
+#endif
 
+#if version >= 1.9
     public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
         return instance.tileEntityList;
     }
 #else
-    protected final (Collection<EntityHandle>) List<Entity> entityRemoveQueue:g;
-
     public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
         // Fallback for 1.8.8 and before, which is slower, but works
         java.util.ArrayList tiles = new java.util.ArrayList();

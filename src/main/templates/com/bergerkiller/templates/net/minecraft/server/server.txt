@@ -8,6 +8,9 @@ import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
+import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
+import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
 
 class MinecraftServer {
     private boolean hasStopped;
@@ -92,4 +95,18 @@ class LocaleLanguage {
     private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
 
     public synchronized String get:a(String s);
+}
+
+class CrashReport {
+    public static (CrashReportHandle) CrashReport create:a(Throwable throwable, String message);
+
+    public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:a(String message);
+}
+
+class CrashReportSystemDetails {
+
+}
+
+class ReportedException {
+    public (ReportedExceptionHandle) ReportedException((CrashReportHandle) CrashReport paramCrashReport);
 }

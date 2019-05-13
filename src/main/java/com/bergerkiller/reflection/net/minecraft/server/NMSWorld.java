@@ -1,16 +1,13 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -18,7 +15,6 @@ import org.bukkit.World;
 import java.util.List;
 
 @Deprecated
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("World");
 
@@ -27,7 +23,6 @@ public class NMSWorld {
     public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
 
     public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
-    public static final FieldAccessor<List<Object>> accessList = (FieldAccessor) WorldHandle.T.accessList.raw.toFieldAccessor();
 
     /**
      * This field is only available >= MC 1.10.2

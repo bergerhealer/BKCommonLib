@@ -87,8 +87,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract void setRandom(Random value);
     public abstract WorldProviderHandle getWorldProvider();
     public abstract void setWorldProvider(WorldProviderHandle value);
-    public abstract List<IWorldAccessHandle> getAccessList();
-    public abstract void setAccessList(List<IWorldAccessHandle> value);
     public abstract World getBukkitWorld();
     public abstract void setBukkitWorld(World value);
     public abstract boolean isKeepSpawnInMemory();
@@ -102,7 +100,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
         @Template.Optional
         public final Template.Field.Converted<Object> navigationListener = new Template.Field.Converted<Object>();
-        public final Template.Field.Converted<List<IWorldAccessHandle>> accessList = new Template.Field.Converted<List<IWorldAccessHandle>>();
         @Template.Optional
         public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();

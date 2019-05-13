@@ -14,7 +14,9 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
@@ -27,7 +29,6 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**
  * From MC 1.8 to MC 1.13.2 there was an IWorldAccess listener list we could subscribe to.
@@ -35,14 +36,20 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
  */
 public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
     private final SafeField<?> entitiesByIdField;
+    private final SafeField<List<Object>> accessListField;
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
         this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+            accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
+        } else {
+            accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "u", List.class));
+        }
     }
 
     @Override
     public void hook(World world) {
-        List<Object> accessList = NMSWorld.accessList.get(Conversion.toWorldHandle.convert(world));
+        List<Object> accessList = this.accessListField.get(Conversion.toWorldHandle.convert(world));
         for (Object o : accessList) {
             if (WorldListenerHook.get(o, WorldListenerHook.class) != null) {
                 return; // Already hooked
@@ -55,7 +62,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
     @Override
     public void unhook(World world) {
-        Iterator<Object> iter = NMSWorld.accessList.get(Conversion.toWorldHandle.convert(world)).iterator();
+        Iterator<Object> iter = this.accessListField.get(Conversion.toWorldHandle.convert(world)).iterator();
         while (iter.hasNext()) {
             if (WorldListenerHook.get(iter.next(), WorldListenerHook.class) != null) {
                 iter.remove();
@@ -102,7 +109,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);
 
             // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
-            Collection<?> removeQueue = (Collection<?>) WorldServerHandle.T.entityRemoveQueue.raw.get(HandleConversion.toWorldHandle(world));
+            Collection<?> removeQueue = (Collection<?>) WorldServerHandle.T.opt_entityRemoveQueue.raw.get(HandleConversion.toWorldHandle(world));
             if (removeQueue != null && removeQueue.contains(entity)) {
                 CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
             }
