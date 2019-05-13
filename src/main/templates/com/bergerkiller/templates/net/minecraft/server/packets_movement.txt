@@ -166,66 +166,145 @@ class PacketPlayOutEntityVelocity extends Packet {
 
 class PacketPlayOutEntity extends Packet {
     protected int entityId:a;
-#if version >= 1.9
-    protected optional byte dx_1_8_8:###;
-    protected optional byte dy_1_8_8:###;
-    protected optional byte dz_1_8_8:###;
-    protected optional int dx_1_10_2:b;
-    protected optional int dy_1_10_2:c;
-    protected optional int dz_1_10_2:d;
-#else
-    protected optional byte dx_1_8_8:b;
-    protected optional byte dy_1_8_8:c;
-    protected optional byte dz_1_8_8:d;
-    protected optional int dx_1_10_2:###;
-    protected optional int dy_1_10_2:###;
-    protected optional int dz_1_10_2:###;
-#endif
-    protected optional byte dyaw_raw:e;
-    protected optional byte dpitch_raw:f;
     protected boolean onGround:g;
     protected unknown boolean hasMovement:h;
 
-    // A whole bunch of accessor functions that help translating the protocol / actual values
-    <code>
+#if version >= 1.14
+    #require net.minecraft.server.PacketPlayOutEntity protected short dx:b;
+    #require net.minecraft.server.PacketPlayOutEntity protected short dy:c;
+    #require net.minecraft.server.PacketPlayOutEntity protected short dz:d;
+
     public double getDeltaX() {
-        return getProtocolPosition(T.dx_1_8_8, T.dx_1_10_2);
+        return (double) instance#dx / 4096.0;
     }
 
     public double getDeltaY() {
-        return getProtocolPosition(T.dy_1_8_8, T.dy_1_10_2);
+        return (double) instance#dy / 4096.0;
     }
 
     public double getDeltaZ() {
-        return getProtocolPosition(T.dz_1_8_8, T.dz_1_10_2);
+        return (double) instance#dz / 4096.0;
     }
 
     public void setDeltaX(double dx) {
-        setProtocolPosition(T.dx_1_8_8, T.dx_1_10_2, dx);
+        instance#dx = (short) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx*4096.0);
     }
 
     public void setDeltaY(double dy) {
-        setProtocolPosition(T.dy_1_8_8, T.dy_1_10_2, dy);
+        instance#dy = (short) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy*4096.0);
     }
 
     public void setDeltaZ(double dz) {
-        setProtocolPosition(T.dz_1_8_8, T.dz_1_10_2, dz);
+        instance#dz = (short) com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz*4096.0);
+    }
+#elseif version >= 1.9
+    #require net.minecraft.server.PacketPlayOutEntity protected int dx:b;
+    #require net.minecraft.server.PacketPlayOutEntity protected int dy:c;
+    #require net.minecraft.server.PacketPlayOutEntity protected int dz:d;
+
+    public double getDeltaX() {
+        return (double) instance#dx / 4096.0;
     }
 
+    public double getDeltaY() {
+        return (double) instance#dy / 4096.0;
+    }
+
+    public double getDeltaZ() {
+        return (double) instance#dz / 4096.0;
+    }
+
+    public void setDeltaX(double dx) {
+        instance#dx = com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx*4096.0);
+    }
+
+    public void setDeltaY(double dy) {
+        instance#dy = com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy*4096.0);
+    }
+
+    public void setDeltaZ(double dz) {
+        instance#dz = com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz*4096.0);
+    }
+#else
+    #require net.minecraft.server.PacketPlayOutEntity protected byte dx:b;
+    #require net.minecraft.server.PacketPlayOutEntity protected byte dy:c;
+    #require net.minecraft.server.PacketPlayOutEntity protected byte dz:d;
+
+    public double getDeltaX() {
+        return (double) instance#dx / 32.0;
+    }
+
+    public double getDeltaY() {
+        return (double) instance#dy / 32.0;
+    }
+
+    public double getDeltaZ() {
+        return (double) instance#dz / 32.0;
+    }
+
+    public void setDeltaX(double dx) {
+        instance#dx = (byte)com.bergerkiller.bukkit.common.utils.MathUtil.floor(dx*32.0);
+    }
+
+    public void setDeltaY(double dy) {
+        instance#dy = (byte)com.bergerkiller.bukkit.common.utils.MathUtil.floor(dy*32.0);
+    }
+
+    public void setDeltaZ(double dz) {
+        instance#dz = (byte)com.bergerkiller.bukkit.common.utils.MathUtil.floor(dz*32.0);
+    }
+#endif
+
+    #require net.minecraft.server.PacketPlayOutEntity protected byte yaw:e;
+    #require net.minecraft.server.PacketPlayOutEntity protected byte pitch:f;
+
+    public float getYaw() {
+        return (float) instance#yaw * 360.0f / 256.0f;   
+    }
+
+    public float getPitch() {
+        return (float) instance#pitch * 360.0f / 256.0f;   
+    }
+
+    public void setYaw(float yaw) {
+        instance#yaw = (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(yaw * 256.0f / 360.0f);
+    }
+
+    public void setPitch(float pitch) {
+        instance#pitch = (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(pitch * 256.0f / 360.0f);
+    }
+
+    <code>
+    /**
+     * Deprecated: is not actually a delta, use getYaw() instead
+     */
+    @Deprecated
     public float getDeltaYaw() {
-        return deserializeRotation(T.dyaw_raw.getByte(getRaw()));
+        return getYaw();
     }
 
+    /**
+     * Deprecated: is not actually a delta, use getPitch() instead
+     */
+    @Deprecated
     public float getDeltaPitch() {
-        return deserializeRotation(T.dpitch_raw.getByte(getRaw()));
+        return getPitch();
     }
 
+    /**
+     * Deprecated: is not actually a delta, use setYaw(yaw) instead
+     */
+    @Deprecated
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(getRaw(), (byte) serializeRotation(deltaYaw));
+        setYaw(deltaYaw);
     }
 
+    /**
+     * Deprecated: is not actually a delta, use setPitch(pitch) instead
+     */
+    @Deprecated
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(getRaw(), (byte) serializeRotation(deltaPitch));
+        setPitch(deltaPitch);
     }
     </code>
 
@@ -238,11 +317,11 @@ class PacketPlayOutEntity extends Packet {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
+        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float yaw, float pitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
             handle.setEntityId(entityId);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
+            handle.setYaw(yaw);
+            handle.setPitch(pitch);
             handle.setOnGround(onGround);
             return handle;
         }
@@ -279,14 +358,14 @@ class PacketPlayOutEntity extends Packet {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
+        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float yaw, float pitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
             handle.setEntityId(entityId);
             handle.setDeltaX(dx);
             handle.setDeltaY(dy);
             handle.setDeltaZ(dz);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
+            handle.setYaw(yaw);
+            handle.setPitch(pitch);
             handle.setOnGround(onGround);
             return handle;
         }

@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -51,6 +52,8 @@ public abstract class WorldServerHandle extends WorldHandle {
             WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
+    public abstract IntHashMap getEntitiesById();
+    public abstract void setEntitiesById(IntHashMap value);
     public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
     public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
     public abstract Collection<EntityHandle> getEntityRemoveQueue();
@@ -60,6 +63,7 @@ public abstract class WorldServerHandle extends WorldHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
+        public final Template.Field.Converted<IntHashMap> entitiesById = new Template.Field.Converted<IntHashMap>();
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();

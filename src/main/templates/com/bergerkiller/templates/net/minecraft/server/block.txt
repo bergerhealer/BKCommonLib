@@ -42,6 +42,19 @@ class Block {
 #endif
 
 #if version >= 1.14
+    public String getTitle:l();
+#elseif version >= 1.13
+    public String getTitle:m();
+#else
+    public String getTitle() {
+        StringBuilder str = new StringBuilder();
+        str.append(instance.a());
+        str.append(".name");
+        return str.toString();
+    }
+#endif
+
+#if version >= 1.14
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.k(iblockdata, world, new BlockPosition(x, y, z));        
@@ -268,7 +281,11 @@ class Block {
 
 #if version >= 1.13
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
+#if version >= 1.14
+        VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.a());
+#else
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition);
+#endif
 #if version >= 1.13.2
         if (shape.isEmpty()) {
 #else

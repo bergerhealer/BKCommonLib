@@ -126,4 +126,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.14 a new light engine is used, with a new LightUpdate Packet and LightEngine storage
      */
     public static final boolean NEW_LIGHT_ENGINE = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
+     * Since Minecraft 1.14 the Lore attribute of items is a chat component (json) instead of a String
+     */
+    public static final boolean LORE_IS_CHAT_COMPONENT = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

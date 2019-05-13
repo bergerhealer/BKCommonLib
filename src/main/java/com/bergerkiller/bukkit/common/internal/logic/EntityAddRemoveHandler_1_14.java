@@ -15,12 +15,13 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**
@@ -28,6 +29,11 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
  * to hook the 'entitiesByUUID' map, and override the methods that add/remove from it.
  */
 public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
+    private final SafeField<?> entitiesByIdField;
+
+    public EntityAddRemoveHandler_1_14() {
+        this.entitiesByIdField = SafeField.create(WorldServerHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+    }
 
     @Override
     @SuppressWarnings("unchecked")
@@ -161,8 +167,8 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
 
         // *** Entities by Id Map ***
-        final IntHashMap<Object> entitiesById = NMSWorld.entitiesById.get(oldEntity.getWorld().getRaw());
-        entitiesById.put(newEntity.getId(), newEntity.getRaw());
+        IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(oldEntity.getWorld().getRaw()));
+        entitiesById.put(oldEntity.getId(), newEntity.getRaw());
 
         // *** EntityTrackerEntry ***
         replaceInEntityTracker(newEntity.getId(), newEntity);

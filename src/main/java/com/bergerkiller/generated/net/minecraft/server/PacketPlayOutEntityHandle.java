@@ -21,45 +21,39 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract double getDeltaX();
+    public abstract double getDeltaY();
+    public abstract double getDeltaZ();
+    public abstract void setDeltaX(double dx);
+    public abstract void setDeltaY(double dy);
+    public abstract void setDeltaZ(double dz);
+    public abstract float getYaw();
+    public abstract float getPitch();
+    public abstract void setYaw(float yaw);
+    public abstract void setPitch(float pitch);
 
-    public double getDeltaX() {
-        return getProtocolPosition(T.dx_1_8_8, T.dx_1_10_2);
-    }
 
-    public double getDeltaY() {
-        return getProtocolPosition(T.dy_1_8_8, T.dy_1_10_2);
-    }
-
-    public double getDeltaZ() {
-        return getProtocolPosition(T.dz_1_8_8, T.dz_1_10_2);
-    }
-
-    public void setDeltaX(double dx) {
-        setProtocolPosition(T.dx_1_8_8, T.dx_1_10_2, dx);
-    }
-
-    public void setDeltaY(double dy) {
-        setProtocolPosition(T.dy_1_8_8, T.dy_1_10_2, dy);
-    }
-
-    public void setDeltaZ(double dz) {
-        setProtocolPosition(T.dz_1_8_8, T.dz_1_10_2, dz);
-    }
-
+    @Deprecated
     public float getDeltaYaw() {
-        return deserializeRotation(T.dyaw_raw.getByte(getRaw()));
+        return getYaw();
     }
 
+
+    @Deprecated
     public float getDeltaPitch() {
-        return deserializeRotation(T.dpitch_raw.getByte(getRaw()));
+        return getPitch();
     }
 
+
+    @Deprecated
     public void setDeltaYaw(float deltaYaw) {
-        T.dyaw_raw.setByte(getRaw(), (byte) serializeRotation(deltaYaw));
+        setYaw(deltaYaw);
     }
 
+
+    @Deprecated
     public void setDeltaPitch(float deltaPitch) {
-        T.dpitch_raw.setByte(getRaw(), (byte) serializeRotation(deltaPitch));
+        setPitch(deltaPitch);
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
@@ -71,23 +65,18 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      */
     public static final class PacketPlayOutEntityClass extends Template.Class<PacketPlayOutEntityHandle> {
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Byte dx_1_8_8 = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Byte dy_1_8_8 = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Byte dz_1_8_8 = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Integer dx_1_10_2 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer dy_1_10_2 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer dz_1_10_2 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Byte dyaw_raw = new Template.Field.Byte();
-        @Template.Optional
-        public final Template.Field.Byte dpitch_raw = new Template.Field.Byte();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
+
+        public final Template.Method<Double> getDeltaX = new Template.Method<Double>();
+        public final Template.Method<Double> getDeltaY = new Template.Method<Double>();
+        public final Template.Method<Double> getDeltaZ = new Template.Method<Double>();
+        public final Template.Method<Void> setDeltaX = new Template.Method<Void>();
+        public final Template.Method<Void> setDeltaY = new Template.Method<Void>();
+        public final Template.Method<Void> setDeltaZ = new Template.Method<Void>();
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Void> setYaw = new Template.Method<Void>();
+        public final Template.Method<Void> setPitch = new Template.Method<Void>();
 
     }
 
@@ -120,11 +109,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float deltaYaw, float deltaPitch, boolean onGround) {
+        public static PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle createNew(int entityId, float yaw, float pitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle handle = createNew();
             handle.setEntityId(entityId);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
+            handle.setYaw(yaw);
+            handle.setPitch(pitch);
             handle.setOnGround(onGround);
             return handle;
         }
@@ -217,14 +206,14 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_MOVE_LOOK;
         }
 
-        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float deltaYaw, float deltaPitch, boolean onGround) {
+        public static PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle createNew(int entityId, double dx, double dy, double dz, float yaw, float pitch, boolean onGround) {
             PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle handle = createNew();
             handle.setEntityId(entityId);
             handle.setDeltaX(dx);
             handle.setDeltaY(dy);
             handle.setDeltaZ(dz);
-            handle.setDeltaYaw(deltaYaw);
-            handle.setDeltaPitch(deltaPitch);
+            handle.setYaw(yaw);
+            handle.setPitch(pitch);
             handle.setOnGround(onGround);
             return handle;
         }

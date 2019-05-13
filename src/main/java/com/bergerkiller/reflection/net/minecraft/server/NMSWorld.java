@@ -25,7 +25,6 @@ public class NMSWorld {
     private static final MethodAccessor<Server> getServer  = WorldHandle.T.getServer.raw.toMethodAccessor();
 
     public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
-    public static final TranslatorFieldAccessor<IntHashMap<Object>> entitiesById = T.selectField("protected final IntHashMap<Entity> entitiesById").translate(DuplexConversion.intHashMap);
 
     public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
     public static final FieldAccessor<List<Object>> accessList = (FieldAccessor) WorldHandle.T.accessList.raw.toFieldAccessor();

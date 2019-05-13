@@ -365,6 +365,7 @@ class World extends IBlockAccess {
 }
 
 class WorldServer extends World {
+    protected final (com.bergerkiller.bukkit.common.wrappers.IntHashMap) IntHashMap<Entity> entitiesById;
     private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;

@@ -17,15 +17,16 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
+import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.Invokable;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**
@@ -33,6 +34,11 @@ import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
  * We add our own custom listener hook to that list, to listen to entity add/remove events.
  */
 public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
+    private final SafeField<?> entitiesByIdField;
+
+    public EntityAddRemoveHandler_1_8_to_1_13_2() {
+        this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+    }
 
     @Override
     public void hook(World world) {
@@ -110,7 +116,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         entitiesByUUID.put(newInstance.getUniqueID(), newInstance);
 
         // *** Entities by Id Map ***
-        final IntHashMap<Object> entitiesById = NMSWorld.entitiesById.get(oldInstance.getWorld().getRaw());
+        IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(oldInstance.getWorld().getRaw()));
         entitiesById.put(newInstance.getId(), newInstance.getRaw());
 
         // *** EntityTrackerEntry ***

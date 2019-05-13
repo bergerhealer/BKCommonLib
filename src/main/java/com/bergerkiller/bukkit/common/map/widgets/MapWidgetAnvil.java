@@ -23,8 +23,6 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -300,9 +298,7 @@ public class MapWidgetAnvil extends MapWidget {
                 }
                 ItemUtil.getMetaTag(item).putValue("RepairCost", 0);
                 if (this.getDescription() != null && !this.getDescription().isEmpty()) {
-                    CommonTagList lores = new CommonTagList();
-                    lores.addValue(ChatColor.RESET.toString() + this.getDescription());
-                    ItemUtil.getMetaTag(item).get("display", CommonTagCompound.class).put("Lore", lores);
+                    ItemUtil.addLoreName(item, ChatColor.RESET.toString() + this.getDescription());
                 }
                 return item;
             }

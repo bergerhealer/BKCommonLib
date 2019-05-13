@@ -804,6 +804,44 @@ public class ItemUtil {
     }
 
     /**
+     * Removes all lores from an item that are set, if they are set
+     * 
+     * @param itemStack
+     */
+    public static void clearLoreNames(org.bukkit.inventory.ItemStack itemStack) {
+        CommonTagCompound meta = ItemUtil.getMetaTag(itemStack, false);
+        if (meta == null) return;
+        CommonTagCompound display = meta.get("display", CommonTagCompound.class);
+        if (display == null) return;
+        display.remove("Lore");
+    }
+
+    /**
+     * Adds a lore name to an item
+     * 
+     * @param itemStack
+     * @param name
+     */
+    public static void addLoreName(org.bukkit.inventory.ItemStack itemStack, String name) {
+        addLoreChatText(itemStack, ChatText.fromMessage(name));
+    }
+
+    /**
+     * Adds a lore name to an item, using a ChatText for more expressive formatting
+     * 
+     * @param itemStack
+     * @param lore
+     */
+    public static void addLoreChatText(org.bukkit.inventory.ItemStack itemStack, ChatText lore) {
+        CommonTagList lores = ItemUtil.getMetaTag(itemStack, true).createCompound("display").createList("Lore");
+        if (CommonCapabilities.LORE_IS_CHAT_COMPONENT) {
+            lores.addValue(lore.getJson());
+        } else {
+            lores.addValue(lore.getMessage());
+        }
+    }
+
+    /**
      * Gets a list of valid items of a particular item type.
      * A list with only a single variant will be returned if the item has no other variants.
      * 
