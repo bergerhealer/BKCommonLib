@@ -49,8 +49,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract Entity getEntityById(int entityId);
     public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
-    public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2, boolean flag);
-    public abstract MovingObjectPositionHandle rayTrace2(Vector point1, Vector point2);
+    public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
     public abstract void setSectionSkyLight(int cx, int cy, int cz, byte[] data);
     public abstract void setSectionBlockLight(int cx, int cy, int cz, byte[] data);
@@ -131,7 +130,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
-        public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace2 = new Template.Method.Converted<MovingObjectPositionHandle>();
         @Template.Optional
         public final Template.Method.Converted<Void> opt_applyPhysics = new Template.Method.Converted<Void>();
         @Template.Optional

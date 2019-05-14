@@ -24,16 +24,17 @@ public abstract class MovingObjectPositionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract BlockFace getDirection();
-    public abstract void setDirection(BlockFace value);
+    @Template.Readonly
     public abstract Vector getPos();
-    public abstract void setPos(Vector value);
     /**
      * Stores class members for <b>net.minecraft.server.MovingObjectPosition</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MovingObjectPositionClass extends Template.Class<MovingObjectPositionHandle> {
-        public final Template.Field.Converted<BlockFace> direction = new Template.Field.Converted<BlockFace>();
+        @Template.Readonly
         public final Template.Field.Converted<Vector> pos = new Template.Field.Converted<Vector>();
+
+        public final Template.Method.Converted<BlockFace> getDirection = new Template.Method.Converted<BlockFace>();
 
     }
 

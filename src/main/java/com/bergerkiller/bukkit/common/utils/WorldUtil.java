@@ -712,7 +712,7 @@ public class WorldUtil extends ChunkUtil {
      * @return the hit Block, or null if none was found (AIR)
      */
     public static Block rayTraceBlock(org.bukkit.World world, double startX, double startY, double startZ, double endX, double endY, double endZ) {
-        MovingObjectPositionHandle mop = WorldHandle.fromBukkit(world).rayTrace2(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ));
+        MovingObjectPositionHandle mop = WorldHandle.fromBukkit(world).rayTrace(new Vector(startX, startY, startZ), new Vector(endX, endY, endZ));
         if (mop == null) {
             return null;
         } else {

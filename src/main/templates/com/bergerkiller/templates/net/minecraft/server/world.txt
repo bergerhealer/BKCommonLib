@@ -188,16 +188,20 @@ class World extends IBlockAccess {
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
     // Fallback...
-    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag) {
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
+        RayTrace rayTrace = new RayTrace(point1, point2, RayTrace.BlockCollisionOption.OUTLINE, RayTrace.FluidCollisionOption.NONE, null);
+        return instance.rayTrace(rayTrace);
+    }
+#elseif version >= 1.13
+    // Fallback...
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
         return instance.rayTrace(point1, point2);
     }
 #else
-    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2, boolean flag);
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2);
 #endif
-
-    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace2:rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2);
 
     // >= 1.11 (has 'self' option)
     public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
@@ -692,8 +696,19 @@ class WorldNBTStorage {
 }
 
 class MovingObjectPosition {
-    public (org.bukkit.block.BlockFace) EnumDirection direction;
-    public (org.bukkit.util.Vector) Vec3D pos;
+    public readonly (org.bukkit.util.Vector) Vec3D pos;
+
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+#if version >= 1.14
+        if (instance_raw instanceof MovingObjectPositionBlock) {
+            return ((MovingObjectPositionBlock) instance_raw).getDirection();
+        } else {
+            return EnumDirection.DOWN;
+        }
+#else
+        return instance.direction;
+#endif
+    }
 }
 
 class RegionFile {
