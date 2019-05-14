@@ -32,14 +32,7 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public abstract ChunkHandle getChunkAt(int cx, int cz);
     public abstract Executor getAsyncExecutor();
     public abstract void getChunkAtAsync(int cx, int cz, Consumer<?> consumer);
-
-    public void saveLoadedChunk(ChunkHandle chunk) {
-        if (T.saveChunk_new.isAvailable()) {
-            T.saveChunk_new.invoke(getRaw(), chunk, false);
-        } else {
-            T.saveChunk_old.invoke(getRaw(), chunk);
-        }
-    }
+    public abstract void saveLoadedChunk(ChunkHandle chunk);
     public abstract Object getChunkLoader();
     public abstract void setChunkLoader(Object value);
     public abstract WorldServerHandle getWorld();
@@ -58,10 +51,7 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method<Executor> getAsyncExecutor = new Template.Method<Executor>();
         public final Template.Method<Void> getChunkAtAsync = new Template.Method<Void>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> saveChunk_old = new Template.Method.Converted<Void>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> saveChunk_new = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> saveLoadedChunk = new Template.Method.Converted<Void>();
 
     }
 

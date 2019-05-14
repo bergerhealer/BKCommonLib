@@ -18,7 +18,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
@@ -201,7 +200,6 @@ public class TemplateTest {
     @Test
     public void testOptionalMembers() {
         assertAvailable(EntityTrackerEntryStateHandle.T.opt_passengers, EntityTrackerEntryStateHandle.T.opt_vehicle);
-        assertAvailable(ChunkProviderServerHandle.T.saveChunk_old, ChunkProviderServerHandle.T.saveChunk_new);
         if (CommonCapabilities.DATAWATCHER_OBJECTS) {
             assertAvailable(EntityHandle.T.DATA_FLAGS);
             assertAvailable(EntityHandle.T.DATA_CUSTOM_NAME);

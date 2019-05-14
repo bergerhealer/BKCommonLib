@@ -576,24 +576,20 @@ class ChunkProviderServer {
     }
 #endif
 
-    // unloaded parameter was added in a newer spigot build of 1.12.1 (CraftBukkit does not have that)
-    public optional void saveChunk_old:saveChunk((ChunkHandle) Chunk chunk);
-
-#if version >= 1.13
-    public optional void saveChunk_new:saveChunk((ChunkHandle) IChunkAccess chunk, boolean unloaded);
-#else
-    public optional void saveChunk_new:saveChunk((ChunkHandle) Chunk chunk, boolean unloaded);
-#endif
-
-    <code>
-    public void saveLoadedChunk(ChunkHandle chunk) {
-        if (T.saveChunk_new.isAvailable()) {
-            T.saveChunk_new.invoke(getRaw(), chunk, false);
-        } else {
-            T.saveChunk_old.invoke(getRaw(), chunk);
-        }
+#if version >= 1.14
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        // Since 1.14: moved to PlayerChunkMap
+        instance.playerChunkMap.saveChunk(chunk);
     }
-    </code>
+#elseif exists net.minecraft.server.ChunkProviderServer public void saveChunk(Chunk chunk);
+    // <= 1.12
+    public void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
+#else
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        // Since 1.12.1 ish: added unloaded=false parameter
+        instance.saveChunk(chunk, false);
+    }
+#endif
 }
 
 class WorldData {
