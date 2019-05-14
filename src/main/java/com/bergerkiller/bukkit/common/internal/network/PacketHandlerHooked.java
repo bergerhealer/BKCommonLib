@@ -300,7 +300,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
                 PacketSendEvent ev = new PacketSendEvent(player, cp);
                 ev.setCancelled(wasCancelled);
                 for (PacketListener listener : listenerList) {
-                    listener.onPacketSend(ev);
+                    try {
+                        listener.onPacketSend(ev);
+                    } catch (Throwable t) {
+                        Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketSend handling " + type + ":", t);
+                    }
                 }
                 if (ev.isCancelled()) {
                     return false;
@@ -318,7 +322,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (monitorList != null) {
             CommonPacket cp = new CommonPacket(packet, packetType);
             for (PacketMonitor monitor : monitorList) {
-                monitor.onMonitorPacketSend(cp, player);
+                try {
+                    monitor.onMonitorPacketSend(cp, player);
+                } catch (Throwable t) {
+                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onMonitorPacketSend handling " + packetType + ":", t);
+                }
             }
         }
     }
@@ -344,7 +352,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
             ev.setCancelled(wasCancelled);
             for (PacketListener listener : listenerList) {
-                listener.onPacketReceive(ev);
+                try {
+                    listener.onPacketReceive(ev);
+                } catch (Throwable t) {
+                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketReceive handling " + type + ":", t);
+                }
             }
             if (ev.isCancelled()) {
                 return false;
@@ -355,7 +367,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (monitorList != null) {
             CommonPacket cp = new CommonPacket(packet, type);
             for (PacketMonitor monitor : monitorList) {
-                monitor.onMonitorPacketReceive(cp, player);
+                try {
+                    monitor.onMonitorPacketReceive(cp, player);
+                } catch (Throwable t) {
+                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onMonitorPacketReceive handling " + type + ":", t);
+                }
             }
         }
         return true;
