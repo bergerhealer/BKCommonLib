@@ -408,17 +408,17 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final ResourceKey getStepSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType().getStepSound().getName());
+        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getStepSound().getName());
     }
 
     @Override
     public final ResourceKey getPlaceSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType().getPlaceSound().getName());
+        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getPlaceSound().getName());
     }
 
     @Override
     public final ResourceKey getBreakSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType().getBreakSound().getName());
+        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getBreakSound().getName());
     }
 
     @Override

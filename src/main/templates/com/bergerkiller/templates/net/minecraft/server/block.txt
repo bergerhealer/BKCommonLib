@@ -29,10 +29,24 @@ class Block {
 
 #if version >= 1.9
     public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
-    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:###;
 #else
     public static final rawtype (Iterable) RegistryID<IBlockData> REGISTRY_ID:d;
-    public optional (SoundEffectTypeHandle) Block.StepSound opt_1_8_8_soundType:stepSound;
+#endif
+
+#if version >= 1.14
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound((IBlockDataHandle) IBlockData iblockdata);
+#elseif version >= 1.11
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.getStepSound();
+    }
+#elseif version >= 1.9
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.w();
+    }
+#else
+    public (SoundEffectTypeHandle) Block.StepSound getSoundType((IBlockDataHandle) IBlockData iblockdata) {
+        return instance.stepSound;
+    }
 #endif
 
 #if version >= 1.13
@@ -220,23 +234,6 @@ class Block {
         return instance.a((net.minecraft.server.Entity) null);
     }
 #endif
-
-#if version >= 1.11
-    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound();
-#elseif version >= 1.9
-    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:w();
-#else
-    public optional (SoundEffectTypeHandle) SoundEffectType getSoundType:###();
-#endif
-    <code>
-    public SoundEffectTypeHandle getSoundType() {
-        if (T.getSoundType.isAvailable()) {
-            return T.getSoundType.invoke(getRaw());
-        } else {
-            return T.opt_1_8_8_soundType.get(getRaw());
-        }
-    }
-    </code>
 
 #if version >= 1.14
     // Since 1.14 it uses a LootTableInfo to store all the properties for the dropping of items

@@ -39,6 +39,7 @@ public abstract class BlockHandle extends Template.Handle {
         return T.getCombinedId.invoke(iblockdata);
     }
 
+    public abstract SoundEffectTypeHandle getSoundType(IBlockDataHandle iblockdata);
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
     public abstract String getTitle();
     public abstract int getOpacity(IBlockDataHandle iblockdata, World world, int x, int y, int z);
@@ -54,14 +55,6 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, World world, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();
-
-    public SoundEffectTypeHandle getSoundType() {
-        if (T.getSoundType.isAvailable()) {
-            return T.getSoundType.invoke(getRaw());
-        } else {
-            return T.opt_1_8_8_soundType.get(getRaw());
-        }
-    }
     /**
      * Stores class members for <b>net.minecraft.server.Block</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -70,13 +63,11 @@ public abstract class BlockHandle extends Template.Handle {
         @SuppressWarnings("rawtypes")
         public final Template.StaticField.Converted<Iterable> REGISTRY_ID = new Template.StaticField.Converted<Iterable>();
 
-        @Template.Optional
-        public final Template.Field.Converted<SoundEffectTypeHandle> opt_1_8_8_soundType = new Template.Field.Converted<SoundEffectTypeHandle>();
-
         public final Template.StaticMethod<Iterable<?>> getRegistry = new Template.StaticMethod<Iterable<?>>();
         public final Template.StaticMethod.Converted<IBlockDataHandle> getByCombinedId = new Template.StaticMethod.Converted<IBlockDataHandle>();
         public final Template.StaticMethod.Converted<Integer> getCombinedId = new Template.StaticMethod.Converted<Integer>();
 
+        public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method<String> getTitle = new Template.Method<String>();
         public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();
@@ -86,8 +77,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> isPowerSource = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> canSupportTop = new Template.Method.Converted<Boolean>();
         public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
-        @Template.Optional
-        public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
