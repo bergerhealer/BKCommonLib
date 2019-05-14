@@ -153,10 +153,14 @@ class EntityTrackerEntry {
 #if version >= 1.14
     #require net.minecraft.server.PlayerChunkMap$EntityTracker private final Entity entity:tracker;
     #require net.minecraft.server.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry;
-    #require net.minecraft.server.EntityTrackerEntry private final Entity trackerEntryEntity:tracker;
+    #require net.minecraft.server.EntityTrackerEntryState private final Entity trackerEntryEntity:tracker;
 
     public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {
         return instance#trackerEntry;
+    }
+
+    public optional void setState((EntityTrackerEntryStateHandle) EntityTrackerEntryState state) {
+        instance#trackerEntry = state;
     }
 
     public (EntityHandle) Entity getEntity() {
@@ -165,7 +169,7 @@ class EntityTrackerEntry {
 
     public void setEntity((EntityHandle) Entity entity) {
         instance#entity = entity;
-        EntityTrackerEntry entry = instance#trackerEntry;
+        EntityTrackerEntryState entry = instance#trackerEntry;
         entry#trackerEntryEntity = entity;
     }
 
@@ -177,6 +181,8 @@ class EntityTrackerEntry {
     public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {
         return instance;
     }
+
+    public optional void setState:###((EntityTrackerEntryStateHandle) EntityTrackerEntryState state);
 
     public (EntityHandle) Entity getEntity() {
         return instance#entity;
@@ -585,6 +591,15 @@ class EntityTrackerEntryState {
     private (CommonPacket) Packet<?> getSpawnPacket:e();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();
+#endif
+
+#if version >= 1.14
+    public void onTick:a();
+#else
+    public void onTick() {
+        // Call track() with an empty list of players to scan
+        instance.track(java.util.Collections.emptyList());
+    }
 #endif
 
 }

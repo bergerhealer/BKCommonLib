@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 
@@ -23,6 +24,22 @@ public abstract class EntityTypingHandler {
             return null;
         }
     }
+
+    /**
+     * Looks up an Entity Tracker Entry hook for network controllers, given an Entity Tracker Entry instance
+     * 
+     * @param entityTrackerEntryHandle
+     * @return Entity Tracker Entry Hook, if available
+     */
+    public abstract EntityTrackerEntryHook getEntityTrackerEntryHook(Object entityTrackerEntryHandle);
+
+    /**
+     * Creates a new EntityTrackerEntryHook wrapping around an entry
+     * 
+     * @param entityTrackerEntryHandle
+     * @return hooked entry
+     */
+    public abstract Object hookEntityTrackerEntry(Object entityTrackerEntryHandle);
 
     /**
      * Creates an entity tracker entry with the right configuration without actually registering it inside the server.

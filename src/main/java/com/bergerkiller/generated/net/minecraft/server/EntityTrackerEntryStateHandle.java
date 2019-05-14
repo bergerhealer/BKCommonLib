@@ -27,6 +27,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     public abstract boolean checkTrackNeeded();
     public abstract CommonPacket getSpawnPacket();
+    public abstract void onTick();
 
     public double getXVel() {
         if (T.opt_xVel.isAvailable()) {
@@ -293,6 +294,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
         public final Template.Method<Boolean> checkTrackNeeded = new Template.Method<Boolean>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
+        public final Template.Method<Void> onTick = new Template.Method<Void>();
 
     }
 

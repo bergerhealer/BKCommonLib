@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
+import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.*;
@@ -372,7 +373,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             this.last_passenger_1_8_8 = entity.getPassenger();
         }
 
-        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(this.entry.getRaw(), EntityTrackerEntryHook.class);
+        EntityTrackerEntryHook hook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(this.entry.getRaw());
         if (hook != null) {
             hook.setController(this);
         }
@@ -683,15 +684,6 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     @Override
     public void onTick() {
-        this.onSync();
-    }
-
-    /**
-     * Called at a set interval to synchronize data to clients.
-     * Deprecated: please use {@link #onTick()} instead.
-     */
-    @Deprecated
-    public void onSync() {
         if (entity.isDead()) {
             return;
         }
@@ -745,17 +737,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Gets a list of passengers that have last been synchronized to the viewers.
      * On MC 1.8.8 this will return the last known passenger entity.
      * 
-     * @return list of last known passengers
+     * @return list of last known passengers (not modifiable)
      */
     public List<org.bukkit.entity.Entity> getSynchedPassengers() {
         if (!EntityTrackerEntryStateHandle.T.opt_passengers.isAvailable()) {
             if (this.last_passenger_1_8_8 == null) {
-                return new ArrayList<org.bukkit.entity.Entity>(0);
+                return Collections.emptyList();
             } else {
-                return new ArrayList<org.bukkit.entity.Entity>(Collections.singleton(this.last_passenger_1_8_8));
+                return Collections.singletonList(this.last_passenger_1_8_8);
             }
         }
-        return EntityTrackerEntryStateHandle.T.opt_passengers.get(state.getRaw());
+        return Collections.unmodifiableList(EntityTrackerEntryStateHandle.T.opt_passengers.get(state.getRaw()));
     }
 
     /**

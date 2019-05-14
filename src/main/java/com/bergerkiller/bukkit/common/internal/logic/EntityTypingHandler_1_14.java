@@ -5,10 +5,14 @@ import java.util.IdentityHashMap;
 
 import org.bukkit.entity.Entity;
 
+import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_14;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -138,6 +142,21 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Override
     public EntityTrackerEntryHandle createEntityTrackerEntry(EntityTracker entityTracker, Entity entity) {
         Object handle = createEntry.invoke(entityTracker.getRawHandle(), HandleConversion.toEntityHandle(entity));
-        return EntityTrackerEntryHandle.createHandle(handle);
+        EntityTrackerEntryHandle entry = EntityTrackerEntryHandle.createHandle(handle);
+
+        // Set the passengers field to the current passengers
+        EntityTrackerEntryStateHandle.T.opt_passengers.set(entry.getState().getRaw(), (new ExtendedEntity<Entity>(entity)).getPassengers());
+
+        return entry;
+    }
+
+    @Override
+    public EntityTrackerEntryHook getEntityTrackerEntryHook(Object entityTrackerEntryHandle) {
+        return EntityTrackerEntryHook_1_14.get(entityTrackerEntryHandle, EntityTrackerEntryHook_1_14.class);
+    }
+
+    @Override
+    public Object hookEntityTrackerEntry(Object entityTrackerEntryHandle) {
+        return new EntityTrackerEntryHook_1_14().hook(entityTrackerEntryHandle);
     }
 }

@@ -131,4 +131,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.14 the Lore attribute of items is a chat component (json) instead of a String
      */
     public static final boolean LORE_IS_CHAT_COMPONENT = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
+     * Since Minecraft 1.14 the Entity Tracker was moved to the Player Chunk Map, and each entry is split
+     * into an Entry and a State.
+     */
+    public static final boolean PLAYER_CHUNK_MAP_ENTITY_TRACKER = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

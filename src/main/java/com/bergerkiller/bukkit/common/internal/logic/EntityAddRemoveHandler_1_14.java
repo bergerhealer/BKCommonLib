@@ -22,7 +22,6 @@ import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is

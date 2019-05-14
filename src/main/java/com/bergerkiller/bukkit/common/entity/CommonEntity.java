@@ -75,7 +75,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (entityTrackerEntry == null) {
             return null;
         }
-        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(entityTrackerEntry, EntityTrackerEntryHook.class);
+        EntityTrackerEntryHook hook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(entityTrackerEntry);
         if (hook != null) {
             return CommonUtil.unsafeCast(hook.getController());
         }
@@ -115,7 +115,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // Find a previous network controller that may have been set
         EntityNetworkController oldController = null;
-        EntityTrackerEntryHook hook = EntityTrackerEntryHook.get(Handle.getRaw(storedEntry), EntityTrackerEntryHook.class);
+        EntityTrackerEntryHook hook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(Handle.getRaw(storedEntry));
         if (hook != null) {
             oldController = (EntityNetworkController<CommonEntity<org.bukkit.entity.Entity>>) hook.getController();
             if (oldController == controller) {
@@ -185,7 +185,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
 
             // Convert the original entry into a hooked entry
-            newEntry = EntityTrackerEntryHandle.createHandle(new EntityTrackerEntryHook().hook(oldEntry.getRaw()));
+            newEntry = EntityTrackerEntryHandle.createHandle(EntityTypingHandler.INSTANCE.hookEntityTrackerEntry(oldEntry.getRaw()));
         }
 
         // Attach the entry to the controller

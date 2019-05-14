@@ -12,6 +12,8 @@ import org.bukkit.entity.Entity;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -113,5 +115,15 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
         }
 
         return createdEntry;
+    }
+
+    @Override
+    public EntityTrackerEntryHook getEntityTrackerEntryHook(Object entityTrackerEntryHandle) {
+        return EntityTrackerEntryHook_1_8_to_1_13_2.get(entityTrackerEntryHandle, EntityTrackerEntryHook_1_8_to_1_13_2.class);
+    }
+
+    @Override
+    public Object hookEntityTrackerEntry(Object entityTrackerEntryHandle) {
+        return new EntityTrackerEntryHook_1_8_to_1_13_2().hook(entityTrackerEntryHandle);
     }
 }

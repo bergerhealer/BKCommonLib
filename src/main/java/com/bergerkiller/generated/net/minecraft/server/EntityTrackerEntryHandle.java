@@ -71,6 +71,8 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> addViewerToSet = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> removeViewerFromSet = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<EntityTrackerEntryStateHandle> getState = new Template.Method.Converted<EntityTrackerEntryStateHandle>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> setState = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<EntityHandle> getEntity = new Template.Method.Converted<EntityHandle>();
         public final Template.Method.Converted<Void> setEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> scanPlayers = new Template.Method.Converted<Void>();
