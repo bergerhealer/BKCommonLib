@@ -329,45 +329,31 @@ class Entity {
 
     public float fallDistance;
 
-#if version >= 1.13
-    private optional float stepCounter_float:aA;
-    private optional int stepCounter_int:###;
+#if version >= 1.14
+    #require net.minecraft.server.Entity private float stepCounter:av;
+#elseif version >= 1.13
+    #require net.minecraft.server.Entity private float stepCounter:aA;
 #elseif version >= 1.10.2
-    private optional float stepCounter_float:###;
-    private optional int stepCounter_int:ax;
+    #require net.minecraft.server.Entity private int stepCounter:ax;
 #elseif version >= 1.9.4
-    private optional float stepCounter_float:###;
-    private optional int stepCounter_int:aw;
+    #require net.minecraft.server.Entity private int stepCounter:aw;
 #elseif version >= 1.9
-    private optional float stepCounter_float:###;
-    private optional int stepCounter_int:av;
+    #require net.minecraft.server.Entity private int stepCounter:av;
 #else
-    private optional float stepCounter_float:###;
-    private optional int stepCounter_int:h;
+    #require net.minecraft.server.Entity private int stepCounter:h;
 #endif
-    <code>
+
     public void setStepCounter(float value) {
-        if (T.stepCounter_float.isAvailable()) {
-            T.stepCounter_float.setFloat(getRaw(), value);
-        } else {
-            T.stepCounter_int.setInteger(getRaw(), (int) value);
-        }
+#if version >= 1.13
+        instance#stepCounter = value;
+#else
+        instance#stepCounter = (int)value;
+#endif
     }
 
     public float getStepCounter() {
-        if (T.stepCounter_float.isAvailable()) {
-            return T.stepCounter_float.getFloat(getRaw());
-        } else {
-            return (float) T.stepCounter_int.getInteger(getRaw());
-        }
+        return (float) instance#stepCounter;
     }
-    </code>
-
-#if version >= 1.13
-    private unknown float aB;
-#elseif version >= 1.12
-    private unknown float ay;
-#endif
 
 #if version >= 1.14
     public unknown double H;
@@ -580,7 +566,10 @@ class Entity {
     public (Dimension) int dimension;
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    optional private final double[] move_SomeArray:aG;
+    optional private long move_SomeState:aH;
+#elseif version >= 1.13
     optional private final double[] move_SomeArray:aL;
     optional private long move_SomeState:aM;
 #elseif version >= 1.12
@@ -775,7 +764,14 @@ class Entity {
 #endif
 
     // See outsideWorldBorderField - is set and returned by these methods
-#if version >= 1.13
+#if version >= 1.14
+    // Removed
+    public boolean isOutsideWorldBorder() {
+        return false;
+    }
+    public void setOutsideWorldBorder(boolean outside) {
+    }
+#elseif version >= 1.13
     public boolean isOutsideWorldBorder:bG();
     public void setOutsideWorldBorder:n(boolean outside);
 #elseif version >= 1.12

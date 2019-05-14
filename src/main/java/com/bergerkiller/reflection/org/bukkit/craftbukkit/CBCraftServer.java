@@ -1,5 +1,6 @@
 package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -15,6 +16,6 @@ public class CBCraftServer {
             .addImport("org.bukkit.World");
 
     public static final FieldAccessor<Map<String, World>> worlds = T.selectField("private final Map<String, World> worlds");
-    public static final MethodAccessor<Object> getServer = T.selectMethod("public MinecraftServer getServer()");
+    public static final MethodAccessor<Object> getServer = CraftServerHandle.T.getServer.raw.toMethodAccessor();
     public static final MethodAccessor<Object> getPlayerList = T.selectMethod("public DedicatedPlayerList getHandle()");
 }

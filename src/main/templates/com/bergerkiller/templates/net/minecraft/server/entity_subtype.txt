@@ -385,7 +385,9 @@ class EntityInsentient extends EntityLiving {
 
     public (Object) NavigationAbstract getNavigation();
 
-#if version >= 1.9
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:b;
+#elseif version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:a;
 #else
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:###;
@@ -657,7 +659,9 @@ class EntityArmorStand extends EntityLiving {
 }
 
 class EntityBat extends EntityInsentient {
-#if version >= 1.9
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:b;
+#elseif version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:a;
 #else
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:###;

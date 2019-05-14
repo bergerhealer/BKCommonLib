@@ -248,47 +248,176 @@ class PacketPlayInBlockPlace extends Packet {
 
 // PacketPlayInBlockPlace on MC 1.8.8 and before when int direction == 255
 class PacketPlayInUseItem extends Packet {
+    // Hand since 1.9
 #if version >= 1.9
-    private (IntVector3) BlockPosition position:a;
-    private optional (Object) EnumDirection opt_direction_face:b;
-    private optional int opt_direction_index:###;
-    private optional (Object) EnumHand opt_enumHand:c;
-    private float deltaX:d;
-    private float deltaY:e;
-    private float deltaZ:f;
+  #if version >= 1.14
+    #require net.minecraft.server.PacketPlayInUseItem private EnumHand enumHand:b;
+  #else
+    #require net.minecraft.server.PacketPlayInUseItem private EnumHand enumHand:c;
+  #endif
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, instance#enumHand);
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        instance#enumHand = (EnumHand) hand.toNMSEnumHand(humanEntity);
+    }
 #else
-    private (IntVector3) BlockPosition position:b;
-    private optional (Object) EnumDirection opt_direction_face:###;
-    private optional int opt_direction_index:c;
-    private optional (Object) EnumHand opt_enumHand:###;
-    private unknown ItemStack d;
-    private float deltaX:e;
-    private float deltaY:f;
-    private float deltaZ:g;
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
+        return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
+    }
+
+    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+    }
+#endif
+
+    // Direction
+#if version >= 1.14
+    #require net.minecraft.server.MovingObjectPositionBlock private final EnumDirection direction_face:b;
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+        if (instance.c() == null) return null;
+        return instance.c().getDirection();
+    }
+    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        instance.c()#direction_face = direction;
+    }
+#elseif version >= 1.9
+    #require net.minecraft.server.PacketPlayInUseItem private EnumDirection direction_face:b;
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+        return instance#direction_face;
+    }
+    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+        instance#direction_face = direction;
+    }
+#else
+    #require net.minecraft.server.PacketPlayInUseItem private int direction_index:c;
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+        int index = instance#direction_index;
+        return EnumDirection.fromType1(index);
+    }
+    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
+        instance#direction_index = direction.a();
+    }
+#endif
+
+    // Direction index value of 255 was used for the 'block place' packet on 1.8.8 and before
+#if version >= 1.9
+    public boolean isBlockPlacePacket() {
+        return false;
+    }
+    public void setBlockPlacePacket() {
+    }
+#else
+    public boolean isBlockPlacePacket() {
+        int index = instance#direction_index;
+        return index == 255;
+    }
+    public void setBlockPlacePacket() {
+        instance#direction_index = 255;
+    }
+#endif
+
+#if version >= 1.14
+    #require net.minecraft.server.MovingObjectPosition protected final Vec3D position:pos;
+    #require net.minecraft.server.MovingObjectPositionBlock private final BlockPosition blockPosition:c;
+    public (IntVector3) BlockPosition getPosition() {
+        if (instance.c() == null) return null;
+        return instance.c().getBlockPosition();
+    }
+    public void setPosition((IntVector3) BlockPosition blockPosition) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+
+        // Make sure to preserve deltas
+        Vec3D position = instance.c().getPos();
+        double new_x = position.x - instance.c().getBlockPosition().getX() + blockPosition.getX();
+        double new_y = position.y - instance.c().getBlockPosition().getY() + blockPosition.getY();
+        double new_z = position.z - instance.c().getBlockPosition().getZ() + blockPosition.getZ();
+        Vec3D new_pos = new Vec3D(new_x, new_y, new_z);
+        instance.c()#position = new_pos;
+        instance.c()#blockPosition = blockPosition;
+    }
+    public float getDeltaX() {
+        if (instance.c() == null) return 0.0f;
+        return (float) (instance.c().getPos().x - (double) instance.c().getBlockPosition().getX());
+    }
+    public float getDeltaY() {
+        if (instance.c() == null) return 0.0f;
+        return (float) (instance.c().getPos().y - (double) instance.c().getBlockPosition().getY());
+    }
+    public float getDeltaZ() {
+        if (instance.c() == null) return 0.0f;
+        return (float) (instance.c().getPos().z - (double) instance.c().getBlockPosition().getZ());
+    }
+    public void setDeltaX(float dx) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        Vec3D old_position = instance.c().getPos();
+        Vec3D new_position = new Vec3D((double) dx + instance.c().getBlockPosition().getX(), old_position.y, old_position.z);
+        instance.c()#position = new_position;
+    }
+    public void setDeltaY(float dy) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        Vec3D old_position = instance.c().getPos();
+        Vec3D new_position = new Vec3D(old_position.x, (double) dy + instance.c().getBlockPosition().getY(), old_position.z);
+        instance.c()#position = new_position;
+    }
+    public void setDeltaZ(float dz) {
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        Vec3D old_position = instance.c().getPos();
+        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + instance.c().getBlockPosition().getZ());
+        instance.c()#position = new_position;
+    }
+    public optional void initMovingObject() {
+        if (instance.c() != null) {
+            return;
+        }
+
+        #require net.minecraft.server.PacketPlayInUseItem private MovingObjectPositionBlock movingObject:a;
+
+        MovingObjectPositionBlock moving = MovingObjectPositionBlock.a(Vec3D.a, EnumDirection.DOWN, BlockPosition.ZERO);
+        instance#movingObject = moving; 
+    }
+#else
+  #if version >= 1.9
+    #require net.minecraft.server.PacketPlayInUseItem private (IntVector3) BlockPosition position:a;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaX:d;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaY:e;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaZ:f;
+  #else
+    #require net.minecraft.server.PacketPlayInUseItem private BlockPosition position:b;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaX:e;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaY:f;
+    #require net.minecraft.server.PacketPlayInUseItem private float deltaZ:g;
+  #endif
+    public (IntVector3) BlockPosition getPosition() {
+        return instance#position;
+    }
+    public void setPosition((IntVector3) BlockPosition position) {
+        instance#position = position;
+    }
+    public float getDeltaX() {
+        return instance#deltaX;
+    }
+    public float getDeltaY() {
+        return instance#deltaY;
+    }
+    public float getDeltaZ() {
+        return instance#deltaZ;
+    }
+    public void setDeltaX(float dx) {
+        return instance#deltaX = dx;
+    }
+    public void setDeltaY(float dy) {
+        return instance#deltaY = dy;
+    }
+    public void setDeltaZ(float dz) {
+        return instance#deltaZ = dz;
+    }
+    public optional void initMovingObject:###();
 #endif
 
     // Spigot
     public optional long timestamp;
-
-#if version >= 1.9
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
-        return (EnumDirection) com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_face.get(instance);
-    }
-
-    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_face.set(instance, direction);
-    }
-#else
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
-        int index = com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(instance);
-        return EnumDirection.fromType1(index);
-    }
-
-    public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
-        int index = direction.a();
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.opt_direction_index.setInteger(instance, index);
-    }
-#endif
 
     <code>
     @Override
@@ -300,14 +429,6 @@ class PacketPlayInUseItem extends Packet {
         if (T.timestamp.isAvailable()) {
             T.timestamp.setLong(getRaw(), timestamp);
         }
-    }
-
-    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.opt_enumHand, humanEntity);
-    }
-
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.opt_enumHand, humanEntity, hand);
     }
     </code>
 }

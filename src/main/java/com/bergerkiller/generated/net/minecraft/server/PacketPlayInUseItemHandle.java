@@ -3,7 +3,9 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.HumanEntity;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayInUseItem</b>.
@@ -23,8 +25,20 @@ public abstract class PacketPlayInUseItemHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract HumanHand getHand(HumanEntity humanEntity);
+    public abstract void setHand(HumanEntity humanEntity, HumanHand hand);
     public abstract BlockFace getDirection();
     public abstract void setDirection(BlockFace direction);
+    public abstract boolean isBlockPlacePacket();
+    public abstract void setBlockPlacePacket();
+    public abstract IntVector3 getPosition();
+    public abstract void setPosition(IntVector3 blockPosition);
+    public abstract float getDeltaX();
+    public abstract float getDeltaY();
+    public abstract float getDeltaZ();
+    public abstract void setDeltaX(float dx);
+    public abstract void setDeltaY(float dy);
+    public abstract void setDeltaZ(float dz);
 
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
@@ -36,42 +50,30 @@ public abstract class PacketPlayInUseItemHandle extends PacketHandle {
             T.timestamp.setLong(getRaw(), timestamp);
         }
     }
-
-    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.opt_enumHand, humanEntity);
-    }
-
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.opt_enumHand, humanEntity, hand);
-    }
-    public abstract IntVector3 getPosition();
-    public abstract void setPosition(IntVector3 value);
-    public abstract float getDeltaX();
-    public abstract void setDeltaX(float value);
-    public abstract float getDeltaY();
-    public abstract void setDeltaY(float value);
-    public abstract float getDeltaZ();
-    public abstract void setDeltaZ(float value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInUseItem</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInUseItemClass extends Template.Class<PacketPlayInUseItemHandle> {
-        public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
-        @Template.Optional
-        public final Template.Field.Converted<Object> opt_direction_face = new Template.Field.Converted<Object>();
-        @Template.Optional
-        public final Template.Field.Integer opt_direction_index = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Converted<Object> opt_enumHand = new Template.Field.Converted<Object>();
-        public final Template.Field.Float deltaX = new Template.Field.Float();
-        public final Template.Field.Float deltaY = new Template.Field.Float();
-        public final Template.Field.Float deltaZ = new Template.Field.Float();
         @Template.Optional
         public final Template.Field.Long timestamp = new Template.Field.Long();
 
+        public final Template.Method<HumanHand> getHand = new Template.Method<HumanHand>();
+        public final Template.Method<Void> setHand = new Template.Method<Void>();
         public final Template.Method.Converted<BlockFace> getDirection = new Template.Method.Converted<BlockFace>();
         public final Template.Method.Converted<Void> setDirection = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isBlockPlacePacket = new Template.Method<Boolean>();
+        public final Template.Method<Void> setBlockPlacePacket = new Template.Method<Void>();
+        public final Template.Method.Converted<IntVector3> getPosition = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<Void> setPosition = new Template.Method.Converted<Void>();
+        public final Template.Method<Float> getDeltaX = new Template.Method<Float>();
+        public final Template.Method<Float> getDeltaY = new Template.Method<Float>();
+        public final Template.Method<Float> getDeltaZ = new Template.Method<Float>();
+        public final Template.Method<Void> setDeltaX = new Template.Method<Void>();
+        public final Template.Method<Void> setDeltaY = new Template.Method<Void>();
+        public final Template.Method<Void> setDeltaZ = new Template.Method<Void>();
+        @Template.Optional
+        public final Template.Method<Void> initMovingObject = new Template.Method<Void>();
 
     }
 

@@ -205,7 +205,7 @@ public class NMSPacketClasses {
         @Override
         protected boolean matchPacket(Object packetHandle) {
             if (CommonCapabilities.PLACE_PACKETS_MERGED) {
-                return PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(packetHandle) == 255;
+                return PacketPlayInUseItemHandle.T.isBlockPlacePacket.invoke(packetHandle).booleanValue();
             } else {
                 return true;
             }
@@ -214,7 +214,7 @@ public class NMSPacketClasses {
         @Override
         public void preprocess(Object packetHandle) {
             if (CommonCapabilities.PLACE_PACKETS_MERGED) {
-                PacketPlayInUseItemHandle.T.opt_direction_index.setInteger(packetHandle, 255);
+                PacketPlayInUseItemHandle.T.setBlockPlacePacket.invoke(packetHandle);
             }
         }
 
@@ -250,7 +250,18 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInUseItem extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayInUseItemHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<IntVector3> position = new SafeDirectField<IntVector3>() {
+            @Override
+            public IntVector3 get(Object instance) {
+                return PacketPlayInUseItemHandle.T.getPosition.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, IntVector3 value) {
+                PacketPlayInUseItemHandle.T.setPosition.invoke(instance, value);
+                return true;
+            }
+        };
         public final FieldAccessor<BlockFace> direction = new SafeDirectField<BlockFace>() {
             @Override
             public BlockFace get(Object instance) {
@@ -263,15 +274,50 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        public final FieldAccessor<Float> deltaX = PacketPlayInUseItemHandle.T.deltaX.toFieldAccessor();
-        public final FieldAccessor<Float> deltaY = PacketPlayInUseItemHandle.T.deltaY.toFieldAccessor();
-        public final FieldAccessor<Float> deltaZ = PacketPlayInUseItemHandle.T.deltaZ.toFieldAccessor();
+        
+        
+        public final FieldAccessor<Float> deltaX = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayInUseItemHandle.T.getDeltaX.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayInUseItemHandle.T.setDeltaX.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Float> deltaY = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayInUseItemHandle.T.getDeltaY.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayInUseItemHandle.T.setDeltaY.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Float> deltaZ = new SafeDirectField<Float>() {
+            @Override
+            public Float get(Object instance) {
+                return PacketPlayInUseItemHandle.T.getDeltaZ.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Float value) {
+                PacketPlayInUseItemHandle.T.setDeltaZ.invoke(instance, value);
+                return true;
+            }
+        };
         public final FieldAccessor<Long> timestamp = PacketPlayInUseItemHandle.T.timestamp.toFieldAccessor().ignoreInvalid(0L);
 
         @Override
         protected boolean matchPacket(Object packetHandle) {
             if (CommonCapabilities.PLACE_PACKETS_MERGED) {
-                return PacketPlayInUseItemHandle.T.opt_direction_index.getInteger(packetHandle) != 255;
+                return !PacketPlayInUseItemHandle.T.isBlockPlacePacket.invoke(packetHandle).booleanValue();
             } else {
                 return true;
             }
@@ -285,9 +331,7 @@ public class NMSPacketClasses {
          * @param humanHand to set to
          */
         public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            if (PacketPlayInUseItemHandle.T.opt_enumHand.isAvailable()) {
-                PacketPlayInUseItemHandle.T.opt_enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
-            }
+            PacketPlayInUseItemHandle.T.setHand.invoke(packet.getHandle(), humanEntity, humanHand);
         }
 
         /**
@@ -298,12 +342,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            if (PacketPlayInUseItemHandle.T.opt_enumHand.isAvailable()) {
-                Object enumHand = PacketPlayInUseItemHandle.T.opt_enumHand.get(packet.getHandle());
-                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
-            } else {
-                return HumanHand.RIGHT;
-            }
+            return PacketPlayInUseItemHandle.T.getHand.invoke(packet.getHandle(), humanEntity);
         }
     }
 

@@ -51,6 +51,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setNotCollidingWithBlock();
     public abstract float getWidth();
     public abstract float getLength();
+    public abstract void setStepCounter(float value);
+    public abstract float getStepCounter();
     public abstract void updateBlockCollision();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
@@ -138,23 +140,6 @@ public abstract class EntityHandle extends Template.Handle {
             T.opt_passenger.set(getRaw(), null);
         } else {
             T.opt_passenger.set(getRaw(), passengers.get(0));
-        }
-    }
-
-
-    public void setStepCounter(float value) {
-        if (T.stepCounter_float.isAvailable()) {
-            T.stepCounter_float.setFloat(getRaw(), value);
-        } else {
-            T.stepCounter_int.setInteger(getRaw(), (int) value);
-        }
-    }
-
-    public float getStepCounter() {
-        if (T.stepCounter_float.isAvailable()) {
-            return T.stepCounter_float.getFloat(getRaw());
-        } else {
-            return (float) T.stepCounter_int.getInteger(getRaw());
         }
     }
 
@@ -377,10 +362,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
         public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
-        @Template.Optional
-        public final Template.Field.Float stepCounter_float = new Template.Field.Float();
-        @Template.Optional
-        public final Template.Field.Integer stepCounter_int = new Template.Field.Integer();
         public final Template.Field.Float heightOffset = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
         public final Template.Field<Random> random = new Template.Field<Random>();
@@ -416,6 +397,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setNotCollidingWithBlock = new Template.Method<Void>();
         public final Template.Method<Float> getWidth = new Template.Method<Float>();
         public final Template.Method<Float> getLength = new Template.Method<Float>();
+        public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
+        public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
