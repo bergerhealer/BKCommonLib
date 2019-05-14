@@ -293,6 +293,8 @@ public abstract class EntityMoveHandler {
                             that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));
                         }
                     }
+                } else {
+                    that.setBoundingBox(that.getBoundingBox().translate(d0, d1, d2));
                 }
             }
 
