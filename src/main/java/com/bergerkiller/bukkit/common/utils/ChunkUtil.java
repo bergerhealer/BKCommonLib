@@ -30,7 +30,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
@@ -58,51 +57,28 @@ public class ChunkUtil {
     }
 
     /**
-     * Initializes one or more heightmaps of a chunk.
+     * Gets the light-level height map of a chunk.
+     * This stores the height above which all (sky) light levels are 15.
+     * The heightmap is not (re-) initialized, instead storing the values as
+     * reported by the server.
      * 
-     * @param chunk to initialize
-     * @param types of heightmap to initialize
+     * @param chunk to get the light heightmap for
+     * @return light heightmap
      */
-    public static void initializeHeightMap(org.bukkit.Chunk chunk, Set<HeightMap.Type> types) {
-        ChunkHandle.fromBukkit(chunk).initializeHeightMap(types);
+    public static HeightMap getLightHeightMap(org.bukkit.Chunk chunk) {
+        return getLightHeightMap(chunk, false);
     }
 
     /**
-     * Gets the height map of a chunk.
+     * Gets the light-level height map of a chunk.
+     * This stores the height above which all (sky) light levels are 15.
      * 
-     * @param chunk to get a heightmap for
-     * @param type of heightmap to get
-     * @return heightmap
+     * @param chunk to get the light heightmap for
+     * @param initialize whether to force a complete recalculation of the light heightmap
+     * @return light heightmap
      */
-    public static HeightMap getHeightMap(org.bukkit.Chunk chunk, HeightMap.Type type) {
-        return ChunkHandle.fromBukkit(chunk).getHeightMap(type);
-    }
-
-    /**
-     * Gets the height to the nearest non-transparent Block of a given column in a chunk.<br>
-     * <b>Deprecated: use {@link #getHeight(chunk, HeightMap.Type.LIGHT_BLOCKING, x, z)} instead.</b>
-     *
-     * @param chunk the column is in
-     * @param x - coordinate of the block column
-     * @param z - coordinate of the block column
-     * @return column height
-     */
-    @Deprecated
-    public static int getHeight(org.bukkit.Chunk chunk, int x, int z) {
-        return getHeight(chunk, HeightMap.Type.LIGHT_BLOCKING, x, z);
-    }
-
-    /**
-     * Gets the height of a given column in a chunk, using a specified {@link HeightMap#Type}.
-     *
-     * @param chunk the column is in
-     * @param type of HeightMap
-     * @param x - coordinate of the block column
-     * @param z - coordinate of the block column
-     * @return column height
-     */
-    public static int getHeight(org.bukkit.Chunk chunk, HeightMap.Type type, int x, int z) {
-        return ChunkHandle.fromBukkit(chunk).getHeight(type, x & 0xf, z & 0xf);
+    public static HeightMap getLightHeightMap(org.bukkit.Chunk chunk, boolean initialize) {
+        return ChunkHandle.fromBukkit(chunk).getLightHeightMap(initialize);
     }
 
     /**

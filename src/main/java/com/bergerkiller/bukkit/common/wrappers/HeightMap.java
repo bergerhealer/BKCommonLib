@@ -13,6 +13,13 @@ public class HeightMap extends BasicWrapper<HeightMapHandle> {
     }
 
     /**
+     * Initializes the heightmap by re-reading the world data
+     */
+    public void initialize() {
+        this.handle.initialize();
+    }
+
+    /**
      * Gets the height at an x and z coordinate according to this Heightmap.
      * 
      * @param x coordinates [ 0 ... 15 ]
@@ -24,93 +31,13 @@ public class HeightMap extends BasicWrapper<HeightMapHandle> {
     }
 
     /**
-     * Type of Heightmap. On MC 1.12.2 and before, only {@link #LIGHT_BLOCKING}
-     * is a valid Heightmap type.
+     * Sets the height at an x and z coordinate
+     * 
+     * @param x coordinates [ 0 ... 15 ]
+     * @param z coordinates [ 0 ... 15 ]
+     * @param height to set to
      */
-    public static enum Type {
-        /**
-         * Highest point of a Block that is not Air.
-         * Used during world generation only.
-         */
-        WORLD_SURFACE_WG,
-        /**
-         * Highest point of a Block that is not Air nor a liquid (Water, Lava).
-         * Used during world generation only.
-         */
-        OCEAN_FLOOR_WG,
-        /**
-         * Highest point of a Block that is not Air nor a fully transparent Block like Glass.
-         * This Block and all blocks above it will have sky light level 15 in the overworld.
-         */
-        LIGHT_BLOCKING,
-        /**
-         * Highest point of a Block that is not Air nor any kind of Block a player can not safely
-         * be inside without suffocating. So no lava, water or solid blocks.
-         */
-        MOTION_BLOCKING,
-        /**
-         * Highest point of a Block that is not Air nor any kind of Block a player can not safely
-         * be inside without suffocating, nor Leaves. So no lava, water, leaves or solid blocks.
-         */
-        MOTION_BLOCKING_NO_LEAVES,
-        /**
-         * Highest point of a Block that is not Air nor a liquid (Water, Lava).
-         * Used during normal world operation.
-         */
-        OCEAN_FLOOR,
-        /**
-         * Highest point of a Block that is not Air.
-         * Used during normal world operation.
-         */
-        WORLD_SURFACE;
-
-        private Object _handle;
-        private boolean _handleInit;
-
-        private Type() {
-            this._handle = null;
-            this._handleInit = false;
-        }
-
-        /**
-         * Gets the net.minecraft.server.Heightmap$Type handle of this Type.
-         * If it does not exist (1.12.2 and before), this returns an internal LIGHT_BLOCKING constant.
-         * 
-         * @return handle
-         */
-        public Object getHandle() {
-            if (!this._handleInit) {
-                this._handleInit = true;
-
-                Enum<?>[] values = (Enum<?>[]) HeightMapHandle.TypeHandle.T.getType().getEnumConstants();
-                Object handle = null;
-                for (Enum<?> value : values) {
-                    if (value.name().equals("LIGHT_BLOCKING")) {
-                        handle = value;
-                    }
-                    if (value.name().equals(this.name())) {
-                        handle = value;
-                        break;
-                    }
-                }
-                this._handle = handle;
-            }
-            return this._handle;
-        }
-
-        /**
-         * Gets the matching Type from a net.minecraft.server.Heightmap$Type handle.
-         * 
-         * @param handle
-         * @return Heightmap Type
-         */
-        public static Type fromHandle(Object handle) {
-            for (Type type : values()) {
-                if (type.getHandle() == handle) {
-                    return type;
-                }
-            }
-            return LIGHT_BLOCKING;
-        }
+    public void setHeight(int x, int z, int height) {
+        this.handle.setHeight(x, z, height);
     }
 }

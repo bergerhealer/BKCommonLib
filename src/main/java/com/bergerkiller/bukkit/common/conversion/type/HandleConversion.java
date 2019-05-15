@@ -470,11 +470,6 @@ public class HandleConversion {
         return heightmap.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.HeightMap$Type")
-    public static Object toHeightMapTypeHandle(HeightMap.Type type) {
-        return type.getHandle();
-    }
-
     @ConverterMethod(output="net.minecraft.server.EntityTypes", optional=true)
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
         return Template.Handle.getRaw(EntityTypesHandle.T.fromEntityClass.invoke(entityClass));

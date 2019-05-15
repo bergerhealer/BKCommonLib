@@ -367,26 +367,6 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.14
-    protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:###;
-#elseif version >= 1.9
-    #if paperspigot
-        #if version >= 1.13
-            protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:g;
-        #else
-            protected optional final (Collection<EntityHandle>) Set<Entity> opt_entityRemoveQueue:f;
-        #endif
-    #else
-        #if version >= 1.13
-            protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:g;
-        #else
-            protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:f;
-        #endif
-    #endif
-#else
-    protected optional final (Collection<EntityHandle>) List<Entity> opt_entityRemoveQueue:g;
-#endif
-
 #if version >= 1.9
     public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
         return instance.tileEntityList;

@@ -637,11 +637,6 @@ public class WrapperConversion {
         return new HeightMap(HeightMapHandle.createHandle(handle));
     }
 
-    @ConverterMethod(input="net.minecraft.server.HeightMap$Type", optional=true)
-    public static HeightMap.Type heightMapTypeFromHandle(Object handle) {
-        return HeightMap.Type.fromHandle(handle);
-    }
-
     @ConverterMethod(input="net.minecraft.server.EntityTypes", optional=true)
     public static Class<?> entityClassFromEntityTypes(Object nmsEntityTypesHandle) {
         return EntityTypesHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);

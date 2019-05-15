@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -61,8 +60,6 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
-        @Template.Optional
-        public final Template.Field.Converted<Collection<EntityHandle>> opt_entityRemoveQueue = new Template.Field.Converted<Collection<EntityHandle>>();
 
         public final Template.Method.Converted<List<TileEntityHandle>> getTileEntityList = new Template.Method.Converted<List<TileEntityHandle>>();
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();

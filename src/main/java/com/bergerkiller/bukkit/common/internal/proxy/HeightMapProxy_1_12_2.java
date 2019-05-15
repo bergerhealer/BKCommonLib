@@ -1,22 +1,19 @@
 package com.bergerkiller.bukkit.common.internal.proxy;
 
-import org.bukkit.World;
-
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
-
 /**
  * Acts as the HeightMap class introduced in Minecraft 1.13.
  * Simply looks up values in an internal int[] array.
  */
 public class HeightMapProxy_1_12_2 {
-    private final ChunkHandle chunkHandle;
+    public final Object chunk;
     private final int[] heightMap;
 
     public HeightMapProxy_1_12_2(Object chunkHandle, int[] heightMap) {
-        this.chunkHandle = ChunkHandle.createHandle(chunkHandle);
+        this.chunk = chunkHandle;
         this.heightMap = heightMap;
     }
 
+    /*
     // a()
     public void initialize() {
         World world = chunkHandle.getBukkitChunk().getWorld();
@@ -38,13 +35,13 @@ public class HeightMapProxy_1_12_2 {
             }
         }
     }
+    */
 
-    // getHeight(x, z)
-    public int a(int x, int z) {
-        return this.heightMap[z << 4 | x];
+    public int getHeight(int x, int z) {
+        return this.heightMap[z << 4 | x] - 2;
     }
 
-    public static enum Type {
-        LIGHT_BLOCKING
+    public void setHeight(int x, int z, int height) {
+        this.heightMap[z << 4 | x] = height + 2;
     }
 }

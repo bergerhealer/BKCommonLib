@@ -72,10 +72,6 @@ public class NMSChunk {
         return ChunkHandle.T.getTopSliceY.invoke(chunkHandle);
     }
 
-    public static int getHeight(Object chunkHandle, int x, int z) {
-        return ChunkHandle.T.getHeight.invoke(chunkHandle, x & XZ_MASK, z & XZ_MASK);
-    }
-
     public static int getBlockLight(Object chunkHandle, int x, int y, int z) {
         return getBrightness(chunkHandle, x, y, z, EnumSkyBlockHandle.BLOCK);
     }
