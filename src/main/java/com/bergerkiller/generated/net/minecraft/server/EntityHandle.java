@@ -50,7 +50,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract Vector getBlockCollisionMultiplier();
     public abstract void setNotCollidingWithBlock();
     public abstract float getWidth();
-    public abstract float getLength();
+    public abstract float getHeight();
     public abstract void setStepCounter(float value);
     public abstract float getStepCounter();
     public abstract void updateBlockCollision();
@@ -396,7 +396,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Vector> getBlockCollisionMultiplier = new Template.Method<Vector>();
         public final Template.Method<Void> setNotCollidingWithBlock = new Template.Method<Void>();
         public final Template.Method<Float> getWidth = new Template.Method<Float>();
-        public final Template.Method<Float> getLength = new Template.Method<Float>();
+        public final Template.Method<Float> getHeight = new Template.Method<Float>();
         public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
         public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
         public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();

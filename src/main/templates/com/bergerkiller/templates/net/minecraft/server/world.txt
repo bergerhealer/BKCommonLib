@@ -10,6 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
@@ -494,7 +495,9 @@ class WorldServer extends World {
 }
 
 class ChunkProviderServer {
-    private final (Object) IChunkLoader chunkLoader;
+    // Gone since MC 1.14
+    // private final (Object) IChunkLoader chunkLoader;
+
     public final (WorldServerHandle) WorldServer world;
 
 #if version >= 1.9.4
@@ -572,6 +575,14 @@ class ChunkProviderServer {
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
         // Since 1.12.1 ish: added unloaded=false parameter
         instance.saveChunk(chunk, false);
+    }
+#endif
+
+#if version >= 1.14
+    public void markBlockDirty:flagDirty((BlockPositionHandle) BlockPosition blockPosition);
+#else
+    public void markBlockDirty((BlockPositionHandle) BlockPosition blockPosition) {
+        instance.world.getPlayerChunkMap().flagDirty(blockPosition);
     }
 #endif
 }
@@ -660,12 +671,6 @@ class BiomeBase {
 
     }
 
-}
-
-interface IWorldAccess {
-    public abstract void onEntityAdded:a((EntityHandle) Entity entity);
-
-    public abstract void onEntityRemoved:b((EntityHandle) Entity entity);
 }
 
 interface IBlockAccess {

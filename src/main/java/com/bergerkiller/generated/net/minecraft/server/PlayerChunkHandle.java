@@ -25,14 +25,10 @@ public abstract class PlayerChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract void markAllLightDirty();
     public abstract List<Player> getPlayers();
-    public abstract void addPlayer(Player player);
-    public abstract void removePlayer(Player player);
-    public abstract void sendChunk(Player player);
     public abstract Chunk getChunkIfLoaded();
-    public abstract PlayerChunkMapHandle getPlayerChunkMap();
-    public abstract void setPlayerChunkMap(PlayerChunkMapHandle value);
     public abstract IntVector2 getLocation();
     public abstract void setLocation(IntVector2 value);
     public abstract int getDirtyCount();
@@ -46,17 +42,14 @@ public abstract class PlayerChunkHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerChunkClass extends Template.Class<PlayerChunkHandle> {
-        public final Template.Field.Converted<PlayerChunkMapHandle> playerChunkMap = new Template.Field.Converted<PlayerChunkMapHandle>();
         public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
         public final Template.Field.Integer dirtyCount = new Template.Field.Integer();
         public final Template.Field.Integer dirtySectionMask = new Template.Field.Integer();
         public final Template.Field.Boolean done = new Template.Field.Boolean();
 
+        public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method<Void> markAllLightDirty = new Template.Method<Void>();
         public final Template.Method.Converted<List<Player>> getPlayers = new Template.Method.Converted<List<Player>>();
-        public final Template.Method.Converted<Void> addPlayer = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> removePlayer = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> sendChunk = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
 
     }

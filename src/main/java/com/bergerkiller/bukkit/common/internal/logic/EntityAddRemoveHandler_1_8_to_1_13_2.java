@@ -24,7 +24,6 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -37,11 +36,13 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
  * We add our own custom listener hook to that list, to listen to entity add/remove events.
  */
 public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
+    private final Class<?> iWorldAccessType;
     private final SafeField<?> entitiesByIdField;
     private final SafeField<List<Object>> accessListField;
     private final SafeField<Collection<Object>> entityRemoveQueue;
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
+        this.iWorldAccessType = CommonUtil.getNMSClass("IWorldAccess");
         this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
             accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
@@ -76,7 +77,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         }
 
         // Create a listener hook and add
-        accessList.add(new WorldListenerHook(this, world).createInstance(IWorldAccessHandle.T.getType()));
+        accessList.add(new WorldListenerHook(this, world).createInstance(this.iWorldAccessType));
     }
 
     @Override
@@ -119,12 +120,12 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             return new NullInvokable(method);
         }
 
-        @HookMethod("public void onEntityAdded:???(Entity entity)")
+        @HookMethod("public void onEntityAdded:a(Entity entity)")
         public void onEntityAdded(Object entity) {
             CommonPlugin.getInstance().notifyAdded(world, WrapperConversion.toEntity(entity));
         }
 
-        @HookMethod("public void onEntityRemoved:???(Entity entity)")
+        @HookMethod("public void onEntityRemoved:b(Entity entity)")
         public void onEntityRemoved(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);

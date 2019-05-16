@@ -372,17 +372,17 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Deprecated: gets/sets length instead
+     * Deprecated: gets/sets height instead
      * 
      * @return height
      */
     @Deprecated
-    public float getHeight() {
-        return this.handle.getLength();
+    public float getLength() {
+        return this.handle.getHeight();
     }
 
-    public float getLength() {
-        return this.handle.getLength();
+    public float getHeight() {
+        return this.handle.getHeight();
     }
 
     public float getWidth() {

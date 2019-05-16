@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
@@ -693,9 +694,7 @@ public class WorldUtil extends ChunkUtil {
      * @param blockZ of the block
      */
     public static void queueBlockSend(org.bukkit.World world, int blockX, int blockY, int blockZ) {
-        Object worldHandle = HandleConversion.toWorldHandle(world);
-        PlayerChunkMapHandle playerChunkMap = WorldServerHandle.T.getPlayerChunkMap.invoke(worldHandle);
-        playerChunkMap.flagPosDirty(blockX, blockY, blockZ);
+        WorldServerHandle.fromBukkit(world).getChunkProviderServer().markBlockDirty(BlockPositionHandle.createNew(blockX, blockY, blockZ));
     }
 
     /**

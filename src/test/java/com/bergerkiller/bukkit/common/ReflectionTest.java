@@ -54,7 +54,6 @@ public class ReflectionTest {
 
             loadClass(NMSBlock.class);
             loadClass(NMSChunk.class);
-            loadClass(NMSChunkProviderServer.class);
             loadClass(NMSChunkSection.class);
             loadClass(NMSEntity.class);
             loadClass(NMSItemStack.class);
@@ -89,7 +88,6 @@ public class ReflectionTest {
             loadClass(NMSPlayerList.class);
             loadClass(PacketType.class);
             loadClass(NMSEntityItem.class);
-            loadClass(NMSWorldManager.class);
             loadClass(NMSItem.class);
             loadClass(NMSMaterial.class);
             loadClass(NMSEntityHanging.class);
@@ -98,7 +96,6 @@ public class ReflectionTest {
             loadClass(BSimplePluginManager.class);
             loadClass(BHandlerList.class);
 
-            loadClass(CBChunkIOExecutor.class);
             loadClass(CBCraftEntity.class);
             loadClass(CBCraftPlayer.class);
             loadClass(CBCraftItemStack.class);

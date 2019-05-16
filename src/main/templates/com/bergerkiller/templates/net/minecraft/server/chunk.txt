@@ -108,7 +108,13 @@ class Chunk {
     }
 #endif
 
+#if version >= 1.14
+    public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position) {
+        return instance.world.getBrightness(enumskyblock, position);
+    }
+#else
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
+#endif
 
 #if version >= 1.13
     public int getTopSliceY:b();
@@ -121,7 +127,11 @@ class Chunk {
 
     public void addEntities();
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean checkCanSave:c(boolean isNotAutosave) {
+        return instance.isNeedsSaving();
+    }
+#elseif version >= 1.13
     public boolean checkCanSave:c(boolean isNotAutosave);
 #else
     public boolean checkCanSave:a(boolean isNotAutosave);
@@ -145,7 +155,11 @@ class Chunk {
 }
 
 class ChunkSection {
+#if version >= 1.14
+    public boolean isEmpty:c();
+#else
     public boolean isEmpty:a();
+#endif
 
     public int getYPosition();
 
@@ -180,7 +194,9 @@ class ChunkSection {
 // This is only used on CraftBukkit servers
 // Spigot uses a simplified List<Entity>
 optional class EntitySlice {
-#if version >= 1.8.3
+#if version >= 1.14
+    private optional final List<T> listValues_1_8_3:c;
+#elseif version >= 1.8.3
     private optional final List<T> listValues_1_8_3:e;
 #else
     private optional final List<T> listValues_1_8_3:###;

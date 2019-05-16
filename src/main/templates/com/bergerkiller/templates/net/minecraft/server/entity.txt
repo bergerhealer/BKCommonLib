@@ -295,7 +295,7 @@ class Entity {
 
 #if version >= 1.14
     public float getWidth();
-    public float getLength();
+    public float getHeight();
 #else
     public unknown float width;
     public unknown float length;
@@ -304,7 +304,7 @@ class Entity {
         return instance.width;
     }
 
-    public float getLength() {
+    public float getHeight() {
         return instance.length;
     }
 #endif
@@ -661,7 +661,11 @@ class Entity {
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if version >= 1.12
+#if version >= 1.14
+    protected (ResourceKey) SoundEffect getSwimSound:getSoundSwim();
+#elseif version >= 1.13
+    protected (ResourceKey) SoundEffect getSwimSound:ad();
+#elseif version >= 1.12
     protected (ResourceKey) SoundEffect getSwimSound:ae();
 #elseif version >= 1.9
     protected (ResourceKey) SoundEffect getSwimSound:aa();
@@ -696,7 +700,9 @@ class Entity {
      *     }
      * }
      */
-#if version >= 1.12
+#if version >= 1.14
+    public boolean isInWaterUpdate:au();
+#elseif version >= 1.12
     public boolean isInWaterUpdate:aq();
 #elseif version >= 1.10.2
     public boolean isInWaterUpdate:ak();
