@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
+import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -243,7 +244,9 @@ public class TemplateTest {
 
     @Test
     public void testEntityMoveHandlerInitialization() {
-        if (Common.evaluateMCVersion(">=", "1.13")) {
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_14.isBlockCollisionsMethodInitialized());
+        } else if (Common.evaluateMCVersion(">=", "1.13")) {
             assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_13.isBlockCollisionsMethodInitialized());
         }
     }
