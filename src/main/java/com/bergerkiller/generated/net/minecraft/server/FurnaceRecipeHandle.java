@@ -28,15 +28,14 @@ public abstract class FurnaceRecipeHandle extends IRecipeHandle {
     }
 
     public abstract CraftInputSlot getIngredient();
-    public abstract void setIngredient(CraftInputSlot value);
     /**
      * Stores class members for <b>net.minecraft.server.FurnaceRecipe</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class FurnaceRecipeClass extends Template.Class<FurnaceRecipeHandle> {
-        public final Template.Field.Converted<CraftInputSlot> ingredient = new Template.Field.Converted<CraftInputSlot>();
-
         public final Template.StaticMethod.Converted<Iterable<FurnaceRecipeHandle>> getRecipes = new Template.StaticMethod.Converted<Iterable<FurnaceRecipeHandle>>();
+
+        public final Template.Method.Converted<CraftInputSlot> getIngredient = new Template.Method.Converted<CraftInputSlot>();
 
     }
 

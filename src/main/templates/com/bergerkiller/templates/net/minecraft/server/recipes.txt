@@ -11,7 +11,9 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 #if version >= 1.12
 
 class IRecipe {
-#if version >= 1.13
+#if version >= 1.14
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:c();
+#elseif version >= 1.13
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:d();
 #else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
@@ -74,7 +76,14 @@ optional class RecipesFurnace {
 
 // >= MC 1.13
 optional class FurnaceRecipe extends IRecipe {
-    private final (CraftInputSlot) RecipeItemStack ingredient;
+    public (CraftInputSlot) RecipeItemStack getIngredient() {
+#if version >= 1.14
+        #require net.minecraft.server.RecipeCooking protected final RecipeItemStack ingredient;
+#else
+        #require net.minecraft.server.FurnaceRecipe private final RecipeItemStack ingredient;
+#endif
+        return instance#ingredient;
+    }
 
     public static (Iterable<com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
         java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();

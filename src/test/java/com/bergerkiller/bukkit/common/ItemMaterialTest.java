@@ -206,7 +206,7 @@ public class ItemMaterialTest {
 
         testProperty(MaterialUtil.ISHEATABLE, "ISHEATABLE")
             .check(Material.COBBLESTONE, true)
-            .check(Material.STONE, false)
+            .check(Material.STONE, Common.evaluateMCVersion(">=", "1.14"))
             .check(Material.SAND, true)
             .check(Material.GLASS, false)
             .check(Material.DIRT, false)
