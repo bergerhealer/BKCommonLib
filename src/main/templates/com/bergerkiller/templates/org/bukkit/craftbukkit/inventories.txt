@@ -46,8 +46,8 @@ class CraftInventoryBrewer {
 class CraftInventoryMerchant {
     public static org.bukkit.inventory.MerchantInventory createNew((Object) net.minecraft.server.InventoryMerchant nmsInventoryMerchant) {
 #if version >= 1.14
-        Object merchant = com.bergerkiller.generated.net.minecraft.server.InventoryMerchantHandle.T.getMerchant.invoke(nmsInventoryMerchant);
-        return new CraftInventoryMerchant(nmsInventoryMerchant, (net.minecraft.server.IMerchant) merchant);
+        Object merchant = com.bergerkiller.generated.net.minecraft.server.InventoryMerchantHandle.T.merchant.get(nmsInventoryMerchant);
+        return new CraftInventoryMerchant((net.minecraft.server.IMerchant) merchant, nmsInventoryMerchant);
 #else
         return new CraftInventoryMerchant(nmsInventoryMerchant);
 #endif
@@ -55,5 +55,12 @@ class CraftInventoryMerchant {
 }
 
 class CraftInventoryBeacon {
-    public (org.bukkit.inventory.BeaconInventory) CraftInventoryBeacon((Object) net.minecraft.server.TileEntityBeacon nmsTileEntityBeacon);
+
+    public static org.bukkit.inventory.BeaconInventory createNew((Object) net.minecraft.server.TileEntityBeacon nmsTileEntityBeacon) {
+#if version >= 1.14
+        return new com.bergerkiller.bukkit.common.internal.proxy.BeaconInventory_1_14(nmsTileEntityBeacon);
+#else
+        return new CraftInventoryBeacon(nmsTileEntityBeacon);
+#endif
+    }
 }

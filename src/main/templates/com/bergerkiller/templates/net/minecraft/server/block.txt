@@ -93,10 +93,13 @@ class Block {
             return false;
         }
 
+        #require net.minecraft.server.Block private static final VoxelShape checkShape:c;
+        VoxelShape checkShape = Block#checkShape;
+
         IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
         BlockPosition blockposition = block.getPosition();
         VoxelShape shape = iblockdata.getCollisionShape(iblockaccess, blockposition);
-        return !VoxelShapes.c(shape.a(EnumDirection.UP), Block.c, OperatorBoolean.ONLY_SECOND);
+        return !VoxelShapes.c(shape.a(EnumDirection.UP), checkShape, OperatorBoolean.ONLY_SECOND);
     }
 #elseif version >= 1.13
     // Since 1.13 getOpacity has a BlockPosition argument
@@ -241,12 +244,12 @@ class Block {
     public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
         Block block = iblockdata.getBlock();
         TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
-        LootTableInfo.Builder loottableinfo_builder = new LootTableInfo.Builder(world);
+        LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(world.random);
-        loottableinfo_builder.set(LootContextParameters.POSITION, blockposition)
-        loottableinfo_builder.set(LootContextParameters.TOOL, ItemStack.a)
+        loottableinfo_builder.set(LootContextParameters.POSITION, blockposition);
+        loottableinfo_builder.set(LootContextParameters.TOOL, ItemStack.a);
         loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
-        loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, 1.0F / yield);
+        loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
         Block.b(iblockdata, loottableinfo_builder);
     }
 #elseif version >= 1.13

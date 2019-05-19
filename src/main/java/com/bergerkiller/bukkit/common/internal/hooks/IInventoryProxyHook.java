@@ -141,13 +141,21 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void closeContainer(Object entityHuman) {
     }
 
-    @HookMethod("public abstract int getProperty:???(int key)")
+    // <= MC 1.13.2 only
+    @HookMethod(value="public abstract int getProperty:???(int key)", optional=true)
     public int getProperty(int key) {
         return 0;
     }
 
-    @HookMethod("public abstract void setProperty:???(int key, int value)")
+    // <= MC 1.13.2 only
+    @HookMethod(value="public abstract void setProperty:???(int key, int value)", optional=true)
     public void setProperty(int key, int value) {
+    }
+
+    // <= MC 1.13.2 only
+    @HookMethod(value="public abstract int someFunction:???()", optional=true)
+    public int someFunction() {
+        return 0;
     }
 
     @HookMethod("public abstract boolean canOpen:???(EntityHuman paramEntityHuman)")
@@ -158,11 +166,6 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     @HookMethod("public abstract boolean canStoreItem:???(int paramInt, ItemStack paramItemStack)")
     public boolean canStoreItem(int paramInt, Object paramItemStack) {
         return true;
-    }
-
-    @HookMethod("public abstract int someFunction:???()")
-    public int someFunction() {
-        return 0;
     }
 
     @HookMethod(value="public abstract boolean someFunction2:???()", optional=true)

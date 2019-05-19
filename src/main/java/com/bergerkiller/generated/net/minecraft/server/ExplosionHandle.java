@@ -21,18 +21,18 @@ public abstract class ExplosionHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final ExplosionHandle createNew(World world, Entity entity, double x, double y, double z, float yield, boolean fire, boolean destroyBlocks) {
-        return T.constr_world_entity_x_y_z_yield_fire_destroyBlocks.newInstanceVA(world, entity, x, y, z, yield, fire, destroyBlocks);
-    }
-
     /* ============================================================================== */
+
+    public static ExplosionHandle createNew(World world, Entity entity, double x, double y, double z, float yield, boolean fire, boolean destroyBlocks) {
+        return T.createNew.invokeVA(world, entity, x, y, z, yield, fire, destroyBlocks);
+    }
 
     /**
      * Stores class members for <b>net.minecraft.server.Explosion</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ExplosionClass extends Template.Class<ExplosionHandle> {
-        public final Template.Constructor.Converted<ExplosionHandle> constr_world_entity_x_y_z_yield_fire_destroyBlocks = new Template.Constructor.Converted<ExplosionHandle>();
+        public final Template.StaticMethod.Converted<ExplosionHandle> createNew = new Template.StaticMethod.Converted<ExplosionHandle>();
 
     }
 

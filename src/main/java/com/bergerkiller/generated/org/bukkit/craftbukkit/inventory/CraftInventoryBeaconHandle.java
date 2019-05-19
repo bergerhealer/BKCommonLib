@@ -20,18 +20,18 @@ public abstract class CraftInventoryBeaconHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final BeaconInventory createNew(Object nmsTileEntityBeacon) {
-        return T.constr_nmsTileEntityBeacon.newInstance(nmsTileEntityBeacon);
-    }
-
     /* ============================================================================== */
+
+    public static BeaconInventory createNew(Object nmsTileEntityBeacon) {
+        return T.createNew.invoke(nmsTileEntityBeacon);
+    }
 
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.inventory.CraftInventoryBeacon</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftInventoryBeaconClass extends Template.Class<CraftInventoryBeaconHandle> {
-        public final Template.Constructor.Converted<BeaconInventory> constr_nmsTileEntityBeacon = new Template.Constructor.Converted<BeaconInventory>();
+        public final Template.StaticMethod.Converted<BeaconInventory> createNew = new Template.StaticMethod.Converted<BeaconInventory>();
 
     }
 

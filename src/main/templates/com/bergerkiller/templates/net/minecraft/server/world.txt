@@ -516,7 +516,15 @@ class ChunkProviderServer {
     public boolean isLoaded:isChunkLoaded(int cx, int cz);
 #endif
 
-#if version >= 1.13.1
+#if version >= 1.14
+    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz) {
+        return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
+    }
+
+    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
+        return instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
+    }
+#elseif version >= 1.13.1
     public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz) {
         return instance.getChunkAt(cx, cz, false, false);
     }

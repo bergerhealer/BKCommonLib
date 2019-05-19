@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.protocol;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -30,7 +31,7 @@ public class PacketType extends ClassTemplate<Object> {
     /* Misc. packets */
     public static final NMSPacket DEFAULT = new NMSPacket();
     public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
-    public static final NMSPacketPlayOutBed OUT_BED = new NMSPacketPlayOutBed();
+    public static final NMSPacketPlayOutBed OUT_BED = Common.evaluateMCVersion(">=", "1.14") ? null : new NMSPacketPlayOutBed();
     public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
     public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
     public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();

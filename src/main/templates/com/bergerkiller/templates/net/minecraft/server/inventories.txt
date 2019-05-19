@@ -15,25 +15,30 @@ interface IInventory {
 
     public abstract boolean canStoreItem:b(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
 
-    public abstract int getProperty(int key);
-
-#if version >= 1.9
-    public abstract void setProperty(int key, int value);
+#if version >= 1.14
+    // Removed
+    public optional abstract int getProperty:###(int key);
+    public optional abstract void setProperty:###(int key, int value);
+    public optional abstract int someFunction:###();
 #else
-    public abstract void setProperty:b(int key, int value);
+    public optional abstract int getProperty(int key);
+  #if version >= 1.9
+    public optional abstract void setProperty(int key, int value);
+  #else
+    public optional abstract void setProperty:b(int key, int value);
+  #endif
+  #if version >= 1.11
+    public optional abstract int someFunction:h();
+  #else
+    public optional abstract int someFunction:g();
+  #endif
 #endif
 
 #if version >= 1.11
     public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
-
-    public abstract int someFunction:h();
-
     public abstract void clear();
 #else
     public abstract (List<ItemStackHandle>) ItemStack[] getContents();
-
-    public abstract int someFunction:g();
-
     public abstract void clear:l();
 #endif
 
