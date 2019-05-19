@@ -194,11 +194,11 @@ class PlayerChunkMap {
     public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);
 #endif
 
-    //    // Needed to make sure the EntityTracker hook works
-    //#if version >= 1.14
-    //    protected optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
-    //#else
-    //    protected optional void trackEntity:###((org.bukkit.entity.Entity) Entity entity);
-    //#endif
+// Needed to make sure the EntityTracker hook works
+#if version >= 1.14
+    protected optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
+#else
+    protected optional void trackEntity:###((org.bukkit.entity.Entity) Entity entity);
+#endif
 
 }

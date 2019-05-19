@@ -30,6 +30,8 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
     public static final class PlayerChunkMapClass extends Template.Class<PlayerChunkMapHandle> {
         public final Template.Method.Converted<PlayerChunkHandle> getChunk = new Template.Method.Converted<PlayerChunkHandle>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
 
     }
 
