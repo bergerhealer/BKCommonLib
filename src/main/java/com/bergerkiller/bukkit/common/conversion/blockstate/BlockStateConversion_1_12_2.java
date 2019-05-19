@@ -186,6 +186,9 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
 
     @Override
     public BlockState blockToBlockState(Block block) {
+        if (!CommonUtil.isMainThread()) {
+            throw new IllegalStateException("Asynchronous access is not permitted");
+        }
         return block.getState();
 
         // I'm not sure why we ever want to do this, because it introduces a nasty overhead for no reason!
@@ -201,7 +204,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     }
 
     @Override
-    public BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Object nmsTileEntity) {
+    public synchronized BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Object nmsTileEntity) {
         if (nmsTileEntity == null) {
             throw new IllegalArgumentException("Tile Entity is null");
         }
@@ -221,7 +224,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         return tileEntityToBlockState(block, nmsTileEntity);
     }
 
-    public BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
+    public synchronized BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
         // Store and restore old state in case of recursive calls to this function
         // This could happen if inside BlockState construction a chunk is loaded anyway
         // Would be bad, but its best to assume the worst
