@@ -26,9 +26,15 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
 
 #if version >= 1.14
     public void markAllLightDirty() {
+  #if version >= 1.14.1
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:t;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:u;
+  #else
         #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
+  #endif
 
         // Set all these masks to 'all layers' (18) to refresh them
         instance#pc_dirtyBlockLightMask = 0x3FFFF;
@@ -69,7 +75,12 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
 
     private final (IntVector2) ChunkCoordIntPair location;
 
-#if version >= 1.14
+#if version >= 1.14.1
+    private int dirtyCount;
+    private int dirtySectionMask:r;
+    public unknown final PlayerChunk.d players;
+    private boolean done:hasBeenLoaded;
+#elseif version >= 1.14
     private int dirtyCount;
     private int dirtySectionMask:q;
     public unknown final PlayerChunk.d players;

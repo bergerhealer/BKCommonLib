@@ -52,7 +52,9 @@ class EntityTracker {
 #endif
     }
 
-#if version >= 1.14
+#if version >= 1.14.1
+    private int trackingDistance:viewDistance;
+#elseif version >= 1.14
     private int trackingDistance:A;
 #elseif fieldexists net.minecraft.server.EntityTracker private int trackingDistance
     private int trackingDistance;

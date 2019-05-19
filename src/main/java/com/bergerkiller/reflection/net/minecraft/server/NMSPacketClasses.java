@@ -609,7 +609,7 @@ public class NMSPacketClasses {
             return constructor1.newInstance(Conversion.toEntityHandle.convert(entity), Conversion.toBlockPositionHandle.convert(bedPosition));
         }
     }
-    
+
     public static class NMSPacketPlayOutBlockAction extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);

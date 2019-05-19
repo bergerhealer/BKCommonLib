@@ -58,7 +58,11 @@ class PlayerList {
 
     public void savePlayers();
 
-#if version >= 1.9
+#if version >= 1.14.1
+    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
+    }
+#elseif version >= 1.9
     public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
         instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
     }

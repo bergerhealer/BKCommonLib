@@ -16,8 +16,6 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.World;
 
-import java.util.Map;
-
 @Deprecated
 public class NMSChunk {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
@@ -27,9 +25,6 @@ public class NMSChunk {
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();
 
     public static final TranslatorFieldAccessor<World> world = ChunkHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
-
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static final FieldAccessor<Map<?, ?>> tileEntities = (FieldAccessor) ChunkHandle.T.tileEntities.raw.toFieldAccessor();
 
     public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
     public static final FieldAccessor<Boolean> hasSkyLight = new SafeDirectField<Boolean>() {

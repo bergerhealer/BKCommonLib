@@ -17,7 +17,6 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
     int j1 = MathHelper.f(voxelshape.c(EnumDirection.EnumAxis.Z)) + 1;
     WorldBorder worldborder = this.getWorldBorder();
     VoxelShape voxelshape2 = VoxelShapes.a();
-    VoxelShapeBitSet voxelshapebitset = new VoxelShapeBitSet(j - i, l - k, j1 - i1);
     BlockPosition$PooledBlockPosition blockposition_b = BlockPosition$PooledBlockPosition.r();
     Throwable throwable = null;
 
@@ -64,26 +63,14 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
                                 }
                                 // BKCommonLib end
 
-                                if (voxelshape5 == VoxelShapes.b()) {
+                                // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                                if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
                                     if (flag) {
-                                        // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
-                                        if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
-                                            voxelshape7 = VoxelShapes.b();
-                                            return voxelshape7;
-                                        }
-                                    } else {
-                                        voxelshapebitset.a(k1 - i, i2 - k, l1 - i1, true, true);
+                                        voxelshape7 = VoxelShapes.b();
+                                        return voxelshape7;
                                     }
-                                } else {
-                                    // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
-                                    if (!VoxelShapes.c(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.c(voxelshape, voxelshape6, OperatorBoolean.AND)) {
-                                        if (flag) {
-                                            voxelshape7 = VoxelShapes.b();
-                                            return voxelshape7;
-                                        }
 
-                                        voxelshape4 = VoxelShapes.b(voxelshape4, voxelshape6, OperatorBoolean.OR);
-                                    }
+                                    voxelshape4 = VoxelShapes.b(voxelshape4, voxelshape6, OperatorBoolean.OR);
                                 }
                             }
                         }
@@ -117,8 +104,6 @@ public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.b
         return java.util.stream.Stream.empty();
     } else {
         voxelshape2 = voxelshape2.c();
-        VoxelShapeWorldRegion voxelshapeworldregion = new VoxelShapeWorldRegion(voxelshapebitset, i, k, i1);
-        voxelshape2 = VoxelShapes.b(voxelshape2, voxelshapeworldregion, OperatorBoolean.OR);
         return com.bergerkiller.mountiplex.MountiplexUtil.toStream(voxelshape2);
     }
 }

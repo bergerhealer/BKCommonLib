@@ -831,7 +831,11 @@ class Entity {
         #require net.minecraft.server.Entity private float headHeight;
         #require net.minecraft.server.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
 
+  #if version >= 1.14.1
+        EntityPose entitypose = instance.getPose();
+  #else
         EntityPose entitypose = instance.Z();
+  #endif
         EntitySize newSize = EntitySize.b(width, height);
 
         instance#size = newSize;

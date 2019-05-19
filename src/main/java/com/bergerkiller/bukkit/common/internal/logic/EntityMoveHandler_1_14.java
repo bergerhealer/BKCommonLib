@@ -9,6 +9,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -39,7 +40,12 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
         try {
-            String method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
+            String method_path;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_1_getBlockCollisions.txt";
+            } else {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
+            }
             try (InputStream input = EntityMoveHandler_1_14.class.getResourceAsStream(method_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");

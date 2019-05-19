@@ -16,8 +16,35 @@ class TileEntity {
 
     public (BlockPositionHandle) BlockPosition getPosition();
 
-#if version >= 1.13
+    public (BlockData) IBlockData getBlockDataIfCached() {
+#if version >= 1.14
+        #require net.minecraft.server.TileEntity private IBlockData cachedBlockData:c;
+        return instance#cachedBlockData;
+#elseif version >= 1.13
+        #require net.minecraft.server.TileEntity private IBlockData cachedBlockData:f;
+        return instance#cachedBlockData;
+#else
+  #if version >= 1.11
+        #require net.minecraft.server.TileEntity private int cachedBlockDataValue:g;
+        #require net.minecraft.server.TileEntity protected Block cachedBlockDataBlock:e;
+  #else
+        #require net.minecraft.server.TileEntity private int cachedBlockDataValue:h;
+        #require net.minecraft.server.TileEntity protected Block cachedBlockDataBlock:e;
+  #endif
 
+        Block block = instance#cachedBlockDataBlock;
+        if (block == null) {
+            return null;
+        }
+        int value = instance#cachedBlockDataValue;
+        if (value == -1) {
+            return null;
+        }
+        return block.fromLegacyData(value);
+#endif
+    }
+
+#if version >= 1.13
     public (BlockData) IBlockData getBlockData:getBlock();
 
     public (org.bukkit.Material) Block getType() {
