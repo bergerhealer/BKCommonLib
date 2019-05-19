@@ -198,12 +198,16 @@ class EntityHuman extends EntityLiving {
     public (ContainerHandle) Container activeContainer;
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
-#if version >= 1.9
-#elseif version >= 1.8.3
-    public (IntVector3) BlockPosition bedPosition:bx;
-#else
-    public (IntVector3) BlockPosition bedPosition:bv;
-#endif
+    // Bed position is datawatcher value on 1.14
+    // Do we actually use this field?
+    //#if version >= 1.9
+    //    public (IntVector3) BlockPosition bedPosition;
+    //#elseif version >= 1.8.3
+    //    public (IntVector3) BlockPosition bedPosition:bx;
+    //#else
+    //    public (IntVector3) BlockPosition bedPosition:bv;
+    //#endif
+
     public int sleepTicks;
 
 #if version >= 1.14
@@ -560,7 +564,10 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
 }
 
 class EntityMinecartCommandBlock extends EntityMinecartAbstract {
-#if version >= 1.9
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:COMMAND;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_PREVIOUS_OUTPUT:c;
+#elseif version >= 1.9
     // DataWatcherObject constants are available
     #if version >= 1.11
         public static optional final (DataWatcher.Key<String>) DataWatcherObject<String> DATA_COMMAND:COMMAND;

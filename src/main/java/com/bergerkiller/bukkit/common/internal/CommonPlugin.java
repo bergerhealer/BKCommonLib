@@ -14,7 +14,7 @@ import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
+import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
@@ -369,7 +369,7 @@ public class CommonPlugin extends PluginBase {
         Collection<Entity> entities = new ArrayList<Entity>();
         for (World world : WorldUtil.getWorlds()) {
             // Unhook chunk providers
-            ChunkProviderServerHook.unhook(world);
+            ChunkGeneratorHook.unhook(world);
             // Unhook entities
             entities.addAll(WorldUtil.getEntities(world));
             for (Entity entity : entities) {
@@ -545,7 +545,7 @@ public class CommonPlugin extends PluginBase {
 
         // Register listeners and hooks
         for (World world : WorldUtil.getWorlds()) {
-            ChunkProviderServerHook.hook(world);
+            ChunkGeneratorHook.hook(world);
             notifyWorldAdded(world);
         }
 

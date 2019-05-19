@@ -122,27 +122,34 @@ class World extends IBlockAccess {
     private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
 #endif
 
-#if version >= 1.13.1
-    public (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
-#elseif version >= 1.13
-    public (java.util.stream.Stream<VoxelShapeHandle>) VoxelShape getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
-#elseif version >= 1.11
-    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
-        return instance.getCubes(entity, boundingBox.b(dx, dy, dz));
-    }
+    //#if version >= 1.13.1
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+    //#elseif version >= 1.13
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) VoxelShape getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+    //#elseif version >= 1.11
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    //        return instance.getCubes(entity, boundingBox.b(dx, dy, dz));
+    //    }
+    //#else
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    //        return instance.getCubes(entity, boundingBox.a(dx, dy, dz));
+    //    }
+    //#endif
+    //
+
+#if version >= 1.13
+    public boolean isNotCollidingWithBlocks:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #else
-    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
-        return instance.getCubes(entity, boundingBox.a(dx, dy, dz));
+    public boolean isNotCollidingWithBlocks((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb) {
+        return instance.getCubes(entity, axisalignedbb).isEmpty();
     }
 #endif
 
+    // Used by the EntityMoveHandler_1_8 only
 #if version >= 1.13
-    //TODO: MISSING!!!!
-    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb) {
-        return new java.util.ArrayList();
-    }
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #else
-    public (List<AxisAlignedBBHandle>) List<AxisAlignedBB> getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #endif
 
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -176,10 +183,11 @@ class World extends IBlockAccess {
     public (org.bukkit.entity.Entity) Entity getEntityById:a(int entityId);
 #endif
 
-    public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+    // Gone since 1.14
+    // public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
 #if version >= 1.14
-    // Gone on 1.14, but isAreaLoaded still exists
+    // Gone since 1.14, but isAreaLoaded still exists
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance) {
         return instance.isAreaLoaded(blockposition.getX() - distance, blockposition.getY() - distance, blockposition.getZ() - distance,
                                      blockposition.getX() + distance, blockposition.getY() + distance, blockposition.getZ() + distance);
@@ -501,16 +509,10 @@ class ChunkProviderServer {
     public final (WorldServerHandle) WorldServer world;
 
 #if version >= 1.9.4
-    public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
-
     public boolean isLoaded(int cx, int cz);
 #elseif version >= 1.9
-    public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:a((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
-
     public boolean isLoaded:e(int cx, int cz);
 #else
-    public (List<BiomeMetaHandle>) List<BiomeBase.BiomeMeta> getBiomeSpawnInfo:getMobsFor((Object) EnumCreatureType enumcreaturetype, (IntVector3) BlockPosition position);
-
     public boolean isLoaded:isChunkLoaded(int cx, int cz);
 #endif
 

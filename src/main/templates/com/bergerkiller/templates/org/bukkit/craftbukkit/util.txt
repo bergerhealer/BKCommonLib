@@ -27,9 +27,13 @@ class LongObjectHashMap {
 
     public V put(long key, V value);
 
+#if version >= 1.14
+    public volatile Collection<V> values();
+    public volatile Set<Long> keySet();
+#else
     public Collection<V> values();
-
     public Set<Long> keySet();
+#endif
 }
 
 class LongHashSet {
@@ -49,7 +53,12 @@ class LongHashSet {
     }
     </code>
 
+#if version >= 1.14
+    public volatile (java.util.Iterator<Long>) java.util.Iterator iterator();
+#else
     public (java.util.Iterator<Long>) java.util.Iterator iterator();
+#endif
+
     public int size();
     public boolean isEmpty();
     public void clear();

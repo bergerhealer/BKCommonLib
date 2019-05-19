@@ -2,9 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
-import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
@@ -26,7 +23,6 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract List<BiomeMetaHandle> getBiomeSpawnInfo(Object enumcreaturetype, IntVector3 position);
     public abstract boolean isLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkIfLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkAt(int cx, int cz);
@@ -43,7 +39,6 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
-        public final Template.Method.Converted<List<BiomeMetaHandle>> getBiomeSpawnInfo = new Template.Method.Converted<List<BiomeMetaHandle>>();
         public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();

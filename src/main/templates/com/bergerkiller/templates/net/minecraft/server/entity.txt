@@ -498,7 +498,6 @@ class Entity {
       public int chunkY:af;
       public int chunkZ:ag;
   #endif
-    public unknown boolean ak;
     public boolean positionChanged:impulse;
 #elseif version >= 1.11
     public boolean isLoaded:aa;

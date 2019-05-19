@@ -47,7 +47,7 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
      * @return True if cubes were found
      */
     protected boolean world_getBlockCubes(EntityHandle entity, AxisAlignedBBHandle movedBounds, List<AxisAlignedBBHandle> cubes) {
-        List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.getCubes.invoke(entity.getWorld().getRaw(), entity, movedBounds);
+        List<AxisAlignedBBHandle> foundBounds = WorldHandle.T.opt_getCubes_1_8.invoke(entity.getWorld().getRaw(), entity, movedBounds);
         if (foundBounds.isEmpty()) {
             return false;
         }

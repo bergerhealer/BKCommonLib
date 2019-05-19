@@ -502,17 +502,19 @@ public class WorldUtil extends ChunkUtil {
         return getEntities(location.getWorld(), null, xmin, ymin, zmin, xmax, ymax, zmax);
     }
 
-    /**
-     * Calculates the damage factor for an entity exposed to an explosion
-     *
-     * @param explosionPosition of the explosion
-     * @param entity that was damaged
-     * @return damage factor
-     */
-    public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
-        final WorldHandle world = CommonNMS.getHandle(explosionPosition.getWorld());
-        return world.getExplosionFactor(explosionPosition.toVector(), CommonNMS.getHandle(entity).getBoundingBox());
-    }
+    // Gone since MC 1.14. Doesn't appear to be used anywhere.
+    //
+    // /**
+    //  * Calculates the damage factor for an entity exposed to an explosion
+    //  *
+    //  * @param explosionPosition of the explosion
+    //  * @param entity that was damaged
+    //  * @return damage factor
+    //  */
+    // public static float getExplosionDamageFactor(Location explosionPosition, org.bukkit.entity.Entity entity) {
+    //     final WorldHandle world = CommonNMS.getHandle(explosionPosition.getWorld());
+    //     return world.getExplosionFactor(explosionPosition.toVector(), CommonNMS.getHandle(entity).getBoundingBox());
+    // }
 
     /**
      * Saves a world to disk, waiting until saving has completed before

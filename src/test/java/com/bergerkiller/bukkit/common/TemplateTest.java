@@ -99,6 +99,9 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumPlayerInfoActionHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle";
                 }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle";
+                }
             }
 
             // <= MC 1.9 class translation fixes
@@ -142,13 +145,32 @@ public class TemplateTest {
                 }
             }
 
-            // MC 1.13 class translation fixed
+            // MC 1.13 class translation fixes
             {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ScoreboardServerHandle.ActionHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
                 }
             }
 
+            // MC 1.14 class translation fixes
+            {
+                if (genClassPath.equals("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMapHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMapHandle.EntryHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle.IntHashMapEntryHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongSetHandle")) {
+                    genClassPath = "com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMapHandle")) {
+                    genClassPath = "com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle";
+                }
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle.EntityTrackerHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle";
+                }
+            }
+            
             Class<?> genClass = CommonUtil.getClass(genClassPath, true);
             if (genClass == null) {
                 System.out.println("Error occurred testing handle for " + dec.type.typePath);

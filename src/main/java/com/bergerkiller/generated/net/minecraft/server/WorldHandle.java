@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import java.util.List;
 import java.util.Random;
-import java.util.stream.Stream;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.World</b>.
@@ -39,15 +38,13 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract long getTime();
     public abstract boolean isWithinWorldBorder(EntityHandle entity);
-    public abstract Stream<VoxelShapeHandle> getCollisionShapes(EntityHandle entity, AxisAlignedBBHandle boundingBox, double dx, double dy, double dz);
-    public abstract List<AxisAlignedBBHandle> getCubes(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
+    public abstract boolean isNotCollidingWithBlocks(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
     public abstract List<EntityHandle> getNearbyEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract TileEntityHandle getTileEntity(IntVector3 blockposition);
     public abstract WorldDataHandle getWorldData();
     public abstract boolean isBurnArea(AxisAlignedBBHandle bounds);
     public abstract Entity getEntityById(int entityId);
-    public abstract float getExplosionFactor(Vector vec3d, AxisAlignedBBHandle bounds);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
@@ -117,8 +114,9 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Stream<VoxelShapeHandle>> getCollisionShapes = new Template.Method.Converted<Stream<VoxelShapeHandle>>();
-        public final Template.Method.Converted<List<AxisAlignedBBHandle>> getCubes = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
+        public final Template.Method.Converted<Boolean> isNotCollidingWithBlocks = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<List<AxisAlignedBBHandle>> opt_getCubes_1_8 = new Template.Method.Converted<List<AxisAlignedBBHandle>>();
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<EntityHandle>> getNearbyEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
@@ -127,7 +125,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method<Void> makeSound = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
-        public final Template.Method.Converted<Float> getExplosionFactor = new Template.Method.Converted<Float>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
         @Template.Optional

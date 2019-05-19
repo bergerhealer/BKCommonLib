@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.internal.hooks.ChunkProviderServerHook;
+import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
@@ -53,7 +53,7 @@ public class CommonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onWorldInit(final WorldInitEvent event) {
-        ChunkProviderServerHook.hook(event.getWorld());
+        ChunkGeneratorHook.hook(event.getWorld());
         CommonUtil.nextTick(new Runnable() {
             public void run() {
                 CommonPlugin.getInstance().notifyWorldAdded(event.getWorld());
