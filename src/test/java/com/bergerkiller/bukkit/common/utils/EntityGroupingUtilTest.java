@@ -373,7 +373,7 @@ public class EntityGroupingUtilTest {
         HOSTILE_TEST(EntityCategory.HOSTILE, EntityType.ZOMBIE, EntityType.SHEEP, false),
         UTILITY_TEST(EntityCategory.UTILITY, EntityType.IRON_GOLEM, EntityType.SHEEP, false),
         BOSS_TEST(EntityCategory.BOSS, EntityType.WITHER, EntityType.SHEEP, false),
-        TAMEABLE_TEST(EntityCategory.TAMEABLE, EntityType.OCELOT, EntityType.SHEEP, false);
+        TAMEABLE_TEST(EntityCategory.TAMEABLE, EntityType.WOLF, EntityType.SHEEP, false);
 
         private EntityCategory entityCategory;
         private EntityType matching;
