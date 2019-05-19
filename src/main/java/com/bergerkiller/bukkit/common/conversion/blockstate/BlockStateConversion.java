@@ -33,6 +33,13 @@ public abstract class BlockStateConversion {
 
     public abstract BlockState blockToBlockState(Block block);
 
-    public abstract BlockState tileEntityToBlockState(Object nmsTileEntity);
+    public abstract BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Object nmsTileEntity);
 
+    /**
+     * <b>Deprecated: may cause unwanted chunk load when trying to convert</b>
+     */
+    @Deprecated
+    public BlockState tileEntityToBlockState(Object nmsTileEntity) {
+        return tileEntityToBlockState(null, nmsTileEntity);
+    }
 }

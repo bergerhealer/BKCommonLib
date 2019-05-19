@@ -36,7 +36,13 @@ class Chunk {
     }
 #endif
 
-    public final (Map<IntVector3, org.bukkit.block.BlockState>) Map<BlockPosition, TileEntity> tileEntities;
+    public java.util.Collection<org.bukkit.block.BlockState> getTileEntities() {
+        java.util.Collection tileEntities = instance.tileEntities.values();
+        com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter chunkBlockStateConverter;
+        chunkBlockStateConverter = new com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter(instance.bukkitChunk);
+        return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
+    }
+
 #if spigot
     public final (List<Object>[]) List<Entity>[] entitySlices;
 #else

@@ -13,10 +13,13 @@ import org.bukkit.block.BlockState;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -36,6 +39,8 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final World proxy_world;
     private final Object proxy_nms_world;
     private final Block proxy_block;
+    private final Class<?> craftBlockEntityState_type;
+    private final SafeField<?> craftBlockEntityState_snapshot_field;
     private final Invokable non_instrumented_invokable = new Invokable() {
         @Override
         public Object invoke(Object instance, Object... args) {
@@ -50,12 +55,19 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         final java.lang.reflect.Field worldField = craftBlock_type.getDeclaredField("world");
         worldField.setAccessible(true);
 
+        // Find CraftBlockEntityState class; we need to fix up the 'world' property of the snapshot tile
+        this.craftBlockEntityState_type = CommonUtil.getCBClass("block.CraftBlockEntityState");
+        this.craftBlockEntityState_snapshot_field = SafeField.create(this.craftBlockEntityState_type,
+                "snapshot", TileEntityHandle.T.getType());
+
         // Create a NMS World proxy for handling the getTileEntity call
         proxy_nms_world = new ClassInterceptor() {
             @Override
             protected Invokable getCallback(Method method) {
+                String methodName = method.getName();
+
                 // Gets the proxy world
-                if (method.getName().equals("getTileEntity")) {
+                if (methodName.equals("getTileEntity")) {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
@@ -65,11 +77,21 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // Gets IBlockData type information of the Block
-                if (method.getName().equals("getType")) {
+                if (methodName.equals("getType")) {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
                             return input_state.blockData.getData();
+                        }
+                    };
+                }
+
+                // Gets the Minecraft Server (safe)
+                if (methodName.equals("getMinecraftServer")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return CommonNMS.getMCServer().getRaw();
                         }
                     };
                 }
@@ -95,12 +117,12 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     };
                 }
 
-                // Get the NMS World handle
+                // Get the NMS World proxy
                 if (method.getName().equals("getHandle")) {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
-                            return input_state.nmsWorld;
+                            return proxy_nms_world;
                         }
                     };
                 }
@@ -124,7 +146,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getChunk();
+                            return input_state.chunk;
                         }
                     };
                 } else if (name.equals("getType")) {
@@ -250,7 +272,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     }
 
     @Override
-    public BlockState tileEntityToBlockState(Object nmsTileEntity) {
+    public BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Object nmsTileEntity) {
         if (nmsTileEntity == null) {
             throw new IllegalArgumentException("Tile Entity is null");
         }
@@ -260,25 +282,34 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         }
         BlockPositionHandle pos = TileEntityHandle.T.getPosition.invoke(nmsTileEntity);
         Block block = WrapperConversion.toWorld(world).getBlockAt(pos.getX(), pos.getY(), pos.getZ());
-        return tileEntityToBlockState(block, nmsTileEntity);
+        return tileEntityToBlockState(chunk, block, nmsTileEntity);
     }
 
-    public BlockState tileEntityToBlockState(Block block, Object nmsTileEntity) {
+    public BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Block block, Object nmsTileEntity) {
         // Store and restore old state in case of recursive calls to this function
         // This could happen if inside BlockState construction a chunk is loaded anyway
         // Would be bad, but its best to assume the worst
         TileState old_state = input_state;
         try {
-            input_state = new TileState(block, nmsTileEntity);
+            input_state = new TileState(chunk, block, nmsTileEntity);
+            World world = block.getWorld();
             BlockState result = proxy_block.getState();
 
             // Internal BlockState needs to have all proxy field instances replaced with what it should be
             BlockStateCache cache = BlockStateCache.get(result.getClass());
             for (SafeField<World> worldField : cache.worldFields) {
-                worldField.set(result, input_state.block.getWorld());
+                worldField.set(result, world);
             }
             for (SafeField<Chunk> chunkField : cache.chunkFields) {
-                chunkField.set(result, input_state.block.getChunk());
+                chunkField.set(result, chunk);
+            }
+
+            // Correct the snapshot field for BlockEntityState Block States
+            if (this.craftBlockEntityState_type.isAssignableFrom(result.getClass())) {
+                Object snapshotTile = this.craftBlockEntityState_snapshot_field.get(result);
+                if (snapshotTile != null) {
+                    TileEntityHandle.T.world_field.set(snapshotTile, world);
+                }
             }
 
             // All done!
@@ -302,15 +333,20 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
     private static final class TileState {
         public final Block block;
+        public final Chunk chunk;
         public final Object tileEntity;
         public final BlockData blockData;
-        public final Object nmsWorld;
 
-        public TileState(Block block, Object nmsTileEntity) {
+        public TileState(Chunk chunk, Block block, Object nmsTileEntity) {
             this.block = block;
+            this.chunk = (chunk == null) ? block.getChunk() : chunk;
             this.tileEntity = nmsTileEntity;
-            this.blockData = TileEntityHandle.T.getBlockData.invoke(nmsTileEntity);
-            this.nmsWorld = TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntity);
+
+            BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
+            if (blockData == null) {
+                blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
+            }
+            this.blockData = blockData;
         }
     }
 
