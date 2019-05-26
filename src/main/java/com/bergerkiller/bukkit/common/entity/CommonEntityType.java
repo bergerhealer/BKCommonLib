@@ -93,6 +93,8 @@ public class CommonEntityType {
             if (Common.evaluateMCVersion("<", "1.11")) {
                 entityTypeName = "Arrow";
             }
+        } else if (entityTypeEnumName.equals("PLAYER")) {
+            entityTypeName = null; // Internal lookup fails!
         }
         if (entityTypeName != null) {
             nmsType = EntityTypesHandle.getEntityClass(entityTypeName);
@@ -276,6 +278,17 @@ public class CommonEntityType {
         EntityHook hook = new EntityHook();
         hook.setStack(new Throwable());
         return hook.hook(entity.getHandle());
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder str = new StringBuilder();
+        str.append("CommonEntityType{");
+        str.append("nms=").append((this.nmsType == null || !this.nmsType.isValid()) ? "null" : this.nmsType.getType().getSimpleName());
+        str.append(", bukkit=").append((this.bukkitType == null || !this.bukkitType.isValid()) ? "null" : this.bukkitType.getType().getSimpleName());
+        str.append(", enum=").append(this.entityType);
+        str.append('}');
+        return str.toString();
     }
 
     /*
