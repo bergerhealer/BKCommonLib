@@ -68,7 +68,7 @@ public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
         return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
-    @HookMethod("public List<BiomeBase.BiomeMeta> getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
+    @HookMethod("public List<net.minecraft.server.BiomeBase.BiomeMeta> getMobsFor(net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
     public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
         List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
         if (CommonPlugin.hasInstance()) {
