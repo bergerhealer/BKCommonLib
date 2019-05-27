@@ -107,25 +107,7 @@ class EntityTrackerEntry {
     }
 #endif
 
-#if fieldexists net.minecraft.server.EntityTrackerEntry public final Set<EntityPlayer> trackedPlayers;
-    // Stored as a Set of players
-
-    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
-        return instance.trackedPlayers;
-    }
-
-    public void clearViewers() {
-        instance.trackedPlayers.clear();
-    }
-
-    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
-        return instance.trackedPlayers.add(viewer);
-    }
-
-    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
-        return instance.trackedPlayers.remove(viewer);
-    }
-#else
+#if fieldexists net.minecraft.server.EntityTrackerEntry public Map<EntityPlayer, Boolean> trackedPlayerMap;
     // Stored as a Map of players (Paperspigot)
 
     public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
@@ -147,6 +129,24 @@ class EntityTrackerEntry {
 
     public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
         return instance.trackedPlayerMap.remove(viewer) != null;
+    }
+#else
+    // Stored as a Set of players
+
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
+        return instance.trackedPlayers;
+    }
+
+    public void clearViewers() {
+        instance.trackedPlayers.clear();
+    }
+
+    public boolean addViewerToSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        return instance.trackedPlayers.add(viewer);
+    }
+
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) EntityPlayer viewer) {
+        return instance.trackedPlayers.remove(viewer);
     }
 #endif
 

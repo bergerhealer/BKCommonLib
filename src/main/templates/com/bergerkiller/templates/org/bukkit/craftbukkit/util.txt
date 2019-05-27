@@ -7,7 +7,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapH
 class LongObjectHashMap {
 #if version >= 1.14
     public static (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap createNew() {
-        return new org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap();
+        return new it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap();
     }
 #else
     public static (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap createNew() {
@@ -39,7 +39,7 @@ class LongObjectHashMap {
 class LongHashSet {
 #if version >= 1.14
     public static (LongHashSetHandle) org.bukkit.craftbukkit.util.LongHashSet createNew(int size) {
-        return new org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongOpenHashSet(size);
+        return new it.unimi.dsi.fastutil.longs.LongOpenHashSet(size);
     }
 #else
     public static (LongHashSetHandle) org.bukkit.craftbukkit.util.LongHashSet createNew(int size) {
@@ -68,7 +68,7 @@ class LongHashSet {
 
 #if version >= 1.14
     public long popFirstElement() {
-        org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongIterator iter;
+        it.unimi.dsi.fastutil.longs.LongIterator iter;
         iter = instance.iterator();
         long result = iter.nextLong();
         iter.remove();
@@ -77,7 +77,7 @@ class LongHashSet {
 
     public long[] toArray() {
         long[] result = new long[instance.size()];
-        org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongIterator iter;
+        it.unimi.dsi.fastutil.longs.LongIterator iter;
         iter = instance.iterator();
         for (int i = 0; i < result.length && iter.hasNext(); i++) {
             result[i] = iter.nextLong();
@@ -87,7 +87,7 @@ class LongHashSet {
 
     public long[] popAll() {
         long[] result = new long[instance.size()];
-        org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongIterator iter;
+        it.unimi.dsi.fastutil.longs.LongIterator iter;
         iter = instance.iterator();
         for (int i = 0; i < result.length && iter.hasNext(); i++) {
             result[i] = iter.nextLong();
@@ -97,10 +97,10 @@ class LongHashSet {
     }
 
     public void trim() {
-        if (instance_raw instanceof org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) {
-            ((org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) instance_raw).trim();
-        } else if (instance_raw instanceof org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongOpenHashSet) {
-            ((org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongOpenHashSet) instance_raw).trim();
+        if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) {
+            ((it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) instance_raw).trim();
+        } else if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongOpenHashSet) {
+            ((it.unimi.dsi.fastutil.longs.LongOpenHashSet) instance_raw).trim();
         }
     }
 #else

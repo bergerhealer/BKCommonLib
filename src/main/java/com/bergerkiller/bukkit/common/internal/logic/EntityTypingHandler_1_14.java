@@ -63,8 +63,13 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                     "    // Spigot World configuration\n" +
                     "#if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
                     "    #require net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
-                    "    org.spigotmc.SpigotWorldConfig config = new org.spigotmc.SpigotWorldConfig(\"DUMMY\");\n" +
-                    "    instance#spigotConfig = config;\n" +
+                    "    org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig(\"DUMMY\");\n" +
+                    "    instance#spigotConfig = spigotConfig;\n" +
+                    "#endif\n" +
+                    "#if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
+                    "    #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
+                    "    com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(\"DUMMY\", spigotConfig);\n" +
+                    "    instance#paperConfig = paperConfig;\n" +
                     "#endif\n" +
                     "\n" +
                     "    // worldProvider field\n" +

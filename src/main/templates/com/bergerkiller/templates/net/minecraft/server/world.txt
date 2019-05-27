@@ -376,7 +376,15 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.9
+#if version >= 1.14
+    public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
+  #if paperspigot
+        return instance.tileEntityListTick;
+  #else
+        return instance.tileEntityList;
+  #endif
+    }
+#elseif version >= 1.9
     public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
         return instance.tileEntityList;
     }

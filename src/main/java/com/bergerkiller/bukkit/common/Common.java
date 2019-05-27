@@ -232,13 +232,27 @@ public class Common {
 
             // Many classes disappeared, merged or moved with MC 1.14
             if (Common.evaluateMCVersion(">=", "1.14")) {
+                String unimi_fastutil_path = "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.";
+                try {
+                    Class.forName(unimi_fastutil_path + "longs.LongSet");
+
+                    // Fixes hardcoded fastutil paths used in templates
+                    remappings.put("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap", unimi_fastutil_path + "ints.Int2ObjectOpenHashMap");
+                    remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectOpenHashMap");
+                    remappings.put("it.unimi.dsi.fastutil.longs.LongIterator", unimi_fastutil_path + "longs.LongIterator");
+                    remappings.put("it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet", unimi_fastutil_path + "longs.LongLinkedOpenHashSet");
+                    remappings.put("it.unimi.dsi.fastutil.longs.LongOpenHashSet", unimi_fastutil_path + "longs.LongOpenHashSet");
+                } catch (ClassNotFoundException ex) {
+                    unimi_fastutil_path = "it.unimi.dsi.fastutil.";
+                }
+
                 remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
                 remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
-                remappings.put(cb_root + ".util.LongHashSet", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongSet");
-                remappings.put(cb_root + ".util.LongObjectHashMap", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.Long2ObjectMap");
-                remappings.put(nms_root + ".IntHashMap", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap");
-                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
-                remappings.put("org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.IntHashMap$IntHashMapEntry", "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectMap$Entry");
+                remappings.put(cb_root + ".util.LongHashSet", unimi_fastutil_path + "longs.LongSet");
+                remappings.put(cb_root + ".util.LongObjectHashMap", unimi_fastutil_path + "longs.Long2ObjectMap");
+                remappings.put(nms_root + ".IntHashMap", unimi_fastutil_path + "ints.Int2ObjectMap");
+                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
+                remappings.put(unimi_fastutil_path + "ints.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
                 remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap");
                 remappings.put(nms_root + ".EntityTrackerEntry", nms_root + ".PlayerChunkMap$EntityTracker");
             }

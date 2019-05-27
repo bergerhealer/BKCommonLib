@@ -5,7 +5,7 @@ import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 class IntHashMap {
     public static (IntHashMapHandle) net.minecraft.server.IntHashMap createNew() {
 #if version >= 1.14
-        return new org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap();
+        return new it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap();
 #else
         return new IntHashMap();
 #endif
