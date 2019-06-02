@@ -275,7 +275,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of entities on the world
      */
     public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return DuplexConversion.entityList.convert(WorldServerHandle.T.getEntityList.raw.invoke(HandleConversion.toWorldHandle(world)));
+        return DuplexConversion.entityCollection.convert(WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 
     /**

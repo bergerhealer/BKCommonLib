@@ -1765,7 +1765,7 @@ public class CommonMapController implements PacketListener, Listener {
         if (itemFrameCacheDirty) {
             itemFrameCacheDirty = false;
             itemFrameCacheWorld = world;
-            for (Object entityHandle : (List<?>) WorldServerHandle.T.getEntityList.raw.invoke(HandleConversion.toWorldHandle(world))) {
+            for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
                 if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
                     itemFrameCache.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
                 }

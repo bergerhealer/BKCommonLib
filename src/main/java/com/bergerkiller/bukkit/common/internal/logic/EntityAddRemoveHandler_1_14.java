@@ -180,13 +180,6 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             }
         }
 
-        // *** World ***
-        replaceInList(newEntity.getWorldServer().getEntityList(), newEntity);
-        // Fixes for PaperSpigot
-        // if (!Common.IS_PAPERSPIGOT_SERVER) {
-        //     replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
-        // }
-
         // *** Entity Current Chunk ***
         final int chunkX = newEntity.getChunkX();
         final int chunkY = newEntity.getChunkY();

@@ -40,7 +40,7 @@ public class CommonEventFactory {
         List<Iterable<Object>> world_entity_lists = new ArrayList<Iterable<Object>>(worlds.size());
         for (World world : worlds) {
             Object worldHandle = WorldServerHandle.fromBukkit(world).getRaw();
-            world_entity_lists.add((Iterable<Object>) WorldServerHandle.T.getEntityList.raw.invoke(worldHandle));
+            world_entity_lists.add((Iterable<Object>) WorldServerHandle.T.getEntities.raw.invoke(worldHandle));
         }
         return Iterables.concat(world_entity_lists);
     }

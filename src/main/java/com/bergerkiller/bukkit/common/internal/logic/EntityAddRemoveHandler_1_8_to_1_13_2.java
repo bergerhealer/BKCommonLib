@@ -27,9 +27,11 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 
 /**
  * From MC 1.8 to MC 1.13.2 there was an IWorldAccess listener list we could subscribe to.
@@ -38,12 +40,20 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
 public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
     private final Class<?> iWorldAccessType;
     private final SafeField<?> entitiesByIdField;
+    private final FastField<List<Object>> entityListField;
     private final SafeField<List<Object>> accessListField;
     private final SafeField<Collection<Object>> entityRemoveQueue;
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
         this.iWorldAccessType = CommonUtil.getNMSClass("IWorldAccess");
         this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+        this.entityListField = new FastField<List<Object>>();
+        try {
+            this.entityListField.init(WorldHandle.T.getType().getDeclaredField("entityList"));
+        } catch (Throwable t) {
+            throw MountiplexUtil.uncheckedRethrow(t);
+        }
+
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
             accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "v", List.class));
         } else {
@@ -140,12 +150,14 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
     @Override
     public void replace(World world, EntityHandle oldInstance, EntityHandle newInstance) {
+        Object worldHandle = oldInstance.getWorld().getRaw();
+
         // *** Entities By UUID Map ***
-        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(oldInstance.getWorld().getRaw());
+        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
         entitiesByUUID.put(newInstance.getUniqueID(), newInstance);
 
         // *** Entities by Id Map ***
-        IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(oldInstance.getWorld().getRaw()));
+        IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(worldHandle));
         entitiesById.put(newInstance.getId(), newInstance.getRaw());
 
         // *** EntityTrackerEntry ***
@@ -160,7 +172,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         }
 
         // *** World ***
-        replaceInList(newInstance.getWorldServer().getEntityList(), newInstance);
+        replaceInList(entityListField.get(worldHandle), newInstance);
         // Fixes for PaperSpigot
         // if (!Common.IS_PAPERSPIGOT_SERVER) {
         //     replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);

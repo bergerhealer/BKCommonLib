@@ -456,16 +456,17 @@ class WorldServer extends World {
 #endif
 
 #if version >= 1.14
-    public (List<EntityHandle>) List<Entity> getEntityList() {
-        #require net.minecraft.server.WorldServer private final List<Entity> globalEntityList;
-        return instance#globalEntityList;
+    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
+        #require net.minecraft.server.WorldServer private final Map<UUID, Entity> entitiesByUUID;
+        java.util.Map entities = instance#entitiesByUUID;
+        return entities.values();
     }
 #elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
-    public (List<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntityList() {
+    public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
         return instance.entityList;
     }
 #else
-    public (List<EntityHandle>) List<Entity> getEntityList() {
+    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
         return instance.entityList;
     }
 #endif

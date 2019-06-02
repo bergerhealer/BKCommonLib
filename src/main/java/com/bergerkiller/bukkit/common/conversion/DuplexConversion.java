@@ -89,6 +89,7 @@ public class DuplexConversion {
 
     // Collection element transformation
     public static final DuplexConverter<List<Object>, List<Entity>> entityList = pairElem(List.class, entity);
+    public static final DuplexConverter<Collection<Object>, Collection<Entity>> entityCollection = pairElem(Collection.class, entity);
     public static final DuplexConverter<List<Object>, List<Player>> playerList = pairElem(List.class, player);
     public static final DuplexConverter<Set<Object>, Set<Player>> playerSet = pairElem(Set.class, player);
     public static final DuplexConverter<Collection<Object>, Collection<Chunk>> chunkCollection = pairElem(Collection.class, chunk);
