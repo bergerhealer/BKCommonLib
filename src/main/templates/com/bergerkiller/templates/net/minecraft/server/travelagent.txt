@@ -54,7 +54,7 @@ class PortalTravelAgent {
         double portalOffsetX = 0.0;
         double portalOffsetZ = 0.0;
         boolean isHuman = true;
-        ShapeDetector$c result = instance.a(blockPosition, entityMotion, entityFacing, portalOffsetX, portalOffsetZ, isHuman);
+        ShapeDetector$Shape result = instance.a(blockPosition, entityMotion, entityFacing, portalOffsetX, portalOffsetZ, isHuman);
         if (result == null) {
             return null;
         }
@@ -62,10 +62,17 @@ class PortalTravelAgent {
         // result stores position (Vec3D a), motion (Vec3D b) and rotation (int c)
         // turn rotation into yaw. Assign x/y/z of a to location
         org.bukkit.Location location = startLocation.clone();
+  #if version >= 1.14.2
+        location.setX(result.position.x);
+        location.setY(result.position.y);
+        location.setZ(result.position.z);
+        location.setYaw((float) result.yaw);
+  #else
         location.setX(result.a.x);
         location.setY(result.a.y);
         location.setZ(result.a.z);
         location.setYaw((float) result.c);
+  #endif
         return location;
 #else
         BlockPosition portalPosition = instance.findPortal(x, y, z, 128);

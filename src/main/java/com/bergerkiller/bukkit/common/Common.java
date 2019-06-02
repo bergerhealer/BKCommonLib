@@ -225,6 +225,11 @@ public class Common {
                 // Located at net.minecraft.server.Paintings like normal.
             }
 
+            // Still obfuscated on these versions of MC
+            if (Common.evaluateMCVersion(">=", "1.14") && Common.evaluateMCVersion("<=", "1.14.1")) {
+                remappings.put(nms_root + ".ShapeDetector$Shape", nms_root + ".ShapeDetector$c");
+            }
+
             // Some classes were moved after 1.13
             if (Common.evaluateMCVersion(">=", "1.13")) {
                 remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");
