@@ -68,7 +68,7 @@ public class Conversion {
     public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.server.BlockPosition");
     public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.server.PlayerAbilities");
     public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
-    public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("org.bukkit.craftbukkit.util.LongHashSet");
+    public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("com.bergerkiller.bukkit.common.internal.LongHashSet");
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.server.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
     public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");

@@ -63,3 +63,4 @@
 #include /net/minecraft/server/itemstack.txt
 #include /net/minecraft/server/tileentity.txt
 #include /net/minecraft/server/tileentity_subtype.txt
+#include /com/bergerkiller/bukkit/common/internal/longhashset.txt

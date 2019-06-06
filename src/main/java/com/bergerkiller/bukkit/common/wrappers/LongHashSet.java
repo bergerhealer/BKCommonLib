@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_14;
 import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
+import com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.LongHashSetHandle;
 
 import java.util.Iterator;
 

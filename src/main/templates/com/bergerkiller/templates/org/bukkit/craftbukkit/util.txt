@@ -1,7 +1,6 @@
 package org.bukkit.craftbukkit.util;
 
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongHashSetHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
 class LongObjectHashMap {
@@ -33,87 +32,6 @@ class LongObjectHashMap {
 #else
     public Collection<V> values();
     public Set<Long> keySet();
-#endif
-}
-
-class LongHashSet {
-#if version >= 1.14
-    public static (LongHashSetHandle) org.bukkit.craftbukkit.util.LongHashSet createNew(int size) {
-        return new it.unimi.dsi.fastutil.longs.LongOpenHashSet(size);
-    }
-#else
-    public static (LongHashSetHandle) org.bukkit.craftbukkit.util.LongHashSet createNew(int size) {
-        return new LongHashSet(size);
-    }
-#endif
-
-    <code>
-    public static LongHashSetHandle createNew() {
-        return createNew(16);
-    }
-    </code>
-
-#if version >= 1.14
-    public volatile (java.util.Iterator<Long>) java.util.Iterator iterator();
-#else
-    public (java.util.Iterator<Long>) java.util.Iterator iterator();
-#endif
-
-    public int size();
-    public boolean isEmpty();
-    public void clear();
-    public boolean add(long value);
-    public boolean remove(long value);
-    public boolean contains(long value);
-
-#if version >= 1.14
-    public long popFirstElement() {
-        it.unimi.dsi.fastutil.longs.LongIterator iter;
-        iter = instance.iterator();
-        long result = iter.nextLong();
-        iter.remove();
-        return result;
-    }
-
-    public long[] toArray() {
-        long[] result = new long[instance.size()];
-        it.unimi.dsi.fastutil.longs.LongIterator iter;
-        iter = instance.iterator();
-        for (int i = 0; i < result.length && iter.hasNext(); i++) {
-            result[i] = iter.nextLong();
-        }
-        return result;
-    }
-
-    public long[] popAll() {
-        long[] result = new long[instance.size()];
-        it.unimi.dsi.fastutil.longs.LongIterator iter;
-        iter = instance.iterator();
-        for (int i = 0; i < result.length && iter.hasNext(); i++) {
-            result[i] = iter.nextLong();
-        }
-        instance.clear();
-        return result;
-    }
-
-    public void trim() {
-        if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) {
-            ((it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) instance_raw).trim();
-        } else if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongOpenHashSet) {
-            ((it.unimi.dsi.fastutil.longs.LongOpenHashSet) instance_raw).trim();
-        }
-    }
-#else
-    public long popFirstElement() {
-        if (instance.isEmpty()) {
-            throw new java.util.NoSuchElementException();
-        }
-        return instance.popFirst();
-    }
-
-    public long[] toArray();
-    public long[] popAll();
-    private void trim:rehash();
 #endif
 }
 

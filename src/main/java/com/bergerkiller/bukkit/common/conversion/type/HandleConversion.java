@@ -269,7 +269,7 @@ public class HandleConversion {
         return entityTracker.getRawHandle();
     }
 
-    @ConverterMethod(output="org.bukkit.craftbukkit.util.LongHashSet")
+    @ConverterMethod(output="com.bergerkiller.bukkit.common.internal.LongHashSet")
     public static Object toLongHashSetHandle(LongHashSet longHashSetWrapper) {
         return longHashSetWrapper.getRawHandle();
     }

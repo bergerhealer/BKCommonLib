@@ -28,7 +28,7 @@ public class Common {
      * <b>Use getVersion() instead if you want the actual, current version!
      * Constants get inlined when compiling!</b>
      */
-    public static final int VERSION = 11401;
+    public static final int VERSION = 11402;
     /**
      * Defines the Minecraft version that runs on the server.
      */
@@ -153,6 +153,11 @@ public class Common {
             // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
             remappings.put(nms_root + ".EntityTrackerEntryState", nms_root + ".EntityTrackerEntry");
 
+            // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
+            // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
+            remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2");
+            remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2$LongIterator");
+
             // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
             if (Common.evaluateMCVersion("<=", "1.8.8")) {
                 remappings.put(nms_root + ".MobSpawnerData", nms_root + ".MobSpawnerAbstract$a");
@@ -253,7 +258,7 @@ public class Common {
 
                 remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
                 remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
-                remappings.put(cb_root + ".util.LongHashSet", unimi_fastutil_path + "longs.LongSet");
+                remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", unimi_fastutil_path + "longs.LongSet");
                 remappings.put(cb_root + ".util.LongObjectHashMap", unimi_fastutil_path + "longs.Long2ObjectMap");
                 remappings.put(nms_root + ".IntHashMap", unimi_fastutil_path + "ints.Int2ObjectMap");
                 remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");

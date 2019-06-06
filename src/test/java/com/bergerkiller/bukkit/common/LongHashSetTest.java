@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 
 import org.junit.Test;
@@ -66,17 +67,89 @@ public class LongHashSetTest {
         assertEquals(0, test.size());
 
         // <= 1.13.2 uses some strange code, check that this actually works
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            test.add(Long.MIN_VALUE);
-            test.add(0);
-            test.add(Long.MAX_VALUE);
-            assertTrue(test.contains(Long.MIN_VALUE));
-            assertTrue(test.contains(0));
-            assertTrue(test.contains(Long.MAX_VALUE));
-            assertEquals(3, test.size());
-        } else {
-            System.out.println("WARNING: LONGHASHSET IS BUGGED AND CANNOT STORE 0");
+        assertTrue(test.add(20));
+        assertFalse(test.add(20));
+        assertTrue(test.add(Long.MIN_VALUE));
+        assertFalse(test.add(Long.MIN_VALUE));
+        assertTrue(test.add(0));
+        assertFalse(test.add(0));
+        assertTrue(test.add(Long.MAX_VALUE));
+        assertFalse(test.add(Long.MAX_VALUE));
+        assertTrue(test.contains(Long.MIN_VALUE));
+        assertTrue(test.contains(0));
+        assertTrue(test.contains(Long.MAX_VALUE));
+        assertEquals(4, test.size());
+
+        // Verify iterator
+        HashSet<Long> verifySet = new HashSet<Long>();
+        iter = test.longIterator();
+        while (iter.hasNext()) {
+            verifySet.add(iter.next());
         }
+        verifySpecialTest(verifySet);
+
+        // Verify toArray()
+        verifySet.clear();
+        for (long value : test.toArray()) {
+            verifySet.add(value);
+        }
+        verifySpecialTest(verifySet);
+
+        // Verify iterator remove()
+        verifySet.clear();
+        iter = test.longIterator();
+        while (iter.hasNext()) {
+            long value = iter.next();
+            iter.remove();
+            assertFalse(test.contains(value));
+            verifySet.add(value);
+        }
+        verifySpecialTest(verifySet);
+
+        // Add again and verify popFirst()
+        verifySet.clear();
+        assertTrue(test.add(20));
+        assertFalse(test.add(20));
+        assertTrue(test.add(Long.MIN_VALUE));
+        assertFalse(test.add(Long.MIN_VALUE));
+        assertTrue(test.add(0));
+        assertFalse(test.add(0));
+        assertTrue(test.add(Long.MAX_VALUE));
+        assertFalse(test.add(Long.MAX_VALUE));
+        while (!test.isEmpty()) {
+            long value = test.popFirst();
+            assertFalse(test.contains(value));
+            verifySet.add(value);
+        }
+        verifySpecialTest(verifySet);
+
+        // Verify removal
+        assertTrue(test.add(20));
+        assertFalse(test.add(20));
+        assertTrue(test.add(Long.MIN_VALUE));
+        assertFalse(test.add(Long.MIN_VALUE));
+        assertTrue(test.add(0));
+        assertFalse(test.add(0));
+        assertTrue(test.add(Long.MAX_VALUE));
+        assertFalse(test.add(Long.MAX_VALUE));
+        assertTrue(test.remove(20));
+        assertFalse(test.remove(20));
+        assertTrue(test.remove(Long.MIN_VALUE));
+        assertFalse(test.remove(Long.MIN_VALUE));
+        assertTrue(test.remove(0));
+        assertFalse(test.remove(0));
+        assertTrue(test.remove(Long.MAX_VALUE));
+        assertFalse(test.remove(Long.MAX_VALUE));
+        assertTrue(test.isEmpty());
+        assertEquals(test.size(), 0);
+    }
+
+    private static void verifySpecialTest(HashSet<Long> set) {
+        assertEquals(4, set.size());
+        assertTrue(set.contains(Long.valueOf(20)));
+        assertTrue(set.contains(Long.valueOf(Long.MIN_VALUE)));
+        assertTrue(set.contains(Long.valueOf(0)));
+        assertTrue(set.contains(Long.valueOf(Long.MAX_VALUE)));
     }
 
     private static void assertAllValuesExist(long[] values, int num) {

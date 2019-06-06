@@ -384,7 +384,7 @@ public class WrapperConversion {
         return new EntityTracker(nmsEntityTrackerHandle);
     }
 
-    @ConverterMethod(input="org.bukkit.craftbukkit.util.LongHashSet")
+    @ConverterMethod(input="com.bergerkiller.bukkit.common.internal.LongHashSet")
     public static LongHashSet toLongHashSet(Object cbLongHashSetHandle) {
         return new LongHashSet(cbLongHashSetHandle);
     }
