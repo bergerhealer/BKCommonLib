@@ -173,7 +173,7 @@ class ChunkSection {
 #if version >= 1.14
         return new ChunkSection(y);
 #else
-        Boolean hasSkyLight = com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle.T.hasSkyLight.invoke(world.worldProvider);
+        Boolean hasSkyLight = (Boolean) com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle.T.hasSkyLight.invoke(world.worldProvider);
         return new ChunkSection(y, hasSkyLight.booleanValue());
 #endif
     }

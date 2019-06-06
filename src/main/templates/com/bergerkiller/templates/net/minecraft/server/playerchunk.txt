@@ -14,13 +14,13 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
     return (PlayerChunkMap) instance.players;
 #elseif version >= 1.9
     #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap;
-    return instance#PlayerChunkMap;
+    return instance#playerChunkMap;
 #elseif version >= 1.8.3
     #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
-    return instance#PlayerChunkMap;
+    return instance#playerChunkMap;
 #else
     #require net.minecraft.server.PlayerChunk final PlayerChunkMap playerChunkMap;
-    return instance#PlayerChunkMap;
+    return instance#playerChunkMap;
 #endif
 }
 

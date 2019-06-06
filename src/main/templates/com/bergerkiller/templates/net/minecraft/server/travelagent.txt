@@ -5,12 +5,20 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
 
 class PortalTravelAgent {
+#if version >= 1.9
     private final readonly (org.bukkit.World) WorldServer world;
+#else
+    private final readonly (org.bukkit.World) WorldServer world:a;
+#endif
 
     public (PortalTravelAgentHandle) PortalTravelAgent((org.bukkit.World) WorldServer world);
 
     public org.bukkit.Location findPortal(org.bukkit.Location startLocation) {
+#if version >= 1.9
         #require net.minecraft.server.PortalTravelAgent private final WorldServer world;
+#else
+        #require net.minecraft.server.PortalTravelAgent private final WorldServer world:a;
+#endif
         WorldServer world = instance#world;
 
         double x = startLocation.getX();

@@ -79,7 +79,7 @@ optional class FurnaceRecipe extends IRecipe {
     public (CraftInputSlot) RecipeItemStack getIngredient() {
 #if version >= 1.14
         #require net.minecraft.server.RecipeCooking protected final RecipeItemStack ingredient;
-#else
+#elseif version >= 1.13
         #require net.minecraft.server.FurnaceRecipe private final RecipeItemStack ingredient;
 #endif
         return instance#ingredient;

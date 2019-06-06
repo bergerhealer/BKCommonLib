@@ -398,7 +398,7 @@ class WorldServer extends World {
             if (chunk == null) {
                 continue;
             }
-            tiles.addAll(tileEntities.values());
+            tiles.addAll(chunk.tileEntities.values());
         }
 
         return tiles;
