@@ -379,7 +379,7 @@ class PacketPlayInUseItem extends Packet {
     }
 #else
   #if version >= 1.9
-    #require net.minecraft.server.PacketPlayInUseItem private (IntVector3) BlockPosition position:a;
+    #require net.minecraft.server.PacketPlayInUseItem private BlockPosition position:a;
     #require net.minecraft.server.PacketPlayInUseItem private float deltaX:d;
     #require net.minecraft.server.PacketPlayInUseItem private float deltaY:e;
     #require net.minecraft.server.PacketPlayInUseItem private float deltaZ:f;
