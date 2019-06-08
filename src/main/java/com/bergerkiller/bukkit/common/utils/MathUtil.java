@@ -93,6 +93,17 @@ public class MathUtil {
     }
 
     /**
+     * Gets the angle difference between two angles
+     *
+     * @param angle1
+     * @param angle2
+     * @return angle difference
+     */
+    public static double getAngleDifference(double angle1, double angle2) {
+        return Math.abs(wrapAngle(angle1 - angle2));
+    }
+
+    /**
      * Wraps the angle to be between -180 and 180 degrees
      *
      * @param angle to wrap
@@ -122,6 +133,23 @@ public class MathUtil {
         }
         while (wrappedAngle > 180f) {
             wrappedAngle -= 360f;
+        }
+        return wrappedAngle;
+    }
+
+    /**
+     * Wraps the angle to be between -180 and 180 degrees
+     *
+     * @param angle to wrap
+     * @return [-180 > angle >= 180]
+     */
+    public static double wrapAngle(double angle) {
+        double wrappedAngle = angle;
+        while (wrappedAngle <= -180.0) {
+            wrappedAngle += 360.0;
+        }
+        while (wrappedAngle > 180.0) {
+            wrappedAngle -= 360.0;
         }
         return wrappedAngle;
     }
