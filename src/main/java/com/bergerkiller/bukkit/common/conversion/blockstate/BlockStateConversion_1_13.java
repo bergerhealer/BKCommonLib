@@ -97,7 +97,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // TileEntityMobSpawner uses this to perform physics logic, disable that and do nothing
-                if (methodName.equals("notify")) {
+                if (methodName.equals("notify") || methodName.equals("b") || methodName.equals("updateAdjacentComparators")) {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
