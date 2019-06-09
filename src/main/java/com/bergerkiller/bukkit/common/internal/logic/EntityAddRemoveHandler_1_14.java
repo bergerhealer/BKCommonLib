@@ -13,6 +13,7 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
@@ -73,7 +74,13 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         }
 
         private void onAdded(Object entity) {
-            CommonPlugin.getInstance().notifyAdded(this.world, WrapperConversion.toEntity(entity));
+            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
+            CommonUtil.nextTick(new Runnable() {
+                @Override
+                public void run() {
+                    CommonPlugin.getInstance().notifyAdded(world, bEntity);
+                }
+            });
         }
 
         private void onRemoved(Object entity) {
