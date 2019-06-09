@@ -276,7 +276,7 @@ public class ChunkUtil {
      */
     public static org.bukkit.Chunk getChunk(World world, final int x, final int z) {
         // Bukkit alternative
-        if (world.isChunkLoaded(x, z)) {
+        if (WorldUtil.isLoaded(world, x, z)) {
             return world.getChunkAt(x, z);
         } else {
             return null;
