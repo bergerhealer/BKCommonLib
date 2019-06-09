@@ -79,6 +79,7 @@ public class CommonPlugin extends PluginBase {
     private CommonMapController mapController = null;
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
+    private CommonForcedChunkManager forcedChunkManager = null;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -271,6 +272,15 @@ public class CommonPlugin extends PluginBase {
         return this.chunkLoaderPool;
     }
 
+    /**
+     * Gets a helper class that allows to designate chunks as 'force loaded', keeping them loaded.
+     * 
+     * @return forced chunk manager
+     */
+    public CommonForcedChunkManager getForcedChunkManager() {
+        return this.forcedChunkManager;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -411,6 +421,10 @@ public class CommonPlugin extends PluginBase {
             t.printStackTrace();
         }
 
+        // Disable CommonForcedChunkManager
+        this.forcedChunkManager.disable(this);
+        this.forcedChunkManager = null;
+
         // Shut down the chunk loader pool, allowing tasks to complete first
         // Set to null to not allow new tasks to be queued
         CommonChunkLoaderPool oldPool = chunkLoaderPool;
@@ -495,6 +509,10 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize chunk loader pool
         chunkLoaderPool = new CommonChunkLoaderPool();
+
+        // Initialize forced chunk manager
+        forcedChunkManager = new CommonForcedChunkManager();
+        forcedChunkManager.enable(this);
 
         // Initialize immutable player set manager
         immutablePlayerSetManager = new CommonImmutablePlayerSetManager();

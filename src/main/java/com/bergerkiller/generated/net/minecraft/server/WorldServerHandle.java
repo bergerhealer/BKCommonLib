@@ -68,6 +68,10 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method.Converted<Void> setEntityTracker = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
+        @Template.Optional
+        public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
+        @Template.Optional
+        public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();
         public final Template.Method.Converted<WorldNBTStorageHandle> getDataManager = new Template.Method.Converted<WorldNBTStorageHandle>();
         public final Template.Method.Converted<Collection<EntityHandle>> getEntities = new Template.Method.Converted<Collection<EntityHandle>>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();

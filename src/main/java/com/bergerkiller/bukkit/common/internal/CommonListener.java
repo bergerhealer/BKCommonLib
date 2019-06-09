@@ -128,5 +128,4 @@ public class CommonListener implements Listener {
             event.setCancelled(CommonUtil.callEvent(new VehicleExitEvent(vehicle, event.getPlayer())).isCancelled());
         }
     }
-
 }

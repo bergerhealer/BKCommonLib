@@ -26,6 +26,7 @@ import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ForcedChunkHandle
 
 class World extends IBlockAccess {
     public final Random random;
@@ -447,6 +448,61 @@ class WorldServer extends World {
 #endif
     }
 
+#if version >= 1.13.1
+    public optional void setForceLoadedAsync(int x, int z, boolean loaded) {
+        com.bergerkiller.mountiplex.reflection.declarations.Template.Method getForcedChunkMethod;
+        getForcedChunkMethod = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getForcedChunk.raw;
+        ForcedChunk forcedchunk = (ForcedChunk) getForcedChunkMethod.invoke(instance_raw);
+
+  #if version >= 1.14
+        long key = ChunkCoordIntPair.pair(x, z);
+  #else
+        long key = ChunkCoordIntPair.a(x, z);
+  #endif
+
+        boolean changed;
+        if (loaded) {
+            changed = forcedchunk.a().add(key);
+        } else {
+            changed = forcedchunk.a().remove(key);
+        }
+        forcedchunk.a(changed);
+
+  #if version >= 1.14
+        if (changed) {
+            ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(x, z);
+            instance.getChunkProvider().a(chunkcoordintpair, loaded);
+        }
+  #endif
+    }
+#else
+    public optional void setForceLoadedAsync:###(int x, int z, boolean loaded);
+#endif
+
+#if version >= 1.14
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        return (ForcedChunk) instance.getWorldPersistentData().a(
+            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+    }
+#elseif version >= 1.13.1
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        ForcedChunk forcedchunk = (ForcedChunk) instance.a(
+            instance.worldProvider.getDimensionManager(),
+            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+        if (forcedchunk == null) {
+            forcedchunk = new ForcedChunk("chunks");
+            instance.a(instance.worldProvider.getDimensionManager(), "chunks", forcedchunk);
+        }
+        return forcedchunk;
+    }
+#else
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
+#endif
+
 #if version >= 1.14
     public (WorldNBTStorageHandle) WorldNBTStorage getDataManager();
 #else
@@ -505,6 +561,10 @@ class WorldServer extends World {
         }
     }
     </code>
+}
+
+// Since MC 1.13.1
+optional class ForcedChunk {
 }
 
 class ChunkProviderServer {

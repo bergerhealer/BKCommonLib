@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.chunk.ForcedChunk;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
@@ -9,6 +10,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -38,6 +40,32 @@ import java.util.function.Consumer;
  * Contains utilities to get and set chunks of a world
  */
 public class ChunkUtil {
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. The chunk is loaded asynchronously
+     * if it is not already loaded.
+     * 
+     * @param world
+     * @param chunkX
+     * @param chunkZ
+     * @return forced chunk
+     */
+    public static ForcedChunk forceChunkLoaded(World world, int chunkX, int chunkZ) {
+        return CommonPlugin.getInstance().getForcedChunkManager().newForcedChunk(world, chunkX, chunkZ);
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. If the provided chunk is currently not
+     * actually loaded, it is loaded asynchronously.
+     * 
+     * @param chunk
+     * @return forced chunk
+     */
+    public static ForcedChunk forceChunkLoaded(org.bukkit.Chunk chunk) {
+        return forceChunkLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
 
     /**
      * Gets an array of vertical Chunk Sections that make up the data of a chunk
