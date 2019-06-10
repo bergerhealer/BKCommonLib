@@ -114,6 +114,16 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     };
                 }
 
+                // setTypeAndData is used by TileEntityStructure
+                if (methodName.equals("setTypeAndData")) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return Boolean.TRUE;
+                        }
+                    };
+                }
+
                 // Gets the Minecraft Server (safe)
                 if (methodName.equals("getMinecraftServer")) {
                     return new Invokable() {
