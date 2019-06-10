@@ -145,7 +145,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // Fluid and Block Tick list
-                if (params.length == 0 && method.getReturnType().equals(CommonUtil.getNMSClass("TickListServer"))) {
+                if (params.length == 0 && CommonUtil.getNMSClass("TickList").isAssignableFrom(method.getReturnType())) {
                     return new Invokable() {
                         @Override
                         public Object invoke(Object instance, Object... args) {
