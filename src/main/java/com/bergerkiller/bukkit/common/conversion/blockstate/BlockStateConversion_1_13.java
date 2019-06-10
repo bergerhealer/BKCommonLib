@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -38,6 +37,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private TileState input_state;
     private final World proxy_world;
     private final Object proxy_nms_world;
+    private final Object proxy_nms_world_ticklist;
     private final Block proxy_block;
     private final Class<?> craftBlockEntityState_type;
     private final SafeField<?> craftBlockEntityState_snapshot_field;
@@ -60,11 +60,39 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         this.craftBlockEntityState_snapshot_field = SafeField.create(this.craftBlockEntityState_type,
                 "snapshot", TileEntityHandle.T.getType());
 
+        // NMS World Proxy has a 'TickListServer' object that is requested by TileEntityCommand
+        proxy_nms_world_ticklist = new ClassInterceptor() {
+            @Override
+            protected Invokable getCallback(Method method) {
+                if (method.getReturnType().equals(boolean.class)) {
+                    // Boolean return value expected, so return false always
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return Boolean.FALSE;
+                        }
+                    };
+                } else if (method.getReturnType().equals(void.class)) {
+                    // Void method, do nothing
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return null;
+                        }
+                    };
+                } else {
+                    // All other method calls fail
+                    return non_instrumented_invokable;
+                }
+            }
+        }.createInstance(CommonUtil.getNMSClass("TickListServer"));
+
         // Create a NMS World proxy for handling the getTileEntity call
         proxy_nms_world = new ClassInterceptor() {
             @Override
             protected Invokable getCallback(Method method) {
                 String methodName = method.getName();
+                Class<?>[] params = method.getParameterTypes();
 
                 // Gets the proxy world
                 if (methodName.equals("getTileEntity")) {
@@ -102,6 +130,16 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                         @Override
                         public Object invoke(Object instance, Object... args) {
                             return null;
+                        }
+                    };
+                }
+
+                // Fluid and Block Tick list
+                if (params.length == 0 && method.getReturnType().equals(CommonUtil.getNMSClass("TickListServer"))) {
+                    return new Invokable() {
+                        @Override
+                        public Object invoke(Object instance, Object... args) {
+                            return proxy_nms_world_ticklist;
                         }
                     };
                 }
