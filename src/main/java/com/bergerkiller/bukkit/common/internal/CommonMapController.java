@@ -112,10 +112,8 @@ public class CommonMapController implements PacketListener, Listener {
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
     // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
     private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
-    // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
-    private final HashSet<IntVector3> neighbourCacheSet = new HashSet<IntVector3>();
-    // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
-    private final Queue<IntVector3> neighbourPendingList = new ArrayDeque<IntVector3>();
+    // Caches used while executing findNeighbours()
+    private FindNeighboursCache findNeighboursCache = null;
     // Neighbours of item frames to check for either x-aligned or z-aligned
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Z = {BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST};
@@ -1671,6 +1669,12 @@ public class CommonMapController implements PacketListener, Listener {
             return Collections.emptyList(); // no neighbours
         }
 
+        // Take cache entry
+        FindNeighboursCache cache = this.findNeighboursCache;
+        if (cache == null) {
+            cache = new FindNeighboursCache();
+        }
+        this.findNeighboursCache = null;
         try {
             // Find all item frames that:
             // - Are on the same world as this item frame
@@ -1696,7 +1700,7 @@ public class CommonMapController implements PacketListener, Listener {
                     if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
                         continue;
                     }
-                    this.neighbourCacheSet.add(new IntVector3(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ()));
+                    cache.cacheSet.add(new IntVector3(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ()));
                 }
             } else {
                 // Along Z, compare the z-coordinates
@@ -1716,31 +1720,37 @@ public class CommonMapController implements PacketListener, Listener {
                     if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
                         continue;
                     }
-                    this.neighbourCacheSet.add(new IntVector3(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z));
+                    cache.cacheSet.add(new IntVector3(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z));
                 }
             }
 
             // Make sure the neighbours result are a single contiguous blob
             // Islands (can not reach the input item frame) are removed
-            List<IntVector3> result = new ArrayList<IntVector3>(this.neighbourCacheSet.size());
-            this.neighbourPendingList.add(itemFramePos);
+            List<IntVector3> result = new ArrayList<IntVector3>(cache.cacheSet.size());
+            cache.pendingList.add(itemFramePos);
             do {
-                IntVector3 pending = this.neighbourPendingList.poll();
+                IntVector3 pending = cache.pendingList.poll();
                 for (BlockFace side : neighbourAxis) {
                     IntVector3 sidePoint = pending.add(side);
-                    if (this.neighbourCacheSet.remove(sidePoint)) {
-                        this.neighbourPendingList.add(sidePoint);
+                    if (cache.cacheSet.remove(sidePoint)) {
+                        cache.pendingList.add(sidePoint);
                         result.add(sidePoint);
                     }
                 }
-            } while (!this.neighbourPendingList.isEmpty());
+            } while (!cache.pendingList.isEmpty());
 
             return result;
         } finally {
-            // Cleanup
-            this.neighbourCacheSet.clear();
-            this.neighbourPendingList.clear();
+            // Return to cache
+            this.findNeighboursCache = cache;
         }
+    }
+
+    private static final class FindNeighboursCache {
+        // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
+        public final HashSet<IntVector3> cacheSet = new HashSet<IntVector3>();
+        // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
+        public final Queue<IntVector3> pendingList = new ArrayDeque<IntVector3>();
     }
 
     private final void resetItemFrameCache(World world) {
