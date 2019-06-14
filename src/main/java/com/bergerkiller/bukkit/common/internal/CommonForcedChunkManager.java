@@ -37,8 +37,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.pendingHandler = new Task(plugin) {
             @Override
             public void run() {
-                synchronized (pending) {
-                    synchronized (CommonForcedChunkManager.this) {
+                synchronized (CommonForcedChunkManager.this) {
+                    synchronized (pending) {
                         for (ChunkKey key : pending) {
                             Entry entry = chunks.get(key);
                             if (entry != null) {
