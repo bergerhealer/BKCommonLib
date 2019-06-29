@@ -5,7 +5,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.util.Collections;
 
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -271,7 +270,13 @@ public class TestServerFactory {
 
             // this.ac = new ResourceManager(EnumResourcePackType.SERVER_DATA);
             {
-                setField(mc_server, "ae", createFromCode(minecraftServerType,
+                String fieldname;
+                if (Common.evaluateMCVersion(">=", "1.14.3")) {
+                    fieldname = "ad";
+                } else {
+                    fieldname = "ae";
+                }
+                setField(mc_server, fieldname, createFromCode(minecraftServerType,
                         "return new ResourceManager(EnumResourcePackType.SERVER_DATA, java.lang.Thread.currentThread());"));
             }
 
@@ -317,16 +322,30 @@ public class TestServerFactory {
                       */
             }
 
-            // this.ag = new CraftingManager();
-            {
-                Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");
-                setField(mc_server, "ai", craftingManagerType.newInstance());
-            }
+            if (Common.evaluateMCVersion(">=", "1.14.3")) {
+                // this.ah = new CraftingManager();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");
+                    setField(mc_server, "ah", craftingManagerType.newInstance());
+                }
 
-            // this.ah = new TagRegistry();
-            {
-                Class<?> craftingManagerType = Class.forName(nms_root + "TagRegistry");
-                setField(mc_server, "aj", craftingManagerType.newInstance());
+                // this.ai = new TagRegistry();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "TagRegistry");
+                    setField(mc_server, "ai", craftingManagerType.newInstance());
+                }
+            } else {
+                // this.ag = new CraftingManager();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");
+                    setField(mc_server, "ai", craftingManagerType.newInstance());
+                }
+
+                // this.ah = new TagRegistry();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "TagRegistry");
+                    setField(mc_server, "aj", craftingManagerType.newInstance());
+                }
             }
 
             // this.ac.a((IResourcePackListener) this.ah);

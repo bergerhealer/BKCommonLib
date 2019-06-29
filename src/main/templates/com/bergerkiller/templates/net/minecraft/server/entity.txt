@@ -864,7 +864,9 @@ class Entity {
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.14
+#if version >= 1.14.3
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
+#elseif version >= 1.14
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
 #elseif version >= 1.12
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
@@ -924,19 +926,33 @@ class Entity {
     }
     </code>
 
-#if version >= 1.14
+#if version >= 1.14.3
+    public boolean isWet:au();
+#elseif version >= 1.14
     public boolean isWet:at();
+#elseif version >= 1.13
+    public boolean isWet:ap();
+#elseif version >= 1.12
+    public boolean isWet:an();
+#elseif version >= 1.10.2
+    public boolean isWet:ai();
+#elseif version >= 1.9.4
+    public boolean isWet:ah();
+#elseif version >= 1.9
+    public boolean isWet:ah();
+#else
+    public boolean isWet:U();
+#endif
+
+#if version >= 1.14
     public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 
 #elseif version >= 1.13
-    public boolean isWet:ap();
     public optional (EntityHandle) Entity getDriverEntity:bO();
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 
 #elseif version >= 1.12
-    public boolean isWet:an();
-
     #if pre
         // This was on the pre-release version
         public optional (EntityHandle) Entity getDriverEntity:bC();
@@ -947,26 +963,18 @@ class Entity {
 
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.10.2
-    public boolean isWet:ai();
-
     public optional (EntityHandle) Entity getDriverEntity:bw();
 
     public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9.4
-    public boolean isWet:ah();
-
     public optional (EntityHandle) Entity getDriverEntity:bu();
 
     public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9
-    public boolean isWet:ah();
-
     public optional (EntityHandle) Entity getDriverEntity:bt();
 
     public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #else
-    public boolean isWet:U();
-
     public optional (EntityHandle) Entity getDriverEntity:###();
 
     public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
@@ -1043,7 +1051,9 @@ class Entity {
      *     return 300;
      * }
      */
-#if version >= 1.14
+#if version >= 1.14.3
+    public int getPortalCooldownMaximum:aX();
+#elseif version >= 1.14
     public int getPortalCooldownMaximum:aW();
 #elseif version >= 1.13
     public int getPortalCooldownMaximum:aQ();
