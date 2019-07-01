@@ -252,6 +252,7 @@ public class Common {
                     remappings.put("it.unimi.dsi.fastutil.longs.LongIterator", unimi_fastutil_path + "longs.LongIterator");
                     remappings.put("it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet", unimi_fastutil_path + "longs.LongLinkedOpenHashSet");
                     remappings.put("it.unimi.dsi.fastutil.longs.LongOpenHashSet", unimi_fastutil_path + "longs.LongOpenHashSet");
+                    remappings.put("it.unimi.dsi.fastutil.longs.LongSet", unimi_fastutil_path + "longs.LongSet");
                 } catch (ClassNotFoundException ex) {
                     unimi_fastutil_path = "it.unimi.dsi.fastutil.";
                 }

@@ -53,8 +53,8 @@ public class RegionHandler_1_14 extends RegionHandler {
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
-                    "    org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongSet coordSet;\n" +
-                    "    org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.longs.LongIterator iter;\n" +
+                    "    it.unimi.dsi.fastutil.longs.LongSet coordSet;\n" +
+                    "    it.unimi.dsi.fastutil.longs.LongIterator iter;\n" +
                     "\n" +
                     "    coordSet = rfc.cache.keySet();\n" +
                     "    java.util.ArrayList result = new java.util.ArrayList(coordSet.size());\n" +
