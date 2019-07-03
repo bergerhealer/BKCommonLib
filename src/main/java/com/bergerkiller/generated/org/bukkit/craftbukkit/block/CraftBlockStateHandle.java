@@ -46,6 +46,9 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
         public final Template.Field.Converted<Chunk> chunk = new Template.Field.Converted<Chunk>();
         public final Template.Field.Integer flag = new Template.Field.Integer();
 
+        @Template.Optional
+        public final Template.Method<Void> init = new Template.Method<Void>();
+
     }
 
 }

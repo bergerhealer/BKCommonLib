@@ -1,6 +1,11 @@
 package org.bukkit.craftbukkit.block;
 
+import org.bukkit.craftbukkit.block.CraftBlock;
 import org.bukkit.craftbukkit.CraftChunk;
+import org.bukkit.craftbukkit.CraftWorld;
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
+
+import net.minecraft.server.TileEntity;
 
 class CraftBlockState {
     private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld world;
@@ -14,6 +19,46 @@ class CraftBlockState {
     protected int flag;
 
     public (org.bukkit.block.BlockState) CraftBlockState(org.bukkit.block.Block block);
+
+    // Fakes the constructor of BlockState or derived types, an a BlockState that is already created on MC 1.13 and later
+    // Not supported on earlier versions, instantiation worked differently there
+#if version >= 1.13
+    public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, net.minecraft.server.IBlockData blockData, net.minecraft.server.TileEntity tileEntity) {
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final CraftWorld blockState_world:world;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final CraftChunk blockState_chunk:chunk;
+        instance#blockState_world = block.getWorld();
+        instance#blockState_chunk = chunk;
+
+#if version >= 1.13.2
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.server.BlockPosition blockState_position:position;
+        instance#blockState_position = ((CraftBlock) block).getPosition();
+#else
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_x:x;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_y:y;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_z:z;
+        instance#blockState_x = block.getX();
+        instance#blockState_y = block.getY();
+        instance#blockState_z = block.getZ();
+#endif
+
+        instance.setData(blockData);
+        instance.setFlag(3);
+
+        if (instance instanceof CraftBlockEntityState) {
+            CraftBlockEntityState entityState = (CraftBlockEntityState) instance;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity tileEntity;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity snapshot;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends TileEntity tileEntity);
+            entityState#tileEntityClass = tileEntity.getClass();
+            entityState#tileEntity = tileEntity;
+            entityState#snapshot = tileEntity;
+            entityState#load(tileEntity);
+        }
+    }
+#else
+    public optional void init:###(org.bukkit.block.Block block, org.bukkit.Chunk chunk, net.minecraft.server.IBlockData blockData, net.minecraft.server.TileEntity tileEntity);
+#endif
 }
 
 class CraftBlock {

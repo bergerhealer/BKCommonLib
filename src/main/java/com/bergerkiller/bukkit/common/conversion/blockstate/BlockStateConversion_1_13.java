@@ -2,10 +2,13 @@ package com.bergerkiller.bukkit.common.conversion.blockstate;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 
 import org.bukkit.Chunk;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -29,6 +32,7 @@ import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 
 /**
  * BlockState conversion used on MC 1.13 and after
@@ -39,6 +43,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final Object proxy_nms_world;
     private final Object proxy_nms_world_ticklist;
     private final Block proxy_block;
+    private final Map<Material, NullInstantiator<BlockState>> blockStateInstantiators;
     private final Class<?> craftBlockEntityState_type;
     private final SafeField<?> craftBlockEntityState_snapshot_field;
     private final Invokable non_instrumented_invokable = new Invokable() {
@@ -54,6 +59,9 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         final Class<?> craftBlock_type = CommonUtil.getCBClass("block.CraftBlock");
         final java.lang.reflect.Field worldField = craftBlock_type.getDeclaredField("world");
         worldField.setAccessible(true);
+
+        // Stores a mapping of CraftBlockState types we have already created, by Block Material
+        this.blockStateInstantiators = new EnumMap<Material, NullInstantiator<BlockState>>(Material.class);
 
         // Find CraftBlockEntityState class; we need to fix up the 'world' property of the snapshot tile
         this.craftBlockEntityState_type = CommonUtil.getCBClass("block.CraftBlockEntityState");
@@ -347,12 +355,31 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     }
 
     public synchronized BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Block block, Object nmsTileEntity) {
+        // Obtain BlockData from Tile Entity if cached, otherwise from the chunk
+        BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
+        if (blockData == null) {
+            blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
+        }
+
+        // If cached, create the BlockState by null-instantiating it and calling load() on it ourselves
+        // This prevents creating a snapshot copy of the Tile Entity state
+        NullInstantiator<BlockState> state_instantiator = this.blockStateInstantiators.get(blockData.getType());
+        if (state_instantiator != null) {
+            BlockState result = state_instantiator.create();
+
+            // Initialize the fields in BlockState
+            // public void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) 
+            CraftBlockStateHandle.T.init.invoke(result, block, chunk, blockData.getData(), nmsTileEntity);
+
+            return result;
+        }
+
         // Store and restore old state in case of recursive calls to this function
         // This could happen if inside BlockState construction a chunk is loaded anyway
         // Would be bad, but its best to assume the worst
         TileState old_state = input_state;
         try {
-            input_state = new TileState(chunk, block, nmsTileEntity);
+            input_state = new TileState(chunk, block, nmsTileEntity, blockData);
             World world = block.getWorld();
             BlockState result = proxy_block.getState();
 
@@ -372,6 +399,9 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     TileEntityHandle.T.world_field.set(snapshotTile, world);
                 }
             }
+
+            // Cache type instantiator for next time
+            this.blockStateInstantiators.put(blockData.getType(), new NullInstantiator<BlockState>(result.getClass()));
 
             // All done!
             return result;
@@ -398,15 +428,10 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         public final Object tileEntity;
         public final BlockData blockData;
 
-        public TileState(Chunk chunk, Block block, Object nmsTileEntity) {
+        public TileState(Chunk chunk, Block block, Object nmsTileEntity, BlockData blockData) {
             this.block = block;
             this.chunk = (chunk == null) ? block.getChunk() : chunk;
             this.tileEntity = nmsTileEntity;
-
-            BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
-            if (blockData == null) {
-                blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
-            }
             this.blockData = blockData;
         }
     }
