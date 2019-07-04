@@ -241,7 +241,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                 new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
                     @Override
                     public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
-                        return new org.bukkit.material.Sign(legacy_data_type, legacy_data_value);
+                        return new CommonSignDataFix(legacy_data_type, legacy_data_value, true);
                     }
 
                     @Override
@@ -260,7 +260,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                 new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
                     @Override
                     public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
-                        return new org.bukkit.material.Sign(legacy_data_type, legacy_data_value);
+                        return new CommonSignDataFix(legacy_data_type, legacy_data_value, false);
                     }
 
                     @Override
