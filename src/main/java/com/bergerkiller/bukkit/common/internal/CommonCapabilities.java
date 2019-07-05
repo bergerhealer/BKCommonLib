@@ -137,4 +137,9 @@ public class CommonCapabilities {
      * into an Entry and a State.
      */
     public static final boolean PLAYER_CHUNK_MAP_ENTITY_TRACKER = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
+     * Since Minecraft 1.14 an asynchronous chunk loading system is used that tends to deadlock
+     */
+    public static final boolean ASYNCHRONOUS_CHUNK_LOADER = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -20,6 +21,7 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 
@@ -275,11 +277,17 @@ public class ChunkUtil {
      * @return The chunk, or null if it is not loaded
      */
     public static org.bukkit.Chunk getChunk(World world, final int x, final int z) {
-        // Bukkit alternative
-        if (WorldUtil.isLoaded(world, x, z)) {
-            return world.getChunkAt(x, z);
+        if (CommonCapabilities.ASYNCHRONOUS_CHUNK_LOADER) {
+            // Should work on earlier versions too, but restricting to 1.14+ for now until tested.
+            ChunkHandle chunk = WorldServerHandle.fromBukkit(world).getChunkProviderServer().getChunkIfLoaded(x, z);
+            return (chunk == null) ? null : chunk.getBukkitChunk();
         } else {
-            return null;
+            // Bukkit alternative
+            if (WorldUtil.isLoaded(world, x, z)) {
+                return world.getChunkAt(x, z);
+            } else {
+                return null;
+            }
         }
     }
 
@@ -295,6 +303,7 @@ public class ChunkUtil {
      */
     public static CompletableFuture<org.bukkit.Chunk> getChunkAsync(World world, final int x, final int z) {
         final CompletableFuture<org.bukkit.Chunk> result = new CompletableFuture<org.bukkit.Chunk>();
+
         org.bukkit.Chunk loadedChunk = getChunk(world, x, z);
         if (loadedChunk != null) {
             result.complete(loadedChunk);
