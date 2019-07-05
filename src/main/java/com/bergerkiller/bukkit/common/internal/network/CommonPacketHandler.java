@@ -15,6 +15,7 @@ import io.netty.channel.ChannelPromise;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.NoSuchElementException;
 import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
@@ -88,7 +89,14 @@ public class CommonPacketHandler extends PacketHandlerHooked {
             Object playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
             Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
             Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
-            channel.pipeline().addBefore("packet_handler", "bkcommonlib", new CommonChannelListener(player));
+            CommonChannelListener listener = new CommonChannelListener(player);
+            try {
+                channel.pipeline().addBefore("packet_handler", "bkcommonlib", listener);
+            } catch (NoSuchElementException ex) {
+                // If for some reason packet_handler does not exist, add it at the first place as a fallback
+                // This sometimes happens when the player login isn't complete, or some other odd reason
+                channel.pipeline().addFirst("bkcommonlib", listener);
+            }
         }
 
         public static void unbind(Player player) {
