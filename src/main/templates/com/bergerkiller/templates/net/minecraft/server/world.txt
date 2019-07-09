@@ -586,7 +586,18 @@ class ChunkProviderServer {
         long key = ChunkCoordIntPair.pair(cx, cz);
         PlayerChunk chunk = (PlayerChunk) instance.playerChunkMap.visibleChunks.get(key);
         if (chunk != null) {
-            return chunk.getChunk();
+#if exists net.minecraft.server.PlayerChunk public Chunk getFullChunk()
+            return chunk.getFullChunk();
+#else
+            java.util.concurrent.CompletableFuture statusFuture;
+  #if exists net.minecraft.server.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(ChunkStatus chunkstatus)
+            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
+  #else
+            statusFuture = chunk.a(ChunkStatus.FULL);
+  #endif
+            com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) statusFuture.getNow(null);
+            return either == null ? null : (Chunk) either.left().orElse(null);
+#endif
         }
         return null;
 
