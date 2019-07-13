@@ -163,4 +163,13 @@ public class LogicUtilTest {
             System.out.println("Sync " + name + " " + col1 + " | " + col2);
         }
     }
+
+    @Test
+    public void testClone() {
+        ArrayList<String> list = new ArrayList<String>();
+        list.add("hello");
+        list.add("world");
+        ArrayList<String> list_clone = LogicUtil.clone(list);
+        assertEquals(list, list_clone);
+    }
 }

@@ -1,8 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
-import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeDirectMethod;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
 
@@ -17,38 +16,7 @@ import java.util.Map.Entry;
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
-    private static final MethodAccessor<Object> objectCloneMethod;
-
-    static {
-        // Get the cloning method
-        MethodAccessor<Object> objectCloneMethodAccessor;
-        try {
-            final Method cloneMethod = Object.class.getDeclaredMethod("clone");
-            cloneMethod.setAccessible(true);
-            objectCloneMethodAccessor = new SafeDirectMethod<Object>() {
-                @Override
-                public Object invoke(Object instance, Object... args) {
-                    try {
-                        return cloneMethod.invoke(instance, args);
-                    } catch (Throwable t) {
-                        throw new RuntimeException("Failed to clone:", t);
-                    }
-                }
-            };
-        } catch (Throwable t) {
-            objectCloneMethodAccessor = new SafeDirectMethod<Object>() {
-                @Override
-                public Object invoke(Object instance, Object... args) {
-                    try {
-                        return instance.getClass().getDeclaredMethod("clone").invoke(instance, args);
-                    } catch (Throwable t) {
-                        throw new RuntimeException("Failed to clone:", t);
-                    }
-                }
-            };
-        }
-        objectCloneMethod = objectCloneMethodAccessor;
-    }
+    private static final Map<Class<?>, Method> _cloneMethodCache = new HashMap<Class<?>, Method>();
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -243,7 +211,26 @@ public class LogicUtil {
         if (value == null) {
             return null;
         }
-        return (T) objectCloneMethod.invoke(value);
+
+        Method cloneMethod = _cloneMethodCache.get(value.getClass());
+        if (cloneMethod == null) {
+            synchronized (_cloneMethodCache) {
+                cloneMethod = _cloneMethodCache.get(value.getClass());
+                if (cloneMethod == null) {
+                    try {
+                        cloneMethod = value.getClass().getMethod("clone");
+                    } catch (NoSuchMethodException | SecurityException e) {
+                        throw new IllegalArgumentException("Object of type " + value.getClass().getName() + " can not be cloned");
+                    }
+                }
+            }
+        }
+
+        try {
+            return (T) cloneMethod.invoke(value);
+        } catch (Throwable t) {
+            throw MountiplexUtil.uncheckedRethrow(t);
+        }
     }
 
     /**

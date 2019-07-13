@@ -17,7 +17,7 @@ import java.util.Map.Entry;
  * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float,
  * double, byte[], int[], String</u>
  */
-public class CommonTag extends BasicWrapper<NBTBaseHandle> {
+public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable {
     protected final NMSNBT.Type info;
 
     public CommonTag(Object data) {
