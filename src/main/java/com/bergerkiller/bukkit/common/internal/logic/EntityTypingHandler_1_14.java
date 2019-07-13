@@ -5,6 +5,7 @@ import java.util.IdentityHashMap;
 
 import org.bukkit.entity.Entity;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
@@ -99,7 +100,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                     "public Object createEntry(Entity entity) {\n" +
                     "    EntityTypes entitytypes = entity.getEntityType();\n" +
                     "    int i = entitytypes.getChunkRange() * 16;\n" +
-                    "    i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);\n" +
+                    (Common.IS_SPIGOT_SERVER ? "i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);\n" : "") +
                     "    int j = entitytypes.getUpdateInterval();\n" +
                     "    return new PlayerChunkMap$EntityTracker(instance, entity, i, j, entitytypes.isDeltaTracking());\n" +
                     "}");
