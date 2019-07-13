@@ -11,7 +11,6 @@ import java.io.RandomAccessFile;
 public class NMSRegionFile {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("RegionFile");
 
-    public static final FieldAccessor<File> file = RegionFileHandle.T.file.toFieldAccessor();
     public static final FieldAccessor<RandomAccessFile> stream = RegionFileHandle.T.stream.toFieldAccessor();
 
     public static final MethodAccessor<Void> close = RegionFileHandle.T.close.toMethodAccessor();

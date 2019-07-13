@@ -791,10 +791,8 @@ class MovingObjectPosition {
 
 class RegionFile {
 #if version >= 1.14
-    private final java.io.File file;
     private java.io.RandomAccessFile stream:b;
 #else
-    private final java.io.File file:b;
     private java.io.RandomAccessFile stream:c;
 #endif
 

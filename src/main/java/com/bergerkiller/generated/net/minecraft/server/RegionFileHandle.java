@@ -29,8 +29,6 @@ public abstract class RegionFileHandle extends Template.Handle {
 
     public abstract void close();
     public abstract boolean chunkExists(int cx, int cz);
-    public abstract File getFile();
-    public abstract void setFile(File value);
     public abstract RandomAccessFile getStream();
     public abstract void setStream(RandomAccessFile value);
     /**
@@ -40,7 +38,6 @@ public abstract class RegionFileHandle extends Template.Handle {
     public static final class RegionFileClass extends Template.Class<RegionFileHandle> {
         public final Template.Constructor.Converted<RegionFileHandle> constr_file = new Template.Constructor.Converted<RegionFileHandle>();
 
-        public final Template.Field<File> file = new Template.Field<File>();
         public final Template.Field<RandomAccessFile> stream = new Template.Field<RandomAccessFile>();
 
         public final Template.Method<Void> close = new Template.Method<Void>();
