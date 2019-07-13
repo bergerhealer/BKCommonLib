@@ -38,3 +38,20 @@ optional class DimensionManager {
 
     public static (Object) DimensionManager fromId:a(int i);
 }
+
+// Since MC 1.14 has static fields
+optional class IRegistry {
+
+#if version >= 1.14
+    public static int getWindowIdFromName(String name) {
+        if (name == null) return -1;
+        Object item = IRegistry.MENU.get(new MinecraftKey(name));
+        return (item == null) ? -1 : IRegistry.MENU.a(item);
+    }
+#else
+    public static int getWindowIdFromName(String name) {
+        return -1;
+    }
+#endif
+
+}

@@ -46,6 +46,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
@@ -88,6 +89,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerListHeaderFooterHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
@@ -1411,11 +1413,20 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutOpenWindow extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<String> windowType = nextFieldSignature("private String b");
-        public final FieldAccessor<Object> windowTitle = nextFieldSignature("private IChatBaseComponent c");
-        public final FieldAccessor<Integer> slotCount = nextFieldSignature("private int d");
-        public final FieldAccessor<Integer> horseEntityId = nextFieldSignature("private int e");
+        public final FieldAccessor<Integer> windowId = PacketPlayOutOpenWindowHandle.T.windowId.toFieldAccessor();
+        public final FieldAccessor<WindowType> windowType = new SafeDirectField<WindowType>() {
+            @Override
+            public WindowType get(Object instance) {
+                return PacketPlayOutOpenWindowHandle.T.getWindowType.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, WindowType value) {
+                PacketPlayOutOpenWindowHandle.T.setWindowType.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<ChatText> windowTitle = PacketPlayOutOpenWindowHandle.T.windowTitle.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {

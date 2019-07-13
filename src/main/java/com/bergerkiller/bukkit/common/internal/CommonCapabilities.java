@@ -142,4 +142,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.14 an asynchronous chunk loading system is used that tends to deadlock
      */
     public static final boolean ASYNCHRONOUS_CHUNK_LOADER = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
+     * Since Minecraft 1.14 the window types are stored in a 'MENU' registry
+     */
+    public static final boolean HAS_WINDOW_TYPE_REGISTRY = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 }

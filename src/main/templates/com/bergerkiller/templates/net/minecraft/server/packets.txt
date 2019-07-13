@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
+import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
@@ -32,6 +33,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityEquipm
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHandle;
 
 class Packet {
     <code>
@@ -487,6 +489,47 @@ class PacketPlayOutWindowItems extends Packet {
     private (List<org.bukkit.inventory.ItemStack>) List<ItemStack> items:b;
 #else
     private (List<org.bukkit.inventory.ItemStack>) ItemStack[] items:b;
+#endif
+}
+
+class PacketPlayOutOpenWindow extends Packet {
+    private int windowId:a;
+    private (ChatText) IChatBaseComponent windowTitle:c;
+
+    public (PacketPlayOutOpenWindowHandle) PacketPlayOutOpenWindow();
+
+#if version >= 1.14
+    #require net.minecraft.server.PacketPlayOutOpenWindow private int windowTypeId:b;
+
+    public WindowType getWindowType() {
+        return com.bergerkiller.bukkit.common.wrappers.WindowType.fromWindowTypeId(instance#windowTypeId);
+    }
+
+    public void setWindowType(WindowType windowType) {
+        int id = windowType.getTypeId();
+        if (id == -1) {
+            throw new IllegalArgumentException("Window type " + windowType.name() + " is not supported");
+        }
+        instance#windowTypeId = id;
+    }
+#else
+    #require net.minecraft.server.PacketPlayOutOpenWindow private String windowName:b;
+    #require net.minecraft.server.PacketPlayOutOpenWindow private int slotCount:d;
+
+    public WindowType getWindowType() {
+        String name = instance#windowName;
+        int slotCount = instance#slotCount;
+        return com.bergerkiller.bukkit.common.wrappers.WindowType.fromLegacyName_1_8(name, slotCount);
+    }
+
+    public void setWindowType(WindowType windowType) {
+        String legacyName = windowType.getLegacyName_1_8();
+        if (legacyName == null) {
+            throw new IllegalArgumentException("Window type " + windowType.name() + " is not supported");
+        }
+        instance#windowName = legacyName;
+        instance#slotCount = windowType.getInventorySlots();
+    }
 #endif
 }
 
