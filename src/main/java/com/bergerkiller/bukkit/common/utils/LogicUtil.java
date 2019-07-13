@@ -223,6 +223,7 @@ public class LogicUtil {
                         throw new IllegalArgumentException("Object of type " + value.getClass().getName() + " can not be cloned");
                     }
                 }
+                _cloneMethodCache.put(value.getClass(), cloneMethod);
             }
         }
 
