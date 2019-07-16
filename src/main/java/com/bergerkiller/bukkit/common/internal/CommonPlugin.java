@@ -511,8 +511,8 @@ public class CommonPlugin extends PluginBase {
         chunkLoaderPool = new CommonChunkLoaderPool();
 
         // Initialize forced chunk manager
-        forcedChunkManager = new CommonForcedChunkManager();
-        forcedChunkManager.enable(this);
+        forcedChunkManager = new CommonForcedChunkManager(this);
+        forcedChunkManager.enable();
 
         // Initialize immutable player set manager
         immutablePlayerSetManager = new CommonImmutablePlayerSetManager();

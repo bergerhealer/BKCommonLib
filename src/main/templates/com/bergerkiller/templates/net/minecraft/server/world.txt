@@ -486,8 +486,25 @@ class WorldServer extends World {
 #endif
     }
 
-#if version >= 1.13.1
-    public optional void setForceLoadedAsync(int x, int z, boolean loaded) {
+#if exists net.minecraft.server.TicketType public static final net.minecraft.server.TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
+    public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
+        ChunkMapDistance chunkDistanceManager;
+  #if exists net.minecraft.server.PlayerChunkMap public final net.minecraft.server.PlayerChunkMap.a chunkDistanceManager;
+        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
+  #else
+        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.u;
+  #endif
+
+        int level = 31;
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        if (loaded) {
+            chunkDistanceManager.addTicketAtLevel(TicketType.PLUGIN_TICKET, chunkCoord, level, plugin);
+        } else {
+            chunkDistanceManager.removeTicketAtLevel(TicketType.PLUGIN_TICKET, chunkCoord, level, plugin);
+        }
+    }
+#elseif version >= 1.13.1
+    public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
         com.bergerkiller.mountiplex.reflection.declarations.Template.Method getForcedChunkMethod;
         getForcedChunkMethod = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getForcedChunk.raw;
         ForcedChunk forcedchunk = (ForcedChunk) getForcedChunkMethod.invoke(instance_raw);
@@ -514,7 +531,7 @@ class WorldServer extends World {
   #endif
     }
 #else
-    public optional void setForceLoadedAsync:###(int x, int z, boolean loaded);
+    public optional void setForceLoadedAsync:###(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded);
 #endif
 
 #if version >= 1.14

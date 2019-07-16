@@ -31,10 +31,15 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private final Map<ChunkKey, Entry> chunks = new HashMap<ChunkKey, Entry>();
     private final Set<ChunkKey> pending = new HashSet<ChunkKey>();
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
+    private final CommonPlugin plugin;
     private Task pendingHandler = null;
 
-    public synchronized void enable(CommonPlugin plugin) {
-        this.pendingHandler = new Task(plugin) {
+    public CommonForcedChunkManager(CommonPlugin plugin) {
+        this.plugin = plugin;
+    }
+
+    public synchronized void enable() {
+        this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
                 synchronized (CommonForcedChunkManager.this) {
@@ -122,7 +127,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
      * @param entry
      * @param forced
      */
-    private static void refreshChunk(Entry entry, boolean forced) {
+    private void refreshChunk(Entry entry, boolean forced) {
         ChunkKey chunk = entry.getKey();
 
         // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
@@ -133,6 +138,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                     HandleConversion.toWorldHandle(chunk.world),
                     Integer.valueOf(chunk.chunkX),
                     Integer.valueOf(chunk.chunkZ),
+                    this.plugin,
                     Boolean.valueOf(forced)
             );
         }
