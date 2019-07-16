@@ -23,8 +23,6 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract boolean isLoaded(int cx, int cz);
-    public abstract ChunkHandle getChunkIfLoaded(int cx, int cz);
     public abstract ChunkHandle getChunkAt(int cx, int cz);
     public abstract Executor getAsyncExecutor();
     public abstract void getChunkAtAsync(int cx, int cz, Consumer<?> consumer);
@@ -39,8 +37,6 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {
         public final Template.Field.Converted<WorldServerHandle> world = new Template.Field.Converted<WorldServerHandle>();
 
-        public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
-        public final Template.Method.Converted<ChunkHandle> getChunkIfLoaded = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method.Converted<ChunkHandle> getChunkAt = new Template.Method.Converted<ChunkHandle>();
         public final Template.Method<Executor> getAsyncExecutor = new Template.Method<Executor>();
         public final Template.Method<Void> getChunkAtAsync = new Template.Method<Void>();

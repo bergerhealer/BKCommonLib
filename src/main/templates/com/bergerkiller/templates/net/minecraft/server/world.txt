@@ -448,6 +448,44 @@ class WorldServer extends World {
 #endif
     }
 
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {
+        ChunkProviderServer cps;
+#if version >= 1.13.2
+        cps = instance.getChunkProvider();
+#elseif version >= 1.9
+        cps = instance.getChunkProviderServer();
+#else
+        cps = instance.chunkProviderServer;
+#endif
+
+#if version >= 1.14
+        long key = ChunkCoordIntPair.pair(cx, cz);
+        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
+        if (chunk != null) {
+#if exists net.minecraft.server.PlayerChunk public Chunk getFullChunk()
+            return chunk.getFullChunk();
+#else
+            java.util.concurrent.CompletableFuture statusFuture;
+  #if exists net.minecraft.server.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(ChunkStatus chunkstatus)
+            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
+  #else
+            statusFuture = chunk.a(ChunkStatus.FULL);
+  #endif
+            com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) statusFuture.getNow(null);
+            return either == null ? null : (Chunk) either.left().orElse(null);
+#endif
+        }
+        return null;
+
+        // Note: suffers server crash bug on earlier versions of Spigot
+        // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
+#elseif version >= 1.13.1
+        return cps.getChunkAt(cx, cz, false, false);
+#else
+        return cps.getChunkIfLoaded(cx, cz);
+#endif
+    }
+
 #if version >= 1.13.1
     public optional void setForceLoadedAsync(int x, int z, boolean loaded) {
         com.bergerkiller.mountiplex.reflection.declarations.Template.Method getForcedChunkMethod;
@@ -573,50 +611,15 @@ class ChunkProviderServer {
 
     public final (WorldServerHandle) WorldServer world;
 
-#if version >= 1.9.4
-    public boolean isLoaded(int cx, int cz);
-#elseif version >= 1.9
-    public boolean isLoaded:e(int cx, int cz);
-#else
-    public boolean isLoaded:isChunkLoaded(int cx, int cz);
-#endif
-
 #if version >= 1.14
-    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz) {
-        long key = ChunkCoordIntPair.pair(cx, cz);
-        PlayerChunk chunk = (PlayerChunk) instance.playerChunkMap.visibleChunks.get(key);
-        if (chunk != null) {
-#if exists net.minecraft.server.PlayerChunk public Chunk getFullChunk()
-            return chunk.getFullChunk();
-#else
-            java.util.concurrent.CompletableFuture statusFuture;
-  #if exists net.minecraft.server.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(ChunkStatus chunkstatus)
-            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
-  #else
-            statusFuture = chunk.a(ChunkStatus.FULL);
-  #endif
-            com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) statusFuture.getNow(null);
-            return either == null ? null : (Chunk) either.left().orElse(null);
-#endif
-        }
-        return null;
-
-        // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
-    }
-
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
     }
 #elseif version >= 1.13.1
-    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz) {
-        return instance.getChunkAt(cx, cz, false, false);
-    }
-
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, true, true);
     }
 #else
-    public (ChunkHandle) Chunk getChunkIfLoaded(int cx, int cz);
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 #endif
 

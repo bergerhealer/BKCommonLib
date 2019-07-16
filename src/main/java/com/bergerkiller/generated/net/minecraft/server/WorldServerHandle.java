@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import org.bukkit.Chunk;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract void setEntityTracker(EntityTracker entityTracker);
     public abstract ChunkProviderServerHandle getChunkProviderServer();
+    public abstract Chunk getChunkIfLoaded(int cx, int cz);
     public abstract WorldNBTStorageHandle getDataManager();
     public abstract Collection<EntityHandle> getEntities();
     public abstract void removeEntity(EntityHandle entity);
@@ -68,6 +70,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method.Converted<Void> setEntityTracker = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
+        public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
         @Template.Optional
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional

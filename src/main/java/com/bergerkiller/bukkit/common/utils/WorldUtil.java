@@ -17,7 +17,6 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
@@ -576,12 +575,7 @@ public class WorldUtil extends ChunkUtil {
     }
 
     public static boolean isLoaded(org.bukkit.World world, int chunkX, int chunkZ) {
-        if (world == null) {
-            return false;
-        }
-        Object worldHandle = HandleConversion.toWorldHandle(world);
-        Object cps = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
-        return ChunkProviderServerHandle.T.isLoaded.invoke(cps, chunkX, chunkZ);
+        return world != null && WorldServerHandle.T.getChunkIfLoaded.raw.invoke(HandleConversion.toWorldHandle(world), chunkX, chunkZ) != null;
     }
 
     public static boolean areChunksLoaded(org.bukkit.World world, int chunkCenterX, int chunkCenterZ, int chunkDistance) {
