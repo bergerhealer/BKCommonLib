@@ -271,7 +271,9 @@ public class TestServerFactory {
             // this.ac = new ResourceManager(EnumResourcePackType.SERVER_DATA);
             {
                 String fieldname;
-                if (Common.evaluateMCVersion(">=", "1.14.3")) {
+                if (Common.evaluateMCVersion(">=", "1.14.4")) {
+                    fieldname = "ae";
+                } else if (Common.evaluateMCVersion(">=", "1.14.3")) {
                     fieldname = "ad";
                 } else {
                     fieldname = "ae";
@@ -322,7 +324,19 @@ public class TestServerFactory {
                       */
             }
 
-            if (Common.evaluateMCVersion(">=", "1.14.3")) {
+            if (Common.evaluateMCVersion(">=", "1.14.4")) {
+                // this.ai = new CraftingManager();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");
+                    setField(mc_server, "ai", craftingManagerType.newInstance());
+                }
+
+                // this.aj = new TagRegistry();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "TagRegistry");
+                    setField(mc_server, "aj", craftingManagerType.newInstance());
+                }
+            } else if (Common.evaluateMCVersion(">=", "1.14.3")) {
                 // this.ah = new CraftingManager();
                 {
                     Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");

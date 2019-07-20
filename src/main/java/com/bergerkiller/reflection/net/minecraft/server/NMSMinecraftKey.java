@@ -10,9 +10,9 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 @Deprecated
 public class NMSMinecraftKey {
 	public static final ClassTemplate<?> T = ClassTemplate.createNMS("MinecraftKey");
-	
-	public static final FieldAccessor<String> namespace = T.nextField("protected final String a");
-	public static final FieldAccessor<String> name = T.nextField("protected final String b");
+
+	public static final FieldAccessor<String> namespace = MinecraftKeyHandle.T.namespace.toFieldAccessor();
+	public static final FieldAccessor<String> name = MinecraftKeyHandle.T.name.toFieldAccessor();
 
 	public static Object newInstance(String namespace, String name) {
 	    return MinecraftKeyHandle.T.constr_code_parts.raw.newInstance(0, new String[] { namespace, name});

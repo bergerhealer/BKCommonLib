@@ -32,7 +32,7 @@ public abstract class MapIconHandle extends Template.Handle {
     }
 
     public abstract MapCursor toCursor();
-    public abstract byte getTypeId();
+    public abstract byte getTypeid();
     public abstract byte getX();
     public abstract byte getY();
     public abstract byte getDirection();
@@ -49,7 +49,7 @@ public abstract class MapIconHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<MapIconHandle> fromCursor = new Template.StaticMethod.Converted<MapIconHandle>();
 
         public final Template.Method<MapCursor> toCursor = new Template.Method<MapCursor>();
-        public final Template.Method<Byte> getTypeId = new Template.Method<Byte>();
+        public final Template.Method<Byte> getTypeid = new Template.Method<Byte>();
         public final Template.Method<Byte> getX = new Template.Method<Byte>();
         public final Template.Method<Byte> getY = new Template.Method<Byte>();
         public final Template.Method<Byte> getDirection = new Template.Method<Byte>();

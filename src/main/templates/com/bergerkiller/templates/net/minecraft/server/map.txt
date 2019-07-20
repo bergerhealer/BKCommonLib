@@ -27,18 +27,24 @@ class MapIcon {
     }
 
     public org.bukkit.map.MapCursor toCursor() {
+  #if version >= 1.14.4
+        IChatBaseComponent title = instance.getName();
+        MapIcon$Type type = instance.getType();
+  #else
         IChatBaseComponent title = instance.g();
+        MapIcon$Type type = instance.b();
+  #endif
         if (title != null) {
             return new org.bukkit.map.MapCursor(
                 instance.getX(), instance.getY(), instance.getRotation(),
-                instance.b().a(),
+                type.a(),
                 true,
                 com.bergerkiller.bukkit.common.wrappers.ChatText.fromComponent(title).getMessage()
             );
         } else {
             return new org.bukkit.map.MapCursor(
                 instance.getX(), instance.getY(), instance.getRotation(),
-                instance.b().a(),
+                type.a(),
                 true
             );
         }
@@ -77,7 +83,11 @@ class MapIcon {
     }
 #endif
 
-#if version >= 1.13
+#if version >= 1.14.4
+    public byte getTypeid() {
+        return instance.getType().a();
+    }
+#elseif version >= 1.13
     public byte getTypeId() {
         return instance.b().a();
     }

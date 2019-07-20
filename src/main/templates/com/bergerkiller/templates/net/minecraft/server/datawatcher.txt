@@ -6,7 +6,9 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHan
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 
 class DataWatcher {
-#if version >= 1.10.2
+#if version >= 1.14.4
+    private final (EntityHandle) Entity owner:entity;
+#elseif version >= 1.10.2
     private final (EntityHandle) Entity owner:c;
 #elseif version >= 1.9
     private final (EntityHandle) Entity owner:b;

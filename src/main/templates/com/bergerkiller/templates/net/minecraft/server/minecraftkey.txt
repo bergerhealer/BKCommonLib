@@ -7,8 +7,13 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 class MinecraftKey {
+#if version >= 1.14.4
+    protected final String namespace;
+    protected final String name:key;
+#else
     protected final String namespace:a;
     protected final String name:b;
+#endif
 
     public (MinecraftKeyHandle) MinecraftKey(String keyToken);
 

@@ -210,7 +210,11 @@ class EntityHuman extends EntityLiving {
 
     public int sleepTicks;
 
-#if version >= 1.14
+#if version >= 1.14.4
+    protected unknown boolean bM;
+    private (IntVector3) BlockPosition spawnCoord:g;
+    private boolean spawnForced:bU;
+#elseif version >= 1.14
     protected unknown boolean bM;
     private (IntVector3) BlockPosition spawnCoord:f;
     private boolean spawnForced:g;
@@ -269,7 +273,12 @@ class EntityHuman extends EntityLiving {
     public int expTotal;
     public float exp;
 
-#if version >= 1.14
+#if version >= 1.14.4
+    protected unknown int bR;
+    protected unknown final float bS;
+    private unknown int bV;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bW;
+#elseif version >= 1.14
     protected unknown int bR;
     protected unknown final float bS;
     private unknown int bU;

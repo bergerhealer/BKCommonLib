@@ -14,6 +14,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -358,20 +359,24 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // Obtain BlockData from Tile Entity if cached, otherwise from the chunk
         BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
         if (blockData == null) {
-            blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
+            try (Timings t = Timings.start(BlockStateConversion_1_13.class, "getBlockData")) {
+                blockData = ChunkUtil.getBlockData(chunk, block.getX(), block.getY(), block.getZ());
+            }
         }
 
         // If cached, create the BlockState by null-instantiating it and calling load() on it ourselves
         // This prevents creating a snapshot copy of the Tile Entity state
         NullInstantiator<BlockState> state_instantiator = this.blockStateInstantiators.get(blockData.getType());
         if (state_instantiator != null) {
-            BlockState result = state_instantiator.create();
+            try (Timings t = Timings.start(BlockStateConversion_1_13.class, blockData.getType().toString())) {
+                BlockState result = state_instantiator.create();
 
-            // Initialize the fields in BlockState
-            // public void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) 
-            CraftBlockStateHandle.T.init.invoke(result, block, chunk, blockData.getData(), nmsTileEntity);
+                // Initialize the fields in BlockState
+                // public void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) 
+                CraftBlockStateHandle.T.init.invoke(result, block, chunk, blockData.getData(), nmsTileEntity);
 
-            return result;
+                return result;
+            }
         }
 
         // Store and restore old state in case of recursive calls to this function
