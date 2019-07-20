@@ -851,6 +851,14 @@ public class MapWidget implements MapDisplayEvents {
             this._boundsChanged = false;
             this.onBoundsChanged();
         }
+        this.handleRefreshFocus();
+        for (MapWidget child : this._children) {
+            child.handleTick();
+        }
+    }
+
+    // Refreshes the focus, firing onFocus() or onBlur() events
+    final void handleRefreshFocus() {
         if (this._wasFocused != this.isFocused()) {
             this._wasFocused = !this._wasFocused;
             if (this._wasFocused) {
@@ -858,9 +866,6 @@ public class MapWidget implements MapDisplayEvents {
             } else {
                 this.onBlur();
             }
-        }
-        for (MapWidget child : this._children) {
-            child.handleTick();
         }
     }
 

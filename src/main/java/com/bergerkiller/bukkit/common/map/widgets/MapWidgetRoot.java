@@ -30,12 +30,14 @@ public class MapWidgetRoot extends MapWidget {
 
     public void setFocusedWidget(MapWidget widget) {
         // When NULL is used, remove all focused widgets
+        MapWidget prevFocus = this._focusedWidget;
         if (widget == null) {
-            if (this._focusedWidget != null) {
-                this._focusedWidget.invalidate();
-            }
             this._focusedWidget = null;
             this._focusChangeFrom = null;
+            if (prevFocus != null) {
+                prevFocus.handleRefreshFocus();
+                prevFocus.invalidate();
+            }
             return;
         }
 
@@ -63,10 +65,11 @@ public class MapWidgetRoot extends MapWidget {
         }
 
         // Perform the focus change
-        if (this._focusedWidget != null) {
-            this._focusedWidget.invalidate();
-        }
         this._focusedWidget = widget;
+        if (prevFocus != null) {
+            prevFocus.handleRefreshFocus();
+            prevFocus.invalidate();
+        }
         this.pushFocus(widget);
         if (this._focusedWidget != null) {
             this._focusedWidget.invalidate();
