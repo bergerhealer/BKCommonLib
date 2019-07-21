@@ -674,6 +674,16 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets the widget that is currently focused.
+     * This is the widget that will be activated next, if ENTER is pressed.
+     * 
+     * @return focused widget
+     */
+    public MapWidget getFocusedWidget() {
+        return this.widgets.getFocusedWidget();
+    }
+
+    /**
      * Sets the master volume. All sounds played using {@link #playSound()} will be pre-multiplied with this factor.
      * 
      * @param masterVolume to set to, 1.0 for defaults
