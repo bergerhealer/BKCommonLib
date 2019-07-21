@@ -23,6 +23,10 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
 
     /* ============================================================================== */
 
+    public static NBTBaseHandle fromMojangson(String mojangson) {
+        return T.fromMojangson.invoke(mojangson);
+    }
+
     public abstract Set<String> getKeys();
     public abstract void remove(String key);
     public abstract void set(String key, NBTBaseHandle value);
@@ -41,6 +45,8 @@ public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
      */
     public static final class NBTTagCompoundClass extends Template.Class<NBTTagCompoundHandle> {
         public final Template.Field.Converted<Map<String, NBTBaseHandle>> map = new Template.Field.Converted<Map<String, NBTBaseHandle>>();
+
+        public final Template.StaticMethod.Converted<NBTBaseHandle> fromMojangson = new Template.StaticMethod.Converted<NBTBaseHandle>();
 
         public final Template.Method<Set<String>> getKeys = new Template.Method<Set<String>>();
         public final Template.Method<Void> remove = new Template.Method<Void>();

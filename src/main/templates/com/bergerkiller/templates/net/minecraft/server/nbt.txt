@@ -67,4 +67,12 @@ class NBTTagCompound extends NBTBase {
         return ((java.util.Map<?, ?>) T.map.raw.get(getRaw())).size();
     }
     </code>
+
+    public static (NBTBaseHandle) NBTBase fromMojangson(String mojangson) {
+        try {
+            return MojangsonParser.parse(mojangson);
+        } catch (Throwable t) {
+            return null;
+        }
+    }
 }

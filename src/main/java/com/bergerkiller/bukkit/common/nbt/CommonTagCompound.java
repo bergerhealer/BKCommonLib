@@ -5,6 +5,8 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.*;
@@ -585,5 +587,16 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public static CommonTagCompound create(Object handle) {
         return CommonUtil.tryCast(CommonTag.create(handle), CommonTagCompound.class);
+    }
+
+    /**
+     * Parses a String in Mojang's json format into an NBT tag compound
+     * 
+     * @param mojangson
+     * @return parsed compound, null if no tag could be parsed
+     */
+    public static CommonTagCompound fromMojangson(String mojangson) {
+        NBTBaseHandle result = NBTTagCompoundHandle.fromMojangson(mojangson);
+        return (result == null) ? null : new CommonTagCompound(result.getRaw());
     }
 }
