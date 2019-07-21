@@ -28,7 +28,33 @@ public class MapWidgetRoot extends MapWidget {
         return this._focusedWidget;
     }
 
+    private static MapWidgetDepthPair findFocusableWidget(MapWidget widget, int depth) {
+        if (widget.isFocusable()) {
+            return new MapWidgetDepthPair(widget, depth);
+        }
+
+        depth++;
+        MapWidgetDepthPair result = null;
+        for (MapWidget child : widget.getWidgets()) {
+            MapWidgetDepthPair pair = findFocusableWidget(child, depth);
+            if (pair != null && (result == null || pair.depth < result.depth)) {
+                result = pair;
+            }
+        }
+        return result;
+    }
+
     public void setFocusedWidget(MapWidget widget) {
+        // When widget is not focusable, pick a child widget that is
+        if (widget != null && !widget.isFocusable()) {
+            MapWidgetDepthPair pair = findFocusableWidget(widget, 0);
+            if (pair == null) {
+                return; // There is nothing to focus :(
+            } else {
+                widget = pair.widget;
+            }
+        }
+
         // When NULL is used, remove all focused widgets
         MapWidget prevFocus = this._focusedWidget;
         if (widget == null) {
@@ -179,4 +205,13 @@ public class MapWidgetRoot extends MapWidget {
         this.activate();
     }
 
+    private static class MapWidgetDepthPair {
+        public final MapWidget widget;
+        public final int depth;
+
+        public MapWidgetDepthPair(MapWidget widget, int depth) {
+            this.widget = widget;
+            this.depth = depth;
+        }
+    }
 }
