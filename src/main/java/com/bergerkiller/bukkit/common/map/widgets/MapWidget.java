@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.map.MapCanvas;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayEvents;
 import com.bergerkiller.bukkit.common.map.MapEventPropagation;
+import com.bergerkiller.bukkit.common.map.MapPlayerInput;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput.Key;
 import com.bergerkiller.bukkit.common.map.util.MapWidgetNavigator;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -983,14 +984,29 @@ public class MapWidget implements MapDisplayEvents {
             // Collect all the widgets eligible for focusing
             // Then use the widget navigator helper class to select the right widget
             List<MapWidget> widgets = MapWidgetNavigator.getFocusableWidgets(this);
-            if (!widgets.isEmpty()) {
-                if (focused == null) {
-                    widgets.get(0).focus();
-                } else {
-                    MapWidgetNavigator.getNextWidget(widgets, focused, event.getKey()).focus();
-                }
+            MapWidget nextFocus = null;
+            if (focused != null) {
+                nextFocus = focused.navigateNextWidget(widgets, event.getKey());
+            } else if (!widgets.isEmpty()) {
+                nextFocus = widgets.get(0);
+            }
+            if (nextFocus != null) {
+                nextFocus.focus();
             }
         }
+    }
+
+    /**
+     * Selects the next widget to give focus to after receiving player input to navigate around.
+     * Can be overridden to adjust the automatic build-in navigation logic.
+     * The method is called for the widget that currently receives focus.
+     * 
+     * @param widgets that can be focused next
+     * @param key that was pressed
+     * @return widget to be focused, null to cancel
+     */
+    protected MapWidget navigateNextWidget(List<MapWidget> widgets, MapPlayerInput.Key key) {
+        return MapWidgetNavigator.getNextWidget(widgets, this, key);
     }
 
     @Override

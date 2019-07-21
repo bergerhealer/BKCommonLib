@@ -28,6 +28,11 @@ public class MapWidgetNavigator {
     }
 
     public static MapWidget getNextWidget(List<MapWidget> widgets, MapWidget current, MapPlayerInput.Key key) {
+        // If no widgets can be selected, cancel entirely
+        if (widgets.isEmpty()) {
+            return null;
+        }
+
         // Find the widget with smallest weight value
         int minWeight = Integer.MAX_VALUE;
         MapWidget result = current;
