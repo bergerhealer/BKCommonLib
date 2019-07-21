@@ -149,6 +149,14 @@ public class MapWidgetTabView extends MapWidget {
         updateBounds();
     }
 
+    @Override
+    public void onAttached() {
+        if (this.getWidgetCount() == 0 && !this.tabs.isEmpty()) {
+            this.addWidget(this.tabs.get(0));
+            this.updateBounds();
+        }
+    }
+
     private void updateBounds() {
         if (this.getWidgetCount() > 0) {
             this.getWidget(0).setBounds(0, 0, getWidth(), getHeight());
