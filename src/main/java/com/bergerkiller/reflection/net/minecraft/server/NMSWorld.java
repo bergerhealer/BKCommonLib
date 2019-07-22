@@ -49,6 +49,6 @@ public class NMSWorld {
     }
 
     public static List<Object> getTileList(org.bukkit.World world) {
-        return CommonUtil.unsafeCast(WorldServerHandle.T.getTileEntityList.invoke(HandleConversion.toWorldHandle(world)));
+        return CommonUtil.unsafeCast(WorldServerHandle.T.getTileEntityList.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 }

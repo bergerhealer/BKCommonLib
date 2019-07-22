@@ -759,7 +759,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        return new ConvertingList<BlockState>(WorldServerHandle.T.getTileEntityList.invoke(worldHandle),
+        return new ConvertingList<BlockState>((List<?>) WorldServerHandle.T.getTileEntityList.raw.invoke(worldHandle),
                 DuplexConversion.blockState);
     }
 

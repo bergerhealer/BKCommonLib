@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -521,7 +522,8 @@ public class BlockUtil extends MaterialUtil {
                 int yMax = y + radiusY;
                 int zMax = z + radiusZ;
                 Object blockPosition;
-                for (Object tile : WorldServerHandle.T.getTileEntityList.invoke(HandleConversion.toWorldHandle(world))) {
+                List<?> rawTileEntityList = (List<?>) WorldServerHandle.T.getTileEntityList.raw.invoke(HandleConversion.toWorldHandle(world));
+                for (Object tile : rawTileEntityList) {
                     blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
 
                     // Check again - security against ghost tiles
