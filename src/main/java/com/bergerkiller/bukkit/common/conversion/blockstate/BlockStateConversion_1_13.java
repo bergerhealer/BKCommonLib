@@ -356,6 +356,11 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     }
 
     public synchronized BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Block block, Object nmsTileEntity) {
+        // If chunk is null, retrieve it!
+        if (chunk == null) {
+            chunk = block.getChunk();
+        }
+
         // Obtain BlockData from Tile Entity if cached, otherwise from the chunk
         BlockData blockData = TileEntityHandle.T.getBlockDataIfCached.invoke(nmsTileEntity);
         if (blockData == null) {
