@@ -480,7 +480,11 @@ class WorldServer extends World {
         // Note: suffers server crash bug on earlier versions of Spigot
         // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
 #elseif version >= 1.13.1
-        return cps.getChunkAt(cx, cz, false, false);
+        long key = ChunkCoordIntPair.a(cx, cz);
+        return (Chunk) cps.chunks.get(key);
+
+        // Note: suffers deadlock because of synchronized (this.chunkLoader) (chunks are already synchronized, anyway)
+        // return cps.getChunkAt(cx, cz, false, false);
 #else
         return cps.getChunkIfLoaded(cx, cz);
 #endif
