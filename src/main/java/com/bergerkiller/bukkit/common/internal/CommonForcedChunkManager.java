@@ -59,7 +59,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 }
             }
         };
-        if (!WorldServerHandle.T.setForceLoadedAsync.isAvailable()) {
+        if (CommonCapabilities.CAN_CANCEL_CHUNK_UNLOAD_EVENT) {
             plugin.register(this.chunkUnloadListener);
         }
     }
@@ -254,7 +254,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
     }
 
-    // Used on 1.12.2 and before in place of the 1.13-introduced setChunkForceLoaded API
+    // Used on MC 1.13.2 and before, where the event could still be cancelled
     private class ChunkUnloadEventListener implements Listener {
 
         @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
