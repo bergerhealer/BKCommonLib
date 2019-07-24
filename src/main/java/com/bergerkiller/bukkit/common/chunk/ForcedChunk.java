@@ -17,6 +17,15 @@ public class ForcedChunk implements AutoCloseable {
     }
 
     /**
+     * Gets whether this Forced Chunk is none, that is, has no chunk assigned
+     * 
+     * @return True if this Forced Chunk refers to no chunk
+     */
+    public boolean isNone() {
+        return this.entry.get() == null;
+    }
+
+    /**
      * Forced Chunk referring to no chunk at all. Can be used with {@link #move(ForcedChunk)}
      * to start loading at a later time
      * 
