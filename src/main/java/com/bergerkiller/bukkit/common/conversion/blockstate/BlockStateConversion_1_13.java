@@ -346,13 +346,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         if (nmsTileEntity == null) {
             throw new IllegalArgumentException("Tile Entity is null");
         }
-        Object world = TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntity);
-        if (world == null) {
-            throw new IllegalArgumentException("Tile Entity has no world set");
-        }
-        BlockPositionHandle pos = TileEntityHandle.T.getPosition.invoke(nmsTileEntity);
-        Block block = WrapperConversion.toWorld(world).getBlockAt(pos.getX(), pos.getY(), pos.getZ());
-        return tileEntityToBlockState(chunk, block, nmsTileEntity);
+        return tileEntityToBlockState(chunk, CraftBlockHandle.createBlockAtTileEntity(nmsTileEntity), nmsTileEntity);
     }
 
     public synchronized BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Block block, Object nmsTileEntity) {

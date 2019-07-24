@@ -90,4 +90,17 @@ class CraftBlock {
             return new net.minecraft.server.BlockPosition(block.getX(), block.getY(), block.getZ());
         }
     }
+
+    public static org.bukkit.block.Block createBlockAtTileEntity(Object nmsTileEntity) {
+        net.minecraft.server.TileEntity tileEntity = (net.minecraft.server.TileEntity) nmsTileEntity;
+        net.minecraft.server.World world = tileEntity.getWorld();
+        if (world == null) {
+            throw new IllegalArgumentException("Tile Entity has no world set");
+        }
+#if version >= 1.13
+        return org.bukkit.craftbukkit.block.CraftBlock.at(world, tileEntity.getPosition());
+#else
+        return world.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
+#endif
+    }
 }

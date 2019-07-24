@@ -27,6 +27,10 @@ public abstract class CraftBlockHandle extends Template.Handle {
         return T.getBlockPosition.invoke(block);
     }
 
+    public static Block createBlockAtTileEntity(Object nmsTileEntity) {
+        return T.createBlockAtTileEntity.invoke(nmsTileEntity);
+    }
+
     public abstract BlockData getBlockData();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.block.CraftBlock</b>.
@@ -34,6 +38,7 @@ public abstract class CraftBlockHandle extends Template.Handle {
      */
     public static final class CraftBlockClass extends Template.Class<CraftBlockHandle> {
         public final Template.StaticMethod<Object> getBlockPosition = new Template.StaticMethod<Object>();
+        public final Template.StaticMethod<Block> createBlockAtTileEntity = new Template.StaticMethod<Block>();
 
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
