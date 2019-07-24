@@ -27,7 +27,6 @@ public abstract class WorldServerHandle extends WorldHandle {
 
     /* ============================================================================== */
 
-    public abstract List<TileEntityHandle> getTileEntityList();
     public abstract List<EntityPlayerHandle> getPlayers();
     public abstract EntityTracker getEntityTracker();
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
@@ -64,7 +63,6 @@ public abstract class WorldServerHandle extends WorldHandle {
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 
-        public final Template.Method.Converted<List<TileEntityHandle>> getTileEntityList = new Template.Method.Converted<List<TileEntityHandle>>();
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
         public final Template.Method.Converted<EntityTracker> getEntityTracker = new Template.Method.Converted<EntityTracker>();
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();

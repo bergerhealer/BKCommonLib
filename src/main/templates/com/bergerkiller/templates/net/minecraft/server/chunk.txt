@@ -36,6 +36,10 @@ class Chunk {
     }
 #endif
 
+    public java.util.Collection<?> getRawTileEntities() {
+        return instance.tileEntities.values();
+    }
+
     public java.util.Collection<org.bukkit.block.BlockState> getTileEntities() {
         java.util.Collection tileEntities = instance.tileEntities.values();
         com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter chunkBlockStateConverter;

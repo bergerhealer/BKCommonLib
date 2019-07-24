@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.WorldBlockStateCollection;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -758,9 +759,7 @@ public class WorldUtil extends ChunkUtil {
      * @return collection of Block States
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.World world) {
-        Object worldHandle = HandleConversion.toWorldHandle(world);
-        return new ConvertingList<BlockState>((List<?>) WorldServerHandle.T.getTileEntityList.raw.invoke(worldHandle),
-                DuplexConversion.blockState);
+        return new WorldBlockStateCollection(getChunks(world));
     }
 
     /**

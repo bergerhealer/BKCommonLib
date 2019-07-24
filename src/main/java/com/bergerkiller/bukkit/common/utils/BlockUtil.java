@@ -2,11 +2,9 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -20,17 +18,18 @@ import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
+import com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.event.block.BlockCanBuildEventHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
@@ -511,8 +510,11 @@ public class BlockUtil extends MaterialUtil {
     public static Collection<BlockState> getBlockStates(org.bukkit.World world, int x, int y, int z, int radiusX, int radiusY, int radiusZ) {
         try {
             if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
-                // simplified coding instead
-                offerTile(world, NMSVector.newPosition(x, y, z));
+                // find a single BlockState at this position
+                Object tile = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), NMSVector.newPosition(x, y, z));
+                if (tile != null) {
+                    blockStateBuff.add(WrapperConversion.toBlockState(tile));
+                }
             } else {
                 // loop through tile entity list
                 int xMin = x - radiusX;
@@ -521,30 +523,38 @@ public class BlockUtil extends MaterialUtil {
                 int xMax = x + radiusX;
                 int yMax = y + radiusY;
                 int zMax = z + radiusZ;
-                Object blockPosition;
-                List<?> rawTileEntityList = (List<?>) WorldServerHandle.T.getTileEntityList.raw.invoke(HandleConversion.toWorldHandle(world));
-                for (Object tile : rawTileEntityList) {
-                    blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
 
-                    // Check again - security against ghost tiles
-                    if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
-                        offerTile(world, blockPosition);
+                // find range of chunk coordinates to look in
+                int chunk_xMin = MathUtil.toChunk(xMin);
+                int chunk_zMin = MathUtil.toChunk(zMin);
+                int chunk_xMax = MathUtil.toChunk(xMax);
+                int chunk_zMax = MathUtil.toChunk(zMax);
+                for (int cx = chunk_xMin; cx <= chunk_xMax; cx++) {
+                    for (int cz = chunk_zMin; cz <= chunk_zMax; cz++) {
+                        // Find chunk if loaded
+                        org.bukkit.Chunk chunk = WorldUtil.getChunk(world, cx, cz);
+                        if (chunk == null) {
+                            continue;
+                        }
+
+                        // Check tile entities held inside
+                        ChunkBlockStateConverter converter = null;
+                        Collection<?> rawTiles = ChunkHandle.T.getRawTileEntities.invoke(HandleConversion.toChunkHandle(chunk));
+                        for (Object tile : rawTiles) {
+                            Object blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
+                            if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
+                                if (converter == null) {
+                                    converter = new ChunkBlockStateConverter(chunk);
+                                }
+                                blockStateBuff.add(converter.convert(tile));
+                            }
+                        }
                     }
                 }
             }
             return new ArrayList<BlockState>(blockStateBuff);
         } finally {
             blockStateBuff.clear();
-        }
-    }
-
-    private static void offerTile(World world, Object blockPosition) {
-        Object tileEntityHandle = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
-        if (tileEntityHandle != null) {
-            BlockState state = WrapperConversion.toBlockState(tileEntityHandle);
-            if (state != null) {
-                blockStateBuff.add(state);
-            }
         }
     }
 

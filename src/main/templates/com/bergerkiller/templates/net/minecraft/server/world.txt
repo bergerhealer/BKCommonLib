@@ -377,35 +377,6 @@ class WorldServer extends World {
 
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.9
-    public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
-  #if fieldexists net.minecraft.server.World public List<TileEntity> tileEntityListTick;
-        return instance.tileEntityListTick;
-  #else
-        return instance.tileEntityList;
-  #endif
-    }
-#else
-    public (List<TileEntityHandle>) List<TileEntity> getTileEntityList() {
-        // Fallback for 1.8.8 and before, which is slower, but works
-        java.util.ArrayList tiles = new java.util.ArrayList();
-
-        // Go by all the chunks and add their tile entities (slower!)
-        //TODO: Maybe do this in a smart way so no new list has to be allocated?
-        //      Iterate the chunks while iterating the list, for example.
-        java.util.Iterator iter = instance.chunkProviderServer.chunks.values().iterator();
-        while (iter.hasNext()) {
-            Chunk chunk = (Chunk) iter.next();
-            if (chunk == null) {
-                continue;
-            }
-            tiles.addAll(chunk.tileEntities.values());
-        }
-
-        return tiles;
-    }
-#endif
-
 #if version >= 1.14
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers();
 #else

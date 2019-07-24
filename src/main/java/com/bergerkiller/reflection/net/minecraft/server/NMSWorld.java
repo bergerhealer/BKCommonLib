@@ -1,10 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -46,9 +43,5 @@ public class NMSWorld {
 
     public static boolean updateBlock(Object worldHandle, int x, int y, int z, BlockData data, int updateFlags) {
         return (Boolean) WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
-    }
-
-    public static List<Object> getTileList(org.bukkit.World world) {
-        return CommonUtil.unsafeCast(WorldServerHandle.T.getTileEntityList.raw.invoke(HandleConversion.toWorldHandle(world)));
     }
 }
