@@ -364,18 +364,15 @@ public class MapWidgetAnvil extends MapWidget {
         public void onInventoryClick(InventoryClickEvent event) {
             if (!mustHandle(event)) return;
 
-            // Only handle when clicking the top (anvil) inventory
             final InventoryView view = event.getView();
-            if (event.getClickedInventory() != view.getTopInventory()) {
-                return;
-            }
 
+            // Use raw slot
             Button button;
-            if (event.getSlot() == 0) {
+            if (event.getRawSlot() == 0) {
                 button = LEFT_BUTTON;
-            } else if (event.getSlot() == 1) {
+            } else if (event.getRawSlot() == 1) {
                 button = MIDDLE_BUTTON;
-            } else if (event.getSlot() == 2) {
+            } else if (event.getRawSlot() == 2) {
                 button = RIGHT_BUTTON;
             } else {
                 return;
