@@ -116,6 +116,7 @@ public class CommonMapController implements PacketListener, Listener {
     private FindNeighboursCache findNeighboursCache = null;
     // Neighbours of item frames to check for either x-aligned or z-aligned
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
+    private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Y = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Z = {BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST};
     // This counter is incremented every time a new map Id is added to the mapping
     // Every 1000 map ids we do a cleanup to free up slots for maps that no longer exist on the server
@@ -724,16 +725,40 @@ public class CommonMapController implements PacketListener, Listener {
         // Queue chunks left/right of this item frame for loading
         // If the display crosses chunk boundaries, this ensures those are loaded
         World world = frame.getWorld();
-        BlockFace left_right = FaceUtil.rotate(frame.getFacing(), 2);
-        IntVector3 pos = new IntVector3(frame.getLocation());
-        IntVector2 chunk = pos.toChunkCoordinates();
-        PendingChunkLoad chunk_left = new PendingChunkLoad(world, pos.add(left_right));
-        PendingChunkLoad chunk_right = new PendingChunkLoad(world, pos.subtract(left_right));
-        if (chunk.x != chunk_left.x || chunk.z != chunk_left.z) {
-            neighbourChunkQueue.add(chunk_left);
-        }
-        if (chunk.x != chunk_right.x || chunk.z != chunk_right.z) {
-            neighbourChunkQueue.add(chunk_right);
+        BlockFace facing = frame.getFacing();
+        if (FaceUtil.isAlongY(facing)) {
+            // Along Y, all chunks surrounding it touching the item frame should be loaded
+            IntVector3 pos = new IntVector3(frame.getLocation());
+            IntVector2 chunk = pos.toChunkCoordinates();
+            PendingChunkLoad chunk_neigh0 = new PendingChunkLoad(world, pos.add(1, 0, 0));
+            PendingChunkLoad chunk_neigh1 = new PendingChunkLoad(world, pos.add(0, 0, 1));
+            PendingChunkLoad chunk_neigh2 = new PendingChunkLoad(world, pos.add(-1, 0, 0));
+            PendingChunkLoad chunk_neigh3 = new PendingChunkLoad(world, pos.add(0, 0, -1));
+            if (chunk.x != chunk_neigh0.x || chunk.z != chunk_neigh0.z) {
+                neighbourChunkQueue.add(chunk_neigh0);
+            }
+            if (chunk.x != chunk_neigh1.x || chunk.z != chunk_neigh1.z) {
+                neighbourChunkQueue.add(chunk_neigh1);
+            }
+            if (chunk.x != chunk_neigh2.x || chunk.z != chunk_neigh2.z) {
+                neighbourChunkQueue.add(chunk_neigh2);
+            }
+            if (chunk.x != chunk_neigh3.x || chunk.z != chunk_neigh3.z) {
+                neighbourChunkQueue.add(chunk_neigh3);
+            }
+        } else {
+            // Along X or Z, check chunks loaded in other two directions
+            BlockFace left_right = FaceUtil.rotate(facing, 2);
+            IntVector3 pos = new IntVector3(frame.getLocation());
+            IntVector2 chunk = pos.toChunkCoordinates();
+            PendingChunkLoad chunk_left = new PendingChunkLoad(world, pos.add(left_right));
+            PendingChunkLoad chunk_right = new PendingChunkLoad(world, pos.subtract(left_right));
+            if (chunk.x != chunk_left.x || chunk.z != chunk_left.z) {
+                neighbourChunkQueue.add(chunk_left);
+            }
+            if (chunk.x != chunk_right.x || chunk.z != chunk_right.z) {
+                neighbourChunkQueue.add(chunk_right);
+            }
         }
     }
 
@@ -1215,28 +1240,63 @@ public class CommonMapController implements PacketListener, Listener {
             // This is a slow and lengthy procedure; hopefully it does not happen too often
             // What we do is: we add all neighbours, then find the most top-left item frame
             // Subtracting coordinates will give us the tile x/y of this item frame
-            List<IntVector3> neighbours = findNeighbours(itemFrame);
+            FindNeighboursResult neighbours = findNeighbours(itemFrame);
             MapUUID newMapUUID;
             boolean isTile;
-            if (!neighbours.isEmpty()) {
+            if (!neighbours.coordinates.isEmpty()) {
                 IntVector3 selfPos = new IntVector3(itemFrameHandle.getLocX(), itemFrameHandle.getLocY(), itemFrameHandle.getLocZ());
                 BlockFace selfFacing = itemFrame.getFacing();
                 int tileX = 0;
                 int tileY = 0;
-                for (IntVector3 neighbour : neighbours) {
-                    int dx = selfFacing.getModX() * (selfPos.z - neighbour.z) -
-                             selfFacing.getModZ() * (selfPos.x - neighbour.x);
-                    int dy = selfPos.y - neighbour.y;
-                    if (dx < tileX) {
-                        tileX = dx;
+                if (FaceUtil.isAlongY(selfFacing)) {
+                    // Vertical pointing up or down, calculation is a little different then
+                    // We use rotation of the item frame to decide which side is up
+                    for (IntVector3 neighbour : neighbours.coordinates) {
+                        int dx_in = selfPos.x - neighbour.x;
+                        int dz_in = selfPos.z - neighbour.z;
+                        int tx, ty;
+                        if (selfFacing.getModY() > 0) {
+                            // Rotation when facing up
+                            switch (neighbours.rotation) {
+                            case 90: tx = -dz_in; ty = dx_in; break;
+                            case 180: tx = dx_in; ty = dz_in; break;
+                            case 270: tx = dz_in; ty = -dx_in; break;
+                            default: tx = -dx_in; ty = -dz_in; break;
+                            }
+                        } else {
+                            // Rotation when facing down
+                            switch (neighbours.rotation) {
+                            case 90: tx = dz_in; ty = dx_in; break;
+                            case 180: tx = dx_in; ty = -dz_in; break;
+                            case 270: tx = -dz_in; ty = -dx_in; break;
+                            default: tx = -dx_in; ty = dz_in; break;
+                            }
+                        }
+
+                        if (tx < tileX) {
+                            tileX = tx;
+                        }
+                        if (ty < tileY) {
+                            tileY = ty;
+                        }
                     }
-                    if (dy < tileY) {
-                        tileY = dy;
+                } else {
+                    // On the wall
+                    for (IntVector3 neighbour : neighbours.coordinates) {
+                        int dx = selfFacing.getModX() * (selfPos.z - neighbour.z) -
+                                 selfFacing.getModZ() * (selfPos.x - neighbour.x);
+                        int dy = selfPos.y - neighbour.y;
+                        if (dx < tileX) {
+                            tileX = dx;
+                        }
+                        if (dy < tileY) {
+                            tileY = dy;
+                        }
                     }
                 }
+
                 tileX = -tileX;
                 tileY = -tileY;
-
                 newMapUUID = new MapUUID(mapUUID, tileX, tileY);
                 isTile = true;
             } else {
@@ -1244,7 +1304,7 @@ public class CommonMapController implements PacketListener, Listener {
                 isTile = false;
             }
 
-            boolean isTiledDisplay = (isDisplayTile && lastMapUUID != null) || (!neighbours.isEmpty());
+            boolean isTiledDisplay = (isDisplayTile && lastMapUUID != null) || (!neighbours.coordinates.isEmpty());
             boolean readd = (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID));
             if (readd) {
                 this.remove();
@@ -1660,13 +1720,13 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame
      */
-    private final List<IntVector3> findNeighbours(ItemFrame itemFrame) {
+    private final FindNeighboursResult findNeighbours(ItemFrame itemFrame) {
         Location itemFrameLocation = itemFrame.getLocation(); // re-used
         BlockFace facing = itemFrame.getFacing();
         IntVector3 itemFramePos = new IntVector3(itemFrameLocation);
         UUID itemFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
         if (itemFrameMapUUID == null) {
-            return Collections.emptyList(); // no neighbours
+            return new FindNeighboursResult(Collections.emptyList(), 0); // no neighbours
         }
 
         // Take cache entry
@@ -1679,10 +1739,30 @@ public class CommonMapController implements PacketListener, Listener {
             // Find all item frames that:
             // - Are on the same world as this item frame
             // - Facing the same way
-            // - Along the same x/z (facing)
+            // - Along the same x/y/z (facing)
             // - Same ItemStack map UUID
             BlockFace[] neighbourAxis;
-            if (FaceUtil.isAlongX(facing)) {
+            if (FaceUtil.isAlongY(facing)) {
+                // Along Y, compare the y-coordinates
+                neighbourAxis = NEIGHBOUR_AXIS_ALONG_Y;
+                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
+                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
+                        continue;
+                    }
+
+                    otherFrame.getLocation(itemFrameLocation);
+                    int block_y = itemFrameLocation.getBlockY();
+                    if (block_y != itemFramePos.y) {
+                        continue;
+                    }
+
+                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
+                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                        continue;
+                    }
+                    cache.put(itemFrameLocation.getBlockX(), block_y, itemFrameLocation.getBlockZ(), otherFrame);
+                }
+            } else if (FaceUtil.isAlongX(facing)) {
                 // Along X, compare the x-coordinates
                 neighbourAxis = NEIGHBOUR_AXIS_ALONG_X;
                 for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
@@ -1700,7 +1780,7 @@ public class CommonMapController implements PacketListener, Listener {
                     if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
                         continue;
                     }
-                    cache.cacheSet.add(new IntVector3(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ()));
+                    cache.put(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ(), otherFrame);
                 }
             } else {
                 // Along Z, compare the z-coordinates
@@ -1720,37 +1800,79 @@ public class CommonMapController implements PacketListener, Listener {
                     if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
                         continue;
                     }
-                    cache.cacheSet.add(new IntVector3(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z));
+                    cache.put(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z, otherFrame);
                 }
             }
 
+            // Find the most common item frame rotation in use
+            // Only 4 possible rotations can be used for maps, so this is easy
+            int[] rotation_counts = new int[4];
+            rotation_counts[(new FindNeighboursCache.Frame(itemFrame)).rotation]++;
+
             // Make sure the neighbours result are a single contiguous blob
             // Islands (can not reach the input item frame) are removed
-            List<IntVector3> result = new ArrayList<IntVector3>(cache.cacheSet.size());
+            List<IntVector3> result = new ArrayList<IntVector3>(cache.cache.size());
             cache.pendingList.add(itemFramePos);
             do {
                 IntVector3 pending = cache.pendingList.poll();
                 for (BlockFace side : neighbourAxis) {
                     IntVector3 sidePoint = pending.add(side);
-                    if (cache.cacheSet.remove(sidePoint)) {
+                    FindNeighboursCache.Frame frame = cache.cache.remove(sidePoint);
+                    if (frame != null) {
+                        rotation_counts[frame.rotation]++;
                         cache.pendingList.add(sidePoint);
                         result.add(sidePoint);
                     }
                 }
             } while (!cache.pendingList.isEmpty());
 
-            return result;
+            // Find maximum rotation index
+            int rotation_idx = 0;
+            for (int i = 1; i < rotation_counts.length; i++) {
+                if (rotation_counts[i] > rotation_counts[rotation_idx]) {
+                    rotation_idx = i;
+                }
+            }
+
+            // The final combined result
+            return new FindNeighboursResult(result, rotation_idx * 90);
         } finally {
             // Return to cache
             this.findNeighboursCache = cache;
         }
     }
 
+    private static final class FindNeighboursResult {
+        // List of coordinates where item frames are stored
+        public final List<IntVector3> coordinates;
+        // Most common ItemFrame rotation used for the display
+        public final int rotation;
+
+        public FindNeighboursResult(List<IntVector3> coordinates, int rotation) {
+            this.coordinates = coordinates;
+            this.rotation = rotation;
+        }
+    }
+
     private static final class FindNeighboursCache {
         // Stores potential multi-ItemFrame neighbours during findNeighbours() temporarily
-        public final HashSet<IntVector3> cacheSet = new HashSet<IntVector3>();
+        public final HashMap<IntVector3, Frame> cache = new HashMap<IntVector3, Frame>();
         // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
         public final Queue<IntVector3> pendingList = new ArrayDeque<IntVector3>();
+
+        // Helper
+        public void put(int x, int y, int z, ItemFrame itemFrame) {
+            cache.put(new IntVector3(x, y, z), new Frame(itemFrame));
+        }
+
+        // Single entry
+        public static final class Frame {
+            public final int rotation;
+
+            public Frame(ItemFrame itemFrame) {
+                this.rotation = itemFrame.getRotation().ordinal() & 0x3;
+            }
+        }
     }
 
     private final void resetItemFrameCache(World world) {
