@@ -1731,10 +1731,12 @@ public class CommonMapController implements PacketListener, Listener {
 
         // Take cache entry
         FindNeighboursCache cache = this.findNeighboursCache;
-        if (cache == null) {
+        if (cache != null) {
+            cache.reset();
+            this.findNeighboursCache = null;
+        } else {
             cache = new FindNeighboursCache();
         }
-        this.findNeighboursCache = null;
         try {
             // Find all item frames that:
             // - Are on the same world as this item frame
@@ -1859,6 +1861,12 @@ public class CommonMapController implements PacketListener, Listener {
         public final HashMap<IntVector3, Frame> cache = new HashMap<IntVector3, Frame>();
         // Stores the coordinates of the item frames whose neighbours still need to be checked during findNeighbours()
         public final Queue<IntVector3> pendingList = new ArrayDeque<IntVector3>();
+
+        // Called before use
+        public void reset() {
+            cache.clear();
+            pendingList.clear();
+        }
 
         // Helper
         public void put(int x, int y, int z, ItemFrame itemFrame) {
