@@ -23,6 +23,7 @@ public abstract class MinecraftServerHandle extends Template.Handle {
 
     public abstract String getResourcePack();
     public abstract String getResourcePackHash();
+    public abstract String getProperty(String key, String defaultValue);
     public abstract int getTicks();
     public abstract boolean isMainThread();
 
@@ -44,6 +45,7 @@ public abstract class MinecraftServerHandle extends Template.Handle {
 
         public final Template.Method<String> getResourcePack = new Template.Method<String>();
         public final Template.Method<String> getResourcePackHash = new Template.Method<String>();
+        public final Template.Method<String> getProperty = new Template.Method<String>();
         public final Template.Method<Integer> getTicks = new Template.Method<Integer>();
         public final Template.Method<Boolean> isMainThread = new Template.Method<Boolean>();
 

@@ -19,6 +19,15 @@ class MinecraftServer {
 
     public String getResourcePackHash();
 
+    public String getProperty(String key, String defaultValue) {
+        DedicatedServer dedicatedServer = (DedicatedServer) instance_raw;
+#if version >= 1.14
+        return dedicatedServer.getDedicatedServerProperties().properties.getProperty(key, defaultValue);
+#else
+        return dedicatedServer.getPropertyManager().properties.getProperty(key, defaultValue);
+#endif
+    }
+
 #if version >= 1.14.4
     public int getTicks:aj();
 #elseif version >= 1.14

@@ -1110,4 +1110,15 @@ public class CommonUtil {
 
         return false;
     }
+
+    /**
+     * Reads a property defined in the server.properties file
+     * 
+     * @param key
+     * @param defaultValue
+     * @return server property
+     */
+    public static String getServerProperty(String key, String defaultValue) {
+        return MinecraftServerHandle.instance().getProperty(key, defaultValue);
+    }
 }
