@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
@@ -24,6 +26,7 @@ public class RecipeUtil {
     private static final EnumMap<Material, Integer> fuelTimes = new EnumMap<Material, Integer>(Material.class);
 
     static {
+        // Store initial values
         for (Material material : Material.values()) {
             ItemStackHandle item = ItemStackHandle.newInstance();
             item.setTypeField(material);
@@ -31,6 +34,15 @@ public class RecipeUtil {
             int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);
+            }
+        }
+
+        // Store legacy material values too
+        for (Material legacyMaterial : CommonLegacyMaterials.getAllLegacyMaterials()) {
+            Material modernType = BlockData.fromMaterial(legacyMaterial).getType();
+            Integer modernFuelValue = fuelTimes.get(modernType);
+            if (modernFuelValue != null) {
+                fuelTimes.put(legacyMaterial, modernFuelValue);
             }
         }
     }

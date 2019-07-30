@@ -1,23 +1,19 @@
 package com.bergerkiller.bukkit.common.internal.legacy;
 
 import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getLegacyMaterial;
+import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getBlockDataFromMaterialName;
 
 import java.util.EnumMap;
 import java.util.Map;
 
 import org.bukkit.Material;
+import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.Sign;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -94,18 +90,72 @@ public class MaterialDataToIBlockData {
             }
         });
 
-        // Post 1.14 we need a builder for LEGACY_WALL_SIGN
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            iblockdataBuilders.put(getLegacyMaterial("WALL_SIGN"), new IBlockDataBuilder<org.bukkit.material.Sign>() {
-                final IBlockDataHandle oak_sign_data = BlockHandle.T.getBlockData.invoke(CraftMagicNumbersHandle.getBlockFromMaterial(getLegacyMaterial("WALL_SIGN")));
+        iblockdataBuilders.put(getLegacyMaterial("MOB_SPAWNER"), new IBlockDataBuilder<org.bukkit.material.MaterialData>() {
+            @Override
+            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.MaterialData spawner) {
+                return getBlockDataFromMaterialName("SPAWNER");
+            }
+        });
+        iblockdataBuilders.put(getLegacyMaterial("TORCH"), new IBlockDataBuilder<org.bukkit.material.Torch>() {
+            @Override
+            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) {
+                if (torch.getAttachedFace() == BlockFace.DOWN) {
+                    iblockdata = getBlockDataFromMaterialName("TORCH");
+                    return iblockdata;
+                } else {
+                    iblockdata = getBlockDataFromMaterialName("WALL_TORCH");
+                    return iblockdata.set("facing", torch.getFacing());
+                }
+            }
+        });
+
+        // Name remapping without special MaterialData
+        storeLegacyRemap("MELON_BLOCK", "MELON");
+
+        // Signs
+        {
+            IBlockDataBuilder<org.bukkit.material.Sign> builder = new IBlockDataBuilder<org.bukkit.material.Sign>() {
+                final IBlockDataHandle wall_sign_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_WALL_SIGN" : "WALL_SIGN");
+                final IBlockDataHandle sign_post_data = getBlockDataFromMaterialName(CommonCapabilities.HAS_MATERIAL_SIGN_TYPES ? "OAK_SIGN" : "SIGN");
 
                 @Override
-                public IBlockDataHandle create(IBlockDataHandle iblockdata, Sign materialdata) {
-                    IBlockDataHandle result = oak_sign_data.set("facing", materialdata.getFacing()).set("waterlogged", false);
-                    return result;
+                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                    if (sign.isWallSign()) {
+                        return wall_sign_data.set("facing", sign.getFacing());
+                    } else {
+                        return sign_post_data.set("rotation", (int) sign.getData());
+                    }
                 }
-            });
+            };
+            iblockdataBuilders.put(getLegacyMaterial("WALL_SIGN"), builder);
+            iblockdataBuilders.put(getLegacyMaterial("SIGN_POST"), builder);
         }
+
+        // Chests
+        {
+            Material[] legacy_types = CommonLegacyMaterials.getAllByName("LEGACY_CHEST", "LEGACY_ENDER_CHEST", "LEGACY_TRAPPED_CHEST");
+            String[] modern_names = new String[] {"CHEST", "ENDER_CHEST", "TRAPPED_CHEST"};
+            for (int n = 0; n < legacy_types.length; n++) {
+                final Material legacy_type = legacy_types[n];
+                final IBlockDataHandle modern_data = CommonLegacyMaterials.getBlockDataFromMaterialName(modern_names[n]);
+                iblockdataBuilders.put(legacy_type, new IBlockDataBuilder<org.bukkit.material.DirectionalContainer>() {
+                    @Override
+                    public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.DirectionalContainer directional) {
+                        return modern_data.set("facing", directional.getFacing());
+                    }
+                });
+            }
+        }
+    }
+
+    private static void storeLegacyRemap(String legacy_name, String modern_name) {
+        final IBlockDataHandle modern_data = getBlockDataFromMaterialName(modern_name);
+        iblockdataBuilders.put(getLegacyMaterial(legacy_name), new IBlockDataBuilder<org.bukkit.material.MaterialData>() {
+            @Override
+            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.MaterialData materialData) {
+                return modern_data;
+            }
+        });
     }
 
     /**
@@ -121,8 +171,9 @@ public class MaterialDataToIBlockData {
         if (materialdata.getItemType() == null) {
             throw new IllegalArgumentException("MaterialData getItemType() == null");
         }
-        IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
+
         IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(materialdata.getItemType()));
+        IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
         if (builder != null) {
             // Convert using createData to fix up a couple issues with MaterialData Class typing
             materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), materialdata.getData());

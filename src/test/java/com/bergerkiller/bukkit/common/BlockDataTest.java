@@ -13,6 +13,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -142,6 +143,7 @@ public class BlockDataTest {
         BlockData blockData = BlockData.fromMaterialData(legacyMaterialType, dataValue);
         MaterialData materialData = blockData.getMaterialData();
         if (materialData.getItemType() != legacyMaterialType) {
+            System.out.println("MaterialData type: " + materialData.getClass().getName());
             System.err.println("BlockData of " + legacyMaterialType + ":" + dataValue + " = " + blockData);
             System.out.println("TEST " + MaterialDataToIBlockData.getIBlockData(new MaterialData(legacyMaterialType, (byte) dataValue)));
             String msg = "testLegacyMaterial(" + legacyMaterialType + ", " + dataValue + ") failed: " +
@@ -155,6 +157,59 @@ public class BlockDataTest {
                     "Expected legacy data " + dataValue + ", but was " + ((int) materialData.getData() & 0xF);
             System.err.println(msg);
             fail(msg);
+        }
+    }
+
+    @Test
+    public void testSigns() {
+        // Test legacy material types
+        testSignMaterial(MaterialUtil.getMaterial("LEGACY_SIGN_POST"), false);
+        testSignMaterial(MaterialUtil.getMaterial("LEGACY_WALL_SIGN"), true);
+
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            // Test the new sign material since 1.14
+            testSignMaterial(MaterialUtil.getMaterial("ACACIA_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("ACACIA_WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getMaterial("BIRCH_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("BIRCH_WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getMaterial("DARK_OAK_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("DARK_OAK_WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getMaterial("JUNGLE_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("JUNGLE_WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getMaterial("OAK_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("OAK_WALL_SIGN"), true);
+            testSignMaterial(MaterialUtil.getMaterial("SPRUCE_SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("SPRUCE_WALL_SIGN"), true);
+        } else {
+            // These material names were used on 1.13 - 1.13.2
+            testSignMaterial(MaterialUtil.getMaterial("SIGN"), false);
+            testSignMaterial(MaterialUtil.getMaterial("WALL_SIGN"), true);
+        }
+    }
+
+    private void testSignMaterial(Material material, boolean isWallSign) {
+        assertNotNull(material);
+        BlockData signData = BlockData.fromMaterial(material);
+        if (signData == null) {
+            fail("Material " + material.name() + " produces unexpected null BlockData");
+        }
+        if (signData == BlockData.AIR) {
+            fail("Material " + material.name() + " can not be resolved to valid Sign BlockData");
+        }
+        if (signData.getLegacyType() != MaterialUtil.getMaterial(isWallSign ? "LEGACY_WALL_SIGN" : "LEGACY_SIGN_POST")) {
+            fail("Material " + material.name() + " has an invalid legacy type that is not a sign: " + signData.getLegacyType());
+        }
+        if (!MaterialUtil.isLegacyType(material) && signData.getType() != material) {
+            fail("Material " + material.name() + " has invalid BlockData type: " + signData.getType());
+        }
+
+        MaterialData legacyMaterialData = signData.getMaterialData();
+        if (!(legacyMaterialData instanceof org.bukkit.material.Sign)) {
+            fail("Material " + material.name() + " does not have Sign MaterialData");
+        }
+        org.bukkit.material.Sign legacySign = (org.bukkit.material.Sign) legacyMaterialData;
+        if (legacySign.isWallSign() != isWallSign) {
+            fail("Material " + material.name() + " expected isWallSign() == " + isWallSign + ", but was " + legacySign.isWallSign());
         }
     }
 

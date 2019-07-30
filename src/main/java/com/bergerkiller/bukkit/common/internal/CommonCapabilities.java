@@ -149,6 +149,11 @@ public class CommonCapabilities {
     public static final boolean HAS_WINDOW_TYPE_REGISTRY = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 
     /**
+     * Since Minecraft 1.14 multiple different material sign types exist for the wall sign and sign post
+     */
+    public static final boolean HAS_MATERIAL_SIGN_TYPES = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
      * Since Minecraft 1.14 it is no longer possible to cancel the chunk unload event
      */
     public static final boolean CAN_CANCEL_CHUNK_UNLOAD_EVENT = CommonBootstrap.evaluateMCVersion("<=", "1.13.2");

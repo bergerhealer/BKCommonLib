@@ -306,7 +306,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final org.bukkit.Material getLegacyType() {
-        return this.materialData.getItemType();
+        return CommonLegacyMaterials.toLegacy(this.materialData.getItemType());
     }
 
     @Override

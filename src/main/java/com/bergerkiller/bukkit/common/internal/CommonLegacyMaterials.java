@@ -8,7 +8,12 @@ import java.util.Map;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -19,6 +24,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 public class CommonLegacyMaterials {
     private static final HashMap<Integer, Material> idToMaterial = new HashMap<Integer, Material>();
     private static final EnumMap<Material, Integer> materialToId = new EnumMap<Material, Integer>(Material.class);
+    private static final EnumMap<Material, Material> materialToLegacy = new EnumMap<Material, Material>(Material.class);
     private static final Map<String, Material> allMaterialValuesByName = new HashMap<String, Material>();
     private static final Material[] allMaterialValues;
     private static final Material[] allLegacyMaterialValues;
@@ -107,6 +113,27 @@ public class CommonLegacyMaterials {
                 t.printStackTrace();
             }
         }
+
+        // Store a remapping from non-legacy materials to legacy materials
+        // First store all materials to themselves
+        for (Material material : allMaterialValues) {
+            materialToLegacy.put(material, material);
+        }
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            // Use CraftLegacy toLegacy(material) to convert them by default
+            // Some we override ourselves, which is done by IBlockDataToMaterialData utility class
+            SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("util.CraftLegacy"), "toLegacy", Material.class);
+            for (Material material : allMaterialValues) {
+                if (isLegacy(material)) {
+                    continue;
+                }
+                Material legacy = IBlockDataToMaterialData.toLegacy(material);
+                if (legacy == material) {
+                    legacy = craftbukkitToLegacy.invoke(null, material);
+                }
+                materialToLegacy.put(material, legacy);
+            }
+        }
     }
 
     /**
@@ -118,6 +145,18 @@ public class CommonLegacyMaterials {
      */
     public static boolean isLegacy(Material material) {
         return isLegacyMethod.invoke(material);
+    }
+
+    /**
+     * Gets the legacy material type that is the closest approximation of a non-legacy material type.
+     * Legacy materials will resolve to themselves.
+     * For example, for blocks of wood that did not exist, a close approximation will be chosen that did.
+     * 
+     * @param material
+     * @return legacy material type
+     */
+    public static Material toLegacy(Material material) {
+        return materialToLegacy.get(material);
     }
 
     /**
@@ -236,5 +275,16 @@ public class CommonLegacyMaterials {
             throw new UnsupportedOperationException("Material Ids are no longer supported on Minecraft 1.13 and onwards");
         }
         return materialToId.get(type);
+    }
+
+    /**
+     * Helper method to retrieve IBlockData by Material enum name.
+     * Only suitable for non-legacy names, and meant to be used before the BlockData API initializes.
+     * 
+     * @param name
+     * @return IBlockData
+     */
+    public static IBlockDataHandle getBlockDataFromMaterialName(String name) {
+        return CraftMagicNumbersHandle.getBlockDataFromMaterial(getMaterial(name));
     }
 }

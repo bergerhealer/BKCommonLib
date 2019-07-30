@@ -13,12 +13,10 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -132,6 +130,10 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             initMaterialDataMap();
         }
+
+        // Make absolutely sure that IBlockData AIR stays AIR, because Bukkit sends back AIR when materials cannot be resolved
+        // This fixes a rather serious issue of some random material data getting mapped to air.
+        storeMaterialData(CraftMagicNumbersHandle.getBlockDataFromMaterial(Material.AIR), new MaterialData(CommonLegacyMaterials.getLegacyMaterial("AIR")));
     }
 
     // Only called on MC >= 1.13
@@ -141,8 +143,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             for (byte data = 0; data < 8; data++) {
                 materialdata.setData(data);
                 IBlockDataHandle iblockdata = MaterialDataToIBlockData.getIBlockData(materialdata);
-                storeMaterialData(materialdata, iblockdata.set("waterlogged", true));
-                storeMaterialData(materialdata, iblockdata.set("waterlogged", false));
+                storeMaterialData(iblockdata.set("waterlogged", true), materialdata);
+                storeMaterialData(iblockdata.set("waterlogged", false), materialdata);
             }
         }
         storeMaterialDataGen("LEGACY_REDSTONE_COMPARATOR_OFF", 0, 7);
@@ -230,12 +232,68 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                     }
                     return variants;
                 }
+
+                @Override
+                public Material fromLegacy(Material legacyMaterial) {
+                    return CommonLegacyMaterials.getMaterial("REDSTONE_WIRE");
+                }
+
             }.setTypes("LEGACY_REDSTONE_WIRE")
              .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
              .build();
         }
 
-        if (Common.evaluateMCVersion(">=", "1.14")) {
+        // Chests
+        {
+            Material[] legacy_types = CommonLegacyMaterials.getAllByName("LEGACY_CHEST", "LEGACY_ENDER_CHEST", "LEGACY_TRAPPED_CHEST");
+            Material[] modern_types = CommonLegacyMaterials.getAllByName("CHEST", "ENDER_CHEST", "TRAPPED_CHEST");
+            for (int n = 0; n < legacy_types.length; n++) {
+                final Material legacy_type = legacy_types[n];
+                final Material modern_type = modern_types[n];
+                final boolean isEnderChest = (n==1);
+
+                new CustomMaterialDataBuilder<org.bukkit.material.DirectionalContainer>() {
+                    @Override
+                    public org.bukkit.material.DirectionalContainer create(Material legacy_data_type, byte legacy_data_value) {
+                        if (isEnderChest) {
+                            org.bukkit.material.EnderChest chest = new org.bukkit.material.EnderChest();
+                            chest.setData(legacy_data_value);
+                            return chest;
+                        } else {
+                            return new org.bukkit.material.Chest(legacy_type, legacy_data_value);
+                        }
+                    }
+
+                    @Override
+                    public List<IBlockDataHandle> createStates(IBlockDataHandle chest_data, org.bukkit.material.DirectionalContainer chest) {
+                        chest_data = chest_data.set("facing", chest.getFacing());
+                        return Arrays.asList(
+                                chest_data.set("waterlogged", true).set("type", "SINGLE"),
+                                chest_data.set("waterlogged", true).set("type", "LEFT"),
+                                chest_data.set("waterlogged", true).set("type", "RIGHT"),
+                                chest_data.set("waterlogged", false).set("type", "SINGLE"),
+                                chest_data.set("waterlogged", false).set("type", "LEFT"),
+                                chest_data.set("waterlogged", false).set("type", "RIGHT")
+                        );
+                    }
+
+                    @Override
+                    public Material fromLegacy(Material legacyMaterial) {
+                        return modern_type;
+                    }
+
+                    @Override
+                    public Material toLegacy(Material material) {
+                        return legacy_type;
+                    }
+
+                }.setTypes(legacy_type, modern_type)
+                 .setDataValues(2, 3, 4, 5)
+                 .build();
+            }
+        }
+
+        if (CommonCapabilities.HAS_MATERIAL_SIGN_TYPES) {
             // LEGACY_WALL_SIGN is broken on 1.14
             {
                 new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
@@ -248,6 +306,16 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                     public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
                         IBlockDataHandle base = iblockdata.set("facing", sign.getFacing());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                    }
+
+                    @Override
+                    public Material fromLegacy(Material legacyMaterial) {
+                        return CommonLegacyMaterials.getMaterial("OAK_WALL_SIGN");
+                    }
+
+                    @Override
+                    public Material toLegacy(Material material) {
+                        return CommonLegacyMaterials.getLegacyMaterial("WALL_SIGN");
                     }
                 }.setTypes("ACACIA_WALL_SIGN", "BIRCH_WALL_SIGN", "DARK_OAK_WALL_SIGN", "JUNGLE_WALL_SIGN", "OAK_WALL_SIGN", "SPRUCE_WALL_SIGN",
                            "LEGACY_WALL_SIGN")
@@ -268,6 +336,16 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                         IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
                         return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
                     }
+
+                    @Override
+                    public Material fromLegacy(Material legacyMaterial) {
+                        return CommonLegacyMaterials.getMaterial("OAK_SIGN");
+                    }
+
+                    @Override
+                    public Material toLegacy(Material material) {
+                        return CommonLegacyMaterials.getLegacyMaterial("SIGN_POST");
+                    }
                 }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN",
                            "LEGACY_SIGN_POST")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
@@ -280,16 +358,28 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         MaterialData materialdata = new MaterialData(CommonLegacyMaterials.getMaterial(legacyTypeName));
         for (int data = data_start; data <= data_end; data++) {
             materialdata.setData((byte) data);
-            storeMaterialData(materialdata, MaterialDataToIBlockData.getIBlockData(materialdata));
+            storeMaterialData(MaterialDataToIBlockData.getIBlockData(materialdata), materialdata);
         }
     }
 
-    private static void storeMaterialData(MaterialData materialdata, IBlockDataHandle iblockdata) {
+    private static void storeMaterialData(IBlockDataHandle iblockdata, MaterialData materialdata) {
         INTERNAL_IBLOCKDATA_TO_MATERIALDATA.put(iblockdata.getRaw(), materialdata.clone());
     }
 
     private static void storeMaterialDataDefault(String name, int data) {
         materialdata_default_data.put(CommonLegacyMaterials.getLegacyMaterial(name), Byte.valueOf((byte) data));
+    }
+
+    /**
+     * Obtains the Legacy Material type from a Material that gets closest to what can be represented.
+     * For example, materials of wood that did not yet exist will return another type of wood that comes close.
+     * By default will return the input material type, unless a custom conversion is required.
+     * 
+     * @param material
+     * @return legacy material type approximation
+     */
+    public static Material toLegacy(Material material) {
+        return materialdata_builders.get(material).toLegacy(material);
     }
 
     /**
@@ -342,12 +432,24 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         }
     }
 
-    private static IBlockDataHandle getIBlockData(Material type) {
-        return BlockHandle.T.getBlockData.invoke(CraftMagicNumbersHandle.getBlockFromMaterial(type));
-    }
-
     private static interface MaterialDataBuilder {
         MaterialData create(Material legacy_data_type, byte legacy_data_value);
+
+        // Creates IBlockData for the default state of a Material
+        default IBlockDataHandle getIBlockData(Material material) {
+            if (CommonLegacyMaterials.isLegacy(material)) {
+                material = fromLegacy(material);
+            }
+            return CraftMagicNumbersHandle.getBlockDataFromMaterial(material);
+        }
+
+        // Turn a legacy material into the new material type that represents it now
+        // The input is guaranteed to be a legacy material only
+        // Is only called by getIBlockData(material) and makes implementation easier
+        default Material fromLegacy(Material legacyMaterial) { return legacyMaterial; }
+
+        // Turn a (new) material into a legacy material close approximate
+        default Material toLegacy(Material material) { return material; }
     }
 
     private static abstract class CustomMaterialDataBuilder<T extends MaterialData> implements MaterialDataBuilder {
@@ -378,6 +480,17 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         }
 
         /**
+         * Sets all possible Material types of this MaterialData
+         * 
+         * @param types
+         * @return this
+         */
+        public CustomMaterialDataBuilder<T> setTypes(Material... types) {
+            this.types = types;
+            return this;
+        }
+
+        /**
          * Sets all possible data values of this MaterialData
          * 
          * @param values
@@ -395,11 +508,11 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             for (Material type : this.types) {
                 materialdata_builders.put(type, this);
                 T materialdata = this.create(type, (byte) this.data_values[0]);
-                IBlockDataHandle iblockdata = getIBlockData(type);
+                IBlockDataHandle baseIBlockData = this.getIBlockData(type);
                 for (int data_value : this.data_values) {
                     materialdata.setData((byte) data_value);
-                    for (IBlockDataHandle iBlockData : this.createStates(iblockdata, materialdata)) {
-                        storeMaterialData(materialdata, iBlockData);
+                    for (IBlockDataHandle iBlockData : this.createStates(baseIBlockData, materialdata)) {
+                        storeMaterialData(iBlockData, materialdata);
                     }
                 }
             }

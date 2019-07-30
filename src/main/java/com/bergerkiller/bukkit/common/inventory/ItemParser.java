@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -277,12 +276,12 @@ public class ItemParser {
                         type = block.getLegacyType();
                         data = block.getRawData();
                     } else {
-                        type = CraftMagicNumbersHandle.toLegacy(type);
+                        type = CommonLegacyMaterials.toLegacy(type);
                         data = 0;
                     }
                 } else {
                     // Self type -> legacy. This shouldn't really be used, ever.
-                    self = CraftMagicNumbersHandle.toLegacy(self);
+                    self = CommonLegacyMaterials.toLegacy(self);
                 }
             }
 
