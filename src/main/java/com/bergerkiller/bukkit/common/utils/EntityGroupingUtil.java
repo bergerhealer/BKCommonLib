@@ -541,7 +541,7 @@ public class EntityGroupingUtil {
         ANIMAL(true, true, Animals.class, Squid.class),
         MONSTER(true, true, Monster.class, Slime.class, Ghast.class, Golem.class),
         NPC(true, true, NPC.class),
-        PASSIVE(true, false, Bat.class, Chicken.class, Cow.class, MushroomCow.class, Pig.class, Sheep.class, Squid.class, Villager.class),
+        PASSIVE(true, false, Bat.class, Chicken.class, Cow.class, MushroomCow.class, Pig.class, Sheep.class, Squid.class, Villager.class, CommonUtil.getClass("org.bukkit.entity.AbstractVillager")),
         NEUTRAL(true, false, CaveSpider.class, Enderman.class, Spider.class, PigZombie.class),
         HOSTILE(true, false, Blaze.class, Creeper.class, Guardian.class, Endermite.class, Ghast.class, MagmaCube.class, Silverfish.class, Skeleton.class, Slime.class, Witch.class, Zombie.class),
         TAMEABLE(true, false, Tameable.class),
@@ -607,6 +607,7 @@ public class EntityGroupingUtil {
 
         public void setEntityClasses(Class<?>[] entityClasses) {
             this.setEntityClasses(new HashSet<Class<?>>(Arrays.asList(entityClasses)));
+            this.entityClasses.remove(null);
         }
 
         public Method getMethod() {
