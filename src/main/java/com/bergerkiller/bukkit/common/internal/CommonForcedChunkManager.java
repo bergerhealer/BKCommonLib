@@ -68,8 +68,10 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.pendingHandler.stop();
         this.pendingHandler = null;
         this.pending.clear();
-        for (Entry entry : this.chunks.values()) {
-            entry.disable();
+        while (!this.chunks.isEmpty()) {
+            for (Entry e : this.chunks.values().toArray(new Entry[0])) {
+                e.disable();
+            }
         }
         this.chunks.clear();
     }
