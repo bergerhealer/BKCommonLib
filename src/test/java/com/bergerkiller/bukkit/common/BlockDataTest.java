@@ -142,7 +142,7 @@ public class BlockDataTest {
     private void testLegacyMaterial(Material legacyMaterialType, int dataValue) {
         BlockData blockData = BlockData.fromMaterialData(legacyMaterialType, dataValue);
         MaterialData materialData = blockData.getMaterialData();
-        if (materialData.getItemType() != legacyMaterialType) {
+        if (CommonLegacyMaterials.toLegacy(materialData.getItemType()) != legacyMaterialType) {
             System.out.println("MaterialData type: " + materialData.getClass().getName());
             System.err.println("BlockData of " + legacyMaterialType + ":" + dataValue + " = " + blockData);
             System.out.println("TEST " + MaterialDataToIBlockData.getIBlockData(new MaterialData(legacyMaterialType, (byte) dataValue)));
@@ -203,13 +203,23 @@ public class BlockDataTest {
             fail("Material " + material.name() + " has invalid BlockData type: " + signData.getType());
         }
 
+        // BlockData -> MaterialData
         MaterialData legacyMaterialData = signData.getMaterialData();
         if (!(legacyMaterialData instanceof org.bukkit.material.Sign)) {
             fail("Material " + material.name() + " does not have Sign MaterialData");
         }
+        if (!MaterialUtil.isLegacyType(material) && legacyMaterialData.getItemType() != material) {
+            fail("Material " + material.name() + " results in MaterialData type " + legacyMaterialData.getItemType() + " from block data");
+        }
         org.bukkit.material.Sign legacySign = (org.bukkit.material.Sign) legacyMaterialData;
         if (legacySign.isWallSign() != isWallSign) {
             fail("Material " + material.name() + " expected isWallSign() == " + isWallSign + ", but was " + legacySign.isWallSign());
+        }
+
+        // MaterialData -> BlockData
+        BlockData restoredBlockData = BlockData.fromMaterialData(legacyMaterialData);
+        if (restoredBlockData != signData) {
+            fail("Block Data was not restored from MaterialData correctly. Expected " + signData + ", but got " + restoredBlockData);
         }
     }
 

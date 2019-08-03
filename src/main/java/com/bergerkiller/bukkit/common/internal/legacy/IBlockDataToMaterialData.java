@@ -62,17 +62,17 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                         "public static org.bukkit.material.MaterialData getMaterialData(net.minecraft.server.IBlockData iblockdata) {\n" +
                         "    Object materialdata_raw = com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.INTERNAL_IBLOCKDATA_TO_MATERIALDATA.get(iblockdata);\n" +
                         "    org.bukkit.material.MaterialData materialdata = (org.bukkit.material.MaterialData) materialdata_raw;\n" +
+                        "    org.bukkit.Material type = CraftMagicNumbers.getMaterial(iblockdata.getBlock());\n" +
                         "    org.bukkit.Material data_type;\n" +
                         "    byte data_value;\n" +
                         "    if (materialdata != null) {\n" +
                         "        data_type = materialdata.getItemType();\n" +
                         "        data_value = materialdata.getData();\n" +
                         "    } else {\n" +
-                        "        org.bukkit.Material type = CraftMagicNumbers.getMaterial(iblockdata.getBlock());\n" +
                         "        data_type = org.bukkit.craftbukkit.util.CraftLegacy.toLegacy(type);\n" +
                         "        data_value = org.bukkit.craftbukkit.util.CraftLegacy.toLegacyData(iblockdata);\n" +
                         "    }\n" +
-                        "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(data_type, data_value);\n" +
+                        "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(type, data_type, data_value);\n" +
                         "}"
                 ));
             } else {
@@ -80,7 +80,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                         "public static org.bukkit.material.MaterialData getMaterialData(net.minecraft.server.IBlockData iblockdata) {\n" +
                         "    org.bukkit.Material data_type = CraftMagicNumbers.getMaterial(iblockdata.getBlock());\n" +
                         "    byte data_value = (byte) iblockdata.getBlock().toLegacyData(iblockdata);\n" +
-                        "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(data_type, data_value);\n" +
+                        "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(data_type, data_type, data_value);\n" +
                         "}"
                 ));
             }
@@ -88,7 +88,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
 
         MaterialDataBuilder default_builder = new MaterialDataBuilder() {
             @Override
-            public MaterialData create(Material legacy_data_type, byte legacy_data_value) {
+            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                 return legacy_data_type.getNewData(legacy_data_value);
             }
         };
@@ -96,16 +96,16 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         // Bukkit bugfix.
         storeBuilders(new MaterialDataBuilder() {
             @Override
-            public MaterialData create(Material legacy_data_type, byte legacy_data_value) {
-                return new org.bukkit.material.PressurePlate(legacy_data_type, legacy_data_value);
+            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                return new org.bukkit.material.PressurePlate(material_type, legacy_data_value);
             }
         }, "LEGACY_GOLD_PLATE", "LEGACY_IRON_PLATE");
 
         // Bukkit bugfix. (<= 1.8.3)
         storeBuilders(new MaterialDataBuilder() {
             @Override
-            public MaterialData create(Material legacy_data_type, byte legacy_data_value) {
-                return new org.bukkit.material.Door(legacy_data_type, legacy_data_value);
+            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                return new org.bukkit.material.Door(material_type, legacy_data_value);
             }
         }, "LEGACY_JUNGLE_DOOR", "LEGACY_ACACIA_DOOR", "LEGACY_DARK_OAK_DOOR", "LEGACY_SPRUCE_DOOR", "LEGACY_BIRCH_DOOR");
 
@@ -158,8 +158,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         {
             new CustomMaterialDataBuilder<org.bukkit.material.Button>() {
                 @Override
-                public org.bukkit.material.Button create(Material legacy_data_type, byte legacy_data_value) {
-                    return new org.bukkit.material.Button(legacy_data_type, legacy_data_value);
+                public org.bukkit.material.Button create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Button(material_type, legacy_data_value);
                 }
 
                 @Override
@@ -189,8 +189,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         {
             new CustomMaterialDataBuilder<org.bukkit.material.PressurePlate>() {
                 @Override
-                public org.bukkit.material.PressurePlate create(Material legacy_data_type, byte legacy_data_value) {
-                    return new org.bukkit.material.PressurePlate(legacy_data_type, legacy_data_value);
+                public org.bukkit.material.PressurePlate create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.PressurePlate(material_type, legacy_data_value);
                 }
 
                 @Override
@@ -208,8 +208,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         {
             new CustomMaterialDataBuilder<org.bukkit.material.RedstoneWire>() {
                 @Override
-                public org.bukkit.material.RedstoneWire create(Material legacy_data_type, byte legacy_data_value) {
-                    return new org.bukkit.material.RedstoneWire(legacy_data_type, legacy_data_value);
+                public org.bukkit.material.RedstoneWire create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.RedstoneWire(material_type, legacy_data_value);
                 }
 
                 @Override
@@ -254,13 +254,13 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
 
                 new CustomMaterialDataBuilder<org.bukkit.material.DirectionalContainer>() {
                     @Override
-                    public org.bukkit.material.DirectionalContainer create(Material legacy_data_type, byte legacy_data_value) {
+                    public org.bukkit.material.DirectionalContainer create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                         if (isEnderChest) {
                             org.bukkit.material.EnderChest chest = new org.bukkit.material.EnderChest();
                             chest.setData(legacy_data_value);
                             return chest;
                         } else {
-                            return new org.bukkit.material.Chest(legacy_type, legacy_data_value);
+                            return new org.bukkit.material.Chest(material_type, legacy_data_value);
                         }
                     }
 
@@ -298,8 +298,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             {
                 new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
                     @Override
-                    public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
-                        return new CommonSignDataFix(legacy_data_type, legacy_data_value, true);
+                    public org.bukkit.material.Sign create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                        return new CommonSignDataFix(material_type, legacy_data_value, true);
                     }
 
                     @Override
@@ -327,8 +327,8 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             {
                 new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
                     @Override
-                    public org.bukkit.material.Sign create(Material legacy_data_type, byte legacy_data_value) {
-                        return new CommonSignDataFix(legacy_data_type, legacy_data_value, false);
+                    public org.bukkit.material.Sign create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                        return new CommonSignDataFix(material_type, legacy_data_value, false);
                     }
 
                     @Override
@@ -400,19 +400,20 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
      * @return MaterialData
      */
     public static MaterialData createMaterialData(Material legacy_data_type) {
-        return createMaterialData(legacy_data_type, materialdata_default_data.get(legacy_data_type).byteValue());
+        return createMaterialData(legacy_data_type, legacy_data_type, materialdata_default_data.get(legacy_data_type).byteValue());
     }
 
     /**
      * Creates new MaterialData from a legacy Material type and legacy data value.
      * This method includes several bugfixes for bugs that exist in the Bukkit API.
      * 
-     * @param legacy_data_type
+     * @param material_type (can differ from legacy data type)
+     * @param legacy_data_type (legacy of material_type)
      * @param legacy_data_value
      * @return MaterialData
      */
-    public static MaterialData createMaterialData(Material legacy_data_type, byte legacy_data_value) {
-        MaterialData result = materialdata_builders.get(legacy_data_type).create(legacy_data_type, legacy_data_value);
+    public static MaterialData createMaterialData(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+        MaterialData result = materialdata_builders.get(legacy_data_type).create(material_type, legacy_data_type, legacy_data_value);
 
         // Fix attachable face returning NULL sometimes
         if (result instanceof Attachable) {
@@ -433,7 +434,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
     }
 
     private static interface MaterialDataBuilder {
-        MaterialData create(Material legacy_data_type, byte legacy_data_value);
+        MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value);
 
         // Creates IBlockData for the default state of a Material
         default IBlockDataHandle getIBlockData(Material material) {
@@ -457,7 +458,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         private int[] data_values;
 
         @Override
-        public abstract T create(Material legacy_data_type, byte legacy_data_value);
+        public abstract T create(Material material_type, Material legacy_data_type, byte legacy_data_value);
 
         /**
          * Creates all possible IBlockDatas state matching with this MaterialData
@@ -507,7 +508,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         public void build() {
             for (Material type : this.types) {
                 materialdata_builders.put(type, this);
-                T materialdata = this.create(type, (byte) this.data_values[0]);
+                T materialdata = this.create(type, type, (byte) this.data_values[0]);
                 IBlockDataHandle baseIBlockData = this.getIBlockData(type);
                 for (int data_value : this.data_values) {
                     materialdata.setData((byte) data_value);

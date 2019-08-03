@@ -127,11 +127,6 @@ public class BlockDataImpl extends BlockData {
                 BY_MATERIAL.put(mat, blockConst);
             }
 
-            // Only store by MaterialData information for Legacy Materials
-            if (!CommonLegacyMaterials.isLegacy(mat)) {
-                continue;
-            }
-
             MaterialData materialdata = new MaterialData(mat);
             for (int data = 0; data < 16; data++) {
                 // Find IBlockData from Material + Data and cache it if needed
@@ -146,26 +141,6 @@ public class BlockDataImpl extends BlockData {
                 int index = CommonLegacyMaterials.getOrdinal(mat);
                 index |= (data << BY_LEGACY_MAT_DATA_SHIFT);
                 BY_LEGACY_MAT_DATA[index] = dataBlockConst;
-            }
-        }
-
-        // Dangerous and unpredictable: fill BY_LEGACY_MAT_DATA with Material taken using toLegacy
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
-                // Skip legacy materials
-                if (CommonLegacyMaterials.isLegacy(mat)) {
-                    continue;
-                }
-
-                // Find legacy Material, then copy all 16 data values from Legacy to New Material
-                Material legacyType = BY_MATERIAL.get(mat).getLegacyType();
-                for (int data = 0; data < 16; data++) {
-                    int index_a = CommonLegacyMaterials.getOrdinal(mat);
-                    index_a |= (data << BY_LEGACY_MAT_DATA_SHIFT);
-                    int index_b = CommonLegacyMaterials.getOrdinal(legacyType);
-                    index_b |= (data << BY_LEGACY_MAT_DATA_SHIFT);
-                    BY_LEGACY_MAT_DATA[index_a] = BY_LEGACY_MAT_DATA[index_b];
-                }
             }
         }
 

@@ -120,10 +120,13 @@ public class MaterialDataToIBlockData {
 
                 @Override
                 public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                    if (CommonLegacyMaterials.isLegacy(sign.getItemType())) {
+                        iblockdata = sign.isWallSign() ? wall_sign_data : sign_post_data;
+                    }
                     if (sign.isWallSign()) {
-                        return wall_sign_data.set("facing", sign.getFacing());
+                        return iblockdata.set("facing", sign.getFacing());
                     } else {
-                        return sign_post_data.set("rotation", (int) sign.getData());
+                        return iblockdata.set("rotation", (int) sign.getData());
                     }
                 }
             };
@@ -172,11 +175,12 @@ public class MaterialDataToIBlockData {
             throw new IllegalArgumentException("MaterialData getItemType() == null");
         }
 
-        IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(materialdata.getItemType()));
+        Material legacyType = CommonLegacyMaterials.toLegacy(materialdata.getItemType());
+        IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(legacyType));
         IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
         if (builder != null) {
             // Convert using createData to fix up a couple issues with MaterialData Class typing
-            materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), materialdata.getData());
+            materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), legacyType, materialdata.getData());
             blockData = builder.create(blockData, materialdata);
         }
         return blockData;
