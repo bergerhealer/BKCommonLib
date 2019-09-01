@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import org.bukkit.World;
@@ -39,7 +40,7 @@ public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
         Object cps = getCPS(world);
         Object generator = cpsChunkGeneratorField.get(cps);
         ChunkGeneratorHook hook = ChunkGeneratorHook.get(generator, ChunkGeneratorHook.class);
-        if (hook == null) {
+        if (hook == null && generator != null && !Modifier.isFinal(generator.getClass().getModifiers())) {
             try {
                 hook = new ChunkGeneratorHook(world);
                 generator = hook.hook(generator);
