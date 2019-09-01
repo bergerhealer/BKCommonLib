@@ -26,7 +26,7 @@ public class LogicUtil {
      * @return the unboxed type
      */
     public static Class<?> getUnboxedType(Class<?> boxedType) {
-	return BoxedType.getUnboxedType(boxedType);
+        return BoxedType.getUnboxedType(boxedType);
     }
 
     /**
@@ -37,7 +37,7 @@ public class LogicUtil {
      * @return the boxed type
      */
     public static Class<?> getBoxedType(Class<?> unboxedType) {
-	return BoxedType.getBoxedType(unboxedType);
+        return BoxedType.getBoxedType(unboxedType);
     }
 
     /**
@@ -48,7 +48,7 @@ public class LogicUtil {
      * @return boxed type, or the type if it has no boxed type
      */
     public static Class<?> tryBoxType(Class<?> type) {
-	return BoxedType.tryBoxType(type);
+        return BoxedType.tryBoxType(type);
     }
 
     /**
@@ -59,7 +59,7 @@ public class LogicUtil {
      * @return True if value1 and value2 equal or are both null, False if not
      */
     public static boolean bothNullOrEqual(Object value1, Object value2) {
-	return value1 == null ? value2 == null : value1.equals(value2);
+        return value1 == null ? value2 == null : value1.equals(value2);
     }
 
     /**
@@ -72,7 +72,7 @@ public class LogicUtil {
      *         False if not
      */
     public static boolean bothNullOrEqualIgnoreCase(String value1, String value2) {
-	return value1 == null ? value2 == null : value1.equalsIgnoreCase(value2);
+        return value1 == null ? value2 == null : value1.equalsIgnoreCase(value2);
     }
 
     /**
@@ -82,7 +82,7 @@ public class LogicUtil {
      * @return True if the collection is null or empty
      */
     public static boolean nullOrEmpty(Map<?, ?> map) {
-	return map == null || map.isEmpty();
+        return map == null || map.isEmpty();
     }
 
     /**
@@ -92,7 +92,7 @@ public class LogicUtil {
      * @return True if the collection is null or empty
      */
     public static boolean nullOrEmpty(Collection<?> collection) {
-	return collection == null || collection.isEmpty();
+        return collection == null || collection.isEmpty();
     }
 
     /**
@@ -102,7 +102,7 @@ public class LogicUtil {
      * @return True if the text is null or empty
      */
     public static boolean nullOrEmpty(String text) {
-	return text == null || text.isEmpty();
+        return text == null || text.isEmpty();
     }
 
     /**
@@ -112,7 +112,7 @@ public class LogicUtil {
      * @return True if the item is null or empty
      */
     public static boolean nullOrEmpty(org.bukkit.inventory.ItemStack item) {
-	return ItemUtil.isEmpty(item);
+        return ItemUtil.isEmpty(item);
     }
 
     /**
@@ -122,7 +122,7 @@ public class LogicUtil {
      * @return True if the item is null or empty
      */
     public static boolean nullOrEmpty(Object[] array) {
-	return array == null || array.length == 0;
+        return array == null || array.length == 0;
     }
 
     /**
@@ -133,7 +133,7 @@ public class LogicUtil {
      * @return True if it is in bounds, False if not
      */
     public static boolean isInBounds(Collection<?> collection, int index) {
-	return collection != null && index >= 0 && index < collection.size();
+        return collection != null && index >= 0 && index < collection.size();
     }
 
     /**
@@ -145,7 +145,7 @@ public class LogicUtil {
      * @return True if it is in bounds, False if not
      */
     public static boolean isInBounds(Object[] array, int index) {
-	return array != null && index >= 0 && index < array.length;
+        return array != null && index >= 0 && index < array.length;
     }
 
     /**
@@ -157,7 +157,7 @@ public class LogicUtil {
      * @return True if it is in bounds, False if not
      */
     public static boolean isInBounds(Object array, int index) {
-	return array != null && index >= 0 && index < Array.getLength(array);
+        return array != null && index >= 0 && index < Array.getLength(array);
     }
 
     /**
@@ -168,7 +168,7 @@ public class LogicUtil {
      * @return the value or the default
      */
     public static <T> T fixNull(T value, T def) {
-	return value == null ? def : value;
+        return value == null ? def : value;
     }
 
     /**
@@ -181,16 +181,16 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] appendArray(T[] array, T... values) {
-	if (nullOrEmpty(array)) {
-	    return values;
-	}
-	if (nullOrEmpty(values)) {
-	    return array;
-	}
-	T[] rval = createArray((Class<T>) array.getClass().getComponentType(), array.length + values.length);
-	System.arraycopy(array, 0, rval, 0, array.length);
-	System.arraycopy(values, 0, rval, array.length, values.length);
-	return rval;
+        if (nullOrEmpty(array)) {
+            return values;
+        }
+        if (nullOrEmpty(values)) {
+            return array;
+        }
+        T[] rval = createArray((Class<T>) array.getClass().getComponentType(), array.length + values.length);
+        System.arraycopy(array, 0, rval, 0, array.length);
+        System.arraycopy(values, 0, rval, array.length, values.length);
+        return rval;
     }
 
     /**
@@ -203,13 +203,13 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] cloneArray(T[] array) {
-	if (array == null) {
-	    return null;
-	}
-	final int length = array.length;
-	T[] rval = createArray((Class<T>) array.getClass().getComponentType(), length);
-	System.arraycopy(array, 0, rval, 0, length);
-	return rval;
+        if (array == null) {
+            return null;
+        }
+        final int length = array.length;
+        T[] rval = createArray((Class<T>) array.getClass().getComponentType(), length);
+        System.arraycopy(array, 0, rval, 0, length);
+        return rval;
     }
 
     /**
@@ -221,31 +221,31 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T clone(T value) {
-	if (value == null) {
-	    return null;
-	}
+        if (value == null) {
+            return null;
+        }
 
-	Method cloneMethod = _cloneMethodCache.get(value.getClass());
-	if (cloneMethod == null) {
-	    synchronized (_cloneMethodCache) {
-		cloneMethod = _cloneMethodCache.get(value.getClass());
-		if (cloneMethod == null) {
-		    try {
-			cloneMethod = value.getClass().getMethod("clone");
-		    } catch (NoSuchMethodException | SecurityException e) {
-			throw new IllegalArgumentException(
-				"Object of type " + value.getClass().getName() + " can not be cloned");
-		    }
-		}
-		_cloneMethodCache.put(value.getClass(), cloneMethod);
-	    }
-	}
+        Method cloneMethod = _cloneMethodCache.get(value.getClass());
+        if (cloneMethod == null) {
+            synchronized (_cloneMethodCache) {
+                cloneMethod = _cloneMethodCache.get(value.getClass());
+                if (cloneMethod == null) {
+                    try {
+                        cloneMethod = value.getClass().getMethod("clone");
+                    } catch (NoSuchMethodException | SecurityException e) {
+                        throw new IllegalArgumentException(
+                                "Object of type " + value.getClass().getName() + " can not be cloned");
+                    }
+                }
+                _cloneMethodCache.put(value.getClass(), cloneMethod);
+            }
+        }
 
-	try {
-	    return (T) cloneMethod.invoke(value);
-	} catch (Throwable t) {
-	    throw MountiplexUtil.uncheckedRethrow(t);
-	}
+        try {
+            return (T) cloneMethod.invoke(value);
+        } catch (Throwable t) {
+            throw MountiplexUtil.uncheckedRethrow(t);
+        }
     }
 
     /**
@@ -257,23 +257,23 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] cloneAll(T[] values) {
-	if (values == null || values.length == 0) {
-	    return values;
-	}
-	try {
-	    final Class<T> compType = (Class<T>) values.getClass().getComponentType();
-	    final Method cloneMethod = compType.getDeclaredMethod("clone");
-	    T[] rval = createArray(compType, values.length);
-	    for (int i = 0; i < rval.length; i++) {
-		final T value = values[i];
-		if (value != null) {
-		    rval[i] = (T) cloneMethod.invoke(value);
-		}
-	    }
-	    return rval;
-	} catch (Exception ex) {
-	    throw new RuntimeException("Cloning was not possible:", ex);
-	}
+        if (values == null || values.length == 0) {
+            return values;
+        }
+        try {
+            final Class<T> compType = (Class<T>) values.getClass().getComponentType();
+            final Method cloneMethod = compType.getDeclaredMethod("clone");
+            T[] rval = createArray(compType, values.length);
+            for (int i = 0; i < rval.length; i++) {
+                final T value = values[i];
+                if (value != null) {
+                    rval[i] = (T) cloneMethod.invoke(value);
+                }
+            }
+            return rval;
+        } catch (Exception ex) {
+            throw new RuntimeException("Cloning was not possible:", ex);
+        }
     }
 
     /**
@@ -286,15 +286,15 @@ public class LogicUtil {
      * @return array type
      */
     public static Class<?> getArrayType(Class<?> componentType) {
-	if (componentType.isPrimitive()) {
-	    return Array.newInstance(componentType, 0).getClass();
-	} else {
-	    try {
-		return Class.forName("[L" + componentType.getName() + ";");
-	    } catch (ClassNotFoundException e) {
-		return Object[].class;
-	    }
-	}
+        if (componentType.isPrimitive()) {
+            return Array.newInstance(componentType, 0).getClass();
+        } else {
+            try {
+                return Class.forName("[L" + componentType.getName() + ";");
+            } catch (ClassNotFoundException e) {
+                return Object[].class;
+            }
+        }
     }
 
     /**
@@ -308,11 +308,11 @@ public class LogicUtil {
      * @return array type
      */
     public static Class<?> getArrayType(Class<?> componentType, int levels) {
-	Class<?> type = componentType;
-	while (levels-- > 0) {
-	    type = getArrayType(type);
-	}
-	return type;
+        Class<?> type = componentType;
+        while (levels-- > 0) {
+            type = getArrayType(type);
+        }
+        return type;
     }
 
     /**
@@ -327,7 +327,7 @@ public class LogicUtil {
      * @return The list element, or the default value
      */
     public static <T> T getList(List<T> list, int index, T def) {
-	return isInBounds(list, index) ? list.get(index) : def;
+        return isInBounds(list, index) ? list.get(index) : def;
     }
 
     /**
@@ -342,7 +342,7 @@ public class LogicUtil {
      * @return The array element, or the default value
      */
     public static <T> T getArray(T[] array, int index, T def) {
-	return isInBounds(array, index) ? array[index] : def;
+        return isInBounds(array, index) ? array[index] : def;
     }
 
     /**
@@ -354,7 +354,7 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] createArray(Class<T> type, int length) {
-	return (T[]) Array.newInstance(type, length);
+        return (T[]) Array.newInstance(type, length);
     }
 
     /**
@@ -366,7 +366,7 @@ public class LogicUtil {
      * @return new Array containing the elements in the collection
      */
     public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
-	return collection.toArray(createArray(type, collection.size()));
+        return collection.toArray(createArray(type, collection.size()));
     }
 
     /**
@@ -378,15 +378,15 @@ public class LogicUtil {
      */
     @SafeVarargs
     public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
-	if (array.length > 20) {
-	    return collection.addAll(Arrays.asList(array));
-	} else {
-	    boolean changed = false;
-	    for (T element : array) {
-		changed |= collection.add(element);
-	    }
-	    return changed;
-	}
+        if (array.length > 20) {
+            return collection.addAll(Arrays.asList(array));
+        } else {
+            boolean changed = false;
+            for (T element : array) {
+                changed |= collection.add(element);
+            }
+            return changed;
+        }
     }
 
     /**
@@ -397,15 +397,15 @@ public class LogicUtil {
      * @return True if the collection changed as a result of the call, False if not.
      */
     public static boolean removeArray(Collection<?> collection, Object... array) {
-	if (array.length > 100) {
-	    return collection.removeAll(Arrays.asList(array));
-	} else {
-	    boolean changed = false;
-	    for (Object element : array) {
-		changed |= collection.remove(element);
-	    }
-	    return changed;
-	}
+        if (array.length > 100) {
+            return collection.removeAll(Arrays.asList(array));
+        } else {
+            boolean changed = false;
+            for (Object element : array) {
+                changed |= collection.remove(element);
+            }
+            return changed;
+        }
     }
 
     /**
@@ -418,12 +418,12 @@ public class LogicUtil {
      * @return new array copy with the value removed, same as input if unchanged
      */
     public static <T> T[] removeArrayElement(T[] input, T value) {
-	for (int index = 0; index < input.length; index++) {
-	    if (bothNullOrEqual(input[index], value)) {
-		return removeArrayElement(input, index);
-	    }
-	}
-	return input;
+        for (int index = 0; index < input.length; index++) {
+            if (bothNullOrEqual(input[index], value)) {
+                return removeArrayElement(input, index);
+            }
+        }
+        return input;
     }
 
     /**
@@ -434,14 +434,14 @@ public class LogicUtil {
      * @return new array copy of input array, with the element at the index removed
      */
     public static <T> T[] removeArrayElement(T[] input, int index) {
-	if (index < 0 || index >= input.length) {
-	    return input;
-	}
-	T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
-	System.arraycopy(input, 0, rval, 0, index);
-	System.arraycopy(input, 0, rval, 0, index);
-	System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
-	return rval;
+        if (index < 0 || index >= input.length) {
+            return input;
+        }
+        T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
+        System.arraycopy(input, 0, rval, 0, index);
+        System.arraycopy(input, 0, rval, 0, index);
+        System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
+        return rval;
     }
 
     /**
@@ -455,7 +455,7 @@ public class LogicUtil {
      *         not
      */
     public static boolean addOrRemove(BlockSet collection, Block value, boolean add) {
-	return add ? collection.add(value) : collection.remove(value);
+        return add ? collection.add(value) : collection.remove(value);
     }
 
     /**
@@ -469,7 +469,7 @@ public class LogicUtil {
      *         not
      */
     public static <T> boolean addOrRemove(Collection<T> collection, T value, boolean add) {
-	return add ? collection.add(value) : collection.remove(value);
+        return add ? collection.add(value) : collection.remove(value);
     }
 
     /**
@@ -480,18 +480,18 @@ public class LogicUtil {
      * @return True if all contents are contained in the map, False if not
      */
     public static boolean containsAll(Map<?, ?> map, Map<?, ?> contents) {
-	for (Map.Entry<?, ?> entry : contents.entrySet()) {
-	    Object value = map.get(entry.getKey());
-	    // Null value stored in the map?
-	    if (value == null) {
-		if (entry.getValue() != null || !map.containsKey(entry.getKey())) {
-		    return false;
-		}
-	    } else if (!value.equals(entry.getValue())) {
-		return false;
-	    }
-	}
-	return true;
+        for (Map.Entry<?, ?> entry : contents.entrySet()) {
+            Object value = map.get(entry.getKey());
+            // Null value stored in the map?
+            if (value == null) {
+                if (entry.getValue() != null || !map.containsKey(entry.getKey())) {
+                    return false;
+                }
+            } else if (!value.equals(entry.getValue())) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -503,12 +503,12 @@ public class LogicUtil {
      */
     @SafeVarargs
     public static <T> boolean contains(T value, T... values) {
-	for (T v : values) {
-	    if (bothNullOrEqual(v, value)) {
-		return true;
-	    }
-	}
-	return false;
+        for (T v : values) {
+            if (bothNullOrEqual(v, value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -520,12 +520,12 @@ public class LogicUtil {
      */
     @SafeVarargs
     public static boolean contains(String value, String... values) {
-	for (String v : values) {
-	    if (bothNullOrEqualIgnoreCase(v, value)) {
-		return true;
-	    }
-	}
-	return false;
+        for (String v : values) {
+            if (bothNullOrEqualIgnoreCase(v, value)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -536,12 +536,12 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     public static boolean containsByte(byte value, byte... values) {
-	for (byte v : values) {
-	    if (v == value) {
-		return true;
-	    }
-	}
-	return false;
+        for (byte v : values) {
+            if (v == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -552,12 +552,12 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     public static boolean containsChar(char value, CharSequence sequence) {
-	for (int i = 0; i < sequence.length(); i++) {
-	    if (sequence.charAt(i) == value) {
-		return true;
-	    }
-	}
-	return false;
+        for (int i = 0; i < sequence.length(); i++) {
+            if (sequence.charAt(i) == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -568,12 +568,12 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     public static boolean containsChar(char value, char... values) {
-	for (char v : values) {
-	    if (v == value) {
-		return true;
-	    }
-	}
-	return false;
+        for (char v : values) {
+            if (v == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -584,12 +584,12 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     public static boolean containsInt(int value, int... values) {
-	for (int v : values) {
-	    if (v == value) {
-		return true;
-	    }
-	}
-	return false;
+        for (int v : values) {
+            if (v == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -600,12 +600,12 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     public static boolean containsBool(boolean value, boolean... values) {
-	for (boolean v : values) {
-	    if (v == value) {
-		return true;
-	    }
-	}
-	return false;
+        for (boolean v : values) {
+            if (v == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -619,10 +619,10 @@ public class LogicUtil {
      * @return the iterator
      */
     public static <T extends Iterator<?>> T skipIterator(T iterator, int count) {
-	for (int i = 0; i < count && iterator.hasNext(); i++) {
-	    iterator.next();
-	}
-	return iterator;
+        for (int i = 0; i < count && iterator.hasNext(); i++) {
+            iterator.next();
+        }
+        return iterator;
     }
 
     /**
@@ -635,15 +635,15 @@ public class LogicUtil {
      * @return key the value is mapped to, or null if not found
      */
     public static <K, V> K getKeyAtValue(Map<K, V> map, V value) {
-	if (map instanceof BiMap) {
-	    return ((BiMap<K, V>) map).inverse().get(value);
-	}
-	for (Entry<K, V> entry : map.entrySet()) {
-	    if (bothNullOrEqual(entry.getValue(), value)) {
-		return entry.getKey();
-	    }
-	}
-	return null;
+        if (map instanceof BiMap) {
+            return ((BiMap<K, V>) map).inverse().get(value);
+        }
+        for (Entry<K, V> entry : map.entrySet()) {
+            if (bothNullOrEqual(entry.getValue(), value)) {
+                return entry.getKey();
+            }
+        }
+        return null;
     }
 
     /**
@@ -653,11 +653,11 @@ public class LogicUtil {
      * @return class types
      */
     public static Class<?>[] getTypes(Object[] values) {
-	Class<?>[] result = new Class<?>[values.length];
-	for (int i = 0; i < values.length; i++) {
-	    result[i] = (values[i] == null) ? null : values[i].getClass();
-	}
-	return result;
+        Class<?>[] result = new Class<?>[values.length];
+        for (int i = 0; i < values.length; i++) {
+            result[i] = (values[i] == null) ? null : values[i].getClass();
+        }
+        return result;
     }
 
     /**
@@ -668,29 +668,29 @@ public class LogicUtil {
      * @param <E> element item type
      */
     public static interface ItemSynchronizer<V, E> {
-	/**
-	 * Checks whether a given value belong to a certain item
-	 * 
-	 * @param item  to check
-	 * @param value to compare
-	 * @return True if the item belongs to the value, False if not
-	 */
-	public boolean isItem(E item, V value);
+        /**
+         * Checks whether a given value belong to a certain item
+         * 
+         * @param item  to check
+         * @param value to compare
+         * @return True if the item belongs to the value, False if not
+         */
+        public boolean isItem(E item, V value);
 
-	/**
-	 * Called when a new item needs to be added to the synchronized list
-	 * 
-	 * @param value to add
-	 * @return result entry to be added to the synchronized list
-	 */
-	public E onAdded(V value);
+        /**
+         * Called when a new item needs to be added to the synchronized list
+         * 
+         * @param value to add
+         * @return result entry to be added to the synchronized list
+         */
+        public E onAdded(V value);
 
-	/**
-	 * Called when an item is about to be removed from the synchronized list
-	 * 
-	 * @param item to be removed
-	 */
-	public void onRemoved(E item);
+        /**
+         * Called when an item is about to be removed from the synchronized list
+         * 
+         * @param item to be removed
+         */
+        public void onRemoved(E item);
     }
 
     /**
@@ -704,8 +704,8 @@ public class LogicUtil {
      * @return True if the synchronized list changed, False if not
      */
     public static <V, E> boolean synchronizeList(List<E> list, Collection<? extends V> values,
-	    ItemSynchronizer<V, E> synchronizer) {
-	return synchronizeList(list, (Iterable<? extends V>) values, synchronizer);
+            ItemSynchronizer<V, E> synchronizer) {
+        return synchronizeList(list, (Iterable<? extends V>) values, synchronizer);
     }
 
     /**
@@ -719,60 +719,60 @@ public class LogicUtil {
      * @return True if the synchronized list changed, False if not
      */
     public static <V, E> boolean synchronizeList(List<E> list, Iterable<? extends V> values,
-	    ItemSynchronizer<V, E> synchronizer) {
-	boolean has_changes = false;
-	Iterator<? extends V> value_iter = values.iterator();
-	ListIterator<E> item_iter = list.listIterator();
-	while (value_iter.hasNext()) {
-	    V value = value_iter.next();
+            ItemSynchronizer<V, E> synchronizer) {
+        boolean has_changes = false;
+        Iterator<? extends V> value_iter = values.iterator();
+        ListIterator<E> item_iter = list.listIterator();
+        while (value_iter.hasNext()) {
+            V value = value_iter.next();
 
-	    // Add a new item at the end of the list
-	    if (!item_iter.hasNext()) {
-		item_iter.add(synchronizer.onAdded(value));
-		has_changes = true;
-		continue;
-	    }
+            // Add a new item at the end of the list
+            if (!item_iter.hasNext()) {
+                item_iter.add(synchronizer.onAdded(value));
+                has_changes = true;
+                continue;
+            }
 
-	    // Verify the next item matches the value
-	    E item = item_iter.next();
-	    if (synchronizer.isItem(item, value)) {
-		continue;
-	    }
+            // Verify the next item matches the value
+            E item = item_iter.next();
+            if (synchronizer.isItem(item, value)) {
+                continue;
+            }
 
-	    // Remember the current iterating position when restoring
-	    // Find the item in the list. If it exists, remove it and add it to the front
-	    // If not found, create a new item at that index
-	    int old_index = item_iter.previousIndex();
-	    while (true) {
-		if (item_iter.hasNext()) {
-		    item = item_iter.next();
-		    if (synchronizer.isItem(item, value)) {
-			item_iter.remove();
-			break;
-		    }
-		} else {
-		    item = null;
-		    break;
-		}
-	    }
-	    item_iter = list.listIterator(old_index);
-	    if (item == null) {
-		item_iter.add(synchronizer.onAdded(value));
-	    } else {
-		item_iter.add(item);
-	    }
-	    has_changes = true;
-	}
+            // Remember the current iterating position when restoring
+            // Find the item in the list. If it exists, remove it and add it to the front
+            // If not found, create a new item at that index
+            int old_index = item_iter.previousIndex();
+            while (true) {
+                if (item_iter.hasNext()) {
+                    item = item_iter.next();
+                    if (synchronizer.isItem(item, value)) {
+                        item_iter.remove();
+                        break;
+                    }
+                } else {
+                    item = null;
+                    break;
+                }
+            }
+            item_iter = list.listIterator(old_index);
+            if (item == null) {
+                item_iter.add(synchronizer.onAdded(value));
+            } else {
+                item_iter.add(item);
+            }
+            has_changes = true;
+        }
 
-	// Remove all items that are past the items list
-	while (item_iter.hasNext()) {
-	    E item = item_iter.next();
-	    synchronizer.onRemoved(item);
-	    item_iter.remove();
-	    has_changes = true;
-	}
+        // Remove all items that are past the items list
+        while (item_iter.hasNext()) {
+            E item = item_iter.next();
+            synchronizer.onRemoved(item);
+            item_iter.remove();
+            has_changes = true;
+        }
 
-	return has_changes;
+        return has_changes;
     }
 
     /**
@@ -795,44 +795,44 @@ public class LogicUtil {
      * @return True if the synchronized collection changed, False if not
      */
     public static <E> boolean synchronizeUnordered(Collection<E> collection, Collection<E> values,
-	    ItemSynchronizer<E, E> synchronizer) {
-	boolean changed = false;
+            ItemSynchronizer<E, E> synchronizer) {
+        boolean changed = false;
 
-	// If values are empty, clear the set and do nothing more
-	if (values.isEmpty()) {
-	    if (!collection.isEmpty()) {
-		for (E old_value : collection) {
-		    synchronizer.onRemoved(old_value);
-		}
-		collection.clear();
-		return true;
-	    }
-	    return false;
-	}
+        // If values are empty, clear the set and do nothing more
+        if (values.isEmpty()) {
+            if (!collection.isEmpty()) {
+                for (E old_value : collection) {
+                    synchronizer.onRemoved(old_value);
+                }
+                collection.clear();
+                return true;
+            }
+            return false;
+        }
 
-	// Remove elements from the set that do not exist in the values
-	Iterator<E> iter = collection.iterator();
-	while (iter.hasNext()) {
-	    E old_value = iter.next();
-	    if (!values.contains(old_value)) {
-		synchronizer.onRemoved(old_value);
-		iter.remove();
-		changed = true;
-	    }
-	}
+        // Remove elements from the set that do not exist in the values
+        Iterator<E> iter = collection.iterator();
+        while (iter.hasNext()) {
+            E old_value = iter.next();
+            if (!values.contains(old_value)) {
+                synchronizer.onRemoved(old_value);
+                iter.remove();
+                changed = true;
+            }
+        }
 
-	// If the values set is larger than the Set, add the new items to the Set
-	if (values.size() > collection.size()) {
-	    for (E new_value : values) {
-		if (!collection.contains(new_value)) {
-		    collection.add(synchronizer.onAdded(new_value));
-		    changed = true;
-		}
-	    }
-	}
+        // If the values set is larger than the Set, add the new items to the Set
+        if (values.size() > collection.size()) {
+            for (E new_value : values) {
+                if (!collection.contains(new_value)) {
+                    collection.add(synchronizer.onAdded(new_value));
+                    changed = true;
+                }
+            }
+        }
 
-	// Done.
-	return changed;
+        // Done.
+        return changed;
     }
 
 }
