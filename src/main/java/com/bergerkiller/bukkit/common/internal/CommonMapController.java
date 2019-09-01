@@ -40,6 +40,7 @@ import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
 import org.bukkit.event.world.WorldLoadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.plugin.Plugin;
@@ -49,7 +50,6 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.collections.ImplicitlySharedList;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
@@ -87,10 +87,8 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
 public class CommonMapController implements PacketListener, Listener {
-    // Temporary ItemFrame buffer to avoid memory allocations / list resizes
-    private World itemFrameCacheWorld = null;
-    private boolean itemFrameCacheDirty = true;
-    private final ImplicitlySharedList<ItemFrame> itemFrameCache = new ImplicitlySharedList<ItemFrame>();
+    // Stores cached thread-safe lists of item frames by world
+    private final HashMap<World, ImplicitlySharedSet<ItemFrame> > worldItemFrames = new HashMap<World, ImplicitlySharedSet<ItemFrame> >();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
@@ -334,6 +332,7 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
         startedTasks.add(new MapInputUpdater(plugin).start(1, 1));
         startedTasks.add(new CachedMapItemCleaner(plugin).start(100, CACHED_ITEM_CLEAN_INTERVAL));
+        startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
 
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
@@ -672,7 +671,7 @@ public class CommonMapController implements PacketListener, Listener {
     protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
-            resetItemFrameCache(frame.getWorld());
+            getItemFrameSet(frame.getWorld()).add(frame);
             onAddItemFrame(frame);
         }
     }
@@ -681,7 +680,7 @@ public class CommonMapController implements PacketListener, Listener {
     protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
-            resetItemFrameCache(frame.getWorld());
+            getItemFrameSet(frame.getWorld()).remove(frame);
             ItemFrameInfo info = itemFrames.get(frame.getEntityId());
             if (info != null) {
                 info.removed = true;
@@ -691,10 +690,14 @@ public class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
-        resetItemFrameCache(event.getWorld());
-        for (ItemFrame frame : iterateItemFrames(event.getWorld())) {
+        for (ItemFrame frame : initItemFrameSetOfWorld(event.getWorld()).cloneAsIterable()) {
             onAddItemFrame(frame);
         }
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+    protected void onWorldUnload(WorldUnloadEvent event) {
+        this.deinitItemFrameSetOfWorld(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
@@ -1669,6 +1672,24 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
+    // Runs every now and then to reset and refresh the by-world item frame sets
+    // This makes sure bugs or glitches don't cause item frames to stay in there forever
+    public class ByWorldItemFrameSetRefresher extends Task {
+
+        public ByWorldItemFrameSetRefresher(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            Collection<World> worlds = Bukkit.getWorlds();
+            deinitItemFrameListForWorldsNotIn(worlds);
+            for (World world : worlds) {
+                initItemFrameSetOfWorld(world);
+            }
+        }
+    }
+
     /**
      * An item that sits around in memory while players in creative mode are moving the item around.
      * 
@@ -1883,35 +1904,49 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private final void resetItemFrameCache(World world) {
-        if (!itemFrameCacheDirty && world == itemFrameCacheWorld) {
-            itemFrameCacheWorld = null;
-            itemFrameCacheDirty = true;
-            itemFrameCache.clear();
+    private final void deinitItemFrameListForWorldsNotIn(Collection<World> worlds) {
+        synchronized (this.worldItemFrames) {
+            Iterator<World> iter = this.worldItemFrames.keySet().iterator();
+            while (iter.hasNext()) {
+                if (!worlds.contains(iter.next())) {
+                    iter.remove();
+                }
+            }
+        }
+    }
+
+    private final void deinitItemFrameSetOfWorld(World world) {
+        synchronized (this.worldItemFrames) {
+            this.worldItemFrames.remove(world);
+        }
+    }
+
+    private final ImplicitlySharedSet<ItemFrame> initItemFrameSetOfWorld(World world) {
+        ImplicitlySharedSet<ItemFrame> itemFrames = new ImplicitlySharedSet<ItemFrame>();
+        for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
+            if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
+                itemFrames.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
+            }
+        }
+        synchronized (this.worldItemFrames) {
+            this.worldItemFrames.put(world, itemFrames);
+        }
+        return itemFrames;
+    }
+
+    private final ImplicitlySharedSet<ItemFrame> getItemFrameSet(World world) {
+        synchronized (this.worldItemFrames) {
+            ImplicitlySharedSet<ItemFrame> set = this.worldItemFrames.get(world);
+            if (set == null) {
+                set = new ImplicitlySharedSet<ItemFrame>();
+                this.worldItemFrames.put(world, set);
+            }
+            return set;
         }
     }
 
     private final Iterable<ItemFrame> iterateItemFrames(World world) {
-        // Not using this, because it creates a nasty temporary List internally
-        // return world.getEntitiesByClass(ItemFrame.class);
-
-        // Reset cache when world differs
-        if (!itemFrameCacheDirty && itemFrameCacheWorld != world) {
-            resetItemFrameCache(itemFrameCacheWorld);
-        }
-
-        // Is regenerated here when empty
-        // Cache is cleared whenever an ItemFrame is added or removed on the server
-        if (itemFrameCacheDirty) {
-            itemFrameCacheDirty = false;
-            itemFrameCacheWorld = world;
-            for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
-                if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
-                    itemFrameCache.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
-                }
-            }
-        }
-        return itemFrameCache.cloneAsIterable();
+        return getItemFrameSet(world).cloneAsIterable();
     }
 
     /**
