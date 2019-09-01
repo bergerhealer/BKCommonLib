@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
+import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
@@ -544,6 +545,7 @@ public class CommonPlugin extends PluginBase {
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
+        startedTasks.add(new CreaturePreSpawnEventHandlerDetectorTask(this).start(0, 20));
 
         // Some servers do not have an Entity Remove Queue.
         // For those servers, we handle them using our own system
@@ -562,8 +564,12 @@ public class CommonPlugin extends PluginBase {
         });
 
         // Register listeners and hooks
+        if (CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
+            for (World world : WorldUtil.getWorlds()) {
+                ChunkGeneratorHook.hook(world);
+            }
+        }
         for (World world : WorldUtil.getWorlds()) {
-            ChunkGeneratorHook.hook(world);
             notifyWorldAdded(world);
         }
 
@@ -758,6 +764,28 @@ public class CommonPlugin extends PluginBase {
             if (CommonPlugin.hasInstance()) {
                 for (CommonPlayerMeta meta : CommonPlugin.getInstance().playerVisibleChunks.values()) {
                     meta.syncRemoveQueue();
+                }
+            }
+        }
+    }
+
+    private static class CreaturePreSpawnEventHandlerDetectorTask extends Task {
+        private boolean _creaturePreSpawnEventHasHandlers;
+
+        public CreaturePreSpawnEventHandlerDetectorTask(JavaPlugin plugin) {
+            super(plugin);
+            this._creaturePreSpawnEventHasHandlers = CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList());
+        }
+
+        @Override
+        public void run() {
+            boolean hasHandlers = CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList());
+            if (hasHandlers != this._creaturePreSpawnEventHasHandlers) {
+                this._creaturePreSpawnEventHasHandlers = hasHandlers;
+                if (hasHandlers) {
+                    for (World world : WorldUtil.getWorlds()) {
+                        ChunkGeneratorHook.hook(world);
+                    }
                 }
             }
         }
