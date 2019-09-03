@@ -7,17 +7,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.server.PaperSpigotServer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -60,20 +59,28 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             accessListField = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "u", List.class));
         }
 
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
-            Class<?> type;
-            if (CommonBootstrap.getCommonServer() instanceof PaperSpigotServer) {
-                type = Set.class;
-            } else {
-                type = List.class;
+        {
+            java.lang.reflect.Field entityRemoveQueueField = null;
+            try {
+                if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("g");
+                } else if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
+                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("f");
+                } else {
+                    entityRemoveQueueField = WorldHandle.T.getType().getDeclaredField("g");
+                }
+                if (!Collection.class.isAssignableFrom(entityRemoveQueueField.getType())) {
+                    Logging.LOGGER_REFLECTION.warning("Entity remove queue field " + entityRemoveQueueField.toString() + " is of incompatible type");
+                    entityRemoveQueueField = null;
+                }
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.warning("Entity remove queue field not found");
             }
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-                this.entityRemoveQueue = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "g", type));
+            if (entityRemoveQueueField == null) {
+                this.entityRemoveQueue = SafeField.createNull("World Entity Remove Queue");
             } else {
-                this.entityRemoveQueue = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "f", type));
+                this.entityRemoveQueue = new SafeField<Collection<Object>>(entityRemoveQueueField);
             }
-        } else {
-            this.entityRemoveQueue = CommonUtil.unsafeCast(SafeField.create(WorldHandle.T.getType(), "g", List.class));
         }
     }
 
@@ -141,9 +148,11 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);
 
             // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
-            Collection<?> removeQueue = this.handler.entityRemoveQueue.get(HandleConversion.toWorldHandle(world));
-            if (removeQueue != null && removeQueue.contains(entity)) {
-                CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
+            if (this.handler.entityRemoveQueue.isValid()) {
+                Collection<?> removeQueue = this.handler.entityRemoveQueue.get(HandleConversion.toWorldHandle(world));
+                if (removeQueue != null && removeQueue.contains(entity)) {
+                    CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
+                }
             }
         }
     }
