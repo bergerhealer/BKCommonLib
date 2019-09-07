@@ -16,6 +16,11 @@ public abstract class EntityAddRemoveHandler {
         }
     }
 
+    /**
+     * Processes pending events at a time where this is safe to do
+     */
+    public abstract void processEvents();
+
     public abstract void hook(World world);
 
     public abstract void unhook(World world);

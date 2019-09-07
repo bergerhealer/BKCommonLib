@@ -143,9 +143,13 @@ public class CommonPlugin extends PluginBase {
         TIMINGS.setActive(!this.timingsListeners.isEmpty());
     }
 
-    public void notifyAdded(org.bukkit.World world, org.bukkit.entity.Entity e) {
+    // called early, too soon to fire an EntityAddEvent, but soon enough to do bookkeeping
+    public void notifyAddedEarly(org.bukkit.World world, org.bukkit.entity.Entity e) {
         // Remove from mapping
         this.entitiesRemovedFromServer.remove(e);
+    }
+
+    public void notifyAdded(org.bukkit.World world, org.bukkit.entity.Entity e) {
         // Event
         CommonUtil.callEvent(new EntityAddEvent(world, e));
     }
@@ -668,6 +672,10 @@ public class CommonPlugin extends PluginBase {
 
         @Override
         public void run() {
+            // Make sure all entity add events have been notified
+            // This runs every tick, which guarantees processEvents() is called at least once per tick
+            EntityAddRemoveHandler.INSTANCE.processEvents();
+
             CommonPlugin plugin = getInstance();
             if (plugin.entitiesRemovedFromServer.isEmpty()) {
                 return;

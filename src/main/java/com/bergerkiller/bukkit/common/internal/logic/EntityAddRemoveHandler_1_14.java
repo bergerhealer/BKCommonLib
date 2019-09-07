@@ -2,9 +2,11 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 
@@ -13,7 +15,6 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
@@ -30,9 +31,17 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
  */
 public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private final SafeField<?> entitiesByIdField;
+    private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
 
     public EntityAddRemoveHandler_1_14() {
         this.entitiesByIdField = SafeField.create(WorldServerHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+    }
+
+    @Override
+    public void processEvents() {
+        for (EntitiesByUUIDMapHook hook : hooks) {
+            hook.processEvents();
+        }
     }
 
     @Override
@@ -41,7 +50,9 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
         Map<UUID, Object> base = (Map<UUID, Object>) WorldServerHandle.T.entitiesByUUID.raw.get(nmsWorldHandle);
         if (!(base instanceof EntitiesByUUIDMapHook)) {
-            WorldServerHandle.T.entitiesByUUID.raw.set(nmsWorldHandle, new EntitiesByUUIDMapHook(world, base));
+            EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(world, base);
+            WorldServerHandle.T.entitiesByUUID.raw.set(nmsWorldHandle, hook);
+            hooks.add(hook);
         }
     }
 
@@ -51,6 +62,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         Object value = WorldServerHandle.T.entitiesByUUID.raw.get(nmsWorldHandle);
         if (value instanceof EntitiesByUUIDMapHook) {
             WorldServerHandle.T.entitiesByUUID.raw.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
+            hooks.remove(value);
         }
     }
 
@@ -63,6 +75,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private static final class EntitiesByUUIDMapHook implements Map<UUID, Object> {
         private final World world;
         private final Map<UUID, Object> base;
+        private final Queue<org.bukkit.entity.Entity> pendingAddEvents = new LinkedList<org.bukkit.entity.Entity>();
 
         public EntitiesByUUIDMapHook(World world, Map<UUID, Object> base) {
             this.world = world;
@@ -73,14 +86,16 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             return this.base;
         }
 
+        public void processEvents() {
+            while (!pendingAddEvents.isEmpty()) {
+                CommonPlugin.getInstance().notifyAdded(world, pendingAddEvents.poll());
+            }
+        }
+
         private void onAdded(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            CommonUtil.nextTick(new Runnable() {
-                @Override
-                public void run() {
-                    CommonPlugin.getInstance().notifyAdded(world, bEntity);
-                }
-            });
+            CommonPlugin.getInstance().notifyAddedEarly(world, bEntity);
+            pendingAddEvents.add(bEntity);
         }
 
         private void onRemoved(Object entity) {

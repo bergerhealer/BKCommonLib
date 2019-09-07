@@ -85,6 +85,11 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
+    public void processEvents() {
+        // Unused
+    }
+
+    @Override
     public void hook(World world) {
         List<Object> accessList = this.accessListField.get(Conversion.toWorldHandle.convert(world));
         for (Object o : accessList) {
@@ -139,7 +144,9 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
         @HookMethod("public void onEntityAdded:a(Entity entity)")
         public void onEntityAdded(Object entity) {
-            CommonPlugin.getInstance().notifyAdded(world, WrapperConversion.toEntity(entity));
+            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
+            CommonPlugin.getInstance().notifyAddedEarly(world, bEntity);
+            CommonPlugin.getInstance().notifyAdded(world, bEntity);
         }
 
         @HookMethod("public void onEntityRemoved:b(Entity entity)")

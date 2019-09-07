@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle;
@@ -64,6 +65,8 @@ public class EntityUtil extends EntityPropertyUtil {
         nmsworld.getEntityTracker().stopTracking(entity);
         // Add the entity to the world
         nmsworld.addEntity(nmsentity);
+        // Process add-related events right now
+        EntityAddRemoveHandler.INSTANCE.processEvents();
     }
 
     /**
