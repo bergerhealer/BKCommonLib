@@ -1,16 +1,22 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.bukkit.block.Block;
+
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
-
-import org.bukkit.block.Block;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.Map.Entry;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations
@@ -63,13 +69,11 @@ public class LogicUtil {
     }
 
     /**
-     * Checks if both String values are null or the values equal each other,
-     * ignoring case
+     * Checks if both String values are null or the values equal each other, ignoring case
      *
      * @param value1 to use
      * @param value2 to use
-     * @return True if value1 and value2 equal, ignoring case, or are both null,
-     *         False if not
+     * @return True if value1 and value2 equal, ignoring case, or are both null, False if not
      */
     public static boolean bothNullOrEqualIgnoreCase(String value1, String value2) {
         return value1 == null ? value2 == null : value1.equalsIgnoreCase(value2);
@@ -172,8 +176,8 @@ public class LogicUtil {
     }
 
     /**
-     * Appends one or more elements to an array This method allocates a new Array of
-     * the same type as the old array, with the size of array + values.
+     * Appends one or more elements to an array This method allocates a new Array of the same type as the old array, with
+     * the size of array + values.
      *
      * @param array  input array to append to
      * @param values to append to array
@@ -194,9 +198,8 @@ public class LogicUtil {
     }
 
     /**
-     * Allocates a new array of the same length and writes the contents to this new
-     * array. Unlike {@link #cloneAll(Object[])}, this method does not individually
-     * clone the elements
+     * Allocates a new array of the same length and writes the contents to this new array. Unlike
+     * {@link #cloneAll(Object[])}, this method does not individually clone the elements
      *
      * @param array to re-allocate as a new array
      * @return new array with the contents of the input array
@@ -233,8 +236,7 @@ public class LogicUtil {
                     try {
                         cloneMethod = value.getClass().getMethod("clone");
                     } catch (NoSuchMethodException | SecurityException e) {
-                        throw new IllegalArgumentException(
-                                "Object of type " + value.getClass().getName() + " can not be cloned");
+                        throw new IllegalArgumentException("Object of type " + value.getClass().getName() + " can not be cloned");
                     }
                 }
                 _cloneMethodCache.put(value.getClass(), cloneMethod);
@@ -277,8 +279,7 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the Class instance representing an array of the component type
-     * specified. For example:<br>
+     * Obtains the Class instance representing an array of the component type specified. For example:<br>
      * - Integer.class -> Integer[].class<br>
      * - int.class -> int[].class
      *
@@ -298,8 +299,7 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the Class instance representing an array of the component type
-     * specified. For example:<br>
+     * Obtains the Class instance representing an array of the component type specified. For example:<br>
      * - Integer.class -> Integer[].class<br>
      * - int.class -> int[].class
      *
@@ -316,8 +316,7 @@ public class LogicUtil {
     }
 
     /**
-     * Tries to get a specific element from a list. The default value is returned
-     * when:<br>
+     * Tries to get a specific element from a list. The default value is returned when:<br>
      * - The list is null<br>
      * - The list index is out of bounds
      *
@@ -331,8 +330,7 @@ public class LogicUtil {
     }
 
     /**
-     * Tries to get a specific element from an array. The default value is returned
-     * when:<br>
+     * Tries to get a specific element from an array. The default value is returned when:<br>
      * - The array is null<br>
      * - The array index is out of bounds
      *
@@ -361,8 +359,7 @@ public class LogicUtil {
      * Converts a collection to an Array
      *
      * @param collection to convert
-     * @param type       of the collection and the array to return (can not be
-     *                   primitive)
+     * @param type       of the collection and the array to return (can not be primitive)
      * @return new Array containing the elements in the collection
      */
     public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
@@ -409,9 +406,8 @@ public class LogicUtil {
     }
 
     /**
-     * Removes a single item from an array, returning a new array of size length-1
-     * with the element removed. If the element could not be found in the input
-     * array, the input array is returned unchanged and no copy is created.
+     * Removes a single item from an array, returning a new array of size length-1 with the element removed. If the element
+     * could not be found in the input array, the input array is returned unchanged and no copy is created.
      * 
      * @param input array
      * @param value in the array to remove
@@ -445,28 +441,24 @@ public class LogicUtil {
     }
 
     /**
-     * Removes or adds an element from/to a Collection, and returns whether
-     * something has changed.
+     * Removes or adds an element from/to a Collection, and returns whether something has changed.
      *
      * @param collection to add or remove an element from
      * @param value      to add or remove
      * @param add        option: True to add, False to remove
-     * @return True if the collection changed (element removed or added), False if
-     *         not
+     * @return True if the collection changed (element removed or added), False if not
      */
     public static boolean addOrRemove(BlockSet collection, Block value, boolean add) {
         return add ? collection.add(value) : collection.remove(value);
     }
 
     /**
-     * Removes or adds an element from/to a Collection, and returns whether
-     * something has changed.
+     * Removes or adds an element from/to a Collection, and returns whether something has changed.
      *
      * @param collection to add or remove an element from
      * @param value      to add or remove
      * @param add        option: True to add, False to remove
-     * @return True if the collection changed (element removed or added), False if
-     *         not
+     * @return True if the collection changed (element removed or added), False if not
      */
     public static <T> boolean addOrRemove(Collection<T> collection, T value, boolean add) {
         return add ? collection.add(value) : collection.remove(value);
@@ -609,9 +601,8 @@ public class LogicUtil {
     }
 
     /**
-     * Skips elements from an iterator by calling 'next' a given amount of times (if
-     * possible). If the count exceeds the amount of elements the iterator provides,
-     * further elements are ignored. In that case, calling
+     * Skips elements from an iterator by calling 'next' a given amount of times (if possible). If the count exceeds the
+     * amount of elements the iterator provides, further elements are ignored. In that case, calling
      * {@link Iterator#hasNext()} would yield false.
      *
      * @param iterator to skip
@@ -626,9 +617,8 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the key at which a specific value is mapped to in a Map. This is
-     * essentially the reverse key lookup in a map, and is thus slow. For 'BiMap'
-     * maps, the inverse is used to obtain the key faster.
+     * Obtains the key at which a specific value is mapped to in a Map. This is essentially the reverse key lookup in a map,
+     * and is thus slow. For 'BiMap' maps, the inverse is used to obtain the key faster.
      *
      * @param map   to check
      * @param value to look for
@@ -661,8 +651,7 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the items from one type to another, handling comparison, adding,
-     * and removal
+     * Synchronizes the items from one type to another, handling comparison, adding, and removal
      * 
      * @param <V> value type bound to the element
      * @param <E> element item type
@@ -694,32 +683,28 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the contents of a list by taking over the items in a collection
-     * of values. The items will be inserted into the list in the same order as the
-     * collection.
+     * Synchronizes the contents of a list by taking over the items in a collection of values. The items will be inserted
+     * into the list in the same order as the collection.
      * 
      * @param list         to synchronize
      * @param values       to synchronize in the list
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
-    public static <V, E> boolean synchronizeList(List<E> list, Collection<? extends V> values,
-            ItemSynchronizer<V, E> synchronizer) {
+    public static <V, E> boolean synchronizeList(List<E> list, Collection<? extends V> values, ItemSynchronizer<V, E> synchronizer) {
         return synchronizeList(list, (Iterable<? extends V>) values, synchronizer);
     }
 
     /**
-     * Synchronizes the contents of a list by taking over the items in an iterable
-     * of values. The items will be inserted into the list in the same order as the
-     * collection.
+     * Synchronizes the contents of a list by taking over the items in an iterable of values. The items will be inserted
+     * into the list in the same order as the collection.
      * 
      * @param list         to synchronize
      * @param values       to synchronize in the list, iterated only ones
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
-    public static <V, E> boolean synchronizeList(List<E> list, Iterable<? extends V> values,
-            ItemSynchronizer<V, E> synchronizer) {
+    public static <V, E> boolean synchronizeList(List<E> list, Iterable<? extends V> values, ItemSynchronizer<V, E> synchronizer) {
         boolean has_changes = false;
         Iterator<? extends V> value_iter = values.iterator();
         ListIterator<E> item_iter = list.listIterator();
@@ -776,26 +761,20 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the contents of a collection by taking over the items in another
-     * collection of values. The items will not necessarily be inserted into the
-     * collection in the same order as the collection. Unlike
-     * {@link #synchronizeList(list, values, synchronizer)} this method will not
-     * call the values {@link Collection#iterator()} method unless absolutely
-     * needed.<br>
+     * Synchronizes the contents of a collection by taking over the items in another collection of values. The items will
+     * not necessarily be inserted into the collection in the same order as the collection. Unlike
+     * {@link #synchronizeList(list, values, synchronizer)} this method will not call the values
+     * {@link Collection#iterator()} method unless absolutely needed.<br>
      * <br>
-     * Because this logic depends on the {@link Collection#contains(o)} method, the
-     * {@link ItemSynchronizer#isItem(o1, o2)} is not used. The input collection and
-     * values collection must hold the same value types.
+     * Because this logic depends on the {@link Collection#contains(o)} method, the {@link ItemSynchronizer#isItem(o1, o2)}
+     * is not used. The input collection and values collection must hold the same value types.
      * 
      * @param collection   to synchronize
-     * @param values       to synchronize in the collection, iterator() call is
-     *                     avoided when possible
-     * @param synchronizer to use when synchronizing the collection with the
-     *                     collection
+     * @param values       to synchronize in the collection, iterator() call is avoided when possible
+     * @param synchronizer to use when synchronizing the collection with the collection
      * @return True if the synchronized collection changed, False if not
      */
-    public static <E> boolean synchronizeUnordered(Collection<E> collection, Collection<E> values,
-            ItemSynchronizer<E, E> synchronizer) {
+    public static <E> boolean synchronizeUnordered(Collection<E> collection, Collection<E> values, ItemSynchronizer<E, E> synchronizer) {
         boolean changed = false;
 
         // If values are empty, clear the set and do nothing more
