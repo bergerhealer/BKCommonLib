@@ -1,8 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
@@ -11,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -21,6 +26,8 @@ public class CommonPlayerMeta {
     private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
     private final List<Integer> removeQueue;
+    private List<EntityNetworkController<?>> pendingViewerUpdates = Collections.emptyList();
+    private int respawnBlindnessEndTick = 0;
 
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
@@ -51,6 +58,40 @@ public class CommonPlayerMeta {
 
     public Player getPlayer() {
         return playerRef.get();
+    }
+
+    /**
+     * Checks whether this viewer is currently blind because of respawning recently.
+     * If this is the case, the controller will be queued and updateViewer() will be
+     * called once this blindness is over.
+     * 
+     * @param controller to queue if blind
+     * @return True if not blind, False if blind
+     */
+    public boolean respawnBlindnessCheck(EntityNetworkController<?> controller) {
+        if (this.respawnBlindnessEndTick != 0) {
+            int num = this.respawnBlindnessEndTick - CommonUtil.getServerTicks();
+            if (num > 0 && CommonPlugin.hasInstance()) {
+                // Schedule updateViewer() at a later time
+                if (this.pendingViewerUpdates.isEmpty()) {
+                    this.pendingViewerUpdates = new ArrayList<EntityNetworkController<?>>();
+                    new ProcessPendingViewerUpdatesTask().start(num);
+                }
+                this.pendingViewerUpdates.add(controller);
+                return false;
+            } else {
+                this.respawnBlindnessEndTick = 0;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Initiates the blindness a player has while respawning onto a new world.
+     * During this time entity spawn packets may not be received properly.
+     */
+    public void initiateRespawnBlindness() {
+        this.respawnBlindnessEndTick = CommonUtil.getServerTicks() + 5;
     }
 
     @Deprecated
@@ -89,6 +130,31 @@ public class CommonPlayerMeta {
                 visibleChunks.add(chunkX, chunkZ);
             } else {
                 visibleChunks.remove(chunkX, chunkZ);
+            }
+        }
+    }
+
+    private final class ProcessPendingViewerUpdatesTask extends Task {
+
+        public ProcessPendingViewerUpdatesTask() {
+            super(CommonPlugin.getInstance());
+        }
+
+        @Override
+        public void run() {
+            Player viewer = CommonPlayerMeta.this.getPlayer();
+            List<EntityNetworkController<?>> pendingUpdates = CommonPlayerMeta.this.pendingViewerUpdates;
+            CommonPlayerMeta.this.pendingViewerUpdates = Collections.emptyList();
+            if (viewer == null || !viewer.isOnline()) {
+                return;
+            }
+
+            for (EntityNetworkController<?> pending : pendingUpdates) {
+                CommonEntity<?> pendingEntity = pending.getEntity();
+                if (pendingEntity == null || pendingEntity.getWorld() != viewer.getWorld()) {
+                    continue; // not bound or wrong world
+                }
+                pending.updateViewer(viewer);
             }
         }
     }

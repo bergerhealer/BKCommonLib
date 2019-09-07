@@ -63,7 +63,7 @@ public class CommonPlugin extends PluginBase {
      */
     private static CommonPlugin instance;
     public final List<PluginBase> plugins = new ArrayList<>();
-    private EntityMap<Player, CommonPlayerMeta> playerVisibleChunks;
+    private EntityMap<Player, CommonPlayerMeta> playerMetadata;
     private CommonListener listener;
     private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<>();
     private final List<Runnable> nextTickTasks = new ArrayList<>();
@@ -200,10 +200,10 @@ public class CommonPlugin extends PluginBase {
      * @return Player meta data
      */
     public CommonPlayerMeta getPlayerMeta(Player player) {
-        synchronized (playerVisibleChunks) {
-            CommonPlayerMeta meta = playerVisibleChunks.get(player);
+        synchronized (playerMetadata) {
+            CommonPlayerMeta meta = playerMetadata.get(player);
             if (meta == null) {
-                playerVisibleChunks.put(player, meta = new CommonPlayerMeta(player));
+                playerMetadata.put(player, meta = new CommonPlayerMeta(player));
             }
             return meta;
         }
@@ -529,7 +529,7 @@ public class CommonPlugin extends PluginBase {
         eventFactory = new CommonEventFactory();
 
         // Initialize entity map (needs to be here because of CommonPlugin instance needed)
-        playerVisibleChunks = new EntityMap<Player, CommonPlayerMeta>();
+        playerMetadata = new EntityMap<Player, CommonPlayerMeta>();
 
         // Register events and tasks, initialize
         register(listener = new CommonListener());
@@ -770,7 +770,7 @@ public class CommonPlugin extends PluginBase {
         @Override
         public void run() {
             if (CommonPlugin.hasInstance()) {
-                for (CommonPlayerMeta meta : CommonPlugin.getInstance().playerVisibleChunks.values()) {
+                for (CommonPlayerMeta meta : CommonPlugin.getInstance().playerMetadata.values()) {
                     meta.syncRemoveQueue();
                 }
             }

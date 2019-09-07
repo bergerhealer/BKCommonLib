@@ -605,16 +605,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             succ = true;
         }
 
-        if (hasNetworkController) {
-            this.setNetworkController(oldNetworkController);
-        }
-
-        if (!succ) {
-            return false;
-        }
-
         // If there was a passenger, teleport it and let passenger enter again
-        if (passengers.size() > 0) {
+        if (succ && !passengers.isEmpty()) {
             // Teleport the passenger, but ignore the chunk send check so vehicle is properly spawned to all players
             List<org.bukkit.entity.Entity> teleportedPassengers = new ArrayList<org.bukkit.entity.Entity>();
             this.handle.setIgnoreChunkCheck(true);
@@ -622,7 +614,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             float yawChange = location.getYaw() - oldLocation.getYaw();
             float pitchChange = location.getPitch() - oldLocation.getPitch();
             for (org.bukkit.entity.Entity passenger : passengers) {
-
                 // Figure out a suitable location yaw and pitch based on what it was before
                 // We must make sure that when players are mounted, they still face the same way relatively
                 Location passengerOld = passenger.getLocation();
@@ -634,10 +625,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                     teleportedPassengers.add(passenger);
                 }
             };
-
             this.handle.setIgnoreChunkCheck(false);
 
-            if (teleportedPassengers.size() > 0) {
+            if (!teleportedPassengers.isEmpty()) {
                 if (hasNetworkController) {
                     // network controller is used; simply set the passengers of the entity handle
                     List<EntityHandle> passengerHandles = new ArrayList<EntityHandle>(teleportedPassengers.size());
@@ -653,7 +643,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         }
 
-        return true;
+        // Set network controller last, to make sure passenger mounting packets are sent properly
+        if (hasNetworkController) {
+            setNetworkController(oldNetworkController);
+        }
+
+        return succ;
     }
 
     /**
