@@ -66,10 +66,17 @@ public class ParseUtil {
         MAT_NAME_MAP.put("LEGACY_STONEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
         MAT_NAME_MAP.put("LEGACY_COBBLEWALL", getMaterial("LEGACY_COBBLE_WALL"));
         MAT_NAME_MAP.put("LEGACY_STONEWALL", getMaterial("LEGACY_COBBLE_WALL"));
+        MAT_NAME_MAP.put("LEGACY_SLAB", getMaterial("LEGACY_STEP"));
+        MAT_NAME_MAP.put("LEGACY_DOUBLE_SLAB", getMaterial("LEGACY_DOUBLE_STEP"));
+        MAT_NAME_MAP.put("LEGACY_STONE_BRICK", getMaterial("LEGACY_SMOOTH_BRICK"));
 
         // Material by name aliases
+        if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            MAT_ALIASES.add("SLAB", "STEP");
+            MAT_ALIASES.add("STONEBRICK", "SMOOTHBRICK");
+        }
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-        MAT_ALIASES.add("SHOVEL", "SPADE").add("SLAB", "STEP").add("GOLDEN", "GOLD").add("PLANK", "WOOD").add("WOODEN", "WOOD");
+        MAT_ALIASES.add("SHOVEL", "SPADE").add("GOLDEN", "GOLD").add("PLANK", "WOOD").add("WOODEN", "WOOD");
         MAT_ALIASES.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
         MAT_ALIASES.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
         MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");

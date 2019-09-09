@@ -413,6 +413,12 @@ public class ItemMaterialTest {
             }, new ItemStack[] {
                     ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
             });
+            // OAK_SLAB since 1.13
+            testItemParser("OAK_SLAB", new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("OAK_SLAB"), 1)
+            }, new ItemStack[] {
+                    ItemUtil.createItem(getMaterial("AIR"), 1)
+            });
         } else {
             // Only legacy material names work
             // Data value specified, should match red wool only
