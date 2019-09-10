@@ -289,6 +289,12 @@ public class CommonEntityType {
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
         entity.loc.set(entity.last.set(location));
 
+        // Refreshes bounding box when the constructor without x/y/z is called
+        // The constructor with x/y/z parameters does this automatically
+        if (!this.hasWorldCoordConstructor) {
+            entity.setPosition(location.getX(), location.getY(), location.getZ());
+        }
+
         // Debug: verify the 'dimension' field is set for the Entity
         if (DimensionManagerHandle.T.isAvailable()) {
             Object raw_dim = EntityHandle.T.dimension.raw.get(entity.getHandle());
