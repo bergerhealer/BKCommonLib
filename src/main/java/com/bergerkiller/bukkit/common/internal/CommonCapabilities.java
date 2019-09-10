@@ -154,6 +154,11 @@ public class CommonCapabilities {
     public static final boolean HAS_MATERIAL_SIGN_TYPES = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 
     /**
+     * Since Minecraft 1.14 the default constructor for entities includes an EntityTypes<?> instance as a first parameter
+     */
+    public static final boolean ENTITY_USES_ENTITYTYPES_IN_CONSTRUCTOR = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
      * Since Minecraft 1.14 it is no longer possible to cancel the chunk unload event
      */
     public static final boolean CAN_CANCEL_CHUNK_UNLOAD_EVENT = CommonBootstrap.evaluateMCVersion("<=", "1.13.2");

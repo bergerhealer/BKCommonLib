@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonHumanEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -48,6 +49,7 @@ public class CommonEntityType {
     public final ClassTemplate<?> commonType;
     public final ClassTemplate<?> bukkitType;
     private final SafeConstructor<?> commonConstructor;
+    private final boolean hasWorldCoordConstructor;
     public final EntityType entityType;
     public final int entityTypeId;
     public final int objectTypeId;
@@ -64,6 +66,7 @@ public class CommonEntityType {
             this.commonType = ClassTemplate.create(CommonEntity.class);
             this.bukkitType = ClassTemplate.create(Entity.class);
             this.commonConstructor = this.commonType.getConstructor(Entity.class);
+            this.hasWorldCoordConstructor = false;
             this.entityTypeId = -1;
             this.nmsEntityType = null;
             this.objectTypeId = -1;
@@ -195,6 +198,18 @@ public class CommonEntityType {
             this.nmsEntityType = null;
         }
 
+        if (nmsType != null) {
+            boolean hasConstructor = false;
+            try {
+                nmsType.getConstructor(CommonUtil.getNMSClass("World"), double.class, double.class, double.class);
+                hasConstructor = true;
+            } catch (Throwable t) {
+            }
+            this.hasWorldCoordConstructor = hasConstructor;
+        } else {
+            this.hasWorldCoordConstructor = false;
+        }
+
         if (EntityTypesHandle.T.getTypeId.isAvailable()) {
             if (this.nmsEntityType != null) {
                 this.objectTypeId = EntityTypesHandle.T.getTypeId.invoke(this.nmsEntityType.getRaw());
@@ -253,9 +268,23 @@ public class CommonEntityType {
 
         EntityHook hook = new EntityHook();
         hook.setStack(new Throwable());
-        Object handle = hook.constructInstance(this.nmsType.getType(), 
-                new Class<?>[] {NMSWorld.T.getType(), double.class, double.class, double.class},
-                new Object[] { Conversion.toWorldHandle.convert(world), x, y, z });
+        Object handle;
+        if (this.hasWorldCoordConstructor) {
+            handle = hook.constructInstance(this.nmsType.getType(),
+                    new Class<?>[] {NMSWorld.T.getType(), double.class, double.class, double.class},
+                    new Object[] { Conversion.toWorldHandle.convert(world), x, y, z });
+        } else if (CommonCapabilities.ENTITY_USES_ENTITYTYPES_IN_CONSTRUCTOR) {
+            if (this.nmsEntityType == null) {
+                throw new IllegalStateException("Type " + this.toString() + " cannot be constructed");
+            }
+            handle = hook.constructInstance(this.nmsType.getType(),
+                    new Class<?>[] {EntityTypesHandle.T.getType(), NMSWorld.T.getType()},
+                    new Object[] { this.nmsEntityType.getRaw(), Conversion.toWorldHandle.convert(world) });
+        } else {
+            handle = hook.constructInstance(this.nmsType.getType(),
+                    new Class<?>[] {NMSWorld.T.getType()},
+                    new Object[] { Conversion.toWorldHandle.convert(world) });
+        }
 
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
         entity.loc.set(entity.last.set(location));
