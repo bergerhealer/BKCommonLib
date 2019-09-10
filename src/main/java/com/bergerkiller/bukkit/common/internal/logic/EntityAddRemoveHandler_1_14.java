@@ -15,6 +15,7 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
@@ -31,10 +32,12 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
  */
 public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private final SafeField<?> entitiesByIdField;
+    private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
 
     public EntityAddRemoveHandler_1_14() {
         this.entitiesByIdField = SafeField.create(WorldServerHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+        this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), "entitiesToAdd", Queue.class));
     }
 
     @Override
@@ -131,8 +134,13 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         @Override
         public Object put(UUID key, Object value) {
             Object rval = this.base.put(key, value);
-            if (value != null) {
-                this.onAdded(value);
+            if (value != rval) {
+                if (rval != null) {
+                    this.onRemoved(rval);
+                }
+                if (value != null) {
+                    this.onAdded(value);
+                }
             }
             return rval;
         }
@@ -183,13 +191,21 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
 
     @Override
     public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
+        // *** Remove from the entities to add queue ***
+        Queue<Object> entitiesToAdd = this.entitiesToAddField.get(oldEntity.getWorld().getRaw());
+        entitiesToAdd.remove(oldEntity.getRaw());
+
         // *** Entities By UUID Map ***
         final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(oldEntity.getWorld().getRaw());
-        entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+        if (!newEntity.equals(entitiesByUUID.get(newEntity.getUniqueID()))) {
+            entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+        }
 
         // *** Entities by Id Map ***
         IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(oldEntity.getWorld().getRaw()));
-        entitiesById.put(oldEntity.getId(), newEntity.getRaw());
+        if (entitiesById.get(oldEntity.getId()) != newEntity.getRaw()) {
+            entitiesById.put(oldEntity.getId(), newEntity.getRaw());
+        }
 
         // *** EntityTrackerEntry ***
         replaceInEntityTracker(newEntity.getId(), newEntity);

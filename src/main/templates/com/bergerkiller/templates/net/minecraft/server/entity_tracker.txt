@@ -32,7 +32,11 @@ class EntityTracker {
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
 #if version >= 1.14
-        return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
+        if (entry == null) {
+            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.remove(entityId);
+        } else {
+            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
+        }
 #else
         #require private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
 
