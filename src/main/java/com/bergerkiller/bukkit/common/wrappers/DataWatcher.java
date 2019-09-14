@@ -25,6 +25,7 @@ import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -166,9 +167,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
-     * Get all watched objects
+     * Get all watched items
      *
-     * @return Watched objects
+     * @return Watched items (immutable)
      */
     public List<Item<?>> getWatchedItems() {
         return getWatchedItems(false);
@@ -178,7 +179,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * Get all watched objects
      *
      * @param unwatch to unwatch all the items before returning them
-     * @return Watched objects
+     * @return Watched objects (immutable)
      */
     public List<Item<?>> getWatchedItems(boolean unwatch) {
         List<?> itemHandles;
@@ -186,6 +187,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             itemHandles = (List<?>) DataWatcherHandle.T.unwatchAndReturnAllWatched.raw.invoke(handle.getRaw());
         } else {
             itemHandles = (List<?>) DataWatcherHandle.T.returnAllWatched.raw.invoke(handle.getRaw());
+        }
+        if (itemHandles == null) {
+            itemHandles = Collections.emptyList();
         }
         return new ConvertingList<Item<?>>(itemHandles, DuplexConversion.dataWatcherItem);
     }
