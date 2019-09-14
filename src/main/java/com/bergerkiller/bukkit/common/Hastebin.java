@@ -86,10 +86,10 @@ public class Hastebin {
                     return;
                 }
 
-                int redirect_limit = 100;
-                while (true) {
-                    // Make the POST request
-                    try {
+                try {
+                    int redirect_limit = 100;
+                    while (--redirect_limit > 0) {
+                        // Make the POST request
                         // Prepare the connection
                         HttpURLConnection con = (HttpURLConnection) document_url.openConnection();
                         con.setRequestMethod("POST");
@@ -131,22 +131,20 @@ public class Hastebin {
                             HastebinUploadResponse response = new Gson().fromJson(reader, HastebinUploadResponse.class);
                             if (response == null || response.key == null) {
                                 complete(result, new UploadResult(false, null, "Server did not respond with a key"));
+                                return;
                             } else {
                                 URL result_url = new URL(root_url.getProtocol(), root_url.getHost(), root_url.getPort(), "/" + response.key);
                                 complete(result, new UploadResult(true, result_url.toString(), null));
+                                return;
                             }
                         }
-                    } catch (IOException ex) {
-                        complete(result, new UploadResult(false, null, "I/O Exception occurred: " + ex.getMessage()));
-                    } catch (Throwable t) {
-                        t.printStackTrace();
-                        complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
                     }
-
-                    if (--redirect_limit == 0) {
-                        complete(result, new UploadResult(false, null, "Maximum number of redirects reached"));
-                        return;
-                    }
+                    complete(result, new UploadResult(false, null, "Maximum number of redirects reached"));
+                } catch (IOException ex) {
+                    complete(result, new UploadResult(false, null, "I/O Exception occurred: " + ex.getMessage()));
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
                 }
             }
         });
