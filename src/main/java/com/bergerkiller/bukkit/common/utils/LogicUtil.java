@@ -1,22 +1,28 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.bukkit.block.Block;
+
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
 
-import org.bukkit.block.Block;
-
-import java.lang.reflect.Array;
-import java.lang.reflect.Method;
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
-    private static final Map<Class<?>, Method> _cloneMethodCache = new HashMap<Class<?>, Method>();
+    private static final Map<Class<?>, Method> _cloneMethodCache = new HashMap<>();
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -60,6 +66,17 @@ public class LogicUtil {
      */
     public static boolean bothNullOrEqual(Object value1, Object value2) {
         return value1 == null ? value2 == null : value1.equals(value2);
+    }
+
+    /**
+     * Checks if both String values are null or the values equal each other, ignoring case
+     *
+     * @param value1 to use
+     * @param value2 to use
+     * @return True if value1 and value2 equal, ignoring case, or are both null, False if not
+     */
+    public static boolean bothNullOrEqualIgnoreCase(String value1, String value2) {
+        return value1 == null ? value2 == null : value1.equalsIgnoreCase(value2);
     }
 
     /**
@@ -116,7 +133,7 @@ public class LogicUtil {
      * Checks whether an element index is within range of a collection
      *
      * @param collection to check
-     * @param index to check
+     * @param index      to check
      * @return True if it is in bounds, False if not
      */
     public static boolean isInBounds(Collection<?> collection, int index) {
@@ -151,7 +168,7 @@ public class LogicUtil {
      * Returns the default value if the input value is null
      *
      * @param value to fix
-     * @param def to return if the value is null
+     * @param def   to return if the value is null
      * @return the value or the default
      */
     public static <T> T fixNull(T value, T def) {
@@ -159,10 +176,10 @@ public class LogicUtil {
     }
 
     /**
-     * Appends one or more elements to an array This method allocates a new
-     * Array of the same type as the old array, with the size of array + values.
+     * Appends one or more elements to an array This method allocates a new Array of the same type as the old array, with
+     * the size of array + values.
      *
-     * @param array input array to append to
+     * @param array  input array to append to
      * @param values to append to array
      * @return new Array with the values from array and values
      */
@@ -181,9 +198,8 @@ public class LogicUtil {
     }
 
     /**
-     * Allocates a new array of the same length and writes the contents to this
-     * new array. Unlike {@link #cloneAll(Object[])}, this method does not
-     * individually clone the elements
+     * Allocates a new array of the same length and writes the contents to this new array. Unlike
+     * {@link #cloneAll(Object[])}, this method does not individually clone the elements
      *
      * @param array to re-allocate as a new array
      * @return new array with the contents of the input array
@@ -263,8 +279,7 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the Class instance representing an array of the component type
-     * specified. For example:<br>
+     * Obtains the Class instance representing an array of the component type specified. For example:<br>
      * - Integer.class -> Integer[].class<br>
      * - int.class -> int[].class
      *
@@ -284,13 +299,12 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the Class instance representing an array of the component type
-     * specified. For example:<br>
+     * Obtains the Class instance representing an array of the component type specified. For example:<br>
      * - Integer.class -> Integer[].class<br>
      * - int.class -> int[].class
      *
      * @param componentType to convert
-     * @param levels the amount of levels to create the array (e.g. 2=[][])
+     * @param levels        the amount of levels to create the array (e.g. 2=[][])
      * @return array type
      */
     public static Class<?> getArrayType(Class<?> componentType, int levels) {
@@ -302,14 +316,13 @@ public class LogicUtil {
     }
 
     /**
-     * Tries to get a specific element from a list. The default value is
-     * returned when:<br>
+     * Tries to get a specific element from a list. The default value is returned when:<br>
      * - The list is null<br>
      * - The list index is out of bounds
      *
-     * @param list to get an element from
+     * @param list  to get an element from
      * @param index of the element to get
-     * @param def value to return on failure
+     * @param def   value to return on failure
      * @return The list element, or the default value
      */
     public static <T> T getList(List<T> list, int index, T def) {
@@ -317,14 +330,13 @@ public class LogicUtil {
     }
 
     /**
-     * Tries to get a specific element from an array. The default value is
-     * returned when:<br>
+     * Tries to get a specific element from an array. The default value is returned when:<br>
      * - The array is null<br>
      * - The array index is out of bounds
      *
      * @param array to get an element from
      * @param index of the element to get
-     * @param def value to return on failure
+     * @param def   value to return on failure
      * @return The array element, or the default value
      */
     public static <T> T getArray(T[] array, int index, T def) {
@@ -334,7 +346,7 @@ public class LogicUtil {
     /**
      * Constructs a new 1-dimensional Array of a given type and length
      *
-     * @param type of the new Array
+     * @param type   of the new Array
      * @param length of the new Array
      * @return new Array
      */
@@ -347,8 +359,7 @@ public class LogicUtil {
      * Converts a collection to an Array
      *
      * @param collection to convert
-     * @param type of the collection and the array to return (can not be
-     * primitive)
+     * @param type       of the collection and the array to return (can not be primitive)
      * @return new Array containing the elements in the collection
      */
     public static <T> T[] toArray(Collection<?> collection, Class<T> type) {
@@ -359,12 +370,11 @@ public class LogicUtil {
      * Adds all the elements of an array to a Collection
      *
      * @param collection to add elements to
-     * @param array to add to the Collection
-     * @return True if the collection changed as a result of the call, False if
-     * not.
+     * @param array      to add to the Collection
+     * @return True if the collection changed as a result of the call, False if not.
      */
     @SafeVarargs
-	public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
+    public static <E, T extends E> boolean addArray(Collection<E> collection, T... array) {
         if (array.length > 20) {
             return collection.addAll(Arrays.asList(array));
         } else {
@@ -380,9 +390,8 @@ public class LogicUtil {
      * Removes all the elements of an array from a Collection
      *
      * @param collection to remove elements from
-     * @param array to remove from the Collection
-     * @return True if the collection changed as a result of the call, False if
-     * not.
+     * @param array      to remove from the Collection
+     * @return True if the collection changed as a result of the call, False if not.
      */
     public static boolean removeArray(Collection<?> collection, Object... array) {
         if (array.length > 100) {
@@ -397,9 +406,8 @@ public class LogicUtil {
     }
 
     /**
-     * Removes a single item from an array, returning a new array of size length-1
-     * with the element removed. If the element could not be found in the input array,
-     * the input array is returned unchanged and no copy is created.
+     * Removes a single item from an array, returning a new array of size length-1 with the element removed. If the element
+     * could not be found in the input array, the input array is returned unchanged and no copy is created.
      * 
      * @param input array
      * @param value in the array to remove
@@ -433,28 +441,24 @@ public class LogicUtil {
     }
 
     /**
-     * Removes or adds an element from/to a Collection, and returns whether
-     * something has changed.
+     * Removes or adds an element from/to a Collection, and returns whether something has changed.
      *
      * @param collection to add or remove an element from
-     * @param value to add or remove
-     * @param add option: True to add, False to remove
-     * @return True if the collection changed (element removed or added), False
-     * if not
+     * @param value      to add or remove
+     * @param add        option: True to add, False to remove
+     * @return True if the collection changed (element removed or added), False if not
      */
     public static boolean addOrRemove(BlockSet collection, Block value, boolean add) {
         return add ? collection.add(value) : collection.remove(value);
     }
 
     /**
-     * Removes or adds an element from/to a Collection, and returns whether
-     * something has changed.
+     * Removes or adds an element from/to a Collection, and returns whether something has changed.
      *
      * @param collection to add or remove an element from
-     * @param value to add or remove
-     * @param add option: True to add, False to remove
-     * @return True if the collection changed (element removed or added), False
-     * if not
+     * @param value      to add or remove
+     * @param add        option: True to add, False to remove
+     * @return True if the collection changed (element removed or added), False if not
      */
     public static <T> boolean addOrRemove(Collection<T> collection, T value, boolean add) {
         return add ? collection.add(value) : collection.remove(value);
@@ -463,7 +467,7 @@ public class LogicUtil {
     /**
      * Checks whether one map contains all the contents of another map
      *
-     * @param map to check for contents
+     * @param map      to check for contents
      * @param contents to check the map for
      * @return True if all contents are contained in the map, False if not
      */
@@ -485,12 +489,12 @@ public class LogicUtil {
     /**
      * Checks if an array of values contains the value specified
      *
-     * @param value to find
+     * @param value  to find
      * @param values to search in
      * @return True if it is contained, False if not
      */
     @SafeVarargs
-	public static <T> boolean contains(T value, T... values) {
+    public static <T> boolean contains(T value, T... values) {
         for (T v : values) {
             if (bothNullOrEqual(v, value)) {
                 return true;
@@ -500,9 +504,26 @@ public class LogicUtil {
     }
 
     /**
+     * Checks if a String array of values contains the value specified
+     *
+     * @param value  to find
+     * @param values to search in
+     * @return True if it is contained, False if not
+     */
+    @SafeVarargs
+    public static boolean containsIgnoreCase(String value, String... values) {
+        for (String v : values) {
+            if (bothNullOrEqualIgnoreCase(v, value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks if a list of bytes contains the byte specified
      *
-     * @param value to find
+     * @param value  to find
      * @param values to search in
      * @return True if it is contained, False if not
      */
@@ -518,7 +539,7 @@ public class LogicUtil {
     /**
      * Checks if a sequence of characters contains the character specified
      *
-     * @param value to find
+     * @param value    to find
      * @param sequence of char values to search in
      * @return True if it is contained, False if not
      */
@@ -534,7 +555,7 @@ public class LogicUtil {
     /**
      * Checks if a list of characters contains the character specified
      *
-     * @param value to find
+     * @param value  to find
      * @param values to search in
      * @return True if it is contained, False if not
      */
@@ -550,7 +571,7 @@ public class LogicUtil {
     /**
      * Checks if a list of integers contains the integer specified
      *
-     * @param value to find
+     * @param value  to find
      * @param values to search in
      * @return True if it is contained, False if not
      */
@@ -566,7 +587,7 @@ public class LogicUtil {
     /**
      * Checks if a list of booleans contains the boolean specified
      *
-     * @param value to find
+     * @param value  to find
      * @param values to search in
      * @return True if it is contained, False if not
      */
@@ -580,13 +601,12 @@ public class LogicUtil {
     }
 
     /**
-     * Skips elements from an iterator by calling 'next' a given amount of times
-     * (if possible). If the count exceeds the amount of elements the iterator
-     * provides, further elements are ignored. In that case, calling
+     * Skips elements from an iterator by calling 'next' a given amount of times (if possible). If the count exceeds the
+     * amount of elements the iterator provides, further elements are ignored. In that case, calling
      * {@link Iterator#hasNext()} would yield false.
      *
      * @param iterator to skip
-     * @param count to skip
+     * @param count    to skip
      * @return the iterator
      */
     public static <T extends Iterator<?>> T skipIterator(T iterator, int count) {
@@ -597,11 +617,10 @@ public class LogicUtil {
     }
 
     /**
-     * Obtains the key at which a specific value is mapped to in a Map. This is
-     * essentially the reverse key lookup in a map, and is thus slow. For
-     * 'BiMap' maps, the inverse is used to obtain the key faster.
+     * Obtains the key at which a specific value is mapped to in a Map. This is essentially the reverse key lookup in a map,
+     * and is thus slow. For 'BiMap' maps, the inverse is used to obtain the key faster.
      *
-     * @param map to check
+     * @param map   to check
      * @param value to look for
      * @return key the value is mapped to, or null if not found
      */
@@ -641,7 +660,7 @@ public class LogicUtil {
         /**
          * Checks whether a given value belong to a certain item
          * 
-         * @param item to check
+         * @param item  to check
          * @param value to compare
          * @return True if the item belongs to the value, False if not
          */
@@ -664,11 +683,11 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the contents of a list by taking over the items in a collection of values.
-     * The items will be inserted into the list in the same order as the collection.
+     * Synchronizes the contents of a list by taking over the items in a collection of values. The items will be inserted
+     * into the list in the same order as the collection.
      * 
-     * @param list to synchronize
-     * @param values to synchronize in the list
+     * @param list         to synchronize
+     * @param values       to synchronize in the list
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
@@ -677,11 +696,11 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the contents of a list by taking over the items in an iterable of values.
-     * The items will be inserted into the list in the same order as the collection.
+     * Synchronizes the contents of a list by taking over the items in an iterable of values. The items will be inserted
+     * into the list in the same order as the collection.
      * 
-     * @param list to synchronize
-     * @param values to synchronize in the list, iterated only ones
+     * @param list         to synchronize
+     * @param values       to synchronize in the list, iterated only ones
      * @param synchronizer to use when synchronizing the collection with the list
      * @return True if the synchronized list changed, False if not
      */
@@ -742,17 +761,16 @@ public class LogicUtil {
     }
 
     /**
-     * Synchronizes the contents of a collection by taking over the items in another collection of values.
-     * The items will not necessarily be inserted into the collection in the same order as the collection.
-     * Unlike {@link #synchronizeList(list, values, synchronizer)} this method will not call the values
+     * Synchronizes the contents of a collection by taking over the items in another collection of values. The items will
+     * not necessarily be inserted into the collection in the same order as the collection. Unlike
+     * {@link #synchronizeList(list, values, synchronizer)} this method will not call the values
      * {@link Collection#iterator()} method unless absolutely needed.<br>
      * <br>
-     * Because this logic depends
-     * on the {@link Collection#contains(o)} method, the {@link ItemSynchronizer#isItem(o1, o2)} is not used.
-     * The input collection and values collection must hold the same value types.
+     * Because this logic depends on the {@link Collection#contains(o)} method, the {@link ItemSynchronizer#isItem(o1, o2)}
+     * is not used. The input collection and values collection must hold the same value types.
      * 
-     * @param collection to synchronize
-     * @param values to synchronize in the collection, iterator() call is avoided when possible
+     * @param collection   to synchronize
+     * @param values       to synchronize in the collection, iterator() call is avoided when possible
      * @param synchronizer to use when synchronizing the collection with the collection
      * @return True if the synchronized collection changed, False if not
      */
