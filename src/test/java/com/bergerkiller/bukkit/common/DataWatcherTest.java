@@ -6,12 +6,14 @@ import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityShulkerHandle;
 
 public class DataWatcherTest {
 
@@ -69,6 +71,23 @@ public class DataWatcherTest {
         assertEquals(true, dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME_VISIBLE).booleanValue());
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME_VISIBLE, false);
         assertEquals(false, dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME_VISIBLE).booleanValue());
+    }
+
+    @Test
+    public void testShulker() {
+        if (!EntityShulkerHandle.T.isAvailable()) {
+            return;
+        }
+
+        DataWatcher dataWatcher = new DataWatcher();
+
+        // DATA_PEEK
+        dataWatcher.set(EntityShulkerHandle.DATA_PEEK, (byte) 5);
+        assertEquals((byte) 5, dataWatcher.get(EntityShulkerHandle.DATA_PEEK).byteValue());
+
+        // DATA_AP (attached point)
+        dataWatcher.set(EntityShulkerHandle.DATA_AP, new IntVector3(5, 6, 7));
+        assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityShulkerHandle.DATA_AP));
     }
 
     private static void checkCustomNameOptional(Object raw) {
