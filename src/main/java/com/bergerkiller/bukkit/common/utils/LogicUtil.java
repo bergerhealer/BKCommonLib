@@ -511,7 +511,7 @@ public class LogicUtil {
      * @return True if it is contained, False if not
      */
     @SafeVarargs
-    public static boolean contains(String value, String... values) {
+    public static boolean containsIgnoreCase(String value, String... values) {
         for (String v : values) {
             if (bothNullOrEqualIgnoreCase(v, value)) {
                 return true;
