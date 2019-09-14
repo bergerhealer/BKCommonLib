@@ -1,10 +1,14 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
+import java.util.logging.Level;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.HumanEntity;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -52,7 +56,13 @@ public class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> {
         if (this.controller == null) {
             return this.base.load(entityHuman);
         } else {
-            return this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(entityHuman)).getRawHandle();
+            CommonTagCompound compound = null;
+            try {
+                compound = this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(entityHuman));
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+            }
+            return (compound == null) ? null : compound.getRawHandle();
         }
     }
 
@@ -61,7 +71,11 @@ public class PlayerFileDataHook extends ClassHook<PlayerFileDataHook> {
         if (this.controller == null) {
             this.base.save(entityHuman);
         } else {
-            this.controller.onSave((HumanEntity) Conversion.toEntity.convert(entityHuman));
+            try {
+                this.controller.onSave((HumanEntity) Conversion.toEntity.convert(entityHuman));
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to handle onSave() on " + this.controller, t);
+            }
         }
     }
 
