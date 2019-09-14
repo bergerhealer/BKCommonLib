@@ -67,7 +67,7 @@
         <!-- Repository for aikar's timings library -->
         <repository>
             <id>aikar</id>
-            <url>https://repo.aikar.co/nexus/content/repositories/aikar-releases</url>
+            <url>https://repo.aikar.co/nexus/content/repositories/aikar-release/</url>
         </repository>
     </repositories>
 
