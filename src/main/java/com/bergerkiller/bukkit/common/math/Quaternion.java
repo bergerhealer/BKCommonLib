@@ -183,7 +183,7 @@ public class Quaternion implements Cloneable {
      * @param rotation (x=pitch, y=yaw, z=roll)
      */
     public final void rotateYawPitchRoll(Vector3 rotation) {
-        rotateYawPitchRoll(rotation.y, rotation.x, rotation.z);
+        rotateYawPitchRoll(rotation.x, rotation.y, rotation.z);
     }
 
     /**
