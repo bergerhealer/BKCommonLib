@@ -1,22 +1,30 @@
 package com.bergerkiller.bukkit.common;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.zip.GZIPInputStream;
+import java.util.zip.GZIPOutputStream;
 
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.google.gson.Gson;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * Hastebin paste client that connects with hastebin's servers.
@@ -30,25 +38,45 @@ import com.google.gson.Gson;
 public class Hastebin {
     private final Executor _executor;
     private final JavaPlugin _plugin;
-    private final String _server;
     private final String _userAgentString;
+    private Session _uploadSession;
+
+    /**
+     * Creates a new Hastebin instance with no server configured.
+     * Please call {@link #setServer(String)} before using it to upload.
+     * Downloading from (other) servers can be done without setting a server.
+     * 
+     * @param plugin
+     */
+    public Hastebin(JavaPlugin plugin) {
+        this(plugin, null);
+    }
 
     /**
      * Creates a new Hastebin instance
      * 
      * @param plugin that will be responsible for the requests
-     * @param server with which is communicated (for example, https://hastebin.com)
+     * @param serverURL with which is communicated when uploading (for example, https://hastebin.com)
      */
-    public Hastebin(JavaPlugin plugin, String server) {
+    public Hastebin(JavaPlugin plugin, String serverURL) {
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin can not be null");
         }
         this._executor = Executors.newFixedThreadPool(2);
         this._plugin = plugin;
-        this._server = server;
         this._userAgentString = "BKCommonLib/" + CommonPlugin.getInstance().getVersion() +
                 " " + plugin.getName() + "/" + plugin.getDescription().getVersion() +
                 " Java/" + System.getProperty("java.version");
+        this._uploadSession = new Session(serverURL);
+    }
+
+    /**
+     * Sets the URL of the Hastebin server with which is communicated
+     * 
+     * @param serverURL to set to
+     */
+    public void setServer(String serverURL) {
+        this._uploadSession = new Session(serverURL);
     }
 
     /**
@@ -56,95 +84,147 @@ public class Hastebin {
      * when the operation either succeeds or fails. Any registered callbacks will be executed
      * on the main thread, in a task scheduled with the plugin as owner.
      * 
-     * @param contents to upload
+     * @param content to upload
      * @return completable future completed when the upload succeeds or fails
      */
-    public CompletableFuture<UploadResult> upload(String contents) {
+    public CompletableFuture<UploadResult> upload(String content) {
         final CompletableFuture<UploadResult> result = new CompletableFuture<UploadResult>();
+        final Session session = this._uploadSession;
         this._executor.execute(new Runnable() {
             @Override
             public void run() {
-                // Parse the root URL from the configuration, attempt prefixing with http:// if required
-                URL root_url;
                 try {
-                    root_url = new URL(_server);
-                } catch (MalformedURLException e1) {
-                    try {
-                        root_url = new URL("http://" +_server);
-                    } catch (MalformedURLException e2) {
-                        complete(result, new UploadResult(false, null, "The configured server '" + _server + "' has an incorrect syntax"));
-                        return;
-                    }
-                }
-
-                // Use the root URL to generate a new URL with the /documents path
-                URL document_url;
-                try {
-                    document_url = new URL(root_url.getProtocol(), root_url.getHost(), root_url.getPort(), "/documents");
-                } catch (MalformedURLException e) {
-                    complete(result, new UploadResult(false, null, "Failed to create document url: " + e.getMessage()));
-                    return;
-                }
-
-                try {
-                    int redirect_limit = 100;
-                    while (--redirect_limit > 0) {
-                        // Make the POST request
-                        // Prepare the connection
-                        HttpURLConnection con = (HttpURLConnection) document_url.openConnection();
-                        con.setRequestMethod("POST");
-                        con.setRequestProperty("User-Agent", _userAgentString);
-                        con.setRequestProperty("X-Requested-With", "HttpURLConnection");
-                        con.setRequestProperty("Accept", "application/json, text/javascript, */*; q=0.01");
-                        con.setInstanceFollowRedirects(false);
-                        con.setDoInput(true);
+                    byte[] contents_bytes = null;
+                    ByteArrayOutputStream contents_bytes_compressed = null;
+                    while (true) {
+                        HttpURLConnection con = session.createRequest("POST", "/documents");
                         con.setDoOutput(true);
-                        con.setConnectTimeout(10000);
-                        con.setReadTimeout(5000);
+                        con.setRequestProperty("Accept", "application/json, */*; q=0.01");
 
-                        // Write the content data to the connection
-                        try (OutputStream output = con.getOutputStream()) {
-                            output.write(contents.getBytes(Charset.forName("UTF-8")));
+                        // Upload the data
+                        if (session.getCapabilities().requestContentEncoding) {
+                            // Compress with gzip and store into contents_bytes_compressed
+                            // We do this so we can compute the content length of the compressed data
+                            if (contents_bytes_compressed == null) {
+                                contents_bytes_compressed = new ByteArrayOutputStream();
+                                try (Writer writer = new OutputStreamWriter(new GZIPOutputStream(contents_bytes_compressed), "UTF-8")) {
+                                    writer.write(content);
+                                }
+                            }
+
+                            // Upload data compressed
+                            con.setRequestProperty("Content-Encoding", "gzip");
+                            con.setFixedLengthStreamingMode(contents_bytes_compressed.size());
+                            try (OutputStream output = con.getOutputStream()) {
+                                contents_bytes_compressed.writeTo(output);
+                            }
+                        } else {
+                            // Upload data uncompressed
+                            if (contents_bytes == null) {
+                                contents_bytes = content.getBytes(Charset.forName("UTF-8"));
+                            }
+                            con.setFixedLengthStreamingMode(contents_bytes.length);
+                            try (OutputStream output = con.getOutputStream()) {
+                                output.write(contents_bytes);
+                            }
                         }
 
-                        // Check status
-                        int status = con.getResponseCode();
-                        if (status == HttpURLConnection.HTTP_MOVED_PERM || status == HttpURLConnection.HTTP_MOVED_TEMP) {
-                            String redirect_url_str = con.getHeaderField("Location");
-                            if (redirect_url_str == null) {
-                                throw new RuntimeException("Status " + status + " response has no Location response header");
-                            }
-                            try {
-                                document_url = new URL(redirect_url_str);
-                                root_url = new URL(document_url.getProtocol(), document_url.getHost(), document_url.getPort(), "");
-                                continue; // retry
-                            } catch (MalformedURLException e) {
-                                throw new RuntimeException("Status " + status + " response Location header is invalid: " + redirect_url_str);
-                            }
-                        } else if (status != HttpURLConnection.HTTP_OK) {
-                            complete(result, new UploadResult(false, null, "Server returned non-OK status code: " + status));
-                            return;
+                        // Check redirects
+                        if (session.handleRedirect(con)) {
+                            continue;
                         }
 
                         // Read response
-                        try (Reader reader = new InputStreamReader(con.getInputStream())) {
-                            HastebinUploadResponse response = new Gson().fromJson(reader, HastebinUploadResponse.class);
-                            if (response == null || response.key == null) {
-                                complete(result, new UploadResult(false, null, "Server did not respond with a key"));
-                                return;
-                            } else {
-                                URL result_url = new URL(root_url.getProtocol(), root_url.getHost(), root_url.getPort(), "/" + response.key);
-                                complete(result, new UploadResult(true, result_url.toString(), null));
-                                return;
-                            }
+                        HastebinUploadResponse response = decodeGSON(con, HastebinUploadResponse.class);
+                        if (response.key == null) {
+                            throw new InvalidServerResponseException("No key");
                         }
+                        complete(result, new UploadResult(true, session.createURL("/" + response.key).toString(), null));
+                        break;
                     }
-                    complete(result, new UploadResult(false, null, "Maximum number of redirects reached"));
                 } catch (IOException ex) {
                     complete(result, new UploadResult(false, null, "I/O Exception occurred: " + ex.getMessage()));
+                } catch (InvalidServerURLException ex) {
+                    complete(result, new UploadResult(false, null, "Invalid Server URL: " + session.getServer()));
+                } catch (InvalidServerResponseException ex) {
+                    complete(result, new UploadResult(false, null, ex.getMessage()));
                 } catch (Throwable t) {
                     t.printStackTrace();
                     complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
+                }
+            }
+        });
+        return result;
+    }
+
+    /**
+     * Downloads data from the server and returns a completable future that will be completed
+     * when the operation either succeeds or fails. Any registered callbacks will be executed
+     * on the main thread, in a task scheduled with the plugin as owner.
+     * No server has to be configured for this method to work.<br>
+     * <br>
+     * Instead of the full url, it is also acceptable to omit the http(s):// portion.
+     * 
+     * @param url to download
+     * @return completable future completed when the download succeeds or fails
+     */
+    public CompletableFuture<DownloadResult> download(String url) {
+        final CompletableFuture<DownloadResult> result = new CompletableFuture<DownloadResult>();
+        this._executor.execute(new Runnable() {
+            @Override
+            public void run() {
+                final Session session = new Session(url);
+                try {
+                    // Find the /raw/somekey URL
+                    final String raw_path = session.findRawPath();
+                    System.out.println("GET " + raw_path);
+                    while (true) {
+                        HttpURLConnection con = session.createRequest("GET", raw_path);
+                        con.setRequestProperty("Accept-Encoding", "gzip");
+                        if (session.handleRedirect(con)) {
+                            continue;
+                        }
+
+                        // Is allowed to be more or less than the actual content
+                        // This initializes the initial capacity of the receive buffer
+                        int expectedContentSize = con.getContentLength();
+                        if (expectedContentSize <= 0) {
+                            expectedContentSize = 1024;
+                        }
+
+                        // Read from InputStream and write to a ByteArrayOutputStream buffer
+                        int length;
+                        byte[] buffer = new byte[1024];
+                        ByteArrayOutputStream contentBuffer = new ByteArrayOutputStream(expectedContentSize);
+                        if ("gzip".equals(con.getContentEncoding())) {
+                            // Download compressed content and decode
+                            try (GZIPInputStream input = new GZIPInputStream(con.getInputStream())) {
+                                while ((length = input.read(buffer)) != -1) {
+                                    contentBuffer.write(buffer, 0, length);
+                                }
+                            }
+                        } else {
+                            // Download uncompressed content
+                            try (InputStream input = con.getInputStream()) {
+                                while ((length = input.read(buffer)) != -1) {
+                                    contentBuffer.write(buffer, 0, length);
+                                }
+                            }
+                        }
+
+                        // Decode UTF-8 String from byte buffer
+                        complete(result, new DownloadResult(true, url, contentBuffer.toString("UTF-8"), null));
+                        break;
+                    }
+                } catch (IOException ex) {
+                    complete(result, new DownloadResult(false, url, null, "I/O Exception occurred: " + ex.getMessage()));
+                } catch (InvalidServerURLException ex) {
+                    complete(result, new DownloadResult(false, url, null, "Invalid URL: " + session.getServer()));
+                } catch (InvalidServerResponseException ex) {
+                    complete(result, new DownloadResult(false, url, null, ex.getMessage()));
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                    complete(result, new DownloadResult(false, url, null, "Error occurred: " + t.getMessage()));
                 }
             }
         });
@@ -168,10 +248,58 @@ public class Hastebin {
     }
 
     /**
-     * GSON Structure for the response of hastebin's /documents call (upload)
+     * The result of a download operation. If the download operation failed,
+     * {@link #success()} returns false, with an error reason available
+     * at {@link #error()}.
      */
-    private static class HastebinUploadResponse {
-        public String key;
+    public static class DownloadResult {
+        private final boolean _success;
+        private final String _url;
+        private final String _content;
+        private final String _error;
+
+        private DownloadResult(boolean success, String url, String content, String error) {
+            this._success = success;
+            this._url = url;
+            this._content = content;
+            this._error = error;
+        }
+
+        /**
+         * Whether the download was successful
+         * 
+         * @return True if successful
+         */
+        public boolean success() {
+            return this._success;
+        }
+
+        /**
+         * The url that this download result is for
+         * 
+         * @return url
+         */
+        public String url() {
+            return this._url;
+        }
+
+        /**
+         * If {@link #success()} returns true, the content returned by the hastebin servers
+         * 
+         * @return content
+         */
+        public String content() {
+            return this._content;
+        }
+
+        /**
+         * If {@link #success()} returns false, the error message
+         * 
+         * @return error message
+         */
+        public String error() {
+            return this._error;
+        }
     }
 
     /**
@@ -215,6 +343,222 @@ public class Hastebin {
          */
         public String error() {
             return this._error;
+        }
+    }
+
+    /**
+     * GSON Structure for the response of hastebin's /documents call (upload)
+     */
+    private static class HastebinUploadResponse {
+        public String key;
+    }
+
+    /**
+     * GSON structure for the response of hastebin's /capabilities call.
+     * This is a special call added to identify additional capabilities.
+     * If the call is not supported, default capabilities are used instead.
+     */
+    private static class HastebinCapabilitiesResponse {
+        @SerializedName("request-content-encoding")
+        public boolean requestContentEncoding = false;
+    }
+
+    private class Session {
+        private final String _server;
+        private URL _serverURL;
+        private HastebinCapabilitiesResponse _capabilities;
+        private int _numRedirects;
+
+        public Session(String serverURL) {
+            this._server = serverURL;
+            this._serverURL = null;
+            this._capabilities = null;
+
+            // Parse the root URL, attempt prefixing with http:// if required
+            if (this._server != null) {
+                try {
+                    this._serverURL = new URL(this._server);
+                } catch (MalformedURLException e1) {
+                    try {
+                        this._serverURL = new URL("http://" + _server);
+                    } catch (MalformedURLException e2) {
+                    }
+                }
+            }
+        }
+
+        // Gets the server configuration that initialized this session
+        public String getServer() {
+            return this._server;
+        }
+
+        // Retrieves the server's capabilities
+        public HastebinCapabilitiesResponse getCapabilities() throws InvalidServerURLException, InvalidServerResponseException, IOException {
+            synchronized (this) {
+                if (this._capabilities != null) {
+                    return this._capabilities;
+                }
+            }
+            while (true) {
+                HttpURLConnection connection = this.createRequest("GET", "/capabilities");
+                connection.setRequestProperty("Accept", "application/json, */*; q=0.01");
+                if (this.handleRedirect(connection)) {
+                    continue;
+                }
+
+                // Vanilla hastebin servers do not support the /capabilities call
+                // They return text/html content instead of text/javascript
+                HastebinCapabilitiesResponse response;
+                if (connection.getResponseCode() != HttpURLConnection.HTTP_OK ||
+                    !("application/json".equals(connection.getContentType())))
+                {
+                    response = new HastebinCapabilitiesResponse();
+                }
+                else
+                {
+                    response = decodeGSON(connection, HastebinCapabilitiesResponse.class);
+                }
+
+                synchronized (this) {
+                    if (this._capabilities == null) {
+                        this._capabilities = response;
+                    }
+                    return this._capabilities;
+                }
+            }
+        }
+
+        // Creates a new HttpURLConnection for a new request
+        public HttpURLConnection createRequest(String method, String path) throws InvalidServerURLException, IOException {
+            URLConnection url_connection = this.createURL(path).openConnection();
+            if (!(url_connection instanceof HttpURLConnection)) {
+                throw new InvalidServerURLException();
+            }
+            HttpURLConnection connection = (HttpURLConnection) url_connection;
+            connection.setRequestMethod(method);
+            connection.setInstanceFollowRedirects(false);
+            connection.setConnectTimeout(10000);
+            connection.setReadTimeout(20000);
+            connection.setRequestProperty("User-Agent", _userAgentString);
+            connection.setRequestProperty("X-Requested-With", "HttpURLConnection");
+            connection.setRequestProperty("Accept-Encoding", "gzip");
+            return connection;
+        }
+
+        // For switching from http to https or server moving
+        public synchronized boolean handleRedirect(HttpURLConnection connection) throws IOException, InvalidServerResponseException {
+            int status = connection.getResponseCode();
+            if (status != HttpURLConnection.HTTP_MOVED_PERM && status != HttpURLConnection.HTTP_MOVED_TEMP) {
+                _numRedirects = 0;
+                return false;
+            } else if (++_numRedirects > 10) {
+                throw new InvalidServerResponseException("Maximum number of HTTP redirects reached");
+            }
+
+            String redirect_url_str = connection.getHeaderField("Location");
+            if (redirect_url_str == null) {
+                throw new InvalidServerResponseException("HTTP Redirect without Location header");
+            }
+            try {
+                URL url = new URL(redirect_url_str);
+                this._serverURL = new URL(url.getProtocol(), url.getHost(), url.getPort(), "");
+                return true;
+            } catch (MalformedURLException e) {
+                throw new InvalidServerResponseException("HTTP Redirect Location is malformed (" + redirect_url_str + ")");
+            }
+        }
+
+        // Attempts to decode the server URL and turn it into the raw URL path where contents can be found
+        // If the URL does not look like a hastebin url, an InvalidServerURLException is thrown
+        // Accepted URLs (with any .extensions):
+        // - /sawezoqeco
+        // - /documents/sawezoqeco
+        // - /raw/sawezoqeco
+        public synchronized String findRawPath() throws InvalidServerURLException {
+            if (this._serverURL == null) {
+                throw new InvalidServerURLException();
+            }
+
+            // Get path, remove any file extensions at the end of it
+            String path = this._serverURL.getPath();
+            if (path == null || path.isEmpty() || path.charAt(0) != '/') {
+                throw new InvalidServerURLException();
+            }
+            int last_slash_idx = path.lastIndexOf('/');
+            if (last_slash_idx == -1) {
+                throw new InvalidServerURLException();
+            }
+            int ext_idx;
+            while ((ext_idx = path.lastIndexOf('.')) != -1 && ext_idx > last_slash_idx) {
+                path = path.substring(0, ext_idx);
+            }
+
+            // If it starts with /documents/ or /raw/, trim
+            if (path.startsWith("/documents/")) {
+                path = path.substring(10);
+            } else if (path.startsWith("/raw/")) {
+                path = path.substring(4);
+            }
+
+            // At this point it should be just /key, so only one slash
+            if (path.indexOf('/', 1) != -1) {
+                throw new InvalidServerURLException();
+            }
+
+            // Create the /raw/ url
+            return "/raw" + path;
+        }
+
+        // Creates a URL for the currently configured server
+        public synchronized URL createURL(String path) throws InvalidServerURLException {
+            if (this._serverURL == null) {
+                throw new InvalidServerURLException();
+            }
+            try {
+                return new URL(this._serverURL.getProtocol(), this._serverURL.getHost(), this._serverURL.getPort(), path);
+            } catch (MalformedURLException e) {
+                throw new InvalidServerURLException();
+            }
+        }
+    }
+
+    private static <T> T decodeGSON(HttpURLConnection connection, Class<T> type) throws InvalidServerResponseException, IOException {
+        if (connection.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new InvalidServerResponseException("Non-OK Status Code " + connection.getResponseCode());
+        }
+
+        // Read response. If compressed using gzip, decompress it.
+        try {
+            T decoded;
+            if ("gzip".equals(connection.getHeaderField("Content-Encoding"))) {
+                try (Reader reader = new InputStreamReader(new GZIPInputStream(connection.getInputStream()))) {
+                    decoded = new Gson().fromJson(reader, type);
+                }
+            } else {
+                try (Reader reader = new InputStreamReader(connection.getInputStream())) {
+                    decoded = new Gson().fromJson(reader, type);
+                }
+            }
+            if (decoded == null) {
+                throw new InvalidServerResponseException("Empty response received (EOF)");
+            }
+            return decoded;
+        } catch (com.google.gson.JsonIOException ex) {
+            throw new IOException("Failed to read JSON: " + ex.getMessage());
+        } catch (com.google.gson.JsonSyntaxException ex) {
+            throw new InvalidServerResponseException("Response is not valid JSON");
+        }
+    }
+
+    private static class InvalidServerURLException extends Exception {
+        private static final long serialVersionUID = -3102529517837518121L;
+    }
+
+    private static class InvalidServerResponseException extends Exception {
+        private static final long serialVersionUID = 1542358791115174559L;
+
+        public InvalidServerResponseException(String what) {
+            super("Invalid response received from server: " + what);
         }
     }
 }
