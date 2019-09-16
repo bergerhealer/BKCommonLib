@@ -74,9 +74,10 @@ public class ParseUtil {
         if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             MAT_ALIASES.add("SLAB", "STEP");
             MAT_ALIASES.add("STONEBRICK", "SMOOTHBRICK");
+            MAT_ALIASES.add("PLANK", "WOOD");
         }
         MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-        MAT_ALIASES.add("SHOVEL", "SPADE").add("GOLDEN", "GOLD").add("PLANK", "WOOD").add("WOODEN", "WOOD");
+        MAT_ALIASES.add("SHOVEL", "SPADE").add("GOLDEN", "GOLD").add("WOODEN", "WOOD");
         MAT_ALIASES.add("PRESSUREPLATE", "PLATE").add("PANTS", "LEGGINGS");
         MAT_ALIASES.add("REDSTONEDUST", "REDSTONE").add("REDSTONEREPEATER", "DIODE");
         MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR").add("REPEATER", "DIODE");
