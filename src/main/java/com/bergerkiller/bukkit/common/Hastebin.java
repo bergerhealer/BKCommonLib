@@ -38,7 +38,6 @@ import com.google.gson.annotations.SerializedName;
 public class Hastebin {
     private final Executor _executor;
     private final JavaPlugin _plugin;
-    private final String _userAgentString;
     private Session _uploadSession;
 
     /**
@@ -64,10 +63,7 @@ public class Hastebin {
         }
         this._executor = Executors.newFixedThreadPool(2);
         this._plugin = plugin;
-        this._userAgentString = "BKCommonLib/" + CommonPlugin.getInstance().getVersion() +
-                " " + plugin.getName() + "/" + plugin.getDescription().getVersion() +
-                " Java/" + System.getProperty("java.version");
-        this._uploadSession = new Session(serverURL);
+        this._uploadSession = new Session(plugin, serverURL);
     }
 
     /**
@@ -76,7 +72,7 @@ public class Hastebin {
      * @param serverURL to set to
      */
     public void setServer(String serverURL) {
-        this._uploadSession = new Session(serverURL);
+        this._uploadSession = new Session(this._plugin, serverURL);
     }
 
     /**
@@ -170,14 +166,13 @@ public class Hastebin {
      */
     public CompletableFuture<DownloadResult> download(String url) {
         final CompletableFuture<DownloadResult> result = new CompletableFuture<DownloadResult>();
+        final Session session = new Session(this._plugin, url);
         this._executor.execute(new Runnable() {
             @Override
             public void run() {
-                final Session session = new Session(url);
                 try {
                     // Find the /raw/somekey URL
                     final String raw_path = session.findRawPath();
-                    System.out.println("GET " + raw_path);
                     while (true) {
                         HttpURLConnection con = session.createRequest("GET", raw_path);
                         con.setRequestProperty("Accept-Encoding", "gzip");
@@ -363,15 +358,19 @@ public class Hastebin {
         public boolean requestContentEncoding = false;
     }
 
-    private class Session {
+    private static class Session {
+        private final JavaPlugin _plugin;
         private final String _server;
         private URL _serverURL;
+        private String _userAgentString;
         private HastebinCapabilitiesResponse _capabilities;
         private int _numRedirects;
 
-        public Session(String serverURL) {
+        public Session(JavaPlugin plugin, String serverURL) {
+            this._plugin = plugin;
             this._server = serverURL;
             this._serverURL = null;
+            this._userAgentString = null;
             this._capabilities = null;
 
             // Parse the root URL, attempt prefixing with http:// if required
@@ -439,9 +438,18 @@ public class Hastebin {
             connection.setInstanceFollowRedirects(false);
             connection.setConnectTimeout(10000);
             connection.setReadTimeout(20000);
-            connection.setRequestProperty("User-Agent", _userAgentString);
             connection.setRequestProperty("X-Requested-With", "HttpURLConnection");
             connection.setRequestProperty("Accept-Encoding", "gzip");
+
+            synchronized (this) {
+                if (this._userAgentString == null) {
+                    this._userAgentString = "BKCommonLib/" + CommonPlugin.getInstance().getVersion() +
+                            " " + this._plugin.getName() + "/" + this._plugin.getDescription().getVersion() +
+                            " Java/" + System.getProperty("java.version");
+                }
+                connection.setRequestProperty("User-Agent", this._userAgentString);
+            }
+
             return connection;
         }
 
