@@ -482,6 +482,7 @@ public class Hastebin {
         // - /sawezoqeco
         // - /documents/sawezoqeco
         // - /raw/sawezoqeco
+        // - /download/sawezoqeco
         public synchronized String findRawPath() throws InvalidServerURLException {
             if (this._serverURL == null) {
                 throw new InvalidServerURLException();
@@ -504,6 +505,8 @@ public class Hastebin {
             // If it starts with /documents/ or /raw/, trim
             if (path.startsWith("/documents/")) {
                 path = path.substring(10);
+            } else if (path.startsWith("/download/")) {
+                path = path.substring(9);
             } else if (path.startsWith("/raw/")) {
                 path = path.substring(4);
             }
