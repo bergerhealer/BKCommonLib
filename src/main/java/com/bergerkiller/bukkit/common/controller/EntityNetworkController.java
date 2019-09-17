@@ -359,6 +359,17 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     public final void bind(T entity, Object entityTrackerEntry) {
         if (this.entity != null) {
             this.onDetached();
+
+            // Bind a default entity network controller to the old entry, so that it does not continue
+            // calling callbacks in this controller.
+            if (this.entry != null) {
+                EntityTrackerEntryHook oldHook = EntityTypingHandler.INSTANCE.getEntityTrackerEntryHook(this.entry.getRaw());
+                if (oldHook != null && oldHook.getController() == this) {
+                    EntityNetworkController<CommonEntity<?>> defaultController = CommonUtil.unsafeCast(new DefaultEntityNetworkController());
+                    defaultController.bind(this.entity, this.entry.getRaw());
+                }
+            }
+
             this.entity = null;
             this.entry = null;
             this.state = null;
