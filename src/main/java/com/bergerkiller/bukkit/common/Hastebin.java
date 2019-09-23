@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.io.Writer;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -22,7 +23,9 @@ import java.util.zip.GZIPOutputStream;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.io.ByteArrayIOStream;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
@@ -187,28 +190,22 @@ public class Hastebin {
                             expectedContentSize = 1024;
                         }
 
-                        // Read from InputStream and write to a ByteArrayOutputStream buffer
-                        int length;
-                        byte[] buffer = new byte[1024];
-                        ByteArrayOutputStream contentBuffer = new ByteArrayOutputStream(expectedContentSize);
+                        // Read from InputStream and write to a ByteArrayIOStream buffer
+                        ByteArrayIOStream contentBuffer = new ByteArrayIOStream(expectedContentSize);
                         if ("gzip".equals(con.getContentEncoding())) {
                             // Download compressed content and decode
                             try (GZIPInputStream input = new GZIPInputStream(con.getInputStream())) {
-                                while ((length = input.read(buffer)) != -1) {
-                                    contentBuffer.write(buffer, 0, length);
-                                }
+                                contentBuffer.readFrom(input);
                             }
                         } else {
                             // Download uncompressed content
                             try (InputStream input = con.getInputStream()) {
-                                while ((length = input.read(buffer)) != -1) {
-                                    contentBuffer.write(buffer, 0, length);
-                                }
+                                contentBuffer.readFrom(input);
                             }
                         }
 
-                        // Decode UTF-8 String from byte buffer
-                        complete(result, new DownloadResult(true, url, contentBuffer.toString("UTF-8"), null));
+                        // Return the results
+                        complete(result, new DownloadResult(true, url, contentBuffer, null));
                         break;
                     }
                 } catch (IOException ex) {
@@ -250,10 +247,10 @@ public class Hastebin {
     public static class DownloadResult {
         private final boolean _success;
         private final String _url;
-        private final String _content;
+        private final ByteArrayIOStream _content;
         private final String _error;
 
-        private DownloadResult(boolean success, String url, String content, String error) {
+        private DownloadResult(boolean success, String url, ByteArrayIOStream content, String error) {
             this._success = success;
             this._url = url;
             this._content = content;
@@ -284,7 +281,34 @@ public class Hastebin {
          * @return content
          */
         public String content() {
-            return this._content;
+            try {
+                return this._content.toString("UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                return "";
+            }
+        }
+
+        /**
+         * If {@link #success()} returns true, the content returned by the hastebin servers
+         * as an input stream of raw bytes. No String decoding is performed.
+         * 
+         * @return content input stream
+         */
+        public InputStream contentInputStream() {
+            return this._content.toInputStream();
+        }
+
+        /**
+         * If {@link #success()} returns true, the content returned by the hastebin servers
+         * as a YAML Basic Configuration.
+         * 
+         * @return Basic Configuration
+         * @throws IOException Thrown if decoding the downloaded data fails
+         */
+        public BasicConfiguration contentYAML() throws IOException {
+            BasicConfiguration config = new BasicConfiguration();
+            config.loadFromStream(this.contentInputStream());
+            return config;
         }
 
         /**
