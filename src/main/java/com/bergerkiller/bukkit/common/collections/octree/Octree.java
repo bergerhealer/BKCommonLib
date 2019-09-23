@@ -193,7 +193,7 @@ public class Octree<T> implements OctreeIterable<T> {
         //bst.put(test_cluster.x, test_cluster.y, test_cluster.z, "lol");
 
         Random rand = new Random(0x6323432);
-        int total_clusters = 500;
+        int total_clusters = 50;
         int cluster_spread = 25000;
         for (int n = 0; n < total_clusters; n++) {
             addCluster(bst, rand.nextInt(2*cluster_spread)-cluster_spread, rand.nextInt(2*cluster_spread)-cluster_spread, rand.nextInt(2*cluster_spread)-cluster_spread, 500, 1000);
