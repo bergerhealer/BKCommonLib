@@ -23,6 +23,43 @@ public class OctreeTest {
     }
 
     @Test
+    public void testRemove() {
+        Octree<String> tree = new Octree<String>();
+        putDemoValues(tree);
+
+        // This complexity was expected to require 178 nodes
+        assertEquals(178, tree.getNodeCount());
+
+        // Remove D and E
+        assertEquals("D", tree.remove(10, 100, 1000));
+        assertEquals(null, tree.get(10, 100, 1000));
+        assertEquals("E", tree.remove(512, 512, 512));
+        assertEquals(null, tree.get(512, 512, 512));
+
+        // Complexity should have gone down to 161 nodes
+        assertEquals(161, tree.getNodeCount());
+
+        // Others should remain unchanged
+        assertEquals("A", tree.get(0, 0, 0));
+        assertEquals("B", tree.get(1000, 1000, 1000));
+        assertEquals("C", tree.get(-1000, -1000, -1000));
+        assertEquals("F", tree.get(1073741824, 1073741824, 1073741824));
+        assertEquals("G", tree.get(2147483647, 2147483647, 2147483647));
+        assertEquals("H", tree.get(-2147483648, -2147483648, -2147483648));
+
+        // Remove all other nodes
+        assertEquals("A", tree.remove(0, 0, 0));
+        assertEquals("B", tree.remove(1000, 1000, 1000));
+        assertEquals("C", tree.remove(-1000, -1000, -1000));
+        assertEquals("F", tree.remove(1073741824, 1073741824, 1073741824));
+        assertEquals("G", tree.remove(2147483647, 2147483647, 2147483647));
+        assertEquals("H", tree.remove(-2147483648, -2147483648, -2147483648));
+
+        // With all data gone, we expect only the root node to remain
+        assertEquals(1, tree.getNodeCount());
+    }
+
+    @Test
     public void testPutGet() {
         Octree<String> tree = new Octree<String>();
         putDemoValues(tree);
@@ -77,6 +114,11 @@ public class OctreeTest {
         assertPosEquals(iter, -1000, -1000, -1000);
 
         assertFalse(iter.hasNext());
+    }
+
+    @Test
+    public void testIteratorRemove() {
+        //TODO!!!
     }
 
     @Test

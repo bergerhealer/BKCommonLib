@@ -141,6 +141,31 @@ public class OctreeIterator<T> implements Iterator<T> {
         return result;
     }
 
+    @Override
+    public void remove() {
+        if (this.state != IteratorState.FIND_NEXT) {
+            throw new NoSuchElementException("Next must be called before elements can be removed");
+        }
+
+        // Remove data value from data at index[0]
+        this.tree.data.set(this.index[0] >>> 3, null);
+
+        // This deallocates nodes without children recursively
+        int node = this.index[++this.depth];
+        while (true) {
+            this.tree.table[node] = 0;
+            if (this.tree.clean(node | 0x7)) {
+                break; // has other children
+            }
+            if (this.depth == (this.index.length-1)) {
+                break; // top node reached (entire tree is empty)
+            }
+
+            this.tree.deallocate(node & ~0x7);
+            node = this.index[++this.depth];
+        }
+    }
+
     /**
      * Performs a search operation for the next node
      * 

@@ -14,9 +14,18 @@ public class OctreeDefragmentIterator<T> extends OctreeIterator<T> {
 
     public OctreeDefragmentIterator(Octree<T> tree) {
         super(tree);
-        this.remapping = new int[(tree.table_size>>3)];
-        this.data_entries = new BitSet(tree.table_size);
+        this.remapping = new int[tree.table_size];
+        this.data_entries = new BitSet(tree.table_size<<3);
         this.counter = 1; // Root at index=0 with value=0
+    }
+
+    /**
+     * Gets the table size requires to represent all values optimally
+     * 
+     * @return table size
+     */
+    public int getTableSize() {
+        return this.remapping.length << 3;
     }
 
     public int getRemapped(int node) {

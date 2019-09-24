@@ -7,37 +7,69 @@ import java.util.Random;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 public class Octree<T> implements OctreeIterable<T> {
-    private static final int TABLE_GROW_RATE = 10240*8;
     protected int[] table;
     protected int table_size;
     protected final ArrayList<T> data;
+    private int deallocated_node_index = 0;
 
     public Octree() {
         this.data = new ArrayList<T>();
         this.data.add(null); //idx=0 terminator
-        this.table_size = 8;
-        this.table = new int[TABLE_GROW_RATE];
-    }
-
-    @Override
-    public OctreeIterator<T> iterator() {
-        return new OctreeIterator<T>(this);
+        this.table_size = 1; // stores root node only
+        this.table = new int[8];
     }
 
     /**
-     * Gets a view of the contents of this tree that lays inside a cuboid area.
+     * Retrieves a node index from the pool of deallocated entries.
+     * If more space is needed, the tree is resized to increase this pool.
+     * The node will have zeroed-out values.
      * 
-     * @param min coordinates of the cuboid (inclusive)
-     * @param max coordinates of the cuboid (inclusive)
-     * @return iterable
+     * @return node index
      */
-    public OctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
-        return new OctreeIterable<T>() {
-            @Override
-            public OctreeIterator<T> iterator() {
-                return new OctreeCuboidIterator<T>(Octree.this, min, max);
+    protected int allocate() {
+        // Grow the tree by 2x size if more nodes are needed, with a chain of deallocated nodes
+        // The last node of the tree will have no next deallocated node (0)
+        if (this.deallocated_node_index == 0) {
+            this.deallocated_node_index = this.table.length;
+            this.table = Arrays.copyOf(this.table, this.table.length << 1);
+            int end_node_index = this.table.length - 8;
+            for (int node = this.deallocated_node_index; node < end_node_index; node += 8) {
+                this.table[node+1] = node+8;
             }
-        };
+        }
+
+        // Retrieve the deallocated node index and set the deallocated node index to next in line
+        // Set the second field that was storing this value to 0 again.
+        int node = this.deallocated_node_index;
+        this.deallocated_node_index = this.table[++node];
+        this.table[node--] = 0;
+        this.table_size++;
+        return node;
+    }
+
+    /**
+     * Stores a node in the pool of deallocated entries.
+     * A deallocated node has the first entry set to 0, with the following
+     * entry set to the index of the previous free node in the chain.
+     * If the usage of the table is significantly low enough after deallocating,
+     * the table is resized to reduce memory usage.
+     * 
+     * @param node to deallocate
+     */
+    protected void deallocate(int node) {
+        int next_deallocated_node_index = this.deallocated_node_index;
+        this.deallocated_node_index = node;
+        this.table[node] = 0;
+        this.table[++node] = next_deallocated_node_index;
+        this.table[++node] = 0;
+        this.table[++node] = 0;
+        this.table[++node] = 0;
+        this.table[++node] = 0;
+        this.table[++node] = 0;
+        this.table[++node] = 0;
+        this.table_size--;
+
+        //TODO: Check table size < 1/2 of table size, warranting resizing
     }
 
     /**
@@ -54,7 +86,10 @@ public class Octree<T> implements OctreeIterable<T> {
         // In the order that we found the nodes using the iterator, move the nodes in the tree
         // Do not alter the indices of entries that refer to data values
         int[] new_table = new int[this.table.length];
-        for (int i = 0; i < this.table_size; i += 8) {
+        for (int i = 0; i < this.table.length; i += 8) {
+            if (this.table[i] == 0) {
+                continue; // deallocated entry
+            }
             int new_pos = iter.getRemapped(i);
             if (iter.isStoringDataValues(i)) {
                 System.arraycopy(this.table, i, new_table, new_pos, 8);
@@ -65,11 +100,58 @@ public class Octree<T> implements OctreeIterable<T> {
             }
         }
 
+        // For all remaining entries in the table, initialize it with deallocated entries
+        this.deallocated_node_index = iter.getTableSize();
+        int end_node_index = new_table.length - 8;
+        for (int node = this.deallocated_node_index; node < end_node_index; node += 8) {
+            new_table[node+1] = node+8;
+        }
+
         // Assign the new table data
         this.table = new_table;
     }
 
-    public void optimize(int parent) {
+    /**
+     * Gets the total number of tree nodes in this octree. The amount that is required highly
+     * depends on the complexity of the data index.
+     * 
+     * @return table node count
+     */
+    public int getNodeCount() {
+        return this.table_size;
+    }
+
+    /**
+     * Gets the total number of data values stored in this octree.
+     * 
+     * @return data value count
+     */
+    public int size() {
+        return this.data.size();
+    }
+
+    @Override
+    public OctreeIterator<T> iterator() {
+        return new OctreeIterator<T>(this);
+    }
+
+    /**
+     * Gets a view of the contents of this tree that lay inside a cuboid area.
+     * 
+     * @param min coordinates of the cuboid (inclusive)
+     * @param max coordinates of the cuboid (inclusive)
+     * @return iterable
+     */
+    public OctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
+        return new OctreeIterable<T>() {
+            @Override
+            public OctreeIterator<T> iterator() {
+                return new OctreeCuboidIterator<T>(Octree.this, min, max);
+            }
+        };
+    }
+
+    protected boolean clean(int parent) {
         int node = 0;
         do {
             int new_node = this.table[parent];
@@ -79,6 +161,17 @@ public class Octree<T> implements OctreeIterable<T> {
                 this.table[parent] = node;
             }
         } while ((parent-- & 0x7) != 0);
+        return node != 0;
+    }
+
+    public T remove(int x, int y, int z) {
+        OctreePointIterator<T> iter = new OctreePointIterator<T>(this, x, y, z);
+        if (iter.hasNext()) {
+            T value = iter.next();
+            iter.remove();
+            return value;
+        }
+        return null;
     }
 
     public T get(int x, int y, int z) {
@@ -110,13 +203,9 @@ public class Octree<T> implements OctreeIterable<T> {
             int next_index = this.table[index];
             if (next_index == 0 || ((next_index & 0x7) != subaddr)) {
                 // Add a new node at this position
-                next_index = this.table_size;
-                this.table_size += 8;
-                if (this.table_size == this.table.length) {
-                    this.table = Arrays.copyOf(this.table, this.table_size + TABLE_GROW_RATE);
-                }
+                next_index = this.allocate();
                 this.table[index] = (next_index | subaddr);
-                optimize(index);
+                clean(index);
             }
 
             index = next_index & ~0x7;
@@ -132,7 +221,7 @@ public class Octree<T> implements OctreeIterable<T> {
         if (data_index == 0 || ((data_index & 0x7) != subaddr)) {
             //System.out.println("STORE DATA " + index + " -> " + this.data.size());
             this.table[index] = (this.data.size() << 3) | subaddr;
-            optimize(index);
+            clean(index);
             this.data.add(value);
         } else {
             this.data.set(data_index >> 3, value);
