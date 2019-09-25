@@ -1,9 +1,9 @@
 package com.bergerkiller.bukkit.common.collections.octree;
 
 /**
- * Iterable that returns am {@link OctreeIterator}
+ * Iterable that returns a {@link OctreeIterator}
  * 
- * @param <T>
+ * @param <T> The value type of the Octree
  */
 public interface OctreeIterable<T> extends Iterable<T> {
     @Override

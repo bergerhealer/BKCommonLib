@@ -27,10 +27,28 @@ public class OctreeIterator<T> implements Iterator<T> {
         this.tree = tree;
         this.coord_dirty = true;
         this.index = new int[33];
-        this.index[this.index.length - 1] = 0;
-        this.state = IteratorState.INITIAL;
+        this.reset();
+    }
+
+    /**
+     * Resets the iterator back to the beginning
+     */
+    public void reset() {
         this.depth = this.index.length-1;
+        this.index[this.depth] = 0;
         this.skipIntersectionBelowDepth = -1;
+        this.state = IteratorState.INITIAL;
+    }
+
+    /**
+     * Gets whether this iterator is in its initial state.
+     * It will stay in this state until {@link #hasNext()} or {@link #next()}
+     * are called.
+     * 
+     * @return True if in initial state, False if not.
+     */
+    public boolean isInitialState() {
+        return this.state == IteratorState.INITIAL;
     }
 
     /**
@@ -164,6 +182,35 @@ public class OctreeIterator<T> implements Iterator<T> {
             this.tree.deallocate(node & ~0x7);
             node = this.index[++this.depth];
         }
+    }
+
+    /**
+     * Gets the value last returned using {@link #next()}
+     * 
+     * @return last returned value
+     */
+    public T get() {
+        if (this.state != IteratorState.FIND_NEXT) {
+            throw new NoSuchElementException("Next must be called before get() can be called");
+        }
+        return this.tree.data.get(this.index[0] >>> 3);
+    }
+
+    /**
+     * Replaces the value last returned using {@link #next()} with a new value,
+     * stored at the same coordinates.
+     * 
+     * @param value to set
+     * @return previously stored value
+     */
+    public T put(T value) {
+        if (this.state != IteratorState.FIND_NEXT) {
+            throw new NoSuchElementException("Next must be called before get() can be called");
+        }
+        int index = (this.index[0] >>> 3);
+        T oldValue = this.tree.data.get(index);
+        this.tree.data.set(index, value);
+        return oldValue;
     }
 
     /**

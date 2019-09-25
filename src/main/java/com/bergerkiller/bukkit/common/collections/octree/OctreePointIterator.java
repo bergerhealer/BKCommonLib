@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.collections.octree;
 
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
 /**
  * Implementation of {@link OctreeIterator} that iterates towards a single point
  * stored in the tree. All other values are ignored.
@@ -7,12 +9,30 @@ package com.bergerkiller.bukkit.common.collections.octree;
  * @param <T>
  */
 public class OctreePointIterator<T> extends OctreeIterator<T> {
-    private final int point_x;
-    private final int point_y;
-    private final int point_z;
+    private int point_x;
+    private int point_y;
+    private int point_z;
+
+    public OctreePointIterator(Octree<T> tree, IntVector3 point) {
+        this(tree, point.x, point.y, point.z);
+    }
 
     public OctreePointIterator(Octree<T> tree, int x, int y, int z) {
         super(tree);
+        this.point_x = x;
+        this.point_y = y;
+        this.point_z = z;
+    }
+
+    /**
+     * Resets the iterator and points it to a different point
+     * 
+     * @param x
+     * @param y
+     * @param z
+     */
+    public void reset(int x, int y, int z) {
+        super.reset();
         this.point_x = x;
         this.point_y = y;
         this.point_z = z;

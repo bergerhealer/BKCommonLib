@@ -41,7 +41,7 @@ public class OctreeDefragmentIterator<T> extends OctreeIterator<T> {
         if (this.isDataNode()) {
             this.data_entries.set(this.getParentNode() >>> 3);
         } else {
-            this.remapping[this.getNode()>>>3] = counter++;
+            this.remapping[this.getNode()>>>3] = this.counter++;
         }
         return Intersection.PARTIAL;
     }

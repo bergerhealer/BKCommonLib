@@ -23,6 +23,21 @@ public class OctreeTest {
     }
 
     @Test
+    public void testPutGet() {
+        Octree<String> tree = new Octree<String>();
+        putDemoValues(tree);
+
+        assertEquals("A", tree.get(0, 0, 0));
+        assertEquals("B", tree.get(1000, 1000, 1000));
+        assertEquals("C", tree.get(-1000, -1000, -1000));
+        assertEquals("D", tree.get(10, 100, 1000));
+        assertEquals("E", tree.get(512, 512, 512));
+        assertEquals("F", tree.get(1073741824, 1073741824, 1073741824));
+        assertEquals("G", tree.get(2147483647, 2147483647, 2147483647));
+        assertEquals("H", tree.get(-2147483648, -2147483648, -2147483648));
+    }
+
+    @Test
     public void testRemove() {
         Octree<String> tree = new Octree<String>();
         putDemoValues(tree);
@@ -60,59 +75,19 @@ public class OctreeTest {
     }
 
     @Test
-    public void testPutGet() {
-        Octree<String> tree = new Octree<String>();
-        putDemoValues(tree);
-
-        assertEquals("A", tree.get(0, 0, 0));
-        assertEquals("B", tree.get(1000, 1000, 1000));
-        assertEquals("C", tree.get(-1000, -1000, -1000));
-        assertEquals("D", tree.get(10, 100, 1000));
-        assertEquals("E", tree.get(512, 512, 512));
-        assertEquals("F", tree.get(1073741824, 1073741824, 1073741824));
-        assertEquals("G", tree.get(2147483647, 2147483647, 2147483647));
-        assertEquals("H", tree.get(-2147483648, -2147483648, -2147483648));
-    }
-
-    @Test
     public void testIterator() {
         Octree<String> tree = new Octree<String>();
         putDemoValues(tree);
 
         OctreeIterator<String> iter = tree.iterator();
-
-        assertTrue(iter.hasNext());
-        assertEquals("A", iter.next());
-        assertPosEquals(iter, 0, 0, 0);
-
-        assertTrue(iter.hasNext());
-        assertEquals("D", iter.next());
-        assertPosEquals(iter, 10, 100, 1000);
-
-        assertTrue(iter.hasNext());
-        assertEquals("E", iter.next());
-        assertPosEquals(iter, 512, 512, 512);
-
-        assertTrue(iter.hasNext());
-        assertEquals("B", iter.next());
-        assertPosEquals(iter, 1000, 1000, 1000);
-
-        assertTrue(iter.hasNext());
-        assertEquals("F", iter.next());
-        assertPosEquals(iter, 1073741824, 1073741824, 1073741824);
-
-        assertTrue(iter.hasNext());
-        assertEquals("G", iter.next());
-        assertPosEquals(iter, 2147483647, 2147483647, 2147483647);
-
-        assertTrue(iter.hasNext());
-        assertEquals("H", iter.next());
-        assertPosEquals(iter, -2147483648, -2147483648, -2147483648);
-
-        assertTrue(iter.hasNext());
-        assertEquals("C", iter.next());
-        assertPosEquals(iter, -1000, -1000, -1000);
-
+        assertNext(iter, "A", 0, 0, 0);
+        assertNext(iter, "D", 10, 100, 1000);
+        assertNext(iter, "E", 512, 512, 512);
+        assertNext(iter, "B", 1000, 1000, 1000);
+        assertNext(iter, "F", 1073741824, 1073741824, 1073741824);
+        assertNext(iter, "G", 2147483647, 2147483647, 2147483647);
+        assertNext(iter, "H", -2147483648, -2147483648, -2147483648);
+        assertNext(iter, "C", -1000, -1000, -1000);
         assertFalse(iter.hasNext());
     }
 
@@ -150,15 +125,8 @@ public class OctreeTest {
         tree.put(block.x, block.y+1, block.z, "C");
 
         OctreeIterator<String> iter = tree.cuboid(block, block.add(1, 1, 0)).iterator();
-
-        assertTrue(iter.hasNext());
-        assertEquals("A", iter.next());
-        assertPosEquals(iter, block.x, block.y, block.z);
-
-        assertTrue(iter.hasNext());
-        assertEquals("C", iter.next());
-        assertPosEquals(iter, block.x, block.y+1, block.z);
-
+        assertNext(iter, "A", block.x, block.y, block.z);
+        assertNext(iter, "C", block.x, block.y+1, block.z);
         assertFalse(iter.hasNext());
     }
 
@@ -168,7 +136,9 @@ public class OctreeTest {
         Octree.test2();
     }
 
-    private void assertPosEquals(OctreeIterator<String> iter, int x, int y, int z) {
+    private void assertNext(OctreeIterator<String> iter, String value, int x, int y, int z) {
+        assertTrue(iter.hasNext());
+        assertEquals(value, iter.next());
         assertEquals(x, iter.getX());
         assertEquals(y, iter.getY());
         assertEquals(z, iter.getZ());
