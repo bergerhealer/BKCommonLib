@@ -154,7 +154,7 @@ public class OctreeIterator<T> implements Iterator<T> {
         if (dataIndex == 0) {
             throw new NoSuchElementException("No more elements in Octal Search Tree");
         }
-        T result = this.tree.data.get(dataIndex);
+        T result = this.tree.values.getAt(dataIndex);
         this.state = IteratorState.FIND_NEXT;
         return result;
     }
@@ -166,7 +166,7 @@ public class OctreeIterator<T> implements Iterator<T> {
         }
 
         // Remove data value from data at index[0]
-        this.tree.data.set(this.index[0] >>> 3, null);
+        this.tree.values.setAt(this.index[0] >>> 3, null);
 
         // This deallocates nodes without children recursively
         int node = this.index[++this.depth];
@@ -193,7 +193,7 @@ public class OctreeIterator<T> implements Iterator<T> {
         if (this.state != IteratorState.FIND_NEXT) {
             throw new NoSuchElementException("Next must be called before get() can be called");
         }
-        return this.tree.data.get(this.index[0] >>> 3);
+        return this.tree.values.getAt(this.index[0] >>> 3);
     }
 
     /**
@@ -208,8 +208,8 @@ public class OctreeIterator<T> implements Iterator<T> {
             throw new NoSuchElementException("Next must be called before get() can be called");
         }
         int index = (this.index[0] >>> 3);
-        T oldValue = this.tree.data.get(index);
-        this.tree.data.set(index, value);
+        T oldValue = this.tree.values.getAt(index);
+        this.tree.values.setAt(index, value);
         return oldValue;
     }
 

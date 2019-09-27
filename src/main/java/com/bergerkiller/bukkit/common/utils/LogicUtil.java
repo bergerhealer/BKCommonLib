@@ -495,9 +495,17 @@ public class LogicUtil {
      */
     @SafeVarargs
     public static <T> boolean contains(T value, T... values) {
-        for (T v : values) {
-            if (bothNullOrEqual(v, value)) {
-                return true;
+        if (value == null) {
+            for (T v : values) {
+                if (v == null) {
+                    return true;
+                }
+            }
+        } else {
+            for (T v : values) {
+                if (value.equals(v)) {
+                    return true;
+                }
             }
         }
         return false;

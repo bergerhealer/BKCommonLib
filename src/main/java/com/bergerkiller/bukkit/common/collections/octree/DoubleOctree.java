@@ -603,6 +603,15 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         }
 
         /**
+         * Gets a new 3D Vector storing the x/y/z coordinates of where the value is stored
+         * 
+         * @return coordinates vector
+         */
+        public Vector toVector() {
+            return new Vector(this.x, this.y, this.z);
+        }
+
+        /**
          * Gets the value being stored
          * 
          * @return value

@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.collections.octree;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Random;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.IndexedCollection;
 
 /**
  * Maps values to 3D x/y/z coordinates with integer resolution.
@@ -19,12 +21,12 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 public class Octree<T> implements OctreeIterable<T> {
     protected int[] table;
     protected int table_size;
-    protected final ArrayList<T> data;
+    protected final IndexedCollection<T> values;
     private int deallocated_node_index;
     protected final OctreePointIterator<T> remove_iter;
 
     public Octree() {
-        this.data = new ArrayList<T>();
+        this.values = new IndexedCollection<T>();
         this.clear();
         this.remove_iter = new OctreePointIterator<T>(this, 0, 0, 0);
     }
@@ -33,9 +35,8 @@ public class Octree<T> implements OctreeIterable<T> {
      * Clears all the contents of this Octree, freeing all memory associated with it.
      */
     public void clear() {
-        this.data.clear();
-        this.data.add(null); //idx=0 terminator
-        this.data.trimToSize();
+        this.values.clear();
+        this.values.add(null);
         this.deallocated_node_index = 0; // must be resized
         this.table_size = 1; // stores root node only
         this.table = new int[8];
@@ -164,7 +165,16 @@ public class Octree<T> implements OctreeIterable<T> {
      * @return data value count
      */
     public int size() {
-        return this.data.size();
+        return this.values.size();
+    }
+
+    /**
+     * Gets an unmodifiable view of all the values inside this tree
+     * 
+     * @return values
+     */
+    public Collection<T> values() {
+        return Collections.unmodifiableCollection(this.values);
     }
 
     @Override
@@ -266,8 +276,8 @@ public class Octree<T> implements OctreeIterable<T> {
      * @return previous value stored at the index, or null if none was stored
      */
     public T putValueAtIndex(int index, T value) {
-        T result = this.data.get(index);
-        this.data.set(index, value);
+        T result = this.values.getAt(index);
+        this.values.setAt(index, value);
         return result;
     }
 
@@ -279,7 +289,7 @@ public class Octree<T> implements OctreeIterable<T> {
      * @return value stored at the index, or null if none was stored
      */
     public T getValueAtIndex(int index) {
-        return this.data.get(index);
+        return this.values.getAt(index);
     }
 
     /**
@@ -320,8 +330,7 @@ public class Octree<T> implements OctreeIterable<T> {
             index |= subaddr;
             int data_index = this.table[index];
             if (data_index == 0 || ((data_index & 0x7) != subaddr)) {
-                data_index = this.data.size();
-                this.data.add(null);
+                data_index = this.values.addAndGetIndex(null);
                 this.table[index] = (data_index << 3) | subaddr;
                 clean(index);
             } else {
@@ -494,5 +503,9 @@ public class Octree<T> implements OctreeIterable<T> {
         */
 
         //System.out.println("PUT EM ALL "  + bst.table.length);
+    }
+
+    private static class UninitializedValue {
+        public UninitializedValue next = null;
     }
 }
