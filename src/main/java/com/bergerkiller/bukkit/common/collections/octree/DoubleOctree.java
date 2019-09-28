@@ -1,8 +1,15 @@
 package com.bergerkiller.bukkit.common.collections.octree;
 
+import java.util.AbstractCollection;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
@@ -75,53 +82,79 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
 
     /**
      * Checks whether a value is stored at the coordinates specified.
-     * Also returns true if the value stored is null.
      * 
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
+     * @param x      The X-coordinate
+     * @param y      The Y-coordinate
+     * @param z      The Z-coordinate
+     * @param value  The value expected to be stored here
      * @return True if a value is stored at the coordinates, False if not
      */
-    public boolean contains(double x, double y, double z) {
-        return this.getEntry(x, y, z) != null;
+    public boolean contains(double x, double y, double z, T value) {
+        Entry<T> entry = this.tree.get(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
+        if (entry != null) {
+            do {
+                int compare = entry.compareTo(x, y, z);
+                if (compare > 0) {
+                    return false;
+                } else if (compare == 0 && LogicUtil.bothNullOrEqual(entry.getValue(), value)) {
+                    return true;
+                }
+            } while ((entry = entry.next) != null);
+        }
+        return false;
     }
 
     /**
-     * Gets the value stored at the specified coordinates.
+     * Gets the values stored at the specified coordinates.
      * 
      * @param x The X-coordinate
      * @param y The Y-coordinate
      * @param z The Z-coordinate
-     * @return Value stored at these coordinates. Null if nothing, or null, is stored.
+     * @return Values stored at these coordinates
      */
-    public T get(double x, double y, double z) {
-        return value(this.getEntry(x, y, z));
+    public Collection<T> get(double x, double y, double z) {
+        Entry<T> firstEntry = this.getFirstEntry(x, y, z);
+        return (firstEntry == null) ? Collections.emptyList() : new PositionCollection<T>(firstEntry);
     }
 
     /**
-     * Puts a new entry at the specified coordinates, returning the previous value
+     * Adds a new entry at the specified coordinates
      * 
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
-     * @param value to store
-     * @return previous value at these coordinates, null if none existed
+     * @param x      The X-coordinate
+     * @param y      The Y-coordinate
+     * @param z      The Z-coordinate
+     * @param value  The value to store
      */
-    public T put(double x, double y, double z, T value) {
-        return value(putEntry(new Entry<T>(x, y, z, value)));
+    public void add(double x, double y, double z, T value) {
+        addEntry(new Entry<T>(x, y, z, value));
     }
 
     /**
-     * Removes an entry stored at the specified coordinates, returning the value of the entry
+     * Removes an entry stored at the coordinates specified, returning the entry that was
      * removed.
      * 
-     * @param x The Y-coordinate
-     * @param y The Y-coordinate
-     * @param z The Y-coordinate
-     * @return previous value at these coordinates, null if none existed
+     * @param x      The X-coordinate
+     * @param y      The Y-coordinate
+     * @param z      The Z-coordinate
+     * @param value  The value of the entry to remove
+     * @return True if an entry was found and removed, False otherwise
      */
-    public T remove(double x, double y, double z) {
-        return value(removeEntry(x, y, z));
+    public boolean remove(double x, double y, double z, T value) {
+        this.remove_iter.reset();
+        this.tree.remove_iter.reset(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
+        while (this.remove_iter.hasNext()) {
+            Entry<T> entry = this.remove_iter.nextEntry();
+            int compare = entry.compareTo(x, y, z);
+            if (compare > 0) {
+                break;
+            } else if (compare == 0 && LogicUtil.bothNullOrEqual(entry.getValue(), value)) {
+                this.remove_iter.remove();
+                return true;
+            } else if (compare > 0) {
+                break;
+            }
+        }
+        return false;
     }
 
     /**
@@ -136,15 +169,39 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param oldX      The X-coordinate of the old position
      * @param oldY      The Y-coordinate of the old position
      * @param oldZ      The Z-coordinate of the old position
+     * @param oldValue  The value stored at the old position
      * @param newX      The X-coordinate of the desired new position
      * @param newY      The Y-coordinate of the desired new position
      * @param newZ      The Z-coordinate of the desired new position
      * @param newValue  The value to store at the new position
-     * @return the result of the move, which will be SUCCESS if the tree was changed
+     * @return True if the old value was found and moved, False otherwise
      * @see {@link #moveEntry(Entry, Entry)}
      */
-    public MoveResult move(double oldX, double oldY, double oldZ, double newX, double newY, double newZ, T newValue) {
-        return moveEntry(new Entry<T>(oldX, oldY, oldZ, null), new Entry<T>(newX, newY, newZ, newValue));
+    public boolean move(double oldX, double oldY, double oldZ, T oldValue, double newX, double newY, double newZ, T newValue) {
+        return moveEntry(new Entry<T>(oldX, oldY, oldZ, oldValue), new Entry<T>(newX, newY, newZ, newValue));
+    }
+
+    /**
+     * Moves an entry from the old position to a new position as efficiently as possible.
+     * The lookup is optimized in several ways to speed this up:
+     * <ul>
+     * <li>If the position is unchanged, only the value is updated
+     * <li>If the old and new position are in the same 1x1x1 block, chain lookup is only done once
+     * <li>Traversing the underlying tree is done while excluding regions that contain neither old nor new entry
+     * </ul>
+     * 
+     * @param oldX      The X-coordinate of the old position
+     * @param oldY      The Y-coordinate of the old position
+     * @param oldZ      The Z-coordinate of the old position
+     * @param value     The value stored at the old position that will be moved to a new position
+     * @param newX      The X-coordinate of the desired new position
+     * @param newY      The Y-coordinate of the desired new position
+     * @param newZ      The Z-coordinate of the desired new position
+     * @return True if the old value was found and moved, False otherwise
+     * @see {@link #moveEntry(Entry, Entry)}
+     */
+    public boolean move(double oldX, double oldY, double oldZ, T value, double newX, double newY, double newZ) {
+        return moveEntry(new Entry<T>(oldX, oldY, oldZ, value), new Entry<T>(newX, newY, newZ, value));
     }
 
     /**
@@ -157,32 +214,41 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @return True if the entry specified is contained, False if not
      */
     public boolean containsEntry(Entry<T> entry) {
-        Entry<T> existing = this.getEntry(entry.getX(), entry.getY(), entry.getZ());
+        Entry<T> existing = this.getFirstEntry(entry.getX(), entry.getY(), entry.getZ());
         if (existing == null) {
             return false;
-        } else if (existing == entry) {
+        } else if (existing.valueEquals(entry)) {
             return true;
-        } else if (existing.getValue() == null) {
-            return entry.getValue() == null;
-        } else {
-            return existing.getValue().equals(entry.getValue());
         }
+        existing = existing.next;
+        while (existing != null && existing.equalsCoord(entry.getX(), entry.getY(), entry.getZ())) {
+            if (existing.valueEquals(entry)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
-     * Gets the entry stored at the coordinates specified
+     * Gets the first entry stored that represents the coordinates specified
      * 
      * @param x The X-coordinate
      * @param y The Y-coordinate
      * @param z The Z-coordinate
-     * @return Entry stored at these coordinates. Null if nothing is stored.
+     * @return First entry stored at these coordinates. Null if nothing is stored.
      */
-    public Entry<T> getEntry(double x, double y, double z) {
+    private Entry<T> getFirstEntry(double x, double y, double z) {
+        int compare;
         Entry<T> entry = this.tree.get(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
-        while (entry != null && (entry.getX() != x || entry.getY() != y || entry.getZ() != z)) {
-            entry = entry.next;
+        while (true) {
+            if (entry == null || (compare = entry.compareTo(x, y, z)) > 0) {
+                return null;
+            } else if (compare == 0) {
+                return entry;
+            } else {
+                entry = entry.next;
+            }
         }
-        return entry;
     }
 
     /**
@@ -192,7 +258,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param value
      * @return previous entry at the coordinates of the entry, if one existed
      */
-    public Entry<T> putEntry(Entry<T> value) {
+    public void addEntry(Entry<T> value) {
         int index = this.tree.getValueIndex(MathUtil.floor(value.getX()),
                                             MathUtil.floor(value.getY()),
                                             MathUtil.floor(value.getZ()), true);
@@ -201,7 +267,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         Entry<T> currentEntry = this.tree.getValueAtIndex(index);
         if (currentEntry == null) {
             this.tree.putValueAtIndex(index, value);
-            return null;
+            return;
         }
 
         // Go by all the sorted entries in the chain until we find it
@@ -218,16 +284,8 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
                     // Insert in between the previous and current entry
                     previous.next = value;
                 }
-                if (compare == 0) {
-                    // Remove the current entry (and return it)
-                    value.next = currentEntry.next;
-                    currentEntry.next = null;
-                    return currentEntry;
-                } else {
-                    // Nothing was replaced
-                    value.next = currentEntry;
-                    return null;
-                }
+                value.next = currentEntry;
+                return;
             }
 
             // Keep looking
@@ -238,32 +296,16 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         // Append to the end of the chain
         previous.next = value;
         value.next = null;
-        return null;
     }
 
     /**
-     * Removes an entry stored at the coordinates specified, returning the entry that was
-     * removed.
+     * Removes an entry stored inside this octree.
      * 
-     * @param x The X-coordinate
-     * @param y The Y-coordinate
-     * @param z The Z-coordinate
-     * @return removed entry, or null if no entry was stored here
+     * @param entry The entry to remove
+     * @return True if an entry was found and removed, False otherwise
      */
-    public Entry<T> removeEntry(double x, double y, double z) {
-        this.remove_iter.reset();
-        this.tree.remove_iter.reset(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
-        while (this.remove_iter.hasNext()) {
-            Entry<T> entry = this.remove_iter.nextEntry();
-            int compare = entry.compareTo(x, y, z);
-            if (compare == 0) {
-                this.remove_iter.remove();
-                return entry;
-            } else if (compare > 0) {
-                break;
-            }
-        }
-        return null;
+    public boolean removeEntry(Entry<T> entry) {
+        return remove(entry.getX(), entry.getY(), entry.getZ(), entry.getValue());
     }
 
     /**
@@ -279,15 +321,10 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param newEntry to replace oldEntry with
      * @return the result of the move, which will be SUCCESS if the tree was changed
      */
-    public MoveResult moveEntry(Entry<T> oldEntry, Entry<T> newEntry) {
-        // If unchanged, only verify that the old entry exists, and replace the value
-        if (oldEntry.equalsCoord(newEntry.getX(), newEntry.getY(), newEntry.getZ())) {
-            if (this.putEntry(newEntry) == null) {
-                this.removeEntry(newEntry.getX(), newEntry.getY(), newEntry.getZ());
-                return MoveResult.NOT_FOUND;
-            } else {
-                return MoveResult.SUCCESS;
-            }
+    public boolean moveEntry(Entry<T> oldEntry, Entry<T> newEntry) {
+        // If unchanged, only verify that the old entry exists
+        if (oldEntry.equals(newEntry)) {
+            return this.containsEntry(oldEntry);
         }
 
         // Find the 1x1x1 block coordinates and value index of the old and new entry
@@ -299,7 +336,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         int newBlockZ = MathUtil.floor(newEntry.getZ());
         int oldIndex = this.tree.getValueIndex(oldBlockX, oldBlockY, oldBlockZ, false);
         if (oldIndex == 0) {
-            return MoveResult.NOT_FOUND;
+            return false;
         }
 
         // If block is unchanged, we only have to find a single entry and modify the chain
@@ -309,45 +346,41 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
 
         // TODO: Optimize this lookup, since we can walk the root of the tree once for both blocks
         int newIndex = this.tree.getValueIndex(newBlockX, newBlockY, newBlockZ, true);
-        MoveResult result = moveEntryBetweenChains(oldIndex, newIndex, oldEntry, newEntry);
-        if (result == MoveResult.NOT_FOUND && this.tree.getValueAtIndex(newIndex) == null) {
+        boolean result = moveEntryBetweenChains(oldIndex, newIndex, oldEntry, newEntry);
+        if (!result && this.tree.getValueAtIndex(newIndex) == null) {
             this.tree.remove(newBlockX, newBlockY, newBlockZ);
         }
         return result;
     }
 
     // Moves an entry from one chain to another
-    private MoveResult moveEntryBetweenChains(int indexFrom, int indexTo, Entry<T> oldEntry, Entry<T> newEntry) {
+    private boolean moveEntryBetweenChains(int indexFrom, int indexTo, Entry<T> oldEntry, Entry<T> newEntry) {
         // Find the entry that comes before the node to remove from the old chain
-        boolean entryBeforeOldEntryIsFirstEntry;
-        Entry<T> entryBeforeOldEntry;
         {
             Entry<T> currentEntry = this.tree.getValueAtIndex(indexFrom);
             int compare = currentEntry.compareTo(oldEntry);
-            if (compare == 0) {
+            if (compare == 0 && currentEntry.valueEquals(oldEntry)) {
                 // First entry of chain, use setValueAtIndex to update it
-                entryBeforeOldEntry = currentEntry;
-                entryBeforeOldEntryIsFirstEntry = true;
+                this.tree.putValueAtIndex(indexFrom, currentEntry.next);
             } else if (compare > 0) {
                 // Expected before this entry, so missing
-                return MoveResult.NOT_FOUND;
+                return false;
             } else {
                 // Find it in the chain
                 while (true) {
                     if (currentEntry.next == null || (compare = currentEntry.next.compareTo(oldEntry)) > 0) {
-                        return MoveResult.NOT_FOUND;
-                    }
-                    if (compare == 0) {
-                        entryBeforeOldEntry = currentEntry;
-                        entryBeforeOldEntryIsFirstEntry = false;
+                        return false;
+                    } else if (compare == 0 && currentEntry.next.valueEquals(oldEntry)) {
+                        currentEntry.next = currentEntry.next.next;
                         break;
+                    } else {
+                        currentEntry = currentEntry.next;
                     }
-                    currentEntry = currentEntry.next;
                 }
             }
         }
 
-        // Find out if the new entry already exists, or otherwise, what entry to stick it after
+        // Find out what entry to stick it after
         {
             Entry<T> currentEntry = this.tree.getValueAtIndex(indexTo);
             if (currentEntry == null) {
@@ -356,21 +389,17 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
                 this.tree.putValueAtIndex(indexTo, newEntry);
             } else {
                 int compare = currentEntry.compareTo(newEntry);
-                if (compare < 0) {
+                if (compare >= 0) {
                     // Insert at the beginning
                     newEntry.next = currentEntry;
                     this.tree.putValueAtIndex(indexTo, newEntry);
-                } else if (compare == 0) {
-                    return MoveResult.TARGET_OCCUPIED;
                 } else {
                     // Walk the chain and attempt to insert it
                     while (true) {
-                        if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) < 0) {
+                        if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) >= 0) {
                             newEntry.next = currentEntry.next;
                             currentEntry.next = newEntry;
                             break;
-                        } else if (compare == 0) {
-                            return MoveResult.TARGET_OCCUPIED;
                         }
                         currentEntry = currentEntry.next;
                     }
@@ -378,83 +407,63 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             }
         }
 
-        // We can remove the old entry now we have successfully stored the new entry
-        if (entryBeforeOldEntryIsFirstEntry) {
-            this.tree.putValueAtIndex(indexFrom, entryBeforeOldEntry.next);
-        } else {
-            entryBeforeOldEntry.next = entryBeforeOldEntry.next.next;
-        }
-
-        return MoveResult.SUCCESS;
+        return true;
     }
 
     // Moves an entry inside the chain of the same 1x1x1 block
-    private MoveResult moveEntryInChain(int index, Entry<T> oldEntry, Entry<T> newEntry) {
+    private boolean moveEntryInChain(int index, Entry<T> oldEntry, Entry<T> newEntry) {
         final Entry<T> entryAtIndex = this.tree.getValueAtIndex(index);
         int compare;
 
         // Special care with the very first entry of the chain
         {
             // Check whether the old entry is the start of the chain, or 'before' (missing)
-            if ((compare = entryAtIndex.compareTo(oldEntry)) == 0) {
+            if ((compare = entryAtIndex.compareTo(oldEntry)) == 0 && entryAtIndex.valueEquals(oldEntry)) {
                 // Shortcut when only a single entry is stored in a 1x1x1 block, or when
                 // the new entry is put in the front of the chain
                 Entry<T> currentEntry = entryAtIndex.next;
                 if (currentEntry == null || (compare = currentEntry.compareTo(newEntry)) > 0) {
                     newEntry.next = currentEntry;
                     this.tree.putValueAtIndex(index, newEntry);
-                    return MoveResult.SUCCESS;
-                } else if (compare == 0) {
-                    // The next entry is the same as the new entry, then we cannot store it
-                    return MoveResult.TARGET_OCCUPIED;
+                    return true;
                 }
 
                 // Find where in the chain we must store the next entry
-                while (currentEntry.next != null) {
-                    compare = currentEntry.next.compareTo(newEntry);
-                    if (compare > 0) {
-                        // Put it right after this entry
-                        break;
-                    } else if (compare == 0) {
-                        return MoveResult.TARGET_OCCUPIED;
-                    } else {
-                        currentEntry = currentEntry.next;
-                    }
+                while (currentEntry.next != null && (compare = currentEntry.next.compareTo(newEntry)) < 0) {
+                    currentEntry = currentEntry.next;
                 }
 
                 // Insert after the entry where we stopped
                 newEntry.next = currentEntry.next;
                 currentEntry.next = newEntry;
                 this.tree.putValueAtIndex(index, entryAtIndex.next);
-                return MoveResult.SUCCESS;
+                return true;
             } else if (compare > 0) {
-                return MoveResult.NOT_FOUND;
+                return false;
             }
 
             // Check whether the new entry should be the new start of the chain
-            if ((compare = entryAtIndex.compareTo(newEntry)) > 0) {
+            if ((compare = entryAtIndex.compareTo(newEntry)) >= 0) {
                 // We know entryAtIndex is not oldEntry, but find where the oldEntry is, then
                 Entry<T> currentEntry = entryAtIndex;
                 while (currentEntry.next != null) {
                     compare = currentEntry.next.compareTo(oldEntry);
-                    if (compare == 0) {
+                    if (compare == 0 && currentEntry.next.valueEquals(oldEntry)) {
                         // Found it! Do the swap!
                         newEntry.next = entryAtIndex;
                         currentEntry.next = currentEntry.next.next;
                         this.tree.putValueAtIndex(index, newEntry);
-                        return MoveResult.SUCCESS;
+                        return true;
                     } else if (compare > 0) {
                         // Old entry was expected here, but isn't
-                        return MoveResult.NOT_FOUND;
+                        return false;
                     } else {
                         currentEntry = currentEntry.next;
                     }
                 }
 
                 // Could not find oldEntry in the chain
-                return MoveResult.NOT_FOUND;
-            } else if (compare == 0) {
-                return MoveResult.TARGET_OCCUPIED;
+                return false;
             }
         }
 
@@ -468,8 +477,8 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             Entry<T> currentEntry = entryAtIndex;
             while (true) {
                 if (currentEntry.next == null || (compare = currentEntry.next.compareTo(oldEntry)) > 0) {
-                    return MoveResult.NOT_FOUND;
-                } else if (compare == 0) {
+                    return false;
+                } else if (compare == 0 && currentEntry.next.valueEquals(oldEntry)) {
                     entryBeforeOldEntry = currentEntry;
                     currentEntry = currentEntry.next.next;
                     break;
@@ -480,23 +489,19 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
 
             // First loop, check if the new entry directly follows the parent of the old entry
             // In that case the new entry will replace the old entry
-            if (currentEntry == null || (compare = currentEntry.compareTo(newEntry)) > 0) {
+            if (currentEntry == null || (compare = currentEntry.compareTo(newEntry)) >= 0) {
                 newEntry.next = currentEntry;
                 entryBeforeOldEntry.next = newEntry;
-                return MoveResult.SUCCESS;
-            } else if (compare == 0) {
-                return MoveResult.TARGET_OCCUPIED;
+                return true;
             }
 
             // Loop until we find a place for the new entry
             while (true) {
-                if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) > 0) {
+                if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) >= 0) {
                     newEntry.next = currentEntry.next;
                     entryBeforeOldEntry.next = entryBeforeOldEntry.next.next;
                     currentEntry.next = newEntry;
-                    return MoveResult.SUCCESS;
-                } else if (compare == 0) {
-                    return MoveResult.TARGET_OCCUPIED;
+                    return true;
                 } else {
                     currentEntry = currentEntry.next;
                 }
@@ -508,12 +513,10 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             // Loop until we find a place for the new entry
             Entry<T> currentEntry = entryAtIndex;
             while (true) {
-                if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) > 0) {
+                if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) >= 0) {
                     entryBeforeNewEntry = currentEntry;
                     currentEntry = currentEntry.next;
                     break;
-                } else if (compare == 0) {
-                    return MoveResult.TARGET_OCCUPIED;
                 } else {
                     currentEntry = currentEntry.next;
                 }
@@ -522,22 +525,22 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             // First loop, check if the old entry directly follows the parent of the new entry
             // In that case we must carefully reorder the entries
             if (currentEntry == null || (compare = currentEntry.compareTo(oldEntry)) > 0) {
-                return MoveResult.NOT_FOUND;
-            } else if (compare == 0) {
+                return false;
+            } else if (compare == 0 && currentEntry.valueEquals(oldEntry)) {
                 newEntry.next = currentEntry.next;
                 entryBeforeNewEntry.next = newEntry;
-                return MoveResult.SUCCESS;
+                return true;
             }
 
             // Loop until we find the old entry
             while (true) {
                 if (currentEntry.next == null || (compare = currentEntry.next.compareTo(oldEntry)) > 0) {
-                    return MoveResult.NOT_FOUND;
-                } else if (compare == 0) {
+                    return false;
+                } else if (compare == 0 && currentEntry.next.valueEquals(oldEntry)) {
                     newEntry.next = entryBeforeNewEntry.next;
                     currentEntry.next = currentEntry.next.next;
                     entryBeforeNewEntry.next = newEntry;
-                    return MoveResult.SUCCESS;
+                    return true;
                 } else {
                     currentEntry = currentEntry.next;
                 }
@@ -545,8 +548,66 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         }
     }
 
-    private static <T> T value(Entry<T> entry) {
-        return (entry != null) ? entry.getValue() : null;
+    /**
+     * Collection of values at a single x/y/z coordinate. Must store at least one
+     * entry.
+     */
+    private static final class PositionCollection<T> extends AbstractCollection<T> {
+        private final Entry<T> root;
+
+        public PositionCollection(Entry<T> root) {
+            this.root = root;
+        }
+
+        private Entry<T> getNext(Entry<T> entry) {
+            Entry<T> next = entry.next;
+            if (next != null &&
+                next.getX() == this.root.getX() &&
+                next.getY() == this.root.getY() &&
+                next.getZ() == this.root.getZ())
+            {
+                return next;
+            } else {
+                return null;
+            }
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                Entry<T> next = root;
+
+                @Override
+                public boolean hasNext() {
+                    return this.next != null;
+                }
+
+                @Override
+                public T next() {
+                    if (this.next == null) {
+                        throw new NoSuchElementException("No next element available");
+                    }
+                    T result = this.next.getValue();
+                    this.next = getNext(this.next);
+                    return result;
+                }
+            };
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return false;
+        }
+
+        @Override
+        public int size() {
+            int size = 0;
+            Entry<T> entry = this.root;
+            do {
+                size++;
+            } while ((entry = getNext(entry)) != null);
+            return size;
+        }
     }
 
     /**
@@ -620,6 +681,28 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             return this.value;
         }
 
+        /**
+         * Gets whether the value of this entry equals the value specified.
+         * Also returns true if both are null.
+         * 
+         * @param value
+         * @return True if equals
+         */
+        public boolean valueEquals(Object value) {
+            return LogicUtil.bothNullOrEqual(this.value, value);
+        }
+
+        /**
+         * Gets whether the value of this entry equals the value in the entry specified.
+         * Also returns true if both are null.
+         * 
+         * @param value
+         * @return True if equals
+         */
+        public boolean valueEquals(Entry<T> entry) {
+            return this == entry || valueEquals(entry.getValue());
+        }
+
         @Override
         public int compareTo(Entry<T> other) {
             return this.compareTo(other.x, other.y, other.z);
@@ -662,17 +745,10 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
                 return true;
             } else if (other instanceof Entry) {
                 Entry<?> otherEntry = (Entry<?>) other;
-                if (this.getX() != otherEntry.getX() ||
-                    this.getY() != otherEntry.getY() |
-                    this.getZ() != otherEntry.getZ())
-                {
-                    return false;
-                }
-                if (this.getValue() == null) {
-                    return otherEntry.getValue() == null;
-                } else {
-                    return this.getValue().equals(otherEntry.getValue());
-                }
+                return this.getX() == otherEntry.getX() &&
+                       this.getY() == otherEntry.getY() &&
+                       this.getZ() == otherEntry.getZ() &&
+                       this.valueEquals(otherEntry.getValue());
             } else {
                 return false;
             }
@@ -688,23 +764,5 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         public String toString() {
             return "{x:" + this.x + ", y:" + this.y + ", z:" + this.z + ", value:" + this.value + "}";
         }
-    }
-
-    /**
-     * A possible outcome of the {@link #moveEntry()} operation
-     */
-    public static enum MoveResult {
-        /**
-         * Operation was successful
-         */
-        SUCCESS,
-        /**
-         * The original entry could not be found
-         */
-        NOT_FOUND,
-        /**
-         * The target position is already occupied by a different entry
-         */
-        TARGET_OCCUPIED
     }
 }
