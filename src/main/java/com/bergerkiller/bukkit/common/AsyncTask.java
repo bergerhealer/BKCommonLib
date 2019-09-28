@@ -55,6 +55,7 @@ public abstract class AsyncTask implements Runnable {
                 task.running = false;
             }
         };
+        this.thread.setDaemon(true);
         if (priority >= 1 && priority <= 10) {
             this.thread.setPriority(priority);
         }
