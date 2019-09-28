@@ -317,13 +317,20 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * <li>Traversing the underlying tree is done while excluding regions that contain neither old nor new entry
      * </ul>
      * 
-     * @param oldEntry to replace
-     * @param newEntry to replace oldEntry with
+     * @param oldEntry to replace, null to only add a new entry
+     * @param newEntry to replace oldEntry with, null to remove the old entry
      * @return the result of the move, which will be SUCCESS if the tree was changed
      */
     public boolean moveEntry(Entry<T> oldEntry, Entry<T> newEntry) {
-        // If unchanged, only verify that the old entry exists
-        if (oldEntry.equals(newEntry)) {
+        // Special cases where we do not move, but instead add or remove
+        if (oldEntry == null) {
+            if (newEntry != null) {
+                this.addEntry(newEntry);
+            }
+            return true;
+        } else if (newEntry == null) {
+            return this.removeEntry(oldEntry);
+        } else if (oldEntry.equals(newEntry)) {
             return this.containsEntry(oldEntry);
         }
 
