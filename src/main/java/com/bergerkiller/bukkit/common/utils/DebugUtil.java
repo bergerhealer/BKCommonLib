@@ -12,6 +12,7 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.bergerkiller.bukkit.common.AsyncTask;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -428,4 +429,24 @@ public class DebugUtil {
         }
     }
 
+    /**
+     * Logs the stack trace of the current thread after a delay in milliseconds.
+     * Can be used to debug application freezes.
+     * 
+     * @param delay after which to log the stack trace
+     */
+    public static void logStackTraceAsynchronously(long delay) {
+        final Thread thread = Thread.currentThread();
+        new AsyncTask() {
+            @Override
+            public void run() {
+                sleep(delay);
+                StackTraceElement[] stack = thread.getStackTrace();
+                System.err.println("Stack trace of thread " + thread.getName() + ":");
+                for (int i = 0; i < stack.length; i++) {
+                    System.err.println("  at " + stack[i].toString());
+                }
+            }
+        }.start();
+    }
 }
