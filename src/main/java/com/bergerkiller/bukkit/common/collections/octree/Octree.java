@@ -27,6 +27,8 @@ public class Octree<T> implements OctreeIterable<T> {
 
     public Octree() {
         this.values = new IndexedCollection<T>();
+        this.values.reserve(1);
+        this.values.setAt(0, null);
         this.clear();
         this.remove_iter = new OctreePointIterator<T>(this, 0, 0, 0);
     }
@@ -36,7 +38,6 @@ public class Octree<T> implements OctreeIterable<T> {
      */
     public void clear() {
         this.values.clear();
-        this.values.add(null);
         this.deallocated_node_index = 0; // must be resized
         this.table_size = 1; // stores root node only
         this.table = new int[8];
@@ -503,9 +504,5 @@ public class Octree<T> implements OctreeIterable<T> {
         */
 
         //System.out.println("PUT EM ALL "  + bst.table.length);
-    }
-
-    private static class UninitializedValue {
-        public UninitializedValue next = null;
     }
 }

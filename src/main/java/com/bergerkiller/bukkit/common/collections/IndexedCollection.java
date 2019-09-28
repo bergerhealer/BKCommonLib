@@ -23,8 +23,10 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
     private Object[] _values;
     private int _freeIndex;
     private int _size;
+    private int _reserved;
 
     public IndexedCollection() {
+        this._reserved = 0;
         this.clear();
     }
 
@@ -35,9 +37,47 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
 
     @Override
     public void clear() {
-        this._values = new Object[] { new FreeValue(-1) };
-        this._freeIndex = 0;
+        this.clearAndReserve(this._reserved);
+    }
+
+    /**
+     * Sets an offset to the indices into this collection.
+     * Values set before this offset will not show up during iteration,
+     * value removal or contains checks. The first value that is added
+     * will have this index (as opposed to the default 0).
+     * Values before the offset can be safely set using {@link #setAt(index, value)}.
+     * These values will also be preserved when clearing.<br>
+     * <br>
+     * This method can only be called while the collection is empty.
+     * 
+     * @param reserved The number of elements to reserve
+     */
+    public void reserve(int reserved) {
+        if (this._size != 0) {
+            throw new IllegalStateException("Can not set an offset when collection is not empty");
+        }
+        if (this._reserved != reserved) {
+            this.clearAndReserve(reserved);
+        }
+    }
+
+    private void clearAndReserve(int newReserved) {
+        int initialSize = 1;
+        while (initialSize <= newReserved) {
+            initialSize <<= 1;
+        }
+        if (this._values == null) {
+            this._values = new Object[initialSize];
+        } else if (this._values.length != initialSize) {
+            Object[] newValues = new Object[initialSize];
+            for (int i = 0; i < newReserved; i++) {
+                newValues[i] = (i < this._reserved) ? this._values[i] : null;
+            }
+            this._values = newValues;
+        }
+        this.createFreeIndex(newReserved, this._values.length);
         this._size = 0;
+        this._reserved = newReserved;
     }
 
     /**
@@ -48,6 +88,9 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
      */
     public void setAt(int index, T value) {
         this._values[index] = value;
+        if (value == null && index >= this._reserved) {
+            Thread.dumpStack();
+        }
     }
 
     /**
@@ -88,19 +131,25 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
 
         if (this._freeIndex < 0) {
             // We need more free entries! Resize the array to make space for them.
-            int index = this._values.length;
-            this._values = Arrays.copyOf(this._values, index << 1);
+            int firstIndex = this._values.length;
+            this._values = Arrays.copyOf(this._values, this._values.length << 1);
 
             // Fill free slots with values
-            this._freeIndex = index;
-            while (index < (this._values.length-1)) {
-                this._values[index] = new FreeValue(index+1);
-                index++;
-            }
-            this._values[index] = new FreeValue(-1);
+            this.createFreeIndex(firstIndex, this._values.length);
         }
 
         return valueIndex;
+    }
+
+    private void createFreeIndex(int startIndex, int endIndex) {
+        this._freeIndex = startIndex;
+
+        int index = startIndex;
+        while (index < (endIndex-1)) {
+            this._values[index] = new FreeValue(index+1);
+            index++;
+        }
+        this._values[index] = new FreeValue(-1);
     }
 
     /**
@@ -111,15 +160,15 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
      */
     public int indexOf(Object value) {
         if (value == null) {
-            for (int i = 0; i < this._values.length; i++) {
+            for (int i = this._reserved; i < this._values.length; i++) {
                 if (this._values[i] == null) {
                     return i;
                 }
             }
         } else {
-            for (int i = 0; i < this._values.length; i++) {
+            for (int i = this._reserved; i < this._values.length; i++) {
                 Object stored = this._values[i];
-                if (!(stored instanceof FreeValue) && value.equals(stored)) {
+                if (stored != null && stored.equals(value)) {
                     return i;
                 }
             }
@@ -202,8 +251,13 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
         }
 
         private void findNext() {
+            if (this.index == INDEX_FLAG_UNSET) {
+                this.nextIndex = this.collection._reserved - 1;
+            } else {
+                this.nextIndex = this.index;
+            }
+
             Object[] values = this.collection._values;
-            this.nextIndex = this.index;
             while (++this.nextIndex < values.length) {
                 if (!(values[this.nextIndex] instanceof FreeValue)) {
                     return;
@@ -218,6 +272,11 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
 
         public FreeValue(int next) {
             this.next = next;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return false;
         }
     }
 }

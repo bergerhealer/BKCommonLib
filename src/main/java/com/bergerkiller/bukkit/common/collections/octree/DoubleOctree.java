@@ -46,6 +46,64 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
     }
 
     /**
+     * Gets an unmodifiable view of all the values inside this tree
+     * 
+     * @return values
+     */
+    public Collection<T> values() {
+        return new DoubleOctreeValues<T>(this.tree.values());
+    }
+
+    private static final class DoubleOctreeValues<T> extends AbstractCollection<T> {
+        private final Collection<Entry<T>> rootEntries;
+
+        public DoubleOctreeValues(Collection<Entry<T>> rootEntries) {
+            this.rootEntries = rootEntries;
+        }
+
+        @Override
+        public Iterator<T> iterator() {
+            return new Iterator<T>() {
+                private Iterator<Entry<T>> rootEntryIter = rootEntries.iterator();
+                private Entry<T> nextEntry = null;
+
+                @Override
+                public boolean hasNext() {
+                    if (this.nextEntry == null) {
+                        if (this.rootEntryIter.hasNext()) {
+                            this.nextEntry = this.rootEntryIter.next();
+                        } else {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+
+                @Override
+                public T next() {
+                    if (!this.hasNext()) {
+                        throw new NoSuchElementException("No more elements inside the tree");
+                    }
+                    T value = this.nextEntry.getValue();
+                    this.nextEntry = this.nextEntry.next;
+                    return value;
+                }
+            };
+        }
+
+        @Override
+        public int size() {
+            int size = 0;
+            Iterator<T> iter = this.iterator();
+            while (iter.hasNext()) {
+                size++;
+                iter.next();
+            }
+            return size;
+        }
+    }
+
+    /**
      * Gets a view of the contents of this tree that lay inside a cuboid area.
      * The maximum coordinate includes all values inside that block of values.
      * If this is {1,2,3} then this will includes coordinates such as {1.2, 2.99, 3.0}.
@@ -89,7 +147,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param value  The value expected to be stored here
      * @return True if a value is stored at the coordinates, False if not
      */
-    public boolean contains(double x, double y, double z, T value) {
+    public boolean contains(double x, double y, double z, Object value) {
         Entry<T> entry = this.tree.get(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
         if (entry != null) {
             do {
@@ -139,7 +197,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param value  The value of the entry to remove
      * @return True if an entry was found and removed, False otherwise
      */
-    public boolean remove(double x, double y, double z, T value) {
+    public boolean remove(double x, double y, double z, Object value) {
         this.remove_iter.reset();
         this.tree.remove_iter.reset(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
         while (this.remove_iter.hasNext()) {
@@ -213,7 +271,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param entry The entry to find
      * @return True if the entry specified is contained, False if not
      */
-    public boolean containsEntry(Entry<T> entry) {
+    public boolean containsEntry(Entry<?> entry) {
         Entry<T> existing = this.getFirstEntry(entry.getX(), entry.getY(), entry.getZ());
         if (existing == null) {
             return false;
@@ -224,6 +282,8 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         while (existing != null && existing.equalsCoord(entry.getX(), entry.getY(), entry.getZ())) {
             if (existing.valueEquals(entry)) {
                 return true;
+            } else {
+                existing = existing.next;
             }
         }
         return false;
@@ -258,15 +318,16 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param value
      * @return previous entry at the coordinates of the entry, if one existed
      */
-    public void addEntry(Entry<T> value) {
-        int index = this.tree.getValueIndex(MathUtil.floor(value.getX()),
-                                            MathUtil.floor(value.getY()),
-                                            MathUtil.floor(value.getZ()), true);
+    @SuppressWarnings("unchecked")
+    public void addEntry(Entry<? extends T> value) {
+        int index = this.tree.getValueIndex(value.getBlockX(),
+                                            value.getBlockY(),
+                                            value.getBlockZ(), true);
 
         // Retrieve entry, if it is null, then nothing was stored in this 1x1x1 block
         Entry<T> currentEntry = this.tree.getValueAtIndex(index);
         if (currentEntry == null) {
-            this.tree.putValueAtIndex(index, value);
+            this.tree.putValueAtIndex(index, (Entry<T>) value);
             return;
         }
 
@@ -278,13 +339,13 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
                 // Found an entry equal to or beyond the one we want
                 if (previous == null) {
                     // Insert as first entry in the tree
-                    previous = value;
+                    previous = (Entry<T>) value;
                     this.tree.putValueAtIndex(index, previous);
                 } else {
                     // Insert in between the previous and current entry
-                    previous.next = value;
+                    previous.next = (Entry<T>) value;
                 }
-                value.next = currentEntry;
+                ((Entry<T>) value).next = currentEntry;
                 return;
             }
 
@@ -294,7 +355,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         } while (currentEntry != null);
 
         // Append to the end of the chain
-        previous.next = value;
+        previous.next = (Entry<T>) value;
         value.next = null;
     }
 
@@ -304,7 +365,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param entry The entry to remove
      * @return True if an entry was found and removed, False otherwise
      */
-    public boolean removeEntry(Entry<T> entry) {
+    public boolean removeEntry(Entry<?> entry) {
         return remove(entry.getX(), entry.getY(), entry.getZ(), entry.getValue());
     }
 
@@ -321,7 +382,8 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param newEntry to replace oldEntry with, null to remove the old entry
      * @return the result of the move, which will be SUCCESS if the tree was changed
      */
-    public boolean moveEntry(Entry<T> oldEntry, Entry<T> newEntry) {
+    @SuppressWarnings("unchecked")
+    public boolean moveEntry(Entry<? extends T> oldEntry, Entry<? extends T> newEntry) {
         // Special cases where we do not move, but instead add or remove
         if (oldEntry == null) {
             if (newEntry != null) {
@@ -335,12 +397,12 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         }
 
         // Find the 1x1x1 block coordinates and value index of the old and new entry
-        int oldBlockX = MathUtil.floor(oldEntry.getX());
-        int oldBlockY = MathUtil.floor(oldEntry.getY());
-        int oldBlockZ = MathUtil.floor(oldEntry.getZ());
-        int newBlockX = MathUtil.floor(newEntry.getX());
-        int newBlockY = MathUtil.floor(newEntry.getY());
-        int newBlockZ = MathUtil.floor(newEntry.getZ());
+        int oldBlockX = oldEntry.getBlockX();
+        int oldBlockY = oldEntry.getBlockY();
+        int oldBlockZ = oldEntry.getBlockZ();
+        int newBlockX = newEntry.getBlockX();
+        int newBlockY = newEntry.getBlockY();
+        int newBlockZ = newEntry.getBlockZ();
         int oldIndex = this.tree.getValueIndex(oldBlockX, oldBlockY, oldBlockZ, false);
         if (oldIndex == 0) {
             return false;
@@ -348,27 +410,20 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
 
         // If block is unchanged, we only have to find a single entry and modify the chain
         if (oldBlockX == newBlockX && oldBlockY == newBlockY && oldBlockZ == newBlockZ) {
-            return moveEntryInChain(oldIndex, oldEntry, newEntry);
+            return moveEntryInChain(oldIndex, (Entry<T>) oldEntry, (Entry<T>) newEntry);
         }
 
-        // TODO: Optimize this lookup, since we can walk the root of the tree once for both blocks
-        int newIndex = this.tree.getValueIndex(newBlockX, newBlockY, newBlockZ, true);
-        boolean result = moveEntryBetweenChains(oldIndex, newIndex, oldEntry, newEntry);
-        if (!result && this.tree.getValueAtIndex(newIndex) == null) {
-            this.tree.remove(newBlockX, newBlockY, newBlockZ);
-        }
-        return result;
-    }
-
-    // Moves an entry from one chain to another
-    private boolean moveEntryBetweenChains(int indexFrom, int indexTo, Entry<T> oldEntry, Entry<T> newEntry) {
-        // Find the entry that comes before the node to remove from the old chain
+        // Remove the entry at the old block
         {
-            Entry<T> currentEntry = this.tree.getValueAtIndex(indexFrom);
+            Entry<T> currentEntry = this.tree.getValueAtIndex(oldIndex);
             int compare = currentEntry.compareTo(oldEntry);
             if (compare == 0 && currentEntry.valueEquals(oldEntry)) {
                 // First entry of chain, use setValueAtIndex to update it
-                this.tree.putValueAtIndex(indexFrom, currentEntry.next);
+                if (currentEntry.next == null) {
+                    this.tree.remove(oldBlockX, oldBlockY, oldBlockZ);
+                } else {
+                    this.tree.putValueAtIndex(oldIndex, currentEntry.next);
+                }
             } else if (compare > 0) {
                 // Expected before this entry, so missing
                 return false;
@@ -387,33 +442,8 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             }
         }
 
-        // Find out what entry to stick it after
-        {
-            Entry<T> currentEntry = this.tree.getValueAtIndex(indexTo);
-            if (currentEntry == null) {
-                // Store at the beginning
-                newEntry.next = null;
-                this.tree.putValueAtIndex(indexTo, newEntry);
-            } else {
-                int compare = currentEntry.compareTo(newEntry);
-                if (compare >= 0) {
-                    // Insert at the beginning
-                    newEntry.next = currentEntry;
-                    this.tree.putValueAtIndex(indexTo, newEntry);
-                } else {
-                    // Walk the chain and attempt to insert it
-                    while (true) {
-                        if (currentEntry.next == null || (compare = currentEntry.next.compareTo(newEntry)) >= 0) {
-                            newEntry.next = currentEntry.next;
-                            currentEntry.next = newEntry;
-                            break;
-                        }
-                        currentEntry = currentEntry.next;
-                    }
-                }
-            }
-        }
-
+        // Add the new entry
+        this.addEntry(newEntry);
         return true;
     }
 
@@ -442,7 +472,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
 
                 // Insert after the entry where we stopped
                 newEntry.next = currentEntry.next;
-                currentEntry.next = newEntry;
+                currentEntry.next = (Entry<T>) newEntry;
                 this.tree.putValueAtIndex(index, entryAtIndex.next);
                 return true;
             } else if (compare > 0) {
@@ -624,7 +654,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * 
      * @param <T> value type
      */
-    public static final class Entry<T> implements Comparable<Entry<T>> {
+    public static final class Entry<T> implements Comparable<Entry<?>> {
         private final double x;
         private final double y;
         private final double z;
@@ -671,12 +701,87 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         }
 
         /**
+         * Gets the X-coordinate of the 1x1x1 block where the value is stored
+         * 
+         * @return Block X-coordinate
+         */
+        public int getBlockX() {
+            return MathUtil.floor(this.x);
+        }
+
+        /**
+         * Gets the Y-coordinate of the 1x1x1 block where the value is stored
+         * 
+         * @return Block Y-coordinate
+         */
+        public int getBlockY() {
+            return MathUtil.floor(this.y);
+        }
+
+        /**
+         * Gets the Z-coordinate of the 1x1x1 block where the value is stored
+         * 
+         * @return Block Z-coordinate
+         */
+        public int getBlockZ() {
+            return MathUtil.floor(this.z);
+        }
+
+        /**
          * Gets a new 3D Vector storing the x/y/z coordinates of where the value is stored
          * 
          * @return coordinates vector
          */
         public Vector toVector() {
             return new Vector(this.x, this.y, this.z);
+        }
+
+        /**
+         * Gets the squared distance between the position of this entry and the
+         * coordinates specified.
+         * 
+         * @param x The X-coordinate
+         * @param y The Y-coordinate
+         * @param z The Z-coordinate
+         * @return Distance squared between this entry and the coordinates specified
+         */
+        public double distanceSquared(double x, double y, double z) {
+            return MathUtil.distanceSquared(this.x, this.y, this.z, x, y, z);
+        }
+
+        /**
+         * Gets the squared distance between the position of this entry and the
+         * coordinates specified.
+         * 
+         * @param pos The coordinates
+         * @return Distance squared between this entry and the coordinates specified
+         */
+        public double distanceSquared(Vector pos) {
+            return distanceSquared(pos.getX(), pos.getY(), pos.getZ());
+        }
+
+        /**
+         * Gets the distance between the position of this entry and the
+         * coordinates specified.
+         * 
+         * @param x The X-coordinate
+         * @param y The Y-coordinate
+         * @param z The Z-coordinate
+         * @return Distance between this entry and the coordinates specified
+         */
+        public double distance(double x, double y, double z) {
+            return Math.sqrt(distanceSquared(x, y, z));
+        }
+
+        /**
+         * Gets the distance between the position of this entry and the
+         * coordinates specified.
+         * 
+         * @param pos The coordinates
+         * @return Distance between this entry and the coordinates specified
+         */
+        public double distance(Vector pos) {
+            return distance(pos.getX(), pos.getY(), pos.getZ());
         }
 
         /**
@@ -706,12 +811,12 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
          * @param value
          * @return True if equals
          */
-        public boolean valueEquals(Entry<T> entry) {
+        public boolean valueEquals(Entry<?> entry) {
             return this == entry || valueEquals(entry.getValue());
         }
 
         @Override
-        public int compareTo(Entry<T> other) {
+        public int compareTo(Entry<?> other) {
             return this.compareTo(other.x, other.y, other.z);
         }
 
@@ -746,6 +851,40 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
             return this.x == x && this.y == y && this.z == z;
         }
 
+        /**
+         * Gets whether the x/y/z of this entry equals the x/y/z in the vector specified
+         * 
+         * @param pos The coordinates to compare against
+         * @return True if the coordinates are equal
+         */
+        public boolean equalsCoord(Vector pos) {
+            return this.x == pos.getX() && this.y == pos.getY() && this.z == pos.getZ();
+        }
+
+        /**
+         * Gets whether the x/y/z coordinates of the 1x1x1 block this entry is stored in equals
+         * the x/y/z block coordinates specified
+         * 
+         * @param x The block X-coordinate
+         * @param y The block Y-coordinate
+         * @param z The block Z-coordinate
+         * @return True if the coordinates are equal
+         */
+        public boolean equalsBlockCoord(int x, int y, int z) {
+            return this.getBlockX() != x || this.getBlockY() != y || this.getBlockZ() != z;
+        }
+
+        /**
+         * Gets whether the x/y/z coordinates of the 1x1x1 block this entry is stored in equals
+         * the x/y/z block coordinates specified
+         * 
+         * @param blockCoord The coordinates
+         * @return True if the coordinates are equal
+         */
+        public boolean equalsBlockCoord(IntVector3 blockCoord) {
+            return equalsBlockCoord(blockCoord.x, blockCoord.y, blockCoord.z);
+        }
+
         @Override
         public boolean equals(Object other) {
             if (other == this) {
@@ -770,6 +909,30 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
         @Override
         public String toString() {
             return "{x:" + this.x + ", y:" + this.y + ", z:" + this.z + ", value:" + this.value + "}";
+        }
+
+        /**
+         * Creates a new entry
+         * 
+         * @param pos    The position of the entry
+         * @param value  The value of the entry
+         * @return New Entry
+         */
+        public static <T> Entry<T> create(Vector pos, T value) {
+            return new Entry<T>(pos, value);
+        }
+
+        /**
+         * Creates a new entry
+         * 
+         * @param x      The X-coordinate of the entry
+         * @param y      The Y-coordinate of the entry
+         * @param z      The Z-coordinate of the entry
+         * @param value  The value of the entry
+         * @return New Entry
+         */
+        public static <T> Entry<T> create(double x, double y, double z, T value) {
+            return new Entry<T>(x, y, z, value);
         }
     }
 }

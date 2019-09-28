@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.Collection;
+import java.util.Iterator;
+
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -92,6 +95,35 @@ public class OctreeTest {
     }
 
     @Test
+    public void testValues() {
+        Octree<String> tree = new Octree<String>();
+        putDemoValues(tree);
+
+        Collection<String> values = tree.values();
+        assertTrue(values.contains("A"));
+        assertTrue(values.contains("B"));
+        assertTrue(values.contains("C"));
+        assertTrue(values.contains("D"));
+        assertTrue(values.contains("E"));
+        assertTrue(values.contains("F"));
+        assertTrue(values.contains("G"));
+        assertTrue(values.contains("H"));
+        assertFalse(values.contains(null));
+
+        // We expect this to iterate in the order we added them
+        Iterator<String> iter = values.iterator();
+        assertNext(iter, "A");
+        assertNext(iter, "B");
+        assertNext(iter, "C");
+        assertNext(iter, "D");
+        assertNext(iter, "E");
+        assertNext(iter, "F");
+        assertNext(iter, "G");
+        assertNext(iter, "H");
+        assertFalse(iter.hasNext());
+    }
+
+    @Test
     public void testIteratorRemove() {
         //TODO!!!
     }
@@ -134,6 +166,11 @@ public class OctreeTest {
     @Test
     public void runTest() {
         Octree.test2();
+    }
+
+    private void assertNext(Iterator<String> iter, String value) {
+        assertTrue(iter.hasNext());
+        assertEquals(value, iter.next());
     }
 
     private void assertNext(OctreeIterator<String> iter, String value, int x, int y, int z) {

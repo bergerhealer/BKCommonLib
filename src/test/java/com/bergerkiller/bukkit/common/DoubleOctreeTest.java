@@ -122,6 +122,23 @@ public class DoubleOctreeTest {
     }
 
     @Test
+    public void testValues() {
+        DoubleOctree<String> tree = new DoubleOctree<String>();
+        putDemoValues(tree);
+
+        Collection<String> values = tree.values();
+        assertTrue(values.contains("A"));
+        assertTrue(values.contains("B"));
+        assertTrue(values.contains("C"));
+        assertTrue(values.contains("D"));
+        assertTrue(values.contains("E"));
+        assertTrue(values.contains("F"));
+        assertTrue(values.contains("G"));
+        assertTrue(values.contains("H"));
+        assertTrue(values.contains("I"));
+    }
+    
+    @Test
     public void testCuboidIterator() {
         DoubleOctree<String> tree = new DoubleOctree<String>();
         putDemoValues(tree);

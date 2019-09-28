@@ -166,7 +166,7 @@ public class OctreeIterator<T> implements Iterator<T> {
         }
 
         // Remove data value from data at index[0]
-        this.tree.values.setAt(this.index[0] >>> 3, null);
+        this.tree.values.removeAt(this.index[0] >>> 3);
 
         // This deallocates nodes without children recursively
         int node = this.index[++this.depth];
@@ -410,6 +410,8 @@ public class OctreeIterator<T> implements Iterator<T> {
                     // Technically intersect() should not return partial in that case...
                     return this.depth > 0;
                 } else {
+                    // Restore depth and try next node
+                    this.depth++;
                     continue;
                 }
             }
