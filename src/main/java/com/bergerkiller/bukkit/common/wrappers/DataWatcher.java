@@ -59,7 +59,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
     /**
      * Write a new value to the watched objects.
-     * If the key does not yet exist, the key is added with the default value specified.
+     * If the key does not yet exist, the key is added with the value specified.
      *
      * @param key Object key
      * @param value Value to set to
@@ -86,6 +86,49 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
+     * Write a new value to the watched objects.
+     * If the key does not yet exist, the key is added with the value specified.
+     * This is a special overload for Byte keys that can be set using an int without a cast.
+     * 
+     * @param key Object key
+     * @param value Value to set to, is cast to a byte (0-255)
+     */
+    public void setByte(Key<Byte> key, int value) {
+        set(key, Byte.valueOf((byte) (value & 0xFF)));
+    }
+
+    /**
+     * Gets whether a flag is set
+     * 
+     * @param key of the flag to get
+     * @param flag to get
+     * @return True if the flag is set, False if not
+     */
+    public boolean getFlag(Key<Byte> key, int flag) {
+        return (this.tryGetByte(key, 0) & flag) != 0;
+    }
+
+    /**
+     * Toggles a metadata flag on or off
+     * 
+     * @param key of the flag to set
+     * @param flag to set (can be multiple bits)
+     * @param set True to set the flags, False to clear them
+     */
+    public void setFlag(Key<Byte> key, int flag, boolean set) {
+        int old_flags = this.tryGetByte(key, 0);
+        int new_flags = old_flags;
+        if (set) {
+            new_flags |= flag; 
+        } else {
+            new_flags &= ~flag;
+        }
+        if (old_flags != new_flags) {
+            this.set(key, Byte.valueOf((byte) (new_flags & 0xFF)));
+        }
+    }
+
+    /**
      * Read an object from the watched objects
      *
      * @param key Object key
@@ -98,18 +141,62 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             return ((Key.Disabled<V>) key).getDefaultValue();
         }
 
-        Object rawItem;
-        if (CommonCapabilities.DATAWATCHER_OBJECTS) {
-            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
-        } else {
-            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
-        }
+        Object rawItem = getItemRawHandle(key);
         if (rawItem == null) {
             throw new IllegalArgumentException("This key is not watched in this DataWatcher");
         } else {
             Object rawValue = DataWatcherHandle.ItemHandle.T.getValue.invoke(rawItem);
             return key.getType().getConverter().convert(rawValue);
         }
+    }
+
+    /**
+     * Read an object from the watched objects
+     * 
+     * @param key Object key
+     * @return Object value at the key (0-255), -1 if the value stored is null
+     */
+    public int getByte(Key<Byte> key) {
+        Byte result = get(key);
+        return (result == null) ? -1 : result.intValue();
+    }
+
+    /**
+     * Tries to get the value of a key, returns the default value if the key is not
+     * registered inside this data watcher.
+     * 
+     * @param key to get
+     * @param defaultValue
+     * @return value of key, or defaultValue if the key isn't registered
+     */
+    public <V> V tryGet(Key<V> key, V defaultValue) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        } else if (key instanceof Key.Disabled) {
+            return ((Key.Disabled<V>) key).getDefaultValue();
+        }
+
+        Object rawItem = getItemRawHandle(key);
+        if (rawItem == null) {
+            return defaultValue;
+        } else {
+            Object rawValue = DataWatcherHandle.ItemHandle.T.getValue.invoke(rawItem);
+            return key.getType().getConverter().convert(rawValue);
+        }
+    }
+
+    /**
+     * Tries to get the value of a key, returns the default value if the key is not
+     * registered inside this data watcher.
+     * This is a special overload for Byte keys that can be set using an int without a cast.
+     * 
+     * @param key to get
+     * @param defaultValue, cast to a byte (0-255)
+     * @return value of key, defaultValue if the key isn't registered, -1 if null
+     */
+    public int tryGetByte(Key<Byte> key, int defaultValue) {
+        Byte result = tryGet(key, Byte.valueOf((byte) (defaultValue & 0xFF))).byteValue();
+        return (result == null) ? -1 : result.byteValue();
     }
 
     /**
@@ -123,12 +210,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             throw new IllegalArgumentException("Key is null");
         }
 
-        Object rawItem;
-        if (CommonCapabilities.DATAWATCHER_OBJECTS) {
-            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
-        } else {
-            rawItem = DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
-        }
+        Object rawItem = getItemRawHandle(key);
         if (rawItem == null) {
             return null;
         } else {
@@ -242,6 +324,15 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             clone.watch(item);
         }
         return clone;
+    }
+
+    // Gets the raw item handle of a key
+    private Object getItemRawHandle(Key<?> key) {
+        if (CommonCapabilities.DATAWATCHER_OBJECTS) {
+            return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getRawHandle());
+        } else {
+            return DataWatcherHandle.T.read.raw.invoke(this.handle.getRaw(), key.getId());
+        }
     }
 
     /**
