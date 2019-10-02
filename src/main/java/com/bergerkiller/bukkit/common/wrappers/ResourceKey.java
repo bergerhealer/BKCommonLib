@@ -31,24 +31,46 @@ public class ResourceKey extends BasicWrapper<MinecraftKeyHandle> {
 
     /**
      * Constructs a new Resource Key taking information from a backing minecraft key token.
+     * Returns null if the input minecraft key is null.
      * 
      * @param minecraftKey
-     * @return resource key
+     * @return resource key, null if minecraftkey is null
      */
     public static ResourceKey fromMinecraftKey(MinecraftKeyHandle minecraftKey) {
-        return new ResourceKey(minecraftKey);
+        if (minecraftKey != null) {
+            return new ResourceKey(minecraftKey);
+        } else {
+            return null;
+        }
     }
 
     /**
-     * Constructs a new Resource Key taking information from a key String token.
-     * On MC 1.8.8, this key is stored as is. On MC 1.10.2 and onwards, the key is transformed
-     * into a MinecraftKey before use.
+     * Constructs a new Resource Key taking information from a key String token.<br>
+     * <br>
+     * The key may only contain the characters: [a-z0-9/._-]<br>
+     * No uppercase characters are allowed in the path.
+     * If the input key is invalid, null is returned.
      * 
      * @param key
-     * @return resource key
+     * @return resource key, null if the key contains invalid characters
      */
     public static ResourceKey fromPath(String key) {
-        return new ResourceKey(MinecraftKeyHandle.createNew(key));
+        return fromMinecraftKey(MinecraftKeyHandle.createNew(key));
     }
 
+    /**
+     * Constructs a new Resource Key taking information from a key String token,
+     * made out of the namespace and name parts.<br>
+     * <br>
+     * The key may only contain the characters: [a-z0-9/._-]<br>
+     * No uppercase characters are allowed in the path.
+     * If the input key is invalid, null is returned.
+     * 
+     * @param namespace
+     * @param name
+     * @return resource key, null if the key contains invalid characters
+     */
+    public static ResourceKey fromPath(String namespace, String name) {
+        return fromMinecraftKey(MinecraftKeyHandle.createNew(namespace, name));
+    }
 }

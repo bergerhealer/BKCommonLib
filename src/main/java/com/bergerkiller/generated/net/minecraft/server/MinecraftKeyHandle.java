@@ -19,19 +19,47 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final MinecraftKeyHandle createNew(String keyToken) {
-        return T.constr_keyToken.newInstance(keyToken);
-    }
-
     /* ============================================================================== */
 
+    public static MinecraftKeyHandle createNew(String keyToken) {
+        return T.createNew.invoke(keyToken);
+    }
+
+
+    public static boolean isValid(String key) {
+        return createNew(key) != null;
+    }
+
+    public static boolean isValidNamespace(String namespace) {
+        if (namespace == null || namespace.isEmpty()) {
+            return true;
+        }
+        for (int cidx = 0; cidx < namespace.length(); cidx++) {
+            char i = namespace.charAt(cidx);
+            if (i == 95 || i == 45 || (i >= 97 && i <= 122) || (i >= 48 && i <= 57) || i == 46) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidName(String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        for (int cidx = 0; cidx < name.length(); cidx++) {
+            char i = name.charAt(cidx);
+            if (i == 95 || i == 45 || (i >= 97 && i <= 122) || (i >= 48 && i <= 57) || i == 47 || i == 46) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
 
     public static MinecraftKeyHandle createNew(String namespace, String name) {
-        if (T.constr_parts.isAvailable()) {
-            return T.constr_parts.newInstance(new String[] { namespace, name });
-        } else {
-            return T.constr_code_parts.newInstance(0, new String[] { namespace, name });
-        }
+        return T.createNew2.invoke(namespace, name);
     }
     public abstract String getNamespace();
     public abstract void setNamespace(String value);
@@ -42,14 +70,15 @@ public abstract class MinecraftKeyHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MinecraftKeyClass extends Template.Class<MinecraftKeyHandle> {
-        public final Template.Constructor.Converted<MinecraftKeyHandle> constr_keyToken = new Template.Constructor.Converted<MinecraftKeyHandle>();
         @Template.Optional
-        public final Template.Constructor.Converted<MinecraftKeyHandle> constr_code_parts = new Template.Constructor.Converted<MinecraftKeyHandle>();
-        @Template.Optional
-        public final Template.Constructor.Converted<MinecraftKeyHandle> constr_parts = new Template.Constructor.Converted<MinecraftKeyHandle>();
+        public final Template.Constructor.Converted<Object> constr_code_parts = new Template.Constructor.Converted<Object>();
 
         public final Template.Field<String> namespace = new Template.Field<String>();
         public final Template.Field<String> name = new Template.Field<String>();
+
+        public final Template.StaticMethod.Converted<MinecraftKeyHandle> createNew = new Template.StaticMethod.Converted<MinecraftKeyHandle>();
+        @Template.Optional
+        public final Template.StaticMethod.Converted<MinecraftKeyHandle> createNew2 = new Template.StaticMethod.Converted<MinecraftKeyHandle>();
 
     }
 

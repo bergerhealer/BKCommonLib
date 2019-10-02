@@ -474,7 +474,13 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeSound(String soundName, float volume, float pitch) {
-        handle.makeSound(ResourceKey.fromPath(soundName), volume, pitch);
+        makeSound(ResourceKey.fromPath(soundName), volume, pitch);
+    }
+
+    public void makeSound(ResourceKey sound, float volume, float pitch) {
+        if (sound != null) {
+            handle.makeSound(sound, volume, pitch);
+        }
     }
 
     public void makeStepSound(org.bukkit.block.Block block) {

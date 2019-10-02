@@ -386,7 +386,9 @@ public class PlayerUtil extends EntityUtil {
      * @param pitch of the sound
      */
     public static void playSound(Player player, ResourceKey soundKey, float volume, float pitch) {
-        player.playSound(player.getEyeLocation(), soundKey.toMinecraftKey().getName(), volume, pitch);
+        if (soundKey != null) {
+            player.playSound(player.getEyeLocation(), soundKey.toMinecraftKey().getName(), volume, pitch);
+        }
     }
 
     /**
@@ -399,6 +401,8 @@ public class PlayerUtil extends EntityUtil {
      * @param pitch of the sound
      */
     public static void playSound(Player player, Location location, ResourceKey soundKey, float volume, float pitch) {
-        player.playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
+        if (soundKey != null) {
+            player.playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
+        }
     }
 }

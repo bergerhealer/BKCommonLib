@@ -28,8 +28,12 @@ public abstract class SoundEffectHandle extends Template.Handle {
 
     public static SoundEffectHandle byName(String name) {
         if (T.opt_getRegistry.isAvailable()) {
-            Object mc_key_raw = MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
-            return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
+            Object mc_key_raw = MinecraftKeyHandle.T.createNew.raw.invoke(name);
+            if (mc_key_raw != null) {
+                return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
+            } else {
+                return null;
+            }
         } else {
             return createNew(MinecraftKeyHandle.createNew(name));
         }

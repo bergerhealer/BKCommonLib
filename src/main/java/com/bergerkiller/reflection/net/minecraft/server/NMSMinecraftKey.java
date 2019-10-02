@@ -15,11 +15,11 @@ public class NMSMinecraftKey {
 	public static final FieldAccessor<String> name = MinecraftKeyHandle.T.name.toFieldAccessor();
 
 	public static Object newInstance(String namespace, String name) {
-	    return MinecraftKeyHandle.T.constr_code_parts.raw.newInstance(0, new String[] { namespace, name});
+        return MinecraftKeyHandle.T.createNew2.raw.invoke(namespace, name);
 	}
 
 	public static Object newInstance(String name) {
-	    return MinecraftKeyHandle.T.constr_keyToken.raw.newInstance(name);
+	    return MinecraftKeyHandle.T.createNew.raw.invoke(name);
 	}
 
 	public static String getCombinedName(Object minecraftKey) {

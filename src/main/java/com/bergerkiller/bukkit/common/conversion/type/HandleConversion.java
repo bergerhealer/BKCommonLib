@@ -399,7 +399,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.MinecraftKey")
     public static Object getMinecraftKeyFromName(String name) {
-        return MinecraftKeyHandle.T.constr_keyToken.newInstance(name);
+        return MinecraftKeyHandle.T.createNew.raw.invoke(name);
     }
 
     @ConverterMethod(input="net.minecraft.server.MinecraftKey")
