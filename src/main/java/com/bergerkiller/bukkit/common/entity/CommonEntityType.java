@@ -40,6 +40,7 @@ public class CommonEntityType {
     private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
     private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<Integer, CommonEntityType>();
+    private static final Map<Integer, CommonEntityType> byEntityTypeId = new HashMap<Integer, CommonEntityType>();
     private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<Object, CommonEntityType>();
     private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
@@ -188,7 +189,12 @@ public class CommonEntityType {
         this.nmsType = ClassTemplate.create(nmsType);
         this.commonType = ClassTemplate.create(commonType);
         this.commonConstructor = this.commonType.getConstructor(entityClass);
+
         this.entityTypeId = EntityTypesHandle.getEntityTypeId(this.nmsType.getType());
+        if (this.entityTypeId != -1) {
+            byEntityTypeId.put(this.entityTypeId, this);
+        }
+
         if (EntityTypesHandle.T.fromEntityClass.isAvailable() && nmsType != null) {
             this.nmsEntityType = EntityTypesHandle.T.fromEntityClass.invoke(nmsType);
             if (this.nmsEntityType != null) {
@@ -347,6 +353,10 @@ public class CommonEntityType {
 
     public static CommonEntityType byObjectTypeId(int objectTypeId) {
         return LogicUtil.fixNull(byObjectTypeId.get(objectTypeId), UNKNOWN);
+    }
+
+    public static CommonEntityType byEntityTypeId(int entityTypeId) {
+        return LogicUtil.fixNull(byEntityTypeId.get(entityTypeId), UNKNOWN);
     }
 
     public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {

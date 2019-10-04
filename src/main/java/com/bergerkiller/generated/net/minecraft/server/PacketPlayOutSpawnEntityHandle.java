@@ -40,16 +40,18 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
 
     public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
         if (commonEntityType == null) {
-            return;
+            throw new IllegalArgumentException("Input CommonEntityType is null");
         }
         if (T.opt_entityTypeId.isAvailable()) {
-            if (commonEntityType.objectTypeId != -1) {
-                T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
+            if (commonEntityType.objectTypeId == -1) {
+                throw new IllegalArgumentException("Input " + commonEntityType.toString() + " cannot be spawned using this packet");
             }
+            T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
         } else {
-            if (commonEntityType.nmsEntityType != null) {
-                T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
+            if (commonEntityType.nmsEntityType == null) {
+                throw new IllegalArgumentException("Input " + commonEntityType.toString() + " cannot be spawned using this packet");
             }
+            T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
         }
         if (commonEntityType.objectExtraData != -1) {
             setExtraData(commonEntityType.objectExtraData);

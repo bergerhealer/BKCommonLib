@@ -67,16 +67,18 @@ class PacketPlayOutSpawnEntity extends Packet {
 
     public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
         if (commonEntityType == null) {
-            return;
+            throw new IllegalArgumentException("Input CommonEntityType is null");
         }
         if (T.opt_entityTypeId.isAvailable()) {
-            if (commonEntityType.objectTypeId != -1) {
-                T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
+            if (commonEntityType.objectTypeId == -1) {
+                throw new IllegalArgumentException("Input " + commonEntityType.toString() + " cannot be spawned using this packet");
             }
+            T.opt_entityTypeId.setInteger(getRaw(), commonEntityType.objectTypeId);
         } else {
-            if (commonEntityType.nmsEntityType != null) {
-                T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
+            if (commonEntityType.nmsEntityType == null) {
+                throw new IllegalArgumentException("Input " + commonEntityType.toString() + " cannot be spawned using this packet");
             }
+            T.opt_entityType.set(getRaw(), commonEntityType.nmsEntityType);
         }
         if (commonEntityType.objectExtraData != -1) {
             setExtraData(commonEntityType.objectExtraData);
@@ -338,7 +340,18 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     }
 
     public void setEntityType(org.bukkit.entity.EntityType type) {
-        setEntityTypeId(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId);
+        if (type == null) {
+            throw new IllegalArgumentException("Input EntityType is null");
+        }
+        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
+        if (typeId == -1) {
+            throw new IllegalArgumentException("Input EntityType " + type.name() + " cannot be spawned using this packet");
+        }
+        setEntityTypeId(typeId);
+    }
+
+    public org.bukkit.entity.EntityType getEntityType() {
+        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId()).entityType;
     }
 
     public double getPosX() {

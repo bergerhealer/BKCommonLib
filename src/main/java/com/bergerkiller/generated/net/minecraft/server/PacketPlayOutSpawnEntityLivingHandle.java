@@ -47,7 +47,18 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     }
 
     public void setEntityType(org.bukkit.entity.EntityType type) {
-        setEntityTypeId(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId);
+        if (type == null) {
+            throw new IllegalArgumentException("Input EntityType is null");
+        }
+        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
+        if (typeId == -1) {
+            throw new IllegalArgumentException("Input EntityType " + type.name() + " cannot be spawned using this packet");
+        }
+        setEntityTypeId(typeId);
+    }
+
+    public org.bukkit.entity.EntityType getEntityType() {
+        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId()).entityType;
     }
 
     public double getPosX() {
