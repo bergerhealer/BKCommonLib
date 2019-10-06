@@ -56,6 +56,10 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
         handle = CraftChatMessageHandle.fromString(messageText)[0];
     }
 
+    public static ChatText empty() {
+        return fromMessage(""); //TODO: Optimize
+    }
+
     public static ChatText fromJson(String jsonText) {
         if (jsonText == null) {
             return null;

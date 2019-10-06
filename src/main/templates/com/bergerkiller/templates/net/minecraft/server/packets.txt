@@ -19,6 +19,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle;
@@ -1057,6 +1058,8 @@ class PacketPlayOutScoreboardTeam extends Packet {
     private int mode:h;
     private int friendlyFire:i;
 #endif
+
+    public (PacketPlayOutScoreboardTeamHandle) PacketPlayOutScoreboardTeam();
 
     <code>
     public void setCollisionRule(String rule) {

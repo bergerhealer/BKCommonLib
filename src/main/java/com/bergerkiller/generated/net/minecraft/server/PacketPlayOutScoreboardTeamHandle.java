@@ -22,6 +22,10 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
+    public static final PacketPlayOutScoreboardTeamHandle createNew() {
+        return T.constr.newInstance();
+    }
+
     /* ============================================================================== */
 
 
@@ -61,6 +65,8 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutScoreboardTeamClass extends Template.Class<PacketPlayOutScoreboardTeamHandle> {
+        public final Template.Constructor.Converted<PacketPlayOutScoreboardTeamHandle> constr = new Template.Constructor.Converted<PacketPlayOutScoreboardTeamHandle>();
+
         public final Template.Field<String> name = new Template.Field<String>();
         public final Template.Field.Converted<ChatText> displayName = new Template.Field.Converted<ChatText>();
         public final Template.Field.Converted<ChatText> prefix = new Template.Field.Converted<ChatText>();
