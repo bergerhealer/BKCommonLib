@@ -29,4 +29,48 @@ public class ChatTextTest {
             fail("Chat text conversion to JSON is not working correctly");
         }
     }
+
+    @Test
+    public void testSuffixStyle() {
+        // Test that a String with a suffix chat style character preserves the style
+        String msg = "Prefix" + ChatColor.RED.toString();
+        ChatText text = ChatText.fromMessage(msg);
+        assertEquals(msg, text.getMessage());
+    }
+
+    @Test
+    public void testPrefixStyle() {
+        // Test that a String with a prefix chat style character preserves the style
+        String msg = ChatColor.RED.toString() + "Postfix";
+        ChatText text = ChatText.fromMessage(msg);
+        assertEquals(msg, text.getMessage());
+    }
+
+    @Test
+    public void testStyleOnly() {
+        String msg = ChatColor.RED.toString();
+        ChatText text = ChatText.fromMessage(msg);
+        assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
+        assertEquals(msg, text.getMessage());
+    }
+
+    @Test
+    public void testFromChatColor() {
+        for (ChatColor color : ChatColor.values()) {
+            ChatText text = ChatText.fromMessage(color.toString());
+            if (color == ChatColor.RESET) {
+                assertEquals("", text.getMessage());
+            } else {
+                assertEquals(color.toString(), text.getMessage());
+            }
+        }
+    }
+
+    @Test
+    public void testEmpty() {
+        // Test empty chat text
+        ChatText text = ChatText.empty();
+        assertEquals("", text.getMessage());
+        assertEquals("{\"text\":\"\"}", text.getJson());
+    }
 }

@@ -1,5 +1,10 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.ArrayList;
+
+import org.bukkit.ChatColor;
+
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle;
 
@@ -53,11 +58,43 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
      * @param messageText to set to
      */
     public final void setMessage(String messageText) {
+        // Optimization for empty strings
+        if (messageText.isEmpty()) {
+            handle = IChatBaseComponentHandle.ChatSerializerHandle.empty();
+            return;
+        }
+
+        // Use CraftBukkit util's method of parsing
         handle = CraftChatMessageHandle.fromString(messageText)[0];
+
+        // Find trailing color formatting characters in the message that would otherwise be dropped
+        ArrayList<ChatColor> trailing_formatting_chars = new ArrayList<ChatColor>(0);
+        for (int i = messageText.length() - 2; i >= 0; i -= 2) {
+            if (messageText.charAt(i) == StringUtil.CHAT_STYLE_CHAR) {
+                ChatColor color = ChatColor.getByChar(messageText.charAt(i + 1));
+                if (color != null) {
+                    trailing_formatting_chars.add(0, color);
+                    continue;
+                }
+            }
+            break;
+        }
+        if (!trailing_formatting_chars.isEmpty()) {
+            handle.addSibling(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(trailing_formatting_chars));
+        }
+    }
+
+    /**
+     * Appends text to this Chat Text
+     * 
+     * @param text to append
+     */
+    public final void append(ChatText text) {
+        handle.addSibling(text.handle);
     }
 
     public static ChatText empty() {
-        return fromMessage(""); //TODO: Optimize
+        return fromMessage("");
     }
 
     public static ChatText fromJson(String jsonText) {
@@ -84,6 +121,15 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
         }
         ChatText text = new ChatText();
         text.setHandle(IChatBaseComponentHandle.createHandle(iChatBaseComponentHandle));
+        return text;
+    }
+
+    public static ChatText fromChatColor(ChatColor color) {
+        if (color == null) {
+            return null;
+        }
+        ChatText text = new ChatText();
+        text.setHandle(IChatBaseComponentHandle.ChatSerializerHandle.modifierToComponent(color));
         return text;
     }
 

@@ -52,7 +52,40 @@ class CraftMagicNumbers {
 }
 
 class CraftChatMessage {
-    public static String fromComponent((IChatBaseComponentHandle) net.minecraft.server.IChatBaseComponent component);
+
+    // Original was modified so it does not erase a chat color style prefix character
+    public static String fromComponent((IChatBaseComponentHandle) net.minecraft.server.IChatBaseComponent component) {
+        if (component == null) {
+            return "";
+        }
+
+        StringBuilder out = new StringBuilder();
+        java.util.Iterator iter = ((Iterable) component).iterator();
+        while (iter.hasNext()) {
+            net.minecraft.server.IChatBaseComponent c = (net.minecraft.server.IChatBaseComponent) iter.next();
+            net.minecraft.server.ChatModifier modi = c.getChatModifier();
+            if (modi.getColor() != null) {
+                out.append(modi.getColor());
+            }
+            if (modi.isBold()) {
+                out.append(net.minecraft.server.EnumChatFormat.BOLD);
+            }
+            if (modi.isItalic()) {
+                out.append(net.minecraft.server.EnumChatFormat.ITALIC);
+            }
+            if (modi.isUnderlined()) {
+                out.append(net.minecraft.server.EnumChatFormat.UNDERLINE);
+            }
+            if (modi.isStrikethrough()) {
+                out.append(net.minecraft.server.EnumChatFormat.STRIKETHROUGH);
+            }
+            if (modi.isRandom()) {
+                out.append(net.minecraft.server.EnumChatFormat.OBFUSCATED);
+            }
+            out.append(c.getText());
+        }
+        return out.toString();
+    }
 
     public static (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] fromString(String message);
 }

@@ -2,6 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.ChatColor;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.IChatBaseComponent</b>.
@@ -21,11 +23,14 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract IChatBaseComponentHandle addSibling(IChatBaseComponentHandle sibling);
     /**
      * Stores class members for <b>net.minecraft.server.IChatBaseComponent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IChatBaseComponentClass extends Template.Class<IChatBaseComponentHandle> {
+        public final Template.Method.Converted<IChatBaseComponentHandle> addSibling = new Template.Method.Converted<IChatBaseComponentHandle>();
+
     }
 
 
@@ -55,6 +60,18 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
             return T.jsonToChatComponent.invoke(jsonString);
         }
 
+        public static IChatBaseComponentHandle empty() {
+            return T.empty.invoke();
+        }
+
+        public static IChatBaseComponentHandle modifierToComponent(ChatColor color) {
+            return T.modifierToComponent.invoke(color);
+        }
+
+        public static IChatBaseComponentHandle modifiersToComponent(Collection<ChatColor> colors) {
+            return T.modifiersToComponent.invoke(colors);
+        }
+
         /**
          * Stores class members for <b>net.minecraft.server.IChatBaseComponent.ChatSerializer</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
@@ -62,6 +79,9 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
         public static final class ChatSerializerClass extends Template.Class<ChatSerializerHandle> {
             public final Template.StaticMethod.Converted<String> chatComponentToJson = new Template.StaticMethod.Converted<String>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> jsonToChatComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<IChatBaseComponentHandle> empty = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<IChatBaseComponentHandle> modifierToComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<IChatBaseComponentHandle> modifiersToComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
 
         }
 

@@ -3,9 +3,59 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 
 class IChatBaseComponent {
+    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling);
+
     class IChatBaseComponent.ChatSerializer {
         public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
 
         public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
+            return new ChatComponentText("");
+        }
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifierToComponent(org.bukkit.ChatColor color) {
+            ChatModifier modifier = new ChatModifier();
+            if (color == org.bukkit.ChatColor.RESET) {
+                // Nothing
+            } else if (color == org.bukkit.ChatColor.BOLD) {
+                modifier.setBold(Boolean.TRUE);
+            } else if (color == org.bukkit.ChatColor.ITALIC) {
+                modifier.setItalic(Boolean.TRUE);
+            } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                modifier.setStrikethrough(Boolean.TRUE);
+            } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                modifier.setUnderline(Boolean.TRUE);
+            } else if (color == org.bukkit.ChatColor.MAGIC) {
+                modifier.setRandom(Boolean.TRUE);
+            } else {
+                modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+            }
+            return new ChatComponentText("").setChatModifier(modifier);
+        }
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+            ChatModifier modifier = new ChatModifier();
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = new ChatModifier();
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier.setBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier.setItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier.setStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier.setUnderline(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier.setRandom(Boolean.TRUE);
+                } else {
+                    modifier = new ChatModifier().setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+                }
+            }
+            return new ChatComponentText("").setChatModifier(modifier);
+        }
     }
 }
