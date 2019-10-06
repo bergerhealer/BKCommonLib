@@ -4,11 +4,11 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
@@ -25,8 +25,6 @@ public class CommonLegacyMaterials {
     private static final HashMap<Integer, Material> idToMaterial = new HashMap<Integer, Material>();
     private static final EnumMap<Material, Integer> materialToId = new EnumMap<Material, Integer>(Material.class);
     private static final EnumMap<Material, Material> materialToLegacy = new EnumMap<Material, Material>(Material.class);
-    private static final Map<String, Material> allMaterialValuesByName = new HashMap<String, Material>();
-    private static final Material[] allMaterialValues;
     private static final Material[] allLegacyMaterialValues;
     private static final FastMethod<Boolean> isLegacyMethod = new FastMethod<Boolean>();
 
@@ -46,37 +44,12 @@ public class CommonLegacyMaterials {
             isLegacyMethod.init(new MethodDeclaration(resolver, template));
         }
 
-        // Retrieve all Material values through reflection
-        {
-            Material[] values = null;
-            try {
-                values = (Material[]) Material.class.getMethod("values").invoke(null);
-            } catch (Throwable t) {
-                t.printStackTrace();
-                values = Material.values();
-            }
-
-            // On MC 1.8 there is a LOCKED_CHEST Material that does not actually exist
-            // It throws tests off the rails because of the Type Id clash it causes
-            // By removing this rogue element from the array we can avoid these problems.
-            if (values != null && CommonBootstrap.evaluateMCVersion("==", "1.8")) {
-                for (int index = 0; index < values.length; index++) {
-                    if (getMaterialName(values[index]).equals("LEGACY_LOCKED_CHEST")) {
-                        values = LogicUtil.removeArrayElement(values, index);
-                        break;
-                    }
-                }
-            }
-
-            allMaterialValues = values;
-        }
-
         // Filter by only the legacy Material values
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             // Material names that start with LEGACY_ are legacy material values
             // We do not use isLegacy() on purpose when under test to avoid initialization of templates
             List<Material> legacyMaterials = new ArrayList<Material>();
-            for (Material material : allMaterialValues) {
+            for (Material material : MaterialsByName.getAllMaterials()) {
                 if (isLegacy(material)) {
                     legacyMaterials.add(material);
                 }
@@ -84,17 +57,7 @@ public class CommonLegacyMaterials {
             allLegacyMaterialValues = LogicUtil.toArray(legacyMaterials, Material.class);
         } else {
             // All material values are legacy materials
-            allLegacyMaterialValues = allMaterialValues;
-        }
-
-        // Fill the allMaterialValuesByName map with LEGACY_ names and new names
-        // On versions before 1.13, allow for legacy names in the map normally
-        try {
-            for (Material material : allMaterialValues) {
-                allMaterialValuesByName.put(getMaterialName(material), material);
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
+            allLegacyMaterialValues =  MaterialsByName.getAllMaterials();
         }
 
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
@@ -116,14 +79,14 @@ public class CommonLegacyMaterials {
 
         // Store a remapping from non-legacy materials to legacy materials
         // First store all materials to themselves
-        for (Material material : allMaterialValues) {
+        for (Material material : MaterialsByName.getAllMaterials()) {
             materialToLegacy.put(material, material);
         }
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             // Use CraftLegacy toLegacy(material) to convert them by default
             // Some we override ourselves, which is done by IBlockDataToMaterialData utility class
             SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("util.CraftLegacy"), "toLegacy", Material.class);
-            for (Material material : allMaterialValues) {
+            for (Material material :  MaterialsByName.getAllMaterials()) {
                 if (isLegacy(material)) {
                     continue;
                 }
@@ -188,7 +151,7 @@ public class CommonLegacyMaterials {
      * @return material, null if not found
      */
     public static Material getMaterial(String name) {
-        return allMaterialValuesByName.get(name);
+        return MaterialsByName.getMaterial(name);
     }
 
     /**
@@ -199,11 +162,7 @@ public class CommonLegacyMaterials {
      * @return type name
      */
     public static String getMaterialName(Material type) {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            return ((Enum<?>) type).name();
-        } else {
-            return "LEGACY_" + ((Enum<?>) type).name();
-        }
+        return MaterialsByName.getMaterialName(type);
     }
 
     /**
@@ -234,7 +193,7 @@ public class CommonLegacyMaterials {
      * @return all Material enum values
      */
     public static Material[] getAllMaterials() {
-        return allMaterialValues;
+        return MaterialsByName.getAllMaterials();
     }
 
     /**

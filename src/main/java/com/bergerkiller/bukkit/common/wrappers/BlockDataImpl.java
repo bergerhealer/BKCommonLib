@@ -12,6 +12,7 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -67,6 +68,9 @@ public class BlockDataImpl extends BlockData {
     private static final EnumSet<Material> BLOCK_UPDATE_STATE_BLACKLIST = EnumSet.noneOf(Material.class);
 
     static {
+        // Make sure templates are initialized first
+        Common.bootstrap();
+
         // Retrieve
         Iterable<?> REGISTRY = BlockHandle.getRegistry();
 

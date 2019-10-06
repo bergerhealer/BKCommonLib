@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.MaterialTypeProperty;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -189,7 +190,7 @@ public class MaterialUtil {
      * @return Material
      */
     public static Material getMaterial(String name) {
-        return CommonLegacyMaterials.getMaterial(name);
+        return MaterialsByName.getMaterial(name);
     }
 
     /**

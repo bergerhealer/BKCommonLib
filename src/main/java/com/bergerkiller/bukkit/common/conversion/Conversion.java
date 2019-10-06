@@ -31,7 +31,6 @@ import org.bukkit.util.Vector;
 import java.util.UUID;
 
 public class Conversion {
-
     // Misc
     @SuppressWarnings("rawtypes")
     public static final Converter NONE = new NullConverter(Object.class, Object.class);
