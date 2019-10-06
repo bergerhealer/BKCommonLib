@@ -1,5 +1,0 @@
-build:
-  image: openjdk:8-jdk
-  commands:
-    - mvn clean
-    - mvn build
