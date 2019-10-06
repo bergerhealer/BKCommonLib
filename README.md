@@ -1,5 +1,5 @@
 # BKCommonLib
-[Spigot Resource Page](https://www.spigotmc.org/resources/bkcommonlib.39590/) | [Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/)
+[Spigot Resource Page](https://www.spigotmc.org/resources/bkcommonlib.39590/) | [Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/) | [Javadocs](https://jd.mg-dev.eu/BKCommonLib)
 
 To build BKCommonLib you will (probably) need to run [Build Tools](https://www.spigotmc.org/wiki/buildtools/) beforehand.
 Otherwise tests will fail and maven will complain. No actual server code is linked during compiling, hence the dependency is type test.
@@ -17,7 +17,7 @@ It also simplifies coding:
 
 ### License
 Copyright (C) 2013-2015 bergerkiller
-Copyright (C) 2016-2017 Berger Healer
+Copyright (C) 2016-2019 Berger Healer
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, and/or sublicense the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
