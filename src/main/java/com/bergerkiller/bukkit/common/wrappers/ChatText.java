@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.bukkit.ChatColor;
 
@@ -129,7 +130,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
             return null;
         }
         ChatText text = new ChatText();
-        text.setHandle(IChatBaseComponentHandle.ChatSerializerHandle.modifierToComponent(color));
+        text.setHandle(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(Collections.singleton(color)));
         return text;
     }
 
