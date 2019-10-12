@@ -100,7 +100,7 @@ public class CharArrayBufferTest {
     @Test
     public void testSwapBuffer() {
         char[] input_buffer = new char[] {'X','X','h','e','l','l','o','X'};
-        CharArrayBuffer buffer = new CharArrayBuffer("hello");
+        CharArrayBuffer buffer = new CharArrayBuffer("XXXXX");
 
         // Swap the buffers. CharArrayBuffer should now refer to 'hello' (same length)
         buffer.swapBuffer(input_buffer, 2);
