@@ -6,52 +6,137 @@ package com.bergerkiller.bukkit.common.config.yaml;
  * a recursive parent path.
  */
 public final class YamlPath {
+    /**
+     * Root yaml path with an empty name and no parent path
+     */
+    public static final YamlPath ROOT = new YamlPath();
+
     private final YamlPath parent;
     private final String name;
     private final int hashcode;
     private final int depth;
 
-    /**
-     * Constructs a new YamlPath using a .-delimited path string.
-     * 
-     * @param path String
-     */
-    public YamlPath(String path) {
-        this(null, path);
+    // Constructor for ROOT
+    private YamlPath() {
+        this.parent = null;
+        this.name = "";
+        this.hashcode = 0;
+        this.depth = 0;
+    }
+
+    // Constructor used in the static factory methods, parent cannot be null
+    private YamlPath(YamlPath parent, String name) {
+        this.parent = parent;
+        this.name = name;
+        this.hashcode = this.name.hashCode() + 31 * this.parent.hashcode;
+        this.depth = this.parent.depth + 1;
     }
 
     /**
-     * Constructs a new YamlPath extending another path
+     * Creates a new YamlPath using a .-delimited path string.
      * 
-     * @param parent YamlPath to extend, null if this is a root path
-     * @param path String to extend the base path with, can be .-delimited or a name
+     * @param path
+     * @return creates yaml path
      */
-    public YamlPath(YamlPath parent, String path) {
-        // Turn .-delimited parts in the path into recursive parent paths
-        int startIndex = 0;
-        int endIndex;
-        while ((endIndex = path.indexOf('.', startIndex)) != -1) {
-            parent = new YamlPath(parent, path.substring(startIndex, endIndex));
-            startIndex = endIndex + 1;
-        }
-        this.parent = parent;
-        this.name = path.substring(startIndex);
-        if (this.parent == null) {
-            this.hashcode = 961 + (31 * this.name.hashCode());
-            this.depth = 0;
+    public static YamlPath create(String path) {
+        return createChild(ROOT, path);
+    }
+
+    private static YamlPath createListChild(YamlPath parent, int listIndex) {
+        return new YamlPath(parent, "[" + listIndex + "]");
+    }
+
+    private static YamlPath createChild(YamlPath parent, String path) {
+        if (path.isEmpty()) {
+            // If path is empty, then return the parent path
+            return parent;
         } else {
-            this.hashcode = 961 + (31 * this.name.hashCode()) + this.parent.hashCode();
-            this.depth = this.parent.getDepth() + 1;
+            // Turn .-delimited parts in the path into additional recursive parents
+            int startIndex = 0;
+            for (int i = 0; i < path.length(); i++) {
+                char c = path.charAt(i);
+                if (c == '.') {
+                    parent = createChild(parent, path.substring(startIndex, i));
+                    startIndex = i + 1;
+                } else if (c == '[') {
+                    parent = createChild(parent, path.substring(startIndex, i));
+                    startIndex = i;
+                }
+            }
+
+            // Create the path
+            return new YamlPath(parent, path.substring(startIndex));
         }
+    }
+
+    /**
+     * Gets whether this is a root path, which is equivalent to an
+     * empty path String. This will be the {@link #ROOT} instance.
+     * There are no deeper parents.
+     * 
+     * @return True if this is a root path
+     */
+    public boolean isRoot() {
+        return this == ROOT;
+    }
+
+    /**
+     * Gets whether this path refers to a list element, which means
+     * the name contains an index. For example: [12]
+     * 
+     * @return True if this is a path to a list element
+     */
+    public boolean isList() {
+        return this.name.length() > 2 &&
+               this.name.charAt(0) == '[' &&
+               this.name.charAt(this.name.length()-1) == ']';
+    }
+
+    /**
+     * Gets the index to the parent node's list this path refers to.
+     * If this is not a list as indicated by {@link #isList()} then this
+     * method returns -1.
+     * 
+     * @return list index
+     */
+    public int listIndex() {
+        if (this.isList()) {
+            try {
+                return Integer.parseInt(this.name.substring(1, this.name.length()-1));
+            } catch (NumberFormatException ex) {}
+        }
+        return -1;
     }
 
     /**
      * Gets the parent path of this YamlPath
      * 
-     * @return parent YamlPath
+     * @return parent YamlPath, null if this is a root path
      */
-    public YamlPath getParent() {
+    public YamlPath parent() {
         return this.parent;
+    }
+
+    /**
+     * Gets a child path of this path. The child path can contain
+     * multiple path parts to refer to a deeper child. If the child
+     * path is empty, this path is returned instead.
+     * 
+     * @param childPath The path to the child
+     * @return child path
+     */
+    public YamlPath child(String childPath) {
+        return createChild(this, childPath);
+    }
+
+    /**
+     * Creates a child path of this path to a list element
+     * 
+     * @param listIndex The index of the element in the list
+     * @return list child path
+     */
+    public YamlPath listChild(int listIndex) {
+        return createListChild(this, listIndex);
     }
 
     /**
@@ -59,7 +144,7 @@ public final class YamlPath {
      * 
      * @return name
      */
-    public String getName() {
+    public String name() {
         return this.name;
     }
 
@@ -67,9 +152,9 @@ public final class YamlPath {
      * Gets the depth of this path, which is the amount of
      * sub-nodes below this path.
      * 
-     * @return depth, 0 if {@link #getParent()} == null
+     * @return depth, 0 if {@link #parent()} == null
      */
-    public int getDepth() {
+    public int depth() {
         return this.depth;
     }
 
@@ -85,32 +170,35 @@ public final class YamlPath {
         } else if (o instanceof YamlPath) {
             YamlPath p1 = this;
             YamlPath p2 = (YamlPath) o;
-            if (p1.getDepth() != p2.getDepth()) {
-                return false;
-            }
-
-            do {
-                if (!p1.name.equals(p2.name)) {
-                    return false;
+            if (p1.depth() == p2.depth()) {
+                while (p1.name.equals(p2.name)) {
+                    p1 = p1.parent();
+                    p2 = p2.parent();
+                    if (p1 == p2) {
+                        return true;
+                    }
                 }
-                p1 = p1.getParent();
-                p2 = p2.getParent();
-            } while (p1 != null);
-
-            return true;
-        } else {
-            return false;
+            }
         }
+        return false;
     }
 
     @Override
     public String toString() {
-        StringBuilder str = new StringBuilder(this.name);        
-        YamlPath path = this;
-        while ((path = path.parent) != null) {
-            str.insert(0, '.');
-            str.insert(0, path.name);
+        if (this.isRoot()) {
+            return "";
+        } else {
+            // Child of root
+            StringBuilder str = new StringBuilder(this.name);        
+            YamlPath path = this;
+            while (!path.parent.isRoot()) {
+                if (!path.isList()) {
+                    str.insert(0, '.');
+                }
+                path = path.parent;
+                str.insert(0, path.name);
+            }
+            return str.toString();
         }
-        return str.toString();
     }
 }
