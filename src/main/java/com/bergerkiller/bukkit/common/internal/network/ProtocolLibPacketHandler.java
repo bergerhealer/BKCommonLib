@@ -24,6 +24,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
 import java.util.*;
+import java.util.logging.Level;
 
 /**
  * A packet handler implementation that uses ProtocolLib packet listeners
@@ -36,6 +37,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private final SilentPacketQueue silentPacketQueueFallback = new SilentPacketQueue();
     private final SilentQueueCleanupTask silentQueueCleanupTask = new SilentQueueCleanupTask();
     private boolean useSilentPacketQueue = false;
+    private boolean isSendSilentPacketBroken = false;
 
     @Override
     public void onPlayerJoin(Player player) {
@@ -148,14 +150,35 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.silentQueueCleanupTask.kick();
         }
 
-        // Silent - do not send it through listeners, only through monitors
-        try {
-            PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
-            ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
-        } catch (PlayerLoggedOutException ex) {
-            // Ignore
-        } catch (Throwable t) {
-            throw new RuntimeException("Error while sending packet:", t);
+        if (this.isSendSilentPacketBroken) {
+            // ProtocolLib had a linkage error while sending the packet before
+            // Instead we now use our own 'silent' packet queue to deal with this
+            PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
+
+        } else {
+            // Silent - do not send it through listeners, only through monitors
+            try {
+                PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+                ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
+            } catch (PlayerLoggedOutException ex) {
+                // Ignore
+            } catch (LinkageError err) {
+                // Serious issue inside the ProtocolLib library. We cannot use it.
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "A severe error occurred inside ProtocolLib while trying to send a packet");
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Please look for an update of ProtocolLib to get this issue resolved");
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error that occurred", err);
+
+                // Enable the silent packet queue (if it wasn't already)
+                // Remove the packet from the queue in case we added it previously
+                this.silentPacketQueueFallback.take(player, packet);
+                this.isSendSilentPacketBroken = true;
+                this.useSilentPacketQueue = true;
+
+                // Fallback
+                sendPacket(player, type, packet, throughListeners);
+            } catch (Throwable t) {
+                throw new RuntimeException("Error while sending packet:", t);
+            }
         }
     }
 
