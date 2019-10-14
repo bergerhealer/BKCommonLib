@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.bergerkiller.bukkit.common.collections.StringTreeNode;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 public class YamlNode {
     protected YamlRoot _root;
@@ -25,12 +27,12 @@ public class YamlNode {
     }
 
     // Creates a new child node from an entry
+    // Called from YamlEntry createNodeValue()
     protected YamlNode(YamlEntry entry, boolean isListNode) {
         this._root = entry.getParentNode()._root;
         this._entry = entry;
         this._children = new ArrayList<YamlEntry>(10);
         this._isListNode = isListNode;
-        this._entry.setValue(this);
     }
 
     /**
@@ -40,6 +42,17 @@ public class YamlNode {
      */
     public boolean hasParent() {
         return this.getParent() != null;
+    }
+
+    /**
+     * Gets whether this is a List of values instead of a compound node.
+     * A list node omits the names of the child values, which are indices.
+     * Normally list nodes are used using {@link #getList(path)}
+     * 
+     * @return True if this is a list node
+     */
+    public boolean isListNode() {
+        return this._isListNode;
     }
 
     /**
@@ -79,12 +92,10 @@ public class YamlNode {
     }
 
     /**
-     * Gets the {@link YamlPath} to this node as a String.<br>
-     * <b>Deprecated: use {@link #getYamlPath()}.toString() instead</b>
+     * Gets the {@link YamlPath} to this node as a String
      * 
      * @return path
      */
-    @Deprecated
     public String getPath() {
         return this.getYamlPath().toString();
     }
@@ -291,7 +302,107 @@ public class YamlNode {
      * @return the node
      */
     public YamlNode getNode(String path) {
-        return this.getEntry(path).createNodeValue();
+        return this.getEntry(path).createNodeValue(false);
+    }
+
+    /**
+     * Gets a list of values at the path specified, creates one if not present.
+     * If originally a normal node is stored, then that node is turned into a list
+     * storing the values sorted by key.
+     * 
+     * @param path to get a list
+     * @return the list
+     */
+    public List<Object> getList(String path) {
+        this.getEntry(path).createNodeValue(true);
+        return null; //TODO!
+    }
+
+    /**
+     * Gets the raw value at the path specified
+     *
+     * @param path The path to the value to get
+     * @return the raw value
+     */
+    public Object get(String path) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        return (entry == null) ? null : entry.getValue();
+    }
+
+    /**
+     * Gets the raw value at the path as the type specified
+     *
+     * @param path The path to the value to get
+     * @param type of value to get
+     * @return the converted value, or null if not found or of the wrong type
+     */
+    public <T> T get(String path, Class<T> type) {
+        return ParseUtil.convert(this.get(path), type, null);
+    }
+
+    /**
+     * Gets the value stored at the path as the type specified.
+     * If the value is not stored or could not be converted to the type,
+     * then the default value is set and returned instead.<br>
+     * <br>
+     * <b>The def value is used to get the type, it can not be null!</b>
+     *
+     * @param path   The path to the value to get
+     * @param def    The value to return and store on failure, defines the type of value to return
+     * @return The converted value, or the default value if not found or of the wrong type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(String path, T def) {
+        return this.get(path, (Class<T>) def.getClass(), def);
+    }
+
+    /**
+     * Gets the raw value at the path as the type specified.
+     * If the value is not stored or could not be converted to the type,
+     * then the default value is set and returned instead.
+     *
+     * @param path    The path to the value to get
+     * @param type    The type of value to convert the stored value to
+     * @param def     The value to return and store on failure
+     * @return The converted value, or the default value if not found or of the wrong type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T get(String path, Class<T> type, T def) {
+        YamlEntry entry = this.getEntry(path);
+        Object value = entry.getValue();
+        if (type == String.class && value instanceof String[]) {
+            // Special conversion to line-by-line String
+            // This is needed, as it saves line-split Strings as such
+            return (T) StringUtil.join("\n", (String[]) value);
+        }
+        T rval = ParseUtil.convert(value, type, null);
+        if (rval == null) {
+            rval = def;
+            entry.setValue(rval);
+        }
+        return rval;
+    }
+
+    /**
+     * Sets a value at a certain path
+     *
+     * @param path to set
+     * @param value to set to
+     */
+    public void set(String path, Object value) {
+        this.getEntry(path).setValue(value);
+    }
+
+    /**
+     * Removes the value at the path specified
+     *
+     * @param path to remove at
+     */
+    public void remove(String path) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null && entry.getParentNode() != null) {
+            entry.getParentNode().removeChildEntry(entry);
+        }
     }
 
     /**
@@ -308,22 +419,118 @@ public class YamlNode {
     }
 
     /**
-     * Sets a value at a certain path
+     * Shares a single value with a target node:<br>
+     * - Writes the value from this node to the target if possible<br>
+     * - Writes the value from the target to this node alternatively<br>
+     * - If no value was found at all, both the target and this node get the
+     * default value
      *
-     * @param path to set
-     * @param value to set to
+     * @param target  The YamlNode to share the value with
+     * @param path    The relative path to the value to share
+     * @param def     The default value to store if no value was found
      */
-    public void set(String path, Object value) {
-        this.getEntry(path).setValue(value);
+    public void shareWith(YamlNode target, String path, Object def) {
+        YamlEntry entry_a = this.getEntry(path);
+        YamlEntry entry_b = target.getEntry(path);
+        if (entry_a.getValue() != null) {
+            entry_b.setValue(entry_a.getValue());
+        } else if (entry_b.getValue() != null) {
+            entry_a.setValue(entry_b.getValue());
+        } else {
+            entry_a.setValue(def);
+            entry_b.setValue(def);
+        }
     }
 
+    /**
+     * Shares a single value with a target key-value map:<br>
+     * - Writes the value from this node to the target map if possible<br>
+     * - Writes the value from the target map to this node alternatively<br>
+     * - If no value was found at all, both the target map and this node get the
+     * default value
+     *
+     * @param target  The map of key-value pairs to share the value with
+     * @param path    The relative path to the value to share
+     * @param def     The default value to store if no value was found
+     */
+    public void shareWithMap(Map<String, Object> target, String path, Object def) {
+        YamlEntry entry_a = this.getEntry(path);
+        if (entry_a.getValue() != null) {
+            target.put(path, entry_a.getValue());
+        } else {
+            Object value = target.get(path);
+            if (value == null) {
+                value = def;
+                target.put(path, def);
+            }
+            entry_a.setValue(value);
+        }
+    }
+
+    /**
+     * Creates an exact clone of this node, where this node is the root of the YAML tree.
+     */
+    @Override
+    public YamlNode clone() {
+        YamlNode clone = new YamlNode();
+        clone._entry.assignProperties(this._entry);
+        this.cloneChildrenTo(clone);
+        return clone;
+    }
+
+    private void cloneChildrenTo(YamlNode clone) {
+        for (YamlEntry child : this._children) {
+            YamlPath childPath = clone.getYamlPath().child(child.getPath().name());
+            StringTreeNode childYaml = clone._entry.yaml.add();
+            YamlEntry childClone = new YamlEntry(clone, childPath, childYaml);
+            childClone.assignProperties(child);
+            clone._children.add(childClone);
+            clone._root.putEntry(childClone);
+
+            if (child.isNodeValue()) {
+                YamlNode originalChildNode = child.getNodeValue();
+                YamlNode childCloneNode = childClone.createNodeValue(originalChildNode.isListNode());
+                originalChildNode.cloneChildrenTo(childCloneNode);
+            }
+        }
+    }
+
+    /**
+     * Gets the YAML of this YamlNode and its descendants. If this is the root node, it contains
+     * the full YAML document as a String. If it is not, then it contains the YAML of the node's
+     * descendants. This node's key and header are omitted.
+     * 
+     * @return YAML String
+     */
     @Override
     public String toString() {
-        return this._entry.getYaml().toString();
+        if (this.getYamlPath().depth() == 0) {
+            // Root node: we can include the entire yaml String
+            return this._entry.getYaml().toString();
+        } else {
+            // Descendant of root: only include the yaml of the children
+            // Omit indentation at this depth level
+            StringBuilder yaml = new StringBuilder();
+            int indent = 2 * this.getYamlPath().depth();
+            for (YamlEntry child : this._children) {
+                String childYaml = child.getYaml().toString();
+                int lineStart = 0;
+                for (int i = 0; i < childYaml.length(); i++) {
+                    char c = childYaml.charAt(i);
+                    if (c == '\n') {
+                        yaml.append(c);
+                        lineStart = i + 1;
+                    } else if ((i-lineStart) >= indent) {
+                        yaml.append(c);
+                    }
+                }
+            }
+            return yaml.toString();
+        }
     }
 
     protected YamlNode createChildNode(int index, boolean isListNode, YamlPath path) {
-        return new YamlNode(createChildEntry(index, path), isListNode);
+        return createChildEntry(index, path).createNodeValue(isListNode);
     }
 
     protected YamlEntry createChildEntry(int index, YamlPath path) {
@@ -338,9 +545,15 @@ public class YamlNode {
             }
         }
 
+        // When children were empty, then YAML writes a {} or []
+        // Make sure YAML is regenerated so that this is removed again
+        if (this._children.isEmpty()) {
+            this._entry.markYamlChanged();
+        }
+
         // Create a new child entry and add it to this node
         // TODO: What about lists?
-        YamlEntry entry = new YamlEntry(this, path, this._entry.getYaml().insert(index));
+        YamlEntry entry = new YamlEntry(this, path, this._entry.yaml.insert(index));
         this._children.add(index, entry);
         this._root.putEntry(entry);
         return entry;
@@ -362,5 +575,11 @@ public class YamlNode {
         // Detach as a child
         this._children.remove(entry);
         this._root.detach(entry);
+
+        // When children are empty, it now writes [] or {} as YAML
+        // Make sure YAML is regenerated so this is done
+        if (this._children.isEmpty()) {
+            this._entry.markYamlChanged();
+        }
     }
 }

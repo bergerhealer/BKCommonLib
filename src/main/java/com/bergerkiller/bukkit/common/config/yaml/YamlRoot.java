@@ -86,7 +86,7 @@ public class YamlRoot {
     }
 
     public void removeEntry(YamlEntry entry) {
-        entry.detachYaml();
+        entry.yaml.remove();
         this._entries.remove(entry.getPath());
     }
 
@@ -107,9 +107,13 @@ public class YamlRoot {
     }
 
     public YamlEntry getEntry(YamlPath path) {
+        return getEntry(path, false);
+    }
+
+    private YamlEntry getEntry(YamlPath path, boolean isListNode) {
         YamlEntry entry = this._entries.get(path);
         if (entry == null) {
-            YamlNode parentNode = getEntry(path.parent()).createNodeValue();
+            YamlNode parentNode = getEntry(path.parent(), path.isList()).createNodeValue(isListNode);
             entry = parentNode.createChildEntry(parentNode._children.size(), path);
         }
         return entry;

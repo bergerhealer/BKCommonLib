@@ -95,20 +95,162 @@ public class YamlTest {
     */
 
     @Test
-    public void testYamlNode() {
+    public void testYamlNodeClone() {
+        // Create a somewhat complex tree of nodes
+        YamlNode root = new YamlNode();
+        root.set("child.subchild.name", "value");
+        root.set("child.field", 12);
+        root.set("child.other", 55);
+        root.setHeader("child.field", "Header of field");
+        root.setHeader("child", "Header of child");
+
+        // Clone it
+        YamlNode root_clone = root.clone();
+
+        // Make changes to the original, verify the clone it all good
+        root.set("child.field", 22);
+        root.set("child.other", 22);
+        assertEquals("value", root_clone.get("child.subchild.name"));
+        assertEquals(12, root_clone.get("child.field"));
+        assertEquals(55, root_clone.get("child.other"));
+        assertEquals("Header of field", root_clone.getHeader("child.field"));
+        assertEquals("Header of child", root_clone.getHeader("child"));
+
+        // Make changes to the clone, verify the clone is all good
+        root_clone.set("child.field", 10);
+        assertEquals(22, root.get("child.field"));
+
+        // Extra check: 'child' node should not be equal
+        assertNotEquals(root.getNode("child"), root_clone.getNode("child"));
+    }
+
+    @Test
+    public void testYamlNodeToString() {
+        // Test various trees and changes to them
         YamlNode root = new YamlNode();
         YamlNode child = root.getNode("subnode");
-        child.getNode("lol").set("hello", 12);
+        child.getNode("node").set("hello", 12);
+        assertEquals("node:\n" + 
+                     "  hello: 12\n",
+                     child.toString());
 
-        child.getNode("lol").set("hello", 15);
-        child.getNode("lol").set("wooo", new Vector(1,2,3));
+        // Test vector in subnode
+        child.getNode("node").set("hello", 15);
+        child.getNode("node").set("wooo", new Vector(1,2,3));
         child.set("other", "hey");
+        assertEquals("node:\n" + 
+                     "  hello: 15\n" + 
+                     "  wooo:\n" + 
+                     "    ==: Vector\n" + 
+                     "    x: 1.0\n" + 
+                     "    y: 2.0\n" + 
+                     "    z: 3.0\n" + 
+                     "other: hey\n",
+                     child.toString());
 
+        // Test headers, should prompt yaml regeneration
         root.setHeader("This is the root header");
         child.setHeader("\nThis is the child header");
-        child.getNode("lol").setHeader("This is the header of lol");
+        child.getNode("node").setHeader("This is the header of node");
+        assertEquals("#> This is the root header\n" + 
+                     "\n" + 
+                     "# This is the child header\n" + 
+                     "subnode:\n" + 
+                      "  # This is the header of node\n" + 
+                      "  node:\n" + 
+                      "    hello: 15\n" + 
+                      "    wooo:\n" + 
+                      "      ==: Vector\n" + 
+                      "      x: 1.0\n" + 
+                      "      y: 2.0\n" + 
+                      "      z: 3.0\n" + 
+                      "  other: hey\n",
+                      root.toString());
 
-        System.out.println(root.toString());
+        // Change value to a different value, but with the same length
+        child.set("node.hello", 12);
+        assertEquals("#> This is the root header\n" + 
+                "\n" + 
+                "# This is the child header\n" + 
+                "subnode:\n" + 
+                 "  # This is the header of node\n" + 
+                 "  node:\n" + 
+                 "    hello: 12\n" + 
+                 "    wooo:\n" + 
+                 "      ==: Vector\n" + 
+                 "      x: 1.0\n" + 
+                 "      y: 2.0\n" + 
+                 "      z: 3.0\n" + 
+                 "  other: hey\n",
+                 root.toString());
+    }
+
+    @Test
+    public void testYamlNodeValue() {
+        YamlNode root = new YamlNode();
+
+        // Set to store a new value, verify it has been set
+        // The functions get(), getValues() and getKeys() should all work
+        assertNull(root.get("key"));
+        root.set("key", "value");
+        assertTrue(root.contains("key"));
+        assertEquals("value", root.get("key"));
+        assertEquals(1, root.getKeys().size());
+        assertEquals("key", root.getKeys().iterator().next());
+        assertEquals(1, root.getValues().size());
+        assertEquals("value", root.getValues().values().iterator().next());
+
+        // Change value
+        // The functions get(), getValues() and getKeys() should all work
+        root.set("key", "new_value");
+        assertTrue(root.contains("key"));
+        assertEquals("new_value", root.get("key"));
+        assertEquals(1, root.getKeys().size());
+        assertEquals("key", root.getKeys().iterator().next());
+        assertEquals(1, root.getValues().size());
+        assertEquals("new_value", root.getValues().values().iterator().next());
+
+        // Remove the value
+        root.remove("key");
+        assertFalse(root.contains("key"));
+        assertNull(root.get("key"));
+        assertEquals(0, root.getValues().size());
+        assertEquals(0, root.getKeys().size());
+    }
+
+    @Test
+    public void testYamlNodeValueDeep() {
+        YamlNode root = new YamlNode();
+
+        // Set to store a new value, verify it has been set
+        // The functions get(), getValues() and getKeys() should all work
+        assertNull(root.get("key.deeper"));
+        root.set("key.deeper", "value");
+        assertTrue(root.contains("key.deeper"));
+        assertEquals("value", root.get("key.deeper"));
+        assertEquals(1, root.getKeys().size());
+        assertEquals("key", root.getKeys().iterator().next());
+        assertEquals(1, root.getValues().size());
+        assertTrue(root.getValues().values().iterator().next() instanceof YamlNode);
+
+        // Change value
+        // The functions get(), getValues() and getKeys() should all work
+        root.set("key.deeper", "new_value");
+        assertTrue(root.contains("key.deeper"));
+        assertEquals("new_value", root.get("key.deeper"));
+        assertEquals(1, root.getKeys().size());
+        assertEquals("key", root.getKeys().iterator().next());
+        assertEquals(1, root.getValues().size());
+        assertTrue(root.getValues().values().iterator().next() instanceof YamlNode);
+
+        // Remove the key, which also removes deeper
+        root.remove("key");
+        assertFalse(root.contains("key.deeper"));
+        assertFalse(root.contains("key"));
+        assertNull(root.get("key.deeper"));
+        assertNull(root.get("key"));
+        assertEquals(0, root.getValues().size());
+        assertEquals(0, root.getKeys().size());
     }
 
     @Test

@@ -13,11 +13,11 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
 public class YamlEntry {
     private final YamlNode parent;
     private final YamlPath path;
-    private final StringTreeNode yaml;
-    private boolean yaml_needs_generating;
-    private boolean yaml_check_children;
+    protected final StringTreeNode yaml;
+    protected boolean yaml_needs_generating;
+    protected boolean yaml_check_children;
     private String header;
-    private Object value;
+    protected Object value;
 
     // Root node only
     protected YamlEntry(YamlNode rootNode) {
@@ -71,24 +71,27 @@ public class YamlEntry {
     }
 
     /**
-     * Detaches the YAML of this entry from the parent
-     */
-    protected void detachYaml() {
-        this.yaml.remove();
-    }
-
-    /**
      * Returns this value as a YamlNode. If the value is not a
      * node, the original value is discarded and a new node is created.
+     * If the original node is a list node and a non-list node is requested,
+     * or vice-versa, then the node type is changed.
      * 
+     * @param isListNode  Whether the node should be a normal compound node, or a List node
      * @return YamlNode
      */
-    public YamlNode createNodeValue() {
+    public YamlNode createNodeValue(boolean isListNode) {
+        // Check if original value is already a node
         if (this.value instanceof YamlNode) {
-            return (YamlNode) this.value;
-        } else {
-            return new YamlNode(this, false);
+            YamlNode nodeValue = (YamlNode) this.value;
+            if (nodeValue.isListNode() == isListNode) {
+                return nodeValue;
+            }
         }
+
+        // Discards the old value and creates a new node
+        YamlNode newNode = new YamlNode(this, isListNode);
+        this.setValue(newNode);
+        return newNode;
     }
 
     /**
@@ -189,7 +192,9 @@ public class YamlEntry {
      */
     protected void assignProperties(YamlEntry entry) {
         this.header = entry.header;
-        this.value = entry.value;
+        if (!(entry.value instanceof YamlNode)) {
+            this.value = entry.value;
+        }
     }
 
     /**
@@ -229,7 +234,11 @@ public class YamlEntry {
         this.markYamlChanged();
     }
 
-    private void markYamlChanged() {
+    /**
+     * Requests the YAML for this entry to be regenerated the next time
+     * {@link #getYaml()} is called.
+     */
+    public void markYamlChanged() {
         if (!this.yaml_needs_generating) {
             this.yaml_needs_generating = true;
 
@@ -262,16 +271,18 @@ public class YamlEntry {
                 StringBuilder builder = new StringBuilder();
                 if (indent > 0) {
                     builder.append(YamlSerializer.INSTANCE.serialize(this.path.name(), this.header, indent));
-                    if (node._children.isEmpty()) {
-                        // Generate YAML that looks like this:
-                        // # Header line
-                        // key: {}\n
-                        builder.insert(builder.length()-1, ": {}");
-                    } else {
-                        // Generate YAML that looks like this:
+                    if (!node._children.isEmpty()) {
                         // # Header line
                         // key:\n
                         builder.insert(builder.length()-1, ':');
+                    } else if (node.isListNode()) {
+                        // # Header line
+                        // key: []\n
+                        builder.insert(builder.length()-1, ": []");
+                    } else {
+                        // # Header line
+                        // key: {}\n
+                        builder.insert(builder.length()-1, ": {}");
                     }
                 } else if (!this.header.isEmpty()) {
                     // Generate the root YAML, which only contains a header
