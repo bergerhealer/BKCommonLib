@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.io.StringBuilderWriter;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
- * Helper class for serializing data to YAML-encoded Strings
+ * Helper class for serializing data to YAML-encoded text
  */
 public class YamlSerializer {
     private String indentStr;
@@ -39,8 +39,14 @@ public class YamlSerializer {
     private Object emitterStateStartValue;
     private boolean reuseEmitter;
 
+    /**
+     * A singleton instance of the YamlSerializer. Is thread-safe.
+     */
     public static final YamlSerializer INSTANCE = new YamlSerializer();
 
+    /**
+     * Creates a new YamlSerializer
+     */
     public YamlSerializer() {
         headerPrefixes = new String[] { "#> ", "# " };
         dumperOptions = new DumperOptions();
@@ -276,31 +282,46 @@ public class YamlSerializer {
 
         // When our reflection hacks work, indentation is correct while writing
         // When it is not, we must perform indentation as a post-processing step
+        StringBuilder builder = output.getBuilder();
         if (this.reuseEmitter) {
-            appendHeader(output.getBuilder(), header, indent);
+            appendHeader(builder, header, indent);
             for (int i = 1; i < indent; i++) {
-                output.getBuilder().append(indentStr);
+                builder.append(indentStr);
             }
         } else {
-            appendHeader(output.getBuilder(), header, (indent == 0) ? 0 : 1);
+            appendHeader(builder, header, (indent == 0) ? 0 : 1);
         }
 
         // Serialize it using SnakeYaml
+        int valueInitialOffset = builder.length();
         try {
             serializer.serialize(representer.represent(value));
         } catch (IOException e) {
             // never happens, writer writes to a StringBuilder, what can go wrong?
         }
 
-        // Post-serialization operations
+        // Replace chat color codes (§c) with ampersand codes (&c) in the value YAML
+        // Also check whether an ampersand is going to accidentally turn into one
+        // In that case, we must escape it (&&)
+        for (int i = valueInitialOffset; i < builder.length()-1; i++) {
+            char c = builder.charAt(i);
+            if (c == StringUtil.CHAT_STYLE_CHAR && StringUtil.isChatCode(builder.charAt(i + 1))) {
+                builder.setCharAt(i, '&');
+                i++;
+            } else if (c == '&' && StringUtil.isChatCode(builder.charAt(i + 1))) {
+                builder.insert(i, '&');
+                i++;
+            }
+        }
+
+        // Further post-serialization operations
         if (this.reuseEmitter) {
             // Erase trailing spaces from indent
             if (indent > 1) {
-                output.getBuilder().setLength(output.getBuilder().length() - 2*(indent-2));
+                output.getBuilder().setLength(builder.length() - 2*(indent-2));
             }
         } else if (indent > 1) {
             // Add indents after the fact
-            StringBuilder builder = output.getBuilder();
             String fullIndentStr = StringUtil.getFilledString(indentStr, indent - 1);
             int indentStart = 0;
             for (int i = 0; i < builder.length(); i++) {

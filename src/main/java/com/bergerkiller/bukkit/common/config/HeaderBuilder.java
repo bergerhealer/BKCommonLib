@@ -6,10 +6,7 @@ package com.bergerkiller.bukkit.common.config;
 public class HeaderBuilder {
 
     private StringBuilder buffer = new StringBuilder();
-
-    private StringBuilder add() {
-        return this.buffer.append('\n');
-    }
+    private boolean isFirstHeaderLine = true;
 
     /**
      * Handles the reading input of a new line
@@ -17,13 +14,32 @@ public class HeaderBuilder {
      * @param line to handle
      * @return True if a header was handled, False if not
      */
-    public boolean handle(String line) {
-        if (line.isEmpty()) {
-            add().append(' ');
-        } else if (line.startsWith("# ")) {
-            add().append(line.substring(2));
-        } else if (line.startsWith("#")) {
-            add().append(line.substring(1));
+    public boolean handle(CharSequence line) {
+        return handle(line, 0, line.length());
+    }
+
+    /**
+     * Handles the reading input of a new line
+     *
+     * @param line to handle
+     * @param contentStart the start offset into the line
+     * @param contentEnd the index (exclusive) of the last character in the line
+     * @return True if a header was handled, False if not
+     */
+    public boolean handle(CharSequence line, int contentStart, int contentEnd) {
+        if (contentStart == contentEnd) {
+            this.buffer.append('\n');
+        } else if (line.charAt(contentStart) == '#') {
+            if (this.isFirstHeaderLine) {
+                this.isFirstHeaderLine = false;
+            } else {
+                this.buffer.append('\n');
+            }
+            if (contentStart < (contentEnd-1) && line.charAt(contentStart+1) == ' ') {
+                this.buffer.append(line, contentStart+2, contentEnd);
+            } else {
+                this.buffer.append(line, contentStart+1, contentEnd);
+            }
         } else {
             return false;
         }
@@ -35,6 +51,7 @@ public class HeaderBuilder {
      */
     public void clear() {
         this.buffer.setLength(0);
+        this.isFirstHeaderLine = true;
     }
 
     /**
@@ -52,6 +69,6 @@ public class HeaderBuilder {
      * @return header
      */
     public String getHeader() {
-        return hasHeader() ? this.buffer.substring(1) : null;
+        return hasHeader() ? this.buffer.toString() : null;
     }
 }

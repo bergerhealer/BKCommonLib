@@ -5,12 +5,14 @@ import static org.junit.Assert.*;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.bukkit.GameMode;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
 import com.bergerkiller.bukkit.common.config.yaml.YamlNode;
 import com.bergerkiller.bukkit.common.config.yaml.YamlPath;
 import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
@@ -342,6 +344,87 @@ public class YamlTest {
         assertNull(root.get("key"));
         assertEquals(0, root.getValues().size());
         assertEquals(0, root.getKeys().size());
+    }
+
+    @Test
+    public void testYamlDeserializer() {
+        // Deserialize a String which tests the following properties:
+        // - Nodes, subnodes, lists and lists inside lists
+        // - Using the key '*' for a node ('any' in permissions)
+        // - Color code characters with ampersand
+        // - Double ampersand escaping
+        // - Headers, with and without newline prefix
+        // - There's a tab used for a full indent position, both at pos=0 and with spaces left of it
+        YamlDeserializer.Output output = YamlDeserializer.INSTANCE.deserialize(
+                "#> Main file header\n" +
+                "\n" +
+                "# Header of hello\n" +
+                "hello:\n" +
+                "  # Header of cool\n" +
+                "  cool:\n" +
+                "\t\t# Header of text\n" +
+                "\n" +
+                "    # With a line gap in-between\n" +
+                "  \ttext: '&cColored text&&ampersand'\n" +
+                "\n" +
+                "    value: -5\n" +
+                "  *:\n" +
+                "    - value1\n" +
+                "    - value2\n" +
+                "    - - value3\n" +
+                "      - value4\n");
+
+        // Verification
+        verifyDeserializeResults(output);
+    }
+
+    @Test
+    public void testYamlDeserializerOddIndent() {
+        // Check that an odd indent (3 spaces) also works
+        YamlDeserializer.Output output = YamlDeserializer.INSTANCE.deserialize(
+                "#> Main file header\n" +
+                "\n" +
+                "# Header of hello\n" +
+                "hello:\n" +
+                "   # Header of cool\n" +
+                "   cool:\n" +
+                "\t\t# Header of text\n" +
+                "\n" +
+                "      # With a line gap in-between\n" +
+                "   \ttext: '&cColored text&&ampersand'\n" +
+                "\n" +
+                "      value: -5\n" +
+                "   *:\n" +
+                "      - value1\n" +
+                "      - value2\n" +
+                "      -  - value3\n" +
+                "         - value4\n");
+
+        // Verification
+        verifyDeserializeResults(output);
+    }
+
+    private void verifyDeserializeResults(YamlDeserializer.Output output) {
+        // Check all values
+        Map<?, ?> hello = (Map<?, ?>) output.root.get("hello");
+        Map<?, ?> cool = (Map<?, ?>) hello.get("cool");
+        List<?> anyList = (List<?>) hello.get("*");
+        assertEquals("§cColored text&ampersand", (String) cool.get("text"));
+        assertEquals(Integer.valueOf(-5), (Integer) cool.get("value"));
+        assertEquals(3, anyList.size());
+        assertEquals("value1", (String) anyList.get(0));
+        assertEquals("value2", (String) anyList.get(1));
+        List<?> anyListSubList = (List<?>) anyList.get(2);
+        assertEquals(2, anyListSubList.size());
+        assertEquals("value3", (String) anyListSubList.get(0));
+        assertEquals("value4", (String) anyListSubList.get(1));
+
+        // Check all headers
+        assertEquals("Main file header", output.headers.get(YamlPath.create("")));
+        assertEquals("\nHeader of hello", output.headers.get(YamlPath.create("hello")));
+        assertEquals("Header of cool", output.headers.get(YamlPath.create("hello.cool")));
+        assertEquals("Header of text\n\nWith a line gap in-between", output.headers.get(YamlPath.create("hello.cool.text")));
+        assertEquals("\n", output.headers.get(YamlPath.create("hello.cool.value")));
     }
 
     @Test
