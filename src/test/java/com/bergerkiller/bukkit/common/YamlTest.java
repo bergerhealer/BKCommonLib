@@ -20,6 +20,29 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 public class YamlTest {
 
     @Test
+    public void testYamlNodeLoadFromString() {
+        // Test the (recursive) loading functionality, replacing
+        // of original contents and applying of headers.
+        YamlNode root = new YamlNode();
+        root.set("child.old", 12);
+        root.set("child.sub.deeper", "deep");
+        root.getNode("child").loadFromString(
+                "new_key: new_value\n" +
+                "\n" +
+                "# Header of sub\n" +
+                "sub:\n" +
+                "  # Header of sub_new_key\n" +
+                "  sub_new_key: sub_new_value\n");
+
+        // Verify state
+        assertFalse(root.contains("child.old"));
+        assertEquals("new_value", root.get("child.new_key"));
+        assertEquals("sub_new_value", root.get("child.sub.sub_new_key"));
+        assertEquals("\nHeader of sub", root.getHeader("child.sub"));
+        assertEquals("Header of sub_new_key", root.getHeader("child.sub.sub_new_key"));
+    }
+
+    @Test
     public void testYamlNodeList() {
         YamlNode root = new YamlNode();
         List<Object> list;
@@ -618,6 +641,11 @@ public class YamlTest {
         assertEquals("root.child", child.toString());
         assertEquals(root, child.parent());
         assertNotEquals(root, child);
+
+        // Check child node constructed using yaml path
+        YamlPath child_using_yaml_path = child.child(YamlPath.create("subnode.sub"));
+        assertEquals("sub", child_using_yaml_path.name());
+        assertEquals("root.child.subnode.sub", child_using_yaml_path.toString());
 
         // Check a different root.child node that is created
         // The child should equal the previous root.child path

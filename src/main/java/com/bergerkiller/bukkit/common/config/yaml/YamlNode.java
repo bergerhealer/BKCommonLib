@@ -1,5 +1,12 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -8,14 +15,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.yaml.snakeyaml.error.YAMLException;
+
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
+/**
+ * A node in the YAML tree
+ */
 public class YamlNode {
     protected YamlRoot _root;
     protected YamlEntry _entry;
     protected List<YamlEntry> _children;
 
+    /**
+     * Creates a new empty Yaml Root Node
+     */
     public YamlNode() {
         this._root = new YamlRoot();
         this._entry = new YamlEntry(this);
@@ -214,6 +229,20 @@ public class YamlNode {
             values.put(entry.getPath().name(), entry.getValue());
         }
         return values;
+    }
+
+    /**
+     * Sets all the values mapped to the keys that are a descendant
+     * of this node. Values in the map that are maps or collections are turned
+     * into deeper nested nodes.
+     * 
+     * @param values to set
+     */
+    public void setValues(Map<?, ?> values) {
+        this.clear();
+        for (Map.Entry<?, ?> entry : values.entrySet()) {
+            this.set(entry.getKey().toString(), entry.getValue());
+        }
     }
 
     /**
@@ -445,6 +474,90 @@ public class YamlNode {
                 target.put(path, def);
             }
             entry_a.setValue(value);
+        }
+    }
+
+    /**
+     * Loads the YAML-encoded text from an input stream and fills this node with this information.
+     * All original node information will be lost.
+     * Multiple indentation formats are supported and automatically detected.
+     * The platform's default character encoding is used to decode the stream.
+     * The stream is automatically closed, also when errors occur.
+     * 
+     * @param stream to read from
+     * @throws YAMLException When the YAML-encoded text is malformed or an IO Exception occurs
+     */
+    public void loadFromStream(InputStream stream) throws YAMLException {
+        loadFromReader(new InputStreamReader(stream));
+    }
+
+    /**
+     * Loads the YAML-encoded text from a reader and fills this node with this information.
+     * All original node information will be lost.
+     * Multiple indentation formats are supported and automatically detected.
+     * The stream is automatically closed, also when errors occur.
+     * 
+     * @param reader to load from
+     * @throws YAMLException When the YAML-encoded text is malformed or an IO Exception occurs
+     */
+    public void loadFromReader(Reader reader) throws YAMLException {
+        loadDeserializerOutput(YamlDeserializer.INSTANCE.deserialize(reader));
+    }
+
+    /**
+     * Loads the YAML-encoded text from a String and fills this node with this information.
+     * All original node information will be lost.
+     * Multiple indentation formats are supported and automatically detected.
+     * 
+     * @param yamlString YAML-encoded text to decode and load
+     * @throws YAMLException When the YAML-encoded text is malformed
+     */
+    public void loadFromString(String yamlString) throws YAMLException {
+        loadDeserializerOutput(YamlDeserializer.INSTANCE.deserialize(yamlString));
+    }
+
+    /**
+     * Loads the output of the {@link YamlDeserializer} into this node
+     * 
+     * @param output
+     */
+    public void loadDeserializerOutput(YamlDeserializer.Output output) {
+        this.setValues(output.root);
+        for (Map.Entry<YamlPath, String> header : output.headers.entrySet()) {
+            YamlEntry entry = this._root.getEntryIfExists(this.getYamlPath().child(header.getKey()));
+            if (entry != null) {
+                entry.setHeader(header.getValue());
+            }
+        }
+    }
+
+    /**
+     * Encodes this YamlNode to YAML-formatted text and writes it to an
+     * output stream.
+     * The platform's default character encoding is used to encode the text.
+     * The stream is automatically closed, also when errors occur.
+     * 
+     * @param stream to write to
+     * @throws IOException When the stream throws an error while writing
+     */
+    public void saveToStream(OutputStream stream) throws IOException {
+        saveToWriter(new OutputStreamWriter(stream));
+    }
+
+    /**
+     * Encodes this YamlNode to YAML-formatted text and writes it to a writer.
+     * The stream is automatically closed, also when errors occur.
+     * 
+     * @param writer to write to
+     * @throws IOException When the writer throws an error while writing
+     */
+    public void saveToWriter(Writer writer) throws IOException {
+        try {
+            writer.write(this.toString());
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException ex) {}
         }
     }
 

@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.config.yaml;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
+import java.util.Map;
 
 import com.bergerkiller.bukkit.common.collections.StringTreeNode;
 
@@ -175,11 +176,16 @@ public class YamlEntry {
             return;
         }
 
-        // Turn a Collection (or List) value into a YamlListNode instead
         if (value instanceof Collection && !(value instanceof YamlNode)) {
+            // Turn a Collection (or List) value into a YamlListNode
             YamlListNode listNode = new YamlListNode();
             listNode.addAll((Collection<?>) value);
             value = listNode;
+        } else if (value instanceof Map) {
+            // Turn a Map into a YamlNode
+            YamlNode node = new YamlNode();
+            node.setValues((Map<?, ?>) value);
+            value = node;
         }
 
         YamlNode newNode;

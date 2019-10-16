@@ -47,21 +47,28 @@ public class YamlDeserializer {
     }
 
     /**
-     * Deserializes a Yaml String read from a Reader
+     * Deserializes a Yaml String read from a Reader.
+     * The stream is automatically closed, also when errors occur.
      * 
      * @param reader The reader to read YAML-encoded text from
      * @return The deserialized YAML data, containing the values and headers
-     * @throws YAMLException When the YAML-encoded text is malformed
+     * @throws YAMLException When the YAML-encoded text is malformed or an IO Exception occurs
      */
     public synchronized Output deserialize(Reader reader) throws YAMLException {
-        this.preParser.open(reader);
-        Output output = new Output();
-        output.root = CommonUtil.tryCast(this.yaml.load(this.preParser), Map.class, Collections.emptyMap());
-        output.headers = new HashMap<YamlPath, String>(this.preParser.headers);
-        if (this.preParser.mainHeader.length() > 0) {
-            output.headers.put(YamlPath.ROOT, this.preParser.mainHeader.toString());
+        try {
+            this.preParser.open(reader);
+            Output output = new Output();
+            output.root = CommonUtil.tryCast(this.yaml.load(this.preParser), Map.class, Collections.emptyMap());
+            output.headers = new HashMap<YamlPath, String>(this.preParser.headers);
+            if (this.preParser.mainHeader.length() > 0) {
+                output.headers.put(YamlPath.ROOT, this.preParser.mainHeader.toString());
+            }
+            return output;
+        } finally {
+            try {
+                reader.close();
+            } catch (IOException ex) {}
         }
-        return output;
     }
 
     /**

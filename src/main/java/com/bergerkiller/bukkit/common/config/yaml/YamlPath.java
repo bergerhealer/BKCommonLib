@@ -130,6 +130,22 @@ public final class YamlPath {
     }
 
     /**
+     * Gets a child path of this path. The child path can contain
+     * multiple path parts to refer to a deeper child. If the child
+     * path is root, this path is returned instead.
+     * 
+     * @param childPath The YamlPath to append to this path to make a child
+     * @return child path
+     */
+    public YamlPath child(YamlPath childPath) {
+        if (childPath.isRoot()) {
+            return this;
+        } else {
+            return child(childPath.parent()).child(childPath.name());
+        }
+    }
+
+    /**
      * Creates a child path of this path to a list element
      * 
      * @param listIndex The index of the element in the list
