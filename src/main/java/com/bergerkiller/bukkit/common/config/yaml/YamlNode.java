@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.bergerkiller.bukkit.common.collections.StringTreeNode;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -16,23 +15,20 @@ public class YamlNode {
     protected YamlRoot _root;
     protected YamlEntry _entry;
     protected List<YamlEntry> _children;
-    protected boolean _isListNode;
 
     public YamlNode() {
         this._root = new YamlRoot();
         this._entry = new YamlEntry(this);
         this._children = new ArrayList<YamlEntry>(10);
-        this._isListNode = false;
         this._root.putEntry(this._entry);
     }
 
     // Creates a new child node from an entry
     // Called from YamlEntry createNodeValue()
-    protected YamlNode(YamlEntry entry, boolean isListNode) {
+    protected YamlNode(YamlEntry entry) {
         this._root = entry.getParentNode()._root;
         this._entry = entry;
         this._children = new ArrayList<YamlEntry>(10);
-        this._isListNode = isListNode;
     }
 
     /**
@@ -42,17 +38,6 @@ public class YamlNode {
      */
     public boolean hasParent() {
         return this.getParent() != null;
-    }
-
-    /**
-     * Gets whether this is a List of values instead of a compound node.
-     * A list node omits the names of the child values, which are indices.
-     * Normally list nodes are used using {@link #getList(path)}
-     * 
-     * @return True if this is a list node
-     */
-    public boolean isListNode() {
-        return this._isListNode;
     }
 
     /**
@@ -260,11 +245,8 @@ public class YamlNode {
      * Nodes that were removed turn into a detached tree of their own.
      */
     public void clear() {
-        Iterator<YamlEntry> iter = this._children.iterator();
-        while (iter.hasNext()) {
-            YamlEntry entry = iter.next();
-            iter.remove();
-            this.removeChildEntry(entry);
+        for (int i = this._children.size()-1; i >= 0; --i) {
+            this.removeChildEntryAt(i);
         }
     }
 
@@ -302,7 +284,7 @@ public class YamlNode {
      * @return the node
      */
     public YamlNode getNode(String path) {
-        return this.getEntry(path).createNodeValue(false);
+        return this.getEntry(path).createNodeValue();
     }
 
     /**
@@ -314,8 +296,7 @@ public class YamlNode {
      * @return the list
      */
     public List<Object> getList(String path) {
-        this.getEntry(path).createNodeValue(true);
-        return null; //TODO!
+        return this.getEntry(path).createListNodeValue();
     }
 
     /**
@@ -481,16 +462,20 @@ public class YamlNode {
     private void cloneChildrenTo(YamlNode clone) {
         for (YamlEntry child : this._children) {
             YamlPath childPath = clone.getYamlPath().child(child.getPath().name());
-            StringTreeNode childYaml = clone._entry.yaml.add();
-            YamlEntry childClone = new YamlEntry(clone, childPath, childYaml);
+            YamlEntry childClone = clone.createChildEntry(clone._children.size(), childPath);
             childClone.assignProperties(child);
-            clone._children.add(childClone);
-            clone._root.putEntry(childClone);
 
             if (child.isNodeValue()) {
                 YamlNode originalChildNode = child.getNodeValue();
-                YamlNode childCloneNode = childClone.createNodeValue(originalChildNode.isListNode());
+                YamlNode childCloneNode;
+                if (originalChildNode instanceof YamlListNode) {
+                    childCloneNode = childClone.createListNodeValue();
+                } else {
+                    childCloneNode = childClone.createNodeValue();
+                }
                 originalChildNode.cloneChildrenTo(childCloneNode);
+            } else {
+                childClone.value = child.value;
             }
         }
     }
@@ -529,20 +514,11 @@ public class YamlNode {
         }
     }
 
-    protected YamlNode createChildNode(int index, boolean isListNode, YamlPath path) {
-        return createChildEntry(index, path).createNodeValue(isListNode);
-    }
-
     protected YamlEntry createChildEntry(int index, YamlPath path) {
-        // If the parent path of the path is not equal to the path to this node,
-        // we need to insert additional nodes in-between to get there
-        // This works recursively. If we hit the root node, then the path is invalid.
+        // We can only insert children when the path is relative to this node
+        // Create the parent entries first when path has multiple depths
         if (!path.parent().equals(this._entry.getPath())) {
-            if (path.isRoot()) {
-                throw new IllegalArgumentException("Path " + path + " is not a child of " + this._entry.getPath());
-            } else {
-                return createChildNode(index, path.isList(), path.parent()).createChildEntry(0, path);
-            }
+            throw new IllegalArgumentException("Path " + path + " is not a child of " + this._entry.getPath());
         }
 
         // When children were empty, then YAML writes a {} or []
@@ -568,12 +544,21 @@ public class YamlNode {
     }
 
     protected void removeChildEntry(YamlEntry entry) {
-        if (entry.getParentNode() != this) {
+        int index = this._children.indexOf(entry);
+        if (index != -1) {
+            removeChildEntryAt(index);
+        } else {
             throw new IllegalArgumentException("The entry is not a child of this node");
+        }
+    }
+
+    protected YamlEntry removeChildEntryAt(int index) {
+        if (index < 0 || index >= this._children.size()) {
+            throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
         }
 
         // Detach as a child
-        this._children.remove(entry);
+        YamlEntry entry = this._children.remove(index);
         this._root.detach(entry);
 
         // When children are empty, it now writes [] or {} as YAML
@@ -581,5 +566,9 @@ public class YamlNode {
         if (this._children.isEmpty()) {
             this._entry.markYamlChanged();
         }
+
+        // May be useful?
+        return entry;
     }
+
 }

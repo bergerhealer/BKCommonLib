@@ -2,8 +2,12 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
+import org.bukkit.GameMode;
+import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 import org.junit.Test;
 
@@ -13,86 +17,66 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 
 public class YamlTest {
 
-    /*
     @Test
-    public void testYamlEntryTree() {
-        // Create the entries
-        YamlEntry root = new YamlEntry();
-        root.setName("root");
-        root.setHeader("Header of root");
-        YamlEntry child1 = new YamlEntry();
-        child1.setName("child1");
-        child1.setValue("child1value");
-        child1.setHeader("Header of child 1");
-        YamlEntry child2 = new YamlEntry();
-        child2.setName("child2");
-        child2.setValue("child2value");
-        child2.setHeader("\nHeader of child 2 with newline in front");
-        YamlEntry child3 = new YamlEntry();
-        child3.setName("child3");
-        child3.setValue("child3value");
+    public void testYamlNodeList() {
+        YamlNode root = new YamlNode();
+        List<Object> list;
 
-        // Link them together
-        YamlNode rootNode = new YamlNode();
-        rootNode.firstChild = child1;
-        root.setValue(rootNode);
-        child1.setNextSibling(child2);
-        child2.setNextSibling(child3);
+        // Add 3 values and verify
+        list = root.getList("list");
+        list.add("Value1");
+        list.add(12);
+        list.add("Value3");
+        list = root.getList("list");
+        assertEquals(3, list.size());
+        assertEquals("Value1", list.get(0));
+        assertEquals(Integer.valueOf(12), list.get(1));
+        assertEquals("Value3", list.get(2));
+        assertEquals("Value1", root.get("list[0]"));
+        assertEquals(Integer.valueOf(12), root.get("list[1]"));
+        assertEquals("Value3", root.get("list[2]"));
+        assertTrue(root.contains("list[0]"));
+        assertTrue(root.contains("list[1]"));
+        assertTrue(root.contains("list[2]"));
 
-        // Get yaml
-        //System.out.println(root.getYaml());
+        // Remove value in the middle, verify all is good
+        list.remove(1);
+        list = root.getList("list");
+        assertEquals(2, list.size());
+        assertEquals("Value1", list.get(0));
+        assertEquals("Value3", list.get(1));
+        assertEquals("Value1", root.get("list[0]"));
+        assertEquals("Value3", root.get("list[1]"));
+        assertFalse(root.contains("list[2]"));
+
+        // Insert value in the middle, verify all is good
+        list.add(0, "Value0");
+        list = root.getList("list");
+        assertEquals(3, list.size());
+        assertEquals("Value0", list.get(0));
+        assertEquals("Value1", list.get(1));
+        assertEquals("Value3", list.get(2));
+        assertEquals("Value0", root.get("list[0]"));
+        assertEquals("Value1", root.get("list[1]"));
+        assertEquals("Value3", root.get("list[2]"));
+
+        // Add a complex node tree
+        YamlNode node = new YamlNode();
+        node.set("key", "value");
+        node.set("nested.key1", "value1");
+        node.set("nested.key2", "value2");
+        list.add(node);
+        assertEquals(4, list.size());
+        assertEquals(node, list.get(list.size()-1));
+        assertEquals("value", root.get("list[3].key"));
+        assertEquals("value1", root.get("list[3].nested.key1"));
+        assertEquals("value2", root.get("list[3].nested.key2"));
+        assertTrue(root.contains("list[3].key"));
+        assertTrue(root.contains("list[3].nested.key1"));
+        assertTrue(root.contains("list[3].nested.key2"));
+        assertEquals("value1", root.getNode("list[3].nested").get("key1"));
+        assertEquals("value2", root.getNode("list[3].nested").get("key2"));
     }
-
-    @Test
-    public void testYamlEntry() {
-        YamlEntry entry = new YamlEntry();
-
-        // Verify correct workings of name, value and header properties
-        entry.setName("the_name");
-        assertEquals("the_name", entry.getName());
-        entry.setValue("hello, world!");
-        assertEquals("hello, world!", entry.getValue());
-        assertEquals("", entry.getHeader());
-        entry.setHeader("This is a header\nConsisting of two lines");
-        assertEquals("This is a header\nConsisting of two lines", entry.getHeader());
-
-        // Verify that yaml() produces the correct expected output (prefix the header)
-        assertEquals("# This is a header\n" + 
-                "# Consisting of two lines\n" + 
-                "the_name: hello, world!\n",
-                entry.getYaml());
-
-        // Change the value, check yaml changes accordingly
-        entry.setValue(Integer.valueOf(78));
-        assertEquals("# This is a header\n" + 
-                "# Consisting of two lines\n" + 
-                "the_name: 78\n",
-                entry.getYaml());
-
-        // Change the name, check yaml changes accordingly
-        entry.setName("new_name");
-        assertEquals("# This is a header\n" + 
-                "# Consisting of two lines\n" + 
-                "new_name: 78\n",
-                entry.getYaml());
-
-        // Change the header, check yaml changes accordingly
-        entry.setHeader("This is a new header");
-        assertEquals("# This is a new header\n" + 
-                "new_name: 78\n",
-                entry.getYaml());
-
-        // Change value to an empty list. Check this works.
-        entry.setValue(Collections.emptyList());
-        assertEquals("# This is a new header\n" +
-                     "new_name: []\n",
-                     entry.getYaml());
-
-        // Change value to a List of strings. Check this works.
-        entry.setValue(Arrays.asList("item1", "item2", "item3"));
-        System.out.println(entry.getYaml());
-    }
-    */
 
     @Test
     public void testYamlNodeClone() {
@@ -183,6 +167,113 @@ public class YamlTest {
                  "      z: 3.0\n" + 
                  "  other: hey\n",
                  root.toString());
+    }
+
+    @Test
+    public void testYamlSimpleListToString() {
+        YamlNode root = new YamlNode();
+        List<Object> list = root.getList("simpleList");
+        list.add("Value1");
+        list.add("Value2");
+        list.add("Value3");
+
+        assertEquals("simpleList:\n" +
+                     "  - Value1\n" +
+                     "  - Value2\n" +
+                     "  - Value3\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlListOfNodesToString() {
+        YamlNode root = new YamlNode();
+        List<Object> list = root.getList("simpleList");
+
+        YamlNode node1 = new YamlNode();
+        node1.set("node1key1", "node1value1");
+        node1.set("node1key2", "node1value2");
+        list.add(node1);
+
+        YamlNode node2 = new YamlNode();
+        node2.set("node2key1", "node2value1");
+        node2.set("node2key2", "node2value2");
+        list.add(node2);
+
+        YamlNode node3 = new YamlNode();
+        node3.set("node3key1", "node3value1");
+        node3.set("node3key2", "node3value2");
+        list.add(node3);
+
+        assertEquals("simpleList:\n" + 
+                     "  - node1key1: node1value1\n" + 
+                     "    node1key2: node1value2\n" + 
+                     "  - node2key1: node2value1\n" + 
+                     "    node2key2: node2value2\n" + 
+                     "  - node3key1: node3value1\n" + 
+                     "    node3key2: node3value2\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlNestedListToString() {
+        YamlNode root = new YamlNode();
+        root.set("simpleList", Arrays.asList(
+                "value1",
+                Arrays.asList("nested1value1", "nested1value2"),
+                "value2",
+                Arrays.asList(Arrays.asList("nested2deeper1value1", "nested2deeper1value2"), "nested2value2"),
+                Arrays.asList("nested3value1", "nested3value2")));
+
+        assertEquals("simpleList:\n" + 
+                     "  - value1\n" + 
+                     "  - - nested1value1\n" + 
+                     "    - nested1value2\n" + 
+                     "  - value2\n" + 
+                     "  - - - nested2deeper1value1\n" + 
+                     "      - nested2deeper1value2\n" + 
+                     "    - nested2value2\n" + 
+                     "  - - nested3value1\n" + 
+                     "    - nested3value2\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlEmptyNodeToString() {
+        YamlNode root = new YamlNode();
+        root.set("simpleNode", new YamlNode());
+        root.set("simpleNodeNested", Arrays.asList(new YamlNode()));
+
+        assertEquals("simpleNode: {}\n" + 
+                     "simpleNodeNested:\n" + 
+                     "  - {}\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlEmptyListToString() {
+        YamlNode root = new YamlNode();
+        root.set("simpleList", Collections.emptyList());
+        root.set("simpleListNested", Arrays.asList(Collections.emptyList()));
+
+        assertEquals("simpleList: []\n" + 
+                     "simpleListNested:\n" + 
+                     "  - []\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlEnumToString() {
+        YamlNode root = new YamlNode();
+        root.set("permissionTrue", PermissionDefault.TRUE);
+        root.set("permissionFalse", PermissionDefault.FALSE);
+        root.set("permissionOp", PermissionDefault.OP);
+        root.set("gameMode", GameMode.CREATIVE);
+
+        assertEquals("permissionTrue: true\n" +
+                     "permissionFalse: false\n" +
+                     "permissionOp: op\n" +
+                     "gameMode: CREATIVE\n",
+                     root.toString());
     }
 
     @Test

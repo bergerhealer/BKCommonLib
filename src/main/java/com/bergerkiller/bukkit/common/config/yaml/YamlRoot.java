@@ -61,6 +61,7 @@ public class YamlRoot {
         // Preserve certain properties from the original entry, such as the header
         YamlEntry newEntry = new YamlEntry(newParent, newPath, newYaml);
         newEntry.assignProperties(entry);
+        newEntry.value = entry.value;
         newRoot._entries.put(newPath, newEntry);
 
         // Special handling for nodes
@@ -83,6 +84,11 @@ public class YamlRoot {
         }
 
         return newEntry;
+    }
+
+    public void updateEntryPath(YamlEntry entry, YamlPath newPath) {
+        this._entries.remove(entry.getPath());
+        this._entries.put(newPath, entry);
     }
 
     public void removeEntry(YamlEntry entry) {
@@ -113,7 +119,8 @@ public class YamlRoot {
     private YamlEntry getEntry(YamlPath path, boolean isListNode) {
         YamlEntry entry = this._entries.get(path);
         if (entry == null) {
-            YamlNode parentNode = getEntry(path.parent(), path.isList()).createNodeValue(isListNode);
+            YamlEntry parentEntry = getEntry(path.parent(), path.isList());
+            YamlNode parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
             entry = parentNode.createChildEntry(parentNode._children.size(), path);
         }
         return entry;

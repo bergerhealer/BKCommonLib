@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.ListIterator;
 
@@ -12,7 +13,7 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
  */
 public class YamlEntry {
     private final YamlNode parent;
-    private final YamlPath path;
+    private YamlPath path;
     protected final StringTreeNode yaml;
     protected boolean yaml_needs_generating;
     protected boolean yaml_check_children;
@@ -52,6 +53,33 @@ public class YamlEntry {
     }
 
     /**
+     * Sets the path to which this entry's value is bound. Updates it
+     * for this entry, and if this is a node, all its child entries.
+     * 
+     * @param path
+     */
+    public void setPath(YamlPath path) {
+        if (this.parent != null) {
+            setPath(this.parent._root, path);
+        } else if (this.isNodeValue()) {
+            setPath(this.getNodeValue()._root, path);
+        } else {
+            // Not bound to any tree, just update the path variable
+            this.path = path;
+        }
+    }
+
+    private void setPath(YamlRoot root, YamlPath path) {
+        root.updateEntryPath(this, path);
+        this.path = path;
+        if (this.isNodeValue()) {
+            for (YamlEntry childEntry : this.getNodeValue()._children) {
+                childEntry.setPath(root, path.child(childEntry.path.name()));
+            }
+        }
+    }
+
+    /**
      * Gets the parent yaml node of which this entry is a child
      * 
      * @return parent node
@@ -73,29 +101,44 @@ public class YamlEntry {
     /**
      * Returns this value as a YamlNode. If the value is not a
      * node, the original value is discarded and a new node is created.
-     * If the original node is a list node and a non-list node is requested,
-     * or vice-versa, then the node type is changed.
+     * If the original node is a list node and then the node type is changed.
      * 
-     * @param isListNode  Whether the node should be a normal compound node, or a List node
      * @return YamlNode
      */
-    public YamlNode createNodeValue(boolean isListNode) {
+    public YamlNode createNodeValue() {
         // Check if original value is already a node
-        if (this.value instanceof YamlNode) {
-            YamlNode nodeValue = (YamlNode) this.value;
-            if (nodeValue.isListNode() == isListNode) {
-                return nodeValue;
-            }
+        if (this.value instanceof YamlNode && !(this.value instanceof YamlListNode)) {
+            return (YamlNode) this.value;
         }
 
         // Discards the old value and creates a new node
-        YamlNode newNode = new YamlNode(this, isListNode);
+        YamlNode newNode = new YamlNode(this);
         this.setValue(newNode);
         return newNode;
     }
 
     /**
-     * Gets whether this entry stores a YamlNode value
+     * Returns this value as a YamlNode. If the value is not a
+     * list node, the original value is discarded and a new node is created.
+     * If the original node is a normal node then the original keys are sorted
+     * and values added to a list in that order.
+     * 
+     * @return YamlNode
+     */
+    public YamlListNode createListNodeValue() {
+        // Check if original value is already a node
+        if (this.value instanceof YamlListNode) {
+            return (YamlListNode) this.value;
+        }
+
+        // Discards the old value and creates a new node
+        YamlListNode newNode = new YamlListNode(this);
+        this.setValue(newNode);
+        return newNode;
+    }
+
+    /**
+     * Gets whether this entry stores a YamlNode or YamlListNode value
      * 
      * @return True if the value is a YamlNode
      */
@@ -104,7 +147,8 @@ public class YamlEntry {
     }
 
     /**
-     * Gets this entry's value as a YamlNode
+     * Gets this entry's value as a YamlNode, which can also be
+     * a YamlListNode.
      * 
      * @return node value
      */
@@ -129,6 +173,13 @@ public class YamlEntry {
     public void setValue(Object value) {
         if (this.value == value) {
             return;
+        }
+
+        // Turn a Collection (or List) value into a YamlListNode instead
+        if (value instanceof Collection && !(value instanceof YamlNode)) {
+            YamlListNode listNode = new YamlListNode();
+            listNode.addAll((Collection<?>) value);
+            value = listNode;
         }
 
         YamlNode newNode;
@@ -186,15 +237,13 @@ public class YamlEntry {
     }
 
     /**
-     * Assigns properties such as header and value from another entry
+     * Assigns properties such as header from another entry.
+     * The value is not copied as it requires special handling of node values.
      * 
      * @param entry to assign the properties of to this entry
      */
     protected void assignProperties(YamlEntry entry) {
         this.header = entry.header;
-        if (!(entry.value instanceof YamlNode)) {
-            this.value = entry.value;
-        }
     }
 
     /**
@@ -250,6 +299,32 @@ public class YamlEntry {
         }
     }
 
+    /**
+     * Serializes a value to a YAML-formatted String using all the YAML formatting rules for values.
+     * Also checks whether an additional - needs to be prefixed because it is the first
+     * item of a list. This is done here because then these characters will align on the same line.
+     * 
+     * @param value
+     * @return YAML formatted String
+     */
+    private String serializeYamlValue(Object value) {
+        // When value is the first item of a parent list, we want to prefix it with an (additional) -
+        // This is done by wrapping the value into a list and adjusting indent
+        int indent = this.path.depth();
+        YamlEntry entry = this;
+        while (entry != null
+               && entry.parent._children.get(0) == entry
+               && entry.parent.getParent() instanceof YamlListNode)
+        {
+            value = Collections.singletonList(value);
+            indent--;
+            entry = entry.parent._entry;
+        }
+
+        // Serialize the value to a String
+        return YamlSerializer.INSTANCE.serialize(value, this.header, indent);
+    }
+
     private void generateYaml() {
         // Call generateYaml() on the children
         if (this.yaml_check_children) {
@@ -265,38 +340,44 @@ public class YamlEntry {
         if (this.yaml_needs_generating) {
             this.yaml_needs_generating = false;
 
-            int indent = this.path.depth();
-            if (this.isNodeValue()) {
-                YamlNode node = this.getNodeValue();
-                StringBuilder builder = new StringBuilder();
-                if (indent > 0) {
-                    builder.append(YamlSerializer.INSTANCE.serialize(this.path.name(), this.header, indent));
-                    if (!node._children.isEmpty()) {
-                        // # Header line
-                        // key:\n
-                        builder.insert(builder.length()-1, ':');
-                    } else if (node.isListNode()) {
-                        // # Header line
-                        // key: []\n
-                        builder.insert(builder.length()-1, ": []");
-                    } else {
-                        // # Header line
-                        // key: {}\n
-                        builder.insert(builder.length()-1, ": {}");
-                    }
-                } else if (!this.header.isEmpty()) {
+            YamlNode node = this.isNodeValue() ? this.getNodeValue() : null;
+
+            if (this.parent == null) {
+                if (this.header.isEmpty()) {
+                    this.yaml.setValue("");
+                } else {
                     // Generate the root YAML, which only contains a header
                     // Special about this header is that it uses #> instead of #
                     // This allows us to differentiate it from the header at a key
+                    StringBuilder builder = new StringBuilder();
                     YamlSerializer.INSTANCE.appendHeader(builder, header, 0);
+                    this.yaml.setValue(builder.toString());
                 }
-                this.yaml.setValue(builder.toString());
+            } else if (node != null && !node._children.isEmpty()) {
+                if (this.parent instanceof YamlListNode) {
+                    // We store nothing for lists, this is the responsibility of the elements
+                    // This is because lists don't have a clear header
+                    this.yaml.setValue("");
+                } else {
+                    // # Header line
+                    // key:\n
+                    StringBuilder builder = new StringBuilder();
+                    builder.append(this.serializeYamlValue(this.path.name()));
+                    builder.insert(builder.length()-1, ':');
+                    this.yaml.setValue(builder.toString());
+                }
             } else {
-                // Special handling for enums: write the text version of it instead
-                // For enum values true/false (Bukkit PermissionDefault) write boolean true/false
-                // TODO: Is toString() really the right way to go? name() might be better.
                 Object value = this.value;
-                if (value != null && value.getClass().isEnum()) {
+                if (node instanceof YamlListNode) {
+                    // Generate YAML that looks like this: []\n
+                    value = Collections.emptyList();
+                } else if (node instanceof YamlNode) {
+                    // Generate YAML that looks like this: {}\n
+                    value = Collections.emptyMap();
+                } else if (value != null && value.getClass().isEnum()) {
+                    // Special handling for enums: write the text version of it instead
+                    // For enum values true/false (Bukkit PermissionDefault) write boolean true/false
+                    // TODO: Is toString() really the right way to go? name() might be better.
                     String text = value.toString();
                     if (text.equalsIgnoreCase("true")) {
                         value = Boolean.TRUE;
@@ -307,9 +388,18 @@ public class YamlEntry {
                     }
                 }
 
-                // Generate YAML that looks like this:
-                // key: value\n
-                this.yaml.setValue(YamlSerializer.INSTANCE.serialize(Collections.singletonMap(this.getPath().name(), value), this.header, indent));
+                // When value is a key: value pair, use a singleton map to emulate that
+                // If it is a list value, then use a singleton list to prefix a -
+                if (this.parent instanceof YamlListNode) {
+                    // Generate YAML that looks like this: - value\n
+                    value = Collections.singletonList(value);
+                } else {
+                    // Generate YAML that looks like this: key: value\n
+                    value = Collections.singletonMap(this.getPath().name(), value);
+                }
+
+                // Store it
+                this.yaml.setValue(this.serializeYamlValue(value));
             }
         }
     }
