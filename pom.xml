@@ -248,7 +248,7 @@
                         <configuration>
                             <rules>
                                 <requireMavenVersion>
-                                    <version>3.3.9</version>
+                                    <version>3.3.3</version>
                                 </requireMavenVersion>
                             </rules>
                             <fail>true</fail>
