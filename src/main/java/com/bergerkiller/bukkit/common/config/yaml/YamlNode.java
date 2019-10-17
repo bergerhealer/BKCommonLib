@@ -32,18 +32,36 @@ public class YamlNode {
      * Creates a new empty Yaml Root Node
      */
     public YamlNode() {
-        this._root = new YamlRoot();
-        this._entry = new YamlEntry(this);
-        this._children = new ArrayList<YamlEntry>(10);
-        this._root.putEntry(this._entry);
+        this(null);
     }
 
-    // Creates a new child node from an entry
-    // Called from YamlEntry createNodeValue()
+    /**
+     * Creates a new child node for an entry, or a new root node
+     * if the entry is null.
+     * 
+     * @param entry
+     */
     protected YamlNode(YamlEntry entry) {
-        this._root = entry.getParentNode()._root;
-        this._entry = entry;
         this._children = new ArrayList<YamlEntry>(10);
+        if (entry == null) {
+            this._root = new YamlRoot();
+            this._entry = new YamlEntry(this);
+            this._root.putEntry(this._entry);
+        } else {
+            this._root = entry.getParentNode()._root;
+            this._entry = entry;
+        }
+    }
+
+    /**
+     * Creates a new YamlNode instance used by an entry.
+     * Can be overridden to create custom YamlNode implementations.
+     * 
+     * @param entry to which the node is bound, null to create a new root node
+     * @return new node
+     */
+    protected YamlNode createNode(YamlEntry entry) {
+        return new YamlNode(entry);
     }
 
     /**
@@ -563,10 +581,11 @@ public class YamlNode {
 
     /**
      * Creates an exact clone of this node, where this node is the root of the YAML tree.
+     * The clone will have the same data type as this node.
      */
     @Override
     public YamlNode clone() {
-        YamlNode clone = new YamlNode();
+        YamlNode clone = this.createNode(null);
         clone._entry.assignProperties(this._entry);
         this.cloneChildrenTo(clone);
         return clone;

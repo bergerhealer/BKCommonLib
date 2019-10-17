@@ -112,8 +112,24 @@ public class YamlEntry {
             return (YamlNode) this.value;
         }
 
-        // Discards the old value and creates a new node
-        YamlNode newNode = new YamlNode(this);
+        // Find a YamlNode parent that is not a YamlNodeList
+        // We ask this parent to create a new node value
+        // This cannot be a 'list' type because that one cannot be extended
+        YamlNode closeParent = this.parent;
+        while (closeParent instanceof YamlListNode) {
+            closeParent = closeParent.getParent();
+        }
+
+        // Create a new node, ask YamlNode parent or previous value to create it
+        // This makes sure custom YamlNode implementations can work
+        YamlNode newNode;
+        if (closeParent != null) {
+            newNode = closeParent.createNode(this);
+        } else {
+            newNode = new YamlNode(this);
+        }
+
+        // Discards the old value and assigns a new node
         this.setValue(newNode);
         return newNode;
     }
@@ -176,16 +192,20 @@ public class YamlEntry {
             return;
         }
 
+        // Turn a Collection (or List) value into a YamlListNode
         if (value instanceof Collection && !(value instanceof YamlNode)) {
-            // Turn a Collection (or List) value into a YamlListNode
-            YamlListNode listNode = new YamlListNode();
+            YamlListNode listNode = this.createListNodeValue();
+            listNode.clear();
             listNode.addAll((Collection<?>) value);
-            value = listNode;
-        } else if (value instanceof Map) {
-            // Turn a Map into a YamlNode
-            YamlNode node = new YamlNode();
+            return;
+        }
+
+        // Turn a Map into a YamlNode
+        if (value instanceof Map && !(value instanceof YamlNode)) {
+            YamlNode node = this.createNodeValue();
+            node.clear();
             node.setValues((Map<?, ?>) value);
-            value = node;
+            return;
         }
 
         YamlNode newNode;
