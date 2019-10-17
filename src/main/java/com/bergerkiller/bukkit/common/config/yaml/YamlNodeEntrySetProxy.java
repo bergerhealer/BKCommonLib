@@ -15,9 +15,9 @@ import java.util.Set;
  * Used by {@link YamlNodeMapProxy#entrySet()}.
  */
 public class YamlNodeEntrySetProxy implements Set<Map.Entry<String, Object>> {
-    private final YamlNode _node;
+    private final YamlNodeAbstract<?> _node;
 
-    public YamlNodeEntrySetProxy(YamlNode node) {
+    public YamlNodeEntrySetProxy(YamlNodeAbstract<?> node) {
         this._node = node;
     }
 

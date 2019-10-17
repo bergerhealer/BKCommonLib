@@ -13,13 +13,18 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics;
  * A list of values where every value is stored, without key name,
  * in a list prefixed with a dash (-). It behaves like a normal list.
  */
-public class YamlListNode extends YamlNode implements List<Object> {
+public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List<Object> {
 
     public YamlListNode() {
     }
 
     protected YamlListNode(YamlEntry entry) {
         super(entry);
+    }
+
+    @Override
+    protected YamlListNode createNode(YamlEntry entry) {
+        throw new UnsupportedOperationException("YamlListNode does not support this");
     }
 
     @Override

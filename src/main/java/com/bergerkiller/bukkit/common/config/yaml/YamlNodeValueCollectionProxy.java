@@ -11,9 +11,9 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics;
  * Used by {@link YamlNodeMapProxy#values()}.
  */
 public class YamlNodeValueCollectionProxy implements Collection<Object> {
-    private final YamlNode _node;
+    private final YamlNodeAbstract<?> _node;
 
-    public YamlNodeValueCollectionProxy(YamlNode node) {
+    public YamlNodeValueCollectionProxy(YamlNodeAbstract<?> node) {
         _node = node;
     }
 
@@ -89,11 +89,11 @@ public class YamlNodeValueCollectionProxy implements Collection<Object> {
     }
 
     public static class ValueIterator implements Iterator<Object> {
-        private final YamlNode _node;
+        private final YamlNodeAbstract<?> _node;
         private int _index = 0;
         private boolean _nextCalled = false;
 
-        public ValueIterator(YamlNode node) {
+        public ValueIterator(YamlNodeAbstract<?> node) {
             _node = node;
         }
 

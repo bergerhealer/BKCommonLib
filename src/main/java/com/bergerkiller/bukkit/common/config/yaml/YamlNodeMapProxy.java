@@ -6,12 +6,12 @@ import java.util.Set;
 
 /**
  * Accesses a YamlNode's children using a Map interface.
- * Used by {@link YamlNode#getValues()}.
+ * Used by {@link YamlNodeAbstract<?>#getValues()}.
  */
 public class YamlNodeMapProxy implements Map<String, Object> {
-    private final YamlNode _node;
+    private final YamlNodeAbstract<?> _node;
 
-    public YamlNodeMapProxy(YamlNode node) {
+    public YamlNodeMapProxy(YamlNodeAbstract<?> node) {
        _node = node;
     }
 

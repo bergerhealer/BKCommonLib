@@ -13,10 +13,10 @@ import com.bergerkiller.bukkit.common.utils.ParseUtil;
  * incremented from 1.
  */
 public class YamlNodeIndexedValueList extends AbstractList<Object> {
-    private final YamlNode _node;
+    private final YamlNodeAbstract<?> _node;
     private boolean _namedByIndex;
 
-    private YamlNodeIndexedValueList(YamlNode node) {
+    private YamlNodeIndexedValueList(YamlNodeAbstract<?> node) {
         _node = node;
         _namedByIndex = false;
     }
@@ -110,7 +110,7 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> {
      * @param node
      * @return value list
      */
-    public static YamlNodeIndexedValueList sortAndCreate(YamlNode node) {
+    public static YamlNodeIndexedValueList sortAndCreate(YamlNodeAbstract<?> node) {
         Collections.sort(node._children, new Comparator<YamlEntry>() {
             @Override
             public int compare(YamlEntry e1, YamlEntry e2) {

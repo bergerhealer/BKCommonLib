@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
  * Automatically regenerates the yaml when required.
  */
 public class YamlEntry implements Map.Entry<String, Object> {
-    private final YamlNode parent;
+    private final YamlNodeAbstract<?> parent;
     private YamlPath path;
     protected final StringTreeNode yaml;
     protected boolean yaml_needs_generating;
@@ -22,7 +22,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
     protected Object value;
 
     // Root node only
-    protected YamlEntry(YamlNode rootNode) {
+    protected YamlEntry(YamlNodeAbstract<?> rootNode) {
         this.parent = null;
         this.path = YamlPath.ROOT;
         this.header = "";
@@ -33,7 +33,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
     }
 
     // Constructor used inside YamlNode to create new entries
-    protected YamlEntry(YamlNode parent, YamlPath path, StringTreeNode yaml) {
+    protected YamlEntry(YamlNodeAbstract<?> parent, YamlPath path, StringTreeNode yaml) {
         this.parent = parent;
         this.path = path;
         this.header = "";
@@ -62,8 +62,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
     public void setPath(YamlPath path) {
         if (this.parent != null) {
             setPath(this.parent._root, path);
-        } else if (this.isNodeValue()) {
-            setPath(this.getNodeValue()._root, path);
+        } else if (this.isAbstractNode()) {
+            setPath(this.getAbstractNode()._root, path);
         } else {
             // Not bound to any tree, just update the path variable
             this.path = path;
@@ -73,8 +73,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
     private void setPath(YamlRoot root, YamlPath path) {
         root.updateEntryPath(this, path);
         this.path = path;
-        if (this.isNodeValue()) {
-            for (YamlEntry childEntry : this.getNodeValue()._children) {
+        if (this.isAbstractNode()) {
+            for (YamlEntry childEntry : this.getAbstractNode()._children) {
                 childEntry.setPath(root, path.child(childEntry.path.name()));
             }
         }
@@ -85,7 +85,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * 
      * @return parent node
      */
-    public YamlNode getParentNode() {
+    public YamlNodeAbstract<?> getParentNode() {
         return this.parent;
     }
 
@@ -106,23 +106,23 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * 
      * @return YamlNode
      */
-    public YamlNode createNodeValue() {
+    public YamlNodeAbstract<?> createNodeValue() {
         // Check if original value is already a node
-        if (this.value instanceof YamlNode && !(this.value instanceof YamlListNode)) {
-            return (YamlNode) this.value;
+        if (this.value instanceof YamlNodeAbstract<?> && !(this.value instanceof YamlListNode)) {
+            return (YamlNodeAbstract<?>) this.value;
         }
 
         // Find a YamlNode parent that is not a YamlNodeList
         // We ask this parent to create a new node value
         // This cannot be a 'list' type because that one cannot be extended
-        YamlNode closeParent = this.parent;
+        YamlNodeAbstract<?> closeParent = this.parent;
         while (closeParent instanceof YamlListNode) {
             closeParent = closeParent.getParent();
         }
 
         // Create a new node, ask YamlNode parent or previous value to create it
-        // This makes sure custom YamlNode implementations can work
-        YamlNode newNode;
+        // This makes sure custom YamlNodeAbstract implementations can work
+        YamlNodeAbstract<?> newNode;
         if (closeParent != null) {
             newNode = closeParent.createNode(this);
         } else {
@@ -155,12 +155,23 @@ public class YamlEntry implements Map.Entry<String, Object> {
     }
 
     /**
-     * Gets whether this entry stores a YamlNode or YamlListNode value
+     * Gets whether this entry stores a YamlNodeAbstract or YamlListNode value.
+     * This only indicates the value is an abstract node, it does not mean it
+     * can be cast to the custom implementation type of the node.
      * 
      * @return True if the value is a YamlNode
      */
-    public boolean isNodeValue() {
-        return this.value instanceof YamlNode;
+    public boolean isAbstractNode() {
+        return this.value instanceof YamlNodeAbstract;
+    }
+
+    /**
+     * Gets whether this entry stores a node. Lists are excluded.
+     * 
+     * @return True if this is a node
+     */
+    public boolean isNode() {
+        return this.value instanceof YamlNodeAbstract && !(this.value instanceof YamlListNode);
     }
 
     /**
@@ -169,8 +180,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * 
      * @return node value
      */
-    public YamlNode getNodeValue() {
-        return (YamlNode) this.value;
+    public YamlNodeAbstract<?> getAbstractNode() {
+        return (YamlNodeAbstract<?>) this.value;
     }
 
     /**
@@ -205,7 +216,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         }
 
         // Turn a Collection (or List) value into a YamlListNode
-        if (value instanceof Collection && !(value instanceof YamlNode)) {
+        if (value instanceof Collection && !(value instanceof YamlNodeAbstract<?>)) {
             YamlListNode listNode = this.createListNodeValue();
             listNode.clear();
             listNode.addAll((Collection<?>) value);
@@ -213,15 +224,15 @@ public class YamlEntry implements Map.Entry<String, Object> {
         }
 
         // Turn a Map into a YamlNode
-        if (value instanceof Map && !(value instanceof YamlNode)) {
-            YamlNode node = this.createNodeValue();
+        if (value instanceof Map && !(value instanceof YamlNodeAbstract<?>)) {
+            YamlNodeAbstract<?> node = this.createNodeValue();
             node.clear();
             node.setValues((Map<?, ?>) value);
             return oldValue;
         }
 
-        YamlNode newNode;
-        if (value instanceof YamlNode && ((newNode = (YamlNode) value)._entry != this)) {
+        YamlNodeAbstract<?> newNode;
+        if (value instanceof YamlNodeAbstract<?> && ((newNode = (YamlNodeAbstract<?>) value)._entry != this)) {
             // Verify the node is not already added to something
             if (newNode.hasParent()) {
                 throw new IllegalArgumentException("Tried to store a Yaml Node that is already added to another node");
@@ -270,8 +281,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
     // It will become a detached root node with a new YamlEntry.
     // This entry is not removed or detached and remains functional
     private void removeNodeValue() {
-        if (this.isNodeValue()) {
-            this.getNodeValue()._root.moveToRoot(this, null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
+        if (this.isAbstractNode()) {
+            this.getAbstractNode()._root.moveToRoot(this, null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
         }
     }
 
@@ -330,7 +341,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         if (!this.yaml_needs_generating) {
             this.yaml_needs_generating = true;
 
-            YamlNode node = this.parent;
+            YamlNodeAbstract<?> node = this.parent;
             while (node != null && !node._entry.yaml_check_children) {
                 node._entry.yaml_check_children = true;
                 node = node.getParent();
@@ -368,8 +379,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
         // Call generateYaml() on the children
         if (this.yaml_check_children) {
             this.yaml_check_children = false;
-            if (this.isNodeValue()) {
-                for (YamlEntry entry : this.getNodeValue()._children) {
+            if (this.isAbstractNode()) {
+                for (YamlEntry entry : this.getAbstractNode()._children) {
                     entry.generateYaml();
                 }
             }
@@ -379,7 +390,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         if (this.yaml_needs_generating) {
             this.yaml_needs_generating = false;
 
-            YamlNode node = this.isNodeValue() ? this.getNodeValue() : null;
+            YamlNodeAbstract<?> node = this.isAbstractNode() ? this.getAbstractNode() : null;
 
             if (this.parent == null) {
                 if (this.header.isEmpty()) {
@@ -410,7 +421,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
                 if (node instanceof YamlListNode) {
                     // Generate YAML that looks like this: []\n
                     value = Collections.emptyList();
-                } else if (node instanceof YamlNode) {
+                } else if (node instanceof YamlNodeAbstract<?>) {
                     // Generate YAML that looks like this: {}\n
                     value = Collections.emptyMap();
                 } else if (value != null && value.getClass().isEnum()) {

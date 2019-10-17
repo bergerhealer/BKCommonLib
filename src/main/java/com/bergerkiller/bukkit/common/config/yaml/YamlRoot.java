@@ -34,7 +34,7 @@ public class YamlRoot {
      */
     public void detach(YamlEntry entry) {
         this.removeEntry(entry);
-        if (entry.isNodeValue()) {
+        if (entry.isAbstractNode()) {
             moveToRoot(entry, null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
         }
     }
@@ -56,7 +56,7 @@ public class YamlRoot {
      * @return The new entry, null if the entry referred to a non-node value and no parent was set.
      *         It is up to the caller to store the entry in the right place (node children).
      */
-    public YamlEntry moveToRoot(YamlEntry entry, YamlNode newParent, YamlRoot newRoot, YamlPath newPath, StringTreeNode newYaml) {
+    public YamlEntry moveToRoot(YamlEntry entry, YamlNodeAbstract<?> newParent, YamlRoot newRoot, YamlPath newPath, StringTreeNode newYaml) {
         // Create the replacement entry, which is at a new path
         // Preserve certain properties from the original entry, such as the header
         YamlEntry newEntry = new YamlEntry(newParent, newPath, newYaml);
@@ -65,9 +65,9 @@ public class YamlRoot {
         newRoot._entries.put(newPath, newEntry);
 
         // Special handling for nodes
-        if (entry.isNodeValue()) {
+        if (entry.isAbstractNode()) {
             // Store the new entry in the node
-            YamlNode node = entry.getNodeValue();
+            YamlNodeAbstract<?> node = entry.getAbstractNode();
             node._root = newRoot;
             node._entry = newEntry;
 
@@ -127,7 +127,7 @@ public class YamlRoot {
         YamlEntry entry = this._entries.get(path);
         if (entry == null) {
             YamlEntry parentEntry = getEntry(path.parent(), path.isList());
-            YamlNode parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
+            YamlNodeAbstract<?> parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
             entry = parentNode.createChildEntry(parentNode._children.size(), path);
         }
         return entry;

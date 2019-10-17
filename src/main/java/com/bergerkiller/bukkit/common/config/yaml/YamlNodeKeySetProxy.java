@@ -9,12 +9,12 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 
 /**
  * Accesses a YamlNode's key names using a Set interface.
- * Used by {@link YamlNode#getKeys()}.
+ * Used by {@link YamlNodeAbstract<?>#getKeys()}.
  */
 public class YamlNodeKeySetProxy implements Set<String> {
-    private final YamlNode _node;
+    private final YamlNodeAbstract<?> _node;
 
-    public YamlNodeKeySetProxy(YamlNode node) {
+    public YamlNodeKeySetProxy(YamlNodeAbstract<?> node) {
         _node = node;
     }
 
