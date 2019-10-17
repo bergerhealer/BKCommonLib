@@ -302,6 +302,36 @@ public class YamlTest {
     }
 
     @Test
+    public void testYamlChildNodeToString() {
+        // Checks that doing toString() on a child node uses proper indentation
+        // Also verifies that doing root toString() after is not corrupted by this
+        YamlNode root = new YamlNode();
+        root.set("child.subchild.key", "value1");
+        root.set("child.subchild.node.key", "value2");
+        root.set("child.subchild.node.num", 23);
+
+        assertEquals("key: value1\n" +
+                     "node:\n" +
+                     "  key: value2\n" +
+                     "  num: 23\n",
+                     root.getNode("child.subchild").toString());
+
+        assertEquals("child:\n" +
+                     "  subchild:\n" +
+                     "    key: value1\n" +
+                     "    node:\n" +
+                     "      key: value2\n" +
+                     "      num: 23\n",
+                     root.toString());
+
+        assertEquals("key: value1\n" +
+                     "node:\n" +
+                     "  key: value2\n" +
+                     "  num: 23\n",
+                     root.getNode("child.subchild").toString());
+    }
+
+    @Test
     public void testYamlNodeValue() {
         YamlNode root = new YamlNode();
 
