@@ -8,8 +8,6 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -97,7 +95,7 @@ public class YamlNode {
      * @return path
      */
     public YamlPath getYamlPath() {
-        return this._entry.getPath();
+        return this._entry.getYamlPath();
     }
 
     /**
@@ -231,7 +229,7 @@ public class YamlNode {
      * @return key set
      */
     public Set<String> getKeys() {
-        return this.getValues().keySet();
+        return new YamlNodeKeySetProxy(this);
     }
 
     /**
@@ -241,12 +239,7 @@ public class YamlNode {
      * @return map of the values
      */
     public Map<String, Object> getValues() {
-        //TODO: Efficiency!
-        HashMap<String, Object> values = new HashMap<String, Object>();
-        for (YamlEntry entry : this._children) {
-            values.put(entry.getPath().name(), entry.getValue());
-        }
-        return values;
+        return new YamlNodeMapProxy(this);
     }
 
     /**
@@ -264,24 +257,26 @@ public class YamlNode {
     }
 
     /**
-     * Gets all the values mapped to the keys of the type specified
-     * that are a descendant of this node.
+     * Calls {@link #getValues()} and converts all values to the value type
+     * specified. Values that cannot be converted are removed from the map.
+     * Strings can be converted to numbers, among other things.
      *
-     * @param type to convert to
+     * @param valueType The value type to convert the original values to
      * @return map of the converted values
      */
     @SuppressWarnings("unchecked")
-    public <T> Map<String, T> getValues(Class<T> type) {
-        //TODO: Use a functional map filter/transformer instead!
+    public <T> Map<String, T> getValues(Class<T> valueType) {
         Map<String, Object> values = this.getValues();
-        Iterator<Map.Entry<String, Object>> iter = values.entrySet().iterator();
+        YamlNodeValueCollectionProxy.ValueIterator iter = new YamlNodeValueCollectionProxy.ValueIterator(this);
         while (iter.hasNext()) {
-            Map.Entry<String, Object> entry = iter.next();
-            T newvalue = ParseUtil.convert(entry.getValue(), type);
-            if (newvalue == null) {
-                iter.remove();
-            } else {
-                entry.setValue(newvalue);
+            Object oldValue = iter.next();
+            if (oldValue != null) {
+                T newvalue = ParseUtil.convert(oldValue, valueType);
+                if (newvalue == null) {
+                    iter.remove();
+                } else {
+                    iter.set(newvalue);
+                }
             }
         }
         return (Map<String, T>) values;
@@ -298,13 +293,14 @@ public class YamlNode {
     }
 
     /**
-     * Gets all configuration nodes sorted by insertion order
+     * Gets all children of this node that are nodes themselves,
+     * sorted by insertion order. Changes to the returned set do not
+     * cause modifications to this node.
      *
-     * @return Set of configuration nodes
+     * @return Set of child nodes
      */
     public Set<YamlNode> getNodes() {
-        //TODO: Efficiency!
-        LinkedHashSet<YamlNode> result = new LinkedHashSet<YamlNode>();
+        LinkedHashSet<YamlNode> result = new LinkedHashSet<YamlNode>(this._children.size());
         for (YamlEntry child : this._children) {
             if (child.isNodeValue()) {
                 result.add((YamlNode) child.getValue());
@@ -593,7 +589,7 @@ public class YamlNode {
 
     private void cloneChildrenTo(YamlNode clone) {
         for (YamlEntry child : this._children) {
-            YamlPath childPath = clone.getYamlPath().child(child.getPath().name());
+            YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
             YamlEntry childClone = clone.createChildEntry(clone._children.size(), childPath);
             childClone.assignProperties(child);
 
@@ -649,8 +645,8 @@ public class YamlNode {
     protected YamlEntry createChildEntry(int index, YamlPath path) {
         // We can only insert children when the path is relative to this node
         // Create the parent entries first when path has multiple depths
-        if (!path.parent().equals(this._entry.getPath())) {
-            throw new IllegalArgumentException("Path " + path + " is not a child of " + this._entry.getPath());
+        if (!path.parent().equals(this._entry.getYamlPath())) {
+            throw new IllegalArgumentException("Path " + path + " is not a child of " + this._entry.getYamlPath());
         }
 
         // When children were empty, then YAML writes a {} or []
@@ -660,19 +656,47 @@ public class YamlNode {
         }
 
         // Create a new child entry and add it to this node
-        // TODO: What about lists?
         YamlEntry entry = new YamlEntry(this, path, this._entry.yaml.insert(index));
         this._children.add(index, entry);
         this._root.putEntry(entry);
         return entry;
     }
 
+    protected int indexOfKey(Object key) {
+        if (key != null && !this._children.isEmpty()) {
+            String keyStr = key.toString();
+            for (int i = 0; i < this._children.size(); i++) {
+                if (this._children.get(i).getKey().equals(keyStr)) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    protected int indexOfValue(Object value) {
+        if (value == null) {
+            for (int i = 0; i < this._children.size(); i++) {
+                if (this._children.get(i).getValue() == null) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i = 0; i < this._children.size(); i++) {
+                if (value.equals(this._children.get(i).getValue())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
     protected YamlEntry getEntryIfExists(String path) {
-        return this._root.getEntryIfExists(this._entry.getPath(), path);
+        return this._root.getEntryIfExists(this._entry.getYamlPath(), path);
     }
 
     protected YamlEntry getEntry(String path) {
-        return this._root.getEntry(this._entry.getPath(), path);
+        return this._root.getEntry(this._entry.getYamlPath(), path);
     }
 
     protected void removeChildEntry(YamlEntry entry) {

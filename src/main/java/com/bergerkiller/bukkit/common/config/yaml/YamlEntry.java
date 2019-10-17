@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
  * Stores the name, value, header and cached serialized YAML String.
  * Automatically regenerates the yaml when required.
  */
-public class YamlEntry {
+public class YamlEntry implements Map.Entry<String, Object> {
     private final YamlNode parent;
     private YamlPath path;
     protected final StringTreeNode yaml;
@@ -49,7 +49,7 @@ public class YamlEntry {
      * 
      * @return path
      */
-    public YamlPath getPath() {
+    public YamlPath getYamlPath() {
         return this.path;
     }
 
@@ -174,10 +174,20 @@ public class YamlEntry {
     }
 
     /**
+     * Gets the key of this entry relative to the parent, which will
+     * be the name of the path.
+     */
+    @Override
+    public String getKey() {
+        return this.path.name();
+    }
+
+    /**
      * Gets the current value of this entry
      * 
      * @return value
      */
+    @Override
     public Object getValue() {
         return this.value;
     }
@@ -187,9 +197,11 @@ public class YamlEntry {
      * 
      * @param value to set to
      */
-    public void setValue(Object value) {
-        if (this.value == value) {
-            return;
+    @Override
+    public Object setValue(Object value) {
+        Object oldValue = this.value;
+        if (oldValue == value) {
+            return oldValue;
         }
 
         // Turn a Collection (or List) value into a YamlListNode
@@ -197,7 +209,7 @@ public class YamlEntry {
             YamlListNode listNode = this.createListNodeValue();
             listNode.clear();
             listNode.addAll((Collection<?>) value);
-            return;
+            return oldValue;
         }
 
         // Turn a Map into a YamlNode
@@ -205,7 +217,7 @@ public class YamlEntry {
             YamlNode node = this.createNodeValue();
             node.clear();
             node.setValues((Map<?, ?>) value);
-            return;
+            return oldValue;
         }
 
         YamlNode newNode;
@@ -251,6 +263,7 @@ public class YamlEntry {
         // Assign the new value and schedule YAML for rebuilding
         this.value = value;
         this.markYamlChanged();
+        return oldValue;
     }
 
     // If this entry stores a node as value, detach that node from the tree
@@ -421,7 +434,7 @@ public class YamlEntry {
                     value = Collections.singletonList(value);
                 } else {
                     // Generate YAML that looks like this: key: value\n
-                    value = Collections.singletonMap(this.getPath().name(), value);
+                    value = Collections.singletonMap(this.getYamlPath().name(), value);
                 }
 
                 // Store it
@@ -429,5 +442,4 @@ public class YamlEntry {
             }
         }
     }
-
 }

@@ -77,7 +77,7 @@ public class YamlRoot {
                 YamlEntry childEntry = iter.next();
                 this.removeEntry(childEntry);
 
-                YamlPath newChildPath = newPath.child(childEntry.getPath().name());
+                YamlPath newChildPath = newPath.child(childEntry.getKey());
                 StringTreeNode newChildYaml = newYaml.add();
                 iter.set(this.moveToRoot(childEntry, node, newRoot, newChildPath, newChildYaml));
             }
@@ -87,17 +87,17 @@ public class YamlRoot {
     }
 
     public void updateEntryPath(YamlEntry entry, YamlPath newPath) {
-        this._entries.remove(entry.getPath());
+        this._entries.remove(entry.getYamlPath());
         this._entries.put(newPath, entry);
     }
 
     public void removeEntry(YamlEntry entry) {
         entry.yaml.remove();
-        this._entries.remove(entry.getPath());
+        this._entries.remove(entry.getYamlPath());
     }
 
     public void putEntry(YamlEntry entry) {
-        this._entries.put(entry.getPath(), entry);
+        this._entries.put(entry.getYamlPath(), entry);
     }
 
     public YamlEntry getEntryIfExists(YamlPath parent, String path) {

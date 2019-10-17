@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
-import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -8,6 +7,7 @@ import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 import com.bergerkiller.bukkit.common.collections.AbstractListProxy;
+import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 
 public class YamlListNode extends YamlNode implements List<Object> {
 
@@ -99,7 +99,7 @@ public class YamlListNode extends YamlNode implements List<Object> {
 
     @Override
     public boolean remove(Object o) {
-        int index = this.indexOf(o);
+        int index = this.indexOfValue(o);
         if (index != -1) {
             this.removeChildEntryAt(index);
             return true;
@@ -114,25 +114,12 @@ public class YamlListNode extends YamlNode implements List<Object> {
 
     @Override
     public boolean contains(Object o) {
-        return indexOf(o) != -1;
+        return indexOfValue(o) != -1;
     }
 
     @Override
     public int indexOf(Object o) {
-        if (o == null) {
-            for (int i = 0; i < this._children.size(); i++) {
-                if (this._children.get(i).getValue() == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = 0; i < this._children.size(); i++) {
-                if (o.equals(this._children.get(i).getValue())) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+        return indexOfValue(o);
     }
 
     @Override
@@ -155,36 +142,17 @@ public class YamlListNode extends YamlNode implements List<Object> {
 
     @Override
     public Object[] toArray() {
-        Object[] result = new Object[this._children.size()];
-        for (int i = 0; i < this._children.size(); i++) {
-            result[i] = this._children.get(i).getValue();
-        }
-        return result;
+        return CollectionBasics.toArray(this);
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T[] toArray(T[] a) {
-        int size = this._children.size();
-        if (a.length < size) {
-            a = (T[]) Array.newInstance(a.getClass().getComponentType(), size);
-        } else if (size > a.length) {
-            a[size] = null;
-        }
-        for (int i = 0; i < size; i++) {
-            a[i] = (T) this._children.get(i).getValue();
-        }
-        return a;
+        return CollectionBasics.toArray(this, a);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        for (Object o : c) {
-            if (!contains(o)) {
-                return false;
-            }
-        }
-        return true;
+        return CollectionBasics.containsAll(this, c);
     }
 
     @Override

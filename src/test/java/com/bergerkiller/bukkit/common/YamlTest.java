@@ -4,8 +4,10 @@ import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.GameMode;
 import org.bukkit.permissions.PermissionDefault;
@@ -18,6 +20,89 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlPath;
 import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 
 public class YamlTest {
+
+    @Test
+    public void testYamlNodeConvertedValues() {
+        YamlNode root = new YamlNode();
+        root.set("key1", 12);
+        root.set("key2", "13");
+        root.set("key3", "invalid");
+        root.set("key4", Long.valueOf(14));
+        Map<String, Integer> values = root.getValues(Integer.class);
+        assertEquals(3, root.getValues().size());
+        assertEquals(3, values.size());
+        assertEquals(Integer.valueOf(12), values.get("key1"));
+        assertEquals(Integer.valueOf(13), values.get("key2"));
+        assertNull(values.get("key3"));
+        assertEquals(Integer.valueOf(14), values.get("key4"));
+    }
+
+    @Test
+    public void testYamlNodeValues() {
+        YamlNode root = new YamlNode();
+        root.set("key1", "value1");
+        root.set("key2", "value2");
+        root.set("key3.key1", "subkey1");;
+        root.set("key3.key2", "subkey2");;
+        Map<String, Object> values = root.getValues();
+        assertEquals(3, values.size());
+
+        assertTrue(values.containsKey("key1"));
+        assertTrue(values.containsKey("key2"));
+        assertTrue(values.containsKey("key3"));
+        assertFalse(values.containsKey("key4"));
+
+        assertTrue(values.containsValue("value1"));
+        assertTrue(values.containsValue("value2"));
+        assertTrue(values.containsValue(root.getNode("key3")));
+        assertFalse(values.containsValue("value3"));
+
+        assertEquals("value1", values.get("key1"));
+        assertEquals("value2", values.get("key2"));
+        assertEquals(root.getNode("key3"), values.get("key3"));
+        assertNull(values.get("key4"));
+
+        Map.Entry<String, Object> e;
+        Iterator<Map.Entry<String, Object>> entriesIter = values.entrySet().iterator();
+        assertTrue(entriesIter.hasNext());
+        e = entriesIter.next();
+        assertEquals("key1", e.getKey());
+        assertEquals("value1", e.getValue());
+        e = entriesIter.next();
+        assertEquals("key2", e.getKey());
+        assertEquals("value2", e.getValue());
+        e = entriesIter.next();
+        assertEquals("key3", e.getKey());
+        assertEquals(root.getNode("key3"), e.getValue());
+        assertFalse(entriesIter.hasNext());
+    }
+
+    @Test
+    public void testYamlNodeKeys() {
+        YamlNode root = new YamlNode();
+        root.set("key1", "value1");
+        root.set("key2", "value2");
+        root.set("key3.key1", "subkey1");;
+        root.set("key3.key2", "subkey2");;
+        Set<String> keys = root.getKeys();
+        assertEquals(3, keys.size());
+
+        assertTrue(keys.contains("key1"));
+        assertTrue(keys.contains("key2"));
+        assertTrue(keys.contains("key3"));
+        assertFalse(keys.contains("key4"));
+
+        Iterator<String> iter = keys.iterator();
+        assertTrue(iter.hasNext());
+        assertEquals("key1", iter.next());
+        assertEquals("key2", iter.next());
+        assertEquals("key3", iter.next());
+        assertFalse(iter.hasNext());
+
+        assertTrue(keys.remove("key2"));
+        assertFalse(keys.contains("key2"));
+        assertFalse(root.contains("key2"));
+    }
 
     @Test
     public void testYamlNodeLoadFromString() {
