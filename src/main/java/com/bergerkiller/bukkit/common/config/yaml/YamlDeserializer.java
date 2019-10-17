@@ -104,9 +104,11 @@ public class YamlDeserializer {
 
         @Override
         public int read() throws IOException {
-            if (currentColumn >= currentLine.length()) {
-                currentColumn = 0;
-                if (!this.readNextLine()) {
+            if (currentColumn == currentLine.length()) {
+                if (this.readNextLine()) {
+                    currentColumn = 0;
+                } else {
+                    currentColumn = currentLine.length();
                     return -1;
                 }
             }
@@ -118,17 +120,32 @@ public class YamlDeserializer {
             if (len == 0) {
                 return 0;
             }
-            int numRead = 1;
-            int c;
-            if ((c = this.read()) == -1) {
-                return -1;
-            }
-            cbuf[off++] = (char) c;
-            while (numRead < len && (c = this.read()) != -1) {
-                numRead++;
-                cbuf[off++] = (char) c;
-            }
-            return numRead;
+
+            int startLen = len;
+            do {
+                int available = (currentLine.length() - currentColumn);
+                if (available == 0) {
+                    if (this.readNextLine()) {
+                        currentColumn = 0;
+                        available = currentLine.length();
+                    } else {
+                        currentColumn = currentLine.length();
+                        break;
+                    }
+                }
+                if (len > available) {
+                    currentLine.getChars(currentColumn, currentLine.length(), cbuf, off);
+                    currentColumn = currentLine.length();
+                    off += available;
+                    len -= available;
+                } else {
+                    currentLine.getChars(currentColumn, currentColumn + len, cbuf, off);
+                    currentColumn += len;
+                    return startLen;
+                }
+            } while (len > 0);
+
+            return (len == startLen) ? -1 : (startLen - len);
         }
 
         @Override
