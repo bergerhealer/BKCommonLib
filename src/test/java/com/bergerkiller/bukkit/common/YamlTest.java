@@ -22,6 +22,46 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 public class YamlTest {
 
     @Test
+    public void testYamlNodeSetNodeList() {
+        YamlNode root = new YamlNode();
+        YamlNode n1 = new YamlNode();
+        n1.set("key1", "item1value1");
+        n1.set("key2", "item1value2");
+        YamlNode n2 = new YamlNode();
+        n2.set("key1", "item2value1");
+        n2.set("key2", "item2value2");
+        YamlNode n3 = new YamlNode();
+        n3.set("key1", "item3value1");
+        n3.set("key2", "item3value2");
+        root.setNodeList("list", Arrays.asList(n1, n2, n3));
+        assertEquals("item1value1", root.get("list.1.key1"));
+        assertEquals("item1value2", root.get("list.1.key2"));
+        assertEquals("item2value1", root.get("list.2.key1"));
+        assertEquals("item2value2", root.get("list.2.key2"));
+        assertEquals("item3value1", root.get("list.3.key1"));
+        assertEquals("item3value2", root.get("list.3.key2"));
+    }
+
+    @Test
+    public void testYamlNodeGetNodeList() {
+        YamlNode root = new YamlNode();
+        root.set("list.1.key1", "item1value1");
+        root.set("list.1.key2", "item1value2");
+        root.set("list.2.key1", "item2value1");
+        root.set("list.2.key2", "item2value2");
+        root.set("list.3.key1", "item3value1");
+        root.set("list.3.key2", "item3value2");
+        List<YamlNode> nodes = root.getNodeList("list");
+        assertEquals(3, nodes.size());
+        assertEquals("item1value1", nodes.get(0).get("key1"));
+        assertEquals("item1value2", nodes.get(0).get("key2"));
+        assertEquals("item2value1", nodes.get(1).get("key1"));
+        assertEquals("item2value2", nodes.get(1).get("key2"));
+        assertEquals("item3value1", nodes.get(2).get("key1"));
+        assertEquals("item3value2", nodes.get(2).get("key2"));
+    }
+
+    @Test
     public void testYamlNodeIndexedList() {
         YamlNode root = new YamlNode();
         root.set("list.1", "value1");

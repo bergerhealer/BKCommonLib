@@ -332,6 +332,27 @@ public class YamlNode {
     }
 
     /**
+     * Stores a list of nodes at the path specified, creates one if not present.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.<br>
+     * <br>
+     * <b>Legacy: this will always produce a node with index children rather than a
+     * list of nodes. This will change in the near future.</b>
+     * 
+     * @param path
+     * @param nodes List of nodes to store
+     */
+    public void setNodeList(String path, List<YamlNode> nodes) {
+        this.remove(path);
+        this.getNodeList(path).addAll(nodes);
+    }
+
+    /**
      * Gets a list of nodes at the path specified, creates one if not present.<br>
      * <br>
      * If at the path a node is stored rather than a list, then the children of
