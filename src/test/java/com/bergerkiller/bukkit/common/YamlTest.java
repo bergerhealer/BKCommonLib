@@ -22,6 +22,40 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 public class YamlTest {
 
     @Test
+    public void testYamlNodeIndexedList() {
+        YamlNode root = new YamlNode();
+        root.set("list.1", "value1");
+        root.set("list.2", "value2");
+        root.set("list.4", "value4");
+        root.set("list.3", "value3");
+        List<String> values = root.getList("list", String.class);
+        assertEquals(4, values.size());
+        assertEquals("value1", values.get(0));
+        assertEquals("value2", values.get(1));
+        assertEquals("value3", values.get(2));
+        assertEquals("value4", values.get(3));
+        assertEquals("value1", root.get("list.1"));
+        assertEquals("value2", root.get("list.2"));
+        assertEquals("value3", root.get("list.3"));
+        assertEquals("value4", root.get("list.4"));
+
+        // Add a value, from then on the list should maintain 1-upward indices
+        values.add("value5");
+        assertEquals(5, values.size());
+        assertEquals("value1", root.get("list.1"));
+        assertEquals("value2", root.get("list.2"));
+        assertEquals("value3", root.get("list.3"));
+        assertEquals("value4", root.get("list.4"));
+        assertEquals("value5", root.get("list.5"));
+        values.remove("value2");
+        assertEquals(4, values.size());
+        assertEquals("value1", root.get("list.1"));
+        assertEquals("value3", root.get("list.2"));
+        assertEquals("value4", root.get("list.3"));
+        assertEquals("value5", root.get("list.4"));
+    }
+
+    @Test
     public void testYamlNodeConvertedValues() {
         YamlNode root = new YamlNode();
         root.set("key1", 12);

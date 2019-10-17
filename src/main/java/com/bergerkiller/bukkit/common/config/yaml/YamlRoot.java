@@ -87,7 +87,14 @@ public class YamlRoot {
     }
 
     public void updateEntryPath(YamlEntry entry, YamlPath newPath) {
-        this._entries.remove(entry.getYamlPath());
+        // Remove entry at the old path. If a different entry is already stored
+        // there now, restore that entry
+        YamlEntry removed = this._entries.remove(entry.getYamlPath());
+        if (removed != entry && removed != null) {
+            this._entries.put(entry.getYamlPath(), removed);
+        }
+
+        // Store the entry at the new path
         this._entries.put(newPath, entry);
     }
 

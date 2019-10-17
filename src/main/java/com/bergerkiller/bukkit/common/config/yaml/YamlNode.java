@@ -15,6 +15,7 @@ import java.util.Set;
 
 import org.yaml.snakeyaml.error.YAMLException;
 
+import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -271,11 +272,11 @@ public class YamlNode {
         while (iter.hasNext()) {
             Object oldValue = iter.next();
             if (oldValue != null) {
-                T newvalue = ParseUtil.convert(oldValue, valueType);
-                if (newvalue == null) {
+                T convertedValue = Conversion.convert(oldValue, valueType, null);
+                if (convertedValue == null) {
                     iter.remove();
-                } else {
-                    iter.set(newvalue);
+                } else if (convertedValue != oldValue) {
+                    iter.set(convertedValue);
                 }
             }
         }
@@ -331,19 +332,110 @@ public class YamlNode {
     }
 
     /**
-     * Gets a list of values at the path specified, creates one if not present.
-     * If originally a normal node is stored, then that node is turned into a list
-     * storing the values sorted by key.
+     * Gets a list of nodes at the path specified, creates one if not present.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.<br>
+     * <br>
+     * <b>Legacy: this will always produce a node with index children rather than a
+     * list of nodes. This will change in the near future.</b>
      * 
-     * @param path to get a list
-     * @return the list
+     * @param path
+     * @return list of configuration nodes
      */
-    public List<Object> getList(String path) {
-        return this.getEntry(path).createListNodeValue();
+    public List<YamlNode> getNodeList(String path) {
+        this.getNode(path); // Hack!
+        return getList(path, YamlNode.class);
     }
 
     /**
-     * Gets the raw value at the path specified
+     * Gets a list of values at the path specified, creates one if not present.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.
+     * 
+     * @param path The path to get a list
+     * @return the list, is modifiable
+     */
+    public List<Object> getList(String path) {
+        YamlEntry entry = this.getEntry(path);
+        Object value = entry.getValue();
+        if (value instanceof YamlListNode) {
+            return (YamlListNode) value;
+        } else if (value instanceof YamlNode) {
+            return YamlNodeIndexedValueList.sortAndCreate((YamlNode) value);
+        } else {
+            return entry.createListNodeValue();
+        }
+    }
+
+    /**
+     * Gets the value at the path as a List of a given type, creates one if not present.
+     * Values in the list that cannot be converted to the type are removed.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.
+     *
+     * @param path       The path to get a list
+     * @param valueType  The type of values the list should contain
+     * @return the list storing values of valueType, is modifiable
+     */
+    @SuppressWarnings("unchecked")
+    public <T> List<T> getList(String path, Class<T> valueType) {
+        List<Object> list = this.getList(path);
+        for (int i = 0; i < list.size(); i++) {
+            Object oldValue = list.get(i);
+            if (oldValue != null) {
+                T convertedValue = Conversion.convert(oldValue, valueType, null);
+                if (convertedValue == null) {
+                    list.remove(i--);
+                } else if (convertedValue != oldValue) {
+                    list.set(i, convertedValue);
+                }
+            }
+        }
+        return (List<T>) list;
+    }
+
+    /**
+     * Gets the value at the path as a List of a given type, creates one if not present
+     * using the initial values specified in def. Values in the list that cannot be
+     * converted to the type are removed.<br>
+     * <br>
+     * If at the path a node is stored rather than a list, then the children of
+     * that node are represented as a List instead, sorted by key names.
+     * No changes will occur to the node structure of the value at the path
+     * while reading these values. When a new value is added to this list,
+     * then the original key names will be replaced with an index incrementing
+     * starting at 1.
+     *
+     * @param path       The path to get a list
+     * @param valueType  The type of values the list should contain
+     * @param def        The default values to store if the list does not exist
+     * @return the list storing values of valueType, is modifiable
+     */
+    public <T> List<T> getList(String path, Class<T> type, List<T> def) {
+        if (!this.contains(path)) {
+            this.set(path, def);
+        }
+        return this.getList(path, type);
+    }
+
+    /**
+     * Gets the raw value at the path specified.
+     * Returns null if nothing is stored at the path.
      *
      * @param path The path to the value to get
      * @return the raw value

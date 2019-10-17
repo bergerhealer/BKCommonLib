@@ -9,6 +9,26 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
 public class StringTreeNodeTest {
 
     @Test
+    public void testChangeIndex() {
+        StringTreeNode node = new StringTreeNode();
+        node.setValue("root");
+        StringTreeNode c1 = node.add();
+        StringTreeNode c2 = node.add();
+        StringTreeNode c3 = node.add();
+        c1.setValue("1");
+        c2.setValue("2");
+        c3.setValue("3");
+        assertEquals("root123", node.toString());
+
+        c1.setIndex(2);
+        assertEquals("root231", node.toString());
+
+        c3.setIndex(0);
+        c2.setIndex(1);
+        assertEquals("root321", node.toString());
+    }
+
+    @Test
     public void testValue() {
         StringTreeNode node = new StringTreeNode();
         assertEquals("", node.getValue());

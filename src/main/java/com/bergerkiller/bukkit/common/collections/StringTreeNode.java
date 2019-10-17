@@ -72,6 +72,27 @@ public class StringTreeNode {
     }
 
     /**
+     * Moves this tree node to another index relative to other siblings of the same
+     * parent node.
+     * 
+     * @param index this tree node should get
+     */
+    public void setIndex(int index) {
+        if (this._parent == null) {
+            return;
+        } else if (index < 0 || index >= this._parent._children.size()) {
+            throw new IndexOutOfBoundsException("Index " +  index + " is out of range");
+        } else if (this._parent.get(index) != this) {
+            int oldIndex = this._parent._children.indexOf(this);
+            if (oldIndex != -1) {
+                this._parent._children.remove(oldIndex);
+                this._parent._children.add(index, this);
+                this._parent.markChanged();
+            }
+        }
+    }
+
+    /**
      * Gets the value of this tree node
      * 
      * @return value as a String
@@ -314,5 +335,12 @@ public class StringTreeNode {
                 node._changed = true;
             } while ((node = node._parent) != null);
         }
+    }
+
+    private void markChanged() {
+        StringTreeNode node = this;
+        do {
+            node._changed = true;
+        } while ((node = node._parent) != null && !node._changed);
     }
 }

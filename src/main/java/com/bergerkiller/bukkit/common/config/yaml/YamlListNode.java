@@ -9,6 +9,10 @@ import java.util.NoSuchElementException;
 import com.bergerkiller.bukkit.common.collections.AbstractListProxy;
 import com.bergerkiller.bukkit.common.collections.CollectionBasics;
 
+/**
+ * A list of values where every value is stored, without key name,
+ * in a list prefixed with a dash (-). It behaves like a normal list.
+ */
 public class YamlListNode extends YamlNode implements List<Object> {
 
     public YamlListNode() {
@@ -80,10 +84,7 @@ public class YamlListNode extends YamlNode implements List<Object> {
 
     @Override
     public Object set(int index, Object element) {
-        YamlEntry entry = this._children.get(index);
-        Object oldValue = entry.getValue();
-        entry.setValue(element);
-        return oldValue;
+        return this._children.get(index).setValue(element);
     }
 
     @Override
