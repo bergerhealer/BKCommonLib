@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.events.StreamEndEvent;
+import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
@@ -30,6 +31,7 @@ public class YamlSerializer {
     private final DumperOptions dumperOptions;
     private final Resolver resolver;
     private final YamlRepresenter representer;
+    private final StringBuilder builder;
     private final StringBuilderWriter output;
     private Emitter emitter;
     private Serializer serializer;
@@ -60,6 +62,7 @@ public class YamlSerializer {
         representer.getPropertyUtils().setAllowReadOnlyProperties(dumperOptions.isAllowReadOnlyProperties());
         representer.setTimeZone(dumperOptions.getTimeZone());
         output = new StringBuilderWriter();
+        builder = output.getBuilder();
         reuseEmitter = false;
         reset(0);
 
@@ -170,10 +173,13 @@ public class YamlSerializer {
         }
     }
 
-    private void reset(int indent) {
-        // Reset StringBuilder to empty state
-        output.getBuilder().setLength(0);
+    private String build() {
+        String str = this.output.toString();
+        builder.setLength(0);
+        return str;
+    }
 
+    private void reset(int indent) {
         // Reset the emitter to its initial state of expecting a new document
         // If this for whatever reason fails (library changes in the future?), use a slower fallback
         if (reuseEmitter) {
@@ -267,6 +273,36 @@ public class YamlSerializer {
     }
 
     /**
+     * Serializes a key to a YAML-encoded String.
+     * If the specified header is not empty, every line is prefixed to
+     * the output starting with a #-character.
+     * 
+     * @param key     The key to write
+     * @param header  The text to put in front prefixed with #-characters, empty String or null for no header
+     * @param indent  The number of indentation levels to add
+     * @return YAML-encoded String
+     */
+    public synchronized String serializeKey(String key, String header, int indent) {
+        // Append the header, if one exists
+        appendHeader(header, indent);
+
+        if (key.length() == 1 && key.charAt(0) == '*') {
+            // If key is '*' write without quotes around it
+            appendIndent(indent);
+            builder.append("*:\n");
+        } else {
+            // Append the key: by writing key: 0
+            appendKeyValue(key, 0, indent, true);
+
+            // Replace the ' 0\n' portion with a newline
+            builder.setLength(builder.length() - 3);
+            builder.append('\n');
+        }
+
+        return build();
+    }
+
+    /**
      * Serializes a value to a YAML-encoded String.
      * If the specified header is not empty, every line is prefixed to
      * the output starting with a #-character.
@@ -276,26 +312,115 @@ public class YamlSerializer {
      * @param indent  The number of indentation levels to add
      * @return YAML-encoded String
      */
+    @SuppressWarnings("unchecked")
     public synchronized String serialize(Object value, String header, int indent) {
-        // Reset the buffer and serializer
-        reset(indent);
+        // Append the header, if one exists
+        appendHeader(header, indent);
 
-        // When our reflection hacks work, indentation is correct while writing
-        // When it is not, we must perform indentation as a post-processing step
-        StringBuilder builder = output.getBuilder();
-        if (this.reuseEmitter) {
-            appendHeader(builder, header, indent);
-            for (int i = 1; i < indent; i++) {
-                builder.append(indentStr);
+        // Optimization for simple key: value pairs
+        // SnakeYAML is awfully slow with these
+        if (value instanceof Map) {
+            Map<String, Object> m = (Map<String, Object>) value;
+            if (m.size() == 1) {
+                Map.Entry<String, Object> entry = m.entrySet().iterator().next();
+                appendKeyValue(entry.getKey(), entry.getValue(), indent, true);
+                return build();
             }
-        } else {
-            appendHeader(builder, header, (indent == 0) ? 0 : 1);
         }
+
+        // Fallback
+        appendValue(value, indent, true);
+        return build();
+    }
+
+    private void appendHeader(String header, int indent) {
+        appendHeader(this.builder, header, indent);
+    }
+
+    private void appendKeyValue(String key, Object value, int indent, boolean indentFirstLine) {
+        // If key is not a String literal, really strange formatting rules may happen
+        // For example, a multiline string will write ? |-\n  text\n  text\n: for the key
+        // Just don't bother and let Snakeyaml deal with those rare cases
+        if (!canWriteStringLiteral(key)) {
+            appendValue(Collections.singletonMap(key, value), indent, indentFirstLine);
+            return;
+        }
+
+        // Append first line indent now
+        if (indentFirstLine) {
+            appendIndent(indent);
+        }
+
+        // Append the value of the key where some have been optimized
+        if (value == null) {
+            builder.append(key);
+            builder.append(": ~\n");
+            return;
+        } else if (value instanceof Number) {
+            builder.append(key);
+            builder.append(": ");
+
+            // Avoid toString() for common value types (int, double)
+            Number valueNum = (Number) value;
+            if (value instanceof Integer) {
+                builder.append(valueNum.intValue());
+            } else if (value instanceof Double) {
+                builder.append(valueNum.doubleValue());
+            } else {
+                builder.append(value.toString());
+            }
+
+            builder.append('\n');
+            return;
+        } else if (value instanceof String) {
+            String valueStr = value.toString();
+            if (canWriteStringLiteral(valueStr)) {
+                builder.append(key);
+                builder.append(": ");
+                builder.append(valueStr);
+                builder.append('\n');
+                return;
+            }
+        } else if (value instanceof Boolean) {
+            builder.append(key);
+            if (((Boolean) value).booleanValue()) {
+                builder.append(": true\n");
+            } else {
+                builder.append(": false\n");
+            }
+            return;
+        }
+
+        // Other value types may consist of a block of key: value pairs or weird indent rules
+        // In that case, a newline is put right after the key
+        // But it may also be a simple value that is stored on the same line
+        // We cannot know this, so let Snakeyaml solve that
+        appendValue(Collections.singletonMap(key, value), indent, false);
+    }
+
+    private void appendValue(Object value, int indent, boolean indentFirstLine) {
+        appendNode(this.representer.represent(value), indent, indentFirstLine);
+    }
+
+    private void appendIndent(int indent) {
+        for (int i = 1; i < indent; i++) {
+            builder.append(indentStr);
+        }
+    }
+
+    private void appendNode(Node node, int indent, boolean indentFirstLine) {
+        // Reset the serializer
+        reset(indent);
 
         // Serialize it using SnakeYaml
         int valueInitialOffset = builder.length();
         try {
-            serializer.serialize(representer.represent(value));
+            if (indentFirstLine) {
+                for (int i = 1; i < indent; i++) {
+                    builder.append(indentStr);
+                }
+            }
+            serializer.serialize(node);
         } catch (IOException e) {
             // never happens, writer writes to a StringBuilder, what can go wrong?
         }
@@ -318,13 +443,13 @@ public class YamlSerializer {
         if (this.reuseEmitter) {
             // Erase trailing spaces from indent
             if (indent > 1) {
-                output.getBuilder().setLength(builder.length() - 2*(indent-2));
+                builder.setLength(builder.length() - 2*(indent-2));
             }
         } else if (indent > 1) {
-            // Add indents after the fact
+            // Add indents after the fact for all but the first line
             String fullIndentStr = StringUtil.getFilledString(indentStr, indent - 1);
-            int indentStart = 0;
-            for (int i = 0; i < builder.length(); i++) {
+            int indentStart = Integer.MAX_VALUE; // skip first line
+            for (int i = valueInitialOffset; i < builder.length(); i++) {
                 char c = builder.charAt(i);
                 if (c == '\n') {
                     if (i > indentStart) {
@@ -335,7 +460,58 @@ public class YamlSerializer {
                 }
             }
         }
-
-        return output.toString();
     }
+
+    // Checks whether a String can be written as a String literal, without ' or "
+    // This is a fast check for the most common case of only a-zA-Z key names
+    private boolean canWriteStringLiteral(String str) {
+        int len = str.length();
+        if (len == 0) {
+            return false; // ''
+        }
+
+        int i = 0;
+        char c = str.charAt(i);
+        if (len == 3 && (c == 'i' || c == 'I')) {
+            // Check for 'inf'
+            c = str.charAt(++i);
+            if (c == 'n' || c == 'N') {
+                c = str.charAt(++i);
+                if (c == 'f' || c == 'F') {
+                    return false; // 'inf'
+                }
+            }
+        } else if (len == 3 && (c == 'n' || c == 'N')) {
+            // Check for 'nan'
+            c = str.charAt(++i);
+            if (c == 'a' || c == 'A') {
+                c = str.charAt(++i);
+                if (c == 'n' || c == 'N') {
+                    return false; // 'nan'
+                }
+            }
+        } else if (len == 4 && (c == 'n' || c == 'N')) {
+            // Check for 'null'
+            c = str.charAt(++i);
+            if (c == 'u' || c == 'U') {
+                c = str.charAt(++i);
+                if (c == 'l' || c == 'L') {
+                    c = str.charAt(++i);
+                    if (c == 'l' || c == 'L') {
+                        return false; // 'null'
+                    }
+                }
+            }
+        }
+        while (true) {
+            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-')) {
+                return false;
+            } else if (++i == len) {
+                return true;
+            } else {
+                c = str.charAt(i);
+            }
+        }
+    }
+
 }

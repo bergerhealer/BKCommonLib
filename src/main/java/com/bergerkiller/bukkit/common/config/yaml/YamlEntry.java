@@ -467,10 +467,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
                 } else {
                     // # Header line
                     // key:\n
-                    StringBuilder builder = new StringBuilder();
-                    builder.append(this.serializeYamlValue(this.path.name()));
-                    builder.insert(builder.length()-1, ':');
-                    this.yaml.setValue(builder.toString());
+                    this.yaml.setValue(YamlSerializer.INSTANCE.serializeKey(this.path.name(), header, this.path.depth()));
                 }
             } else {
                 Object value = this.value;

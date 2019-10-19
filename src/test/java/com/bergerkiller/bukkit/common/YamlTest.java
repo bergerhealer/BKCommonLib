@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -12,12 +13,15 @@ import java.util.Set;
 import org.bukkit.GameMode;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
 import com.bergerkiller.bukkit.common.config.yaml.YamlNode;
 import com.bergerkiller.bukkit.common.config.yaml.YamlPath;
 import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
+import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
 
@@ -386,7 +390,7 @@ public class YamlTest {
         YamlNode root = new YamlNode();
         YamlNode child = root.getNode("subnode");
         child.getNode("node").set("hello", 12);
-        assertEquals("node:\n" + 
+        assertEquals("node:\n" +
                      "  hello: 12\n",
                      child.toString());
 
@@ -394,13 +398,13 @@ public class YamlTest {
         child.getNode("node").set("hello", 15);
         child.getNode("node").set("wooo", new Vector(1,2,3));
         child.set("other", "hey");
-        assertEquals("node:\n" + 
-                     "  hello: 15\n" + 
-                     "  wooo:\n" + 
-                     "    ==: Vector\n" + 
-                     "    x: 1.0\n" + 
-                     "    y: 2.0\n" + 
-                     "    z: 3.0\n" + 
+        assertEquals("node:\n" +
+                     "  hello: 15\n" +
+                     "  wooo:\n" +
+                     "    ==: Vector\n" +
+                     "    x: 1.0\n" +
+                     "    y: 2.0\n" +
+                     "    z: 3.0\n" +
                      "other: hey\n",
                      child.toString());
 
@@ -408,37 +412,64 @@ public class YamlTest {
         root.setHeader("This is the root header");
         child.setHeader("\nThis is the child header");
         child.getNode("node").setHeader("This is the header of node");
-        assertEquals("#> This is the root header\n" + 
-                     "\n" + 
-                     "# This is the child header\n" + 
-                     "subnode:\n" + 
-                      "  # This is the header of node\n" + 
-                      "  node:\n" + 
-                      "    hello: 15\n" + 
-                      "    wooo:\n" + 
-                      "      ==: Vector\n" + 
-                      "      x: 1.0\n" + 
-                      "      y: 2.0\n" + 
-                      "      z: 3.0\n" + 
+        assertEquals("#> This is the root header\n" +
+                     "\n" +
+                     "# This is the child header\n" +
+                     "subnode:\n" +
+                      "  # This is the header of node\n" +
+                      "  node:\n" +
+                      "    hello: 15\n" +
+                      "    wooo:\n" +
+                      "      ==: Vector\n" +
+                      "      x: 1.0\n" +
+                      "      y: 2.0\n" +
+                      "      z: 3.0\n" +
                       "  other: hey\n",
                       root.toString());
 
         // Change value to a different value, but with the same length
         child.set("node.hello", 12);
-        assertEquals("#> This is the root header\n" + 
-                "\n" + 
-                "# This is the child header\n" + 
-                "subnode:\n" + 
-                 "  # This is the header of node\n" + 
-                 "  node:\n" + 
-                 "    hello: 12\n" + 
-                 "    wooo:\n" + 
-                 "      ==: Vector\n" + 
-                 "      x: 1.0\n" + 
-                 "      y: 2.0\n" + 
-                 "      z: 3.0\n" + 
-                 "  other: hey\n",
-                 root.toString());
+        assertEquals("#> This is the root header\n" +
+                     "\n" +
+                     "# This is the child header\n" +
+                     "subnode:\n" +
+                     "  # This is the header of node\n" +
+                     "  node:\n" +
+                     "    hello: 12\n" +
+                     "    wooo:\n" +
+                     "      ==: Vector\n" +
+                     "      x: 1.0\n" +
+                     "      y: 2.0\n" +
+                     "      z: 3.0\n" +
+                     "  other: hey\n",
+                     root.toString());
+
+        // Add a node with the 'any' key, which should be written as such
+        // Add a node with name '*test' which should be escaped
+        child.set("*.key", 12);
+        child.set("*.default", true);
+        child.set("*test.key1", 32);
+        child.set("*test.key2", "value5");
+        assertEquals("#> This is the root header\n" +
+                     "\n" +
+                     "# This is the child header\n" +
+                     "subnode:\n" +
+                     "  # This is the header of node\n" +
+                     "  node:\n" +
+                     "    hello: 12\n" +
+                     "    wooo:\n" +
+                     "      ==: Vector\n" +
+                     "      x: 1.0\n" +
+                     "      y: 2.0\n" +
+                     "      z: 3.0\n" +
+                     "  other: hey\n" +
+                     "  *:\n" +
+                     "    key: 12\n" +
+                     "    default: true\n" +
+                     "  '*test':\n" +
+                     "    key1: 32\n" +
+                     "    key2: value5\n",
+                     root.toString());
     }
 
     @Test
@@ -506,6 +537,38 @@ public class YamlTest {
                      "    - nested2value2\n" + 
                      "  - - nested3value1\n" + 
                      "    - nested3value2\n",
+                     root.toString());
+    }
+
+    @Test
+    public void testYamlNestedListNodesTostring() {
+        YamlNode root = new YamlNode();
+        YamlNode node = new YamlNode();
+        node.set("key", "value");
+        node.set("num", 12);
+        node.set("child.key", 22);
+        node.set("child.num", -2);
+        root.set("simpleList", Arrays.asList(
+                "value1",
+                node.clone(),
+                "value2",
+                Arrays.asList(node.clone(), "value3", "value4")));
+
+        assertEquals("simpleList:\n" + 
+                     "  - value1\n" + 
+                     "  - key: value\n" + 
+                     "    num: 12\n" + 
+                     "    child:\n" + 
+                     "      key: 22\n" + 
+                     "      num: -2\n" + 
+                     "  - value2\n" + 
+                     "  - - key: value\n" + 
+                     "      num: 12\n" + 
+                     "      child:\n" + 
+                     "        key: 22\n" + 
+                     "        num: -2\n" + 
+                     "    - value3\n" + 
+                     "    - value4\n",
                      root.toString());
     }
 
@@ -730,11 +793,11 @@ public class YamlTest {
     @Test
     public void testYamlSerializer() {
         // Verify that the Serializer is able to serialize basic values and perform escaping rules
-        // For the most part we trust SnakeYaml will do the correct things
         YamlSerializer serializer = YamlSerializer.INSTANCE;
         assertEquals("hello, world!\n", serializer.serialize("hello, world!"));
         assertEquals("23\n", serializer.serialize(23));
         assertEquals("key: value\n", serializer.serialize(Collections.singletonMap("key", "value")));
+        assertEquals("key: 12\n", serializer.serialize(Collections.singletonMap("key", 12)));
         assertEquals("'1': '*'\n", serializer.serialize(Collections.singletonMap("1", "*")));
         assertEquals("vector:\n" +
                 "  ==: Vector\n" +
@@ -779,6 +842,21 @@ public class YamlTest {
                      "key: value\n",
                      serializer.serialize(Collections.singletonMap("key", "value"),
                         "this is the first line\n", 1));
+
+        // Multiline string values
+        assertEquals("key: |-\n" +
+                     "  this is\n" +
+                     "  a multiline\n" +
+                     "  string value\n",
+                     serializer.serialize(Collections.singletonMap("key", "this is\na multiline\nstring value"), "", 1));
+
+        // Multiline string key
+        assertEquals("? |-\n" +
+                     "  this is\n" +
+                     "  a multiline\n" +
+                     "  string key\n" +
+                     ": value\n",
+                     serializer.serialize(Collections.singletonMap("this is\na multiline\nstring key", "value"), "", 1));
     }
 
     @Test
@@ -848,6 +926,28 @@ public class YamlTest {
                      "      y: 2.0\n" +
                      "      z: 3.0\n",
                      serializer.serialize(Collections.singletonMap("vector", new Vector(1, 2, 3)), "", 3));
+
+        // Multiline string values
+        assertEquals("key: |-\n" +
+                     "  this is\n" +
+                     "  a multiline\n" +
+                     "  string value\n",
+                     serializer.serialize(Collections.singletonMap("key", "this is\na multiline\nstring value"), "", 0));
+        assertEquals("key: |-\n" +
+                     "  this is\n" +
+                     "  a multiline\n" +
+                     "  string value\n",
+                     serializer.serialize(Collections.singletonMap("key", "this is\na multiline\nstring value"), "", 1));
+        assertEquals("  key: |-\n" +
+                     "    this is\n" +
+                     "    a multiline\n" +
+                     "    string value\n",
+                     serializer.serialize(Collections.singletonMap("key", "this is\na multiline\nstring value"), "", 2));
+        assertEquals("    key: |-\n" +
+                     "      this is\n" +
+                     "      a multiline\n" +
+                     "      string value\n",
+                     serializer.serialize(Collections.singletonMap("key", "this is\na multiline\nstring value"), "", 3));
 
         // Simple value with header
         assertEquals("#> Simple header\n" +
@@ -990,5 +1090,39 @@ public class YamlTest {
         assertEquals(list_path_by_name.hashCode(), list_path_by_index.hashCode());
         assertTrue(list_path_by_index.isList());
         assertEquals(22, list_path_by_index.listIndex());
+    }
+
+    // Used by saveToFileAsync()
+    @Ignore
+    @Test
+    public void stressTestAsyncTextWriter() {
+        StringBuilder testData = new StringBuilder();
+        int numLines = 10000;
+        for (int i = 0; i < numLines; i++) {
+            testData.append("123456789\n");
+        }
+        String testString = testData.toString();
+
+        java.io.File testFile = new java.io.File("test_async_writer.dat");
+        int n = 0;
+        int k = 0;
+        while (true) {
+            if (++n > 1000) {
+                System.out.println("RUN #" + ++k);
+            }
+            try {
+                AsyncTextWriter.write(testFile, testString).get();
+            } catch (Throwable t) {
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
+
+            List<String> lines;
+            try {
+                lines = Files.readAllLines(testFile.toPath());
+            } catch (Throwable t) {
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
+            assertEquals(numLines, lines.size());
+        }
     }
 }
