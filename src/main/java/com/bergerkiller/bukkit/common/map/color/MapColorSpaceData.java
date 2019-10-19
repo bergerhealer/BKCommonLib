@@ -23,8 +23,8 @@ public class MapColorSpaceData implements Cloneable {
     public final int getColorCount() {
         int count = 0;
         boolean found_all_transparent = false;
-        for (int i = 0; i < this.colors.length; i++) {
-            if (this.colors[i].getAlpha() >= 128) {
+        for (Color color : this.colors) {
+            if (color.getAlpha() >= 128) {
                 found_all_transparent = true;
                 count++;
             } else if (!found_all_transparent) {

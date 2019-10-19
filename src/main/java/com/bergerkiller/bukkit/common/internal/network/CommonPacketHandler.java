@@ -16,7 +16,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.NoSuchElementException;
-import java.util.concurrent.Callable;
 import java.util.logging.Level;
 
 /**
@@ -104,13 +103,9 @@ public class CommonPacketHandler extends PacketHandlerHooked {
             Object playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
             Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
             final Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
-            channel.eventLoop().submit(new Callable<Object>() {
-
-                @Override
-                public Object call() throws Exception {
-                    channel.pipeline().remove("bkcommonlib");
-                    return null;
-                }
+            channel.eventLoop().submit(() -> {
+                channel.pipeline().remove("bkcommonlib");
+                return null;
             });
         }
 

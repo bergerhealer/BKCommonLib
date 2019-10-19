@@ -203,12 +203,7 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
      * @return iterable clone view of this list's data
      */
     public Iterable<E> cloneAsIterable() {
-        return new Iterable<E>() {
-            @Override
-            public Iterator<E> iterator() {
-                return new ReferencedListCopyIterator<E>(ImplicitlySharedList.this);
-            }
-        };
+        return () -> new ReferencedListCopyIterator<E>(ImplicitlySharedList.this);
     }
 
     @Override

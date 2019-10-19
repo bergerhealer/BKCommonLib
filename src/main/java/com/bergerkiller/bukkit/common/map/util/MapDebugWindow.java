@@ -3,8 +3,6 @@ package com.bergerkiller.bukkit.common.map.util;
 import java.awt.GridLayout;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -43,16 +41,13 @@ public class MapDebugWindow {
             public void mouseMoved(MouseEvent e) {
             }
         });
-        this.label.addMouseWheelListener(new MouseWheelListener() {
-            @Override
-            public void mouseWheelMoved(MouseWheelEvent e) {
-                if (e.getWheelRotation() > 0) {
-                    _z_dirty++;
-                    signal();
-                } else if (e.getWheelRotation() < 0) {
-                    _z_dirty--;
-                    signal();
-                }
+        this.label.addMouseWheelListener(e -> {
+            if (e.getWheelRotation() > 0) {
+                _z_dirty++;
+                signal();
+            } else if (e.getWheelRotation() < 0) {
+                _z_dirty--;
+                signal();
             }
         });
         updateImage();

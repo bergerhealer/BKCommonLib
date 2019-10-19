@@ -59,11 +59,7 @@ public class CommonListener implements Listener {
         if (CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
             ChunkGeneratorHook.hook(event.getWorld());
         }
-        CommonUtil.nextTick(new Runnable() {
-            public void run() {
-                CommonPlugin.getInstance().notifyWorldAdded(event.getWorld());
-            }
-        });
+        CommonUtil.nextTick(() -> CommonPlugin.getInstance().notifyWorldAdded(event.getWorld()));
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)

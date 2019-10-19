@@ -183,12 +183,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     public void receivePacket(final Player player, final PacketType type, final Object packet) {
         // If not main thread, schedule a next-tick task to run it
         if (!CommonUtil.isMainThread()) {
-            CommonUtil.nextTick(new Runnable() {
-                @Override
-                public void run() {
-                    receivePacket(player, type, packet);
-                }
-            });
+            CommonUtil.nextTick(() -> receivePacket(player, type, packet));
             return;
         }
 

@@ -113,12 +113,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @return iterable
      */
     public DoubleOctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
-        return new DoubleOctreeIterable<T>() {
-            @Override
-            public DoubleOctreeIterator<T> iterator() {
-                return new DoubleOctreeIterator<T>(new OctreeCuboidIterator<Entry<T>>(DoubleOctree.this.tree, min, max));
-            }
-        };
+        return () -> new DoubleOctreeIterator<T>(new OctreeCuboidIterator<Entry<T>>(DoubleOctree.this.tree, min, max));
     }
 
     /**
@@ -130,12 +125,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @return iterable
      */
     public DoubleOctreeIterable<T> block(final IntVector3 block) {
-        return new DoubleOctreeIterable<T>() {
-            @Override
-            public DoubleOctreeIterator<T> iterator() {
-                return new DoubleOctreeIterator<T>(new OctreePointIterator<Entry<T>>(DoubleOctree.this.tree, block));
-            }
-        };
+        return () -> new DoubleOctreeIterator<T>(new OctreePointIterator<Entry<T>>(DoubleOctree.this.tree, block));
     }
 
     /**

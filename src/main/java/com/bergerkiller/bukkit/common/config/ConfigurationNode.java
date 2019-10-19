@@ -281,20 +281,17 @@ public class ConfigurationNode implements Cloneable {
      */
     public List<ConfigurationNode> getNodeList(String path) {
         ArrayList<ConfigurationNode> list = new ArrayList<ConfigurationNode>(this.getNode(path).getNodes());
-        Collections.sort(list, new Comparator<ConfigurationNode>() {
-            @Override
-            public int compare(ConfigurationNode o1, ConfigurationNode o2) {
-                String n1 = o1.getName();
-                String n2 = o2.getName();
-                if (ParseUtil.isNumeric(n1) && ParseUtil.isNumeric(n2)) {
-                    try {
-                        int num1 = Integer.parseInt(n1);
-                        int num2 = Integer.parseInt(n2);
-                        return Integer.compare(num1, num2);
-                    } catch (NumberFormatException ex) {}
-                }
-                return n1.compareTo(n2);
+        Collections.sort(list, (o1, o2) -> {
+            String n1 = o1.getName();
+            String n2 = o2.getName();
+            if (ParseUtil.isNumeric(n1) && ParseUtil.isNumeric(n2)) {
+                try {
+                    int num1 = Integer.parseInt(n1);
+                    int num2 = Integer.parseInt(n2);
+                    return Integer.compare(num1, num2);
+                } catch (NumberFormatException ex) {}
             }
+            return n1.compareTo(n2);
         });
         return list;
     }

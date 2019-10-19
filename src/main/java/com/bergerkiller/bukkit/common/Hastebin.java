@@ -89,68 +89,65 @@ public class Hastebin {
     public CompletableFuture<UploadResult> upload(String content) {
         final CompletableFuture<UploadResult> result = new CompletableFuture<UploadResult>();
         final Session session = this._uploadSession;
-        this._executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    byte[] contents_bytes = null;
-                    ByteArrayOutputStream contents_bytes_compressed = null;
-                    while (true) {
-                        HttpURLConnection con = session.createRequest("POST", "/documents");
-                        con.setDoOutput(true);
-                        con.setRequestProperty("Accept", "application/json, */*; q=0.01");
+        this._executor.execute(() -> {
+            try {
+                byte[] contents_bytes = null;
+                ByteArrayOutputStream contents_bytes_compressed = null;
+                while (true) {
+                    HttpURLConnection con = session.createRequest("POST", "/documents");
+                    con.setDoOutput(true);
+                    con.setRequestProperty("Accept", "application/json, */*; q=0.01");
 
-                        // Upload the data
-                        if (session.getCapabilities().requestContentEncoding) {
-                            // Compress with gzip and store into contents_bytes_compressed
-                            // We do this so we can compute the content length of the compressed data
-                            if (contents_bytes_compressed == null) {
-                                contents_bytes_compressed = new ByteArrayOutputStream();
-                                try (Writer writer = new OutputStreamWriter(new GZIPOutputStream(contents_bytes_compressed), "UTF-8")) {
-                                    writer.write(content);
-                                }
-                            }
-
-                            // Upload data compressed
-                            con.setRequestProperty("Content-Encoding", "gzip");
-                            con.setFixedLengthStreamingMode(contents_bytes_compressed.size());
-                            try (OutputStream output = con.getOutputStream()) {
-                                contents_bytes_compressed.writeTo(output);
-                            }
-                        } else {
-                            // Upload data uncompressed
-                            if (contents_bytes == null) {
-                                contents_bytes = content.getBytes(Charset.forName("UTF-8"));
-                            }
-                            con.setFixedLengthStreamingMode(contents_bytes.length);
-                            try (OutputStream output = con.getOutputStream()) {
-                                output.write(contents_bytes);
+                    // Upload the data
+                    if (session.getCapabilities().requestContentEncoding) {
+                        // Compress with gzip and store into contents_bytes_compressed
+                        // We do this so we can compute the content length of the compressed data
+                        if (contents_bytes_compressed == null) {
+                            contents_bytes_compressed = new ByteArrayOutputStream();
+                            try (Writer writer = new OutputStreamWriter(new GZIPOutputStream(contents_bytes_compressed), "UTF-8")) {
+                                writer.write(content);
                             }
                         }
 
-                        // Check redirects
-                        if (session.handleRedirect(con)) {
-                            continue;
+                        // Upload data compressed
+                        con.setRequestProperty("Content-Encoding", "gzip");
+                        con.setFixedLengthStreamingMode(contents_bytes_compressed.size());
+                        try (OutputStream output1 = con.getOutputStream()) {
+                            contents_bytes_compressed.writeTo(output1);
                         }
-
-                        // Read response
-                        HastebinUploadResponse response = decodeGSON(con, HastebinUploadResponse.class);
-                        if (response.key == null) {
-                            throw new InvalidServerResponseException("No key");
+                    } else {
+                        // Upload data uncompressed
+                        if (contents_bytes == null) {
+                            contents_bytes = content.getBytes(Charset.forName("UTF-8"));
                         }
-                        complete(result, new UploadResult(true, session.createURL("/" + response.key).toString(), null));
-                        break;
+                        con.setFixedLengthStreamingMode(contents_bytes.length);
+                        try (OutputStream output2 = con.getOutputStream()) {
+                            output2.write(contents_bytes);
+                        }
                     }
-                } catch (IOException ex) {
-                    complete(result, new UploadResult(false, null, "I/O Exception occurred: " + ex.getMessage()));
-                } catch (InvalidServerURLException ex) {
-                    complete(result, new UploadResult(false, null, "Invalid Server URL: " + session.getServer()));
-                } catch (InvalidServerResponseException ex) {
-                    complete(result, new UploadResult(false, null, ex.getMessage()));
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
+
+                    // Check redirects
+                    if (session.handleRedirect(con)) {
+                        continue;
+                    }
+
+                    // Read response
+                    HastebinUploadResponse response = decodeGSON(con, HastebinUploadResponse.class);
+                    if (response.key == null) {
+                        throw new InvalidServerResponseException("No key");
+                    }
+                    complete(result, new UploadResult(true, session.createURL("/" + response.key).toString(), null));
+                    break;
                 }
+            } catch (IOException ex1) {
+                complete(result, new UploadResult(false, null, "I/O Exception occurred: " + ex1.getMessage()));
+            } catch (InvalidServerURLException ex2) {
+                complete(result, new UploadResult(false, null, "Invalid Server URL: " + session.getServer()));
+            } catch (InvalidServerResponseException ex3) {
+                complete(result, new UploadResult(false, null, ex3.getMessage()));
+            } catch (Throwable t) {
+                t.printStackTrace();
+                complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
             }
         });
         return result;
@@ -170,54 +167,51 @@ public class Hastebin {
     public CompletableFuture<DownloadResult> download(String url) {
         final CompletableFuture<DownloadResult> result = new CompletableFuture<DownloadResult>();
         final Session session = new Session(this._plugin, url);
-        this._executor.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    // Find the /raw/somekey URL
-                    final String raw_path = session.findRawPath();
-                    while (true) {
-                        HttpURLConnection con = session.createRequest("GET", raw_path);
-                        con.setRequestProperty("Accept-Encoding", "gzip");
-                        if (session.handleRedirect(con)) {
-                            continue;
-                        }
-
-                        // Is allowed to be more or less than the actual content
-                        // This initializes the initial capacity of the receive buffer
-                        int expectedContentSize = con.getContentLength();
-                        if (expectedContentSize <= 0) {
-                            expectedContentSize = 1024;
-                        }
-
-                        // Read from InputStream and write to a ByteArrayIOStream buffer
-                        ByteArrayIOStream contentBuffer = new ByteArrayIOStream(expectedContentSize);
-                        if ("gzip".equals(con.getContentEncoding())) {
-                            // Download compressed content and decode
-                            try (GZIPInputStream input = new GZIPInputStream(con.getInputStream())) {
-                                contentBuffer.readFrom(input);
-                            }
-                        } else {
-                            // Download uncompressed content
-                            try (InputStream input = con.getInputStream()) {
-                                contentBuffer.readFrom(input);
-                            }
-                        }
-
-                        // Return the results
-                        complete(result, new DownloadResult(true, url, contentBuffer, null));
-                        break;
+        this._executor.execute(() -> {
+            try {
+                // Find the /raw/somekey URL
+                final String raw_path = session.findRawPath();
+                while (true) {
+                    HttpURLConnection con = session.createRequest("GET", raw_path);
+                    con.setRequestProperty("Accept-Encoding", "gzip");
+                    if (session.handleRedirect(con)) {
+                        continue;
                     }
-                } catch (IOException ex) {
-                    complete(result, new DownloadResult(false, url, null, "I/O Exception occurred: " + ex.getMessage()));
-                } catch (InvalidServerURLException ex) {
-                    complete(result, new DownloadResult(false, url, null, "Invalid URL: " + session.getServer()));
-                } catch (InvalidServerResponseException ex) {
-                    complete(result, new DownloadResult(false, url, null, ex.getMessage()));
-                } catch (Throwable t) {
-                    t.printStackTrace();
-                    complete(result, new DownloadResult(false, url, null, "Error occurred: " + t.getMessage()));
+
+                    // Is allowed to be more or less than the actual content
+                    // This initializes the initial capacity of the receive buffer
+                    int expectedContentSize = con.getContentLength();
+                    if (expectedContentSize <= 0) {
+                        expectedContentSize = 1024;
+                    }
+
+                    // Read from InputStream and write to a ByteArrayIOStream buffer
+                    ByteArrayIOStream contentBuffer = new ByteArrayIOStream(expectedContentSize);
+                    if ("gzip".equals(con.getContentEncoding())) {
+                        // Download compressed content and decode
+                        try (GZIPInputStream input1 = new GZIPInputStream(con.getInputStream())) {
+                            contentBuffer.readFrom(input1);
+                        }
+                    } else {
+                        // Download uncompressed content
+                        try (InputStream input2 = con.getInputStream()) {
+                            contentBuffer.readFrom(input2);
+                        }
+                    }
+
+                    // Return the results
+                    complete(result, new DownloadResult(true, url, contentBuffer, null));
+                    break;
                 }
+            } catch (IOException ex1) {
+                complete(result, new DownloadResult(false, url, null, "I/O Exception occurred: " + ex1.getMessage()));
+            } catch (InvalidServerURLException ex2) {
+                complete(result, new DownloadResult(false, url, null, "Invalid URL: " + session.getServer()));
+            } catch (InvalidServerResponseException ex3) {
+                complete(result, new DownloadResult(false, url, null, ex3.getMessage()));
+            } catch (Throwable t) {
+                t.printStackTrace();
+                complete(result, new DownloadResult(false, url, null, "Error occurred: " + t.getMessage()));
             }
         });
         return result;
@@ -228,12 +222,7 @@ public class Hastebin {
             Logging.LOGGER_NETWORK.warning("Hastebin operation for " + this._plugin.getName() + " completed after plugin was disabled");
             return;
         }
-        int id = Bukkit.getScheduler().scheduleSyncDelayedTask(this._plugin, new Runnable() {
-            @Override
-            public void run() {
-                future.complete(result);
-            }
-        });
+        int id = Bukkit.getScheduler().scheduleSyncDelayedTask(this._plugin, () -> future.complete(result));
         if (id == -1) {
             Logging.LOGGER_NETWORK.warning("Hastebin operation for " + this._plugin.getName() + " completed but running the callbacks failed");
         }

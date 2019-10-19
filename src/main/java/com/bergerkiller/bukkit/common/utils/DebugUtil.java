@@ -443,8 +443,8 @@ public class DebugUtil {
                 sleep(delay);
                 StackTraceElement[] stack = thread.getStackTrace();
                 System.err.println("Stack trace of thread " + thread.getName() + ":");
-                for (int i = 0; i < stack.length; i++) {
-                    System.err.println("  at " + stack[i].toString());
+                for (StackTraceElement element : stack) {
+                    System.err.println("  at " + element.toString());
                 }
             }
         }.start();

@@ -86,28 +86,13 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             }
         }
 
-        MaterialDataBuilder default_builder = new MaterialDataBuilder() {
-            @Override
-            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
-                return legacy_data_type.getNewData(legacy_data_value);
-            }
-        };
+        MaterialDataBuilder default_builder = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
 
         // Bukkit bugfix.
-        storeBuilders(new MaterialDataBuilder() {
-            @Override
-            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
-                return new org.bukkit.material.PressurePlate(material_type, legacy_data_value);
-            }
-        }, "LEGACY_GOLD_PLATE", "LEGACY_IRON_PLATE");
+        storeBuilders((material_type, legacy_data_type, legacy_data_value) -> new org.bukkit.material.PressurePlate(material_type, legacy_data_value), "LEGACY_GOLD_PLATE", "LEGACY_IRON_PLATE");
 
         // Bukkit bugfix. (<= 1.8.3)
-        storeBuilders(new MaterialDataBuilder() {
-            @Override
-            public MaterialData create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
-                return new org.bukkit.material.Door(material_type, legacy_data_value);
-            }
-        }, "LEGACY_JUNGLE_DOOR", "LEGACY_ACACIA_DOOR", "LEGACY_DARK_OAK_DOOR", "LEGACY_SPRUCE_DOOR", "LEGACY_BIRCH_DOOR");
+        storeBuilders((material_type, legacy_data_type, legacy_data_value) -> new org.bukkit.material.Door(material_type, legacy_data_value), "LEGACY_JUNGLE_DOOR", "LEGACY_ACACIA_DOOR", "LEGACY_DARK_OAK_DOOR", "LEGACY_SPRUCE_DOOR", "LEGACY_BIRCH_DOOR");
 
         // Default data values for some common Material types
         // This ensures getMaterialData() works correctly when used from BY_MATERIAL

@@ -242,15 +242,12 @@ public class Metrics {
                                     graphBuffer.addAll(graphs);
                                 }
                                 if (!graphBuffer.isEmpty()) {
-                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                                        @Override
-                                        public void run() {
-                                            for (Graph graph : graphBuffer) {
-                                                graph.onUpdate(plugin);
-                                            }
-                                            synchronized (syncLock) {
-                                                syncLock.notify();
-                                            }
+                                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                                        for (Graph graph : graphBuffer) {
+                                            graph.onUpdate(plugin);
+                                        }
+                                        synchronized (syncLock) {
+                                            syncLock.notify();
                                         }
                                     });
                                     // Wait for the previous task to be completed
@@ -491,12 +488,10 @@ public class Metrics {
         } else {
             // Is this the first update this hour?
             if (response.contains("OK This is your first update this hour")) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, new Runnable() {
-                    public void run() {
-                        synchronized (graphs) {
-                            for (Graph graph : graphs) {
-                                graph.onReset(plugin);
-                            }
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () -> {
+                    synchronized (graphs) {
+                        for (Graph graph : graphs) {
+                            graph.onReset(plugin);
                         }
                     }
                 });

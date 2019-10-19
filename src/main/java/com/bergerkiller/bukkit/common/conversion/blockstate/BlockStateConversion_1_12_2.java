@@ -36,12 +36,9 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     private final World proxy_world;
     private final Chunk proxy_chunk;
     private final Block proxy_block;
-    private final Invokable non_instrumented_invokable = new Invokable() {
-        @Override
-        public Object invoke(Object instance, Object... args) {
-            String name = instance.getClass().getSuperclass().getSimpleName();
-            throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
-        }
+    private final Invokable non_instrumented_invokable = (instance, args) -> {
+        String name = instance.getClass().getSuperclass().getSimpleName();
+        throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
     };
 
     public BlockStateConversion_1_12_2() throws Throwable {
@@ -57,12 +54,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             protected Invokable getCallback(Method method) {
                 // Gets the proxy world
                 if (method.getName().equals("getCraftWorld")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return proxy_world;
-                        }
-                    };
+                    return (instance, args) -> proxy_world;
                 }
 
                 // All other method calls fail
@@ -78,12 +70,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             protected Invokable getCallback(Method method) {
                 // Gets our requested tile entity
                 if (method.getName().equals("getTileEntityAt")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.tileEntity;
-                        }
-                    };
+                    return (instance, args) -> input_state.tileEntity;
                 }
 
                 // All other method calls fail
@@ -102,19 +89,9 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 if (name.equals("getWorld")) {
                     return new NullInvokable(proxy_world);
                 } else if (name.equals("getChunk")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getChunk();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getChunk();
                 } else if (name.equals("getType")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.type;
-                        }
-                    };
+                    return (instance, args) -> input_state.type;
                 } else if (name.equals("getTypeId")) {
                     return new Invokable() {
                         @Override
@@ -124,40 +101,15 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                         }
                     };
                 } else if (name.equals("getData")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.rawData;
-                        }
-                    };
+                    return (instance, args) -> input_state.rawData;
                 } else if (name.equals("getLightLevel")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getLightLevel();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getLightLevel();
                 } else if (name.equals("getX")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getX();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getX();
                 } else if (name.equals("getY")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getY();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getY();
                 } else if (name.equals("getZ")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getZ();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getZ();
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
                 } else if (name.equals("getState0")) {

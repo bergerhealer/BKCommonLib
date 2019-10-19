@@ -191,12 +191,7 @@ public class Octree<T> implements OctreeIterable<T> {
      * @return iterable
      */
     public OctreeIterable<T> cuboid(final IntVector3 min, final IntVector3 max) {
-        return new OctreeIterable<T>() {
-            @Override
-            public OctreeIterator<T> iterator() {
-                return new OctreeCuboidIterator<T>(Octree.this, min, max);
-            }
-        };
+        return () -> new OctreeCuboidIterator<T>(Octree.this, min, max);
     }
 
     protected boolean clean(int parent) {

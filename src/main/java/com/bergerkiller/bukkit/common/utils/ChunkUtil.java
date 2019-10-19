@@ -319,12 +319,7 @@ public class ChunkUtil {
                     if (executor == null) {
                         cps_handle.getChunkAtAsync(x, z, this);
                     } else {
-                        CompletableFuture.runAsync(new Runnable() {
-                            @Override
-                            public void run() {
-                                cps_handle.getChunkAtAsync(x, z, AsyncConsumer.this);
-                            }
-                        }, executor);
+                        CompletableFuture.runAsync(() -> cps_handle.getChunkAtAsync(x, z, AsyncConsumer.this), executor);
                     }
                 }
             };

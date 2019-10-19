@@ -61,51 +61,32 @@ public class MaterialDataToIBlockData {
     // Only called after MC 1.13, before that everything was fine!
     private static void initBuilders() {
         if (getLegacyMaterial("REDSTONE_COMPARATOR_OFF") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
-                @Override
-                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
-                    iblockdata = iblockdata.set("powered", false);
-                    iblockdata = iblockdata.set("facing", comparator.getFacing());
-                    iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
-                    return iblockdata;
-                }
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), (iblockdata, comparator) -> {
+                iblockdata = iblockdata.set("powered", false);
+                iblockdata = iblockdata.set("facing", comparator.getFacing());
+                iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
+                return iblockdata;
             });
         }
         if (getLegacyMaterial("REDSTONE_COMPARATOR_ON") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), new IBlockDataBuilder<org.bukkit.material.Comparator>() {
-                @Override
-                public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) {
-                    iblockdata = iblockdata.set("powered", true);
-                    iblockdata = iblockdata.set("facing", comparator.getFacing());
-                    iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
-                    return iblockdata;
-                }
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), (iblockdata, comparator) -> {
+                iblockdata = iblockdata.set("powered", true);
+                iblockdata = iblockdata.set("facing", comparator.getFacing());
+                iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
+                return iblockdata;
             });
         }
 
-        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), new IBlockDataBuilder<org.bukkit.material.Step>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Step step) {
-                return iblockdata.set("type", "double");
-            }
-        });
+        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), (iblockdata, step) -> iblockdata.set("type", "double"));
 
-        iblockdataBuilders.put(getLegacyMaterial("MOB_SPAWNER"), new IBlockDataBuilder<org.bukkit.material.MaterialData>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.MaterialData spawner) {
-                return getBlockDataFromMaterialName("SPAWNER");
-            }
-        });
-        iblockdataBuilders.put(getLegacyMaterial("TORCH"), new IBlockDataBuilder<org.bukkit.material.Torch>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) {
-                if (torch.getAttachedFace() == BlockFace.DOWN) {
-                    iblockdata = getBlockDataFromMaterialName("TORCH");
-                    return iblockdata;
-                } else {
-                    iblockdata = getBlockDataFromMaterialName("WALL_TORCH");
-                    return iblockdata.set("facing", torch.getFacing());
-                }
+        iblockdataBuilders.put(getLegacyMaterial("MOB_SPAWNER"), (iblockdata, spawner) -> getBlockDataFromMaterialName("SPAWNER"));
+        iblockdataBuilders.put(getLegacyMaterial("TORCH"), (iblockdata, torch) -> {
+            if (torch.getAttachedFace() == BlockFace.DOWN) {
+                iblockdata = getBlockDataFromMaterialName("TORCH");
+                return iblockdata;
+            } else {
+                iblockdata = getBlockDataFromMaterialName("WALL_TORCH");
+                return iblockdata.set("facing", torch.getFacing());
             }
         });
 
@@ -141,24 +122,14 @@ public class MaterialDataToIBlockData {
             for (int n = 0; n < legacy_types.length; n++) {
                 final Material legacy_type = legacy_types[n];
                 final IBlockDataHandle modern_data = CommonLegacyMaterials.getBlockDataFromMaterialName(modern_names[n]);
-                iblockdataBuilders.put(legacy_type, new IBlockDataBuilder<org.bukkit.material.DirectionalContainer>() {
-                    @Override
-                    public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.DirectionalContainer directional) {
-                        return modern_data.set("facing", directional.getFacing());
-                    }
-                });
+                iblockdataBuilders.put(legacy_type, (iblockdata, directional) -> modern_data.set("facing", directional.getFacing()));
             }
         }
     }
 
     private static void storeLegacyRemap(String legacy_name, String modern_name) {
         final IBlockDataHandle modern_data = getBlockDataFromMaterialName(modern_name);
-        iblockdataBuilders.put(getLegacyMaterial(legacy_name), new IBlockDataBuilder<org.bukkit.material.MaterialData>() {
-            @Override
-            public IBlockDataHandle create(IBlockDataHandle iblockdata, org.bukkit.material.MaterialData materialData) {
-                return modern_data;
-            }
-        });
+        iblockdataBuilders.put(getLegacyMaterial(legacy_name), (iblockdata, materialData) -> modern_data);
     }
 
     /**

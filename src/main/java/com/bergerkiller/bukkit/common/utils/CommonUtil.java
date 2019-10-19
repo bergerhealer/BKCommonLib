@@ -564,14 +564,11 @@ public class CommonUtil {
 
         // Lock object that keeps us waiting
         final CountDownLatch lock = new CountDownLatch(1);
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    runnable.run();
-                } finally {
-                    lock.countDown();
-                }
+        Runnable r = () -> {
+            try {
+                runnable.run();
+            } finally {
+                lock.countDown();
             }
         };
         nextTick(r);

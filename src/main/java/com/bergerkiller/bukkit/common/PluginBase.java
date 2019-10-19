@@ -463,12 +463,12 @@ public abstract class PluginBase extends JavaPlugin {
             if (arguments.length > 0) {
                 StringBuilder tmpPathBuilder = new StringBuilder(path);
                 String tmpPath = path;
-                for (int i = 0; i < arguments.length; i++) {
+                for (String argument : arguments) {
                     tmpPathBuilder.append('.');
-                    if (arguments[i] == null) {
+                    if (argument == null) {
                         tmpPathBuilder.append("null");
                     } else {
-                        tmpPathBuilder.append(arguments[i].toLowerCase(Locale.ENGLISH));
+                        tmpPathBuilder.append(argument.toLowerCase(Locale.ENGLISH));
                     }
                     tmpPath = tmpPathBuilder.toString();
                     // New argument appended path exists, update the path

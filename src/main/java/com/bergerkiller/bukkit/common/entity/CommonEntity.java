@@ -403,12 +403,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance);
 
         // *** Repeat the replacement in the server the next tick to make sure nothing lingers ***
-        CommonUtil.nextTick(new Runnable() {
-            @Override
-            public void run() {
-                EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance);
-            }
-        });
+        CommonUtil.nextTick(() -> EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance));
 
         // *** Make sure a controller is set when hooked ***
         if (this.isHooked()) {

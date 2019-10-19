@@ -47,12 +47,9 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final Map<Material, NullInstantiator<BlockState>> blockStateInstantiators;
     private final Class<?> craftBlockEntityState_type;
     private final SafeField<?> craftBlockEntityState_snapshot_field;
-    private final Invokable non_instrumented_invokable = new Invokable() {
-        @Override
-        public Object invoke(Object instance, Object... args) {
-            String name = instance.getClass().getSuperclass().getSimpleName();
-            throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
-        }
+    private final Invokable non_instrumented_invokable = (instance, args) -> {
+        String name = instance.getClass().getSuperclass().getSimpleName();
+        throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
     };
 
     public BlockStateConversion_1_13() throws Throwable {
@@ -75,20 +72,10 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             protected Invokable getCallback(Method method) {
                 if (method.getReturnType().equals(boolean.class)) {
                     // Boolean return value expected, so return false always
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return Boolean.FALSE;
-                        }
-                    };
+                    return (instance, args) -> Boolean.FALSE;
                 } else if (method.getReturnType().equals(void.class)) {
                     // Void method, do nothing
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return null;
-                        }
-                    };
+                    return (instance, args) -> null;
                 } else {
                     // All other method calls fail
                     return non_instrumented_invokable;
@@ -105,62 +92,32 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
                 // Gets the proxy world
                 if (methodName.equals("getTileEntity")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.tileEntity;
-                        }
-                    };
+                    return (instance, args) -> input_state.tileEntity;
                 }
 
                 // Gets IBlockData type information of the Block
                 if (methodName.equals("getType")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.blockData.getData();
-                        }
-                    };
+                    return (instance, args) -> input_state.blockData.getData();
                 }
 
                 // setTypeAndData is used by TileEntityStructure
                 if (methodName.equals("setTypeAndData")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return Boolean.TRUE;
-                        }
-                    };
+                    return (instance, args) -> Boolean.TRUE;
                 }
 
                 // Gets the Minecraft Server (safe)
                 if (methodName.equals("getMinecraftServer")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return CommonNMS.getMCServer().getRaw();
-                        }
-                    };
+                    return (instance, args) -> CommonNMS.getMCServer().getRaw();
                 }
 
                 // TileEntityMobSpawner uses this to perform physics logic, disable that and do nothing
                 if (methodName.equals("notify") || methodName.equals("b") || methodName.equals("updateAdjacentComparators")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return null;
-                        }
-                    };
+                    return (instance, args) -> null;
                 }
 
                 // Fluid and Block Tick list
                 if (params.length == 0 && CommonUtil.getNMSClass("TickList").isAssignableFrom(method.getReturnType())) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return proxy_nms_world_ticklist;
-                        }
-                    };
+                    return (instance, args) -> proxy_nms_world_ticklist;
                 }
 
                 // All other method calls fail
@@ -176,22 +133,12 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             protected Invokable getCallback(Method method) {
                 // Gets our requested tile entity
                 if (method.getName().equals("getTileEntityAt")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.tileEntity;
-                        }
-                    };
+                    return (instance, args) -> input_state.tileEntity;
                 }
 
                 // Get the NMS World proxy
                 if (method.getName().equals("getHandle")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return proxy_nms_world;
-                        }
-                    };
+                    return (instance, args) -> proxy_nms_world;
                 }
 
                 // All other method calls fail
@@ -210,93 +157,40 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 if (name.equals("getWorld")) {
                     return new NullInvokable(proxy_world);
                 } else if (name.equals("getChunk")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.chunk;
-                        }
-                    };
+                    return (instance, args) -> input_state.chunk;
                 } else if (name.equals("getType")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.blockData.getType();
-                        }
-                    };
+                    return (instance, args) -> input_state.blockData.getType();
                 } else if (name.equals("getData")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.blockData.getRawData();
-                        }
-                    };
+                    return (instance, args) -> input_state.blockData.getRawData();
                 } else if (name.equals("getLightLevel")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getLightLevel();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getLightLevel();
                 } else if (name.equals("getX")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getX();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getX();
                 } else if (name.equals("getY")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getY();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getY();
                 } else if (name.equals("getZ")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.block.getZ();
-                        }
-                    };
+                    return (instance, args) -> input_state.block.getZ();
                 } else if (name.equals("getPosition")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return CraftBlockHandle.getBlockPosition(input_state.block);
-                        }
-                    };
+                    return (instance, args) -> CraftBlockHandle.getBlockPosition(input_state.block);
                 } else if (name.equals("getNMS")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.blockData.getData();
-                        }
-                    };
+                    return (instance, args) -> input_state.blockData.getData();
                 } else if (name.equals("getNMSBlock")) {
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            return input_state.blockData.getBlockRaw();
-                        }
-                    };
+                    return (instance, args) -> input_state.blockData.getBlockRaw();
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
                 } else if (name.equals("toString")) {
                     // This does a bunch of internal lookups we really do not want to see happen.
-                    return new Invokable() {
-                        @Override
-                        public Object invoke(Object instance, Object... args) {
-                            // return "CraftBlock{pos=" + position + ",type=" + getType() + ",data=" + getNMS() + ",fluid=" + world.getFluid(position) + '}';
-                            StringBuilder str = new StringBuilder();
-                            str.append("CraftBlock{pos=");
-                            str.append("BlockPosition{x=").append(input_state.block.getX());
-                            str.append(",y=").append(input_state.block.getY());
-                            str.append(",z=").append(input_state.block.getY()).append('}');
-                            str.append(",type=").append(input_state.blockData.getType());
-                            str.append(",data=").append(input_state.blockData.toString());
-                            str.append('}');
-                            return str.toString();
-                        }
+                    return (instance, args) -> {
+                        // return "CraftBlock{pos=" + position + ",type=" + getType() + ",data=" + getNMS() + ",fluid=" + world.getFluid(position) + '}';
+                        StringBuilder str = new StringBuilder();
+                        str.append("CraftBlock{pos=");
+                        str.append("BlockPosition{x=").append(input_state.block.getX());
+                        str.append(",y=").append(input_state.block.getY());
+                        str.append(",z=").append(input_state.block.getY()).append('}');
+                        str.append(",type=").append(input_state.blockData.getType());
+                        str.append(",data=").append(input_state.blockData.toString());
+                        str.append('}');
+                        return str.toString();
                     };
                 } else if (name.equals("getState0")) {
                     return null; // Paperspigot: uses this method to abstract out state snapshotting

@@ -20,9 +20,9 @@ public class StringUtil {
     static {
         ChatColor[] styles = ChatColor.values();
         LinkedHashSet<Character> chars = new LinkedHashSet<Character>(styles.length * 2);
-        for (int i = 0; i < styles.length; i++) {
-            chars.add(Character.toLowerCase(styles[i].getChar()));
-            chars.add(Character.toUpperCase(styles[i].getChar()));
+        for (ChatColor style : styles) {
+            chars.add(Character.toLowerCase(style.getChar()));
+            chars.add(Character.toUpperCase(style.getChar()));
         }
         CHAT_CODES = new char[chars.size()];
         int i = 0;
