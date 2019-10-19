@@ -16,6 +16,7 @@ import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
@@ -32,9 +33,9 @@ public class AsyncTextWriter {
     private final ByteBuffer _writeBufferB;
     private final CompletableFuture<Void> _future;
     private FileLock _lock;
-    private long _position;
-    private boolean _finishedReading;
-    private boolean _finishedEncoding;
+    private volatile long _position;
+    private volatile boolean _finishedReading;
+    private volatile boolean _finishedEncoding;
 
     private AsyncTextWriter(AsynchronousFileChannel file, CharBuffer inputData, int bufferSize) {
         _file = file;
@@ -72,6 +73,18 @@ public class AsyncTextWriter {
         }
     }
 
+    private ByteBuffer getBufferA() {
+        return this._writeBufferA;
+    }
+
+    private ByteBuffer getBufferB() {
+        return this._writeBufferB;
+    }
+
+    private void start(AsyncTextWriterStep<?> step) {
+        step.start(this);
+    }
+
     private void encode(ByteBuffer buffer) {
         buffer.clear();
         CoderResult result;
@@ -95,6 +108,19 @@ public class AsyncTextWriter {
         } else if (result.isUnderflow()) {
             _finishedEncoding = true;
         }
+    }
+
+    /**
+     * Starts writing the text data to a temporary file, then replaces the file with this file.
+     * This is more resilient to a sudden software shutdown or write errors. The original file is
+     * not modified if anything goes wrong.
+     * 
+     * @param file       File to write to
+     * @param inputData  Text data to write
+     * @return Completable future completed when writing finishes. May complete exceptionally if I/O errors occur.
+     */
+    public static CompletableFuture<Void> writeSafe(File file, String inputData) {
+        return writeSafe(file, CharBuffer.wrap(inputData));
     }
 
     /**
@@ -167,6 +193,17 @@ public class AsyncTextWriter {
      * @param inputData  Text data to write
      * @return Completable future completed when writing finishes. May complete exceptionally if I/O errors occur.
      */
+    public static CompletableFuture<Void> write(File file, String inputData) {
+        return write(file, CharBuffer.wrap(inputData));
+    }
+
+    /**
+     * Starts writing the text data to a file. The original contents of the file are replaced.
+     * 
+     * @param file       File to write to
+     * @param inputData  Text data to write
+     * @return Completable future completed when writing finishes. May complete exceptionally if I/O errors occur.
+     */
     public static CompletableFuture<Void> write(File file, CharBuffer inputData) {
         try {
             // Open the file. May throw an error.
@@ -183,7 +220,7 @@ public class AsyncTextWriter {
 
             // Create the writer and initiate it
             AsyncTextWriter writer = new AsyncTextWriter(fileChannel, inputData, bufferSize);
-            writer._file.lock(writer, START_WRITING);
+            writer.start(LOCK_FILE);
             return writer._future;
         } catch (Throwable t) {
             CompletableFuture<Void> future = new CompletableFuture<Void>();
@@ -192,65 +229,109 @@ public class AsyncTextWriter {
         }
     }
 
-    private static final AsyncTextWriterStep<FileLock> START_WRITING = new AsyncTextWriterStep<FileLock>() {
+    private static final AsyncTextWriterStep<FileLock> LOCK_FILE = new AsyncTextWriterStep<FileLock>() {
         @Override
         public void start(AsyncTextWriter writer) {
-            writer.encode(writer._writeBufferA);
-            WRITE_BUFFER_A.start(writer);
+            writer._file.lock(writer, this);
         }
 
         @Override
-        public void done(AsyncTextWriter writer, FileLock result) {
-            writer._lock = result;
-        }
-    };
-
-    private static final AsyncTextWriterStep<Integer> WRITE_BUFFER_A = new AsyncTextWriterStep<Integer>() {
-        @Override
-        public void start(AsyncTextWriter writer) {
-            if (writer._finishedEncoding) {
-                writer._file.write(writer._writeBufferA, writer._position, writer, WRITE_FINISH);
-            } else {
-                writer._file.write(writer._writeBufferA, writer._position, writer, WRITE_BUFFER_B);
-                writer.encode(writer._writeBufferB);
+        public void completed(FileLock result, AsyncTextWriter writer) {
+            synchronized (writer) {
+                writer._lock = result;
+                writer.encode(writer.getBufferA());
+                writer.start(writer._finishedEncoding ? FINISH_BUFFER_A : WRITE_BUFFER_A);
             }
         }
+    };
+
+    private static final AsyncTestWriterStepWriter WRITE_BUFFER_A = new AsyncTestWriterStepWriter(AsyncTextWriter::getBufferA) {
+        @Override
+        public void start(AsyncTextWriter writer) {
+            super.start(writer);
+            writer.encode(writer.getBufferB());
+        }
 
         @Override
-        public void done(AsyncTextWriter writer, Integer result) {
-            writer._position += result.intValue();
+        public void next(AsyncTextWriter writer) {
+            writer.start(writer._finishedEncoding ? FINISH_BUFFER_B : WRITE_BUFFER_B);
         }
     };
 
-    private static final AsyncTextWriterStep<Integer> WRITE_BUFFER_B = new AsyncTextWriterStep<Integer>() {
+    private static final AsyncTestWriterStepWriter WRITE_BUFFER_B = new AsyncTestWriterStepWriter(AsyncTextWriter::getBufferB) {
         @Override
         public void start(AsyncTextWriter writer) {
-            if (writer._finishedEncoding) {
-                writer._file.write(writer._writeBufferB, writer._position, writer, WRITE_FINISH);
-            } else {
-                writer._file.write(writer._writeBufferB, writer._position, writer, WRITE_BUFFER_A);
-                writer.encode(writer._writeBufferA);
-            }
+            super.start(writer);
+            writer.encode(writer.getBufferA());
         }
 
         @Override
-        public void done(AsyncTextWriter writer, Integer result) {
-            writer._position += result.intValue();
+        public void next(AsyncTextWriter writer) {
+            writer.start(writer._finishedEncoding ? FINISH_BUFFER_A : WRITE_BUFFER_A);
         }
     };
 
-    private static final AsyncTextWriterStep<Integer> WRITE_FINISH = new AsyncTextWriterStep<Integer>() {
+    private static final AsyncTestWriterStepWriter FINISH_BUFFER_A = new AsyncTestWriterStepWriter(AsyncTextWriter::getBufferA) {
         @Override
-        public void start(AsyncTextWriter writer) {
+        public void next(AsyncTextWriter writer) {
             writer.close();
             writer._future.complete(null);
         }
+    };
 
+    private static final AsyncTestWriterStepWriter FINISH_BUFFER_B = new AsyncTestWriterStepWriter(AsyncTextWriter::getBufferB) {
         @Override
-        public void done(AsyncTextWriter writer, Integer result) {
-            writer._position += result.intValue();
+        public void next(AsyncTextWriter writer) {
+            writer.close();
+            writer._future.complete(null);
         }
     };
+
+    private static abstract class AsyncTestWriterStepWriter extends AsyncTextWriterStep<Integer> {
+        private final Function<AsyncTextWriter, ByteBuffer> _getBufferFunction;
+
+        public AsyncTestWriterStepWriter(Function<AsyncTextWriter, ByteBuffer> getBufferFunction) {
+            _getBufferFunction = getBufferFunction;
+        }
+
+        /**
+         * Execute the next step
+         * 
+         * @param writer
+         */
+        protected abstract void next(AsyncTextWriter writer);
+
+        @Override
+        public void start(AsyncTextWriter writer) {
+            writer._file.write(_getBufferFunction.apply(writer), writer._position, writer, this);
+        }
+
+        @Override
+        public void completed(Integer result, AsyncTextWriter writer) {
+            int num = result.intValue();
+            writer._position += num;
+
+            synchronized (writer) {
+                ByteBuffer buffer = _getBufferFunction.apply(writer);
+                if (buffer.remaining() > 0) {
+                    // If we wrote 0 bytes then something fishy is going on
+                    // Likely the underlying I/O is overloaded
+                    // Stress testing showed that without this sleep the entire VM
+                    // can crash at random, which is obviously very bad.
+                    if (num == 0) {
+                        try {
+                            Thread.sleep(10);
+                        } catch (InterruptedException e) {}
+                    }
+
+                    // Write the remainder of the buffer
+                    writer._file.write(buffer, writer._position, writer, this);
+                } else {
+                    this.next(writer);
+                }
+            }
+        }
+    }
 
     // Base class for a writer execution state
     private static abstract class AsyncTextWriterStep<T> implements CompletionHandler<T, AsyncTextWriter> {
@@ -260,22 +341,6 @@ public class AsyncTextWriter {
          * @param writer
          */
         public abstract void start(AsyncTextWriter writer);
-
-        /**
-         * Callback called when this writer step finishes
-         * 
-         * @param writer
-         * @param result
-         */
-        public abstract void done(AsyncTextWriter writer, T result);
-
-        @Override
-        public final void completed(T result, AsyncTextWriter writer) {
-            done(writer, result);
-            synchronized (writer) {
-                this.start(writer);
-            }
-        }
 
         @Override
         public final void failed(Throwable exc, AsyncTextWriter writer) {
