@@ -804,7 +804,7 @@ public class MapDisplay implements MapDisplayEvents {
     public final void setRunning(boolean running) {
         if (running) {
             if (this.plugin != null && this.updateTaskId == -1) {
-                this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, () -> update(), 1, 1);
+                this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, this::update, 1, 1);
 
                 CommonPlugin.getInstance().getMapController().getDisplays().add(getClass(), this);
 

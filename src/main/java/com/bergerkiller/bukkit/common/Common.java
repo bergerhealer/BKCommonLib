@@ -107,9 +107,9 @@ public class Common {
 
         // Register server to handle field, method and class resolving
         //TODO! Implement these functions in SERVER directly
-        Resolver.registerClassResolver(classPath -> SERVER.getClassName(classPath));
-        Resolver.registerFieldResolver((declaredClass, fieldName) -> SERVER.getFieldName(declaredClass, fieldName));
-        Resolver.registerMethodResolver((declaredClass, methodName, parameterTypes) -> SERVER.getMethodName(declaredClass, methodName, parameterTypes));
+        Resolver.registerClassResolver(SERVER::getClassName);
+        Resolver.registerFieldResolver(SERVER::getFieldName);
+        Resolver.registerMethodResolver(SERVER::getMethodName);
 
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
         if (CommonUtil.getNMSClass("EnumGamemode") == null) {
@@ -278,7 +278,7 @@ public class Common {
         }
 
         // This unloader takes care of de-referencing everything container in here
-        MountiplexUtil.registerUnloader(() -> TEMPLATE_RESOLVER.unload());
+        MountiplexUtil.registerUnloader(TEMPLATE_RESOLVER::unload);
     }
 
     /**
