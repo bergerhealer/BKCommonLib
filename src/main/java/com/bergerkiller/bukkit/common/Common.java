@@ -8,9 +8,6 @@ import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
-import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
-import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
-import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.templates.TemplateResolver;
 
@@ -110,37 +107,19 @@ public class Common {
 
         // Register server to handle field, method and class resolving
         //TODO! Implement these functions in SERVER directly
-        Resolver.registerClassResolver(new ClassPathResolver() {
-            @Override
-            public String resolveClassPath(String classPath) {
-                return SERVER.getClassName(classPath);
-            }
-        });
-        Resolver.registerFieldResolver(new FieldNameResolver() {
-            @Override
-            public String resolveFieldName(Class<?> declaredClass, String fieldName) {
-                return SERVER.getFieldName(declaredClass, fieldName);
-            }
-        });
-        Resolver.registerMethodResolver(new MethodNameResolver() {
-            @Override
-            public String resolveMethodName(Class<?> declaredClass, String methodName, Class<?>[] parameterTypes) {
-                return SERVER.getMethodName(declaredClass, methodName, parameterTypes);
-            }
-        });
+        Resolver.registerClassResolver(classPath -> SERVER.getClassName(classPath));
+        Resolver.registerFieldResolver((declaredClass, fieldName) -> SERVER.getFieldName(declaredClass, fieldName));
+        Resolver.registerMethodResolver((declaredClass, methodName, parameterTypes) -> SERVER.getMethodName(declaredClass, methodName, parameterTypes));
 
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
         if (CommonUtil.getNMSClass("EnumGamemode") == null) {
             final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");
             final String eg_path_proxy = Resolver.resolveClassPath("net.minecraft.server.WorldSettings$EnumGamemode");
-            Resolver.registerClassResolver(new ClassPathResolver() {
-                @Override
-                public String resolveClassPath(String classPath) {
-                    if (classPath.equals(eg_path)) {
-                        return eg_path_proxy;
-                    }
-                    return classPath;
+            Resolver.registerClassResolver(classPath -> {
+                if (classPath.equals(eg_path)) {
+                    return eg_path_proxy;
                 }
+                return classPath;
             });
         }
 
@@ -270,12 +249,9 @@ public class Common {
 
             // If remappings exist, add a resolver for them
             if (!remappings.isEmpty()) {
-                Resolver.registerClassResolver(new ClassPathResolver() {
-                    @Override
-                    public String resolveClassPath(String classPath) {
-                        String remapped = remappings.get(classPath);
-                        return (remapped != null) ? remapped : classPath;
-                    }
+                Resolver.registerClassResolver(classPath -> {
+                    String remapped = remappings.get(classPath);
+                    return (remapped != null) ? remapped : classPath;
                 });
             }
         }
@@ -302,12 +278,7 @@ public class Common {
         }
 
         // This unloader takes care of de-referencing everything container in here
-        MountiplexUtil.registerUnloader(new Runnable() {
-            @Override
-            public void run() {
-                TEMPLATE_RESOLVER.unload();
-            }
-        });
+        MountiplexUtil.registerUnloader(() -> TEMPLATE_RESOLVER.unload());
     }
 
     /**

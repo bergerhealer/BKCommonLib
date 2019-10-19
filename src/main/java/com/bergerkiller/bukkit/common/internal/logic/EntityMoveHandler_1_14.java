@@ -149,9 +149,7 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         if (entity != null && this.entityCollisionEnabled) {
             List<EntityHandle> list = entity.getWorld().getNearbyEntities(entity, axisalignedbb.growUniform(0.25D));
 
-            for (int i = 0; i < list.size(); i++) {
-                EntityHandle entity1 = list.get(i);
-
+            for (EntityHandle entity1 : list) {
                 if (!entity.isInSameVehicle(entity1)) {
                     // BKCommonLib start: block collision event handler
                     AxisAlignedBBHandle axisalignedbb1 = entity1.getOtherBoundingBox();

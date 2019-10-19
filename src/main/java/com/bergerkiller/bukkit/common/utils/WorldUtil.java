@@ -530,12 +530,9 @@ public class WorldUtil extends ChunkUtil {
             // TODO: Is there any step of saveLevel() we could do asynchronously as well?
             //       Like a join on some sort of queue, for example.
             final CompletableFuture<Object> future = new CompletableFuture<Object>();
-            CommonUtil.nextTick(new Runnable() {
-                @Override
-                public void run() {
-                    CommonNMS.getHandle(world).saveLevel();
-                    future.complete(null);
-                }
+            CommonUtil.nextTick(() -> {
+                CommonNMS.getHandle(world).saveLevel();
+                future.complete(null);
             });
             future.join();
         } else {

@@ -45,24 +45,21 @@ public class MapPlayerInput implements Tickable {
 
     public MapPlayerInput(Player player) {
         this.player = player;
-        this._inputTickTracker.setRunnable(new Runnable() {
-            @Override
-            public void run() {
-                _isIntercepting = _newInterceptState;
-                _newInterceptState = false;
+        this._inputTickTracker.setRunnable(() -> {
+            _isIntercepting = _newInterceptState;
+            _newInterceptState = false;
 
-                updateInterception(_isIntercepting);
-                if (!MapPlayerInput.this.player.isInsideVehicle() && !_fakeMountShown) {
-                    receiveInput(0, 0, 0);
-                }
-
-                last_dx = curr_dx;
-                last_dy = curr_dy;
-                last_dz = curr_dz;
-                curr_dx = recv_dx;
-                curr_dy = recv_dy;
-                curr_dz = recv_dz;
+            updateInterception(_isIntercepting);
+            if (!MapPlayerInput.this.player.isInsideVehicle() && !_fakeMountShown) {
+                receiveInput(0, 0, 0);
             }
+
+            last_dx = curr_dx;
+            last_dy = curr_dy;
+            last_dz = curr_dz;
+            curr_dx = recv_dx;
+            curr_dy = recv_dy;
+            curr_dz = recv_dz;
         });
         reset();
     }

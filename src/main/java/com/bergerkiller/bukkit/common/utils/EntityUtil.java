@@ -132,11 +132,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @param to location to teleport to
      */
     public static void teleportNextTick(final org.bukkit.entity.Entity entity, final Location to) {
-        CommonUtil.nextTick(new Runnable() {
-            public void run() {
-                teleport(entity, to);
-            }
-        });
+        CommonUtil.nextTick(() -> teleport(entity, to));
     }
 
     /**

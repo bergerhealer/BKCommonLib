@@ -16,10 +16,7 @@ public class ItemVariants_pre_1_12_1 {
     static {
         // Empty variants that don't show up at all
         {
-            VariantProducer emptyProducer = new VariantProducer() {
-                @Override
-                public void addVariants(Material type, List<ItemStack> result) {
-                }
+            VariantProducer emptyProducer = (type, result) -> {
             };
             for (String name : new String[] {
                     "AIR", "MOB_SPAWNER", "SOIL", "HUGE_MUSHROOM_1", "HUGE_MUSHROOM_2",
@@ -71,17 +68,14 @@ public class ItemVariants_pre_1_12_1 {
         registerRange("BANNER", 15, 0);
 
         // Complicated generators
-        register("STEP", new VariantProducer() {
-            @Override
-            public void addVariants(Material type, List<ItemStack> result) {
-                result.add(new ItemStack(type, 1, (short) 0));
-                result.add(new ItemStack(type, 1, (short) 1));
-                result.add(new ItemStack(type, 1, (short) 3));
-                result.add(new ItemStack(type, 1, (short) 4));
-                result.add(new ItemStack(type, 1, (short) 5));
-                result.add(new ItemStack(type, 1, (short) 6));
-                result.add(new ItemStack(type, 1, (short) 7));
-            }
+        register("STEP", (type, result) -> {
+            result.add(new ItemStack(type, 1, (short) 0));
+            result.add(new ItemStack(type, 1, (short) 1));
+            result.add(new ItemStack(type, 1, (short) 3));
+            result.add(new ItemStack(type, 1, (short) 4));
+            result.add(new ItemStack(type, 1, (short) 5));
+            result.add(new ItemStack(type, 1, (short) 6));
+            result.add(new ItemStack(type, 1, (short) 7));
         });
 
         //TODO: 

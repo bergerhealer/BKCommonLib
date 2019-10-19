@@ -479,9 +479,9 @@ public class ItemParser {
         }
         if (!this.rules.isEmpty()) {
             rval.append(METADATA_CHAR);
-            for (int i = 0; i < this.rules.size(); i++) {
+            for (ItemParserMetaRule element : this.rules) {
                 rval.append(METADATA_CHAR);
-                rval.append(this.rules.get(i).toString());
+                rval.append(element.toString());
             }
         }
         return rval.toString();

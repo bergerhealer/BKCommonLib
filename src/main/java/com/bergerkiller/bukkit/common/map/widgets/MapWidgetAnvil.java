@@ -157,12 +157,7 @@ public class MapWidgetAnvil extends MapWidget {
                 if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
                     ContainerAnvilHandle container = ContainerAnvilHandle.fromBukkit(view);
                     LegacyContainerAnvilHook hook = ClassHook.get(container.getRaw(), LegacyContainerAnvilHook.class);
-                    hook.textChangeCallback = new Runnable() {
-                        @Override
-                        public void run() {
-                            handleTextChange(view);
-                        }
-                    };
+                    hook.textChangeCallback = () -> handleTextChange(view);
                 }
 
                 this._openInventories.add(view);
@@ -389,12 +384,7 @@ public class MapWidgetAnvil extends MapWidget {
             onClick(button);
 
             if (_isWindowOpen) {
-                CommonUtil.nextTick(new Runnable() {
-                    @Override
-                    public void run() {
-                        refreshButtons(view);
-                    }
-                });
+                CommonUtil.nextTick(() -> refreshButtons(view));
             }
         }
     }

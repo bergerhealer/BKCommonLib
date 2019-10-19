@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
@@ -127,12 +126,7 @@ public class TestServerFactory {
                     Object resourcePackLoaderFunc = Proxy.newProxyInstance(
                            TestServerFactory.class.getClassLoader(),
                            new Class<?>[]{resourcePackLoaderFuncType},
-                           new InvocationHandler() {
-                               @Override
-                               public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                                   return loaderCreator.invoke(null, args);
-                               }
-                           });
+                           (proxy, method, args) -> loaderCreator.invoke(null, args));
 
                     Class<?> resourcePackRepositoryType = Class.forName(nms_root + "ResourcePackRepository");
                     setField(mc_server, "resourcePackRepository", construct(resourcePackRepositoryType, resourcePackLoaderFunc));
@@ -301,12 +295,7 @@ public class TestServerFactory {
                 Object resourcePackLoaderFunc = Proxy.newProxyInstance(
                        TestServerFactory.class.getClassLoader(),
                        new Class<?>[]{resourcePackLoaderFuncType},
-                       new InvocationHandler() {
-                           @Override
-                           public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                               return loaderCreator.invoke(null, args);
-                           }
-                       });
+                       (proxy, method, args) -> loaderCreator.invoke(null, args));
 
                 Class<?> resourcePackRepositoryType = Class.forName(nms_root + "ResourcePackRepository");
                 setField(mc_server, "resourcePackRepository", construct(resourcePackRepositoryType, resourcePackLoaderFunc));

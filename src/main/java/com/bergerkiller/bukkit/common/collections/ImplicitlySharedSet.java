@@ -157,12 +157,7 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
      * @return iterable clone view of this set's data
      */
     public Iterable<E> cloneAsIterable() {
-        return new Iterable<E>() {
-            @Override
-            public Iterator<E> iterator() {
-                return new ReferencedSetCopyIterator<E>(ImplicitlySharedSet.this);
-            }
-        };
+        return () -> new ReferencedSetCopyIterator<E>(ImplicitlySharedSet.this);
     }
 
     @Override
