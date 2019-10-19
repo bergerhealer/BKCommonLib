@@ -21,6 +21,10 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> {
         _namedByIndex = false;
     }
 
+    public YamlNodeAbstract<?> getNode() {
+        return _node;
+    }
+
     @Override
     public void clear() {
         _node.clear();

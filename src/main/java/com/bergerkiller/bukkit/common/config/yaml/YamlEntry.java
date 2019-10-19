@@ -214,6 +214,10 @@ public class YamlEntry implements Map.Entry<String, Object> {
         if (oldValue == value) {
             return oldValue;
         }
+        if (oldValue != null && oldValue.equals(value)) {
+            this.value = value;
+            return oldValue;
+        }
 
         // Turn a Collection (or List) value into a YamlListNode
         if (value instanceof Collection && !(value instanceof YamlNodeAbstract<?>)) {
@@ -233,25 +237,35 @@ public class YamlEntry implements Map.Entry<String, Object> {
 
         YamlNodeAbstract<?> newNode;
         if (value instanceof YamlNodeAbstract<?> && ((newNode = (YamlNodeAbstract<?>) value)._entry != this)) {
-            // Verify the node is not already added to something
-            if (newNode.hasParent()) {
-                throw new IllegalArgumentException("Tried to store a Yaml Node that is already added to another node");
-            }
+            // Assigning to the root node doesn't work very well
             if (this.parent == null) {
                 throw new IllegalArgumentException("Cannot assign a new node to a root node");
+            }
+
+            // If the node is already assigned to another parent, then replace that node in the parent
+            // with a new instance. The node becomes parented to this one's parent, with the original
+            // parent getting a clone of the original node assigned.
+            if (newNode.hasParent()) {
+                int index = newNode.getParent()._children.indexOf(newNode._entry);
+                if (index == -1) {
+                    // Fallback
+                    newNode = newNode.clone();
+                    value = newNode;
+                } else {
+                    // Replace original entry with a clone for the original parent
+                    newNode.getParent().cloneChildEntry(index);
+                }
             }
 
             // Clean up old value
             removeNodeValue();
 
+            // Take over certain properties of the new node
+            this.assignProperties(newNode._entry);
+
             // Re-assign the node's entry and root to refer to ourself
-            YamlEntry originalNodeEntry = newNode._entry;
-            YamlRoot originalRoot = newNode._root;
             newNode._entry = this;
             newNode._root = this.parent._root;
-
-            // Take over certain properties of the new node too
-            this.assignProperties(originalNodeEntry);
 
             // Move all children from this node to the new root as a descendant of the parent
             if (!newNode._children.isEmpty()) {
@@ -260,12 +274,9 @@ public class YamlEntry implements Map.Entry<String, Object> {
                     YamlEntry childEntry = iter.next();
                     YamlPath newChildPath = this.path.child(childEntry.path.name());
                     StringTreeNode newChildYaml = this.yaml.add();
-                    iter.set(originalRoot.moveToRoot(childEntry, newNode, newNode._root, newChildPath, newChildYaml));
+                    iter.set(childEntry.copyToParent(newNode, newNode._root, newChildPath, newChildYaml));
                 }
             }
-
-            // Clean up original root, may help GC and prevents surprise bugs
-            originalRoot.clear();
         } else {
             // Clean up old value
             removeNodeValue();
@@ -279,11 +290,56 @@ public class YamlEntry implements Map.Entry<String, Object> {
 
     // If this entry stores a node as value, detach that node from the tree
     // It will become a detached root node with a new YamlEntry.
-    // This entry is not removed or detached and remains functional
+    // This entry is not removed or detached and remains functional to store other values
     private void removeNodeValue() {
         if (this.isAbstractNode()) {
-            this.getAbstractNode()._root.moveToRoot(this, null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
+            YamlNodeAbstract<?> node = this.getAbstractNode();
+            node._root.removeChildEntries(node);
+            this.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
         }
+    }
+
+    /**
+     * Creates a copy of this entry and all child entries and assigns it to a new parent.
+     * The original YamlNodeAbstract instances are preserved.
+     * All nodes and values get a new entry with the updated path and yaml.<br>
+     * <br>
+     * <b>Note: </b>this entry is not removed from the original root and parent, so the entry can be repurposed
+     * to store different data. Call {@link YamlRoot#removeEntry(entry)} to remove this entry before
+     * calling this function if this is desired, or use {@link YamlRoot#detach(entry)}.
+     * 
+     * @param newParent  The new parent node for the entry, null if it is a root node
+     * @param newRoot    The new root to store the entry in
+     * @param newPath    The new (root) path of the entry
+     * @param newYaml    The new yaml String tree node for the entry
+     * @return The new entry. It is up to the caller to assign the entry to the new parent node's children.
+     */
+    protected YamlEntry copyToParent(YamlNodeAbstract<?> newParent, YamlRoot newRoot, YamlPath newPath, StringTreeNode newYaml) {
+        // Create the replacement entry, which is at a new path
+        // Preserve certain properties from the original entry, such as the header
+        YamlEntry newEntry = new YamlEntry(newParent, newPath, newYaml);
+        newEntry.assignProperties(this);
+        newEntry.value = this.value;
+        newRoot.putEntry(newEntry);
+
+        // Special handling for nodes
+        if (this.isAbstractNode()) {
+            // Store the new entry in the node
+            YamlNodeAbstract<?> node = this.getAbstractNode();
+            node._root = newRoot;
+            node._entry = newEntry;
+
+            // Recursively operate on the children of the node
+            ListIterator<YamlEntry> iter = node._children.listIterator();
+            while (iter.hasNext()) {
+                YamlEntry childEntry = iter.next();
+                YamlPath newChildPath = newPath.child(childEntry.getKey());
+                StringTreeNode newChildYaml = newYaml.add();
+                iter.set(childEntry.copyToParent(node, newRoot, newChildPath, newChildYaml));
+            }
+        }
+
+        return newEntry;
     }
 
     /**

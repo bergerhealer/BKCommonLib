@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -253,6 +254,17 @@ public class StringTreeNode {
         }
 
         return clone;
+    }
+
+    /**
+     * Concatenates the value of this tree node and all children recursively into
+     * a single sequence stored in a {@link CharBuffer}. If there were few changes to the value of this node
+     * or the children, this operation is optimized for that.
+     * 
+     * @return the value of this node and all children concatenated to a CharBuffer
+     */
+    public CharBuffer toCharBuffer() {
+        return CharBuffer.wrap(this.toCharArray());
     }
 
     /**

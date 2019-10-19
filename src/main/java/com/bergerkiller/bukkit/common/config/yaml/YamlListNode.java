@@ -24,7 +24,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
 
     @Override
     protected YamlListNode createNode(YamlEntry entry) {
-        throw new UnsupportedOperationException("YamlListNode does not support this");
+        return new YamlListNode(entry);
     }
 
     @Override

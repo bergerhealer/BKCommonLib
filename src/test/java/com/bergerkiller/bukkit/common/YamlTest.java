@@ -22,6 +22,60 @@ import com.bergerkiller.bukkit.common.config.yaml.YamlSerializer;
 public class YamlTest {
 
     @Test
+    public void testYamlReassignNode() {
+        // Prepare an old root from which we will be assigning a child
+        YamlNode root_old = new YamlNode();
+        YamlNode child_old = root_old.getNode("oldNode");
+        child_old.set("key1", "value1");
+        child_old.set("key2", 12);
+        child_old.set("key3.sub1", "sub1");
+        child_old.set("key3.sub2", 22);
+
+        // Create a new root with a different structure that will be replaced
+        YamlNode root_new = new YamlNode();
+        YamlNode child_new = root_new.getNode("newNode");
+        child_new.set("key1", "gone");
+        child_new.set("newkey", -2);
+        child_new.set("different.sub", 55);
+
+        // Re-assign
+        root_new.set("newNode", child_old);
+
+        // The previous value, stored at child_new, should now be a detached root node
+        // The original data should still be there
+        assertFalse(child_new.hasParent());
+        assertEquals("gone", child_new.get("key1"));
+        assertEquals(55, child_new.get("different.sub"));
+
+        // Right now we expect both root_old and root_new to store the same YAML structure
+        // The original data at newNode should be gone entirely
+        // The child we assigned (child_old) should now refer to what is stored in root_new
+        // Changes to that child should not cause changes to the original node in root_old
+        child_old = root_old.getNode("oldNode");
+        child_new = root_new.getNode("newNode");
+        for (YamlNode child : Arrays.asList(child_old, child_new)) {
+            assertEquals("value1", child.get("key1"));
+            assertEquals(12, child.get("key2"));
+            assertEquals("sub1", child.get("key3.sub1"));
+            assertEquals(22, child.get("key3.sub2"));
+            assertFalse(child.contains("newkey"));
+            assertFalse(child.contains("different"));
+            assertFalse(child.contains("different.sub"));
+        }
+
+        // Make changes to both child_old and child_new. They should both work and not corrupt each other.
+        child_old.set("key2", 101);
+        child_new.set("key2", 102);
+        assertEquals(101, child_old.get("key2"));
+        assertEquals(102, child_new.get("key2"));
+        assertNotEquals(child_old.getNode("key3"), child_new.getNode("key3"));
+        child_old.set("key3.sub2", 103);
+        child_new.set("key3.sub2", 104);
+        assertEquals(103, child_old.get("key3.sub2"));
+        assertEquals(104, child_new.get("key3.sub2"));
+    }
+
+    @Test
     public void testYamlNodeSetNodeList() {
         YamlNode root = new YamlNode();
         YamlNode n1 = new YamlNode();
@@ -263,6 +317,38 @@ public class YamlTest {
     }
 
     @Test
+    public void testYamlNodeCloneChild() {
+        // Create a somewhat complex tree of nodes
+        YamlNode root = new YamlNode();
+        root.set("child.subchild.name", "value");
+        root.set("child.field", 12);
+        root.set("child.other", 55);
+        root.setHeader("child.field", "Header of field");
+        root.setHeader("child", "Header of child");
+
+        // Clone child
+        YamlNode child_clone = root.getNode("child").clone();
+        assertFalse(child_clone.hasParent());
+        assertNull(child_clone.getParent());
+
+        // Make changes to the original, verify the clone child is all good
+        root.set("child.field", 22);
+        root.set("child.other", 22);
+        assertEquals("value", child_clone.get("subchild.name"));
+        assertEquals(12, child_clone.get("field"));
+        assertEquals(55, child_clone.get("other"));
+        assertEquals("Header of field", child_clone.getHeader("field"));
+        assertEquals("Header of child", child_clone.getHeader());
+
+        // Make changes to the clone, verify the clone is all good
+        child_clone.set("field", 10);
+        assertEquals(22, root.get("child.field"));
+
+        // Extra check: 'child' node should not be equal
+        assertNotEquals(root.getNode("child"), child_clone);
+    }
+
+    @Test
     public void testYamlNodeClone() {
         // Create a somewhat complex tree of nodes
         YamlNode root = new YamlNode();
@@ -274,8 +360,10 @@ public class YamlTest {
 
         // Clone it
         YamlNode root_clone = root.clone();
+        assertFalse(root_clone.hasParent());
+        assertNull(root_clone.getParent());
 
-        // Make changes to the original, verify the clone it all good
+        // Make changes to the original, verify the clone is all good
         root.set("child.field", 22);
         root.set("child.other", 22);
         assertEquals("value", root_clone.get("child.subchild.name"));

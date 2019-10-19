@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,15 +8,19 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
+import java.nio.CharBuffer;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -25,7 +30,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * 
  * @param <N> - Type of YamlNodeAbstract implementation
  */
-public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
+public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements Cloneable {
     protected YamlRoot _root;
     protected YamlEntry _entry;
     protected List<YamlEntry> _children;
@@ -358,7 +363,26 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
      * @param nodes List of nodes to store
      */
     public void setNodeList(String path, List<N> nodes) {
-        this.remove(path);
+        YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null) {
+            // When setting the output of getNodeList() nothing changes
+            if ((Object) nodes instanceof YamlNodeIndexedValueList) {
+                YamlNodeIndexedValueList valueList = CommonUtil.unsafeCast(nodes);
+                if (valueList.getNode() == entry.getValue()) {
+                    return;
+                } else {
+                    throw new IllegalArgumentException("Tried to store a node that is already added to another node");
+                }
+            }
+            if (entry.getValue() == nodes) {
+                return;
+            }
+
+            // Remove the old entry
+            entry.getParentNode().removeChildEntry(entry);
+        }
+
+        // Create a new node list at the path and add all the nodes
         this.getNodeList(path).addAll(nodes);
     }
 
@@ -540,7 +564,11 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
     }
 
     /**
-     * Sets a value at a certain path
+     * Sets a value at a certain path. If the value is a node,
+     * it will be parented to this node's tree. Changes to the node
+     * then impact this tree. If the node is already parented,
+     * it is cloned and later changes to the node will not impact this
+     * tree.
      *
      * @param path to set
      * @param value to set to
@@ -708,6 +736,19 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
     }
 
     /**
+     * Encodes this YamlNode to YAML-formatted text and writes it to a file asynchronously.
+     * The returned completable future is completed when the operation finishes, or when
+     * an error occurs. If writing fails and a previous file existed at this path, it will
+     * be unchanged. To wait for saving to complete, use {@link CompletableFuture#get()}.
+     * 
+     * @param file  The file to write to
+     * @return completable future for the asynchronous operation
+     */
+    public CompletableFuture<Void> saveToFileAsync(File file) {
+        return AsyncTextWriter.writeSafe(file, this.toCharBuffer());
+    }
+
+    /**
      * Creates an exact clone of this node, where this node is the root of the YAML tree.
      * The clone will have the same data type as this node.
      */
@@ -719,6 +760,12 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
         return clone;
     }
 
+    /**
+     * Clones all the child entries of this node and assigns them to the node specified.
+     * This operation is recursive.
+     * 
+     * @param clone The clone to assign the clones entries to
+     */
     private void cloneChildrenTo(YamlNodeAbstract<?> clone) {
         for (YamlEntry child : this._children) {
             YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
@@ -741,11 +788,58 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> {
     }
 
     /**
-     * Gets the YAML of this YamlNode and its descendants. If this is the root node, it contains
-     * the full YAML document as a String. If it is not, then it contains the YAML of the node's
-     * descendants. This node's key and header are omitted.
+     * Replaces a child entry of this node with a clone, reusing the original entry's YAML
+     * buffer and properties. For entries that are nodes, they are given a new node instance.
+     * The original entries should not be used anymore. This operation is recursive.
      * 
-     * @return YAML String
+     * @param index of the child to clone
+     * @return cloned child entry
+     */
+    protected YamlEntry cloneChildEntry(int index) {
+        YamlEntry oldEntry = this._children.get(index);
+        YamlEntry newEntry = new YamlEntry(this, oldEntry.getYamlPath(), oldEntry.yaml);
+        newEntry.assignProperties(oldEntry);
+        newEntry.yaml_check_children = oldEntry.yaml_check_children;
+        newEntry.yaml_needs_generating = oldEntry.yaml_needs_generating;
+        this._children.set(index, newEntry);
+        this._root.putEntry(newEntry);
+        if (oldEntry.isAbstractNode()) {
+            YamlNodeAbstract<?> oldNode = oldEntry.getAbstractNode();
+            YamlNodeAbstract<?> newNode = oldNode.createNode(newEntry);
+            newNode._children.addAll(oldNode._children);
+            for (int i = 0; i < newNode._children.size(); i++) {
+                newNode.cloneChildEntry(i);
+            }
+            newEntry.value = newNode;
+        } else {
+            newEntry.value = oldEntry.value;
+        }
+        return newEntry;
+    }
+
+    /**
+     * Gets the YAML of this YamlNode and its descendants in a CharBuffer. If this is the root node, it contains
+     * the full YAML document. If it is not, then it contains the YAML of the node's
+     * descendants.
+     * 
+     * @return YAML stored in CharBuffer
+     */
+    public CharBuffer toCharBuffer() {
+        if (this.getYamlPath().depth() == 0) {
+            // Root node: we can include the entire yaml String
+            return this._entry.getYaml().toCharBuffer();
+        } else {
+            // Fallback requires a StringBuilder, so just call toString()
+            return CharBuffer.wrap(this.toString());
+        }
+    }
+
+    /**
+     * Gets the YAML of this YamlNode and its descendants in a String. If this is the root node, it contains
+     * the full YAML document. If it is not, then it contains the YAML of the node's
+     * descendants.
+     * 
+     * @return YAML stored in String
      */
     @Override
     public String toString() {
