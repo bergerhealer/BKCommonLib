@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import org.bukkit.command.SimpleCommandMap;
+import java.io.File;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.CraftServer</b>.
@@ -27,6 +28,7 @@ public abstract class CraftServerHandle extends Template.Handle {
     public abstract SimpleCommandMap getCommandMap();
     public abstract DedicatedPlayerListHandle getPlayerList();
     public abstract MinecraftServerHandle getServer();
+    public abstract File getPluginsDirectory();
 
     private static CraftServerHandle _instance = null;
     public static CraftServerHandle instance() {
@@ -43,6 +45,7 @@ public abstract class CraftServerHandle extends Template.Handle {
         public final Template.Method<SimpleCommandMap> getCommandMap = new Template.Method<SimpleCommandMap>();
         public final Template.Method.Converted<DedicatedPlayerListHandle> getPlayerList = new Template.Method.Converted<DedicatedPlayerListHandle>();
         public final Template.Method.Converted<MinecraftServerHandle> getServer = new Template.Method.Converted<MinecraftServerHandle>();
+        public final Template.Method<File> getPluginsDirectory = new Template.Method<File>();
 
     }
 

@@ -17,6 +17,10 @@ class CraftServer {
     public (MinecraftServerHandle) net.minecraft.server.MinecraftServer getServer();
 #endif
 
+    public java.io.File getPluginsDirectory() {
+        return (java.io.File) instance.getServer().options.valueOf("plugins");
+    }
+
     <code>
     private static CraftServerHandle _instance = null;
     public static CraftServerHandle instance() {
