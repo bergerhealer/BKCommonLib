@@ -1,13 +1,19 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
+import org.apache.logging.log4j.message.MessageFactory;
+import org.apache.logging.log4j.spi.ExtendedLogger;
+import org.apache.logging.log4j.spi.LoggerContext;
+import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.ModuleLogger;
 import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
@@ -49,6 +55,9 @@ public class CommonBootstrap {
 
             // Get all available server types
             if (isTestMode()) {
+                // Use our own logger to speed up initialization under test
+                initLog4j();
+
                 // Always Spigot server
                 _commonServer = new SpigotServer();
                 _commonServer.init();
@@ -95,6 +104,7 @@ public class CommonBootstrap {
      * the case.
      */
     public static void initServer() {
+        Common.bootstrap();
         if (!_hasInitTestServer && Bukkit.getServer() == null) {
 
             // Sometimes this is unwanted when running tests
@@ -109,5 +119,57 @@ public class CommonBootstrap {
             // Display this too during the test
             Logging.LOGGER.log(Level.INFO, "Test running on " + Common.SERVER.getServerDetails());
         }
+    }
+
+    /**
+     * Initializes the Logger Context Factory of log4j to log to our own Module Logger.
+     * This prevents very slow initialization of the default logger under test.
+     */
+    private static void initLog4j() {
+        org.apache.logging.log4j.LogManager.setFactory(new LoggerContextFactory() {
+            @Override
+            public LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3) {
+                return new LoggerContext() {
+                    @Override
+                    public Object getExternalContext() {
+                        return null;
+                    }
+
+                    @Override
+                    public ExtendedLogger getLogger(String name) {
+                        return new ModuleLogger(name).toLog4jExtendedLogger();
+                    }
+
+                    @Override
+                    public ExtendedLogger getLogger(String arg0, MessageFactory arg1) {
+                        return getLogger(arg0);
+                    }
+
+                    @Override
+                    public boolean hasLogger(String arg0) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean hasLogger(String arg0, MessageFactory arg1) {
+                        return true;
+                    }
+
+                    @Override
+                    public boolean hasLogger(String arg0, Class<? extends MessageFactory> arg1) {
+                        return true;
+                    }
+                };
+            }
+
+            @Override
+            public LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3, URI arg4, String arg5) {
+                return getContext(arg0, arg1, arg2, arg3);
+            }
+
+            @Override
+            public void removeContext(LoggerContext arg0) {
+            }
+        });
     }
 }

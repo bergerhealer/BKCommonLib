@@ -7,8 +7,6 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 
-import java.lang.reflect.Method;
-
 import org.bukkit.Bukkit;
 
 public class CraftBukkitServer extends CommonServerBase {
@@ -72,6 +70,7 @@ public class CraftBukkitServer extends CommonServerBase {
             Class<?> minecraftServerType = Class.forName(NMS_ROOT_VERSIONED + ".MinecraftServer", false, this.getClass().getClassLoader());
             java.lang.reflect.Method getVersionMethod = minecraftServerType.getMethod("getVersion");
 
+            // This is easy when the server is already initialized
             if (Bukkit.getServer() != null) {
                 // Obtain MinecraftServer instance from server
                 Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
@@ -80,27 +79,36 @@ public class CraftBukkitServer extends CommonServerBase {
 
                 // Use getVersion() on this instance
                 MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
-            } else {
+                return;
+            }
+
+            // If MinecraftVersion class exists, we can use the static a() method to retrieve it
+            // Alternative is using SharedConstants, but it initializes a whole lot extra and is therefore slow
+            // Both of these methods work since MC 1.14
+            try {
+                Object gameVersion;
                 try {
-                    // Since MC 1.14 SharedConstants exists with a get version method, so we no longer have to use ASM to get it
-                    Class<?> sharedConstantsClass = Class.forName(NMS_ROOT_VERSIONED + ".SharedConstants");
-                    Method getGameVersionMethod = sharedConstantsClass.getDeclaredMethod("a");
-                    Object gameVersion = getGameVersionMethod.invoke(null);
-                    MC_VERSION = gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
-
+                    Class<?> minecraftVersionClass = Class.forName(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                    gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
                 } catch (ClassNotFoundException | NoSuchMethodException ex) {
-                    // No server instance is available, fastest way is to inspect the bytecode using ASM
-                    // Creating an instance, even without calling constructors, takes a long while to initialize
-                    MC_VERSION = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
+                    Class<?> sharedConstantsClass = Class.forName(NMS_ROOT_VERSIONED + ".SharedConstants");
+                    gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
+                    Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
+                }
+                MC_VERSION = gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
 
-                    // Create an instance of Minecraft Server without calling any constructors
-                    // This is a bit slower, but works as a reliable fallback
-                    if (MC_VERSION == null) {
-                        Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
-                        ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
-                        Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
-                        MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
-                    }
+            } catch (ClassNotFoundException | NoSuchMethodException ex) {
+                // No server instance is available, fastest way is to inspect the bytecode using ASM
+                // Creating an instance, even without calling constructors, takes a long while to initialize
+                MC_VERSION = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
+
+                // Create an instance of Minecraft Server without calling any constructors
+                // This is a bit slower, but works as a reliable fallback
+                if (MC_VERSION == null) {
+                    Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
+                    ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                    Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
+                    MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
                 }
             }
         } catch (Throwable t) {

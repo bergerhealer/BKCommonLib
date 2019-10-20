@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import org.bukkit.DyeColor;
@@ -20,10 +21,7 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getMaterial;
 
 public class ParseUtil {
-
     private static final StringMapCaseInsensitive<Boolean> BOOL_NAME_MAP = new StringMapCaseInsensitive<>();
-    private static final StringMap<Material> MAT_NAME_MAP = new StringMap<>();
-    private static final StringReplaceBundle MAT_ALIASES = new StringReplaceBundle();
 
     static {
         // Boolean representing text values
@@ -33,60 +31,6 @@ public class ParseUtil {
         for (String falseValue : new String[]{"no", "none", "deny", "denied", "false", "n", "f", "off", "disabled", "disable"}) {
             BOOL_NAME_MAP.put(falseValue, Boolean.FALSE);
         }
-
-        // Material by name mapping
-        for (Material material : Material.values()) {
-            MAT_NAME_MAP.putUpper(CommonLegacyMaterials.getMaterialName(material), material);
-        }
-        MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"));
-        MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
-        MAT_NAME_MAP.put("PISTON", getFirst("PISTON", "LEGACY_PISTON_BASE"));
-        MAT_NAME_MAP.put("STICKPISTON", getFirst("STICKY_PISTON", "LEGACY_PISTON_STICKY_BASE"));
-        MAT_NAME_MAP.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
-        MAT_NAME_MAP.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
-        MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
-        MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
-        MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
-        MAT_NAME_MAP.put("COBBLEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
-
-        // Legacy names
-        MAT_NAME_MAP.put("LEGACY_REDSTONE_TORCH", getMaterial("LEGACY_REDSTONE_TORCH_ON"));
-        MAT_NAME_MAP.put("LEGACY_STONE_BUTTON", getMaterial("LEGACY_STONE_BUTTON"));
-        MAT_NAME_MAP.put("LEGACY_PISTON", getMaterial("LEGACY_PISTON_BASE"));
-        MAT_NAME_MAP.put("LEGACY_STICKPISTON", getMaterial("LEGACY_PISTON_STICKY_BASE"));
-        MAT_NAME_MAP.put("LEGACY_MOSSSTONE", getMaterial("LEGACY_MOSSY_COBBLESTONE"));
-        MAT_NAME_MAP.put("LEGACY_STONESTAIR", getMaterial("LEGACY_COBBLESTONE_STAIRS"));
-        MAT_NAME_MAP.put("LEGACY_SANDSTAIR", getMaterial("LEGACY_SANDSTONE_STAIRS"));
-        MAT_NAME_MAP.put("LEGACY_GOLDAPPLE", getMaterial("LEGACY_GOLDEN_APPLE"));
-        MAT_NAME_MAP.put("LEGACY_APPLEGOLD", getMaterial("LEGACY_GOLDEN_APPLE"));
-        MAT_NAME_MAP.put("LEGACY_COBBLEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("LEGACY_STONEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("LEGACY_COBBLEWALL", getMaterial("LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("LEGACY_STONEWALL", getMaterial("LEGACY_COBBLE_WALL"));
-        MAT_NAME_MAP.put("LEGACY_SLAB", getMaterial("LEGACY_STEP"));
-        MAT_NAME_MAP.put("LEGACY_DOUBLE_SLAB", getMaterial("LEGACY_DOUBLE_STEP"));
-        MAT_NAME_MAP.put("LEGACY_STONE_BRICK", getMaterial("LEGACY_SMOOTH_BRICK"));
-
-        // Material by name aliases
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            MAT_ALIASES.add("SPADE", "SHOVEL");
-            MAT_ALIASES.add("REDSTONEREPEATER", "REPEATER");
-        } else {
-            MAT_ALIASES.add("SLAB", "STEP");
-            MAT_ALIASES.add("STONEBRICK", "SMOOTHBRICK");
-            MAT_ALIASES.add("PLANK", "WOOD");
-            MAT_ALIASES.add("SHOVEL", "SPADE");
-            MAT_ALIASES.add("REDSTONEREPEATER", "DIODE");
-            MAT_ALIASES.add("REPEATER", "DIODE");
-            MAT_ALIASES.add("PRESSUREPLATE", "PLATE");
-        }
-        MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
-        MAT_ALIASES.add("PANTS", "LEGGINGS").add("REDSTONEDUST", "REDSTONE");
-        MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR");
-        MAT_ALIASES.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN");
     }
 
     /**
@@ -457,7 +401,7 @@ public class ParseUtil {
         }
 
         // Replace aliases and find the corresponding Material
-        String matName = MAT_ALIASES.replace(text.trim().toUpperCase(Locale.ENGLISH));
+        String matName = Materials.MAT_ALIASES.replace(text.trim().toUpperCase(Locale.ENGLISH));
 
         // Stick LEGACY_ in front, if needed
         String matName_legacy = matName;
@@ -468,7 +412,7 @@ public class ParseUtil {
         Material mat;
         while (true) {
             // First consult the name mapping (faster)
-            mat = MAT_NAME_MAP.get(matName);
+            mat = Materials.MAT_NAME_MAP.get(matName);
             if (mat != null) {
                 return mat;
             }
@@ -614,5 +558,66 @@ public class ParseUtil {
      */
     public static <T> T convert(Object object, Class<T> type, T def) {
         return Conversion.convert(object, type, def);
+    }
+
+    private static class Materials {
+        private static final StringMap<Material> MAT_NAME_MAP = new StringMap<>();
+        private static final StringReplaceBundle MAT_ALIASES = new StringReplaceBundle();
+
+        static {
+            // Material by name mapping
+            for (Material material : Material.values()) {
+                MAT_NAME_MAP.putUpper(MaterialsByName.getMaterialName(material), material);
+            }
+            MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"));
+            MAT_NAME_MAP.put("BUTTON", Material.STONE_BUTTON);
+            MAT_NAME_MAP.put("PISTON", getFirst("PISTON", "LEGACY_PISTON_BASE"));
+            MAT_NAME_MAP.put("STICKPISTON", getFirst("STICKY_PISTON", "LEGACY_PISTON_STICKY_BASE"));
+            MAT_NAME_MAP.put("MOSSSTONE", Material.MOSSY_COBBLESTONE);
+            MAT_NAME_MAP.put("STONESTAIR", Material.COBBLESTONE_STAIRS);
+            MAT_NAME_MAP.put("SANDSTAIR", Material.SANDSTONE_STAIRS);
+            MAT_NAME_MAP.put("GOLDAPPLE", Material.GOLDEN_APPLE);
+            MAT_NAME_MAP.put("APPLEGOLD", Material.GOLDEN_APPLE);
+            MAT_NAME_MAP.put("COBBLEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("STONEFENCE", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("COBBLEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("STONEWALL", getFirst("COBBLESTONE_WALL", "LEGACY_COBBLE_WALL"));
+
+            // Legacy names
+            MAT_NAME_MAP.put("LEGACY_REDSTONE_TORCH", getMaterial("LEGACY_REDSTONE_TORCH_ON"));
+            MAT_NAME_MAP.put("LEGACY_STONE_BUTTON", getMaterial("LEGACY_STONE_BUTTON"));
+            MAT_NAME_MAP.put("LEGACY_PISTON", getMaterial("LEGACY_PISTON_BASE"));
+            MAT_NAME_MAP.put("LEGACY_STICKPISTON", getMaterial("LEGACY_PISTON_STICKY_BASE"));
+            MAT_NAME_MAP.put("LEGACY_MOSSSTONE", getMaterial("LEGACY_MOSSY_COBBLESTONE"));
+            MAT_NAME_MAP.put("LEGACY_STONESTAIR", getMaterial("LEGACY_COBBLESTONE_STAIRS"));
+            MAT_NAME_MAP.put("LEGACY_SANDSTAIR", getMaterial("LEGACY_SANDSTONE_STAIRS"));
+            MAT_NAME_MAP.put("LEGACY_GOLDAPPLE", getMaterial("LEGACY_GOLDEN_APPLE"));
+            MAT_NAME_MAP.put("LEGACY_APPLEGOLD", getMaterial("LEGACY_GOLDEN_APPLE"));
+            MAT_NAME_MAP.put("LEGACY_COBBLEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("LEGACY_STONEFENCE", getMaterial("LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("LEGACY_COBBLEWALL", getMaterial("LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("LEGACY_STONEWALL", getMaterial("LEGACY_COBBLE_WALL"));
+            MAT_NAME_MAP.put("LEGACY_SLAB", getMaterial("LEGACY_STEP"));
+            MAT_NAME_MAP.put("LEGACY_DOUBLE_SLAB", getMaterial("LEGACY_DOUBLE_STEP"));
+            MAT_NAME_MAP.put("LEGACY_STONE_BRICK", getMaterial("LEGACY_SMOOTH_BRICK"));
+
+            // Material by name aliases
+            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+                MAT_ALIASES.add("SPADE", "SHOVEL");
+                MAT_ALIASES.add("REDSTONEREPEATER", "REPEATER");
+            } else {
+                MAT_ALIASES.add("SLAB", "STEP");
+                MAT_ALIASES.add("STONEBRICK", "SMOOTHBRICK");
+                MAT_ALIASES.add("PLANK", "WOOD");
+                MAT_ALIASES.add("SHOVEL", "SPADE");
+                MAT_ALIASES.add("REDSTONEREPEATER", "DIODE");
+                MAT_ALIASES.add("REPEATER", "DIODE");
+                MAT_ALIASES.add("PRESSUREPLATE", "PLATE");
+            }
+            MAT_ALIASES.add(" ", "_").add("DIAM_", "DIAMOND").add("LEAT_", "LEATHER").add("_", "");
+            MAT_ALIASES.add("PANTS", "LEGGINGS").add("REDSTONEDUST", "REDSTONE");
+            MAT_ALIASES.add("SULPHER", "SULPHUR").add("SULPHOR", "SULPHUR").add("DOORBLOCK", "DOOR");
+            MAT_ALIASES.add("LIGHTER", "FLINTANDSTEEL").add("LITPUMPKIN", "JACKOLANTERN");
+        }
     }
 }
