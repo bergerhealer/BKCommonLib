@@ -120,7 +120,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         // This cannot be a 'list' type because that one cannot be extended
         YamlNodeAbstract<?> closeParent = this.parent;
         while (closeParent instanceof YamlListNode) {
-            closeParent = closeParent.getParent();
+            closeParent = closeParent.getYamlParent();
         }
 
         // Create a new node, ask YamlNode parent or previous value to create it
@@ -291,14 +291,14 @@ public class YamlEntry implements Map.Entry<String, Object> {
             // with a new instance. The node becomes parented to this one's parent, with the original
             // parent getting a clone of the original node assigned.
             if (newNode.hasParent()) {
-                int index = newNode.getParent()._children.indexOf(newNode._entry);
+                int index = newNode.getYamlParent()._children.indexOf(newNode._entry);
                 if (index == -1) {
                     // Fallback
                     newNode = newNode.clone();
                     value = newNode;
                 } else {
                     // Replace original entry with a clone for the original parent
-                    newNode.getParent().cloneChildEntry(index);
+                    newNode.getYamlParent().cloneChildEntry(index);
                 }
             }
 
@@ -445,7 +445,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
             YamlNodeAbstract<?> node = this.parent;
             while (node != null && !node._entry.yaml_check_children) {
                 node._entry.yaml_check_children = true;
-                node = node.getParent();
+                node = node.getYamlParent();
             }
         }
     }
@@ -465,7 +465,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         YamlEntry entry = this;
         while (entry != null
                && entry.parent._children.get(0) == entry
-               && entry.parent.getParent() instanceof YamlListNode)
+               && entry.parent.getYamlParent() instanceof YamlListNode)
         {
             value = Collections.singletonList(value);
             indent--;

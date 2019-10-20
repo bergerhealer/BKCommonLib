@@ -75,7 +75,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @return True if it has a parent, False if not
      */
     public boolean hasParent() {
-        return this.getParent() != null;
+        return this.getYamlParent() != null;
     }
 
     /**
@@ -95,6 +95,16 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     @SuppressWarnings("unchecked")
     public N getParent() {
         return (N) this._entry.getParentNode();
+    }
+
+    /**
+     * Gets the parent YAML node of this Node.
+     * This may be of a type different than {@link #getParent()} supports.
+     * 
+     * @return parent YAML node
+     */
+    public final YamlNodeAbstract<?> getYamlParent() {
+        return this._entry.getParentNode();
     }
 
     /**
@@ -394,9 +404,6 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             // the first time a new node is added.
             return CommonUtil.unsafeCast(new YamlNodeLazyCreateValueList(this, path, true));
         }
-
-        // Force creation of an indexed value list instead of a list
-        nodeEntry.createNodeValue();
 
         // Obtain the list, filter non-node values from it
         List<?> list = this.getList(path);
