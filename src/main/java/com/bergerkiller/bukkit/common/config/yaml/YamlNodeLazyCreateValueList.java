@@ -123,6 +123,19 @@ public class YamlNodeLazyCreateValueList extends AbstractList<Object> implements
         return createList().addAll(index, c);
     }
 
+    @Override
+    public void assignTo(YamlEntry entry) {
+        _parent = entry.getParentNode();
+        _path = entry.getKey();
+        if (_list != null) {
+            entry.setValue(_list);
+        } else if (_createIndexedValueList) {
+            _list = YamlNodeIndexedValueList.sortAndCreate(entry.createNodeValue());
+        } else {
+            _list = entry.createListNodeValue();
+        }
+    }
+
     // Check whether the list now exists
     private List<Object> getList() {
         if (_list != null) {
@@ -162,16 +175,4 @@ public class YamlNodeLazyCreateValueList extends AbstractList<Object> implements
         return _list;
     }
 
-    @Override
-    public void assignTo(YamlEntry entry) {
-        _parent = entry.getParentNode();
-        _path = entry.getKey();
-        if (_list != null) {
-            entry.setValue(_list);
-        } else if (_createIndexedValueList) {
-            _list = YamlNodeIndexedValueList.sortAndCreate(entry.createNodeValue());
-        } else {
-            _list = entry.createListNodeValue();
-        }
-    }
 }

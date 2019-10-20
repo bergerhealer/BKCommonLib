@@ -1,10 +1,10 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -158,6 +158,26 @@ public class YamlEntry implements Map.Entry<String, Object> {
     }
 
     /**
+     * Creates the most appropriate list type for this entry.
+     * If this is a node, then a {@link YamlNodeIndexedValueList} is returned.
+     * If this is a list, then a {@link YamlListNode} is returned.
+     * If this is neither of these, the original value is discarded and a new list node
+     * is created.
+     * 
+     * @return list
+     */
+    public List<Object> createList() {
+        Object value = this.value;
+        if (value instanceof YamlListNode) {
+            return (YamlListNode) value;
+        } else if (value instanceof YamlNodeAbstract) {
+            return YamlNodeIndexedValueList.sortAndCreate((YamlNodeAbstract<?>) value);
+        } else {
+            return this.createListNodeValue();
+        }
+    }
+
+    /**
      * Gets whether this entry stores a YamlNodeAbstract or YamlListNode value.
      * This only indicates the value is an abstract node, it does not mean it
      * can be cast to the custom implementation type of the node.
@@ -235,19 +255,19 @@ public class YamlEntry implements Map.Entry<String, Object> {
         if (!(value instanceof YamlNodeAbstract<?>)) {
             // Turn a Collection (or List) value into a YamlListNode
             if (value instanceof Collection) {
-                YamlListNode listNode = this.createListNodeValue();
+                List<Object> targetList = this.createList();
                 Collection<?> collection = (Collection<?>) value;
                 Iterator<?> iter = collection.iterator();
                 int len = collection.size();
                 for (int i = 0; i < len; i++) {
-                    if (i < listNode.size()) {
-                        listNode.set(i, iter.next());
+                    if (i < targetList.size()) {
+                        targetList.set(i, iter.next());
                     } else {
-                        listNode.add(iter.next());
+                        targetList.add(iter.next());
                     }
                 }
-                for (int i = listNode.size()-1; i >= len; i--) {
-                    listNode.remove(i);
+                for (int i = targetList.size()-1; i >= len; i--) {
+                    targetList.remove(i);
                 }
                 return oldValue;
             }
@@ -256,17 +276,17 @@ public class YamlEntry implements Map.Entry<String, Object> {
             // TODO: Replace with something that calls the list-based code above, wrapping
             //       the array into a list like Arrays.asList does. (must handle primitive types)
             if (value.getClass().isArray()) {
-                YamlListNode listNode = this.createListNodeValue();
+                List<Object> targetList = this.createList();
                 int len = Array.getLength(value);
                 for (int i = 0; i < len; i++) {
-                    if (i < listNode.size()) {
-                        listNode.set(i, Array.get(value, i));
+                    if (i < targetList.size()) {
+                        targetList.set(i, Array.get(value, i));
                     } else {
-                        listNode.add(Array.get(value, i));
+                        targetList.add(Array.get(value, i));
                     }
                 }
-                for (int i = listNode.size()-1; i >= len; i--) {
-                    listNode.remove(i);
+                for (int i = targetList.size()-1; i >= len; i--) {
+                    targetList.remove(i);
                 }
                 return oldValue;
             }

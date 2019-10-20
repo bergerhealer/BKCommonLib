@@ -20,7 +20,6 @@ import org.yaml.snakeyaml.error.YAMLException;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -359,12 +358,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     /**
      * Stores a list of nodes at the path specified, creates one if not present.<br>
      * <br>
-     * If at the path a node is stored rather than a list, then the children of
-     * that node are represented as a List instead, sorted by key names.
-     * No changes will occur to the node structure of the value at the path
-     * while reading these values. When a new value is added to this list,
-     * then the original key names will be replaced with an index incrementing
-     * starting at 1.<br>
+     * If at the path a node is stored rather than a list, then the nodes are set
+     * as children of this node numbered 0 incrementing.<br>
      * <br>
      * <b>Legacy: this will always produce a node with index children rather than a
      * list of nodes. This will change in the near future.</b>
@@ -373,7 +368,14 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param nodes List of nodes to store
      */
     public void setNodeList(String path, List<N> nodes) {
-        this.set(path, nodes);
+        // Make sure that if the value did not exist, a node is created (not a list node)
+        // In newer versions we may allow the set() logic to create a normal list node instead
+        // See the above legacy bolded warning
+        YamlEntry entry = this.getEntry(path);
+        if (!entry.isAbstractNode()) {
+            entry.createNodeValue();
+        }
+        entry.setValue(nodes);
     }
 
     /**
@@ -398,15 +400,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     @SuppressWarnings("unchecked")
     public List<N> getNodeList(String path) {
-        YamlEntry nodeEntry = this.getEntryIfExists(path);
-        if (nodeEntry == null) {
-            // Entry does not yet exist. Create one and add to this node
-            // the first time a new node is added.
-            return CommonUtil.unsafeCast(new YamlNodeLazyCreateValueList(this, path, true));
-        }
-
         // Obtain the list, filter non-node values from it
-        List<?> list = this.getList(path);
+        List<?> list = this.getList(path, true);
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
             if (!(value instanceof YamlNodeAbstract) || value instanceof YamlListNode) {
@@ -417,7 +412,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
-     * Gets a list of values at the path specified, creates one if not present.<br>
+     * Gets a list of values at the path specified. If nothing is stored at the path,
+     * an empty list is returned and no list is created. When an element is added to this
+     * empty list for the first time, then the list is created and filled with that element.<br>
      * <br>
      * If at the path a node is stored rather than a list, then the children of
      * that node are represented as a List instead, sorted by key names.
@@ -427,17 +424,19 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * starting at 0.
      * 
      * @param path The path to get a list
-     * @return the list, is modifiable
+     * @return The modifiable list at the path. Changes to the list result in updates to this tree.
      */
     public List<Object> getList(String path) {
-        YamlEntry entry = this.getEntry(path);
-        Object value = entry.getValue();
-        if (value instanceof YamlListNode) {
-            return (YamlListNode) value;
-        } else if (value instanceof YamlNodeAbstract) {
-            return YamlNodeIndexedValueList.sortAndCreate((YamlNodeAbstract<?>) value);
+        return getList(path, false);
+    }
+
+    // Helper function adding createIndexed option
+    private List<Object> getList(String path, boolean createIndexed) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null) {
+            return entry.createList();
         } else {
-            return entry.createListNodeValue();
+            return new YamlNodeLazyCreateValueList(this, path, createIndexed);
         }
     }
 

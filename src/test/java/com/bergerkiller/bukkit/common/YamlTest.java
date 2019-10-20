@@ -26,6 +26,36 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testYamlListAddRemove() {
+        // Create a list and add a single child node to it
+        YamlNode root = new YamlNode();
+        List<YamlNode> list = root.getNodeList("list");
+        assertEquals(0, list.size());
+        assertFalse(root.contains("list"));
+        YamlNode child = new YamlNode();
+        child.set("key", "value");
+        list.add(child);
+        assertEquals(1, list.size());
+        assertTrue(root.contains("list"));
+        assertEquals(child, list.get(0));
+        root.setNodeList("list", list);
+
+        // Empty list and then remove the list from root
+        list.clear();
+        assertEquals(0, list.size());
+        root.remove("list");
+        assertFalse(root.contains("list"));
+
+        // Adding an entry again should still work and re-adds the list
+        child = new YamlNode();
+        child.set("key2", "value2");
+        list.add(child);
+        root.setNodeList("list", list);
+        assertTrue(root.contains("list"));
+        assertEquals("value2", root.get("list.0.key2"));
+    }
+
+    @Test
     public void testYamlReassignNode() {
         // Prepare an old root from which we will be assigning a child
         YamlNode root_old = new YamlNode();
