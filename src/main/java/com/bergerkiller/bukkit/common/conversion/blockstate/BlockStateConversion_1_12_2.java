@@ -83,6 +83,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         // - CraftBlock:getWorld() - to instrument getTileEntityAt
         // All other methods will fail.
         proxy_block = (Block) new ClassInterceptor() {
+            @SuppressWarnings("deprecation")
             @Override
             protected Invokable getCallback(Method method) {
                 String name = method.getName();
@@ -93,13 +94,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 } else if (name.equals("getType")) {
                     return (instance, args) -> input_state.type;
                 } else if (name.equals("getTypeId")) {
-                    return new Invokable() {
-                        @Override
-                        @SuppressWarnings("deprecation")
-                        public Object invoke(Object instance, Object... args) {
-                            return CommonLegacyMaterials.getIdFromMaterial(input_state.type);
-                        }
-                    };
+                    return (instance, args) -> CommonLegacyMaterials.getIdFromMaterial(input_state.type);
                 } else if (name.equals("getData")) {
                     return (instance, args) -> input_state.rawData;
                 } else if (name.equals("getLightLevel")) {

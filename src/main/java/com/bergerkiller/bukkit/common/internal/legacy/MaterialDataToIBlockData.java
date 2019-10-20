@@ -61,7 +61,7 @@ public class MaterialDataToIBlockData {
     // Only called after MC 1.13, before that everything was fine!
     private static void initBuilders() {
         if (getLegacyMaterial("REDSTONE_COMPARATOR_OFF") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), (iblockdata, comparator) -> {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_OFF"), (IBlockDataHandle iblockdata, org.bukkit.material.Comparator  comparator) -> {
                 iblockdata = iblockdata.set("powered", false);
                 iblockdata = iblockdata.set("facing", comparator.getFacing());
                 iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
@@ -69,7 +69,7 @@ public class MaterialDataToIBlockData {
             });
         }
         if (getLegacyMaterial("REDSTONE_COMPARATOR_ON") != null) {
-            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), (iblockdata, comparator) -> {
+            iblockdataBuilders.put(getLegacyMaterial("REDSTONE_COMPARATOR_ON"), (IBlockDataHandle iblockdata, org.bukkit.material.Comparator comparator) -> {
                 iblockdata = iblockdata.set("powered", true);
                 iblockdata = iblockdata.set("facing", comparator.getFacing());
                 iblockdata = iblockdata.set("mode", comparator.isSubtractionMode() ? "subtract" : "compare");
@@ -77,10 +77,10 @@ public class MaterialDataToIBlockData {
             });
         }
 
-        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), (iblockdata, step) -> iblockdata.set("type", "double"));
+        iblockdataBuilders.put(getLegacyMaterial("DOUBLE_STEP"), (IBlockDataHandle iblockdata, org.bukkit.material.Step step) -> iblockdata.set("type", "double"));
 
         iblockdataBuilders.put(getLegacyMaterial("MOB_SPAWNER"), (iblockdata, spawner) -> getBlockDataFromMaterialName("SPAWNER"));
-        iblockdataBuilders.put(getLegacyMaterial("TORCH"), (iblockdata, torch) -> {
+        iblockdataBuilders.put(getLegacyMaterial("TORCH"), (IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) -> {
             if (torch.getAttachedFace() == BlockFace.DOWN) {
                 iblockdata = getBlockDataFromMaterialName("TORCH");
                 return iblockdata;
@@ -122,7 +122,7 @@ public class MaterialDataToIBlockData {
             for (int n = 0; n < legacy_types.length; n++) {
                 final Material legacy_type = legacy_types[n];
                 final IBlockDataHandle modern_data = CommonLegacyMaterials.getBlockDataFromMaterialName(modern_names[n]);
-                iblockdataBuilders.put(legacy_type, (iblockdata, directional) -> modern_data.set("facing", directional.getFacing()));
+                iblockdataBuilders.put(legacy_type, (IBlockDataHandle iblockdata, org.bukkit.material.DirectionalContainer directional) -> modern_data.set("facing", directional.getFacing()));
             }
         }
     }
