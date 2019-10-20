@@ -88,7 +88,7 @@ public class YamlRoot {
     private YamlEntry getEntry(YamlPath path, boolean isListNode) {
         YamlEntry entry = this._entries.get(path);
         if (entry == null) {
-            YamlEntry parentEntry = getEntry(path.parent(), path.isList());
+            YamlEntry parentEntry = getEntry(path.parent(), path.isListElement());
             YamlNodeAbstract<?> parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
             entry = parentNode.createChildEntry(parentNode._children.size(), path);
         }

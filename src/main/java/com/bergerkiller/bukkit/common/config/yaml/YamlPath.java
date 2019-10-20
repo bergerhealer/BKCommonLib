@@ -5,7 +5,7 @@ package com.bergerkiller.bukkit.common.config.yaml;
  * Each path consists of the name of the last part of the path, and
  * a recursive parent path.
  */
-public final class YamlPath {
+public class YamlPath {
     /**
      * Root yaml path with an empty name and no parent path
      */
@@ -42,10 +42,6 @@ public final class YamlPath {
         return createChild(ROOT, path);
     }
 
-    private static YamlPath createListChild(YamlPath parent, int listIndex) {
-        return new YamlPath(parent, "[" + listIndex + "]");
-    }
-
     private static YamlPath createChild(YamlPath parent, String path) {
         if (path.isEmpty()) {
             // If path is empty, then return the parent path
@@ -53,19 +49,63 @@ public final class YamlPath {
         } else {
             // Turn .-delimited parts in the path into additional recursive parents
             int startIndex = 0;
-            for (int i = 0; i < path.length(); i++) {
-                char c = path.charAt(i);
+            while (startIndex < path.length()) {
+                char c = path.charAt(startIndex);
+
+                // Skip path separator characters
                 if (c == '.') {
-                    parent = createChild(parent, path.substring(startIndex, i));
-                    startIndex = i + 1;
-                } else if (c == '[') {
-                    parent = createChild(parent, path.substring(startIndex, i));
-                    startIndex = i;
+                    startIndex++;
+                    continue;
+                }
+
+                // Detect list elements, which start with [ and end with ]
+                // They must contain 0-9 digit characters inside for the index
+                if (c == '[' && (path.length()-startIndex) >= 3) {
+                    int i = startIndex;
+                    int listIndex = 0;
+                    boolean foundDigit = false;
+                    int listEndIndex = -1;
+                    while (++i < path.length()) {
+                        char digit = path.charAt(i);
+                        if (digit >= '0' && digit <= '9') {
+                            foundDigit = true;
+                            listIndex *= 10;
+                            listIndex += (digit-'0');
+                        } else if (digit == ']') {
+                            listEndIndex = i + 1;
+                            break;
+                        } else {
+                            break;
+                        }
+                    }
+                    if (foundDigit && listEndIndex != -1) {
+                        parent = new YamlPathListElement(parent, listIndex);
+                        startIndex = listEndIndex;
+                        continue;
+                    }
+                }
+
+                // Anything else is a path node element, including malformed list elements
+                // Select up to the next . or [
+                int i = startIndex;
+                while (true) {
+                    if (++i >= path.length()) {
+                        // End of path found, take all from start index to the end
+                        parent = new YamlPath(parent, path.substring(startIndex));
+                        startIndex = path.length();
+                        break;
+                    }
+                    c = path.charAt(i);
+                    if (c == '.' || c == '[') {
+                        parent = new YamlPath(parent, path.substring(startIndex, i));
+                        startIndex = i;
+                        break;
+                    }
                 }
             }
 
-            // Create the path
-            return new YamlPath(parent, path.substring(startIndex));
+            // Done
+            return parent;
         }
     }
 
@@ -86,25 +126,18 @@ public final class YamlPath {
      * 
      * @return True if this is a path to a list element
      */
-    public boolean isList() {
-        return this.name.length() > 2 &&
-               this.name.charAt(0) == '[' &&
-               this.name.charAt(this.name.length()-1) == ']';
+    public boolean isListElement() {
+        return false;
     }
 
     /**
      * Gets the index to the parent node's list this path refers to.
-     * If this is not a list as indicated by {@link #isList()} then this
+     * If this is not a list as indicated by {@link #isListElement()} then this
      * method returns -1.
      * 
      * @return list index
      */
     public int listIndex() {
-        if (this.isList()) {
-            try {
-                return Integer.parseInt(this.name.substring(1, this.name.length()-1));
-            } catch (NumberFormatException ex) {}
-        }
         return -1;
     }
 
@@ -152,11 +185,12 @@ public final class YamlPath {
      * @return list child path
      */
     public YamlPath listChild(int listIndex) {
-        return createListChild(this, listIndex);
+        return new YamlPathListElement(this, listIndex);
     }
 
     /**
-     * Gets the name of the last part of this YamlPath
+     * Gets the name of the last part of this YamlPath.
+     * If this is a list element, the [] portion is omitted.
      * 
      * @return name
      */
@@ -205,16 +239,50 @@ public final class YamlPath {
             return "";
         } else {
             // Child of root
-            StringBuilder str = new StringBuilder(this.name);        
+            StringBuilder str = new StringBuilder(64);
             YamlPath path = this;
-            while (!path.parent.isRoot()) {
-                if (!path.isList()) {
-                    str.insert(0, '.');
-                }
+            do {
+                path.insertBeginning(str);
                 path = path.parent;
-                str.insert(0, path.name);
-            }
+            } while (!path.isRoot());
             return str.toString();
+        }
+    }
+
+    protected void insertBeginning(StringBuilder str) {
+        str.insert(0, this.name);
+        if (!this.parent.isRoot()) {
+            str.insert(0, '.');
+        }
+    }
+
+    /**
+     * YamlPath implementation for the list element of a list of values.
+     * Is automatically detected with the [] idiom.
+     */
+    private static final class YamlPathListElement extends YamlPath {
+        private final int index;
+
+        public YamlPathListElement(YamlPath parent, int index) {
+            super(parent, Integer.toString(index));
+            this.index = index;
+        }
+
+        @Override
+        public int listIndex() {
+            return this.index;
+        }
+
+        @Override
+        public boolean isListElement() {
+            return true;
+        }
+
+        @Override
+        protected void insertBeginning(StringBuilder str) {
+            str.insert(0, ']');
+            str.insert(0, this.name());
+            str.insert(0, '[');
         }
     }
 }

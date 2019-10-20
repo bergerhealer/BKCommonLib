@@ -1085,12 +1085,12 @@ public class YamlTest {
     public void testYamlListPath() {
         // Test a path with a list element inside
         YamlPath list_path = YamlPath.create("root.child[12]");
-        assertEquals("[12]", list_path.name());
+        assertEquals("12", list_path.name());
         assertEquals("root.child", list_path.parent().toString());
-        assertFalse(list_path.parent().isList());
+        assertFalse(list_path.parent().isListElement());
         assertEquals(-1, list_path.parent().listIndex());
         assertEquals("root.child[12]", list_path.toString());
-        assertTrue(list_path.isList());
+        assertTrue(list_path.isListElement());
         assertEquals(12, list_path.listIndex());
 
         // Create a child of this path, which is a normal node
@@ -1100,12 +1100,12 @@ public class YamlTest {
 
         // List child of a list child (if this is even possible in yaml)
         YamlPath list_path_array_child = list_path.child("[16]");
-        assertEquals("[16]", list_path_array_child.name());
+        assertEquals("16", list_path_array_child.name());
         assertEquals("root.child[12][16]", list_path_array_child.toString());
-        assertTrue(list_path_array_child.isList());
-        assertTrue(list_path_array_child.parent().isList());
-        assertFalse(list_path_array_child.parent().parent().isList());
-        assertFalse(list_path_array_child.parent().parent().parent().isList());
+        assertTrue(list_path_array_child.isListElement());
+        assertTrue(list_path_array_child.parent().isListElement());
+        assertFalse(list_path_array_child.parent().parent().isListElement());
+        assertFalse(list_path_array_child.parent().parent().parent().isListElement());
         assertEquals(16, list_path_array_child.listIndex());
 
         // Creating a deeply nested list child from String
@@ -1126,7 +1126,7 @@ public class YamlTest {
         assertEquals(list_path_by_name, list_path_by_index);
         assertEquals(list_path_by_name.name(), list_path_by_index.name());
         assertEquals(list_path_by_name.hashCode(), list_path_by_index.hashCode());
-        assertTrue(list_path_by_index.isList());
+        assertTrue(list_path_by_index.isListElement());
         assertEquals(22, list_path_by_index.listIndex());
     }
 
