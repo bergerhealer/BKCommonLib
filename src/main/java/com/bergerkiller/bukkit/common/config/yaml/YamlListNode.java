@@ -130,20 +130,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
 
     @Override
     public int lastIndexOf(Object o) {
-        if (o == null) {
-            for (int i = this._children.size()-1; i >= 0; i--) {
-                if (this._children.get(i).getValue() == null) {
-                    return i;
-                }
-            }
-        } else {
-            for (int i = this._children.size()-1; i >= 0; i--) {
-                if (o.equals(this._children.get(i).getValue())) {
-                    return i;
-                }
-            }
-        }
-        return -1;
+        return lastIndexOfValue(o);
     }
 
     @Override

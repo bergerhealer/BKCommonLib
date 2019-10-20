@@ -92,12 +92,13 @@ public class YamlTest {
         n3.set("key1", "item3value1");
         n3.set("key2", "item3value2");
         root.setNodeList("list", Arrays.asList(n1, n2, n3));
-        assertEquals("item1value1", root.get("list.1.key1"));
-        assertEquals("item1value2", root.get("list.1.key2"));
-        assertEquals("item2value1", root.get("list.2.key1"));
-        assertEquals("item2value2", root.get("list.2.key2"));
-        assertEquals("item3value1", root.get("list.3.key1"));
-        assertEquals("item3value2", root.get("list.3.key2"));
+
+        assertEquals("item1value1", root.get("list[0].key1"));
+        assertEquals("item1value2", root.get("list[0].key2"));
+        assertEquals("item2value1", root.get("list[1].key1"));
+        assertEquals("item2value2", root.get("list[1].key2"));
+        assertEquals("item3value1", root.get("list[2].key1"));
+        assertEquals("item3value2", root.get("list[2].key2"));
     }
 
     @Test
@@ -137,20 +138,20 @@ public class YamlTest {
         assertEquals("value3", root.get("list.3"));
         assertEquals("value4", root.get("list.4"));
 
-        // Add a value, from then on the list should maintain 1-upward indices
+        // Add a value, from then on the list should maintain 0-upward indices
         values.add("value5");
         assertEquals(5, values.size());
-        assertEquals("value1", root.get("list.1"));
-        assertEquals("value2", root.get("list.2"));
-        assertEquals("value3", root.get("list.3"));
-        assertEquals("value4", root.get("list.4"));
-        assertEquals("value5", root.get("list.5"));
-        values.remove("value2");
-        assertEquals(4, values.size());
-        assertEquals("value1", root.get("list.1"));
+        assertEquals("value1", root.get("list.0"));
+        assertEquals("value2", root.get("list.1"));
         assertEquals("value3", root.get("list.2"));
         assertEquals("value4", root.get("list.3"));
         assertEquals("value5", root.get("list.4"));
+        values.remove("value2");
+        assertEquals(4, values.size());
+        assertEquals("value1", root.get("list.0"));
+        assertEquals("value3", root.get("list.1"));
+        assertEquals("value4", root.get("list.2"));
+        assertEquals("value5", root.get("list.3"));
     }
 
     @Test

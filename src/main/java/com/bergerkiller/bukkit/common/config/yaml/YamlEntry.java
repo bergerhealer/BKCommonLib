@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.ListIterator;
 import java.util.Map;
 
@@ -213,26 +216,68 @@ public class YamlEntry implements Map.Entry<String, Object> {
         Object oldValue = this.value;
         if (oldValue == value) {
             return oldValue;
-        }
-        if (oldValue != null && oldValue.equals(value)) {
+        } else if (value == null) {
+            this.removeNodeValue();
+            this.value = null;
+            this.markYamlChanged();
+            return oldValue;
+        } else if (value.equals(oldValue)) {
             this.value = value;
             return oldValue;
         }
 
-        // Turn a Collection (or List) value into a YamlListNode
-        if (value instanceof Collection && !(value instanceof YamlNodeAbstract<?>)) {
-            YamlListNode listNode = this.createListNodeValue();
-            listNode.clear();
-            listNode.addAll((Collection<?>) value);
+        // Deal with objects that link to data elsewhere properly
+        if (value instanceof YamlNodeLinkedValue) {
+            ((YamlNodeLinkedValue) value).assignTo(this);
             return oldValue;
         }
 
-        // Turn a Map into a YamlNode
-        if (value instanceof Map && !(value instanceof YamlNodeAbstract<?>)) {
-            YamlNodeAbstract<?> node = this.createNodeValue();
-            node.clear();
-            node.setValues((Map<?, ?>) value);
-            return oldValue;
+        if (!(value instanceof YamlNodeAbstract<?>)) {
+            // Turn a Collection (or List) value into a YamlListNode
+            if (value instanceof Collection) {
+                YamlListNode listNode = this.createListNodeValue();
+                Collection<?> collection = (Collection<?>) value;
+                Iterator<?> iter = collection.iterator();
+                int len = collection.size();
+                for (int i = 0; i < len; i++) {
+                    if (i < listNode.size()) {
+                        listNode.set(i, iter.next());
+                    } else {
+                        listNode.add(iter.next());
+                    }
+                }
+                for (int i = listNode.size()-1; i >= len; i--) {
+                    listNode.remove(i);
+                }
+                return oldValue;
+            }
+
+            // Turn arrays into a YamlListNode
+            // TODO: Replace with something that calls the list-based code above, wrapping
+            //       the array into a list like Arrays.asList does. (must handle primitive types)
+            if (value.getClass().isArray()) {
+                YamlListNode listNode = this.createListNodeValue();
+                int len = Array.getLength(value);
+                for (int i = 0; i < len; i++) {
+                    if (i < listNode.size()) {
+                        listNode.set(i, Array.get(value, i));
+                    } else {
+                        listNode.add(Array.get(value, i));
+                    }
+                }
+                for (int i = listNode.size()-1; i >= len; i--) {
+                    listNode.remove(i);
+                }
+                return oldValue;
+            }
+
+            // Turn a Map into a YamlNode
+            if (value instanceof Map) {
+                YamlNodeAbstract<?> node = this.createNodeValue();
+                node.clear();
+                node.setValues((Map<?, ?>) value);
+                return oldValue;
+            }
         }
 
         YamlNodeAbstract<?> newNode;

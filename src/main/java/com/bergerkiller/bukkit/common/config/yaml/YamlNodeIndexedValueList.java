@@ -10,19 +10,15 @@ import com.bergerkiller.bukkit.common.utils.ParseUtil;
  * Represents a YamlNode as a list of values. The values are sorted by key name
  * and accessed in that order by index. When adding a value to the list using
  * this instance, all original keys are removed and replaced with a number
- * incremented from 1.
+ * incremented from 0.
  */
-public class YamlNodeIndexedValueList extends AbstractList<Object> {
+public class YamlNodeIndexedValueList extends AbstractList<Object> implements YamlNodeLinkedValue {
     private final YamlNodeAbstract<?> _node;
     private boolean _namedByIndex;
 
     private YamlNodeIndexedValueList(YamlNodeAbstract<?> node) {
         _node = node;
         _namedByIndex = false;
-    }
-
-    public YamlNodeAbstract<?> getNode() {
-        return _node;
     }
 
     @Override
@@ -48,6 +44,11 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> {
     @Override
     public int indexOf(Object value) {
         return _node.indexOfValue(value);
+    }
+
+    @Override
+    public int lastIndexOf(Object o) {
+        return _node.lastIndexOfValue(o);
     }
 
     @Override
@@ -96,6 +97,11 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> {
         updateIndexFrom(index+1);
     }
 
+    @Override
+    public void assignTo(YamlEntry entry) {
+        entry.setValue(_node);
+    }
+
     private void updateIndexFrom(int index) {
         while (index < _node._children.size()) {
             _node._children.get(index).setPath(getIndexedPath(index));
@@ -104,7 +110,7 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> {
     }
 
     private YamlPath getIndexedPath(int index) {
-        return _node.getYamlPath().child(Integer.toString(index+1));
+        return _node.getYamlPath().child(Integer.toString(index));
     }
 
     /**

@@ -363,27 +363,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param nodes List of nodes to store
      */
     public void setNodeList(String path, List<N> nodes) {
-        YamlEntry entry = this.getEntryIfExists(path);
-        if (entry != null) {
-            // When setting the output of getNodeList() nothing changes
-            if ((Object) nodes instanceof YamlNodeIndexedValueList) {
-                YamlNodeIndexedValueList valueList = CommonUtil.unsafeCast(nodes);
-                if (valueList.getNode() == entry.getValue()) {
-                    return;
-                } else {
-                    throw new IllegalArgumentException("Tried to store a node that is already added to another node");
-                }
-            }
-            if (entry.getValue() == nodes) {
-                return;
-            }
-
-            // Remove the old entry
-            entry.getParentNode().removeChildEntry(entry);
-        }
-
-        // Create a new node list at the path and add all the nodes
-        this.getNodeList(path).addAll(nodes);
+        this.set(path, nodes);
     }
 
     /**
@@ -396,6 +376,10 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * then the original key names will be replaced with an index incrementing
      * starting at 1.<br>
      * <br>
+     * If nothing is yet stored at this path, then a new list is created the first time
+     * a node is added to the list or when {@link #setNodeList(String, List)} is called.
+     * The returned list will be empty in that case.<br>
+     * <br>
      * <b>Legacy: this will always produce a node with index children rather than a
      * list of nodes. This will change in the near future.</b>
      * 
@@ -404,8 +388,17 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     @SuppressWarnings("unchecked")
     public List<N> getNodeList(String path) {
-        this.getNode(path); // Hack!
+        YamlEntry nodeEntry = this.getEntryIfExists(path);
+        if (nodeEntry == null) {
+            // Entry does not yet exist. Create one and add to this node
+            // the first time a new node is added.
+            return CommonUtil.unsafeCast(new YamlNodeLazyCreateValueList(this, path, true));
+        }
 
+        // Force creation of an indexed value list instead of a list
+        nodeEntry.createNodeValue();
+
+        // Obtain the list, filter non-node values from it
         List<?> list = this.getList(path);
         for (int i = 0; i < list.size(); i++) {
             Object value = list.get(i);
@@ -424,7 +417,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * No changes will occur to the node structure of the value at the path
      * while reading these values. When a new value is added to this list,
      * then the original key names will be replaced with an index incrementing
-     * starting at 1.
+     * starting at 0.
      * 
      * @param path The path to get a list
      * @return the list, is modifiable
@@ -517,7 +510,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @return the converted value, or null if not found or of the wrong type
      */
     public <T> T get(String path, Class<T> type) {
-        return ParseUtil.convert(this.get(path), type, null);
+        return this.get(path, type, null);
     }
 
     /**
@@ -548,8 +541,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String path, Class<T> type, T def) {
-        YamlEntry entry = this.getEntry(path);
-        Object value = entry.getValue();
+        Object value = this.get(path);
         if (type == String.class && value instanceof String[]) {
             // Special conversion to line-by-line String
             // This is needed, as it saves line-split Strings as such
@@ -558,17 +550,17 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         T rval = ParseUtil.convert(value, type, null);
         if (rval == null) {
             rval = def;
-            entry.setValue(rval);
+            this.set(path, rval);
         }
         return rval;
     }
 
     /**
-     * Sets a value at a certain path. If the value is a node,
-     * it will be parented to this node's tree. Changes to the node
-     * then impact this tree. If the node is already parented,
-     * it is cloned and later changes to the node will not impact this
-     * tree.
+     * Sets a value at a certain path<br>
+     * <br>
+     * If the value is a node, it will be parented to this node's tree. Changes to the node
+     * then impact this tree. If the node is already parented, it is cloned and later
+     * changes to the node will not impact this tree.
      *
      * @param path to set
      * @param value to set to
@@ -909,6 +901,23 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             }
         } else {
             for (int i = 0; i < this._children.size(); i++) {
+                if (value.equals(this._children.get(i).getValue())) {
+                    return i;
+                }
+            }
+        }
+        return -1;
+    }
+
+    protected int lastIndexOfValue(Object value) {
+        if (value == null) {
+            for (int i = this._children.size()-1; i >= 0; i--) {
+                if (this._children.get(i).getValue() == null) {
+                    return i;
+                }
+            }
+        } else {
+            for (int i = this._children.size()-1; i >= 0; i--) {
                 if (value.equals(this._children.get(i).getValue())) {
                     return i;
                 }

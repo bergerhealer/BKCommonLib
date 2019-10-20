@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.collections.CollectionBasics;
  * Accesses a YamlNode's values using a Collection interface.
  * Used by {@link YamlNodeMapProxy#values()}.
  */
-public class YamlNodeValueCollectionProxy implements Collection<Object> {
+public class YamlNodeValueCollectionProxy implements Collection<Object>, YamlNodeLinkedValue {
     private final YamlNodeAbstract<?> _node;
 
     public YamlNodeValueCollectionProxy(YamlNodeAbstract<?> node) {
@@ -86,6 +86,11 @@ public class YamlNodeValueCollectionProxy implements Collection<Object> {
     @Override
     public boolean add(Object e) {
         throw new UnsupportedOperationException("Node values can not be added to");
+    }
+
+    @Override
+    public void assignTo(YamlEntry entry) {
+        entry.setValue(_node);
     }
 
     public static class ValueIterator implements Iterator<Object> {
