@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
+import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
@@ -31,6 +32,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
 
@@ -47,9 +49,12 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.awt.Color;
+import java.io.File;
 import java.lang.ref.SoftReference;
+import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class CommonPlugin extends PluginBase {
@@ -430,6 +435,9 @@ public class CommonPlugin extends PluginBase {
         chunkLoaderPool = null;
         oldPool.disable();
 
+        // Wait for pending FileConfiguration save() to complete
+        flushSaveOperations(null);
+
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
 
@@ -642,6 +650,42 @@ public class CommonPlugin extends PluginBase {
             return true;
         }
         return false;
+    }
+
+    /**
+     * Flushes all pending save operations to disk and waits for this to complete
+     * 
+     * @param plugin The plugin to flush operations for, null to flush all operations
+     */
+    public static void flushSaveOperations(Plugin plugin) {
+        final Logger logger  = (plugin == null) ? Logging.LOGGER_CONFIG : plugin.getLogger();
+        final File directory = (plugin == null) ? null : plugin.getDataFolder();
+        for (File file : FileConfiguration.findSaveOperationsInDirectory(directory)) {
+            // First try and flush the save operation with a timeout of 500 milliseconds
+            // if it takes longer than this, log a message and wait for as long as it takes
+            if (FileConfiguration.flushSaveOperation(file, 500)) {
+                logger.log(Level.INFO, "Saving " + getPluginsRelativePath(plugin, file) + "...");
+                FileConfiguration.flushSaveOperation(file);
+            }
+        }
+    }
+
+    // Attempts to turn an absolute path into a path relative to plugins/
+    // If this fails FOR ANY REASON, just return the absolute path
+    private static String getPluginsRelativePath(Plugin plugin, File file) {
+        try {
+            File pluginsDirectory;
+            if (plugin == null) {
+                pluginsDirectory = CraftServerHandle.instance().getPluginsDirectory().getAbsoluteFile();
+            } else {
+                pluginsDirectory = plugin.getDataFolder().getAbsoluteFile().getParentFile();
+            }
+            Path pluginsParentPath = pluginsDirectory.getParentFile().toPath();
+            Path filePath = file.getAbsoluteFile().toPath();
+            return pluginsParentPath.relativize(filePath).toString();
+        } catch (Throwable t) {
+            return file.getAbsolutePath();
+        }
     }
 
     private static class TabUpdater extends Task {

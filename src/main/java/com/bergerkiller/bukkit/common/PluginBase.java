@@ -756,8 +756,8 @@ public abstract class PluginBase extends JavaPlugin {
 
                 // Transfer description and usage
                 Map<String, Object> data = new HashMap<String, Object>(commandEntry.getValue());
-                node.shareWith(data, "description", "No description specified");
-                node.shareWith(data, "usage", "/" + commandEntry.getKey());
+                node.shareWithMap(data, "description", "No description specified");
+                node.shareWithMap(data, "usage", "/" + commandEntry.getKey());
                 commandEntry.setValue(Collections.unmodifiableMap(data));
             }
 
@@ -822,6 +822,9 @@ public abstract class PluginBase extends JavaPlugin {
             }
         }
 
+        // Save
+        CommonPlugin.flushSaveOperations(this);
+
         // Enable messages
         if (this.enableMessage != null) {
             log(Level.INFO, this.enableMessage);
@@ -860,9 +863,12 @@ public abstract class PluginBase extends JavaPlugin {
             metrics = null;
         }
 
+        // Finish saving
+        CommonPlugin.flushSaveOperations(this);
+
         // If specified to do so, a disable message is shown
         if (doDisableMessage) {
-        	Common.LOGGER.log(Level.INFO, this.disableMessage);
+            this.getLogger().log(Level.INFO, this.disableMessage);
         }
     }
 

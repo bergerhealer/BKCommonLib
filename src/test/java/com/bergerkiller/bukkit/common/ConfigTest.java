@@ -13,11 +13,15 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 
 /**
  * Tests BasicConfiguration YAML stuff
  */
 public class ConfigTest {
+    static {
+        CommonBootstrap.initServer();
+    }
 
     @Test
     public void testYAMLLoadSave() {
@@ -97,8 +101,8 @@ public class ConfigTest {
     private void checkNodeListA(FileConfiguration config) {
         List<ConfigurationNode> nodeList = config.getNodeList("nodeList");
         assertEquals(2, nodeList.size());
-        assertEquals("1", nodeList.get(0).getName());
-        assertEquals("2", nodeList.get(1).getName());
+        assertEquals("0", nodeList.get(0).getName());
+        assertEquals("1", nodeList.get(1).getName());
         assertEquals("value1", nodeList.get(0).get("node1Key", String.class));
         assertEquals("value2", nodeList.get(1).get("node2Key", String.class));
         assertEquals("value3", nodeList.get(1).getNode("subNode").get("subNodeKey", String.class));
@@ -107,9 +111,9 @@ public class ConfigTest {
     private void checkNodeListB(FileConfiguration config) {
         List<ConfigurationNode> nodeList = config.getNodeList("nodeList");
         assertEquals(3, nodeList.size());
-        assertEquals("1", nodeList.get(0).getName());
-        assertEquals("2", nodeList.get(1).getName());
-        assertEquals("3", nodeList.get(2).getName());
+        assertEquals("0", nodeList.get(0).getName());
+        assertEquals("1", nodeList.get(1).getName());
+        assertEquals("2", nodeList.get(2).getName());
         assertEquals("value1", nodeList.get(0).get("node1Key", String.class));
         assertEquals("value4", nodeList.get(1).get("node3Key", String.class));
         assertEquals("value2", nodeList.get(2).get("node2Key", String.class));

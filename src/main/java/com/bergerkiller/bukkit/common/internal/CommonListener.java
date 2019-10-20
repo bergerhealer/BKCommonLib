@@ -44,6 +44,7 @@ public class CommonListener implements Listener {
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
             pb.updateDependency(event.getPlugin(), name, true);
         }
+        CommonPlugin.flushSaveOperations(event.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
@@ -52,6 +53,7 @@ public class CommonListener implements Listener {
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
             pb.updateDependency(event.getPlugin(), name, false);
         }
+        CommonPlugin.flushSaveOperations(event.getPlugin());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
