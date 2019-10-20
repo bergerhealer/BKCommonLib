@@ -39,7 +39,7 @@ public class MaterialUtil {
             try (InputStream input = MaterialUtil.class.getResourceAsStream(mat_cat_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");
-                    material_categories_str = "#set version " + CommonBootstrap.getCommonServer().getMinecraftVersionMajor() + "\n" +
+                    material_categories_str = "#set version " + CommonBootstrap.initCommonServer().getMinecraftVersionMajor() + "\n" +
                                               scanner.next();
                     material_categories_str = SourceDeclaration.preprocess(material_categories_str);
                 }

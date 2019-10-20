@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -28,11 +29,12 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * Bukkit MaterialData that preserve all original legacy MaterialData states.
  */
 @SuppressWarnings("deprecation")
-public class IBlockDataToMaterialData extends CommonLegacyMaterials {
+public class IBlockDataToMaterialData {
     public static final Map<Object, MaterialData> INTERNAL_IBLOCKDATA_TO_MATERIALDATA = new HashMap<Object, MaterialData>();
     private static final Map<Material, MaterialDataBuilder> materialdata_builders = new EnumMap<Material, MaterialDataBuilder>(Material.class);
     private static final Map<Material, Byte> materialdata_default_data = new EnumMap<Material, Byte>(Material.class);
     private static final FastMethod<MaterialData> craftbukkitGetMaterialdata = new FastMethod<MaterialData>();
+    private static final EnumMap<Material, Material> materialToLegacyCache;
 
     static {
         // Stores a mapping from IBlockData to MaterialData for some values
@@ -52,6 +54,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             }
         }
         INTERNAL_IBLOCKDATA_TO_MATERIALDATA.putAll(iblockdataToMaterialdata_map);
+        MaterialDataBuilder default_builder = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
 
         // Generated method for generating MaterialData from IBlockData
         {
@@ -86,8 +89,6 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
             }
         }
 
-        MaterialDataBuilder default_builder = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
-
         // Bukkit bugfix.
         storeBuilders((material_type, legacy_data_type, legacy_data_value) -> new org.bukkit.material.PressurePlate(material_type, legacy_data_value), "LEGACY_GOLD_PLATE", "LEGACY_IRON_PLATE");
 
@@ -102,7 +103,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         storeMaterialDataDefault("REDSTONE_TORCH_ON", 5);
 
         // Initialize missing defaults
-        for (Material type : CommonLegacyMaterials.getAllMaterials()) {
+        for (Material type : MaterialsByName.getAllMaterials()) {
             if (!materialdata_builders.containsKey(type)) {
                 materialdata_builders.put(type, default_builder);
             }
@@ -119,12 +120,20 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
         // Make absolutely sure that IBlockData AIR stays AIR, because Bukkit sends back AIR when materials cannot be resolved
         // This fixes a rather serious issue of some random material data getting mapped to air.
         storeMaterialData(CraftMagicNumbersHandle.getBlockDataFromMaterial(Material.AIR), new MaterialData(CommonLegacyMaterials.getLegacyMaterial("AIR")));
+
+        // Cache all the Material -> legacy material mappings to make lookup fast
+        // Before this point materialToLegacy is null
+        EnumMap<Material, Material> initMaterialToLegacy = new EnumMap<>(Material.class);
+        for (Material material : MaterialsByName.getAllMaterials()) {
+            initMaterialToLegacy.put(material, toLegacy(material));
+        }
+        materialToLegacyCache = initMaterialToLegacy;
     }
 
     // Only called on MC >= 1.13
     private static void initMaterialDataMap() {
         {
-            MaterialData materialdata = new MaterialData(CommonLegacyMaterials.getMaterial("LEGACY_DOUBLE_STEP"));
+            MaterialData materialdata = new MaterialData(MaterialsByName.getMaterial("LEGACY_DOUBLE_STEP"));
             for (byte data = 0; data < 8; data++) {
                 materialdata.setData(data);
                 IBlockDataHandle iblockdata = MaterialDataToIBlockData.getIBlockData(materialdata);
@@ -352,7 +361,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
     }
 
     private static void storeMaterialDataDefault(String name, int data) {
-        materialdata_default_data.put(CommonLegacyMaterials.getLegacyMaterial(name), Byte.valueOf((byte) data));
+        materialdata_default_data.put(MaterialsByName.getLegacyMaterial(name), Byte.valueOf((byte) data));
     }
 
     /**
@@ -364,7 +373,19 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
      * @return legacy material type approximation
      */
     public static Material toLegacy(Material material) {
-        return materialdata_builders.get(material).toLegacy(material);
+        if (materialToLegacyCache != null) {
+            return materialToLegacyCache.get(material);
+        } else if (!CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            return material;
+        } else if (MaterialsByName.isLegacy(material)) {
+            return material;
+        } else {
+            Material legacy = materialdata_builders.get(material).toLegacy(material);
+            if (legacy == material) {
+                legacy = CraftBukkitToLegacy.toLegacy(material);
+            }
+            return legacy;
+        }
     }
 
     /**
@@ -413,7 +434,7 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
 
     private static void storeBuilders(MaterialDataBuilder builder, String... typeNames) {
         for (String typeName : typeNames) {
-            Material type = CommonLegacyMaterials.getMaterial(typeName);
+            Material type = MaterialsByName.getMaterial(typeName);
             if (type != null) materialdata_builders.put(type, builder);
         }
     }
@@ -502,6 +523,14 @@ public class IBlockDataToMaterialData extends CommonLegacyMaterials {
                     }
                 }
             }
+        }
+    }
+
+    private static class CraftBukkitToLegacy {
+        private static final SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("util.CraftLegacy"), "toLegacy", Material.class);
+
+        public static Material toLegacy(Material material) {
+            return craftbukkitToLegacy.invoke(null, material);
         }
     }
 }

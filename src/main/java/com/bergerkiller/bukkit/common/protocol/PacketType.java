@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
@@ -20,6 +21,9 @@ import java.util.List;
 import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
+    static {
+        CommonBootstrap.initTemplates();
+    }
 
     private static final ClassMap<List<PacketType>> typesByPacketClass = new ClassMap<List<PacketType>>();
 

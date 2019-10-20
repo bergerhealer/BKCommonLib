@@ -2,7 +2,8 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
-import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -33,8 +34,9 @@ import java.util.UUID;
  * @param <T> - type of output
  */
 public abstract class PropertyConverter<T> extends Converter<Object, T> {
-
-    private static final EnumDirectionHandle[] paintingFaces = {EnumDirectionHandle.DOWN, EnumDirectionHandle.UP, EnumDirectionHandle.NORTH, EnumDirectionHandle.SOUTH, EnumDirectionHandle.WEST, EnumDirectionHandle.EAST};
+    static {
+        CommonBootstrap.initCommonServer();
+    }
 
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = new PropertyConverter<Integer>(Integer.class) {
@@ -78,8 +80,8 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
                 return ((Number) value).intValue();
             } else if (EnumDirectionHandle.T.isAssignableFrom(value)) {
                 EnumDirectionHandle face = EnumDirectionHandle.createHandle(value);
-                for (int i = 0; i < paintingFaces.length; i++) {
-                    if (paintingFaces[i].equals(face)) {
+                for (int i = 0; i < PaintingFacingHelper.faces.length; i++) {
+                    if (PaintingFacingHelper.faces[i].equals(face)) {
                         return i;
                     }
                 }
@@ -89,39 +91,19 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
             }
         }
     };
-    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(EnumDirectionHandle.T.getType()) {
+    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(CommonUtil.getNMSClass("EnumDirection")) {
         @Override
         public Object convertInput(Object value) {
             Integer id = toPaintingFacingId.convert(value);
             if (id != null) {
                 final int idInt = id.intValue();
-                if (LogicUtil.isInBounds(paintingFaces, idInt)) {
-                    return paintingFaces[idInt].getRaw();
+                if (LogicUtil.isInBounds(PaintingFacingHelper.faces, idInt)) {
+                    return PaintingFacingHelper.faces[idInt].getRaw();
                 }
             }
             return null;
         }
     };
-
-    // ======================= Material -> EntityType for Minecarts =============================
-    private static final EnumMap<Material, EntityType> matToMinecartType = new EnumMap<Material, EntityType>(Material.class);
-    private static void storeMinecartTypes(EntityType type, String... materialNames) {
-        for (String materialName : materialNames) {
-            Material mat = CommonLegacyMaterials.getMaterial(materialName);
-            if (mat != null) {
-                matToMinecartType.put(mat, type);
-            }
-        }
-    }
-    static {
-        storeMinecartTypes(EntityType.MINECART, "MINECART", "LEGACY_MINECART");
-        storeMinecartTypes(EntityType.MINECART_HOPPER, "HOPPER", "HOPPER_MINECART", "LEGACY_HOPPER_MINECART");
-        storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
-        storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART", "LEGACY_COMMAND", "LEGACY_COMMAND_MINECART");
-        storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "FURNACE_MINECART", "LEGACY_FURNACE", "LEGACY_POWERED_MINECART");
-        storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "TNT_MINECART", "LEGACY_TNT", "LEGACY_EXPLOSIVE_MINECART");
-    }
-    // ============================================================================================
 
     public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
         @Override
@@ -138,7 +120,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
                 if (material == null) {
                     return null;
                 }
-                return matToMinecartType.get(material);
+                return MinecartMaterialHelper.matToMinecartType.get(material);
             }
         }
     };
@@ -152,7 +134,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
             }
         }
     };
-    public static final PropertyConverter<Object> toGameProfileFromId = new PropertyConverter<Object>(GameProfileHandle.T.getType()) {
+    public static final PropertyConverter<Object> toGameProfileFromId = new PropertyConverter<Object>(CommonUtil.getClass("com.mojang.authlib.GameProfile")) {
         @Override
         public Object convertInput(Object value) {
             if (value instanceof String) {
@@ -178,4 +160,28 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         super(Object.class, (Class<T>) outputType);
     }
 
+    private static class PaintingFacingHelper {
+        private static final EnumDirectionHandle[] faces = {EnumDirectionHandle.DOWN, EnumDirectionHandle.UP, EnumDirectionHandle.NORTH, EnumDirectionHandle.SOUTH, EnumDirectionHandle.WEST, EnumDirectionHandle.EAST};
+    }
+
+    // Material -> EntityType for Minecarts
+    private static class MinecartMaterialHelper {
+        private static final EnumMap<Material, EntityType> matToMinecartType = new EnumMap<Material, EntityType>(Material.class);
+        private static void storeMinecartTypes(EntityType type, String... materialNames) {
+            for (String materialName : materialNames) {
+                Material mat = MaterialsByName.getMaterial(materialName);
+                if (mat != null) {
+                    matToMinecartType.put(mat, type);
+                }
+            }
+        }
+        static {
+            storeMinecartTypes(EntityType.MINECART, "MINECART", "LEGACY_MINECART");
+            storeMinecartTypes(EntityType.MINECART_HOPPER, "HOPPER", "HOPPER_MINECART", "LEGACY_HOPPER_MINECART");
+            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
+            storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART", "LEGACY_COMMAND", "LEGACY_COMMAND_MINECART");
+            storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "FURNACE_MINECART", "LEGACY_FURNACE", "LEGACY_POWERED_MINECART");
+            storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "TNT_MINECART", "LEGACY_TNT", "LEGACY_EXPLOSIVE_MINECART");
+        }
+    }
 }

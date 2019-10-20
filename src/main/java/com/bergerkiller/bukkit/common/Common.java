@@ -1,20 +1,12 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.conversion.CommonConverters;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.server.*;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.mountiplex.MountiplexUtil;
-import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.templates.TemplateResolver;
 
 import org.bukkit.Bukkit;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.logging.Level;
 
 public class Common {
@@ -54,7 +46,7 @@ public class Common {
     /**
      * Resolves template Class Declarations at runtime
      */
-    public static final TemplateResolver TEMPLATE_RESOLVER = new TemplateResolver();
+    public static final TemplateResolver TEMPLATE_RESOLVER;
     /**
      * Gets whether the current server software used is the Spigot
      * implementation
@@ -99,186 +91,12 @@ public class Common {
         LOGGER = Logging.LOGGER;
 
         // Set up the constants
-        SERVER = CommonBootstrap.getCommonServer();
-        IS_COMPATIBLE = SERVER.isCompatible();
+        SERVER = CommonBootstrap.initCommonServer();
         MC_VERSION = SERVER.getMinecraftVersion();
-        IS_SPIGOT_SERVER = SERVER instanceof SpigotServer;
+        IS_SPIGOT_SERVER = CommonBootstrap.isSpigotServer();
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
-
-        // Register server to handle field, method and class resolving
-        //TODO! Implement these functions in SERVER directly
-        Resolver.registerClassResolver(SERVER::getClassName);
-        Resolver.registerFieldResolver(SERVER::getFieldName);
-        Resolver.registerMethodResolver(SERVER::getMethodName);
-
-        // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
-        if (CommonUtil.getNMSClass("EnumGamemode") == null) {
-            final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");
-            final String eg_path_proxy = Resolver.resolveClassPath("net.minecraft.server.WorldSettings$EnumGamemode");
-            Resolver.registerClassResolver(classPath -> {
-                if (classPath.equals(eg_path)) {
-                    return eg_path_proxy;
-                }
-                return classPath;
-            });
-        }
-
-        // Register additional version-specific class remappings
-        if (IS_COMPATIBLE) {
-            final String nms_root = SERVER.getClassName("net.minecraft.server.Entity").replace(".Entity", "");
-            final String cb_root = SERVER.getClassName("org.bukkit.craftbukkit.CraftServer").replaceAll(".CraftServer", "");
-            final Map<String, String> remappings = new HashMap<String, String>();
-
-            // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
-            remappings.put(nms_root + ".EntityTrackerEntryState", nms_root + ".EntityTrackerEntry");
-
-            // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
-            // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
-            remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2");
-            remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2$LongIterator");
-
-            // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
-            if (Common.evaluateMCVersion("<=", "1.8.8")) {
-                remappings.put(nms_root + ".MobSpawnerData", nms_root + ".MobSpawnerAbstract$a");
-                remappings.put(nms_root + ".SoundEffectType", nms_root + ".Block$StepSound"); // workaround
-                remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".DataWatcher$WatchableObject");
-                remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
-
-                // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
-                remappings.put(nms_root + ".PacketPlayInUseItem", nms_root + ".PacketPlayInBlockPlace");
-
-                // We proxy a bunch of classes, because they don't exist in 1.8.8
-                // Writing custom wrappers with switches would be too tiresome
-                // This allows continued use of the same API without trouble
-                // Converters take care to convert between the Class and Id used internally
-                remappings.put(nms_root + ".EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
-                remappings.put(nms_root + ".DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
-                remappings.put(nms_root + ".DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
-                remappings.put(nms_root + ".MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
-                remappings.put(nms_root + ".SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect");
-            }
-
-            // Some classes were moved before around 1.8
-            if (Common.evaluateMCVersion("<=", "1.8")) {
-                remappings.put(nms_root + ".SoundEffectType", nms_root + ".StepSound");
-                remappings.put(nms_root + ".Block$StepSound", nms_root + ".StepSound");
-                remappings.put(nms_root + ".EnumDirection$EnumAxis", nms_root + ".EnumAxis");
-                remappings.put(nms_root + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction", nms_root + ".EnumPlayerInfoAction");
-                remappings.put(nms_root + ".PacketPlayInUseEntity$EnumEntityUseAction", nms_root + ".EnumEntityUseAction");
-                remappings.put(nms_root + ".MobSpawnerData", nms_root + ".TileEntityMobSpawnerData");
-                remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".WatchableObject");
-                remappings.put(nms_root + ".DataWatcher$WatchableObject", nms_root + ".WatchableObject");
-                remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".EnumScoreboardAction");
-                remappings.put(nms_root + ".PacketPlayOutMapChunk$ChunkMap", nms_root + ".ChunkMap");
-                remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
-                remappings.put(nms_root + ".PacketPlayOutTitle$EnumTitleAction", nms_root + ".EnumTitleAction");
-                remappings.put(nms_root + ".PacketPlayOutCombatEvent$EnumCombatEventType", nms_root + ".EnumCombatEventType");
-                remappings.put(nms_root + ".PacketPlayOutWorldBorder$EnumWorldBorderAction", nms_root + ".EnumWorldBorderAction");
-                remappings.put(nms_root + ".PacketPlayOutPlayerInfo$PlayerInfoData", nms_root + ".PlayerInfoData");
-                remappings.put(nms_root + ".PacketPlayInResourcePackStatus$EnumResourcePackStatus", nms_root + ".EnumResourcePackStatus");
-                remappings.put(nms_root + ".PacketPlayInBlockDig$EnumPlayerDigType", nms_root + ".EnumPlayerDigType");
-                remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
-                remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
-                remappings.put(nms_root + ".WeightedRandom$WeightedRandomChoice", nms_root + ".WeightedRandomChoice");
-                remappings.put(nms_root + ".BiomeBase$BiomeMeta", nms_root + ".BiomeMeta");
-                remappings.put(nms_root + ".IScoreboardCriteria$EnumScoreboardHealthDisplay", nms_root + ".EnumScoreboardHealthDisplay");
-                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", nms_root + ".IntHashMapEntry");
-                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
-                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMove", nms_root + ".PacketPlayOutRelEntityMove");
-                remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
-                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInLook", nms_root + ".PacketPlayInLook");
-                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPosition", nms_root + ".PacketPlayInPosition");
-                remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPositionLook", nms_root + ".PacketPlayInPositionLook");
-                remappings.put(nms_root + ".IChatBaseComponent$ChatSerializer", nms_root + ".ChatSerializer");
-            }
-
-            // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
-            if (Common.evaluateMCVersion("<", "1.13")) {
-                remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
-                remappings.put(nms_root + ".HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
-                remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
-                remappings.put(nms_root + ".VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
-            }
-
-            // EnumArt has seen many places...
-            if (Common.evaluateMCVersion("<=", "1.8")) {
-                remappings.put(nms_root + ".Paintings", nms_root + ".EnumArt");
-            } else if (Common.evaluateMCVersion("<", "1.13")) {
-                remappings.put(nms_root + ".Paintings", nms_root + ".EntityPainting$EnumArt");
-            } else {
-                // Located at net.minecraft.server.Paintings like normal.
-            }
-
-            // Still obfuscated on these versions of MC
-            if (Common.evaluateMCVersion(">=", "1.14") && Common.evaluateMCVersion("<=", "1.14.1")) {
-                remappings.put(nms_root + ".ShapeDetector$Shape", nms_root + ".ShapeDetector$c");
-            }
-
-            // Some classes were moved after 1.13
-            if (Common.evaluateMCVersion(">=", "1.13")) {
-                remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");
-            }
-
-            // Many classes disappeared, merged or moved with MC 1.14
-            if (Common.evaluateMCVersion(">=", "1.14")) {
-                String unimi_fastutil_path = "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.";
-                try {
-                    Class.forName(unimi_fastutil_path + "longs.LongSet");
-
-                    // Fixes hardcoded fastutil paths used in templates
-                    remappings.put("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap", unimi_fastutil_path + "ints.Int2ObjectOpenHashMap");
-                    remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectOpenHashMap");
-                    remappings.put("it.unimi.dsi.fastutil.longs.LongIterator", unimi_fastutil_path + "longs.LongIterator");
-                    remappings.put("it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet", unimi_fastutil_path + "longs.LongLinkedOpenHashSet");
-                    remappings.put("it.unimi.dsi.fastutil.longs.LongOpenHashSet", unimi_fastutil_path + "longs.LongOpenHashSet");
-                    remappings.put("it.unimi.dsi.fastutil.longs.LongSet", unimi_fastutil_path + "longs.LongSet");
-                } catch (ClassNotFoundException ex) {
-                    unimi_fastutil_path = "it.unimi.dsi.fastutil.";
-                }
-
-                remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
-                remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
-                remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", unimi_fastutil_path + "longs.LongSet");
-                remappings.put(cb_root + ".util.LongObjectHashMap", unimi_fastutil_path + "longs.Long2ObjectMap");
-                remappings.put(nms_root + ".IntHashMap", unimi_fastutil_path + "ints.Int2ObjectMap");
-                remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
-                remappings.put(unimi_fastutil_path + "ints.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
-                remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap");
-                remappings.put(nms_root + ".EntityTrackerEntry", nms_root + ".PlayerChunkMap$EntityTracker");
-            }
-
-            // If remappings exist, add a resolver for them
-            if (!remappings.isEmpty()) {
-                Resolver.registerClassResolver(classPath -> {
-                    String remapped = remappings.get(classPath);
-                    return (remapped != null) ? remapped : classPath;
-                });
-            }
-        }
-
-        // Only do these things when we are compatible
-        if (Common.IS_COMPATIBLE) {
-            // Debug
-            if (CommonBootstrap.WARN_WHEN_INIT_TEMPLATES) {
-                Logging.LOGGER.log(Level.WARNING, "WARN_WHEN_INIT_TEMPLATES", new RuntimeException("Initializing templates"));
-            }
-
-            // This must be initialized AFTER we have registered the Class path resolvers!
-            TEMPLATE_RESOLVER.load();
-            Resolver.registerClassDeclarationResolver(TEMPLATE_RESOLVER);
-
-            // Conversion types registration
-            try {
-                CommonUtil.loadClass(CommonConverters.class);
-                CommonUtil.loadClass(Conversion.class);
-                CommonUtil.loadClass(DuplexConversion.class);
-            } catch (Throwable t) {
-                Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Failed to initialize default converters", t);
-            }
-        }
-
-        // This unloader takes care of de-referencing everything container in here
-        MountiplexUtil.registerUnloader(TEMPLATE_RESOLVER::unload);
+        IS_COMPATIBLE = SERVER.isCompatible();
+        TEMPLATE_RESOLVER = CommonBootstrap.initTemplates();
     }
 
     /**

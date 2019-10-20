@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -55,7 +56,7 @@ public class CommonUtil {
     public static final Thread MAIN_THREAD = Thread.currentThread();
 
     private static final Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
-    
+
     static {
     	if (Bukkit.getServer() == null) {
     		VIEW = 5;
@@ -68,6 +69,20 @@ public class CommonUtil {
     	
     	classMap.put("double", double.class);
     }
+
+    /**
+     * Defines the net.minecraft.server. constant used by getNMSClass() (which is not inlined or
+     * relocated). Implementer note: do NOT change this to a constant or maven
+     * shading will rename it.
+     */
+    private static final String NMS_ROOT = StringUtil.join(".", "net", "minecraft", "server", "");
+
+    /**
+     * Defines the org.bukkit.craftbukkit. constant used by getCBClass() (which is not inlined or
+     * relocated). Implementer note: do NOT change this to a constant or maven
+     * shading will rename it.
+     */
+    private static final String CB_ROOT = StringUtil.join(".", "org", "bukkit", "craftbukkit", "");
 
     /**
      * When under test internal classes have to be loaded in a very specific order.
@@ -683,7 +698,7 @@ public class CommonUtil {
      * @return Plugin
      */
     public static Plugin getPlugin(String name) {
-        if (Common.IS_TEST_MODE) {
+        if (CommonBootstrap.isTestMode()) {
             return null;
         }
         return Bukkit.getPluginManager().getPlugin(name);
@@ -696,7 +711,7 @@ public class CommonUtil {
      * @return the Plugin matching the Class, or null if not found
      */
     public static Plugin getPluginByClass(Class<?> clazz) {
-        if (Common.IS_TEST_MODE) {
+        if (CommonBootstrap.isTestMode()) {
             return null;
         }
         ClassLoader loader = clazz.getClassLoader();
@@ -804,7 +819,7 @@ public class CommonUtil {
      * @return the class, or null if not found
      */
     public static Class<?> getNMSClass(String name) {
-        return getClass(Common.NMS_ROOT + "." + name, false);
+        return getClass(NMS_ROOT + name, false);
     }
 
     /**
@@ -814,7 +829,7 @@ public class CommonUtil {
      * @return the class, or null if not found
      */
     public static Class<?> getCBClass(String name) {
-        return getClass(Common.CB_ROOT + "." + name, false);
+        return getClass(CB_ROOT + name, false);
     }
 
     /**
@@ -1098,7 +1113,7 @@ public class CommonUtil {
         // When shutting down, this may be the Spigot WatchDog thread
         // This is used when the server freezes and needs to be shut down for a restart
         // At that point this thread 'acts' as a main thread, despite it not being one
-        if (Common.IS_SPIGOT_SERVER) {
+        if (CommonBootstrap.isSpigotServer()) {
             Class<?> threadClass = Thread.currentThread().getClass();
             if (threadClass.getName().equals("org.spigotmc.WatchdogThread")) {
                 return true;

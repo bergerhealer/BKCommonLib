@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
@@ -103,7 +103,7 @@ public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public boolean isCompatible() {
-        return Common.TEMPLATE_RESOLVER.isSupported(this.getMinecraftVersion());
+        return CommonBootstrap.getTemplates().isSupported(this.getMinecraftVersion());
     }
 
     @Override

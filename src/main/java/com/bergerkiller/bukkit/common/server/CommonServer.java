@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.mountiplex.MountiplexUtil;
 
 import java.io.File;
 import java.util.Collection;

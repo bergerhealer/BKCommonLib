@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.legacy;
 
-import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getLegacyMaterial;
-import static com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials.getBlockDataFromMaterialName;
+import static com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName.getLegacyMaterial;
+import static com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName.getBlockDataFromMaterialName;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -117,11 +117,11 @@ public class MaterialDataToIBlockData {
 
         // Chests
         {
-            Material[] legacy_types = CommonLegacyMaterials.getAllByName("LEGACY_CHEST", "LEGACY_ENDER_CHEST", "LEGACY_TRAPPED_CHEST");
+            Material[] legacy_types = MaterialsByName.getAllByName("LEGACY_CHEST", "LEGACY_ENDER_CHEST", "LEGACY_TRAPPED_CHEST");
             String[] modern_names = new String[] {"CHEST", "ENDER_CHEST", "TRAPPED_CHEST"};
             for (int n = 0; n < legacy_types.length; n++) {
                 final Material legacy_type = legacy_types[n];
-                final IBlockDataHandle modern_data = CommonLegacyMaterials.getBlockDataFromMaterialName(modern_names[n]);
+                final IBlockDataHandle modern_data = getBlockDataFromMaterialName(modern_names[n]);
                 iblockdataBuilders.put(legacy_type, (IBlockDataHandle iblockdata, org.bukkit.material.DirectionalContainer directional) -> modern_data.set("facing", directional.getFacing()));
             }
         }
@@ -146,7 +146,7 @@ public class MaterialDataToIBlockData {
             throw new IllegalArgumentException("MaterialData getItemType() == null");
         }
 
-        Material legacyType = CommonLegacyMaterials.toLegacy(materialdata.getItemType());
+        Material legacyType = IBlockDataToMaterialData.toLegacy(materialdata.getItemType());
         IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(legacyType));
         IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
         if (builder != null) {

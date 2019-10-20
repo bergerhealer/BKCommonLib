@@ -9,41 +9,17 @@ import org.bukkit.Material;
 
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
-import com.bergerkiller.mountiplex.reflection.SafeMethod;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Helper methods for all legacy Material API
  */
-public class CommonLegacyMaterials {
+public class CommonLegacyMaterials extends MaterialsByName {
     private static final HashMap<Integer, Material> idToMaterial = new HashMap<Integer, Material>();
     private static final EnumMap<Material, Integer> materialToId = new EnumMap<Material, Integer>(Material.class);
-    private static final EnumMap<Material, Material> materialToLegacy = new EnumMap<Material, Material>(Material.class);
     private static final Material[] allLegacyMaterialValues;
-    private static final FastMethod<Boolean> isLegacyMethod = new FastMethod<Boolean>();
 
     static {
-        // This method gets whether a material is legacy, or not
-        // On 1.12.2 and before, it always returns true
-        // We do it this way so we don't have to initialize all templates to get this to work
-        {
-            String template = "public boolean isLegacy() {\n";
-            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-                template += "return instance.isLegacy();\n}";
-            } else {
-                template += "return true;\n}";
-            }
-            ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(Material.class);
-            isLegacyMethod.init(new MethodDeclaration(resolver, template));
-        }
-
         // Filter by only the legacy Material values
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             // Material names that start with LEGACY_ are legacy material values
@@ -76,38 +52,6 @@ public class CommonLegacyMaterials {
                 t.printStackTrace();
             }
         }
-
-        // Store a remapping from non-legacy materials to legacy materials
-        // First store all materials to themselves
-        for (Material material : MaterialsByName.getAllMaterials()) {
-            materialToLegacy.put(material, material);
-        }
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            // Use CraftLegacy toLegacy(material) to convert them by default
-            // Some we override ourselves, which is done by IBlockDataToMaterialData utility class
-            SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("util.CraftLegacy"), "toLegacy", Material.class);
-            for (Material material :  MaterialsByName.getAllMaterials()) {
-                if (isLegacy(material)) {
-                    continue;
-                }
-                Material legacy = IBlockDataToMaterialData.toLegacy(material);
-                if (legacy == material) {
-                    legacy = craftbukkitToLegacy.invoke(null, material);
-                }
-                materialToLegacy.put(material, legacy);
-            }
-        }
-    }
-
-    /**
-     * Gets whether a given Material enum value is legacy, or not.
-     * Always returns true on MC 1.12.2 and before.
-     * 
-     * @param material
-     * @return True if this is a legacy Material
-     */
-    public static boolean isLegacy(Material material) {
-        return isLegacyMethod.invoke(material);
     }
 
     /**
@@ -119,7 +63,7 @@ public class CommonLegacyMaterials {
      * @return legacy material type
      */
     public static Material toLegacy(Material material) {
-        return materialToLegacy.get(material);
+        return IBlockDataToMaterialData.toLegacy(material);
     }
 
     /**
@@ -130,70 +74,6 @@ public class CommonLegacyMaterials {
      */
     public static int getOrdinal(Material material) {
         return ((Enum<?>) material).ordinal();
-    }
-
-    /**
-     * Gets a legacy material by name. Prepends LEGACY_ on MC 1.13 and onwards for lookup.
-     * The Material remapping performed by Spigot on MC 1.13 is ignored.
-     * 
-     * @param name
-     * @return
-     */
-    public static Material getLegacyMaterial(String name) {
-        return getMaterial("LEGACY_" + name);
-    }
-
-    /**
-     * Gets a material by name.
-     * The Material remapping performed by Spigot on MC 1.13 is ignored.
-     * 
-     * @param name
-     * @return material, null if not found
-     */
-    public static Material getMaterial(String name) {
-        return MaterialsByName.getMaterial(name);
-    }
-
-    /**
-     * Gets the name() of a Material.
-     * The Material remapping performed by Spigot on MC 1.13 is ignored.
-     * 
-     * @param type
-     * @return type name
-     */
-    public static String getMaterialName(Material type) {
-        return MaterialsByName.getMaterialName(type);
-    }
-
-    /**
-     * Gets an array of materials from material enum names.
-     * Any names missing will cause an exception.
-     * The Material remapping performed by Spigot on MC 1.13 is ignored.<br>
-     * <b>Not suitable for use by Plugins</b>
-     * 
-     * @param names
-     * @return materials
-     */
-    public static Material[] getAllByName(String... names) {
-        Material[] result = new Material[names.length];
-        for (int i = 0; i < names.length; i++) {
-            Material m = getMaterial(names[i]);
-            if (m == null) {
-                throw new RuntimeException("Material not found: " + names[i]);
-            }
-            result[i] = m;
-        }
-        return result;
-    }
-
-    /**
-     * Gets an array of all Material enum values, unaffected by the Spigot Material remapping.<br>
-     * <b>Not suitable for use by Plugins</b>
-     * 
-     * @return all Material enum values
-     */
-    public static Material[] getAllMaterials() {
-        return MaterialsByName.getAllMaterials();
     }
 
     /**
@@ -236,14 +116,4 @@ public class CommonLegacyMaterials {
         return materialToId.get(type);
     }
 
-    /**
-     * Helper method to retrieve IBlockData by Material enum name.
-     * Only suitable for non-legacy names, and meant to be used before the BlockData API initializes.
-     * 
-     * @param name
-     * @return IBlockData
-     */
-    public static IBlockDataHandle getBlockDataFromMaterialName(String name) {
-        return CraftMagicNumbersHandle.getBlockDataFromMaterial(getMaterial(name));
-    }
 }

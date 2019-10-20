@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.conversion;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -31,6 +32,10 @@ import org.bukkit.util.Vector;
 import java.util.UUID;
 
 public class Conversion {
+    static {
+        CommonBootstrap.initCommonServer();
+    }
+
     // Misc
     @SuppressWarnings("rawtypes")
     public static final Converter NONE = new NullConverter(Object.class, Object.class);
@@ -125,7 +130,7 @@ public class Conversion {
     public static final InputConverter<int[]> toIntArr = getConverterTo(int[].class);
     public static final InputConverter<long[]> toLongArr = getConverterTo(long[].class);
     public static final InputConverter<float[]> toFloatArr = getConverterTo(float[].class);
-    public static final InputConverter<double[]> toDoubleArr = getConverterTo(double[].class);;
+    public static final InputConverter<double[]> toDoubleArr = getConverterTo(double[].class);
     // Properties (these are not actually registered.)
     @Deprecated
     public static final PropertyConverter<Integer> toItemId = PropertyConverter.toItemId;
