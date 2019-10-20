@@ -718,6 +718,7 @@ public class YamlTest {
         // - Double ampersand escaping
         // - Headers, with and without newline prefix
         // - There's a tab used for a full indent position, both at pos=0 and with spaces left of it
+        // - A numeric key is used, which node setValues() should be able to deal with
         YamlDeserializer.Output output = YamlDeserializer.INSTANCE.deserialize(
                 "#> Main file header\n" +
                 "\n" +
@@ -731,6 +732,7 @@ public class YamlTest {
                 "  \ttext: '&cColored text&&ampersand'\n" +
                 "\n" +
                 "    value: -5\n" +
+                "    123: 55\n" +
                 "  *:\n" +
                 "    - value1\n" +
                 "    - value2\n" +
@@ -757,6 +759,7 @@ public class YamlTest {
                 "   \ttext: '&cColored text&&ampersand'\n" +
                 "\n" +
                 "      value: -5\n" +
+                "      123:  55\n" +
                 "   *:\n" +
                 "      - value1\n" +
                 "      - value2\n" +
@@ -774,6 +777,7 @@ public class YamlTest {
         List<?> anyList = (List<?>) hello.get("*");
         assertEquals("§cColored text&ampersand", (String) cool.get("text"));
         assertEquals(Integer.valueOf(-5), (Integer) cool.get("value"));
+        assertEquals(Integer.valueOf(55), (Integer) cool.get(Integer.valueOf(123)));
         assertEquals(3, anyList.size());
         assertEquals("value1", (String) anyList.get(0));
         assertEquals("value2", (String) anyList.get(1));
@@ -788,6 +792,26 @@ public class YamlTest {
         assertEquals("Header of cool", output.headers.get(YamlPath.create("hello.cool")));
         assertEquals("Header of text\n\nWith a line gap in-between", output.headers.get(YamlPath.create("hello.cool.text")));
         assertEquals("\n", output.headers.get(YamlPath.create("hello.cool.value")));
+
+        // Serialize into a YamlNode
+        YamlNode root = new YamlNode();
+        root.loadDeserializerOutput(output);
+
+        // Verify YamlNode values are initialized according to what is in the output
+        assertEquals("§cColored text&ampersand", root.get("hello.cool.text"));
+        assertEquals(Integer.valueOf(-5), root.get("hello.cool.value"));
+        assertEquals(Integer.valueOf(55), root.get("hello.cool.123"));
+        assertEquals("value1", root.get("hello.*[0]"));
+        assertEquals("value2", root.get("hello.*[1]"));
+        assertEquals("value3", root.get("hello.*[2][0]"));
+        assertEquals("value4", root.get("hello.*[2][1]"));
+
+        // Verify YamlNode headers are initialized according to what is in the output
+        assertEquals("Main file header", root.getHeader());
+        assertEquals("\nHeader of hello", root.getHeader("hello"));
+        assertEquals("Header of cool", root.getHeader("hello.cool"));
+        assertEquals("Header of text\n\nWith a line gap in-between", root.getHeader("hello.cool.text"));
+        assertEquals("\n", root.getHeader("hello.cool.value"));
     }
 
     @Test
@@ -799,6 +823,7 @@ public class YamlTest {
         assertEquals("key: value\n", serializer.serialize(Collections.singletonMap("key", "value")));
         assertEquals("key: 12\n", serializer.serialize(Collections.singletonMap("key", 12)));
         assertEquals("'1': '*'\n", serializer.serialize(Collections.singletonMap("1", "*")));
+        assertEquals("1: value\n", serializer.serialize(Collections.singletonMap("1", "value")));
         assertEquals("vector:\n" +
                 "  ==: Vector\n" +
                 "  x: 1.0\n" +
@@ -842,6 +867,18 @@ public class YamlTest {
                      "key: value\n",
                      serializer.serialize(Collections.singletonMap("key", "value"),
                         "this is the first line\n", 1));
+
+        // Just a newline character
+        assertEquals("\n" +
+                     "key: value\n",
+                     serializer.serialize(Collections.singletonMap("key", "value"), "\n", 1));
+
+        // Newlines at the beginning and end
+        assertEquals("\n" +
+                     "# Header\n" +
+                     "# \n" +
+                     "key: value\n",
+                     serializer.serialize(Collections.singletonMap("key", "value"), "\nHeader\n", 1));
 
         // Multiline string values
         assertEquals("key: |-\n" +

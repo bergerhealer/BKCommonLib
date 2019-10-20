@@ -225,6 +225,17 @@ public class YamlSerializer {
         if (header != null && !header.isEmpty()) {
             int i = 0;
 
+            // Detect newlines in the beginning
+            // Prefix those without a # left of it
+            while (header.charAt(i) == '\n') {
+                if (++i == header.length()) {
+                    // There are only newlines, nothing else
+                    // This means no # are written at all
+                    builder.append(header);
+                    return;
+                }
+            }
+
             // Obtain the header prefix String for this indent level that we use
             // Generate more of them if the indent is higher than what we have cached
             String[] headerPrefixes = this.headerPrefixes;
@@ -239,12 +250,6 @@ public class YamlSerializer {
                 this.headerPrefixes = headerPrefixes = new_prefixes;
             }
             String headerPrefix = headerPrefixes[indent];
-
-            // Detect newlines in the beginning
-            // Prefix those without a # left of it
-            while (i < header.length() && header.charAt(i) == '\n') {
-                i++;
-            }
 
             if (i > 0) {
                 builder.append(header).insert(i, headerPrefix);
@@ -341,7 +346,7 @@ public class YamlSerializer {
         // If key is not a String literal, really strange formatting rules may happen
         // For example, a multiline string will write ? |-\n  text\n  text\n: for the key
         // Just don't bother and let Snakeyaml deal with those rare cases
-        if (!canWriteStringLiteral(key)) {
+        if (!canWriteStringLiteral(key, true)) {
             appendValue(Collections.singletonMap(key, value), indent, indentFirstLine);
             return;
         }
@@ -374,7 +379,7 @@ public class YamlSerializer {
             return;
         } else if (value instanceof String) {
             String valueStr = value.toString();
-            if (canWriteStringLiteral(valueStr)) {
+            if (canWriteStringLiteral(valueStr, false)) {
                 builder.append(key);
                 builder.append(": ");
                 builder.append(valueStr);
@@ -464,7 +469,7 @@ public class YamlSerializer {
 
     // Checks whether a String can be written as a String literal, without ' or "
     // This is a fast check for the most common case of only a-zA-Z key names
-    private boolean canWriteStringLiteral(String str) {
+    private boolean canWriteStringLiteral(String str, boolean isKey) {
         int len = str.length();
         if (len == 0) {
             return false; // ''
@@ -503,15 +508,16 @@ public class YamlSerializer {
                 }
             }
         }
-        while (true) {
-            if (!((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-')) {
-                return false;
-            } else if (++i == len) {
-                return true;
-            } else {
-                c = str.charAt(i);
-            }
+
+        for (; i != len; c = str.charAt(i++)) {
+            if (c >= 'a' && c <= 'z') continue;
+            if (c >= 'A' && c <= 'Z') continue;
+            if (c == '_' || c == '-') continue;
+            if (isKey && c >= '0' && c <= '9') continue;
+            return false;
         }
+
+        return true;
     }
 
 }
