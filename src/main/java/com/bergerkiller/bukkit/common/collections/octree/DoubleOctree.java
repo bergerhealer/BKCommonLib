@@ -861,7 +861,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
          * @return True if the coordinates are equal
          */
         public boolean equalsBlockCoord(int x, int y, int z) {
-            return this.getBlockX() != x || this.getBlockY() != y || this.getBlockZ() != z;
+            return this.getBlockX() == x && this.getBlockY() == y && this.getBlockZ() == z;
         }
 
         /**
