@@ -4,25 +4,25 @@ import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Location;
-import org.bukkit.block.Block;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.TickTracker;
 import com.bergerkiller.bukkit.common.controller.Tickable;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 /**
  * Input controller for virtual map navigation and UI.
@@ -476,11 +476,21 @@ public class MapPlayerInput implements Tickable {
         }
 
         // Verify the player isn't flying, it results in a kick
-        if (!player.isFlying() && !EntityHandle.T.onGround.get(Conversion.toEntityHandle.convert(player))) {
-            // Not standing on the ground, but we may be hovering really close above the floor instead
-            // This happens when the player is mounted due to the offset, which causes rapid oscillation of onGround
-            Block below = player.getLocation().add(0.0, -0.5, 0.0).getBlock();
-            if (!below.getType().isSolid()) {
+        if (!player.isFlying() && !player.isOnGround()) {
+            // Check if there is a block below the player, which means onGround is actually true
+            // This is because, when the player is 'floating' while intercepting, onGround stays false
+            EntityHandle playerHandle = EntityHandle.fromBukkit(player);
+            double half_width = 0.5 * (double) playerHandle.getWidth();
+            double below = 0.1;
+            AxisAlignedBBHandle below_bounds = AxisAlignedBBHandle.createNew(
+                    playerHandle.getLocX() - half_width,
+                    playerHandle.getLocY() - below,
+                    playerHandle.getLocZ() - half_width,
+                    playerHandle.getLocX() + half_width,
+                    playerHandle.getLocY(),
+                    playerHandle.getLocZ() + half_width
+            );
+            if (WorldHandle.fromBukkit(player.getWorld()).isNotCollidingWithBlocks(playerHandle, below_bounds)) {
                 updateInputInterception(false);
                 return;
             }
