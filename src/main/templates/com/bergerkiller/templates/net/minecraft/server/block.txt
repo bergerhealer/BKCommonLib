@@ -287,9 +287,9 @@ class Block {
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition);
 #endif
 #if version >= 1.13.2
-        if (shape.isEmpty()) {
+        if (shape == null || shape.isEmpty()) {
 #else
-        if (shape.b()) {
+        if (shape == null || shape.b()) {
 #endif
             return null;
         } else {
