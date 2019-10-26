@@ -36,7 +36,7 @@ public class CommonCapabilities {
     /**
      * Since Minecraft 1.9.2 players can dual-wield, now introducing an off-hand
      */
-    public static final boolean PLAYER_OFF_HAND = CommonBootstrap.evaluateMCVersion(">=", "1.9.2");
+    public static final boolean PLAYER_OFF_HAND = CommonBootstrap.evaluateMCVersion(">=", "1.9");
 
     /**
      * Since Minecraft 1.11.2 the Entity move function had some changes, introducing a
