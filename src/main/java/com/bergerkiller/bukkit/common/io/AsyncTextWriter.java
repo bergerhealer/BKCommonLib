@@ -114,6 +114,7 @@ public class AsyncTextWriter {
      * Starts writing the text data to a temporary file, then replaces the file with this file.
      * This is more resilient to a sudden software shutdown or write errors. The original file is
      * not modified if anything goes wrong.
+     * If the parent directory of the file does not exist, it is created if possible.
      * 
      * @param file       File to write to
      * @param inputData  Text data to write
@@ -127,6 +128,7 @@ public class AsyncTextWriter {
      * Starts writing the text data to a temporary file, then replaces the file with this file.
      * This is more resilient to a sudden software shutdown or write errors. The original file is
      * not modified if anything goes wrong.
+     * If the parent directory of the file does not exist, it is created if possible.
      * 
      * @param file       File to write to
      * @param inputData  Text data to write
@@ -188,6 +190,7 @@ public class AsyncTextWriter {
 
     /**
      * Starts writing the text data to a file. The original contents of the file are replaced.
+     * If the parent directory of the file does not exist, it is created if possible.
      * 
      * @param file       File to write to
      * @param inputData  Text data to write
@@ -199,6 +202,7 @@ public class AsyncTextWriter {
 
     /**
      * Starts writing the text data to a file. The original contents of the file are replaced.
+     * If the parent directory of the file does not exist, it is created if possible.
      * 
      * @param file       File to write to
      * @param inputData  Text data to write
@@ -206,6 +210,9 @@ public class AsyncTextWriter {
      */
     public static CompletableFuture<Void> write(File file, CharBuffer inputData) {
         try {
+            // Create directories of where the file is located
+            file.getParentFile().mkdirs();
+
             // Open the file. May throw an error.
             AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(file.toPath(),
                     StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
