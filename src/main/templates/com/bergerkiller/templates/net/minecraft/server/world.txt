@@ -426,7 +426,7 @@ class WorldServer extends World {
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {
         ChunkProviderServer cps;
 #if version >= 1.13.2
-        cps = instance.getChunkProvider();
+        cps = (ChunkProviderServer) instance.getChunkProvider();
 #elseif version >= 1.9
         cps = instance.getChunkProviderServer();
 #else
