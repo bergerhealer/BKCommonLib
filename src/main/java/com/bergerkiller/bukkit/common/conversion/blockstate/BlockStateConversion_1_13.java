@@ -221,18 +221,17 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         if (!CommonUtil.isMainThread()) {
             throw new IllegalStateException("Asynchronous access is not permitted");
         }
-        return block.getState();
 
-        // I'm not sure why we ever want to do this, because it introduces a nasty overhead for no reason!
-        // Restore this part if there really was a reason to have this
-        /*
+        // Most reliable
+        // return block.getState();
+
+        // Eliminates the 'snapshotting' overhead of BlockState information
         Object tileEntity = getTileEntityFromWorld(block);
         if (tileEntity != null) {
-            return tileEntityToBlockState(block, tileEntity);
+            return tileEntityToBlockState(null, block, tileEntity);
         } else {
-            return CraftBlockStateHandle.createNew(block);
+            return block.getState();
         }
-        */
     }
 
     @Override
