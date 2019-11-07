@@ -241,7 +241,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
             this.value = null;
             this.markYamlChanged();
             return oldValue;
-        } else if (value.equals(oldValue)) {
+        } else if (!(oldValue instanceof YamlNodeAbstract) && value.equals(oldValue)) {
             this.value = value;
             return oldValue;
         }

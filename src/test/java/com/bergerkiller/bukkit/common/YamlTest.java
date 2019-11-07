@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
@@ -24,6 +25,62 @@ import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
+
+    @Test
+    public void testYamlAssignRetrieveList() {
+        YamlNode root = new YamlNode();
+        YamlNode child = root.getNode("child");
+        List<Object> items;
+
+        // Assign a list of items twice, overwriting it the second time
+        // This causes the logic of updating an existing list to fire
+        for (int i = 0; i < 2; i++) {
+            items = new ArrayList<Object>();
+            items.add("item1");
+            items.add("item2");
+            items.add("item3");
+            child.set("items", items);
+        }
+
+        // Verify the list
+        items = child.getList("items");
+        assertEquals(3, items.size());
+        assertEquals("item1", items.get(0));
+        assertEquals("item2", items.get(1));
+        assertEquals("item3", items.get(2));
+
+        // Update the list with different items, but less items, do this twice again
+        for (int i = 0; i < 2; i++) {
+            items = new ArrayList<Object>();
+            items.add("item4");
+            items.add("item5");
+            child.set("items", items);
+        }
+
+        // Verify the list
+        items = child.getList("items");
+        assertEquals(2, items.size());
+        assertEquals("item4", items.get(0));
+        assertEquals("item5", items.get(1));
+
+        // Update the list with different items, but more items, do this twice again
+        for (int i = 0; i < 2; i++) {
+            items = new ArrayList<Object>();
+            items.add("item6");
+            items.add("item7");
+            items.add("item8");
+            items.add("item9");
+            child.set("items", items);
+        }
+
+        // Verify the list
+        items = child.getList("items");
+        assertEquals(4, items.size());
+        assertEquals("item6", items.get(0));
+        assertEquals("item7", items.get(1));
+        assertEquals("item8", items.get(2));
+        assertEquals("item9", items.get(3));
+    }
 
     @Test
     public void testYamlListAddRemove() {
