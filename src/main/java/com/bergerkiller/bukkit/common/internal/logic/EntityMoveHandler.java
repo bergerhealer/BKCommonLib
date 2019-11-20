@@ -275,19 +275,21 @@ public abstract class EntityMoveHandler {
 
                 // BKCommonLib: add isEmpty() optimization
                 if (!shapeAccumulator.isEmpty()) {
-                    if (d1 != 0.0D) {
+                    if (d1 <= -1.0E-7D || d1 >= 1.0E-7D) {
                         d1 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Y, that.getBoundingBox(), shapeAccumulator.stream(), d1);
-                        that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
+                        if (d1 != 0.0D) {
+                            that.setBoundingBox(that.getBoundingBox().translate(0.0D, d1, 0.0D));
+                        }
                     }
 
-                    if (d0 != 0.0D) {
+                    if (d0 <= -1.0E-7D || d0 >= 1.0E-7D) {
                         d0 = VoxelShapeHandle.traceAxis(EnumAxisHandle.X, that.getBoundingBox(), shapeAccumulator.stream(), d0);
                         if (d0 != 0.0D) {
                             that.setBoundingBox(that.getBoundingBox().translate(d0, 0.0D, 0.0D));
                         }
                     }
 
-                    if (d2 != 0.0D) {
+                    if (d2 <= -1.0E-7D || d2 >= 1.0E-7D) {
                         d2 = VoxelShapeHandle.traceAxis(EnumAxisHandle.Z, that.getBoundingBox(), shapeAccumulator.stream(), d2);
                         if (d2 != 0.0D) {
                             that.setBoundingBox(that.getBoundingBox().translate(0.0D, 0.0D, d2));

@@ -35,7 +35,11 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
 
         // Use legacy logic on 1.12.2 and earlier
         List<AxisAlignedBBHandle> cubes = world_getCubes(entity, mx, my, mz);
-        return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
+        if (cubes.isEmpty()) {
+            return Stream.empty();
+        } else {
+            return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
+        }
     }
 
     /**
