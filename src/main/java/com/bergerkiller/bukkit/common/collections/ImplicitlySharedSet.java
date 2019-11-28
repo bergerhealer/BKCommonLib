@@ -130,14 +130,20 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
     public boolean removeAll(Collection<?> c) {
         if (c.isEmpty()) {
             return false;
-        }
-        try (Reference<Set<E>> ref = write()) {
-            return ref.val.removeAll(c);
+        } else if (c instanceof ImplicitlySharedHolder && this.refEquals((ImplicitlySharedHolder<?>) c)) {
+            this.clear();
+            return true;
+        } else {
+            try (Reference<Set<E>> ref = write()) {
+                return ref.val.removeAll(c);
+            }
         }
     }
 
     @Override
     public void clear() {
+        // TODO: This may create a clone of the backing data to then just clear it
+        // More efficient would be to create a new empty container value instead
         try (Reference<Set<E>> ref = write()) {
             ref.val.clear();
         }

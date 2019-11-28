@@ -1486,12 +1486,8 @@ public class CommonMapController implements PacketListener, Listener {
                         chunk.world.getChunkAt(chunk.x, chunk.z);
                     }
 
-                    // If the set is unchanged, then we can clear it, otherwise we must remove what we did
-                    if (neighbourChunkQueue.refEquals(copy)) {
-                        neighbourChunkQueue.clear();
-                    } else {
-                        neighbourChunkQueue.removeAll(copy);
-                    }
+                    // Remove the chunks we have loaded
+                    neighbourChunkQueue.removeAll(copy);
                 }
             }
 
