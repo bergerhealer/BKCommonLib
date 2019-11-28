@@ -85,6 +85,7 @@ public class CommonPlugin extends PluginBase {
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
+    private boolean isFrameTilingSupported = true;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -103,6 +104,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isServerStarted() {
         return isServerStarted;
+    }
+
+    public boolean isFrameTilingSupported() {
+        return isFrameTilingSupported;
     }
 
     public void nextTick(Runnable runnable) {
@@ -468,6 +473,15 @@ public class CommonPlugin extends PluginBase {
             this.onCriticalFailure();
             return;
         }
+
+        // Load configuration
+        FileConfiguration config = new FileConfiguration(this);
+        config.load();
+        config.setHeader("enableItemFrameTiling", "Whether multiple item frames next to each other can merge to show one large display");
+        config.addHeader("enableItemFrameTiling", "This allows Map Displays to be displayed on multiple item frames at a larger resolution");
+        config.addHeader("enableItemFrameTiling", "The tiling detection logic poses some overhead on the server, and if unused, can be disabled");
+        this.isFrameTilingSupported = config.get("enableItemFrameTiling", true);
+        config.save();
 
         // Welcome message
         final List<String> welcomeMessages = Arrays.asList(

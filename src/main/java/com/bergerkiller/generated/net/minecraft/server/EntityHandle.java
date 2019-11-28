@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -99,6 +100,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
     public abstract Entity getBukkitEntity();
+    public abstract World getBukkitWorld();
 
     public List<EntityHandle> getPassengers() {
         if (T.opt_passengers.isAvailable()) {
@@ -461,6 +463,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
+        public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
 
     }
 

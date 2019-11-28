@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
 /**
  * Keeps track of map UUID <> Map Id conversion
@@ -38,58 +38,39 @@ public class CommonMapUUIDStore {
     /**
      * Gets the Map Id stored inside a Map Item
      * 
-     * @param item
+     * @param item to get it for (must be a CraftItemStack, can not be null)
      * @return map Id
      */
     public static int getItemMapId(ItemStack item) {
-        if (CommonCapabilities.MAP_ID_IN_NBT) {
-            CommonTagCompound tag = ItemUtil.getMetaTag(item, false);
-            if (tag != null) {
-                return tag.getValue("map", -1);
-            } else {
-                return -1;
-            }
-        } else {
-            return item.getDurability();
-        }
+        return ItemStackHandle.T.getMapId.invoke(CraftItemStackHandle.T.handle.raw.get(item)).intValue();
     }
 
     /**
      * Sets the Map Id stored inside a Map Item
      * 
-     * @param item
+     * @param item to set it for (must be a CraftItemStack, can not be null)
      * @param mapId to set to
      */
     public static void setItemMapId(ItemStack item, int mapId) {
-        if (CommonCapabilities.MAP_ID_IN_NBT) {
-            ItemUtil.getMetaTag(item, true).putValue("map", mapId);
-        } else {
-            item.setDurability((short) mapId);
-        }
+        ItemStackHandle.T.setMapId.invoke(CraftItemStackHandle.T.handle.raw.get(item), mapId);
     }
 
     /**
      * Internal use only! Obtains the unique Id of a map item. Returns null when the item is not a valid map.
      * This function may be subject to change and should not be depended on.
      * 
-     * @param item to get the Map Id for
+     * @param item to get the Map Id for (must be a CraftItemStack)
      * @return map id
      */
     public static UUID getMapUUID(ItemStack item) {
-        if (!isMap(item)) {
+        if (item == null) {
             return null;
-        } else {
-            CommonTagCompound tag = ItemUtil.getMetaTag(item, false);
-            if (tag != null) {
-                UUID uuid = tag.getUUID("mapDisplay");
-                if (uuid != null) {
-                    return uuid;
-                }
-            }
-
-            // Turn Map Id into an UUID
-            return getStaticMapUUID(getItemMapId(item));
         }
+        Object nmsItemStack = CraftItemStackHandle.T.handle.raw.get(item);
+        if (nmsItemStack == null) {
+            return null;
+        }
+        return ItemStackHandle.T.getMapDisplayUUID.invoke(nmsItemStack);
     }
 
     /**

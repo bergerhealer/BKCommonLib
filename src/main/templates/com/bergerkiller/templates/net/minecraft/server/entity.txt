@@ -1090,6 +1090,10 @@ class Entity {
 
     public (org.bukkit.entity.Entity) org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity();
 
+    public org.bukkit.World getBukkitWorld() {
+        return instance.world.getWorld();
+    }
+
     <code>
     public WorldServerHandle getWorldServer() {
         return WorldServerHandle.createHandle(T.world.raw.get(getRaw()));

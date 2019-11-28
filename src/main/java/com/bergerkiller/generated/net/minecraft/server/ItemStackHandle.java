@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import java.util.UUID;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ItemStack</b>.
@@ -45,6 +46,9 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract ItemStackHandle cloneAndSubtract(int n);
     public abstract ItemStackHandle cloneItemStack();
     public abstract ItemStack toBukkit();
+    public abstract int getMapId();
+    public abstract void setMapId(int mapId);
+    public abstract UUID getMapDisplayUUID();
 
     public static final ItemStackHandle EMPTY_ITEM;
     static {
@@ -113,6 +117,9 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<ItemStackHandle> cloneItemStack = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<ItemStack> toBukkit = new Template.Method<ItemStack>();
+        public final Template.Method<Integer> getMapId = new Template.Method<Integer>();
+        public final Template.Method<Void> setMapId = new Template.Method<Void>();
+        public final Template.Method<UUID> getMapDisplayUUID = new Template.Method<UUID>();
 
     }
 

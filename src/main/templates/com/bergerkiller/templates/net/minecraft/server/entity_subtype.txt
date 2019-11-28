@@ -620,9 +620,25 @@ class EntityItemFrame extends Entity {
     public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
     </code>
 
-    public (org.bukkit.inventory.ItemStack) ItemStack getItem();
+    public boolean getItemIsMap() {
+        ItemStack item = instance.getItem();
+        return item != null && item.getItem() == Items.FILLED_MAP;
+    }
 
+    public java.util.UUID getItemMapDisplayUUID() {
+        ItemStack item = instance.getItem();
+        if (item == null) {
+            return null;
+        }
+        return (java.util.UUID) com.bergerkiller.generated.net.minecraft.server.ItemStackHandle.T.getMapDisplayUUID.invoke(item);
+    }
+
+    public (org.bukkit.inventory.ItemStack) ItemStack getItem();
     public void setItem((org.bukkit.inventory.ItemStack) ItemStack newItemStack);
+
+    public (IntVector3) BlockPosition getBlockPosition();
+    public (org.bukkit.block.BlockFace) EnumDirection getFacing:getDirection();
+    public int getRotationOrdinal:getRotation();
 
     <code>
     public static EntityItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {

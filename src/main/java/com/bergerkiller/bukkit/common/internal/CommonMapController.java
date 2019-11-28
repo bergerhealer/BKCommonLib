@@ -87,8 +87,8 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
 public class CommonMapController implements PacketListener, Listener {
-    // Stores cached thread-safe lists of item frames by world
-    private final HashMap<World, ImplicitlySharedSet<ItemFrame> > worldItemFrames = new HashMap<World, ImplicitlySharedSet<ItemFrame> >();
+    // Stores cached thread-safe lists of item frames by cluster key
+    private final Map<ItemFrameClusterKey, ImplicitlySharedSet<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
@@ -112,6 +112,8 @@ public class CommonMapController implements PacketListener, Listener {
     private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
     // Caches used while executing findNeighbours()
     private FindNeighboursCache findNeighboursCache = null;
+    // Whether tiling is supported. Disables findNeighbours() if false.
+    private boolean isFrameTilingSupported = true;
     // Neighbours of item frames to check for either x-aligned or z-aligned
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Y = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
@@ -326,7 +328,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param plugin
      * @param startedTasks
      */
-    public void onEnable(JavaPlugin plugin, List<Task> startedTasks) {
+    public void onEnable(CommonPlugin plugin, List<Task> startedTasks) {
         startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
         startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
         startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
@@ -334,10 +336,12 @@ public class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new CachedMapItemCleaner(plugin).start(100, CACHED_ITEM_CLEAN_INTERVAL));
         startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
 
+        this.isFrameTilingSupported = plugin.isFrameTilingSupported();
+
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
         for (World world : Bukkit.getWorlds()) {
-            for (ItemFrame itemFrame : world.getEntitiesByClass(ItemFrame.class)) {
+            for (EntityItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
                 onAddItemFrame(itemFrame);
             }
         }
@@ -670,9 +674,9 @@ public class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
-            ItemFrame frame = (ItemFrame) event.getEntity();
-            getItemFrameSet(frame.getWorld()).add(frame);
-            onAddItemFrame(frame);
+            EntityItemFrameHandle frameHandle = EntityItemFrameHandle.createHandle(HandleConversion.toEntityHandle(event.getEntity()));
+            getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
+            onAddItemFrame(frameHandle);
         }
     }
 
@@ -680,7 +684,8 @@ public class CommonMapController implements PacketListener, Listener {
     protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
         if (event.getEntityType() == EntityType.ITEM_FRAME) {
             ItemFrame frame = (ItemFrame) event.getEntity();
-            getItemFrameSet(frame.getWorld()).remove(frame);
+            EntityItemFrameHandle frameHandle = EntityItemFrameHandle.fromBukkit(frame);
+            getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).remove(frameHandle);
             ItemFrameInfo info = itemFrames.get(frame.getEntityId());
             if (info != null) {
                 info.removed = true;
@@ -690,7 +695,7 @@ public class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
-        for (ItemFrame frame : initItemFrameSetOfWorld(event.getWorld()).cloneAsIterable()) {
+        for (EntityItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
             onAddItemFrame(frame);
         }
     }
@@ -712,26 +717,28 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private void onAddItemFrame(ItemFrame frame) {
-        if (itemFrames.containsKey(frame.getEntityId())) {
+    private void onAddItemFrame(EntityItemFrameHandle frame) {
+        int entityId = frame.getId();
+        if (itemFrames.containsKey(entityId)) {
             return;
         }
 
         // Add Item Frame Info
-        itemFrames.put(frame.getEntityId(), new ItemFrameInfo(frame));
+        itemFrames.put(entityId, new ItemFrameInfo(frame));
 
+        // If frame tiling is disabled, then neighbouring chunks don't have to be loaded
         // If the item frame does not store a map item, we don't have to load the neighbouring chunks
-        if (!CommonMapUUIDStore.isMap(getItemFrameItem(frame))) {
+        if (!this.isFrameTilingSupported || !frame.getItemIsMap()) {
             return;
         }
 
         // Queue chunks left/right of this item frame for loading
         // If the display crosses chunk boundaries, this ensures those are loaded
-        World world = frame.getWorld();
+        World world = frame.getBukkitWorld();
         BlockFace facing = frame.getFacing();
         if (FaceUtil.isAlongY(facing)) {
             // Along Y, all chunks surrounding it touching the item frame should be loaded
-            IntVector3 pos = new IntVector3(frame.getLocation());
+            IntVector3 pos = frame.getBlockPosition();
             IntVector2 chunk = pos.toChunkCoordinates();
             PendingChunkLoad chunk_neigh0 = new PendingChunkLoad(world, pos.add(1, 0, 0));
             PendingChunkLoad chunk_neigh1 = new PendingChunkLoad(world, pos.add(0, 0, 1));
@@ -752,7 +759,7 @@ public class CommonMapController implements PacketListener, Listener {
         } else {
             // Along X or Z, check chunks loaded in other two directions
             BlockFace left_right = FaceUtil.rotate(facing, 2);
-            IntVector3 pos = new IntVector3(frame.getLocation());
+            IntVector3 pos = frame.getBlockPosition();
             IntVector2 chunk = pos.toChunkCoordinates();
             PendingChunkLoad chunk_left = new PendingChunkLoad(world, pos.add(left_right));
             PendingChunkLoad chunk_right = new PendingChunkLoad(world, pos.subtract(left_right));
@@ -1022,11 +1029,11 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame to get the map UUID from
      */
-    private MapUUID getItemFrameMapUUID(ItemFrame itemFrame) {
+    private MapUUID getItemFrameMapUUID(EntityItemFrameHandle itemFrame) {
         if (itemFrame == null) {
             return null;
         } else {
-            ItemFrameInfo info = this.itemFrames.get(itemFrame.getEntityId());
+            ItemFrameInfo info = this.itemFrames.get(itemFrame.getId());
             if (info == null) {
                 return null;
             } else {
@@ -1177,9 +1184,9 @@ public class CommonMapController implements PacketListener, Listener {
         // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
         private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
-        public ItemFrameInfo(ItemFrame itemFrame) {
-            this.itemFrame = itemFrame;
-            this.itemFrameHandle = EntityItemFrameHandle.fromBukkit(itemFrame);
+        public ItemFrameInfo(EntityItemFrameHandle itemFrame) {
+            this.itemFrame = (ItemFrame) itemFrame.toBukkit();
+            this.itemFrameHandle = itemFrame;
             this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
             this.viewers = new HashSet<Player>();
             this.removed = false;
@@ -1237,15 +1244,16 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         public void recalculateUUID() {
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.itemFrameHandle.getItem());
+            UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
 
             // Find out the tile information of this item frame
             // This is a slow and lengthy procedure; hopefully it does not happen too often
             // What we do is: we add all neighbours, then find the most top-left item frame
             // Subtracting coordinates will give us the tile x/y of this item frame
-            FindNeighboursResult neighbours = findNeighbours(itemFrame);
+            FindNeighboursResult neighbours = findNeighbours(itemFrameHandle);
             MapUUID newMapUUID;
             boolean isTile;
+
             if (!neighbours.coordinates.isEmpty()) {
                 IntVector3 selfPos = new IntVector3(itemFrameHandle.getLocX(), itemFrameHandle.getLocY(), itemFrameHandle.getLocZ());
                 BlockFace selfFacing = itemFrame.getFacing();
@@ -1369,14 +1377,15 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Find all map UUIDs that exist on the server
                 HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
-                for (World world : Bukkit.getWorlds()) {
-                    for (ItemFrame itemFrame : iterateItemFrames(world)) {
+                for (ImplicitlySharedSet<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
+                    for (EntityItemFrameHandle itemFrame : itemFrameSet.cloneAsIterable()) {
                         MapUUID mapUUID = getItemFrameMapUUID(itemFrame);
                         if (mapUUID != null) {
                             validUUIDs.add(mapUUID);
                         }
                     }
                 }
+
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     PlayerInventory inv = player.getInventory();
                     for (int i = 0; i < inv.getSize(); i++) {
@@ -1397,12 +1406,11 @@ public class CommonMapController implements PacketListener, Listener {
             if (!dirtyMaps.isEmpty()) {
                 // Refresh all item frames that display this map
                 // This will result in a new EntityMetadata packets being sent, refreshing the map Id
-                for (World world : Bukkit.getWorlds()) {
-                    for (ItemFrame itemFrame : iterateItemFrames(world)) {
-                        ItemStack item = getItemFrameItem(itemFrame);
-                        UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
+                for (ImplicitlySharedSet<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
+                    for (EntityItemFrameHandle itemFrame : itemFrameSet.cloneAsIterable()) {
+                        UUID mapUUID = itemFrame.getItemMapDisplayUUID();
                         if (dirtyMaps.contains(mapUUID)) {
-                            itemFrame.setItem(item);
+                            itemFrame.setItem(itemFrame.getItem());
                         }
                     }
                 }
@@ -1737,11 +1745,12 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame
      */
-    private final FindNeighboursResult findNeighbours(ItemFrame itemFrame) {
-        Location itemFrameLocation = itemFrame.getLocation(); // re-used
-        BlockFace facing = itemFrame.getFacing();
-        IntVector3 itemFramePos = new IntVector3(itemFrameLocation);
-        UUID itemFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(itemFrame));
+    private final FindNeighboursResult findNeighbours(EntityItemFrameHandle itemFrame) {
+        if (!this.isFrameTilingSupported) {
+            return new FindNeighboursResult(Collections.emptyList(), 0); // disabled, no neighbours
+        }
+
+        UUID itemFrameMapUUID = itemFrame.getItemMapDisplayUUID();
         if (itemFrameMapUUID == null) {
             return new FindNeighboursResult(Collections.emptyList(), 0); // no neighbours
         }
@@ -1761,66 +1770,21 @@ public class CommonMapController implements PacketListener, Listener {
             // - Along the same x/y/z (facing)
             // - Same ItemStack map UUID
             BlockFace[] neighbourAxis;
-            if (FaceUtil.isAlongY(facing)) {
-                // Along Y, compare the y-coordinates
+
+            ItemFrameClusterKey key = new ItemFrameClusterKey(itemFrame);
+            for (EntityItemFrameHandle otherFrame : iterateItemFrames(key)) {
+                UUID otherFrameMapUUID = otherFrame.getItemMapDisplayUUID();
+                if (itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                    cache.put(otherFrame);
+                }
+            }
+
+            if (FaceUtil.isAlongY(key.facing)) {
                 neighbourAxis = NEIGHBOUR_AXIS_ALONG_Y;
-                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
-                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
-                        continue;
-                    }
-
-                    otherFrame.getLocation(itemFrameLocation);
-                    int block_y = itemFrameLocation.getBlockY();
-                    if (block_y != itemFramePos.y) {
-                        continue;
-                    }
-
-                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
-                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
-                        continue;
-                    }
-                    cache.put(itemFrameLocation.getBlockX(), block_y, itemFrameLocation.getBlockZ(), otherFrame);
-                }
-            } else if (FaceUtil.isAlongX(facing)) {
-                // Along X, compare the x-coordinates
+            } else if (FaceUtil.isAlongX(key.facing)) {
                 neighbourAxis = NEIGHBOUR_AXIS_ALONG_X;
-                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
-                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
-                        continue;
-                    }
-
-                    otherFrame.getLocation(itemFrameLocation);
-                    int block_x = itemFrameLocation.getBlockX();
-                    if (block_x != itemFramePos.x) {
-                        continue;
-                    }
-
-                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
-                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
-                        continue;
-                    }
-                    cache.put(block_x, itemFrameLocation.getBlockY(), itemFrameLocation.getBlockZ(), otherFrame);
-                }
             } else {
-                // Along Z, compare the z-coordinates
                 neighbourAxis = NEIGHBOUR_AXIS_ALONG_Z;
-                for (ItemFrame otherFrame : iterateItemFrames(itemFrame.getWorld())) {
-                    if (otherFrame == itemFrame || otherFrame.getFacing() != facing) {
-                        continue;
-                    }
-
-                    otherFrame.getLocation(itemFrameLocation);
-                    int block_z = itemFrameLocation.getBlockZ();
-                    if (block_z != itemFramePos.z) {
-                        continue;
-                    }
-
-                    UUID otherFrameMapUUID = CommonMapUUIDStore.getMapUUID(getItemFrameItem(otherFrame));
-                    if (!itemFrameMapUUID.equals(otherFrameMapUUID)) {
-                        continue;
-                    }
-                    cache.put(itemFrameLocation.getBlockX(), itemFrameLocation.getBlockY(), block_z, otherFrame);
-                }
             }
 
             // Find the most common item frame rotation in use
@@ -1831,7 +1795,7 @@ public class CommonMapController implements PacketListener, Listener {
             // Make sure the neighbours result are a single contiguous blob
             // Islands (can not reach the input item frame) are removed
             List<IntVector3> result = new ArrayList<IntVector3>(cache.cache.size());
-            cache.pendingList.add(itemFramePos);
+            cache.pendingList.add(itemFrame.getBlockPosition());
             do {
                 IntVector3 pending = cache.pendingList.poll();
                 for (BlockFace side : neighbourAxis) {
@@ -1886,25 +1850,25 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Helper
-        public void put(int x, int y, int z, ItemFrame itemFrame) {
-            cache.put(new IntVector3(x, y, z), new Frame(itemFrame));
+        public void put(EntityItemFrameHandle itemFrame) {
+            cache.put(itemFrame.getBlockPosition(), new Frame(itemFrame));
         }
 
         // Single entry
         public static final class Frame {
             public final int rotation;
 
-            public Frame(ItemFrame itemFrame) {
-                this.rotation = itemFrame.getRotation().ordinal() & 0x3;
+            public Frame(EntityItemFrameHandle itemFrame) {
+                this.rotation = itemFrame.getRotationOrdinal() & 0x3;
             }
         }
     }
 
     private final void deinitItemFrameListForWorldsNotIn(Collection<World> worlds) {
-        synchronized (this.worldItemFrames) {
-            Iterator<World> iter = this.worldItemFrames.keySet().iterator();
+        synchronized (this.itemFrameEntities) {
+            Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
             while (iter.hasNext()) {
-                if (!worlds.contains(iter.next())) {
+                if (!worlds.contains(iter.next().world)) {
                     iter.remove();
                 }
             }
@@ -1912,37 +1876,41 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private final void deinitItemFrameSetOfWorld(World world) {
-        synchronized (this.worldItemFrames) {
-            this.worldItemFrames.remove(world);
+        synchronized (this.itemFrameEntities) {
+            Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
+            while (iter.hasNext()) {
+                if (iter.next().world == world) {
+                    iter.remove();
+                }
+            }
         }
     }
 
-    private final ImplicitlySharedSet<ItemFrame> initItemFrameSetOfWorld(World world) {
-        ImplicitlySharedSet<ItemFrame> itemFrames = new ImplicitlySharedSet<ItemFrame>();
+    private final List<EntityItemFrameHandle> initItemFrameSetOfWorld(World world) {
+        List<EntityItemFrameHandle> itemFrames = new ArrayList<EntityItemFrameHandle>();
         for (Object entityHandle : (Iterable<?>) WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world))) {
             if (EntityItemFrameHandle.T.isAssignableFrom(entityHandle)) {
-                itemFrames.add((ItemFrame) WrapperConversion.toEntity(entityHandle));
+                EntityItemFrameHandle itemFrame = EntityItemFrameHandle.createHandle(entityHandle);
+                getItemFrameEntities(new ItemFrameClusterKey(itemFrame)).add(itemFrame);
+                itemFrames.add(itemFrame);
             }
-        }
-        synchronized (this.worldItemFrames) {
-            this.worldItemFrames.put(world, itemFrames);
         }
         return itemFrames;
     }
 
-    private final ImplicitlySharedSet<ItemFrame> getItemFrameSet(World world) {
-        synchronized (this.worldItemFrames) {
-            ImplicitlySharedSet<ItemFrame> set = this.worldItemFrames.get(world);
+    private final ImplicitlySharedSet<EntityItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
+        synchronized (this.itemFrameEntities) {
+            ImplicitlySharedSet<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
             if (set == null) {
-                set = new ImplicitlySharedSet<ItemFrame>();
-                this.worldItemFrames.put(world, set);
+                set = new ImplicitlySharedSet<EntityItemFrameHandle>();
+                this.itemFrameEntities.put(key, set);
             }
             return set;
         }
     }
 
-    private final Iterable<ItemFrame> iterateItemFrames(World world) {
-        return getItemFrameSet(world).cloneAsIterable();
+    private final Iterable<EntityItemFrameHandle> iterateItemFrames(ItemFrameClusterKey key) {
+        return getItemFrameEntities(key).cloneAsIterable();
     }
 
     /**
@@ -2005,4 +1973,36 @@ public class CommonMapController implements PacketListener, Listener {
         return item;
     }
 
+    /**
+     * When clustering item frames (finding neighbours), this key is used
+     * to store a mapping of what item frames exist on the server
+     */
+    private static class ItemFrameClusterKey {
+        public final World world;
+        public final BlockFace facing;
+        public final int coordinate;
+
+        public ItemFrameClusterKey(EntityItemFrameHandle itemFrame) {
+            this(itemFrame.getBukkitWorld(), itemFrame.getFacing(), itemFrame.getBlockPosition());
+        }
+
+        public ItemFrameClusterKey(World world, BlockFace facing, IntVector3 coordinates) {
+            this.world = world;
+            this.facing = facing;
+            this.coordinate = facing.getModX()*coordinates.x +
+                              facing.getModY()*coordinates.y +
+                              facing.getModZ()*coordinates.z;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.coordinate + (facing.ordinal()<<6);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            ItemFrameClusterKey other = (ItemFrameClusterKey) o;
+            return other.coordinate == this.coordinate && other.world == this.world && other.facing == this.facing;
+        }
+    }
 }
