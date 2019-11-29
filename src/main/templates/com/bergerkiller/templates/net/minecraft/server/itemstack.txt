@@ -160,19 +160,19 @@ class ItemStack {
 #endif
         } else {
             NBTBase mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
-            if (mapDisplayUUIDMost instanceof NBTNumber) {
+            if (mapDisplayUUIDMost instanceof NBTTagLong) {
                 NBTBase mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
-                if (mapDisplayUUIDLeast instanceof NBTNumber) {
+                if (mapDisplayUUIDLeast instanceof NBTTagLong) {
                     long mostBits, leastBits;
 #if version >= 1.13.2
-                    mostBits = ((NBTNumber) mapDisplayUUIDMost).asLong();
-                    leastBits = ((NBTNumber) mapDisplayUUIDLeast).asLong();
+                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).asLong();
+                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).asLong();
 #elseif version >= 1.10.2
-                    mostBits = ((NBTNumber) mapDisplayUUIDMost).d();
-                    leastBits = ((NBTNumber) mapDisplayUUIDLeast).d();
+                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).d();
+                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).d();
 #else
-                    mostBits = ((NBTNumber) mapDisplayUUIDMost).c();
-                    leastBits = ((NBTNumber) mapDisplayUUIDLeast).c();
+                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).c();
+                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).c();
 #endif
                     return new java.util.UUID(mostBits, leastBits);
                 }

@@ -300,11 +300,6 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".IChatBaseComponent$ChatSerializer", nms_root + ".ChatSerializer");
         }
 
-        // NBTNumber has an interesting history
-        if (evaluateMCVersion("<=", "1.9.4") && !evaluateMCVersion("<=", "1.8")) {
-            remappings.put(nms_root + ".NBTNumber", nms_root + ".NBTBase$NBTNumber");
-        }
-
         // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
         if (evaluateMCVersion("<", "1.13")) {
             remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
