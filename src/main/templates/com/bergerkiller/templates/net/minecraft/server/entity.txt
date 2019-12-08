@@ -17,11 +17,14 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 
 class Entity {
 #if version >= 1.9
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
+
+optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #if version >= 1.14
     private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:entityCount;

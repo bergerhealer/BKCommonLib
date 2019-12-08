@@ -335,6 +335,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.StaticField.Converted<Key<Boolean>> DATA_NO_GRAVITY = new Template.StaticField.Converted<Key<Boolean>>();
 
         public final Template.Field.Converted<Entity> bukkitEntityField = new Template.Field.Converted<Entity>();
+        @Template.Optional
+        public final Template.Field.Converted<EntityTrackerEntryHandle> tracker = new Template.Field.Converted<EntityTrackerEntryHandle>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Boolean preventBlockPlace = new Template.Field.Boolean();
         @Template.Optional
