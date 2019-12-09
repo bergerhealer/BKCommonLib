@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
@@ -470,9 +471,14 @@ public class HandleConversion {
         return heightmap.getRawHandle();
     }
 
+    @ConverterMethod
+    public static EntityTypesHandle toEntityTypesHandleWrapperFromEntityClass(Class<?> entityClass) {
+        return CommonEntityType.getNMSEntityTypeByEntityClass(entityClass);
+    }
+
     @ConverterMethod(output="net.minecraft.server.EntityTypes", optional=true)
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
-        return Template.Handle.getRaw(EntityTypesHandle.T.fromEntityClass.invoke(entityClass));
+        return toEntityTypesHandleWrapperFromEntityClass(entityClass).getRaw();
     }
 
     @ConverterMethod(input="net.minecraft.server.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)

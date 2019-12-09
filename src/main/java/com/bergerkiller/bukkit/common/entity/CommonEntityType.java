@@ -30,6 +30,7 @@ import org.bukkit.entity.Minecart;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.StampedLock;
 import java.util.logging.Level;
 
 /**
@@ -37,11 +38,13 @@ import java.util.logging.Level;
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CommonEntityType {
+    private static final StampedLock lock = new StampedLock();
     private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
-    private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<Integer, CommonEntityType>();
-    private static final Map<Integer, CommonEntityType> byEntityTypeId = new HashMap<Integer, CommonEntityType>();
-    private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<Object, CommonEntityType>();
+    private static final Map<Integer, CommonEntityType> byObjectTypeId = new HashMap<>();
+    private static final Map<Integer, CommonEntityType> byEntityTypeId = new HashMap<>();
+    private static final Map<Object, CommonEntityType> byNMSEntityType = new HashMap<>();
+    private static final Map<Class<?>, EntityTypesHandle> entityTypesByClass = new HashMap<>();
     private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
     public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
@@ -196,7 +199,7 @@ public class CommonEntityType {
         }
 
         if (EntityTypesHandle.T.fromEntityClass.isAvailable() && nmsType != null) {
-            this.nmsEntityType = EntityTypesHandle.T.fromEntityClass.invoke(nmsType);
+            this.nmsEntityType = getNMSEntityTypeByEntityClass(nmsType);
             if (this.nmsEntityType != null) {
                 byNMSEntityType.put(this.nmsEntityType.getRaw(), this);
             }
@@ -373,6 +376,29 @@ public class CommonEntityType {
             }
         }
         return UNKNOWN;
+    }
+
+    public static EntityTypesHandle getNMSEntityTypeByEntityClass(Class<?> entityClass) {
+        // Look up from cache using a quick read lock
+        long stamp = lock.readLock();
+        try {
+            EntityTypesHandle entityTypes = entityTypesByClass.get(entityClass);
+            if (entityTypes != null) {
+                return entityTypes;
+            }
+        } finally {
+            lock.unlockRead(stamp);
+        }
+
+        // Query it and cache it, requiring exclusive write access
+        stamp = lock.writeLock();
+        try {
+            EntityTypesHandle entityTypes = EntityTypesHandle.T.fromEntityClass.invoke(entityClass);
+            entityTypesByClass.put(entityClass, entityTypes);
+            return entityTypes;
+        } finally {
+            lock.unlockWrite(stamp);
+        }
     }
 
     private static void registerObjectType(String entityTypeName, int objectId, int extraData) {
