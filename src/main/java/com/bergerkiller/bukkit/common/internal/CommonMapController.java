@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -81,7 +82,6 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
@@ -105,7 +105,9 @@ public class CommonMapController implements PacketListener, Listener {
     private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     // Tracks all item frames loaded on the server
     // Note: we are not using an IntHashMap because we need to iterate over the values, which is too slow with IntHashMap
-    private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<Integer, ItemFrameInfo>();
+    private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
+    // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
+    private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
     // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
@@ -118,6 +120,10 @@ public class CommonMapController implements PacketListener, Listener {
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Y = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Z = {BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST};
+    // Item frame clusters previously computed, is short-lived
+    private final Map<World, Map<IntVector3, ItemFrameCluster>> itemFrameClustersByWorld = new IdentityHashMap<>();
+    // Whether the short-lived cache is used (only used during the update cycle)
+    private boolean itemFrameClustersByWorldEnabled = false;
     // This counter is incremented every time a new map Id is added to the mapping
     // Every 1000 map ids we do a cleanup to free up slots for maps that no longer exist on the server
     // This is required, otherwise we can run out of the 32K map Ids we have available given enough uptime
@@ -300,7 +306,7 @@ public class CommonMapController implements PacketListener, Listener {
                         dataItem.setValue(newItem, dataItem.isChanged());
                     } else {
                         // When changed, set it normally so the item is refreshed
-                        CommonMapController.setItemFrameItem(itemFrameInfo.itemFrame, newItem);
+                        itemFrameInfo.itemFrameHandle.setItem(newItem);
                     }
                 }
             }
@@ -534,13 +540,22 @@ public class CommonMapController implements PacketListener, Listener {
         // Correct the ItemStack displayed in Item Frames
         if (event.getType() == PacketType.OUT_ENTITY_METADATA) {
             int entityId = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.entityId);
-            Entity entity = WorldHandle.fromBukkit(event.getPlayer().getWorld()).getEntityById(entityId);
-            if (!(entity instanceof ItemFrame)) {
-                return;
-            }
-            ItemFrameInfo frameInfo = this.itemFrames.get(entity.getEntityId());
+            ItemFrameInfo frameInfo = this.itemFrames.get(entityId);
             if (frameInfo == null) {
-                return; // no information available
+                // Verify the Item Frame DATA_ITEM key is inside the metadata of this packet
+                // If this is the case, then this is metadata for an item frame and not a different entity
+                // When that happens then a metadata packet was sent before the entity add event for it fired
+                // To prevent glitches, track that in the itemFrameMetaMisses set
+                List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
+                if (items != null) {
+                    for (DataWatcher.Item<Object> item : items) {
+                        if (EntityItemFrameHandle.DATA_ITEM.equals(item.getKey())) {
+                            itemFrameMetaMisses.add(entityId);
+                            break;
+                        }
+                    }
+                }
+                return; // no information available or not an item frame
             }
 
             frameInfo.updateItem();
@@ -724,7 +739,12 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Add Item Frame Info
-        itemFrames.put(entityId, new ItemFrameInfo(frame));
+        ItemFrameInfo frameInfo = new ItemFrameInfo(frame);
+        itemFrames.put(entityId, frameInfo);
+        if (itemFrameMetaMisses.remove(entityId)) {
+            frameInfo.needsItemRefresh = true;
+            frameInfo.sentToPlayers = true;
+        }
 
         // If frame tiling is disabled, then neighbouring chunks don't have to be loaded
         // If the item frame does not store a map item, we don't have to load the neighbouring chunks
@@ -1250,64 +1270,75 @@ public class CommonMapController implements PacketListener, Listener {
             // This is a slow and lengthy procedure; hopefully it does not happen too often
             // What we do is: we add all neighbours, then find the most top-left item frame
             // Subtracting coordinates will give us the tile x/y of this item frame
-            FindNeighboursResult neighbours = findNeighbours(itemFrameHandle);
+            IntVector3 itemFramePosition = itemFrameHandle.getBlockPosition();
+            ItemFrameCluster cluster = findCluster(itemFrameHandle, itemFramePosition);
             MapUUID newMapUUID;
             boolean isTile;
 
-            if (!neighbours.coordinates.isEmpty()) {
-                IntVector3 selfPos = new IntVector3(itemFrameHandle.getLocX(), itemFrameHandle.getLocY(), itemFrameHandle.getLocZ());
+            if (cluster.hasMultipleTiles()) {
+                IntVector3 selfPos = itemFramePosition;
                 BlockFace selfFacing = itemFrame.getFacing();
                 int tileX = 0;
                 int tileY = 0;
-                if (FaceUtil.isAlongY(selfFacing)) {
-                    // Vertical pointing up or down, calculation is a little different then
+                if (selfFacing.getModY() > 0) {
+                    // Vertical pointing up
                     // We use rotation of the item frame to decide which side is up
-                    for (IntVector3 neighbour : neighbours.coordinates) {
-                        int dx_in = selfPos.x - neighbour.x;
-                        int dz_in = selfPos.z - neighbour.z;
-                        int tx, ty;
-                        if (selfFacing.getModY() > 0) {
-                            // Rotation when facing up
-                            switch (neighbours.rotation) {
-                            case 90: tx = -dz_in; ty = dx_in; break;
-                            case 180: tx = dx_in; ty = dz_in; break;
-                            case 270: tx = dz_in; ty = -dx_in; break;
-                            default: tx = -dx_in; ty = -dz_in; break;
-                            }
-                        } else {
-                            // Rotation when facing down
-                            switch (neighbours.rotation) {
-                            case 90: tx = dz_in; ty = dx_in; break;
-                            case 180: tx = dx_in; ty = -dz_in; break;
-                            case 270: tx = -dz_in; ty = -dx_in; break;
-                            default: tx = -dx_in; ty = dz_in; break;
-                            }
-                        }
-
-                        if (tx < tileX) {
-                            tileX = tx;
-                        }
-                        if (ty < tileY) {
-                            tileY = ty;
-                        }
+                    switch (cluster.rotation) {
+                    case 90:
+                        tileX = (selfPos.z - cluster.min_coord.z);
+                        tileY = (cluster.max_coord.x - selfPos.x);
+                        break;
+                    case 180:
+                        tileX = (cluster.max_coord.x - selfPos.x);
+                        tileY = (cluster.max_coord.z - selfPos.z);
+                        break;
+                    case 270:
+                        tileX = (cluster.max_coord.z - selfPos.z);
+                        tileY = (selfPos.x - cluster.min_coord.x);
+                        break;
+                    default:
+                        tileX = (selfPos.x - cluster.min_coord.x);
+                        tileY = (selfPos.z - cluster.min_coord.z);
+                        break;
+                    }
+                } else if (selfFacing.getModY() < 0) {
+                    // Vertical pointing down
+                    // We use rotation of the item frame to decide which side is up
+                    switch (cluster.rotation) {
+                    case 90:
+                        tileX = (cluster.max_coord.z - selfPos.z);
+                        tileY = (cluster.max_coord.x - selfPos.x);
+                        break;
+                    case 180:
+                        tileX = (cluster.max_coord.x - selfPos.x);
+                        tileY = (selfPos.z - cluster.min_coord.z);
+                        break;
+                    case 270:
+                        tileX = (selfPos.z - cluster.min_coord.z);
+                        tileY = (selfPos.x - cluster.min_coord.x);
+                        break;
+                    default:
+                        tileX = (selfPos.x - cluster.min_coord.x);
+                        tileY = (cluster.max_coord.z - selfPos.z);
+                        break;
                     }
                 } else {
                     // On the wall
-                    for (IntVector3 neighbour : neighbours.coordinates) {
-                        int dx = selfFacing.getModX() * (selfPos.z - neighbour.z) -
-                                 selfFacing.getModZ() * (selfPos.x - neighbour.x);
-                        int dy = selfPos.y - neighbour.y;
-                        if (dx < tileX) {
-                            tileX = dx;
-                        }
-                        if (dy < tileY) {
-                            tileY = dy;
-                        }
+                    switch (selfFacing) {
+                    case NORTH:
+                        tileX = (cluster.max_coord.x - selfPos.x); break;
+                    case EAST:
+                        tileX = (cluster.max_coord.z - selfPos.z); break;
+                    case SOUTH:
+                        tileX = (selfPos.x - cluster.min_coord.x); break;
+                    case WEST:
+                        tileX = (selfPos.z - cluster.min_coord.z); break;
+                    default:
+                        tileX = 0; break;
                     }
+                    tileY = cluster.max_coord.y - selfPos.y;
                 }
 
-                tileX = -tileX;
-                tileY = -tileY;
                 newMapUUID = new MapUUID(mapUUID, tileX, tileY);
                 isTile = true;
             } else {
@@ -1315,7 +1346,7 @@ public class CommonMapController implements PacketListener, Listener {
                 isTile = false;
             }
 
-            boolean isTiledDisplay = (isDisplayTile && lastMapUUID != null) || (!neighbours.coordinates.isEmpty());
+            boolean resetDisplay = (isDisplayTile && lastMapUUID != null) || isTile;
             boolean readd = (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID));
             if (readd) {
                 this.remove();
@@ -1328,7 +1359,10 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             if (readd) {
-                this.add(isTiledDisplay);
+                this.add();
+            }
+            if (resetDisplay) {
+                this.resetDisplay();
             }
         }
 
@@ -1352,12 +1386,15 @@ public class CommonMapController implements PacketListener, Listener {
             this.isDisplayTile = false;
         }
 
-        public void add(boolean isTiledDisplay) {
+        public void add() {
             if (this.displayInfo == null && this.lastMapUUID != null) {
                 this.displayInfo = getInfo(this.lastMapUUID.getUUID());
                 this.displayInfo.itemFrames.add(this);
             }
-            if (isTiledDisplay && !this.displayInfo.sessions.isEmpty()) {
+        }
+
+        public void resetDisplay() {
+            if (!this.displayInfo.sessions.isEmpty()) {
                 this.displayInfo.resetDisplayRequest = true;
             }
         }
@@ -1410,7 +1447,7 @@ public class CommonMapController implements PacketListener, Listener {
                     for (EntityItemFrameHandle itemFrame : itemFrameSet.cloneAsIterable()) {
                         UUID mapUUID = itemFrame.getItemMapDisplayUUID();
                         if (dirtyMaps.contains(mapUUID)) {
-                            itemFrame.setItem(itemFrame.getItem());
+                            itemFrame.refreshItem();
                         }
                     }
                 }
@@ -1499,6 +1536,9 @@ public class CommonMapController implements PacketListener, Listener {
                 }
             }
 
+            // Enable the item frame cluster cache
+            itemFrameClustersByWorldEnabled = true;
+
             // Iterate all tracked item frames and update them
             Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
             while (itemFrames_iter.hasNext()) {
@@ -1536,14 +1576,6 @@ public class CommonMapController implements PacketListener, Listener {
                         info.displayInfo.hasFrameViewerChanges = true;
                     }
                 }
-
-                // Resend Item Frame item (metadata) when the UUID changes
-                // UUID can change when the relative tile displayed changes
-                // This happens when a new item frame is placed left/above a display
-                if (info.needsItemRefresh) {
-                    info.needsItemRefresh = false;
-                    info.itemFrameHandle.setItem(info.itemFrameHandle.getItem());
-                }
             }
 
             // Update the player viewers of all map displays
@@ -1563,13 +1595,14 @@ public class CommonMapController implements PacketListener, Listener {
                     //}
                 }
                 if (map.resetDisplayRequest) {
-                    map.resetDisplayRequest = false;
-
                     // Refresh all item frames' items showing this map
                     // It is possible their UUID changed as a result of the new tiling
                     for (ItemFrameInfo itemFrame : map.itemFrames) {
                         itemFrame.recalculateUUID();
                     }
+
+                    // RecalculateUUID above may cause further resets, so do it after
+                    map.resetDisplayRequest = false;
 
                     // Restart all display sessions; their canvas changed resolution or has holes
                     for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
@@ -1579,6 +1612,20 @@ public class CommonMapController implements PacketListener, Listener {
                     }
                 }
             }
+
+            for (ItemFrameInfo info : itemFrames.values()) {
+                // Resend Item Frame item (metadata) when the UUID changes
+                // UUID can change when the relative tile displayed changes
+                // This happens when a new item frame is placed left/above a display
+                if (info.needsItemRefresh) {
+                    info.needsItemRefresh = false;
+                    info.itemFrameHandle.refreshItem();
+                }
+            }
+
+            // Disable cache again and wipe
+            itemFrameClustersByWorldEnabled = false;
+            itemFrameClustersByWorld.clear();
         }
     }
 
@@ -1741,18 +1788,32 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     /**
-     * Finds all connected neighbours of an item frame
+     * Finds a cluster of all connected item frames that an item frame is part of
      * 
      * @param itemFrame
+     * @return cluster
      */
-    private final FindNeighboursResult findNeighbours(EntityItemFrameHandle itemFrame) {
-        if (!this.isFrameTilingSupported) {
-            return new FindNeighboursResult(Collections.emptyList(), 0); // disabled, no neighbours
+    private final ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
+        UUID itemFrameMapUUID;
+        if (!this.isFrameTilingSupported || (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) == null) {
+            return new ItemFrameCluster(Collections.singletonList(itemFramePosition), 0); // no neighbours or tiling disabled
         }
 
-        UUID itemFrameMapUUID = itemFrame.getItemMapDisplayUUID();
-        if (itemFrameMapUUID == null) {
-            return new FindNeighboursResult(Collections.emptyList(), 0); // no neighbours
+        // Look up in cache first
+        World world = itemFrame.getBukkitWorld();
+        Map<IntVector3, ItemFrameCluster> cachedClusters;
+        if (itemFrameClustersByWorldEnabled) {
+            cachedClusters = itemFrameClustersByWorld.get(world);
+            if (cachedClusters == null) {
+                cachedClusters = new HashMap<>();
+                itemFrameClustersByWorld.put(world, cachedClusters);
+            }
+            ItemFrameCluster fromCache = cachedClusters.get(itemFramePosition);
+            if (fromCache != null) {
+                return fromCache;
+            }
+        } else {
+            cachedClusters = null;
         }
 
         // Take cache entry
@@ -1771,8 +1832,11 @@ public class CommonMapController implements PacketListener, Listener {
             // - Same ItemStack map UUID
             BlockFace[] neighbourAxis;
 
-            ItemFrameClusterKey key = new ItemFrameClusterKey(itemFrame);
+            ItemFrameClusterKey key = new ItemFrameClusterKey(world, itemFrame.getFacing(), itemFramePosition);
             for (EntityItemFrameHandle otherFrame : iterateItemFrames(key)) {
+                if (otherFrame.getId() == itemFrame.getId()) {
+                    continue;
+                }
                 UUID otherFrameMapUUID = otherFrame.getItemMapDisplayUUID();
                 if (itemFrameMapUUID.equals(otherFrameMapUUID)) {
                     cache.put(otherFrame);
@@ -1795,7 +1859,8 @@ public class CommonMapController implements PacketListener, Listener {
             // Make sure the neighbours result are a single contiguous blob
             // Islands (can not reach the input item frame) are removed
             List<IntVector3> result = new ArrayList<IntVector3>(cache.cache.size());
-            cache.pendingList.add(itemFrame.getBlockPosition());
+            result.add(itemFramePosition);
+            cache.pendingList.add(itemFramePosition);
             do {
                 IntVector3 pending = cache.pendingList.poll();
                 for (BlockFace side : neighbourAxis) {
@@ -1818,22 +1883,55 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // The final combined result
-            return new FindNeighboursResult(result, rotation_idx * 90);
+            ItemFrameCluster cluster = new ItemFrameCluster(result, rotation_idx * 90);
+            if (cachedClusters != null) {
+                for (IntVector3 position : cluster.coordinates) {
+                    cachedClusters.put(position, cluster);
+                }
+            }
+            return cluster;
         } finally {
             // Return to cache
             this.findNeighboursCache = cache;
         }
     }
 
-    private static final class FindNeighboursResult {
+    private static final class ItemFrameCluster {
         // List of coordinates where item frames are stored
         public final List<IntVector3> coordinates;
         // Most common ItemFrame rotation used for the display
         public final int rotation;
+        // Minimum/maximum coordinates of the item frame coordinates in this cluster
+        public final IntVector3 min_coord, max_coord;
 
-        public FindNeighboursResult(List<IntVector3> coordinates, int rotation) {
+        public ItemFrameCluster(List<IntVector3> coordinates, int rotation) {
             this.coordinates = coordinates;
             this.rotation = rotation;
+
+            if (hasMultipleTiles()) {
+                // Compute minimum/maximum x and z coordinates
+                Iterator<IntVector3> iter = coordinates.iterator();
+                IntVector3 coord = iter.next();
+                int min_x, max_x, min_y, max_y, min_z, max_z;
+                min_x = max_x = coord.x; min_y = max_y = coord.y; min_z = max_z = coord.z;
+                while (iter.hasNext()) {
+                    coord = iter.next();
+                    if (coord.x < min_x) min_x = coord.x;
+                    if (coord.y < min_y) min_y = coord.y;
+                    if (coord.z < min_z) min_z = coord.z;
+                    if (coord.x > max_x) max_x = coord.x;
+                    if (coord.y > max_y) max_y = coord.y;
+                    if (coord.z > max_z) max_z = coord.z;
+                }
+                min_coord = new IntVector3(min_x, min_y, min_z);
+                max_coord = new IntVector3(max_x, max_y, max_z);
+            } else {
+                min_coord = max_coord = coordinates.get(0);
+            }
+        }
+
+        public boolean hasMultipleTiles() {
+            return coordinates.size() > 1;
         }
     }
 
@@ -1932,8 +2030,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param item to set
      */
     public static void setItemFrameItem(ItemFrame itemFrame, ItemStack item) {
-        EntityItemFrameHandle handle = EntityItemFrameHandle.fromBukkit(itemFrame);
-        handle.setItem(item);
+        EntityItemFrameHandle.fromBukkit(itemFrame).setItem(item);
     }
 
     /**

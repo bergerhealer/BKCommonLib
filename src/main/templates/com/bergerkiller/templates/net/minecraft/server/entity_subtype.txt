@@ -636,6 +636,10 @@ class EntityItemFrame extends Entity {
     public (org.bukkit.inventory.ItemStack) ItemStack getItem();
     public void setItem((org.bukkit.inventory.ItemStack) ItemStack newItemStack);
 
+    public void refreshItem() {
+        instance.setItem(instance.getItem());
+    }
+
     public (IntVector3) BlockPosition getBlockPosition();
     public (org.bukkit.block.BlockFace) EnumDirection getFacing:getDirection();
     public int getRotationOrdinal:getRotation();

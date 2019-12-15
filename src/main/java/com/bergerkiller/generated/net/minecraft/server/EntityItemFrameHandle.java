@@ -30,6 +30,7 @@ public abstract class EntityItemFrameHandle extends EntityHandle {
     public abstract UUID getItemMapDisplayUUID();
     public abstract ItemStack getItem();
     public abstract void setItem(ItemStack newItemStack);
+    public abstract void refreshItem();
     public abstract IntVector3 getBlockPosition();
     public abstract BlockFace getFacing();
     public abstract int getRotationOrdinal();
@@ -52,6 +53,7 @@ public abstract class EntityItemFrameHandle extends EntityHandle {
         public final Template.Method<UUID> getItemMapDisplayUUID = new Template.Method<UUID>();
         public final Template.Method.Converted<ItemStack> getItem = new Template.Method.Converted<ItemStack>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> refreshItem = new Template.Method<Void>();
         public final Template.Method.Converted<IntVector3> getBlockPosition = new Template.Method.Converted<IntVector3>();
         public final Template.Method.Converted<BlockFace> getFacing = new Template.Method.Converted<BlockFace>();
         public final Template.Method<Integer> getRotationOrdinal = new Template.Method<Integer>();
