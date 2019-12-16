@@ -150,6 +150,15 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Gets a list of all display tiles in use by this display
+     * 
+     * @return tiles
+     */
+    public List<MapDisplayTile> getDisplayTiles() {
+        return this.tiles;
+    }
+
+    /**
      * Checks whether a particular map display tile exists displaying contents
      * 
      * @param tileX of the tile
