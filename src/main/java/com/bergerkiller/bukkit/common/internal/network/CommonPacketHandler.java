@@ -81,6 +81,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
         Logging.LOGGER_NETWORK.log(Level.SEVERE, "Dev-bukkit: http://dev.bukkit.org/server-mods/protocollib/");
     }
 
+    @io.netty.channel.ChannelHandler.Sharable
     public static class CommonChannelListener extends ChannelDuplexHandler {
 
         public static void bind(Player player) {
