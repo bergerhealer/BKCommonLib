@@ -111,6 +111,8 @@ public class CommonMapController implements PacketListener, Listener {
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
+    // Whether to automatically load neighbouring chunks when item frames are found on the edges
+    private boolean LOAD_BORDER_CHUNKS = false;
     // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
     private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
     // Caches used while executing findNeighbours()
@@ -749,7 +751,7 @@ public class CommonMapController implements PacketListener, Listener {
 
         // If frame tiling is disabled, then neighbouring chunks don't have to be loaded
         // If the item frame does not store a map item, we don't have to load the neighbouring chunks
-        if (!this.isFrameTilingSupported || !frame.getItemIsMap()) {
+        if (!this.LOAD_BORDER_CHUNKS || !this.isFrameTilingSupported || !frame.getItemIsMap()) {
             return;
         }
 
@@ -1655,15 +1657,17 @@ public class CommonMapController implements PacketListener, Listener {
         @Override
         public void run() {
             // Load neighbouring chunks
-            while (!neighbourChunkQueue.isEmpty()) {
-                try (ImplicitlySharedSet<PendingChunkLoad> copy = neighbourChunkQueue.clone()) {
-                    // Load all the chunks
-                    for (PendingChunkLoad chunk : copy) {
-                        chunk.world.getChunkAt(chunk.x, chunk.z);
-                    }
+            if (LOAD_BORDER_CHUNKS) {
+                while (!neighbourChunkQueue.isEmpty()) {
+                    try (ImplicitlySharedSet<PendingChunkLoad> copy = neighbourChunkQueue.clone()) {
+                        // Load all the chunks
+                        for (PendingChunkLoad chunk : copy) {
+                            chunk.world.getChunkAt(chunk.x, chunk.z);
+                        }
 
-                    // Remove the chunks we have loaded
-                    neighbourChunkQueue.removeAll(copy);
+                        // Remove the chunks we have loaded
+                        neighbourChunkQueue.removeAll(copy);
+                    }
                 }
             }
 
