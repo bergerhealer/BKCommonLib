@@ -524,9 +524,8 @@ public class CommonPlugin extends PluginBase {
         // Initialize MapColorPalette (static initializer)
         MapColorPalette.getColor(Color.RED);
 
-        // Initialize NBTBase createHandle() - workaround for a reported error
-        // The error this potentially fixes is related to a linkageerror when generating the class
-        NBTBaseHandle.T.createHandle(null, true);
+        // Initialize NBT early
+        NBTBaseHandle.T.forceInitialization();
 
         // Initialize chunk loader pool
         chunkLoaderPool = new CommonChunkLoaderPool();

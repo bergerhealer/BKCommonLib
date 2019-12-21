@@ -46,6 +46,17 @@ public class TemplateTest {
             genClassPath = trimAfter(genClassPath, "org.bukkit.craftbukkit.");
             genClassPath = trimAfter(genClassPath, "net.minecraft.server.");
 
+            // NBT classes have been moved
+            {
+                String prefix = "com.bergerkiller.generated.net.minecraft.server.NBTTag";
+                if (genClassPath.startsWith(prefix)
+                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle")
+                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle"))
+                {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle.NBTTag" + genClassPath.substring(prefix.length());
+                }
+            }
+
             // MC 1.8 class translation fixes
             {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumAxisHandle")) {
@@ -173,7 +184,7 @@ public class TemplateTest {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle";
                 }
             }
-            
+
             Class<?> genClass = CommonUtil.getClass(genClassPath, true);
             if (genClass == null) {
                 System.out.println("Error occurred testing handle for " + dec.type.typePath);

@@ -5,9 +5,10 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -46,8 +47,18 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
         super(value);
     }
 
-    private void updateListType(Object elementHandle) {
-        NMSNBT.List.type.set(getRawHandle(), NMSNBT.getTypeId(elementHandle));
+    public CommonTagList(NBTTagListHandle handle) {
+        super(handle);
+    }
+
+    @Override
+    public NBTTagListHandle getBackingHandle() {
+        return (NBTTagListHandle) handle;
+    }
+
+    @Override
+    public CommonTagList clone() {
+        return new CommonTagList((NBTTagListHandle) handle.clone());
     }
 
     @Override
@@ -61,43 +72,18 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     @Override
-    public CommonTagList clone() {
-        return (CommonTagList) super.clone();
-    }
-
-    @Override
     public int size() {
-        return NMSNBT.List.size.invoke(getRawHandle());
+        return getBackingHandle().size();
     }
 
     @Override
     public boolean isEmpty() {
-        return size() == 0;
+        return getBackingHandle().isEmpty();
     }
 
     @Override
     public void clear() {
-        getRawData().clear();
-        updateListType(null);
-    }
-
-    private Object prepElement(Object element) {
-        if (element == null) {
-            throw new IllegalArgumentException("Can not store null elements");
-        } else {
-            try {
-                Object handle = commonToNbt(element);
-                if (!NMSNBT.Base.T.isInstance(handle)) {
-                    handle = NMSNBT.createHandle(handle);
-                }
-                if (handle != null) {
-                    updateListType(handle);
-                    return handle;
-                }
-            } catch (Exception ex) {
-            }
-            throw new IllegalArgumentException("Unable to store an element of type " + element.getClass().getName());
-        }
+        getBackingHandle().clear();
     }
 
     /**
@@ -109,7 +95,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @return element value
      */
     public Object getValue(int index) {
-        return nbtToCommon(NMSNBT.getData(NMSNBT.List.get.invoke(getRawHandle(), index)), false);
+        return wrapRawData(NBTBaseHandle.getDataForHandle(NBTTagListHandle.T.get_at.raw.invoke(getRawHandle(), index)));
     }
 
     /**
@@ -161,7 +147,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to set to
      */
     public void setValue(int index, Object element) {
-        getRawData().set(index, prepElement(element));
+        NBTTagListHandle.T.set_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
     }
 
     /**
@@ -173,7 +159,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to add
      */
     public void addValue(int index, Object element) {
-        getRawData().add(index, prepElement(element));
+        NBTTagListHandle.T.add_at.raw.invoke(getRawHandle(), index, NBTBaseHandle.createRawHandleForData(element));
     }
 
     /**
@@ -184,35 +170,70 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * @param element to add
      */
     public void addValue(Object element) {
-        getRawData().add(prepElement(element));
+        NBTTagListHandle.T.add.raw.invoke(getRawHandle(), NBTBaseHandle.createRawHandleForData(element));
     }
 
     @Override
-    public CommonTag remove(int index) {
-        return CommonTag.create(getRawData().remove(index));
+    public int indexOf(Object o) {
+        if (o instanceof CommonTag) {
+            return getRawData().indexOf(((CommonTag) o).getRawHandle());
+        } else if (NBTBaseHandle.isDataSupportedNatively(o)) {
+            return getRawData().indexOf(NBTBaseHandle.createRawHandleForData(o));
+        } else {
+            return -1;
+        }
     }
 
     @Override
-    public CommonTag set(int index, CommonTag element) {
-        final CommonTag prev = get(index);
-        setValue(index, element);
-        return prev;
+    public int lastIndexOf(Object o) {
+        if (o instanceof CommonTag) {
+            return getRawData().lastIndexOf(((CommonTag) o).getRawHandle());
+        } else if (NBTBaseHandle.isDataSupportedNatively(o)) {
+            return getRawData().lastIndexOf(NBTBaseHandle.createRawHandleForData(o));
+        } else {
+            return -1;
+        }
     }
 
     @Override
-    public void add(int index, CommonTag element) {
-        addValue(index, element);
+    public boolean contains(Object o) {
+        return indexOf(o) != -1;
     }
 
     @Override
-    public boolean add(CommonTag element) {
-        addValue(element);
-        return true;
+    public boolean remove(Object o) {
+        int index = indexOf(o);
+        if (index == -1) {
+            return false;
+        } else {
+            remove(index);
+            return true;
+        }
     }
 
     @Override
     public CommonTag get(int index) {
-        return CommonTag.create(NMSNBT.List.get.invoke(getRawHandle(), index));
+        return getBackingHandle().get_at(index).toCommonTag();
+    }
+
+    @Override
+    public CommonTag set(int index, CommonTag element) {
+        return getBackingHandle().set_at(index, element.getBackingHandle()).toCommonTag();
+    }
+
+    @Override
+    public CommonTag remove(int index) {
+        return getBackingHandle().remove_at(index).toCommonTag();
+    }
+
+    @Override
+    public void add(int index, CommonTag element) {
+        getBackingHandle().add_at(index, element.getBackingHandle());
+    }
+
+    @Override
+    public boolean add(CommonTag element) {
+        return getBackingHandle().add(element.getBackingHandle());
     }
 
     /**
@@ -290,26 +311,6 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     @Override
-    public int indexOf(Object o) {
-        return getRawData().indexOf(commonToNbt(o));
-    }
-
-    @Override
-    public int lastIndexOf(Object o) {
-        return getRawData().lastIndexOf(commonToNbt(o));
-    }
-
-    @Override
-    public boolean contains(Object o) {
-        for (Object elem : this) {
-            if (elem != null && elem.equals(o)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
     public Object[] toArray() {
         Object[] values = new Object[size()];
         Iterator<CommonTag> iter = iterator();
@@ -332,39 +333,23 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
     }
 
     @Override
-    public boolean remove(Object o) {
-        return getRawData().remove(commonToNbt(o));
-    }
-
-    @Override
     public boolean containsAll(Collection<?> c) {
-        List<?> raw = getRawData();
-        for (Object elem : c) {
-            if (!raw.contains(commonToNbt(elem))) {
-                return false;
-            }
-        }
-        return true;
+        return CollectionBasics.containsAll(this, c);
     }
 
     @Override
     public boolean addAll(Collection<? extends CommonTag> c) {
-        return getRawData().addAll((Collection<Object>) commonToNbt(c));
+        return CollectionBasics.addAll(this, c);
     }
 
     @Override
     public boolean addAll(int index, Collection<? extends CommonTag> c) {
-        return getRawData().addAll(index, (Collection<Object>) commonToNbt(c));
+        return CollectionBasics.addAll(this, index, c);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        List<Object> raw = getRawData();
-        boolean changed = false;
-        for (Object o : c) {
-            changed |= raw.remove(commonToNbt(o));
-        }
-        return changed;
+        return CollectionBasics.removeAll(this, c);
     }
 
     @Override

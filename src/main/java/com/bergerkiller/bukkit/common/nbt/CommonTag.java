@@ -1,14 +1,16 @@
 package com.bergerkiller.bukkit.common.nbt;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSNBT;
+import com.bergerkiller.generated.net.minecraft.server.NBTCompressedStreamToolsHandle;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 
 import java.io.*;
-import java.util.AbstractMap.SimpleEntry;
-import java.util.*;
-import java.util.Map.Entry;
+import java.util.List;
+import java.util.Map;
 
 /**
  * An NBT Tag wrapper implementation to safely operate on tags<br><br>
@@ -18,20 +20,17 @@ import java.util.Map.Entry;
  * double, byte[], int[], String</u>
  */
 public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable {
-    protected final NMSNBT.Type info;
 
-    public CommonTag(Object data) {
-    	info = NMSNBT.Type.find(data);
-        setHandle(NBTBaseHandle.createHandle(info.createHandle(commonToNbt(data))));
+    public CommonTag(NBTBaseHandle handle) {
+        setHandle(handle);
     }
 
-    /**
-     * Gets the NBT Type used in this Common Tag
-     * 
-     * @return NBT Type
-     */
-    public NMSNBT.Type getType() {
-    	return info;
+    public CommonTag(Object data) {
+        if (data instanceof NBTBaseHandle) {
+            setHandle((NBTBaseHandle) data);
+        } else {
+            setHandle(NBTBaseHandle.createHandleForData(data));
+        }
     }
 
     /**
@@ -40,7 +39,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return Raw data
      */
     protected Object getRawData() {
-        return info.getData(getRawHandle());
+        return NBTBaseHandle.getDataForHandle(getRawHandle());
     }
 
     /**
@@ -49,7 +48,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return Tag data
      */
     public Object getData() {
-        return nbtToCommon(getRawData(), false);
+        return wrapRawData(getRawData());
     }
 
     /**
@@ -82,23 +81,14 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
         return Conversion.convert(getData(), type, def);
     }
 
-    /**
-     * Sets the data stored by the tag
-     *
-     * @param data to set to
-     */
-    public void setData(Object data) {
-        info.setData(getRawHandle(), commonToNbt(data));
-    }
-
     @Override
     public String toString() {
-        return info.toString(getRawHandle(), 0);
+        return handle.toPrettyString();
     }
 
     @Override
     public CommonTag clone() {
-        return create(NMSNBT.Base.clone.invoke(getRawHandle()));
+        return new CommonTag(handle.clone());
     }
 
     /**
@@ -108,10 +98,11 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @throws IOException
      */
     public void writeToStream(OutputStream out) throws IOException {
-    	if (!(out instanceof DataOutput)) {
-    		out = new DataOutputStream(out);
+    	if (out instanceof DataOutput) {
+    	    NBTCompressedStreamToolsHandle.uncompressed_writeTag(handle, (DataOutput) out);
+    	} else {
+    	    NBTCompressedStreamToolsHandle.uncompressed_writeTag(handle, new DataOutputStream(out));
     	}
-        NMSNBT.StreamTools.Uncompressed.writeTag.invoke(null, getRawHandle(), out);
     }
 
     /**
@@ -122,113 +113,10 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @throws IOException
      */
     public static CommonTag readFromStream(InputStream in) throws IOException {
-    	if (!(in instanceof DataInput)) {
-    		in = new DataInputStream(in);
-    	}
-    	Object limiter = NMSNBT.StreamTools.Uncompressed.getNoReadLimiter();
-    	Object handle = NMSNBT.StreamTools.Uncompressed.readTag.invoke(null, in, 0, limiter);
-    	return create(handle);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected static Object commonToNbt(Object data) {
-        if (data instanceof CommonTag) {
-            return ((CommonTag) data).getRawHandle();
-        } else if (NMSNBT.Base.T.isInstance(data) || data == null) {
-            return data;
-        } else if (data instanceof Entry) {
-            Entry old = (Entry) data;
-            // Replace
-            Object newKey = commonToNbt(old.getKey());
-            Object newValue = commonToNbt(old.getValue());
-            // If changed, return new type
-            if (newKey != old.getKey() || newValue != old.getValue()) {
-                return new SimpleEntry(newKey, newValue);
-            } else {
-                return data;
-            }
-        } else if (data instanceof Set) {
-            Set<Object> elems = (Set<Object>) data;
-            HashSet<Object> tags = new HashSet<Object>(elems.size());
-            // Replace
-            for (Object value : elems) {
-                tags.add(commonToNbt(value));
-            }
-            return tags;
-        } else if (data instanceof Map) {
-            Map<String, Object> elems = (Map<String, Object>) data;
-            HashMap<String, Object> tags = new HashMap<String, Object>(elems.size());
-            // Replace
-            for (Entry<String, Object> entry : elems.entrySet()) {
-                Object value = commonToNbt(entry.getValue());
-                tags.put(entry.getKey(), value);
-            }
-            return tags;
-        } else if (data instanceof Collection) {
-            Collection<Object> elems = (Collection<Object>) data;
-            ArrayList<Object> tags = new ArrayList<Object>(elems.size());
-            // Replace
-            for (Object value : elems) {
-                tags.add(commonToNbt(value));
-            }
-            return tags;
-        } else if (NMSNBT.Type.canStore(data)) {
-            return NMSNBT.createHandle(data);
+        if (in instanceof DataInput) {
+            return create(NBTCompressedStreamToolsHandle.uncompressed_readTag((DataInput) in));
         } else {
-            String dataAsString = Conversion.toString.convert(data);
-            if (dataAsString == null) {
-                throw new IllegalArgumentException("Value of type " + data.getClass() +
-                        " can not be serialized as a String");
-            }
-            return NMSNBT.createHandle(dataAsString);
-        }
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    protected static Object nbtToCommon(Object data, boolean wrapData) {
-        if (NMSNBT.Base.T.isInstance(data)) {
-            return create(data);
-        } else if (data instanceof CommonTag || data == null) {
-            return data;
-        } else if (data instanceof Entry) {
-            Entry old = (Entry) data;
-            // Replace
-            Object newKey = nbtToCommon(old.getKey(), wrapData);
-            Object newValue = nbtToCommon(old.getValue(), wrapData);
-            // If changed, return new type
-            if (newKey != old.getKey() || newValue != old.getValue()) {
-                return new SimpleEntry(newKey, newValue);
-            } else {
-                return data;
-            }
-        } else if (data instanceof Set) {
-            Set<Object> elems = (Set<Object>) data;
-            HashSet<Object> tags = new HashSet<Object>(elems.size());
-            // Replace
-            for (Object value : elems) {
-                tags.add(nbtToCommon(value, wrapData));
-            }
-            return tags;
-        } else if (data instanceof Map) {
-            Map<String, Object> elems = (Map<String, Object>) data;
-            HashMap<String, Object> tags = new HashMap<String, Object>(elems.size());
-            // Replace
-            for (Entry<String, Object> entry : elems.entrySet()) {
-                tags.put(entry.getKey(), nbtToCommon(entry.getValue(), wrapData));
-            }
-            return tags;
-        } else if (data instanceof Collection) {
-            Collection<Object> elems = (Collection<Object>) data;
-            ArrayList<Object> tags = new ArrayList<Object>(elems.size());
-            // Replace
-            for (Object value : elems) {
-                tags.add(nbtToCommon(value, wrapData));
-            }
-            return tags;
-        } else if (wrapData) {
-            return createForData(data);
-        } else {
-            return data;
+            return create(NBTCompressedStreamToolsHandle.uncompressed_readTag(new DataInputStream(in)));
         }
     }
 
@@ -240,7 +128,7 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
      * @return a new CommonTag instance
      */
     public static CommonTag createForData(Object data) {
-        return create(NMSNBT.createHandle(data));
+        return NBTBaseHandle.createHandleForData(data).toCommonTag();
     }
 
     /**
@@ -253,15 +141,32 @@ public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable 
     public static CommonTag create(Object handle) {
         if (handle == null) {
             return null;
-        }
-        CommonTag tag;
-        if (NMSNBT.Compound.T.isInstance(handle)) {
-            tag = new CommonTagCompound(handle);
-        } else if (NMSNBT.List.T.isInstance(handle)) {
-            tag = new CommonTagList(handle);
         } else {
-            tag = new CommonTag(handle);
+            return NBTBaseHandle.createHandleForData(handle).toCommonTag();
         }
-        return tag;
+    }
+
+    protected static Object wrapGetDataForHandle(Object nmsNBTHandle) {
+        return wrapRawData(NBTBaseHandle.getDataForHandle(nmsNBTHandle));
+    }
+
+    /**
+     * Wraps Map and List data to expose CommonTag objects rather than NBTBase.
+     * Other types are returned as-is.
+     * 
+     * @param value
+     * @return wrapped value
+     */
+    protected static Object wrapRawData(Object value) {
+        if (value instanceof Map) {
+            // Convert Map<String, NBTBase> to Map<String, CommonTag>
+            return new ConvertingMap<String, CommonTag>((Map<?, ?>) value, DuplexConversion.string_string, DuplexConversion.nbtBase_commonTag);
+        } else if (value instanceof List) {
+            // Convert List<NBTBase> to List<CommonTag>
+            return new ConvertingList<CommonTag>((List<?>) value, DuplexConversion.nbtBase_commonTag);
+        } else {
+            // Tag data value type does not require further conversion
+            return value;
+        }
     }
 }

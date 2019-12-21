@@ -41,6 +41,7 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
@@ -100,6 +101,30 @@ public class DuplexConversion {
     public static final DuplexConverter<Object[], ChatText[]> chatTextArray = pairArray(chatText);
     public static final DuplexConverter<Object[], ChunkSection[]> chunkSectionArray = pairArray(chunkSection);
     public static final DuplexConverter<Object[], MapCursor[]> mapCursorArray = pairArray(mapCursor);
+
+    public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag = new DuplexConverter<Object, CommonTag>(NBTBaseHandle.T.getType(), CommonTag.class) {
+        @Override
+        public CommonTag convertInput(Object value) {
+            return NBTBaseHandle.createHandleForData(value).toCommonTag();
+        }
+
+        @Override
+        public Object convertOutput(CommonTag value) {
+            return value.getRawHandle();
+        }
+    };
+    public static final DuplexConverter<Object, NBTBaseHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, NBTBaseHandle>(NBTBaseHandle.T.getType(), NBTBaseHandle.class) {
+        @Override
+        public NBTBaseHandle convertInput(Object value) {
+            return NBTBaseHandle.createHandleForData(value);
+        }
+
+        @Override
+        public Object convertOutput(NBTBaseHandle value) {
+            return value.getRaw();
+        }
+    };
+    public static final DuplexConverter<String, String> string_string = DuplexConverter.createNull(TypeDeclaration.fromClass(String.class));
 
     @SuppressWarnings("unchecked")
     private static final <T> T pairElem(Class<?> type, DuplexConverter<?, ?> elementConverter) {

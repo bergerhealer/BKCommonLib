@@ -70,7 +70,6 @@ public class ReflectionTest {
             loadClass(NMSDamageSource.class);
             loadClass(NMSDataWatcher.class);
             loadClass(NMSRegionFile.class);
-            loadClass(NMSNBT.class);
             loadClass(NMSNibbleArray.class);
             loadClass(NMSTileEntity.class);
             loadClass(NMSEntityTypes.class);

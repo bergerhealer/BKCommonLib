@@ -3,27 +3,43 @@ package com.bergerkiller.bukkit.common.conversion.type;
 import java.util.List;
 import java.util.Map;
 
+import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 
 public class NBTConversion {
+
+    @ConverterMethod(input="java.util.Map<String, net.minecraft.server.NBTBase>")
+    public static Map<String, NBTBaseHandle> mapValuesToNBTBaseHandle(Map<String, Object> map) {
+        return new ConvertingMap<String, NBTBaseHandle>(map, DuplexConversion.string_string, DuplexConversion.nbtBase_nbtBaseHandle);
+    }
+
+    @ConverterMethod(input="java.util.List<net.minecraft.server.NBTBase>")
+    public static List<NBTBaseHandle> listValuesToNBTBaseHandle(List<Object> list) {
+        return new ConvertingList<NBTBaseHandle>(list, DuplexConversion.nbtBase_nbtBaseHandle);
+    }
 
     @SuppressWarnings("unchecked")
     @ConverterMethod(input="net.minecraft.server.NBTBase")
     public static <T extends CommonTag> T toCommonTag(Object nmsNBTTagHandle) {
-        return (T) CommonTag.create(nmsNBTTagHandle);
+        return (T) NBTBaseHandle.createHandleForData(nmsNBTTagHandle).toCommonTag();
     }
 
     @ConverterMethod(input="net.minecraft.server.NBTTagList")
     public static CommonTagList toCommonTagList(Object nmsNBTTagListHandle) {
-        return CommonTagList.create(nmsNBTTagListHandle);
+        return CommonTagList.create(NBTTagListHandle.createHandle(nmsNBTTagListHandle));
     }
 
     @ConverterMethod(input="net.minecraft.server.NBTTagCompound")
     public static CommonTagCompound toCommonTagCompound(Object nmsNBTTagCompoundHandle) {
-        return CommonTagCompound.create(nmsNBTTagCompoundHandle);
+        return CommonTagCompound.create(NBTTagCompoundHandle.createHandle(nmsNBTTagCompoundHandle));
     }
 
     @ConverterMethod(output="net.minecraft.server.NBTTagCompound")
@@ -88,6 +104,11 @@ public class NBTConversion {
 
     @ConverterMethod(cost = 2)
     public static CommonTag createCommonTag(int[] data) {
+        return CommonTag.createForData(data);
+    }
+
+    @ConverterMethod(cost = 2)
+    public static CommonTag createCommonTag(long[] data) {
         return CommonTag.createForData(data);
     }
 

@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -22,24 +23,69 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
 
     /* ============================================================================== */
 
-    public abstract boolean add(NBTBaseHandle value);
+    public static NBTTagListHandle createEmpty() {
+        return T.createEmpty.invoke();
+    }
+
+    public static NBTTagListHandle create(Collection<?> data) {
+        return T.create.invoke(data);
+    }
+
     public abstract int size();
-    public abstract NBTBaseHandle get(int index);
-    public abstract List<NBTBaseHandle> getList();
-    public abstract void setList(List<NBTBaseHandle> value);
-    public abstract byte getType();
-    public abstract void setType(byte value);
+    public abstract boolean isEmpty();
+    public abstract int getElementTypeId();
+    public abstract NBTBaseHandle get_at(int index);
+    public abstract void clear();
+    public abstract NBTBaseHandle set_at(int index, NBTBaseHandle nbt_value);
+    public abstract NBTBaseHandle remove_at(int index);
+    public abstract void add_at(int index, NBTBaseHandle value);
+    public abstract boolean add(NBTBaseHandle value);
+
+    public com.bergerkiller.bukkit.common.nbt.CommonTagList toCommonTag() {
+        return new com.bergerkiller.bukkit.common.nbt.CommonTagList(this);
+    }
+
+    @Override
+    public void toPrettyString(StringBuilder str, int indent) {
+        for (int i = 0; i < indent; i++) {
+            str.append("  ");
+        }
+        List<NBTBaseHandle> values = getData();
+        str.append("TagList: ").append(values.size()).append(" entries [");
+        for (NBTBaseHandle value : values) {
+            str.append('\n');
+            value.toPrettyString(str, indent + 1);
+        }
+        if (!values.isEmpty()) {
+            str.append('\n');
+            for (int i = 0; i < indent; i++) {
+                str.append("  ");
+            }
+        }
+        str.append(']');
+    }
+    @Template.Readonly
+    public abstract List<NBTBaseHandle> getData();
     /**
      * Stores class members for <b>net.minecraft.server.NBTTagList</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class NBTTagListClass extends Template.Class<NBTTagListHandle> {
-        public final Template.Field.Converted<List<NBTBaseHandle>> list = new Template.Field.Converted<List<NBTBaseHandle>>();
-        public final Template.Field.Byte type = new Template.Field.Byte();
+        @Template.Readonly
+        public final Template.Field.Converted<List<NBTBaseHandle>> data = new Template.Field.Converted<List<NBTBaseHandle>>();
 
-        public final Template.Method.Converted<Boolean> add = new Template.Method.Converted<Boolean>();
+        public final Template.StaticMethod.Converted<NBTTagListHandle> createEmpty = new Template.StaticMethod.Converted<NBTTagListHandle>();
+        public final Template.StaticMethod.Converted<NBTTagListHandle> create = new Template.StaticMethod.Converted<NBTTagListHandle>();
+
         public final Template.Method<Integer> size = new Template.Method<Integer>();
-        public final Template.Method.Converted<NBTBaseHandle> get = new Template.Method.Converted<NBTBaseHandle>();
+        public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getElementTypeId = new Template.Method<Integer>();
+        public final Template.Method.Converted<NBTBaseHandle> get_at = new Template.Method.Converted<NBTBaseHandle>();
+        public final Template.Method<Void> clear = new Template.Method<Void>();
+        public final Template.Method.Converted<NBTBaseHandle> set_at = new Template.Method.Converted<NBTBaseHandle>();
+        public final Template.Method.Converted<NBTBaseHandle> remove_at = new Template.Method.Converted<NBTBaseHandle>();
+        public final Template.Method.Converted<Void> add_at = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> add = new Template.Method.Converted<Boolean>();
 
     }
 

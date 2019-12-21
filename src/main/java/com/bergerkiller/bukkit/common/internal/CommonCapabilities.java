@@ -162,4 +162,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.14 it is no longer possible to cancel the chunk unload event
      */
     public static final boolean CAN_CANCEL_CHUNK_UNLOAD_EVENT = CommonBootstrap.evaluateMCVersion("<=", "1.13.2");
+
+    /**
+     * Since Minecraft 1.15 the NBT primitive container types return 'this' when cloning
+     * and are immutable (no setters).
+     */
+    public static final boolean IMMUTABLE_NBT_PRIMITIVES = CommonBootstrap.evaluateMCVersion(">=", "1.15");
 }

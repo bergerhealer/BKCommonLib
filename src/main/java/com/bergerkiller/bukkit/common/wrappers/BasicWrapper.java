@@ -24,6 +24,15 @@ public class BasicWrapper<T extends Template.Handle> {
     }
 
     /**
+     * Gets the internal handle of this wrapper
+     * 
+     * @return handle
+     */
+    public T getBackingHandle() {
+        return this.handle;
+    }
+
+    /**
      * Gets the raw internal handle from this wrapper
      *
      * @return handle
