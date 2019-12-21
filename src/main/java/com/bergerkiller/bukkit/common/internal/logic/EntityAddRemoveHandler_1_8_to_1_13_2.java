@@ -116,7 +116,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
      * Handles all the method calls coming from a WorldListener instance that is hooked.
      * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
      */
-    private static class WorldListenerHook extends ClassHook<WorldListenerHook> {
+    public static class WorldListenerHook extends ClassHook<WorldListenerHook> {
         private final EntityAddRemoveHandler_1_8_to_1_13_2 handler;
         private final World world;
 
