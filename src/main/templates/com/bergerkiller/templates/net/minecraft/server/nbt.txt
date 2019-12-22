@@ -323,11 +323,7 @@ class NBTBase {
     }
 
     class NBTTagByteArray extends NBTBase {
-#if version >= 1.15
-        public static (NBTBaseHandle.NBTTagByteArrayHandle) NBTTagByteArray create:a(byte[] data);
-#else
         public static (NBTBaseHandle.NBTTagByteArrayHandle) NBTTagByteArray create(byte[] data) { return new NBTTagByteArray(data); }
-#endif
 #if version >= 1.14
         public byte[] getData:getBytes();
 #else
@@ -336,11 +332,7 @@ class NBTBase {
     }
 
     class NBTTagIntArray extends NBTBase {
-#if version >= 1.15
-        public static (NBTBaseHandle.NBTTagIntArrayHandle) NBTTagIntArray create:a(int[] data);
-#else
         public static (NBTBaseHandle.NBTTagIntArrayHandle) NBTTagIntArray create(int[] data) { return new NBTTagIntArray(data); }
-#endif
 #if version >= 1.14
         public int[] getData:getInts();
 #elseif version >= 1.10.2
@@ -352,11 +344,7 @@ class NBTBase {
 
     // Since MC 1.12
     optional class NBTTagLongArray extends NBTBase {
-#if version >= 1.15
-        public static (NBTBaseHandle.NBTTagLongArrayHandle) NBTTagLongArray create:a(long[] data);
-#else
         public static (NBTBaseHandle.NBTTagLongArrayHandle) NBTTagLongArray create(long[] data) { return new NBTTagLongArray(data); }
-#endif
 #if version >= 1.14
         public long[] getData:getLongs();
 #elseif version >= 1.13
@@ -444,7 +432,7 @@ class NBTTagList extends NBTBase {
         byte list_type = instance#type;
         if (list_type != 0 && list_type != nbt_value.getTypeId()) {
             throw new UnsupportedOperationException("Trying to set tag of type " +
-                value.getTypeId() + " in list of " + list_type);
+                nbt_value.getTypeId() + " in list of " + list_type);
         }
   #if version >= 1.13
         NBTBase old_value = instance.get(index);
