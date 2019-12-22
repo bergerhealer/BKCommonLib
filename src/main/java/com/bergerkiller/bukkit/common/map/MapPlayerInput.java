@@ -551,8 +551,7 @@ public class MapPlayerInput implements Tickable {
                     packet.setPosX(pos.getX());
                     packet.setPosY(pos.getY());
                     packet.setPosZ(pos.getZ());
-                    packet.setDataWatcher(data);
-                    PacketUtil.sendPacket(player, packet);
+                    PacketUtil.sendEntityLivingSpawnPacket(player, packet, data);
                 }
                 {
                     if (PacketType.OUT_MOUNT.getType() != null) {

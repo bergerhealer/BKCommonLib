@@ -152,6 +152,7 @@ public class BlockDataTest {
             fail(msg);
         }
         if (materialData.getData() != (byte) dataValue) {
+            // A problem in here indicates that something needs to be fixed in IBlockDataToMaterialData
             System.err.println("BlockData of " + legacyMaterialType + ":" + dataValue + " = " + blockData);
             String msg = "testLegacyMaterial(" + legacyMaterialType + ", " + dataValue + ") failed: " +
                     "Expected legacy data " + dataValue + ", but was " + ((int) materialData.getData() & 0xF);

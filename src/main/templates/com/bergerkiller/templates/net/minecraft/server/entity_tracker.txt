@@ -286,7 +286,11 @@ class EntityTrackerEntryState {
     private optional double opt_zVel:###;
     private optional (org.bukkit.util.Vector) Vec3D opt_velocity:m;
 
+  #if version >= 1.15
+    public int tickCounter;
+  #else
     public int tickCounter:n;
+  #endif
 #elseif version >= 1.9
     private optional double opt_xVel:n;
     private optional double opt_yVel:o;
@@ -591,7 +595,11 @@ class EntityTrackerEntryState {
     public (CommonPacket) Packet<?> getSpawnPacket() {
         #require net.minecraft.server.EntityTrackerEntryState private final Entity entity:tracker;
         Entity entity = instance#entity;
+  #if version >= 1.15
+        return entity.L();
+  #else
         return entity.N();
+  #endif
     }
 #elseif version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();

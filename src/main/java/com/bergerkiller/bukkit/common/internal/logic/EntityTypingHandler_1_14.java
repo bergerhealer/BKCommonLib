@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
+import java.util.Random;
 
 import org.bukkit.entity.Entity;
 
@@ -16,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -84,6 +86,8 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
             FastMethod<Void> fm = new FastMethod<Void>();
             fm.init(m);
             fm.invoke(this.nmsWorldHandle, nmsWorldData);
+
+            WorldHandle.T.random.set(this.nmsWorldHandle, new Random());
         }
 
         // Pre-register certain classes that cause events to be fired when constructing

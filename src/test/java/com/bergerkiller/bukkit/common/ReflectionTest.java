@@ -69,7 +69,6 @@ public class ReflectionTest {
             loadClass(NMSIChatBaseComponent.class);
             loadClass(NMSDamageSource.class);
             loadClass(NMSDataWatcher.class);
-            loadClass(NMSRegionFile.class);
             loadClass(NMSNibbleArray.class);
             loadClass(NMSTileEntity.class);
             loadClass(NMSEntityTypes.class);

@@ -129,9 +129,30 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double lastX;
     public double lastY;
     public double lastZ;
+
+#if version >= 1.15
+    private double locX;
+    private double locY;
+    private double locZ;
+#else
     public double locX;
     public double locY;
     public double locZ;
+#endif
+
+    // locX/Y/Z fields became private on 1.15
+    // The added method 'setPositionRaw' is faster now
+    // TODO: Mountiplex causes the double values to turn into Double and back
+    //       This makes this method way too slow :(
+    // #if version >= 1.15
+    //     public void setLoc:setPositionRaw(double x, double y, double z);
+    // #else
+    //     public void setLoc(double x, double y, double z) {
+    //         instance.locX = x;
+    //         instance.locY = y;
+    //         instance.locZ = z;
+    //     }
+    // #endif
 
     // motX/Y/Z is private 'mot' field on 1.14
     // For performance reasons, use the getMot/setMot methods
@@ -216,7 +237,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean onGround;
     public boolean horizontalMovementImpaired:positionChanged;
 
-#if version >= 1.14
+#if version >= 1.15
+    public boolean verticalMovementImpaired:v;
+    public boolean movementImpaired:w;
+    public boolean velocityChanged;
+#elseif version >= 1.14
     public boolean verticalMovementImpaired:y;
     public boolean movementImpaired:z;
     public boolean velocityChanged;
@@ -237,7 +262,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.14
     // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
     // If this is greater than 1.0E-7D then the factor should be applied
+  #if version >= 1.15
+    #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:y;
+  #else
     #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:B;
+  #endif
 
     public boolean isCollidingWithBlock() {
         Vec3D multiplier = instance#collidingWithBlockMultiplier;
@@ -312,7 +341,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.15
+    public unknown float A;
+    public float walkedDistanceXZ:B;
+    public float walkedDistanceXYZ:C;
+#elseif version >= 1.14
     public unknown float D;
     public float walkedDistanceXZ:E;
     public float walkedDistanceXYZ:F;
@@ -358,7 +391,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return (float) instance#stepCounter;
     }
 
-#if version >= 1.14
+#if version >= 1.15
+    public unknown double E;
+    public unknown double F;
+    public unknown double G;
+    public float heightOffset:H;
+    public boolean noclip;
+    public unknown float J;
+#elseif version >= 1.14
     public unknown double H;
     public unknown double I;
     public unknown double J;
@@ -402,7 +442,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
 #if version >= 1.14
+  #if version >= 1.15
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
+  #else
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:W;
+  #endif
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
     private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:az;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
@@ -545,7 +589,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public int portalCooldown;
 
-#if version >= 1.14
+#if version >= 1.15
+    protected boolean allowTeleportation:af;
+    protected unknown int ag;
+#elseif version >= 1.14
     protected boolean allowTeleportation:ai;
     protected unknown int aj;
 #elseif version >= 1.13
@@ -702,7 +749,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.14
+#if version >= 1.15
+    public boolean isInWaterUpdate:ay();
+#elseif version >= 1.14
     public boolean isInWaterUpdate:au();
 #elseif version >= 1.12
     public boolean isInWaterUpdate:aq();
@@ -822,7 +871,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
      * }
      */
+#if version >= 1.15
+    public double calculateDistance:g(double x, double y, double z);
+#else
     public double calculateDistance:e(double x, double y, double z);
+#endif
 
     public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
 
@@ -845,9 +898,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance#headHeight = instance#getHeadHeight(entitypose, newSize);
 
         double half_width = (double) width / 2.0;
+  #if version >= 1.15
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.locX() - half_width, instance.locY(), instance.locZ() - half_width,
+            instance.locX() + half_width, instance.locY() + (double) height, instance.locZ() + half_width);
+  #else
         AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
             instance.locX - half_width, instance.locY, instance.locZ - half_width,
             instance.locX + half_width, instance.locY + (double) height, instance.locZ + half_width);
+  #endif
 
         instance.a(new_BoundingBox);
     }
@@ -867,7 +926,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.14.3
+#if version >= 1.15
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
+#elseif version >= 1.14.3
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
 #elseif version >= 1.14
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
@@ -929,7 +990,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
     </code>
 
-#if version >= 1.14.3
+#if version >= 1.15
+    public boolean isWet:ay();
+#elseif version >= 1.14.3
     public boolean isWet:au();
 #elseif version >= 1.14
     public boolean isWet:at();
@@ -1041,7 +1104,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
-#if version >= 1.11
+#if version >= 1.15
+    public void onPush:h(double d0, double d1, double d2);
+#elseif version >= 1.11
     public void onPush:f(double d0, double d1, double d2);
 #else
     public void onPush:g(double d0, double d1, double d2);
@@ -1054,7 +1119,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return 300;
      * }
      */
-#if version >= 1.14.3
+#if version >= 1.15
+    public int getPortalCooldownMaximum:ba();
+#elseif version >= 1.14.3
     public int getPortalCooldownMaximum:aX();
 #elseif version >= 1.14
     public int getPortalCooldownMaximum:aW();

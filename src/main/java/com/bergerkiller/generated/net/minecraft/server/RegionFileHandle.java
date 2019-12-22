@@ -2,8 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import java.io.File;
-import java.io.RandomAccessFile;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.RegionFile</b>.
@@ -21,25 +19,15 @@ public abstract class RegionFileHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final RegionFileHandle createNew(File file) {
-        return T.constr_file.newInstance(file);
-    }
-
     /* ============================================================================== */
 
     public abstract void close();
     public abstract boolean chunkExists(int cx, int cz);
-    public abstract RandomAccessFile getStream();
-    public abstract void setStream(RandomAccessFile value);
     /**
      * Stores class members for <b>net.minecraft.server.RegionFile</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RegionFileClass extends Template.Class<RegionFileHandle> {
-        public final Template.Constructor.Converted<RegionFileHandle> constr_file = new Template.Constructor.Converted<RegionFileHandle>();
-
-        public final Template.Field<RandomAccessFile> stream = new Template.Field<RandomAccessFile>();
-
         public final Template.Method<Void> close = new Template.Method<Void>();
         public final Template.Method<Boolean> chunkExists = new Template.Method<Boolean>();
 

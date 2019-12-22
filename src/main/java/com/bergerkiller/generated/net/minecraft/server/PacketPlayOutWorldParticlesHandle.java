@@ -21,12 +21,12 @@ public abstract class PacketPlayOutWorldParticlesHandle extends Template.Handle 
 
     /* ============================================================================== */
 
-    public abstract float getX();
-    public abstract void setX(float value);
-    public abstract float getY();
-    public abstract void setY(float value);
-    public abstract float getZ();
-    public abstract void setZ(float value);
+    public abstract double getX();
+    public abstract double getY();
+    public abstract double getZ();
+    public abstract void setX(double x);
+    public abstract void setY(double y);
+    public abstract void setZ(double z);
     public abstract float getRandomX();
     public abstract void setRandomX(float value);
     public abstract float getRandomY();
@@ -44,15 +44,19 @@ public abstract class PacketPlayOutWorldParticlesHandle extends Template.Handle 
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutWorldParticlesClass extends Template.Class<PacketPlayOutWorldParticlesHandle> {
-        public final Template.Field.Float x = new Template.Field.Float();
-        public final Template.Field.Float y = new Template.Field.Float();
-        public final Template.Field.Float z = new Template.Field.Float();
         public final Template.Field.Float randomX = new Template.Field.Float();
         public final Template.Field.Float randomY = new Template.Field.Float();
         public final Template.Field.Float randomZ = new Template.Field.Float();
         public final Template.Field.Float speed = new Template.Field.Float();
         public final Template.Field.Integer count = new Template.Field.Integer();
         public final Template.Field.Boolean longDistance = new Template.Field.Boolean();
+
+        public final Template.Method<Double> getX = new Template.Method<Double>();
+        public final Template.Method<Double> getY = new Template.Method<Double>();
+        public final Template.Method<Double> getZ = new Template.Method<Double>();
+        public final Template.Method<Void> setX = new Template.Method<Void>();
+        public final Template.Method<Void> setY = new Template.Method<Void>();
+        public final Template.Method<Void> setZ = new Template.Method<Void>();
 
     }
 

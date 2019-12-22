@@ -16,13 +16,13 @@ class EntityTypes {
 
     // Between MC 1.11 and 1.12.2 inclusively, this is used to find the 'name' of an entity by type id
 #if version >= 1.11
-#if version <= 1.12.2
+  #if version <= 1.12.2
     private static optional final List<String> opt_typeIdToName_1_11:g;
+  #else
+    private static optional final List<String> opt_typeIdToName_1_11:###;
+  #endif
 #else
     private static optional final List<String> opt_typeIdToName_1_11:###;
-#else
-    private static optional final List<String> opt_typeIdToName_1_11:###;
-#endif
 #endif
 
 #if version >= 1.11

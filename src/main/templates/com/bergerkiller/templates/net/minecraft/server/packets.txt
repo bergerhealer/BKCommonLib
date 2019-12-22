@@ -574,10 +574,19 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
 
 class PacketPlayOutLogin extends Packet {
     private int playerId:a;
+
+#if version >= 1.15
+    private unknown long encryptedWorldSeed:b;
+    private boolean hardcore:c;
+    private (org.bukkit.GameMode) EnumGamemode gameMode:d;
+#else
     private boolean hardcore:b;
     private (org.bukkit.GameMode) EnumGamemode gameMode:c;
+#endif
 
-#if version >= 1.13.1
+#if version >= 1.15
+    private (Dimension) DimensionManager dimension:e;
+#elseif version >= 1.13.1
     private (Dimension) DimensionManager dimension:d;
 #else
     private (Dimension) int dimension:d;
@@ -585,7 +594,12 @@ class PacketPlayOutLogin extends Packet {
 
     // Difficulty field only exists <= 1.13.2
     // View distance field only exists >= 1.14
-#if version >= 1.14
+#if version >= 1.15
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+    private int maxPlayers:f;
+    private (org.bukkit.WorldType) WorldType worldType:g;
+    private optional int viewDistance:h;
+#elseif version >= 1.14
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
     private int maxPlayers:e;
     private (org.bukkit.WorldType) WorldType worldType:f;
@@ -597,7 +611,21 @@ class PacketPlayOutLogin extends Packet {
     private optional int viewDistance:###;
 #endif
 
+#if version >= 1.15
+    private boolean reducedDebugInfo:i;
+    private unknown boolean noImmediateRespawn:j;
+#else
     private boolean reducedDebugInfo:h;
+#endif
+
+    // Encrypted world seed field was added on MC 1.15
+    // It has little meaning, so we just add a method to initialize it
+    public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+#if version >= 1.15
+        #require net.minecraft.server.PacketPlayOutLogin private long encryptedWorldSeed:b;
+        instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
+#endif
+    }
 }
 
 class PacketPlayOutRespawn extends Packet {
@@ -610,14 +638,30 @@ class PacketPlayOutRespawn extends Packet {
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+#else
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
+#endif
+
+#if version >= 1.15
+    private unknown long encryptedWorldSeed:b;
+    private (org.bukkit.GameMode) EnumGamemode gamemode:c;
+    private (org.bukkit.WorldType) WorldType worldType:d;
+#elseif version >= 1.14
     private (org.bukkit.GameMode) EnumGamemode gamemode:b;
     private (org.bukkit.WorldType) WorldType worldType:c;
 #else
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
     private (org.bukkit.WorldType) WorldType worldType:d;
 #endif
 
+    // Encrypted world seed field was added on MC 1.15
+    // It has little meaning, so we just add a method to initialize it
+    public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
+#if version >= 1.15
+        #require net.minecraft.server.PacketPlayOutRespawn private long encryptedWorldSeed:b;
+        instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
+#endif
+    }
 }
 
 class PacketPlayOutPlayerListHeaderFooter extends Packet {
@@ -668,7 +712,15 @@ class PacketPlayOutMapChunk extends Packet {
     private int x:a;
     private int z:b;
 
-#if version >= 1.14
+#if version >= 1.15
+    private optional int sectionsMask:c;
+    private optional (CommonTagCompound) NBTTagCompound metadata:d;
+    private unknown BiomeStorage biomeStorage:e;
+    private optional byte[] data:f;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:g;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
+    private boolean hasBiomeData:h;
+#elseif version >= 1.14
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:d;
     private optional byte[] data:e;
@@ -1189,10 +1241,21 @@ class PacketPlayOutWorldParticles {
     // TODO: Create a common interface for particle + data
     // Since 1.13 there is a ParticleParam with many different types
     // Best option would be coming up with a proxy similar to this for <= 1.12.2
-#if version >= 1.13
-    private float x:a;
-    private float y:b;
-    private float z:c;
+#if version >= 1.15
+    #require net.minecraft.server.PacketPlayOutWorldParticles private double pos_x:a;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private double pos_y:b;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private double pos_z:c;
+    private float randomX:d;
+    private float randomY:e;
+    private float randomZ:f;
+    private float speed:g;
+    private int count:h;
+    private boolean longDistance:i;
+    private unknown ParticleParam j;
+#elseif version >= 1.13
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_x:a;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_y:b;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_z:c;
     private float randomX:d;
     private float randomY:e;
     private float randomZ:f;
@@ -1202,9 +1265,9 @@ class PacketPlayOutWorldParticles {
     private unknown ParticleParam j;
 #else
     private unknown EnumParticle a;
-    private float x:b;
-    private float y:c;
-    private float z:d;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_x:x;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_y:y;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_z:z;
     private float randomX:e;
     private float randomY:f;
     private float randomZ:g;
@@ -1212,6 +1275,44 @@ class PacketPlayOutWorldParticles {
     private int count:i;
     private boolean longDistance:j;
     private unknown int[] k;
+#endif
+
+    public double getX() {
+        return (double) instance#pos_x;
+    }
+
+    public double getY() {
+        return (double) instance#pos_y;
+    }
+
+    public double getZ() {
+        return (double) instance#pos_z;
+    }
+
+#if version >= 1.15
+    public void setX(double x) {
+        instance#pos_x = x;
+    }
+
+    public void setY(double y) {
+        instance#pos_y = y;
+    }
+
+    public void setZ(double z) {
+        instance#pos_z = z;
+    }
+#else
+    public void setX(double x) {
+        instance#pos_x = (float)x;
+    }
+
+    public void setY(double y) {
+        instance#pos_y = (float)y;
+    }
+
+    public void setZ(double z) {
+        instance#pos_z = (float)z;
+    }
 #endif
 }
 

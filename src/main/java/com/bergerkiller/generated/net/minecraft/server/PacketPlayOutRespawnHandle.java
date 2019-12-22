@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.WorldType;
 
 /**
@@ -25,6 +26,7 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract void setEncryptedWorldSeed(World world);
     public abstract Dimension getDimension();
     public abstract void setDimension(Dimension value);
     public abstract GameMode getGamemode();
@@ -41,6 +43,8 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Converted<GameMode> gamemode = new Template.Field.Converted<GameMode>();
         public final Template.Field.Converted<WorldType> worldType = new Template.Field.Converted<WorldType>();
+
+        public final Template.Method.Converted<Void> setEncryptedWorldSeed = new Template.Method.Converted<Void>();
 
     }
 

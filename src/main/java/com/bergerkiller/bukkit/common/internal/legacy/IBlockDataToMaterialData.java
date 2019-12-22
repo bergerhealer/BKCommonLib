@@ -197,6 +197,67 @@ public class IBlockDataToMaterialData {
              .build();
         }
 
+        // Burning and not burning furnace (now both the same material, was separate legacy materials)
+        for (boolean burning : new boolean[] {true, false}) {
+            new CustomMaterialDataBuilder<org.bukkit.material.Furnace>() {
+                @Override
+                public Material toLegacy(Material m) {
+                    return CommonLegacyMaterials.getLegacyMaterial(burning ? "BURNING_FURNACE" : "FURNACE");
+                }
+
+                @Override
+                public org.bukkit.material.Furnace create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Furnace(toLegacy(material_type), legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Furnace furnace) {
+                    return Collections.singletonList(iblockdata.set("facing", furnace.getFacing()).set("lit", burning));
+                }
+            }.setTypes("FURNACE")
+             .setDataValues(2, 3, 4, 5)
+             .build();
+        }
+
+        // Wall torch
+        {
+            new CustomMaterialDataBuilder<org.bukkit.material.Torch>() {
+                @Override
+                public org.bukkit.material.Torch create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Torch(legacy_data_type, legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Torch torch) {
+                    return Collections.singletonList(iblockdata.set("facing", torch.getFacing()));
+                }
+            }.setTypes("WALL_TORCH")
+             .setDataValues(1, 2, 3, 4)
+             .build();
+        }
+
+        // Wall redstone torch
+        for (boolean lit : new boolean[] {true, false}) {
+            new CustomMaterialDataBuilder<org.bukkit.material.RedstoneTorch>() {
+                @Override
+                public Material toLegacy(Material m) {
+                    return CommonLegacyMaterials.getLegacyMaterial(lit ? "REDSTONE_TORCH_ON" : "REDSTONE_TORCH_OFF");
+                }
+
+                @Override
+                public org.bukkit.material.RedstoneTorch create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.RedstoneTorch(toLegacy(material_type), legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.RedstoneTorch torch) {
+                    return Collections.singletonList(iblockdata.set("facing", torch.getFacing()).set("lit", lit));
+                }
+            }.setTypes("REDSTONE_WALL_TORCH")
+             .setDataValues(1, 2, 3, 4)
+             .build();
+        }
+
         // Redstone Wire has north/east/south/west metadata too, which also have to be registered
         // Format: minecraft:redstone_wire[east=side,north=none,power=12,south=none,west=none]
         {
@@ -287,6 +348,24 @@ public class IBlockDataToMaterialData {
             }
         }
 
+        // Ladder can also be waterlogged since MC 1.15
+        {
+            new CustomMaterialDataBuilder<org.bukkit.material.Ladder>() {
+                @Override
+                public org.bukkit.material.Ladder create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Ladder(legacy_data_type, legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Ladder ladder) {
+                    IBlockDataHandle base = iblockdata.set("facing", ladder.getFacing());
+                    return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                }
+            }.setTypes("LADDER")
+             .setDataValues(2, 3, 4, 5)
+             .build();
+        }
+
         if (CommonCapabilities.HAS_MATERIAL_SIGN_TYPES) {
             // LEGACY_WALL_SIGN is broken on 1.14
             {
@@ -341,6 +420,44 @@ public class IBlockDataToMaterialData {
                         return CommonLegacyMaterials.getLegacyMaterial("SIGN_POST");
                     }
                 }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN",
+                           "LEGACY_SIGN_POST")
+                 .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+                 .build();
+            }
+        } else {
+            // Fix LEGACY_WALL_SIGN
+            {
+                new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
+                    @Override
+                    public org.bukkit.material.Sign create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                        return new CommonSignDataFix(material_type, legacy_data_value, true);
+                    }
+
+                    @Override
+                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                        IBlockDataHandle base = iblockdata.set("facing", sign.getFacing());
+                        return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                    }
+                }.setTypes("WALL_SIGN",
+                           "LEGACY_WALL_SIGN")
+                 .setDataValues(2, 3, 4, 5)
+                 .build();
+            }
+
+            // Fix LEGACY_SIGN_POST
+            {
+                new CustomMaterialDataBuilder<org.bukkit.material.Sign>() {
+                    @Override
+                    public org.bukkit.material.Sign create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                        return new CommonSignDataFix(material_type, legacy_data_value, false);
+                    }
+
+                    @Override
+                    public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Sign sign) {
+                        IBlockDataHandle base = iblockdata.set("rotation", sign.getData());
+                        return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
+                    }
+                }.setTypes("SIGN",
                            "LEGACY_SIGN_POST")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();

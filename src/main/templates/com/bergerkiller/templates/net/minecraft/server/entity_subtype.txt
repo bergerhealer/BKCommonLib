@@ -20,7 +20,14 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 
 class EntityLiving extends Entity {
 
-#if version >= 1.14
+#if version >= 1.15
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ao;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:f;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:g;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bq;
+#elseif version >= 1.14
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ar;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
@@ -107,7 +114,12 @@ class EntityLiving extends Entity {
 
     public float lastDamage;
 
-#if version >= 1.14
+#if version >= 1.15
+    protected unknown boolean jumping;
+    public float sideMovement:aZ;
+    public unknown float ba;
+    public float forwardMovement:bb;
+#elseif version >= 1.14
     protected unknown boolean jumping;
     public float sideMovement:bb;
     public unknown float bc;
@@ -210,7 +222,11 @@ class EntityHuman extends EntityLiving {
 
     public int sleepTicks;
 
-#if version >= 1.14.4
+#if version >= 1.15
+    protected unknown boolean bJ;
+    private (IntVector3) BlockPosition spawnCoord:g;
+    private boolean spawnForced:bR;
+#elseif version >= 1.14.4
     protected unknown boolean bM;
     private (IntVector3) BlockPosition spawnCoord:g;
     private boolean spawnForced:bU;
@@ -273,7 +289,12 @@ class EntityHuman extends EntityLiving {
     public int expTotal;
     public float exp;
 
-#if version >= 1.14.4
+#if version >= 1.15
+    protected unknown int bO;
+    protected unknown final float bP;
+    private unknown int bS;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bT;
+#elseif version >= 1.14.4
     protected unknown int bR;
     protected unknown final float bS;
     private unknown int bV;
@@ -557,7 +578,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     private int fuse:a;
 #endif
 
-#if version >= 1.9
+#if version >= 1.15
+    protected void explode:h(double damage);
+#elseif version >= 1.9
     protected void explode:c(double damage);
 #else
     protected void explode:b(double damage);
@@ -659,7 +682,11 @@ class EntityArmorStand extends EntityLiving {
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:e;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:f;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:g;
+  #if version >= 1.15
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bp;
+  #else
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bs;
+  #endif
 #elseif version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:a;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:b;

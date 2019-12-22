@@ -214,15 +214,41 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 
 #if version >= 1.9
     private optional (org.bukkit.Material) int heldItem:###;
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:h;
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> dataWatcherItems:i;
 #else
     private optional (org.bukkit.Material) int heldItem:h;
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:i;
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> dataWatcherItems:j;
+#endif
+
+#if version >= 1.15
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:###;
+#elseif version >= 1.9
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:h;
+    private unknown List<DataWatcher.Item<?>> dataWatcherItems:i;
+#else
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:i;
+    private unknown List<DataWatcher.WatchableObject> dataWatcherItems:j;
 #endif
 
     <code>
+    public boolean hasDataWatcherSupport() {
+        return T.opt_dataWatcher.isAvailable();
+    }
+
+    @Deprecated
+    public com.bergerkiller.bukkit.common.wrappers.DataWatcher getDataWatcher() {
+        if (T.opt_dataWatcher.isAvailable()) {
+            return T.opt_dataWatcher.get(getRaw());
+        } else {
+            return null;
+        }
+    }
+
+    @Deprecated
+    public void setDataWatcher(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
+        if (T.opt_dataWatcher.isAvailable()) {
+            T.opt_dataWatcher.set(getRaw(), dataWatcher);
+        }
+    }
+
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_NAMED;
@@ -302,8 +328,6 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private optional byte yaw_raw:j;
     private optional byte pitch_raw:k;
     private optional byte headYaw_raw:l;
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:m;
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> dataWatcherItems:n;
 #else
     private optional UUID entityUUID:###;
     private int entityTypeId:b;
@@ -319,8 +343,17 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private optional byte yaw_raw:i;
     private optional byte pitch_raw:j;
     private optional byte headYaw_raw:k;
-    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher dataWatcher:l;
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> dataWatcherItems:m;
+#endif
+
+    // DataWatcher and items list was removed since MC 1.15
+#if version >= 1.15
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:###;
+#elseif version >= 1.9
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:m;
+    private unknown List<DataWatcher.Item<?>> dataWatcherItems:n;
+#else
+    private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:l;
+    private unknown List<DataWatcher.WatchableObject> dataWatcherItems:m;
 #endif
 
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving();
@@ -328,6 +361,26 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) EntityLiving entity);
 
     <code>
+    public boolean hasDataWatcherSupport() {
+        return T.opt_dataWatcher.isAvailable();
+    }
+
+    @Deprecated
+    public com.bergerkiller.bukkit.common.wrappers.DataWatcher getDataWatcher() {
+        if (T.opt_dataWatcher.isAvailable()) {
+            return T.opt_dataWatcher.get(getRaw());
+        } else {
+            return null;
+        }
+    }
+
+    @Deprecated
+    public void setDataWatcher(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
+        if (T.opt_dataWatcher.isAvailable()) {
+            T.opt_dataWatcher.set(getRaw(), dataWatcher);
+        }
+    }
+
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_SPAWN_LIVING;

@@ -5,6 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 import org.bukkit.WorldType;
 
 /**
@@ -25,6 +26,7 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract void setEncryptedWorldSeed(World world);
     public abstract int getPlayerId();
     public abstract void setPlayerId(int value);
     public abstract boolean isHardcore();
@@ -55,6 +57,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         public final Template.Field.Boolean reducedDebugInfo = new Template.Field.Boolean();
+
+        public final Template.Method.Converted<Void> setEncryptedWorldSeed = new Template.Method.Converted<Void>();
 
     }
 

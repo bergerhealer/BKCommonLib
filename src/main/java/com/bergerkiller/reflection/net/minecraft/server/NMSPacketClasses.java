@@ -1367,8 +1367,6 @@ public class NMSPacketClasses {
             }
         };
         public final FieldAccessor<Material> heldItemId = PacketPlayOutNamedEntitySpawnHandle.T.heldItem.toFieldAccessor().ignoreInvalid(Material.AIR);
-        public final FieldAccessor<DataWatcher> dataWatcher = PacketPlayOutNamedEntitySpawnHandle.T.dataWatcher.toFieldAccessor();
-        public final FieldAccessor<List<DataWatcher.Item<?>>> dataWatcherItems = PacketPlayOutNamedEntitySpawnHandle.T.dataWatcherItems.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutNamedSoundEffect extends NMSPacket {
@@ -1851,8 +1849,6 @@ public class NMSPacketClasses {
                 return true;
             }
         };
-        public final TranslatorFieldAccessor<DataWatcher> dataWatcher = PacketPlayOutSpawnEntityLivingHandle.T.dataWatcher.toFieldAccessor();
-        public final FieldAccessor<List<DataWatcher.Item<?>>> dataWatcherItems = PacketPlayOutSpawnEntityLivingHandle.T.dataWatcherItems.toFieldAccessor();
 
         public CommonPacket newInstance(LivingEntity livingEntity) {
             return PacketPlayOutSpawnEntityLivingHandle.createNew(livingEntity).toCommonPacket();
@@ -2055,9 +2051,42 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutWorldParticles extends NMSPacket {
 
-        public final FieldAccessor<Float> x = PacketPlayOutWorldParticlesHandle.T.x.toFieldAccessor();
-        public final FieldAccessor<Float> y = PacketPlayOutWorldParticlesHandle.T.y.toFieldAccessor();
-        public final FieldAccessor<Float> z = PacketPlayOutWorldParticlesHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutWorldParticlesHandle.T.getX.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutWorldParticlesHandle.T.setX.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutWorldParticlesHandle.T.getY.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutWorldParticlesHandle.T.setY.invoke(instance, value);
+                return true;
+            }
+        };
+        public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
+            @Override
+            public Double get(Object instance) {
+                return PacketPlayOutWorldParticlesHandle.T.getZ.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Double value) {
+                PacketPlayOutWorldParticlesHandle.T.setZ.invoke(instance, value);
+                return true;
+            }
+        };
         public final FieldAccessor<Float> randomX = PacketPlayOutWorldParticlesHandle.T.randomX.toFieldAccessor();
         public final FieldAccessor<Float> randomY = PacketPlayOutWorldParticlesHandle.T.randomY.toFieldAccessor();
         public final FieldAccessor<Float> randomZ = PacketPlayOutWorldParticlesHandle.T.randomZ.toFieldAccessor();

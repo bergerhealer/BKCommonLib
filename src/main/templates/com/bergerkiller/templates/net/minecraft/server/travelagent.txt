@@ -136,9 +136,13 @@ class PortalTravelAgent {
         // The method, however, only uses the locX/locY/locZ
         // Simply null-construct a temporary entity and set these fields
         Entity entity = (Entity) com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.newInstanceNull();
+  #if version >= 1.15
+        entity.setPositionRaw(x, y, z);
+  #else
         entity.locX = x;
         entity.locY = y;
         entity.locZ = z;
+  #endif
         return instance.a(entity);
 #else
         return instance.createPortal(x, y, z, 16);

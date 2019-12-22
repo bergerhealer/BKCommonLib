@@ -11,7 +11,9 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 #if version >= 1.12
 
 class IRecipe {
-#if version >= 1.14
+#if version >= 1.15
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:getResult();
+#elseif version >= 1.14
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:c();
 #elseif version >= 1.13
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:d();

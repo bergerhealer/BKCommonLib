@@ -8,7 +8,9 @@ class DamageSource {
 
     public boolean isExplosion();
 
-#if version >= 1.13
+#if version >= 1.15
+    public boolean isFireDamage:isFire();
+#elseif version >= 1.13
     public boolean isFireDamage:p();
 #else
     public boolean isFireDamage:o();

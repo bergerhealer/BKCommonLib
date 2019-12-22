@@ -313,7 +313,19 @@ public class TestServerFactory {
                       */
             }
 
-            if (Common.evaluateMCVersion(">=", "1.14.4")) {
+            if (Common.evaluateMCVersion(">=", "1.15")) {
+                // this.craftingManager = new CraftingManager();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");
+                    setField(mc_server, "craftingManager", craftingManagerType.newInstance());
+                }
+
+                // this.tagRegistry = new TagRegistry();
+                {
+                    Class<?> craftingManagerType = Class.forName(nms_root + "TagRegistry");
+                    setField(mc_server, "tagRegistry", craftingManagerType.newInstance());
+                }
+            } else if (Common.evaluateMCVersion(">=", "1.14.4")) {
                 // this.ai = new CraftingManager();
                 {
                     Class<?> craftingManagerType = Class.forName(nms_root + "CraftingManager");

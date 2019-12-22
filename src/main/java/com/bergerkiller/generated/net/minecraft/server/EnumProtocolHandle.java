@@ -2,8 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.google.common.collect.BiMap;
-import java.util.Map;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EnumProtocol</b>.
@@ -24,28 +22,10 @@ public abstract class EnumProtocolHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-
-    public Class<?> getPacketClassIn(int id) {
-        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).get(id);
-    }
-
-    public Class<?> getPacketClassOut(int id) {
-        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).get(id);
-    }
-
-    public int getPacketIdIn(Class<?> packetClass) {
-        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).inverse().get(packetClass);
-        return (id == null) ? -1 : id.intValue();
-    }
-
-    public int getPacketIdOut(Class<?> packetClass) {
-        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).inverse().get(packetClass);
-        return (id == null) ? -1 : id.intValue();
-    }
-    @SuppressWarnings("rawtypes")
-    public abstract Map<EnumProtocolDirectionHandle, BiMap> getPacketMap();
-    @SuppressWarnings("rawtypes")
-    public abstract void setPacketMap(Map<EnumProtocolDirectionHandle, BiMap> value);
+    public abstract Class<?> getPacketClassIn(int id);
+    public abstract Class<?> getPacketClassOut(int id);
+    public abstract int getPacketIdIn(Class<?> packetClass);
+    public abstract int getPacketIdOut(Class<?> packetClass);
     /**
      * Stores class members for <b>net.minecraft.server.EnumProtocol</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -53,8 +33,10 @@ public abstract class EnumProtocolHandle extends Template.Handle {
     public static final class EnumProtocolClass extends Template.Class<EnumProtocolHandle> {
         public final Template.EnumConstant.Converted<EnumProtocolHandle> PLAY = new Template.EnumConstant.Converted<EnumProtocolHandle>();
 
-        @SuppressWarnings("rawtypes")
-        public final Template.Field.Converted<Map<EnumProtocolDirectionHandle, BiMap>> packetMap = new Template.Field.Converted<Map<EnumProtocolDirectionHandle, BiMap>>();
+        public final Template.Method<Class<?>> getPacketClassIn = new Template.Method<Class<?>>();
+        public final Template.Method<Class<?>> getPacketClassOut = new Template.Method<Class<?>>();
+        public final Template.Method<Integer> getPacketIdIn = new Template.Method<Integer>();
+        public final Template.Method<Integer> getPacketIdOut = new Template.Method<Integer>();
 
     }
 

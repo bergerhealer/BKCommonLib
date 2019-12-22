@@ -168,7 +168,9 @@ class World extends IBlockAccess {
     public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
 #endif
 
-#if version >= 1.13
+#if version >= 1.15
+    public boolean isBurnArea:c((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.13
     public boolean isBurnArea:b((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #elseif version >= 1.11.2
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -710,7 +712,9 @@ class WorldProvider {
     // if (this.world.worldProvider.m()) {
     //     l = 15;
     //     ...
-#if version >= 1.13
+#if version >= 1.15
+    public boolean hasSkyLight:f();
+#elseif version >= 1.13
     public boolean hasSkyLight:g();
 #elseif version >= 1.11
     public boolean hasSkyLight:m();
@@ -789,21 +793,17 @@ class MovingObjectPosition {
 }
 
 class RegionFile {
-#if version >= 1.14
-    private java.io.RandomAccessFile stream:b;
-#else
-    private java.io.RandomAccessFile stream:c;
-#endif
-
-    public (RegionFileHandle) RegionFile(java.io.File file);
-
 #if methodexists net.minecraft.server.RegionFile public void close()
     public void close();
 #else
     public void close:c();
 #endif
 
-#if version >= 1.14
+#if version >= 1.15
+    public boolean chunkExists(int cx, int cz) {
+        return instance.chunkExists(new ChunkCoordIntPair(cx, cz));
+    }
+#elseif version >= 1.14
     public boolean chunkExists(int cx, int cz) {
         return instance.d(new ChunkCoordIntPair(cx, cz));
     }

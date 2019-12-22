@@ -91,35 +91,83 @@ class EnumGamemode {
 class EnumProtocol {
     enum (EnumProtocolHandle) EnumProtocol PLAY;
 
-#if version >= 1.10.2
-    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:h;
-#elseif version >= 1.9
-    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet<?>>>> packetMap:j;
-#elseif version >= 1.8.3
-    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:j;
-#else
-    private final rawtype (Map<EnumProtocolDirectionHandle, BiMap>) Map<EnumProtocolDirection, BiMap<Integer, Class<? extends Packet>>> packetMap:h;
-#endif
+#if version >= 1.15
+    // Is no longer a BiMap on 1.15
+    #require net.minecraft.server.EnumProtocol private final Map<net.minecraft.server.EnumProtocolDirection, ? extends net.minecraft.server.EnumProtocol.a<?>> packetMap:h;
+    #require net.minecraft.server.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.server.Packet<T extends PacketListener>>> packetToIdMap:a;
+    #require net.minecraft.server.EnumProtocol.a public Integer getPacketClassId:a(Class<?> packetClass);
 
-    <code>
     public Class<?> getPacketClassIn(int id) {
-        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).get(id);
+        Object map = (instance#packetMap).get(EnumProtocolDirection.SERVERBOUND);
+        java.util.Iterator iter = (map#packetToIdMap).entrySet().iterator();
+        while (iter.hasNext()) {
+            java.util.Map$Entry e = (java.util.Map$Entry) iter.next();
+            int packet_id = ((Integer) e.getValue()).intValue();
+            if (packet_id == id) {
+                return (Class) e.getKey();
+            }
+        }
+        return null;
     }
 
     public Class<?> getPacketClassOut(int id) {
-        return (Class<?>) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).get(id);
+        Object map = (instance#packetMap).get(EnumProtocolDirection.CLIENTBOUND);
+        java.util.Iterator iter = (map#packetToIdMap).entrySet().iterator();
+        while (iter.hasNext()) {
+            java.util.Map$Entry e = (java.util.Map$Entry) iter.next();
+            int packet_id = ((Integer) e.getValue()).intValue();
+            if (packet_id == id) {
+                return (Class) e.getKey();
+            }
+        }
+        return null;
     }
 
     public int getPacketIdIn(Class<?> packetClass) {
-        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.SERVERBOUND).inverse().get(packetClass);
+        Object map = (instance#packetMap).get(EnumProtocolDirection.SERVERBOUND);
+        Integer id = map#getPacketClassId(packetClass);
         return (id == null) ? -1 : id.intValue();
     }
 
     public int getPacketIdOut(Class<?> packetClass) {
-        Integer id = (Integer) getPacketMap().get(EnumProtocolDirectionHandle.CLIENTBOUND).inverse().get(packetClass);
+        Object map = (instance#packetMap).get(EnumProtocolDirection.CLIENTBOUND);
+        Integer id = map#getPacketClassId(packetClass);
         return (id == null) ? -1 : id.intValue();
     }
-    </code>
+#else
+    // BiMap stores the PacketClass<>ID relationship
+  #if version >= 1.10.2
+    #require net.minecraft.server.EnumProtocol private final Map<net.minecraft.server.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.server.Packet<?>>>> packetMap:h;
+  #elseif version >= 1.9
+    #require net.minecraft.server.EnumProtocol private final Map<net.minecraft.server.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.server.Packet<?>>>> packetMap:j;
+  #elseif version >= 1.8.3
+    #require net.minecraft.server.EnumProtocol private final Map<net.minecraft.server.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.server.Packet>>> packetMap:j;
+  #else
+    #require net.minecraft.server.EnumProtocol private final Map<net.minecraft.server.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.server.Packet>>> packetMap:h;
+  #endif
+
+    public Class<?> getPacketClassIn(int id) {
+        com.google.common.collect.BiMap map = (com.google.common.collect.BiMap) (instance#packetMap).get(EnumProtocolDirection.SERVERBOUND);
+        return (Class) map.get(Integer.valueOf(id));
+    }
+
+    public Class<?> getPacketClassOut(int id) {
+        com.google.common.collect.BiMap map = (com.google.common.collect.BiMap) (instance#packetMap).get(EnumProtocolDirection.CLIENTBOUND);
+        return (Class) map.get(Integer.valueOf(id));
+    }
+
+    public int getPacketIdIn(Class<?> packetClass) {
+        com.google.common.collect.BiMap map = ((com.google.common.collect.BiMap) (instance#packetMap).get(EnumProtocolDirection.SERVERBOUND)).inverse();
+        Integer id = (Integer) map.get(packetClass);
+        return (id == null) ? -1 : id.intValue();
+    }
+
+    public int getPacketIdOut(Class<?> packetClass) {
+        com.google.common.collect.BiMap map = ((com.google.common.collect.BiMap) (instance#packetMap).get(EnumProtocolDirection.CLIENTBOUND)).inverse();
+        Integer id = (Integer) map.get(packetClass);
+        return (id == null) ? -1 : id.intValue();
+    }
+#endif
 }
 
 class EnumProtocolDirection {

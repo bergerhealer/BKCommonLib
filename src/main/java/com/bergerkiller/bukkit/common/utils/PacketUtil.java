@@ -6,9 +6,13 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -84,6 +88,44 @@ public class PacketUtil {
     public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
         if (packet != null) {
             CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+        }
+    }
+
+    /**
+     * Sends the spawn packet for a living entity. On MC 1.15 and later the metadata for the entity is sent separate
+     * from the spawn packet of the living entity.
+     * 
+     * @param player
+     * @param packet
+     * @param metadata
+     */
+    @SuppressWarnings("deprecation")
+    public static void sendEntityLivingSpawnPacket(Player player, PacketPlayOutSpawnEntityLivingHandle packet, DataWatcher metadata) {
+        if (packet.hasDataWatcherSupport()) {
+            packet.setDataWatcher(metadata);
+            sendPacket(player, packet);
+        } else {
+            sendPacket(player, packet);
+            sendPacket(player, PacketPlayOutEntityMetadataHandle.createNew(packet.getEntityId(), metadata, true));
+        }
+    }
+
+    /**
+     * Sends the spawn packet for a named entity. On MC 1.15 and later the metadata for the entity is sent separate
+     * from the spawn packet of the named entity.
+     * 
+     * @param player
+     * @param packet
+     * @param metadata
+     */
+    @SuppressWarnings("deprecation")
+    public static void sendNamedEntitySpawnPacket(Player player, PacketPlayOutNamedEntitySpawnHandle packet, DataWatcher metadata) {
+        if (packet.hasDataWatcherSupport()) {
+            packet.setDataWatcher(metadata);
+            sendPacket(player, packet);
+        } else {
+            sendPacket(player, packet);
+            sendPacket(player, PacketPlayOutEntityMetadataHandle.createNew(packet.getEntityId(), metadata, true));
         }
     }
 

@@ -3,9 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
 import org.bukkit.entity.LivingEntity;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -34,6 +32,26 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
 
     /* ============================================================================== */
 
+
+    public boolean hasDataWatcherSupport() {
+        return T.opt_dataWatcher.isAvailable();
+    }
+
+    @Deprecated
+    public com.bergerkiller.bukkit.common.wrappers.DataWatcher getDataWatcher() {
+        if (T.opt_dataWatcher.isAvailable()) {
+            return T.opt_dataWatcher.get(getRaw());
+        } else {
+            return null;
+        }
+    }
+
+    @Deprecated
+    public void setDataWatcher(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
+        if (T.opt_dataWatcher.isAvailable()) {
+            T.opt_dataWatcher.set(getRaw(), dataWatcher);
+        }
+    }
 
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
@@ -136,10 +154,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     public abstract void setEntityId(int value);
     public abstract int getEntityTypeId();
     public abstract void setEntityTypeId(int value);
-    public abstract DataWatcher getDataWatcher();
-    public abstract void setDataWatcher(DataWatcher value);
-    public abstract List<Item<?>> getDataWatcherItems();
-    public abstract void setDataWatcherItems(List<Item<?>> value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutSpawnEntityLiving</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -176,8 +190,8 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         public final Template.Field.Byte pitch_raw = new Template.Field.Byte();
         @Template.Optional
         public final Template.Field.Byte headYaw_raw = new Template.Field.Byte();
-        public final Template.Field.Converted<DataWatcher> dataWatcher = new Template.Field.Converted<DataWatcher>();
-        public final Template.Field.Converted<List<Item<?>>> dataWatcherItems = new Template.Field.Converted<List<Item<?>>>();
+        @Template.Optional
+        public final Template.Field.Converted<DataWatcher> opt_dataWatcher = new Template.Field.Converted<DataWatcher>();
 
     }
 

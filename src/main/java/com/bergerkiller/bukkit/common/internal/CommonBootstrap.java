@@ -340,6 +340,7 @@ public class CommonBootstrap {
                 remappings.put("it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet", unimi_fastutil_path + "longs.LongLinkedOpenHashSet");
                 remappings.put("it.unimi.dsi.fastutil.longs.LongOpenHashSet", unimi_fastutil_path + "longs.LongOpenHashSet");
                 remappings.put("it.unimi.dsi.fastutil.longs.LongSet", unimi_fastutil_path + "longs.LongSet");
+                remappings.put("it.unimi.dsi.fastutil.objects.Object2IntMap", unimi_fastutil_path + "objects.Object2IntMap");
             } catch (ClassNotFoundException ex) {
                 unimi_fastutil_path = "it.unimi.dsi.fastutil.";
             }

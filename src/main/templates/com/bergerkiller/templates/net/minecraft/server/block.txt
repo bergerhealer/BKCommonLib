@@ -55,7 +55,9 @@ class Block {
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 #endif
 
-#if version >= 1.14
+#if version >= 1.15
+    public String getTitle:k();
+#elseif version >= 1.14
     public String getTitle:l();
 #elseif version >= 1.13
     public String getTitle:m();
@@ -71,7 +73,11 @@ class Block {
 #if version >= 1.14
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        return instance.k(iblockdata, world, new BlockPosition(x, y, z));        
+  #if version >= 1.15
+        return instance.l(iblockdata, world, new BlockPosition(x, y, z));
+  #else
+        return instance.k(iblockdata, world, new BlockPosition(x, y, z));
+  #endif
     }
 
     public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);
@@ -250,7 +256,16 @@ class Block {
         loottableinfo_builder.set(LootContextParameters.TOOL, ItemStack.a);
         loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
         loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
+  #if version >= 1.15
+        java.util.Iterator items_iter = iblockdata.a(loottableinfo_builder).iterator();
+        while (items_iter.hasNext()) {
+            ItemStack item = (ItemStack) items_iter.next();
+            Block.a(world, blockposition, item);
+        }
+        iblockdata.dropNaturally(world, blockposition, ItemStack.a);
+  #else
         Block.b(iblockdata, loottableinfo_builder);
+  #endif
     }
 #elseif version >= 1.13
     public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, float yield, int chance);
