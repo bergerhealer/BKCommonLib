@@ -89,7 +89,7 @@ public class MaterialUtil {
 
     @Deprecated
     public static int getRawData(org.bukkit.block.Block block) {
-        return block.getData();
+        return WorldUtil.getBlockData(block).getRawData();
     }
 
     public static int getRawData(ItemStack item) {
