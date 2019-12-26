@@ -44,6 +44,14 @@ class CraftMagicNumbers {
 
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
 
+    public static int getDataVersion() {
+#if version >= 1.13
+        return CraftMagicNumbers.INSTANCE.getDataVersion();
+#else
+        return 0;
+#endif
+    }
+
     <code>
     public static com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle getBlockDataFromMaterial(org.bukkit.Material material) {
         return com.bergerkiller.generated.net.minecraft.server.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));

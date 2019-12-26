@@ -5,15 +5,21 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.Function;
 
-import org.bukkit.configuration.file.YamlConstructor;
+import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
+import org.yaml.snakeyaml.nodes.Node;
+import org.yaml.snakeyaml.nodes.Tag;
 
 import com.bergerkiller.bukkit.common.config.HeaderBuilder;
 import com.bergerkiller.bukkit.common.config.NodeBuilder;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
 /**
@@ -271,6 +277,64 @@ public class YamlDeserializer {
 
             // Done, give the line to the parser!
             return true;
+        }
+    }
+
+    // Custom version of org.bukkit.configuration.file.YamlConstructor
+    // This allows us to add our own handlers for certain object types
+    private static class YamlConstructor extends SafeConstructor {
+        private final Map<String, Function<Map<String, Object>, ? extends Object>> custom_builders;
+
+        public YamlConstructor() {
+            this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
+            this.custom_builders = new HashMap<>();
+            this.register("org.bukkit.inventory.ItemStack", new YamlItemStackDeserializer());
+        }
+
+        private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {
+            custom_builders.put(typeName, builder);
+        }
+
+        private class ConstructCustomObject extends ConstructYamlMap {
+            @Override
+            public Object construct(Node node) {
+                if (node.isTwoStepsConstruction()) {
+                    throw new YAMLException("Unexpected referential mapping structure. Node: " + node);
+                }
+
+                Map<?, ?> raw = (Map<?, ?>) super.construct(node);
+
+                String serialized_type = LogicUtil.applyIfNotNull(raw.get(ConfigurationSerialization.SERIALIZED_TYPE_KEY), Object::toString, null);
+                if (serialized_type != null) {
+                    Map<String, Object> typed = CommonUtil.unsafeCast(raw);
+
+                    // If any entries in the mapping uses non-String keys, convert those to a String
+                    // Almost all the time this operation is unneeded, so we do a detection step first
+                    // If no conversion is needed, we use the input map casted as if it stores String keys.
+                    for (Object key : raw.keySet()) {
+                        if (!(key instanceof String)) {
+                            typed = new LinkedHashMap<String, Object>(raw.size());
+                            for (Map.Entry<?, ?> entry : raw.entrySet()) {
+                                typed.put(entry.getKey().toString(), entry.getValue());
+                            }
+                            break;
+                        }
+                    }
+
+                    try {
+                        Function<Map<String, Object>, ? extends Object> builder = custom_builders.get(serialized_type);
+                        if (builder != null) {
+                            return builder.apply(typed);
+                        } else {
+                            return ConfigurationSerialization.deserializeObject(typed);
+                        }
+                    } catch (IllegalArgumentException ex) {
+                        throw new YAMLException("Could not deserialize object", ex);
+                    }
+                }
+
+                return raw;
+            }
         }
     }
 }

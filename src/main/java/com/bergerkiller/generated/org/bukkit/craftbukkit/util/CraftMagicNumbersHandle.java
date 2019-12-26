@@ -38,6 +38,10 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         return T.getBlockFromMaterial.invoke(material);
     }
 
+    public static int getDataVersion() {
+        return T.getDataVersion.invoke();
+    }
+
 
     public static com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle getBlockDataFromMaterial(org.bukkit.Material material) {
         return com.bergerkiller.generated.net.minecraft.server.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));
@@ -51,6 +55,7 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Material> getMaterialFromItem = new Template.StaticMethod.Converted<Material>();
         public final Template.StaticMethod.Converted<Object> getItemFromMaterial = new Template.StaticMethod.Converted<Object>();
         public final Template.StaticMethod.Converted<Object> getBlockFromMaterial = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Integer> getDataVersion = new Template.StaticMethod<Integer>();
 
     }
 

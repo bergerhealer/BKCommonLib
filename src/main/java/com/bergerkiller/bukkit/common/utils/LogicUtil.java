@@ -165,6 +165,18 @@ public class LogicUtil {
     }
 
     /**
+     * Applies a function to an input argument if it is not null, returns def if the value is null.
+     * 
+     * @param input Input argument of the function
+     * @param methodToCall The method to call if input is not null, with the input as argument
+     * @param def The default value to return if null
+     * @return The result from calling the method with the input if not null, def otherwise
+     */
+    public static <I, O> O applyIfNotNull(I input, java.util.function.Function<I, O> methodToCall, O def) {
+        return (input == null) ? def : methodToCall.apply(input);
+    }
+
+    /**
      * Returns the default value if the input value is null
      *
      * @param value to fix
