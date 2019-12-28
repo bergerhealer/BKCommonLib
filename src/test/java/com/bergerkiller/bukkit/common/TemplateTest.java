@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
+import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -242,6 +243,11 @@ public class TemplateTest {
         } else {
             assertAvailable(DataWatcherHandle.ItemHandle.T.keyId);
         }
+    }
+
+    @Test
+    public void testRegionHandler() {
+        RegionHandler.INSTANCE.forceInitialization();
     }
 
     @Test

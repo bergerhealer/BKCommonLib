@@ -8,12 +8,15 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
-public abstract class RegionHandler {
+public abstract class RegionHandler implements LazyInitializedObject {
     public static final RegionHandler INSTANCE;
 
     static {
-        if (Common.evaluateMCVersion(">=", "1.14")) {
+        if (Common.evaluateMCVersion(">=", "1.15")) {
+            INSTANCE = new RegionHandler_1_15();
+        } else if (Common.evaluateMCVersion(">=", "1.14")) {
             INSTANCE = new RegionHandler_1_14();
         } else {
             INSTANCE = new RegionHandler_1_8();

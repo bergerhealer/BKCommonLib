@@ -334,6 +334,7 @@ public class CommonBootstrap {
                 Class.forName(unimi_fastutil_path + "longs.LongSet");
 
                 // Fixes hardcoded fastutil paths used in templates
+                remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectLinkedOpenHashMap");
                 remappings.put("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap", unimi_fastutil_path + "ints.Int2ObjectOpenHashMap");
                 remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectOpenHashMap");
                 remappings.put("it.unimi.dsi.fastutil.longs.LongIterator", unimi_fastutil_path + "longs.LongIterator");

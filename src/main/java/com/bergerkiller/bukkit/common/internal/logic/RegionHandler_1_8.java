@@ -207,4 +207,10 @@ public class RegionHandler_1_8 extends RegionHandler {
         Object cps = WorldServerHandle.T.getChunkProviderServer.raw.invoke(HandleConversion.toWorldHandle(world));
         return chunkExists.invoke(null, cps, cx, cz);
     }
+
+    @Override
+    public void forceInitialization() {
+        this.chunkExists.forceInitialization();
+        this.cacheField.forceInitialization();
+    }
 }

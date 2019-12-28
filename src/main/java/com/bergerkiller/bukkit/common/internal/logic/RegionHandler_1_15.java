@@ -24,13 +24,13 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 /**
  * Handles region-based operations from MC 1.14 onwards
  */
-public class RegionHandler_1_14 extends RegionHandler {
+public class RegionHandler_1_15 extends RegionHandler {
     private final FastMethod<Object> findRegionFileCache = new FastMethod<Object>();
     private final FastMethod<Collection<Object>> findCacheRegionFileInstances = new FastMethod<Collection<Object>>();
     private final FastMethod<Collection<IntVector2>> findCacheRegionFileCoordinates = new FastMethod<Collection<IntVector2>>();
     private final FastMethod<Object> findRegionFileAt = new FastMethod<Object>();
 
-    public RegionHandler_1_14() {
+    public RegionHandler_1_15() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClass(CommonUtil.getNMSClass("RegionFileCache"));
 
@@ -40,7 +40,11 @@ public class RegionHandler_1_14 extends RegionHandler {
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
-                    "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
+                    "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
+                    "    #require net.minecraft.server.IChunkLoader private final IOWorker ioworker:a;\n" +
+                    "    IOWorker ioworker = icl#ioworker;\n" +
+                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:e;\n" +
+                    "    RegionFileCache rfc = ioworker#cache;\n" +
                     "    return rfc.cache;\n" +
                     "}");
             findRegionFileCache.init(findRegionFileCacheMethod);
