@@ -35,7 +35,19 @@ public class RegionHandler_1_15 extends RegionHandler {
         resolver.setDeclaredClass(CommonUtil.getNMSClass("RegionFileCache"));
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
-        {
+        // This is slightly different on PaperSpigot, where they changed the IChunkLoader to extend RegionFileCache, rather than adding a field
+        if (CommonUtil.getNMSClass("RegionFileCache").isAssignableFrom(CommonUtil.getNMSClass("PlayerChunkMap"))) {
+            // PaperMC
+            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
+                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
+                    "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
+                    "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
+                    "    return rfc.cache;\n" +
+                    "}");
+            findRegionFileCache.init(findRegionFileCacheMethod);
+        } else {
+            // Spigot/CraftBukkit/vanilla NMS
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
