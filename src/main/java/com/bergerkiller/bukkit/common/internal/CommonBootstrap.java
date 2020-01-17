@@ -16,7 +16,6 @@ import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.ModuleLogger;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
@@ -390,7 +389,7 @@ public class CommonBootstrap {
 
                     @Override
                     public ExtendedLogger getLogger(String name) {
-                        return new ModuleLogger(name).toLog4jExtendedLogger();
+                        return new CommonLog4jExtendedLogger(name);
                     }
 
                     @Override
