@@ -349,10 +349,14 @@ class NBTBase {
         public long[] getData:getLongs();
 #elseif version >= 1.13
         public long[] getData:d();
-#else
+#elseif version >= 1.12
         public long[] getData() {
             #require net.minecraft.server.NBTTagLongArray private long[] data_field:b;
             return instance#data_field;
+        }
+#else
+        public long[] getData() {
+            throw new UnsupportedOperationException("NBTTagLongArray is not available");
         }
 #endif
     }

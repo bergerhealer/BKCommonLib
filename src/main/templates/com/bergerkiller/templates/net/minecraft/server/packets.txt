@@ -1265,9 +1265,9 @@ class PacketPlayOutWorldParticles {
     private unknown ParticleParam j;
 #else
     private unknown EnumParticle a;
-    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_x:x;
-    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_y:y;
-    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_z:z;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_x:b;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_y:c;
+    #require net.minecraft.server.PacketPlayOutWorldParticles private float pos_z:d;
     private float randomX:e;
     private float randomY:f;
     private float randomZ:g;
