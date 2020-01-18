@@ -137,7 +137,9 @@ public class BlockDataImpl extends BlockData {
                 materialdata.setData((byte) data);
                 IBlockDataHandle blockData = MaterialDataToIBlockData.getIBlockData(materialdata);
                 BlockDataConstant dataBlockConst = blockConst;
-                if (blockData.getRaw() != blockConst.getData()) {
+                if (blockData == null) {
+                    Logging.LOGGER_REGISTRY.warning("Obtaining BlockData of MaterialData " + materialdata + " yielded null result!");
+                } else if (blockData.getRaw() != blockConst.getData()) {
                     dataBlockConst = findConstant(blockData);
                 }
 

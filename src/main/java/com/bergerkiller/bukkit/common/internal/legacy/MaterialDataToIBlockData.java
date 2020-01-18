@@ -42,11 +42,25 @@ public class MaterialDataToIBlockData {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, 
                         "public static net.minecraft.server.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
                         "    net.minecraft.server.Block block = CraftMagicNumbers.getBlock(materialdata.getItemType());\n" +
+                        "    net.minecraft.server.IBlockData result;\n" +
                         "    try {\n" +
-                        "        return block.fromLegacyData((int) materialdata.getData());\n" +
+                        "        result = block.fromLegacyData((int) materialdata.getData());\n" +
+                        "        // Returns null on TacoSpigot when last set() fails\n" +
+                        "        if (result != null) {\n" +
+                        "            return result;\n" +
+                        "        }\n" +
                         "    } catch (IllegalArgumentException ex) {\n" +
-                        "        return block.getBlockData();\n" +
+                        "    } catch (NullPointerException ex) {\n" +
+                        "        // Occurs on TacoSpigot when intermediate set() fails\n" +
+                        "    } catch (Throwable t) {\n" +
+                        "        System.err.println(\"[BKCommonLib] An error occurred inside fromLegacyData(\"+Byte.toString(materialdata.getData())+\"):\");\n" +
+                        "        t.printStackTrace();\n" +
                         "    }\n" +
+                        "    result = block.getBlockData();\n" +
+                        "    if (result == null) {\n" +
+                        "        System.err.println(\"[BKCommonLib] Block \"+block.toString()+\" getBlockData() returned null!\");\n" +
+                        "    }\n" +
+                        "    return result;\n" +
                         "}"
                 ));
             }
