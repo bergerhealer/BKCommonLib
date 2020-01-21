@@ -69,6 +69,14 @@ public class YamlRoot {
         this._entries.put(entry.getYamlPath(), entry);
     }
 
+    public YamlEntry createEntryIfAbsent(YamlPath parent, String path) {
+        return createEntryIfAbsent(parent.child(path));
+    }
+
+    public YamlEntry createEntryIfAbsent(YamlPath path) {
+        return this._entries.containsKey(path) ? null : createEntry(path, false);
+    }
+
     public YamlEntry getEntryIfExists(YamlPath parent, String path) {
         return this._entries.get(parent.child(path));
     }
@@ -87,11 +95,12 @@ public class YamlRoot {
 
     private YamlEntry getEntry(YamlPath path, boolean isListNode) {
         YamlEntry entry = this._entries.get(path);
-        if (entry == null) {
-            YamlEntry parentEntry = getEntry(path.parent(), path.isListElement());
-            YamlNodeAbstract<?> parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
-            entry = parentNode.createChildEntry(parentNode._children.size(), path);
-        }
-        return entry;
+        return (entry != null) ? entry : createEntry(path, isListNode);
+    }
+
+    private YamlEntry createEntry(YamlPath path, boolean isListNode) {
+        YamlEntry parentEntry = getEntry(path.parent(), path.isListElement());
+        YamlNodeAbstract<?> parentNode = isListNode ? parentEntry.createListNodeValue() : parentEntry.createNodeValue();
+        return parentNode.createChildEntry(parentNode._children.size(), path);
     }
 }

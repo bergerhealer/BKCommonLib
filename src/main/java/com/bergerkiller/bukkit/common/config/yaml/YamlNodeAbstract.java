@@ -576,6 +576,27 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Sets a value at a certain path, provided no previous value exists<br>
+     * <br>
+     * If the value is a node, it will be parented to this node's tree. Changes to the node
+     * then impact this tree. If the node is already parented, it is cloned and later
+     * changes to the node will not impact this tree.
+     * 
+     * @param path to set
+     * @param value to set to
+     * @return True if the value was stored, False if a previous value existed
+     */
+    public boolean setIfAbsent(String path, Object value) {
+        YamlEntry entry = this.createEntryIfAbsent(path);
+        if (entry != null) {
+            entry.setValue(value);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Removes the value at the path specified
      *
      * @param path to remove at
@@ -930,6 +951,10 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             }
         }
         return -1;
+    }
+
+    protected YamlEntry createEntryIfAbsent(String path) {
+        return this._root.createEntryIfAbsent(this._entry.getYamlPath(), path);
     }
 
     protected YamlEntry getEntryIfExists(String path) {

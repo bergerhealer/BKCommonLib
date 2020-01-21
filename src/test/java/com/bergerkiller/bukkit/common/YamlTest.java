@@ -760,6 +760,11 @@ public class YamlTest {
         assertNull(root.get("key"));
         assertEquals(0, root.getValues().size());
         assertEquals(0, root.getKeys().size());
+
+        // Sets the value if absent, succeeds the first time, fails second time
+        assertTrue(root.setIfAbsent("key", "InitialValue"));
+        assertFalse(root.setIfAbsent("key", "Changed"));
+        assertEquals("InitialValue", root.get("key"));
     }
 
     @Test
