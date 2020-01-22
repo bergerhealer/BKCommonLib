@@ -16,7 +16,9 @@ class MobEffect {
     private boolean splash;
     private boolean ambient;
 
-#if version >= 1.9
+#if version >= 1.15.2
+    private boolean particles:showParticles;
+#elseif version >= 1.9
     private boolean particles:h;
 #else
     private boolean particles:particles;

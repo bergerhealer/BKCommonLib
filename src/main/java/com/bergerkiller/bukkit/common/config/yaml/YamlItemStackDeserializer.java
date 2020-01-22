@@ -146,11 +146,14 @@ public class YamlItemStackDeserializer implements Function<Map<String, Object>, 
             return Boolean.TRUE;
         });
 
-        // From MC 1.15.1+ to 1.15 (no changes)
+        // From MC 1.15.1 to 1.15 (no changes)
         this.register(2225, NO_CONVERSION);
 
+        // From MC 1.15.2+ to 1.15.1 (no changes)
+        this.register(2227, NO_CONVERSION);
+
         // Maximum supported data version
-        this.max_version = 2227; // MC 1.15.1
+        this.max_version = 2230; // MC 1.15.2
     }
 
     // Registers a converter if it can convert from a future data version only

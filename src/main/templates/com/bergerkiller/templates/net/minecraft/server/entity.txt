@@ -1078,7 +1078,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean isSneaking();
 
-#if version >= 1.9
+#if version >= 1.15.2
+    public optional boolean isInSameVehicle:isSameVehicle((EntityHandle) Entity entity);
+#elseif version >= 1.9
     public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
 #else
     public optional boolean isInSameVehicle:###((EntityHandle) Entity entity);

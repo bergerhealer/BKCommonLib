@@ -143,7 +143,11 @@ class PortalTravelAgent {
         entity.locY = y;
         entity.locZ = z;
   #endif
+  #if version >= 1.15.2
+        return instance.createPortal(entity);
+  #else
         return instance.a(entity);
+  #endif
 #else
         return instance.createPortal(x, y, z, 16);
 #endif

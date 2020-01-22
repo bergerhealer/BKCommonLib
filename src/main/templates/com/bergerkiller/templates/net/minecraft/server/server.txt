@@ -28,7 +28,9 @@ class MinecraftServer {
 #endif
     }
 
-#if version >= 1.14.4
+#if version >= 1.15.2
+    public int getTicks:ak();
+#elseif version >= 1.14.4
     public int getTicks:aj();
 #elseif version >= 1.14
     public int getTicks:ai();

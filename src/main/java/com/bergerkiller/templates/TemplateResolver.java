@@ -27,7 +27,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
             "1.12", "1.12.1", "1.12.2",
             "1.13", "1.13.1", "1.13.2",
             "1.14", "1.14.1", "1.14.2", "1.14.3", "1.14.4",
-            "1.15", "1.15.1"
+            "1.15", "1.15.1", "1.15.2"
     };
 
     @Override
