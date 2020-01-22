@@ -13,6 +13,7 @@ public abstract class BlocksHandle extends Template.Handle {
     public static final BlocksClass T = new BlocksClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(BlocksHandle.class, "net.minecraft.server.Blocks", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
+    public static final Object AIR = T.AIR.getSafe();
     public static final Object LADDER = T.LADDER.getSafe();
     /* ============================================================================== */
 
@@ -27,6 +28,7 @@ public abstract class BlocksHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class BlocksClass extends Template.Class<BlocksHandle> {
+        public final Template.StaticField.Converted<Object> AIR = new Template.StaticField.Converted<Object>();
         public final Template.StaticField.Converted<Object> LADDER = new Template.StaticField.Converted<Object>();
 
     }

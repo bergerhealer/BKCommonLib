@@ -5,14 +5,18 @@ import static com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName.get
 
 import java.util.EnumMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlocksHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -35,7 +39,13 @@ public class MaterialDataToIBlockData {
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, 
                         "public static net.minecraft.server.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
-                        "    return CraftMagicNumbers.getBlock(materialdata);\n" +
+                        "    org.bukkit.Material type = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialdata.getItemType());\n" +
+                        "    org.bukkit.Material legacy_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(materialdata.getItemType());\n" +
+                        "    net.minecraft.server.Block block = CraftMagicNumbers.getBlock(type);\n" +
+                        "    if (block == null) {\n" +
+                        "        return net.minecraft.server.Blocks.AIR.getBlockData();\n" +
+                        "    }\n" +
+                        "    return org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, block, materialdata.getData());\n" +
                         "}"
                 ));
             } else {
@@ -162,13 +172,18 @@ public class MaterialDataToIBlockData {
 
         Material legacyType = IBlockDataToMaterialData.toLegacy(materialdata.getItemType());
         IBlockDataBuilder<MaterialData> builder = CommonUtil.unsafeCast(iblockdataBuilders.get(legacyType));
-        IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
-        if (builder != null) {
-            // Convert using createData to fix up a couple issues with MaterialData Class typing
-            materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), legacyType, materialdata.getData());
-            blockData = builder.create(blockData, materialdata);
+        try {
+            IBlockDataHandle blockData = IBlockDataHandle.createHandle(craftBukkitgetIBlockData.invoke(null, materialdata));
+            if (builder != null) {
+                // Convert using createData to fix up a couple issues with MaterialData Class typing
+                materialdata = IBlockDataToMaterialData.createMaterialData(materialdata.getItemType(), legacyType, materialdata.getData());
+                blockData = builder.create(blockData, materialdata);
+            }
+            return blockData;
+        } catch (Throwable t) {
+            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to retrieve IBlockData for " + materialdata, t);
+            return BlockHandle.T.getBlockData.invoke(BlocksHandle.AIR);
         }
-        return blockData;
     }
 
     private static interface IBlockDataBuilder<M extends MaterialData> {

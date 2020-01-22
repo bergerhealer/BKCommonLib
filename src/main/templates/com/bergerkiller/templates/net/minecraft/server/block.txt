@@ -339,6 +339,7 @@ class Block {
 class Blocks {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
+    public static final (Object) Block AIR;
     public static final (Object) Block LADDER;
 }
 

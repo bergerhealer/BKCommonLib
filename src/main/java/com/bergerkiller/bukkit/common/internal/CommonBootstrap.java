@@ -356,6 +356,11 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".EntityTrackerEntry", nms_root + ".PlayerChunkMap$EntityTracker");
         }
 
+        // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
+        if (evaluateMCVersion("<", "1.15.2")) {
+            remappings.put(cb_root + ".legacy.CraftLegacy", cb_root + ".util.CraftLegacy");
+        }
+
         // If remappings exist, add a resolver for them
         if (!remappings.isEmpty()) {
             Resolver.registerClassResolver(classPath -> {

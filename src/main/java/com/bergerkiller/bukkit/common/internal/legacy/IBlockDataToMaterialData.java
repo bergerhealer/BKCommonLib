@@ -41,7 +41,7 @@ public class IBlockDataToMaterialData {
         // Used on MC 1.13 and onwards for legacy conversions
         Map<Object, MaterialData> iblockdataToMaterialdata_map = Collections.emptyMap();
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            Class<?> craftLegacyClass = CommonUtil.getCBClass("util.CraftLegacy");
+            Class<?> craftLegacyClass = CommonUtil.getCBClass("legacy.CraftLegacy");
             if (craftLegacyClass != null) {
                 try {
                     java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
@@ -72,8 +72,8 @@ public class IBlockDataToMaterialData {
                         "        data_type = materialdata.getItemType();\n" +
                         "        data_value = materialdata.getData();\n" +
                         "    } else {\n" +
-                        "        data_type = org.bukkit.craftbukkit.util.CraftLegacy.toLegacy(type);\n" +
-                        "        data_value = org.bukkit.craftbukkit.util.CraftLegacy.toLegacyData(iblockdata);\n" +
+                        "        data_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(type);\n" +
+                        "        data_value = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacyData(iblockdata);\n" +
                         "    }\n" +
                         "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(type, data_type, data_value);\n" +
                         "}"
@@ -644,7 +644,7 @@ public class IBlockDataToMaterialData {
     }
 
     private static class CraftBukkitToLegacy {
-        private static final SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("util.CraftLegacy"), "toLegacy", Material.class);
+        private static final SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("legacy.CraftLegacy"), "toLegacy", Material.class);
 
         public static Material toLegacy(Material material) {
             return craftbukkitToLegacy.invoke(null, material);
