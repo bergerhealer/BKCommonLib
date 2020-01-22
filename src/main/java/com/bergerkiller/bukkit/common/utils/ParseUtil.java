@@ -566,7 +566,7 @@ public class ParseUtil {
 
         static {
             // Material by name mapping
-            for (Material material : CommonLegacyMaterials.getAllMaterials()) {
+            for (Material material : MaterialsByName.getAllMaterials()) {
                 MAT_NAME_MAP.putUpper(MaterialsByName.getMaterialName(material), material);
             }
             MAT_NAME_MAP.put("REDSTONETORCH", getFirst("REDSTONE_TORCH", "LEGACY_REDSTONE_TORCH_ON"));

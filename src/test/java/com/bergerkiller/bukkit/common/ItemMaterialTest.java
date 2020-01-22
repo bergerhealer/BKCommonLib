@@ -21,7 +21,9 @@ import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -435,6 +437,28 @@ public class ItemMaterialTest {
             }, new ItemStack[] {
                     ItemUtil.createItem(getMaterial("LEGACY_STONE"), 0, 1)
             });
+        }
+    }
+
+    @Test
+    public void testToItemHandleConversion() {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            for (Material m : MaterialsByName.getAllByName("LEGACY_MINECART", "MINECART")) {
+                assertNotNull(m);
+                Object item = HandleConversion.toItemHandle(m);
+                assertNotNull("Material " + m + " resulted in null item", item);
+            }
+        }
+    }
+
+    @Test
+    public void testToBlockHandleConversion() {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            for (Material m : MaterialsByName.getAllByName("LEGACY_STONE", "STONE")) {
+                assertNotNull(m);
+                Object block = HandleConversion.toBlockHandle(m);
+                assertNotNull("Material " + m + " resulted in null block", block);
+            }
         }
     }
 

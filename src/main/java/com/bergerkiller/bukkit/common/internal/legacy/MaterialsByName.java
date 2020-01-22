@@ -46,7 +46,7 @@ public class MaterialsByName {
                 values = (Material[]) Material.class.getMethod("values").invoke(null);
             } catch (Throwable t) {
                 t.printStackTrace();
-                values = Material.values();
+                values = Material.class.getEnumConstants();
             }
 
             // On MC 1.8 there is a LOCKED_CHEST Material that does not actually exist

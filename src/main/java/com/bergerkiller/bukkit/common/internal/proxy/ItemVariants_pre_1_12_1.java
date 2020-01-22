@@ -6,6 +6,8 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
+
 /**
  * Provides item variants (for example, different colors of wool) for MC versions before 1.12.1.
  * The API for this was not available in the server prior.
@@ -101,7 +103,7 @@ public class ItemVariants_pre_1_12_1 {
     }
 
     private static void register(String name, VariantProducer producer) {
-        for (Material m : Material.values()) {
+        for (Material m : MaterialsByName.getAllMaterials()) {
             if (m.name().equals(name)) {
                 variants.put(m, producer);
                 return;

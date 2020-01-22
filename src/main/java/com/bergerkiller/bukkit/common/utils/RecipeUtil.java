@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -27,7 +28,7 @@ public class RecipeUtil {
 
     static {
         // Store initial values
-        for (Material material : Material.values()) {
+        for (Material material : MaterialsByName.getAllMaterials()) {
             ItemStackHandle item = ItemStackHandle.newInstance();
             item.setTypeField(material);
             item.setAmountField(1);
