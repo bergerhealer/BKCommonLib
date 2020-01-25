@@ -18,11 +18,6 @@ public class OctreeIterator<T> implements Iterator<T> {
     private IteratorState state;
     private int skipIntersectionBelowDepth;
 
-    public static int COUNTER_A = 0;
-    public static int COUNTER_B = 0;
-    public static int COUNTER_C = 0;
-    public static int COUNTER_D = 0;
-
     public OctreeIterator(Octree<T> tree) {
         this.tree = tree;
         this.coord_dirty = true;

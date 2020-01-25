@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.collections.octree.OctreeIterator;
@@ -160,12 +159,6 @@ public class OctreeTest {
         assertNext(iter, "A", block.x, block.y, block.z);
         assertNext(iter, "C", block.x, block.y+1, block.z);
         assertFalse(iter.hasNext());
-    }
-
-    @Ignore
-    @Test
-    public void runTest() {
-        Octree.test2();
     }
 
     private void assertNext(Iterator<String> iter, String value) {
