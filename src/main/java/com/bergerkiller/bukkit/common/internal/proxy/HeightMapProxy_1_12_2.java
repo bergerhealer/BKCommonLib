@@ -38,10 +38,10 @@ public class HeightMapProxy_1_12_2 {
     */
 
     public int getHeight(int x, int z) {
-        return this.heightMap[z << 4 | x] - 2;
+        return this.heightMap[z << 4 | x];
     }
 
     public void setHeight(int x, int z, int height) {
-        this.heightMap[z << 4 | x] = height + 2;
+        this.heightMap[z << 4 | x] = height;
     }
 }
