@@ -9,6 +9,7 @@ import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.nio.CharBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -681,7 +682,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @throws YAMLException When the YAML-encoded text is malformed or an IO Exception occurs
      */
     public void loadFromStream(InputStream stream) throws YAMLException {
-        loadFromReader(new InputStreamReader(stream));
+        loadFromReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
     }
 
     /**
@@ -734,7 +735,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @throws IOException When the stream throws an error while writing
      */
     public void saveToStream(OutputStream stream) throws IOException {
-        saveToWriter(new OutputStreamWriter(stream));
+        saveToWriter(new OutputStreamWriter(stream, StandardCharsets.UTF_8));
     }
 
     /**

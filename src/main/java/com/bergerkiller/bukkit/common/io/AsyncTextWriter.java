@@ -7,9 +7,9 @@ import java.nio.CharBuffer;
 import java.nio.channels.AsynchronousFileChannel;
 import java.nio.channels.CompletionHandler;
 import java.nio.channels.FileLock;
-import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
@@ -39,7 +39,7 @@ public class AsyncTextWriter {
 
     private AsyncTextWriter(AsynchronousFileChannel file, CharBuffer inputData, int bufferSize) {
         _file = file;
-        _encoder = Charset.defaultCharset().newEncoder();
+        _encoder = StandardCharsets.UTF_8.newEncoder();
         _inputData = inputData;
         _writeBufferA = ByteBuffer.allocateDirect(bufferSize);
         _writeBufferB = ByteBuffer.allocateDirect(bufferSize);
