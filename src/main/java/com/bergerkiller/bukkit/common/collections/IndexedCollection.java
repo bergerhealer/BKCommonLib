@@ -88,9 +88,6 @@ public class IndexedCollection<T> extends AbstractCollection<T> {
      */
     public void setAt(int index, T value) {
         this._values[index] = value;
-        if (value == null && index >= this._reserved) {
-            Thread.dumpStack();
-        }
     }
 
     /**
