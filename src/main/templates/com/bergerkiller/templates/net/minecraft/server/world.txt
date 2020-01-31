@@ -549,9 +549,7 @@ class WorldServer extends World {
 
 #if version >= 1.14
     public (Collection<EntityHandle>) Collection<Entity> getEntities() {
-        #require net.minecraft.server.WorldServer private final Map<UUID, Entity> entitiesByUUID;
-        java.util.Map entities = instance#entitiesByUUID;
-        return entities.values();
+        return instance.entitiesById.values();
     }
 #elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
