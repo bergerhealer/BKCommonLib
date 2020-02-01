@@ -23,6 +23,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract BlockHandle getBlock();
+    public abstract boolean isBuildable();
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
     public abstract Map<IBlockStateHandle, Comparable<?>> getStates();
@@ -59,6 +60,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
      */
     public static final class IBlockDataClass extends Template.Class<IBlockDataHandle> {
         public final Template.Method.Converted<BlockHandle> getBlock = new Template.Method.Converted<BlockHandle>();
+        public final Template.Method<Boolean> isBuildable = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>> getStates = new Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>>();

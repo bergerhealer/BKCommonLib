@@ -375,6 +375,14 @@ interface IBlockData {
     }
     </code>
 
+    public boolean isBuildable() {
+#if version >= 1.9
+        return instance.getMaterial().isBuildable();
+#else
+        return instance.getBlock().getMaterial().isBuildable();
+#endif
+    }
+
     public Object get((IBlockStateHandle) IBlockState state) {
         if (state != null) {
             return instance.get(state);
