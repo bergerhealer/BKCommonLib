@@ -49,7 +49,9 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
             if (handleAttachment) {
                 this.onAttached();
             }
-            this.markEntityChunkDirty();
+            if (!(this instanceof DefaultEntityController)) {
+                this.markEntityChunkDirty();
+            }
         }
     }
 
