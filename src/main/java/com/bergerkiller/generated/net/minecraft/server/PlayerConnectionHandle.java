@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PlayerConnection</b>.
@@ -22,8 +21,12 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract void sendPacket(CommonPacket packet);
+    public abstract void sendPacket(Object packet);
     public abstract void sendPos(double x, double y, double z);
+
+    public boolean isConnected() {
+        return com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
+    }
     public abstract Object getNetworkManager();
     public abstract void setNetworkManager(Object value);
     /**

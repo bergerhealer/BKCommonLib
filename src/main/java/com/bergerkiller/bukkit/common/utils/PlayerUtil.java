@@ -1,12 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -14,12 +14,10 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -43,16 +41,7 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the player is disconnected, False if not
      */
     public static boolean isDisconnected(Player player) {
-        final Object handle = Conversion.toEntityHandle.convert(player);
-        if (handle == null) {
-            return true;
-        }
-        final Object connection = EntityPlayerHandle.T.playerConnection.get(handle);
-        if (connection == null) {
-            return true;
-        }
-        final Object network = NMSPlayerConnection.networkManager.get(connection);
-        return network == null || !NetworkManagerHandle.T.isConnected.invoke(network);
+        return CommonPacketHandler.getPlayerConnection(player) == null;
     }
 
     /**

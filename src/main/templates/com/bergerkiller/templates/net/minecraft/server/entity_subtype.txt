@@ -17,6 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 class EntityLiving extends Entity {
 
@@ -362,7 +363,7 @@ class EntityHuman extends EntityLiving {
 }
 
 class EntityPlayer extends EntityHuman {
-    public (Object) PlayerConnection playerConnection;
+    public (PlayerConnectionHandle) PlayerConnection playerConnection;
     // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
     // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
     public final optional List<Integer> removeQueue;

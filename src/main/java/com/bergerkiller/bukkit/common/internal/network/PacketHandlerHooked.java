@@ -12,10 +12,8 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
 
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
@@ -47,7 +45,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     public boolean onEnable() {
         // Initialize all receiver methods
         Class<?> packetType = PacketType.DEFAULT.getType();
-        for (Method method : NMSPlayerConnection.T.getType().getDeclaredMethods()) {
+        for (Method method : PlayerConnectionHandle.T.getType().getDeclaredMethods()) {
             if (method.getReturnType() != void.class || method.getParameterTypes().length != 1
                     || !Modifier.isPublic(method.getModifiers())) {
                 continue;
@@ -193,11 +191,11 @@ public abstract class PacketHandlerHooked implements PacketHandler {
         if (method == null) {
         	Logging.LOGGER_NETWORK.log(Level.WARNING, "Could not find suitable packet handler for " + packet.getClass().getSimpleName());
         } else {
-            Object connection = getPlayerConnection(player);
+            PlayerConnectionHandle connection = getPlayerConnection(player);
             if (connection != null) {
                 // We are bypassing the hook - make sure to handle receive packet listener
                 if (this.handlePacketReceive(player, packet, false)) {
-                    method.invoke(connection, packet);
+                    method.invoke(connection.getRaw(), packet);
                 }
             }
         }
@@ -206,7 +204,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     @Override
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
         type.preprocess(packet);
-        Object connection = getPlayerConnection(player);
+        PlayerConnectionHandle connection = getPlayerConnection(player);
         if (connection == null) {
             return;
         }
@@ -215,7 +213,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
             this.silentQueue.add(player, packet);
         }
 
-        PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
+        connection.sendPacket(packet);
     }
 
     @Override
@@ -379,16 +377,14 @@ public abstract class PacketHandlerHooked implements PacketHandler {
      * @param player
      * @return player connection
      */
-    public static Object getPlayerConnection(Player player) {
+    public static PlayerConnectionHandle getPlayerConnection(Player player) {
         Object handle = HandleConversion.toEntityHandle(player);
         if (!EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
 
-        final Object connection = EntityPlayerHandle.T.playerConnection.raw.get(handle);
-        if (connection == null) return null; // No PlayerConnection instance
-
-        final Object network = NMSPlayerConnection.networkManager.get(connection);
-        if (network == null) return null; // No NetworkManager instance
-        if (!NetworkManagerHandle.T.isConnected.invoke(network)) return null; // Not connected
+        final PlayerConnectionHandle connection = EntityPlayerHandle.T.playerConnection.get(handle);
+        if (connection == null || !connection.isConnected()) {
+            return null; // No PlayerConnection instance or not connected
+        }
         return connection;
     }
 

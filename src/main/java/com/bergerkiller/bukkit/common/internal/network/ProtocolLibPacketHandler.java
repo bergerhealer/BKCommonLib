@@ -56,12 +56,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         // joins the server, ProtocolLib still notifies the packet listeners.
         // This here is a workaround for that, at least for BKCommonLib Packet Listeners.
         // See: https://github.com/PaperMC/Paper/issues/1934
+        //
+        // UPDATE 2-feb-2020
+        // Looks like silent packet sending is completely broken on PaperSpigot
+        // Their flushQueue() aborts when there are map chunk packets, causing a failure inside ProtocolLib
+        // By default I now set isSendSilentPacketBroken to true to stop using ProtocolLib for this from now on
+        // The reason the x-ray option appears to matter is because that increases the time the queue is stalled
+        // See: https://github.com/dmulloy2/ProtocolLib/issues/763
         this.useSilentPacketQueue = false;
         if (Common.IS_PAPERSPIGOT_SERVER) {
-            //TODO: This should only be done when anti-xray is enabled in (one of) the world configurations
-            //      I have no idea how to (or if I should) hack into the paperspigot code to read this
-            //      The field can be found in PaperWorldConfig but no idea where the mapping for it is
             this.useSilentPacketQueue = true;
+            this.isSendSilentPacketBroken = true;
         }
         return true;
     }
@@ -131,7 +136,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
-        Object connection = PacketHandlerHooked.getPlayerConnection(player);
+        PlayerConnectionHandle connection = PacketHandlerHooked.getPlayerConnection(player);
         if (connection == null) {
             return; // Player is an NPC or isn't connected
         }
@@ -140,7 +145,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         // Simplified logic for sending normally
         if (throughListeners) {
-            PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
+            connection.sendPacket(packet);
             return;
         }
 
@@ -151,14 +156,14 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
 
         if (this.isSendSilentPacketBroken) {
-            // ProtocolLib had a linkage error while sending the packet before
+            // ProtocolLib had a linkage error while sending the packet before, or some other known bug
             // Instead we now use our own 'silent' packet queue to deal with this
-            PlayerConnectionHandle.T.sendPacket.raw.invoke(connection, packet);
+            connection.sendPacket(packet);
 
         } else {
             // Silent - do not send it through listeners, only through monitors
             try {
-                PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+                final PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
                 ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
             } catch (PlayerLoggedOutException ex) {
                 // Ignore

@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSPlayerConnection;
+import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
@@ -86,8 +86,11 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         public static void bind(Player player) {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
-            Object playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
-            Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
+            PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
+            if (playerConnection == null) {
+                return; // already disconnected
+            }
+            Object networkManager = playerConnection.getNetworkManager();
             Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
             CommonChannelListener listener = new CommonChannelListener(player);
             try {
@@ -101,8 +104,11 @@ public class CommonPacketHandler extends PacketHandlerHooked {
 
         public static void unbind(Player player) {
             Object entityPlayer = Conversion.toEntityHandle.convert(player);
-            Object playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
-            Object networkManager = NMSPlayerConnection.networkManager.get(playerConnection);
+            PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
+            if (playerConnection == null) {
+                return; // already disconnected
+            }
+            Object networkManager = playerConnection.getNetworkManager();
             final Channel channel = NetworkManagerHandle.T.channel.get(networkManager);
             channel.eventLoop().submit(() -> {
                 channel.pipeline().remove("bkcommonlib");

@@ -28,8 +28,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
     }
-    public abstract Object getPlayerConnection();
-    public abstract void setPlayerConnection(Object value);
+    public abstract PlayerConnectionHandle getPlayerConnection();
+    public abstract void setPlayerConnection(PlayerConnectionHandle value);
     public abstract int getPing();
     public abstract void setPing(int value);
     /**
@@ -37,7 +37,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
-        public final Template.Field.Converted<Object> playerConnection = new Template.Field.Converted<Object>();
+        public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
         @Template.Optional
         public final Template.Field<List<Integer>> removeQueue = new Template.Field<List<Integer>>();
         public final Template.Field.Integer ping = new Template.Field.Integer();

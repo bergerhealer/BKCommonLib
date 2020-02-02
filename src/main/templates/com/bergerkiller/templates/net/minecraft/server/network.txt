@@ -23,10 +23,16 @@ class PlayerConnection {
     public final (Object) NetworkManager networkManager;
 
 #if version >= 1.9
-    public void sendPacket((CommonPacket) Packet<?> packet);
+    public void sendPacket((Object) Packet<?> packet);
 #else
-    public void sendPacket((CommonPacket) Packet packet);
+    public void sendPacket((Object) Packet packet);
 #endif
+
+    <code>
+    public boolean isConnected() {
+        return com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
+    }
+    </code>
 
     public void sendPos(double x, double y, double z) {
         java.util.HashSet flags = new java.util.HashSet();
