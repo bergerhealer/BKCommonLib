@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import org.bukkit.Chunk;
 import org.bukkit.EntityEffect;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -250,6 +251,19 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     public <H> H getHandle(Class<H> type) {
         return CommonUtil.tryCast(handle.getRaw(), type);
+    }
+
+    /**
+     * Gets the Chunk the entity is currently assigned to.
+     * Null is returned if the entity was never assigned to a World,
+     * was never assigned to a chunk or the chunk the entity was assigned to is not loaded.
+     * 
+     * @return chunk
+     */
+    public Chunk getChunk() {
+        World world = this.getWorld();
+        return (world == null || !this.handle.isLoaded()) ? null :
+            world.getChunkAt(this.handle.getChunkX(), this.handle.getChunkZ());
     }
 
     public int getChunkX() {

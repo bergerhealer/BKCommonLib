@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
@@ -194,7 +195,10 @@ public class CommonPlugin extends PluginBase {
         // Remove any entity controllers set for the entities that were removed
         EntityHook hook = EntityHook.get(HandleConversion.toEntityHandle(e), EntityHook.class);
         if (hook != null && hook.hasController()) {
-            hook.getController().getEntity().setController(null);
+            EntityController<?> controller = hook.getController();
+            if (controller.getEntity() != null) {
+                controller.getEntity().setController(null);
+            }
         }
     }
 

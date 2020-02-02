@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.controller;
 
+import org.bukkit.Chunk;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
@@ -12,6 +13,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 
 public abstract class EntityController<T extends CommonEntity<?>> extends CommonEntityController<T> {
     private EntityHook hook = null;
@@ -34,6 +36,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
         }
         if (this.entity != null) {
             this.onDetached();
+            this.markEntityChunkDirty();
         }
         this.entity = (T) entity;
         if (this.entity != null) {
@@ -46,6 +49,14 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
             if (handleAttachment) {
                 this.onAttached();
             }
+            this.markEntityChunkDirty();
+        }
+    }
+
+    private void markEntityChunkDirty() {
+        Chunk chunk = this.entity.getChunk();
+        if (chunk != null) {
+            ChunkHandle.fromBukkit(chunk).markDirty();
         }
     }
 
