@@ -7,9 +7,18 @@ import com.bergerkiller.templates.TemplateResolver;
 
 import org.bukkit.Bukkit;
 
+import java.util.Set;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Common {
+    /**
+     * Used by {@link #hasCapability(String)}
+     */
+    private static final Set<String> CAPABILITIES = Stream.of(
+            "Common:Capabilities"
+    ).collect(Collectors.toSet());
 
     /**
      * BKCommonLib version number, use this to set your dependency version for
@@ -162,5 +171,19 @@ public class Common {
      */
     public static boolean evaluateMCVersion(String operand, String version) {
         return CommonBootstrap.evaluateMCVersion(operand, version);
+    }
+
+    /**
+     * For supporting multiple BKCommonLib versions, use this function to check whether
+     * a given capability is supported. Capabilities can be features, internal implementation differences,
+     * or the removal of features. It is not recommended to depend on this in your plugin.
+     * If you do, make sure to remove such code when the minimum supported version of BKCommonLib guarantees
+     * such a feature is supported.
+     * 
+     * @param capability
+     * @return True if supported
+     */
+    public static boolean hasCapability(String capability) {
+        return CAPABILITIES.contains(capability);
     }
 }
