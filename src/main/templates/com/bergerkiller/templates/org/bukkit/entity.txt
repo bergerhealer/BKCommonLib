@@ -2,18 +2,135 @@ package org.bukkit.entity;
 
 class Entity {
 #if version >= 1.11.2
-    public optional List<Entity> getPassengers();
-    public optional boolean addPassenger(Entity passenger);
-    public optional boolean removePassenger(Entity passenger);
+    // Was added to Bukkit API since 1.11.2
+    public List<Entity> getPassengers();
+#elseif version >= 1.9
+    // Multiple passengers were possible since 1.9, but Bukkit API was missing
+    public List<Entity> getPassengers() {
+        net.minecraft.server.Entity handle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        if (handle == null || handle.passengers.isEmpty()) {
+            return java.util.Collections.emptyList();
+        } else if (handle.passengers.size() == 1) {
+            Object passengerHandleRaw = handle.passengers.get(0);
+            return java.util.Collections.singletonList(com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(passengerHandleRaw));
+        } else {
+            java.util.ArrayList passengers = new java.util.ArrayList(handle.passengers.size());
+            java.util.Iterator iter = handle.passengers.iterator();
+            while (iter.hasNext()) {
+                passengers.add(com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(iter.next()));
+            }
+            return java.util.Collections.unmodifiableList(passengers);
+        }
+    }
 #else
-    public optional List<Entity> getPassengers:###();
-    public optional boolean addPassenger:###(Entity passenger);
-    public optional boolean removePassenger:###(Entity passenger);
+    // Only one passenger on 1.8.8 and before
+    public List<Entity> getPassengers() {
+        org.bukkit.entity.Entity p = instance.getPassenger();
+        if (p == null) {
+            return java.util.Collections.emptyList();
+        } else {
+            return java.util.Collections.singletonList(p);
+        }
+    }
 #endif
 
-    // Note: this may stop being supported at some point
-    public Entity getPassenger();
-    public boolean setPassenger(Entity passenger);
+#if version >= 1.9
+    // While addPassenger/removePassenger exists, the implementation is awful
+    // The return code means nothing and it suffers a bug where a vehicle is kept when the vehicle enter event is cancelled
+    // This is an attempt at retro-fixing this mess
+
+    public boolean addPassenger(Entity passenger) {
+        com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");
+        com.google.common.base.Preconditions.checkArgument(!instance.equals(passenger), "Entity cannot ride itself.");
+
+        net.minecraft.server.Entity vehicleHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        net.minecraft.server.Entity passengerHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
+        if (vehicleHandle == null || passengerHandle == null || !passengerHandle.a(vehicleHandle, true)) {
+            return false;
+        }
+
+        // Requires type conversion to use raw
+        com.bergerkiller.mountiplex.reflection.declarations.Template$Field entityVehicleField;
+        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.vehicle.raw;
+
+  #if version >= 1.13.2
+        // Since 1.13.2 Bukkit fixed a bug that the vehicle field wasn't set back to null
+        // This means the vehicle field is now a reliable way of telling whether addPassenger() succeeded
+        return vehicleHandle == entityVehicleField.get(passengerHandle);
+  #else
+        // Bug left vehicle field set to the vehicle even when cancelled. Check the passengers list.
+        if (vehicleHandle.passengers.contains(passengerHandle)) {
+            // Successfully added the passenger
+            return true;
+        } else if (vehicleHandle == entityVehicleField.get(passengerHandle)) {
+            // Fix the bug too
+            entityVehicleField.set(passengerHandle, null);
+            return false;
+        } else {
+            // Set to a different vehicle or someone else bugfixed this
+            return false;
+        }
+  #endif
+    }
+
+    public boolean removePassenger(Entity passenger) {
+        com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");
+
+        net.minecraft.server.Entity vehicleHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        net.minecraft.server.Entity passengerHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
+        if (vehicleHandle == null || passengerHandle == null) {
+            return false;
+        }
+
+        // Requires type conversion to use raw
+        com.bergerkiller.mountiplex.reflection.declarations.Template$Field entityVehicleField;
+        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.vehicle.raw;
+
+  #if version >= 1.13
+        // Since 1.13 Bukkit fixed a bug that the vehicle field wasn't reset to the original vehicle when cancelled
+        // This means the vehicle field being un-equal to the vehicle field is now a reliable way of telling whether removePassenger() succeeded
+        if (vehicleHandle != entityVehicleField.get(passengerHandle)) {
+            return false;
+        }
+        passengerHandle.stopRiding();
+        return vehicleHandle != entityVehicleField.get(passengerHandle);
+  #else
+        // Bug set the vehicle field to null even if the vehicle exist event was cancelled. Check passengers.
+        if (!vehicleHandle.passengers.contains(passengerHandle)) {
+            return false;
+        }
+        passengerHandle.stopRiding();
+        if (vehicleHandle.passengers.contains(passengerHandle)) {
+            // Failed to remove! Correct the vehicle field
+            entityVehicleField.set(passengerHandle, vehicleHandle);
+            return false;
+        } else {
+            // Success!
+            return true;
+        }
+  #endif
+    }
+
+#else
+    // On 1.8.8 and before we use a custom implementation that simulates the same behavior
+    // Adding more than one passenger is impossible
+    public boolean addPassenger(Entity passenger) {
+        // Return code means nothing on 1.8.8 and prior
+        // There is also only one passenger possible, so if there is one, this fails
+        // Correct all that
+        com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");
+        return instance.getPassenger() == null &&
+               instance.setPassenger(passenger) &&
+               instance.getPassenger() == passenger;
+    }
+    public boolean removePassenger(Entity passenger) {
+        // Only one passenger is possible, so remove that one passenger
+        // Check whether this fails
+        return instance.getPassenger() == passenger &&
+               instance.eject() &&
+               instance.getPassenger() != passenger;
+    }
+#endif
 }
 
 class HumanEntity extends Entity {

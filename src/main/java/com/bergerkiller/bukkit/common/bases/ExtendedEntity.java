@@ -521,8 +521,22 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         entity.setMetadata(arg0, arg1);
     }
 
+    /**
+     * Ejects this Entity, removing any passengers inside. When the VehicleExitEvent for an entity is cancelled,
+     * the entity is not removed. Returns True also when ejecting failed for some entities.
+     * 
+     * @return True if there were entities inside this vehicle, False if not.
+     */
     public boolean eject() {
-        return entity.eject();
+        List<Entity> passengers = this.getPassengers();
+        if (passengers.isEmpty()) {
+            return false;
+        } else {
+            for (Entity passenger : passengers) {
+                this.removePassenger(passenger);
+            }
+            return true;
+        }
     }
 
     public int getEntityId() {
@@ -630,17 +644,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return passenger entity list
      */
     public List<org.bukkit.entity.Entity> getPassengers() {
-        if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.isAvailable()) {
-            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.invoke(entity);
-        }
-
-        // Fallback for older version of Bukkit
-        org.bukkit.entity.Entity p = com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassenger.invoke(entity);
-        if (p == null) {
-            return Collections.emptyList();
-        } else {
-            return Arrays.asList(p);
-        }
+        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.invoke(entity);
     }
 
     /**
@@ -842,8 +846,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return EntityUtil.getPortalCooldownMaximum(entity);
     }
 
+    /**
+     * If this Entity is inside a Vehicle, ejects itself from that Vehicle.
+     * 
+     * @return True if a Vehicle was left, False if the entity was not inside a Vehicle
+     *         or the VehicleExitEvent was cancelled.
+     */
     public boolean leaveVehicle() {
-        return entity.leaveVehicle();
+        Entity vehicle = this.getVehicle();
+        return vehicle != null && com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.invoke(vehicle, this.entity);
     }
 
     public void playEffect(EntityEffect arg0) {
@@ -867,11 +878,24 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Deprecated! Use add/remove passenger instead!
+     * Removes all previous passengers and adds the passenger specified
+     * 
+     * @param passenger
+     * @return True if the passenger was added to the vehicle, False if not.
+     *         If some passengers could not be removed, this method still returns True.
+     *         If the passenger was already set, other passengers are ejected, and
+     *         False is returned.
      */
-    @Deprecated
 	public boolean setPassenger(org.bukkit.entity.Entity passenger) {
-        return passenger == null ? entity.eject() : entity.setPassenger(passenger);
+	    boolean alreadyAdded = false;
+        for (Entity entity : this.getPassengers()) {
+            if (entity == passenger) {
+                alreadyAdded = true;
+            } else {
+                this.removePassenger(entity);
+            }
+        }
+        return !alreadyAdded && this.addPassenger(passenger);
     }
 
     /**
@@ -881,9 +905,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return true if a passenger, false if not
      */
     public boolean isPassenger(org.bukkit.entity.Entity passenger) {
-        for (org.bukkit.entity.Entity currPassenger : this.getPassengers()) {
-            if (currPassenger.getUniqueId().equals(passenger.getUniqueId())) {
-                return true;
+        if (passenger != null) {
+            for (org.bukkit.entity.Entity currPassenger : this.getPassengers()) {
+                if (currPassenger.getUniqueId().equals(passenger.getUniqueId())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -892,33 +918,34 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     /**
      * Adds a passenger to this Vehicle, while throwing possible events. If the
      * entering didn't happen, False is returned.
+     * 
+     * <ul>
+     * <li>Returns False if this passenger was already added
+     * <li>Returns False if another passenger is already present on MC 1.8.8 or before
+     * <li>Returns False if a plugin cancelled the VehicleEnterEvent
+     * </ul>
      *
-     * @param passenger to add
-     * @return True if the passenger was successfully set, False if not
+     * @param passenger to add, can not be null or be equal to this Vehicle entity
+     * @return True if the passenger was successfully added, False if not.
      */
 	public boolean addPassenger(org.bukkit.entity.Entity passenger) {
-	    if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.isAvailable()) {
-	        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.invoke(entity, passenger);
-	    } else {
-	        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.setPassenger.invoke(entity, passenger);
-	    }
+	    return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.addPassenger.invoke(this.entity, passenger);
 	}
 
     /**
      * Removes a passenger from this Vehicle, while throwing possible events. If the
      * exiting didn't happen, False is returned.
+     * 
+     * <ul>
+     * <li>Returns False if this passenger was not a passenger of this Vehicle
+     * <li>Returns False if a plugin cancelled the VehicleExitEvent
+     * </ul>
      *
-     * @param passenger to add
+     * @param passenger to remove
      * @return True if the passenger was successfully removed, False if not
      */
     public boolean removePassenger(org.bukkit.entity.Entity passenger) {
-        if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.isAvailable()) {
-            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.invoke(entity, passenger);
-        } else if (com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassenger.invoke(entity) == passenger) {
-            return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.setPassenger.invoke(entity, null);
-        } else {
-            return false;
-        }
+        return com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.removePassenger.invoke(this.entity, passenger);
     }
 
     /**
