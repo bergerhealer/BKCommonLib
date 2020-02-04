@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.image.BufferedImage;
+import java.awt.image.IndexColorModel;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -17,6 +18,7 @@ import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
  */
 public class MapColorPalette {
     private static final MapColorSpaceData COLOR_MAP_DATA = new MapColorSpaceData();
+    private static final IndexColorModel COLOR_INDEX_MODEL;
     public static final byte[] COLOR_MAP_AVERAGE  = new byte[0x10000];
     public static final byte[] COLOR_MAP_ADD      = new byte[0x10000];
     public static final byte[] COLOR_MAP_SUBTRACT = new byte[0x10000];
@@ -68,6 +70,9 @@ public class MapColorPalette {
                 COLOR_MAP_DATA.readFrom(bukkitGen);
             }
         }
+
+        // Create Java ColorIndexModel
+        COLOR_INDEX_MODEL = COLOR_MAP_DATA.toIndexColorModel();
 
         // Generate 256 lightness values for all colors
         for (int a = 0; a < 256; a++) {
@@ -346,6 +351,16 @@ public class MapColorPalette {
         } else {
             return COLOR_MAP_SPECULAR[((color & 0xFF) << 8) + index];
         }
+    }
+
+    /**
+     * Gets the {@link IndexColorModel} that has the R/G/B values mapped to the byte color map indices.
+     * This can be used to encode map data to an indexed image format.
+     * 
+     * @return Index Color Model
+     */
+    public static IndexColorModel getIndexColorModel() {
+        return COLOR_INDEX_MODEL;
     }
 
     /**

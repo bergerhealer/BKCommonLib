@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.color;
 
 import java.awt.Color;
+import java.awt.image.IndexColorModel;
 import java.util.Arrays;
 
 /**
@@ -168,13 +169,37 @@ public class MapColorSpaceData implements Cloneable {
     }
 
     /**
-     * Sets all the red/green values for a single Blue color chanel
+     * Sets all the red/green values for a single Blue color channel
      * 
      * @param b blue channel
      * @param data to set
      */
     public final void setRG(int b, byte[] data) {
         System.arraycopy(data, 0, this.data, b << 16, 1 << 16);
+    }
+
+    /**
+     * Creates an IndexColorModel using this map color space data
+     * 
+     * @return Index Color Model
+     */
+    public IndexColorModel toIndexColorModel() {
+        int num_colors = 0;
+        byte[] r = new byte[256];
+        byte[] g = new byte[256];
+        byte[] b = new byte[256];
+        byte[] a = new byte[256];
+        for (int i = 0; i < 256; i++) {
+            Color c = this.colors[i];
+            if (c.getAlpha() >= 128) {
+                num_colors = (i + 1);
+                r[i] = (byte) c.getRed();
+                g[i] = (byte) c.getGreen();
+                b[i] = (byte) c.getBlue();
+                a[i] = (byte) c.getAlpha();
+            }
+        }
+        return new IndexColorModel(8, num_colors, r, g, b, a);
     }
 
     @Override

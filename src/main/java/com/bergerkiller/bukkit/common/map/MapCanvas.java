@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.map;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -115,25 +117,28 @@ public abstract class MapCanvas {
      */
     public byte[] readPixels(int x, int y, int w, int h, byte[] dst_buffer) {
         if (x == 0 && y == 0 && w == this.getWidth() && h == this.getHeight()) {
-            return getBuffer().clone();
-        }
-        byte[] src_buffer = this.getBuffer();
-        int src_w = this.getWidth();
-        int src_h = this.getHeight();
-        int src_y = y;
-        for (int dst_y = 0; dst_y < h && src_y < src_h; dst_y++) {
-            if (src_y >= 0) {
-                int src_offset = (src_y * src_w);
-                int dst_offset = (dst_y * w);
-                int src_x = x;
-                for (int dst_x = 0; dst_x < w && src_x < src_w; dst_x++) {
-                    if (src_x >= 0) {
-                        dst_buffer[dst_offset + dst_x] = src_buffer[src_offset + src_x];
+            // Copy the entire buffer
+            System.arraycopy(this.getBuffer(), 0, dst_buffer, 0, dst_buffer.length);
+        } else {
+            // Copy only the portion of the window
+            byte[] src_buffer = this.getBuffer();
+            int src_w = this.getWidth();
+            int src_h = this.getHeight();
+            int src_y = y;
+            for (int dst_y = 0; dst_y < h && src_y < src_h; dst_y++) {
+                if (src_y >= 0) {
+                    int src_offset = (src_y * src_w);
+                    int dst_offset = (dst_y * w);
+                    int src_x = x;
+                    for (int dst_x = 0; dst_x < w && src_x < src_w; dst_x++) {
+                        if (src_x >= 0) {
+                            dst_buffer[dst_offset + dst_x] = src_buffer[src_offset + src_x];
+                        }
+                        src_x++;
                     }
-                    src_x++;
                 }
+                src_y++;
             }
-            src_y++;
         }
         return dst_buffer;
     }
@@ -1537,7 +1542,7 @@ public abstract class MapCanvas {
     }
 
     /**
-     * Converts all pixel contents of this Map Canvas to a standard RGB Java Buffered Image
+     * Converts all pixel contents of this Map Canvas to a standard RGB Java Buffered Image.
      * 
      * @return image
      */
@@ -1553,6 +1558,20 @@ public abstract class MapCanvas {
             }
         }
         return result;
+    }
+
+    /**
+     * Converts all pixel contents of this Map Canvas to a 8-bit indexed color format Java Buffered Image.
+     * 
+     * @return image
+     */
+    public final BufferedImage toJavaImageIndexed() {
+        byte[] buffer = this.readPixels();
+        int width = this.getWidth();
+        int height = this.getHeight();
+        java.awt.image.DataBufferByte data = new java.awt.image.DataBufferByte(buffer, buffer.length);
+        WritableRaster raster = Raster.createInterleavedRaster(data, width, height, width, 1, new int[] {0}, null);
+        return new BufferedImage(MapColorPalette.getIndexColorModel(), raster, false, null);
     }
 
     /**
