@@ -110,39 +110,9 @@ public class MapDisplay implements MapDisplayEvents {
 
     // called when setRunning(true) is called, right before onAttached
     private void preRunInitialize() {
-        // Figure out what item frame tiles exist on the server
-        this.tiles.clear();
-        for (ItemFrameInfo itemFrame : this.info.itemFrames) {
-            MapUUID uuid = itemFrame.lastMapUUID;
-            if (uuid != null && (uuid.getTileX() != 0 || uuid.getTileY() != 0)) {
-                if (!this.containsTile(uuid.getTileX(), uuid.getTileY())) {
-                    this.tiles.add(new MapDisplayTile(this, uuid.getTileX(), uuid.getTileY()));
-                }
-            }
-        }
-
-        // Tile 0,0 always exists (held map)
-        if (!this.containsTile(0, 0)) {
-            this.tiles.add(0, new MapDisplayTile(this, 0, 0));
-        }
-
-        // Calculate the dimensions from the tiles and further initialize the buffers
-        int minTileX = Integer.MAX_VALUE;
-        int minTileY = Integer.MAX_VALUE;
-        int maxTileX = 0;
-        int maxTileY = 0;
-        for (MapDisplayTile tile : this.tiles) {
-            if (tile.tileX < minTileX)
-                minTileX = tile.tileX;
-            if (tile.tileX > maxTileX)
-                maxTileX = tile.tileX;
-            if (tile.tileY < minTileY)
-                minTileY = tile.tileY;
-            if (tile.tileY > maxTileY)
-                maxTileY = tile.tileY;
-        }
-        this.width = (maxTileX - minTileX + 1) * 128;
-        this.height = (maxTileY - minTileY + 1) * 128;
+        this.info.loadTiles(this.session, true);
+        this.width = this.info.getDesiredWidth();
+        this.height = this.info.getDesiredHeight();
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
         this.layerStack = new Layer(this, this.width, this.height);

@@ -61,6 +61,7 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.events.map.MapAction;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
+import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
@@ -75,11 +76,13 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -1077,8 +1080,8 @@ public class CommonMapController implements PacketListener, Listener {
         public final ArrayList<ItemFrameInfo> itemFrames = new ArrayList<ItemFrameInfo>();
         public final LinkedHashSet<Player> frameViewers = new LinkedHashSet<Player>();
         private boolean hasFrameViewerChanges = true;
-        private boolean resetDisplayRequest = false;
         private boolean refreshItemFramesRequest = false;
+        private int desiredWidth, desiredHeight;
 
         // A list of all active running displays bound to this map
         public final ArrayList<MapSession> sessions = new ArrayList<MapSession>();
@@ -1088,20 +1091,40 @@ public class CommonMapController implements PacketListener, Listener {
 
         public MapDisplayInfo(UUID uuid) {
             this.uuid = uuid;
+            this.desiredWidth = 128;
+            this.desiredHeight = 128;
+        }
+
+        /**
+         * Gets the desired width of the map displays for this map
+         * 
+         * @return desired width
+         */
+        public int getDesiredWidth() {
+            return this.desiredWidth;
+        }
+
+        /**
+         * Gets the desired height of the map displays for this map
+         * 
+         * @return desired height
+         */
+        public int getDesiredHeight() {
+            return this.desiredHeight;
         }
 
         /**
          * Removes a tile from already running displays, so that players no longer
          * receive update packets for them, if that tile is no longer represented on
          * an item frame.
-         * Does nothing if the display is going to be reset, or no display sessions exist.
+         * Does nothing if the display session is going to be reset, or no display sessions exist.
          * Tile 0,0 will never be removed as it can be held.
          * 
          * @param tileX
          * @param tileY
          */
         public void removeTileIfMissing(int tileX, int tileY) {
-            if (this.resetDisplayRequest || this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
+            if (this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
                 return;
             }
 
@@ -1114,6 +1137,9 @@ public class CommonMapController implements PacketListener, Listener {
 
             // Remove from all sessions
             for (MapSession session : this.sessions) {
+                if (session.refreshResolutionRequested) {
+                    continue;
+                }
                 Iterator<MapDisplayTile> iter = session.display.getDisplayTiles().iterator();
                 while (iter.hasNext()) {
                     MapDisplayTile tile = iter.next();
@@ -1134,16 +1160,19 @@ public class CommonMapController implements PacketListener, Listener {
          * @param tileY
          */
         public void addTileIfMissing(int tileX, int tileY) {
-            if (this.resetDisplayRequest || this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
+            if (this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
+                return;
+            }
+            if ((tileX << 7) >= this.desiredWidth) {
+                return;
+            }
+            if ((tileY << 7) >= this.desiredHeight) {
                 return;
             }
 
             List<CommonPacket> packets = new ArrayList<CommonPacket>();
             for (MapSession session : this.sessions) {
-                if (tileX >= (session.display.getWidth() / 128)) {
-                    continue;
-                }
-                if (tileY >= (session.display.getHeight() / 128)) {
+                if (session.refreshResolutionRequested) {
                     continue;
                 }
                 if (session.display.containsTile(tileX, tileY)) {
@@ -1162,25 +1191,10 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         /**
-         * Resets the display if the resolution differs from the resolution specified.
-         * Recomputes its tiles and re-attaches its display.
-         * Only resets if the display is actually being displayed by anyone.
-         * 
-         * @param resolution
+         * Refreshes the desired width and height of the map displays based on the
+         * item frames that are currently loaded.
          */
-        public void resetDisplayIfResolutionDifferent(IntVector2 resolution) {
-            if (!this.resetDisplayRequest && !this.sessions.isEmpty() && !this.calculateResolution().equals(resolution)) {
-                this.refreshItemFramesRequest = true;
-                this.resetDisplayRequest = true;
-            }
-        }
-
-        /**
-         * Computes the resolution of the tiles in the x and y directions
-         * 
-         * @return resolution (x=x, z=y)
-         */
-        public IntVector2 calculateResolution() {
+        public void refreshResolution() {
             int min_x = 0;
             int min_y = 0;
             int max_x = 0;
@@ -1188,27 +1202,97 @@ public class CommonMapController implements PacketListener, Listener {
             boolean first = true;
             for (ItemFrameInfo itemFrame : itemFrames) {
                 if (itemFrame.lastMapUUID != null) {
+                    int tx = itemFrame.lastMapUUID.getTileX() << 7;
+                    int ty = itemFrame.lastMapUUID.getTileY() << 7;
                     if (first) {
                         first = false;
-                        min_x = max_x = itemFrame.lastMapUUID.getTileX();
-                        min_y = max_y = itemFrame.lastMapUUID.getTileY();
+                        min_x = max_x = tx;
+                        min_y = max_y = ty;
                         continue;
                     }
-                    if (itemFrame.lastMapUUID.getTileX() > max_x) {
-                        max_x = itemFrame.lastMapUUID.getTileX();
+                    if (tx < min_x) min_x = tx;
+                    if (tx > max_x) max_x = tx;
+                    if (ty < min_y) min_y = ty;
+                    if (ty > max_y) max_y = ty;
+                }
+            }
+            int new_width = max_x - min_x + 128;
+            int new_height = max_y - min_y + 128;
+            if (new_width != this.desiredWidth || new_height != this.desiredHeight) {
+                this.desiredWidth = new_width;
+                this.desiredHeight = new_height;
+                this.refreshItemFramesRequest = true;
+                for (MapSession session : this.sessions) {
+                    if (session.refreshResolutionRequested) {
+                        continue;
                     }
-                    if (itemFrame.lastMapUUID.getTileY() > max_y) {
-                        max_y = itemFrame.lastMapUUID.getTileY();
-                    }
-                    if (itemFrame.lastMapUUID.getTileX() < min_x) {
-                        min_x = itemFrame.lastMapUUID.getTileX();
-                    }
-                    if (itemFrame.lastMapUUID.getTileY() < min_y) {
-                        min_y = itemFrame.lastMapUUID.getTileY();
+                    if (session.display.getWidth() != this.desiredWidth ||
+                        session.display.getHeight() != this.desiredHeight)
+                    {
+                        session.refreshResolutionRequested = true;
                     }
                 }
             }
-            return new IntVector2(max_x - min_x + 1, max_y - min_y + 1);
+        }
+
+        /**
+         * Loads the tiles in a Map Display. This also removes tiles in the display
+         * that don't actually exist.
+         * 
+         * @param session The session of the map display
+         * @param initialize Whether the tiles are initialized, and contents are not yet drawn
+         */
+        public void loadTiles(MapSession session, boolean initialize) {
+            MapDisplay display = session.display;
+            List<MapDisplayTile> tiles = display.getDisplayTiles();
+
+            // Collect all tile x/y coordinates into a long hashset
+            LongHashSet tile_coords = new LongHashSet();
+            for (ItemFrameInfo itemFrame : this.itemFrames) {
+                MapUUID uuid = itemFrame.lastMapUUID;
+                if (uuid != null) {
+                    tile_coords.add(uuid.getTileX(), uuid.getTileY());
+                }
+            }
+            tile_coords.add(0, 0);
+
+            if (initialize) {
+                // Wipe previous tiles when initializing
+                tiles.clear();
+            } else {
+                // Remove tiles from the display that are no longer present
+                // Remove existing tiles from the set at the same time
+                // We are left with a set containing tiles that must be added
+                Iterator<MapDisplayTile> iter = tiles.iterator();
+                while (iter.hasNext()) {
+                    MapDisplayTile tile = iter.next();
+                    if (!tile_coords.remove(tile.tileX, tile.tileY)) {
+                        iter.remove();
+                    }
+                }
+            }
+
+            // Packets to fill with map contents to send for new tiles added
+            // When initializing we don't send any map data, so leave empty
+            List<CommonPacket> packets = initialize ? Collections.emptyList() : new ArrayList<CommonPacket>();
+
+            // Add all remaining tiles to the display
+            LongHashSet.LongIterator iter = tile_coords.longIterator();
+            while (iter.hasNext()) {
+                long coord = iter.next();
+                MapDisplayTile newTile = new MapDisplayTile(display,
+                        MathUtil.longHashMsw(coord), MathUtil.longHashLsw(coord));
+                tiles.add(newTile);
+
+                // Send map packets for the added tile
+                if (!initialize) {
+                    for (MapSession.Owner owner : session.onlineOwners) {
+                        newTile.addUpdatePackets(packets, null);
+                        owner.updateMap(packets);
+                        packets.clear();
+                    }
+                }
+            }
         }
 
         /**
@@ -1501,10 +1585,9 @@ public class CommonMapController implements PacketListener, Listener {
 
         public void remove() {
             if (displayInfo != null) {
-                IntVector2 old_resolution = displayInfo.calculateResolution();
                 displayInfo.itemFrames.remove(this);
                 displayInfo.hasFrameViewerChanges = true;
-                displayInfo.resetDisplayIfResolutionDifferent(old_resolution);
+                displayInfo.refreshResolution();
                 displayInfo.removeTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
                 if (!displayInfo.itemFrames.isEmpty()) {
                     displayInfo.refreshItemFramesRequest = true;
@@ -1524,10 +1607,9 @@ public class CommonMapController implements PacketListener, Listener {
         public void add() {
             if (this.displayInfo == null && this.lastMapUUID != null) {
                 this.displayInfo = getInfo(this.lastMapUUID.getUUID());
-                IntVector2 old_resolution = displayInfo.calculateResolution();
                 this.displayInfo.itemFrames.add(this);
                 displayInfo.refreshItemFramesRequest = true;
-                displayInfo.resetDisplayIfResolutionDifferent(old_resolution);
+                displayInfo.refreshResolution();
                 displayInfo.addTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
             }
         }
@@ -1714,6 +1796,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Update the player viewers of all map displays
+            List<MapDisplay> displaysToReset = new ArrayList<MapDisplay>();
             for (MapDisplayInfo map : maps.values()) {
                 if (map.hasFrameViewerChanges) {
                     map.hasFrameViewerChanges = false;
@@ -1733,24 +1816,34 @@ public class CommonMapController implements PacketListener, Listener {
                 // Refresh all item frames' items showing this map
                 // It is possible their UUID changed as a result of the new tiling
                 if (map.refreshItemFramesRequest) {
-                    IntVector2 old_resolution = map.calculateResolution();
                     for (ItemFrameInfo itemFrame : map.itemFrames) {
                         itemFrame.recalculateUUID();
                     }
-                    map.resetDisplayIfResolutionDifferent(old_resolution);
+                    map.refreshResolution();
                     map.refreshItemFramesRequest = false;
                 }
 
-                if (map.resetDisplayRequest) {
-                    // RecalculateUUID above may cause further resets, so do it after
-                    map.resetDisplayRequest = false;
-
-                    // Restart all display sessions; their canvas changed resolution or has holes
-                    for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
-                        MapDisplay display = session.display;
-                        display.setRunning(false);
-                        display.setRunning(true);
+                // Refresh resolution of map sessions
+                displaysToReset.clear();
+                for (MapSession session : map.sessions) {
+                    if (session.refreshResolutionRequested && session.hasViewers) {
+                        session.refreshResolutionRequested = false;
+                        if (session.display.getWidth() == map.getDesiredWidth() &&
+                            session.display.getHeight() == map.getDesiredHeight())
+                        {
+                            // Resolution did not change, but the visible tiles may have. Refresh those.
+                            map.loadTiles(session, false);
+                        } else {
+                            // Resolution changed, reset the map display
+                            displaysToReset.add(session.display);
+                        }
                     }
+                }
+
+                // Reset displays that changed resolution
+                for (MapDisplay display : displaysToReset) {
+                    display.setRunning(false);
+                    display.setRunning(true);
                 }
             }
 

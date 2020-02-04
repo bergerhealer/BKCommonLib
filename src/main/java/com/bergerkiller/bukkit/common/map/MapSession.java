@@ -25,6 +25,7 @@ public class MapSession {
     public boolean hasHolders = false;
     public boolean hasViewers = false;
     public boolean hasNewViewers = false;
+    public boolean refreshResolutionRequested = false;
     public MapSessionMode mode = MapSessionMode.ONLINE;
 
     public MapSession(MapDisplay display) {
