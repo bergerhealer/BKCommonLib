@@ -533,8 +533,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // If in a vehicle, make sure we eject first
         if (isInsideVehicle()) {
+            System.out.println("INSIDE VEHICLE WHAT");
             ExtendedEntity<Entity> extVeh = new ExtendedEntity<Entity>(getVehicle());
-            extVeh.removePassenger(entity);
+            if (!extVeh.removePassenger(entity)) {
+                return false;
+            }
         }
 
         // If vehicle, eject the passenger first
@@ -544,7 +547,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // Perform actual teleportation
         final boolean succ;
-        if (!isWorldChange || entity instanceof Player) {
+        if (entity instanceof Player) {
+            // No special logic here. Just teleport.
+            succ = entity.teleport(location, cause);
+        } else if (!isWorldChange) {
             // First: stop tracking the entity
             final EntityTracker tracker = WorldUtil.getTracker(getWorld());
             tracker.stopTracking(entity);
@@ -557,7 +563,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 }
             }
 
-            // Teleport
+            // Teleport the non-player entity
             succ = entity.teleport(location, cause);
 
             // Start tracking the entity again
