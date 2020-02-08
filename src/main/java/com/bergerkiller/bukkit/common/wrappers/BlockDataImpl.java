@@ -433,6 +433,11 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public boolean isBuildable() {
+        return this.data.isBuildable();
+    }
+
+    @Override
     public final AxisAlignedBBHandle getBoundingBox(Block block) {
         return this.block.getBoundingBox(this.data, WorldHandle.fromBukkit(block.getWorld()), new IntVector3(block));
     }

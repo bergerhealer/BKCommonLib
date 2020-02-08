@@ -395,6 +395,13 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract boolean isPowerSource();
 
     /**
+     * Gets whether this Block can support other attachable blocks, like signs
+     * 
+     * @return True if buildable
+     */
+    public abstract boolean isBuildable();
+
+    /**
      * Gets the damage resilience of a block to damage dealt
      *
      * @return resilience value
