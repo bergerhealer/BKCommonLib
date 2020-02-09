@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.entity.Entity;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutAttachEntity</b>.
@@ -21,13 +22,23 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutAttachEntityHandle createNewMount(Entity passengerEntity, Entity vehicleEntity) {
+        return T.createNewMount.invoke(passengerEntity, vehicleEntity);
+    }
 
-    public static PacketPlayOutAttachEntityHandle createNew(org.bukkit.entity.Entity passengerEntity, org.bukkit.entity.Entity vehicleEntity) {
-        if (T.constr_passengerEntity_vehicleEntity.isAvailable()) {
-            return T.constr_passengerEntity_vehicleEntity.newInstance(passengerEntity, vehicleEntity);
-        } else {
-            return T.constr_leashId_passengerEntity_vehicleEntity.newInstance(0, passengerEntity, vehicleEntity);
-        }
+    public static PacketPlayOutAttachEntityHandle createNewLeash(Entity leashedEntity, Entity holderEntity) {
+        return T.createNewLeash.invoke(leashedEntity, holderEntity);
+    }
+
+    public abstract boolean isLeash();
+    public abstract void setIsLeash(boolean isLeash);
+
+    public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
+        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        packet.setVehicleId(holderEntityId);
+        packet.setPassengerId(leashedEntityId);
+        packet.setIsLeash(true);
+        return packet;
     }
     public abstract int getPassengerId();
     public abstract void setPassengerId(int value);
@@ -39,14 +50,15 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
      */
     public static final class PacketPlayOutAttachEntityClass extends Template.Class<PacketPlayOutAttachEntityHandle> {
         @Template.Optional
-        public final Template.Constructor.Converted<PacketPlayOutAttachEntityHandle> constr_leashId_passengerEntity_vehicleEntity = new Template.Constructor.Converted<PacketPlayOutAttachEntityHandle>();
-        @Template.Optional
-        public final Template.Constructor.Converted<PacketPlayOutAttachEntityHandle> constr_passengerEntity_vehicleEntity = new Template.Constructor.Converted<PacketPlayOutAttachEntityHandle>();
-
-        @Template.Optional
         public final Template.Field.Integer leashId = new Template.Field.Integer();
         public final Template.Field.Integer passengerId = new Template.Field.Integer();
         public final Template.Field.Integer vehicleId = new Template.Field.Integer();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle> createNewMount = new Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle>();
+        public final Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle> createNewLeash = new Template.StaticMethod.Converted<PacketPlayOutAttachEntityHandle>();
+
+        public final Template.Method<Boolean> isLeash = new Template.Method<Boolean>();
+        public final Template.Method<Void> setIsLeash = new Template.Method<Void>();
 
     }
 

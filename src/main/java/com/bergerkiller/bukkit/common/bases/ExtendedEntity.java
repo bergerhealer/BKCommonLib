@@ -1029,7 +1029,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             // Detach all removed passengers
             for (EntityHandle passengerHandle : removedPassengers) {
                 Entity passenger = passengerHandle.getBukkitEntity();
-                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, null));
+                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstanceMount(passenger, null));
 
                 // Make sure the entity tracker does not synchronize a second time
                 EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);
@@ -1042,7 +1042,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             // Note that only a single passenger per vehicle is supported
             if (!newPassengers.isEmpty()) {
                 Entity passenger = newPassengers.get(0);
-                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstance(passenger, this.entity));
+                PacketUtil.broadcastEntityPacket(passenger, PacketType.OUT_ENTITY_ATTACH.newInstanceMount(passenger, this.entity));
 
                 // Make sure the entity tracker does not synchronize a second time
                 EntityTrackerEntryHandle entry = WorldUtil.getTracker(passenger.getWorld()).getEntry(passenger);

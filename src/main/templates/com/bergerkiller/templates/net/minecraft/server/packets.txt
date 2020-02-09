@@ -997,19 +997,49 @@ class PacketPlayOutAttachEntity extends Packet {
     private int vehicleId:c;
 #endif
 
-    // MC 1.8.8
-    public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity(int leashId, (org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
+#if version >= 1.9
+    public boolean isLeash() {
+        return false;
+    }
 
-    // >= MC 1.9
-    public optional (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity);
+    public void setIsLeash(boolean isLeash) {
+    }
+
+    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
+        throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
+    }
+
+    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
+        return new PacketPlayOutAttachEntity(leashedEntity, holderEntity);
+    }
+#else
+    #require net.minecraft.server.PacketPlayOutAttachEntity private int leashId:a;
+    public boolean isLeash() {
+        int leashId = instance#leashId;
+        return leashId == 1;
+    }
+
+    public void setIsLeash(boolean isLeash) {
+        int id = isLeash ? 1 : 0;
+        instance#leashId = id;
+    }
+
+    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewMount((org.bukkit.entity.Entity) Entity passengerEntity, (org.bukkit.entity.Entity) Entity vehicleEntity) {
+        return new PacketPlayOutAttachEntity(0, passengerEntity, vehicleEntity);
+    }
+
+    public static (PacketPlayOutAttachEntityHandle) PacketPlayOutAttachEntity createNewLeash((org.bukkit.entity.Entity) Entity leashedEntity, (org.bukkit.entity.Entity) Entity holderEntity) {
+        return new PacketPlayOutAttachEntity(1, leashedEntity, holderEntity);
+    }
+#endif
 
     <code>
-    public static PacketPlayOutAttachEntityHandle createNew(org.bukkit.entity.Entity passengerEntity, org.bukkit.entity.Entity vehicleEntity) {
-        if (T.constr_passengerEntity_vehicleEntity.isAvailable()) {
-            return T.constr_passengerEntity_vehicleEntity.newInstance(passengerEntity, vehicleEntity);
-        } else {
-            return T.constr_leashId_passengerEntity_vehicleEntity.newInstance(0, passengerEntity, vehicleEntity);
-        }
+    public static PacketPlayOutAttachEntityHandle createNewLeash(int leashedEntityId, int holderEntityId) {
+        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        packet.setVehicleId(holderEntityId);
+        packet.setPassengerId(leashedEntityId);
+        packet.setIsLeash(true);
+        return packet;
     }
     </code>
 }

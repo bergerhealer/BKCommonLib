@@ -614,14 +614,14 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             // On <= MC 1.8.8 we must update the vehicle of this Entity
             org.bukkit.entity.Entity vehicle = EntityTrackerEntryStateHandle.T.opt_vehicle.get(state.getRaw());
             if (vehicle != null) {
-                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(entity.getEntity(), vehicle));
+                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstanceMount(entity.getEntity(), vehicle));
             }
         }
 
         // Potential leash
         Entity leashHolder = entity.getLeashHolder();
         if (leashHolder != null) {
-            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstance(leashHolder, entity.getEntity()));
+            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstanceLeash(leashHolder, entity.getEntity()));
         }
 
         // Human entity sleeping action
@@ -922,7 +922,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             Entity new_vehicle = this.entity.getVehicle();
             if (old_vehicle != new_vehicle) {
                 EntityTrackerEntryStateHandle.T.opt_vehicle.set(state.getRaw(), new_vehicle);
-                broadcast(PacketType.OUT_ENTITY_ATTACH.newInstance(this.entity.getEntity(), new_vehicle));
+                broadcast(PacketType.OUT_ENTITY_ATTACH.newInstanceMount(this.entity.getEntity(), new_vehicle));
             }
 
             // Track passenger ourselves to implement onSyncPassengers functionality

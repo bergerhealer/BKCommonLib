@@ -596,8 +596,12 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> vehicleId = PacketPlayOutAttachEntityHandle.T.vehicleId.toFieldAccessor();
         public final FieldAccessor<Integer> passengerId = PacketPlayOutAttachEntityHandle.T.passengerId.toFieldAccessor();
 
-        public CommonPacket newInstance(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
-            return new CommonPacket(PacketPlayOutAttachEntityHandle.createNew(passenger, vehicle).getRaw());
+        public CommonPacket newInstanceMount(org.bukkit.entity.Entity passenger, org.bukkit.entity.Entity vehicle) {
+            return new CommonPacket(PacketPlayOutAttachEntityHandle.createNewMount(passenger, vehicle).getRaw());
+        }
+
+        public CommonPacket newInstanceLeash(org.bukkit.entity.Entity leashedEntity, org.bukkit.entity.Entity holderEntity) {
+            return new CommonPacket(PacketPlayOutAttachEntityHandle.createNewLeash(leashedEntity, holderEntity).getRaw());
         }
     }
 
