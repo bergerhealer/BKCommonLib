@@ -86,6 +86,7 @@ public class CommonPlugin extends PluginBase {
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
+    private CommonVehicleMountManager vehicleMountManager = null;
     private boolean isFrameTilingSupported = true;
 
     public static boolean hasInstance() {
@@ -299,6 +300,15 @@ public class CommonPlugin extends PluginBase {
         return this.forcedChunkManager;
     }
 
+    /**
+     * Gets the vehicle mount manager, which offers vehicle mount handler facilities
+     * 
+     * @return vehicle mount manager
+     */
+    public CommonVehicleMountManager getVehicleMountManager() {
+        return this.vehicleMountManager;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -411,6 +421,10 @@ public class CommonPlugin extends PluginBase {
         HandlerList.unregisterAll(listener);
         PacketUtil.removePacketListener(this.mapController);
         PacketUtil.removePacketListener(this.tabController);
+
+        // Disable Vehicle mount manager
+        this.vehicleMountManager.disable();
+        this.vehicleMountManager = null;
 
         // Clear running tasks
         for (Task task : startedTasks) {
@@ -530,6 +544,10 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize NBT early
         NBTBaseHandle.T.forceInitialization();
+
+        // Initialize vehicle mount manager
+        vehicleMountManager = new CommonVehicleMountManager(this);
+        vehicleMountManager.enable();
 
         // Initialize chunk loader pool
         chunkLoaderPool = new CommonChunkLoaderPool();

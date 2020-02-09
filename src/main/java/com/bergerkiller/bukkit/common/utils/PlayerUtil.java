@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -17,7 +18,6 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
-import com.bergerkiller.reflection.net.minecraft.server.NMSItemStack;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
@@ -33,6 +33,17 @@ import java.util.List;
  * Player - specific operations and tools
  */
 public class PlayerUtil extends EntityUtil {
+
+    /**
+     * Gets the vehicle mount controller for a player. This controller can be used
+     * to automatically mount and unmount entities when they spawn/respawn.
+     * 
+     * @param player
+     * @return Vehicle Mount Controller
+     */
+    public static VehicleMountController getVehicleMountController(Player player) {
+        return CommonPlugin.getInstance().getVehicleMountManager().get(player);
+    }
 
     /**
      * Gets whether a player is disconnected from the server
@@ -271,6 +282,7 @@ public class PlayerUtil extends EntityUtil {
      * @param index of the slot in the inventory
      * @param item to set to
      */
+    @SuppressWarnings("unchecked")
     public static void setItemSilently(Player player, int index, ItemStack item) {
         Object rawContainer = CommonNMS.getHandle(player).getActiveContainer().getRaw();
         List<Object> rawOldItems = (List<Object>) ContainerHandle.T.oldItems.raw.get(rawContainer);
@@ -282,7 +294,7 @@ public class PlayerUtil extends EntityUtil {
             Object oldItem = SlotHandle.T.getItem.raw.invoke(rawSlots.get(convertedIndex));
             if (oldItem != null && oldItem != ItemStackHandle.EMPTY_ITEM.getRaw()) {
                 // Copy all fields from the input item to this old item
-                NMSItemStack.T.transfer(HandleConversion.toItemStackHandle(item), oldItem);
+                ItemStackHandle.T.copy(HandleConversion.toItemStackHandle(item), oldItem);
             } else {
                 // Item is not modifiable, we have to set it (and cause a change)
                 player.getInventory().setItem(index, item);
