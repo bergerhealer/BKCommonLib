@@ -69,6 +69,6 @@ public class VehicleMountHandler_SinglePassenger extends VehicleMountHandler_Bas
         PacketPlayOutAttachEntityHandle attach = PacketPlayOutAttachEntityHandle.T.newHandleNull();
         attach.setVehicleId((vehicle == null) ? -1 : vehicle.id);
         attach.setPassengerId(passenger.id);
-        PacketUtil.sendPacket(getPlayer(), attach, false);
+        PacketUtil.queuePacket(getPlayer(), attach);
     }
 }

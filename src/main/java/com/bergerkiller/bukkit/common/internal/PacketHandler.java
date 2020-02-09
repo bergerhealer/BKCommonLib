@@ -30,7 +30,25 @@ public interface PacketHandler {
 
     public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types);
 
+    /**
+     * Sends a packet right now
+     * 
+     * @param player
+     * @param type
+     * @param packet
+     * @param throughListeners
+     */
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners);
+
+    /**
+     * Sends a packet after all other packets have been sent
+     * 
+     * @param player
+     * @param type
+     * @param packet
+     * @param throughListeners
+     */
+    public void queuePacket(Player player, PacketType type, Object packet, boolean throughListeners);
 
     public void receivePacket(Player player, PacketType type, Object packet);
 

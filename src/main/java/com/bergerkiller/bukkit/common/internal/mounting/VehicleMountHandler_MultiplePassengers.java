@@ -41,10 +41,6 @@ public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_
                 for (int j = i; j < passengerIdsLength; j++) {
                     passengerIds[j] = passengerIds[j+1];
                 }
-
-                // For some reason, even though we remove the passenger from here, the passenger is unmounted anyway
-                // Queue a mount of the passenger's vehicle for a tick later to correct that
-                queueMount(passenger.vehicleMount);
             } else {
                 i++;
             }
@@ -107,7 +103,7 @@ public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_
     private final void sendVehicleMounts(SpawnedEntity vehicle, boolean sendEmptyList) {
         int[] passengerIds = vehicle.collectSentPassengerIds();
         if (sendEmptyList || passengerIds.length > 0) {
-            PacketUtil.sendPacket(getPlayer(), PacketPlayOutMountHandle.createNew(vehicle.id, vehicle.collectSentPassengerIds()), false);
+            PacketUtil.queuePacket(getPlayer(), PacketPlayOutMountHandle.createNew(vehicle.id, vehicle.collectSentPassengerIds()));
         }
     }
 }

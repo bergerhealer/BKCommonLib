@@ -22,10 +22,23 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract void sendPacket(Object packet);
+    public abstract void queuePacket(Object packet);
     public abstract void sendPos(double x, double y, double z);
 
     public boolean isConnected() {
         return com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
+    }
+
+
+    public static PlayerConnectionHandle forPlayer(org.bukkit.entity.Player player) {
+        Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
+        if (!EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
+
+        final PlayerConnectionHandle connection = EntityPlayerHandle.T.playerConnection.get(handle);
+        if (connection == null || !connection.isConnected()) {
+            return null; // No PlayerConnection instance or not connected
+        }
+        return connection;
     }
     public abstract Object getNetworkManager();
     public abstract void setNetworkManager(Object value);
@@ -37,6 +50,7 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
         public final Template.Field.Converted<Object> networkManager = new Template.Field.Converted<Object>();
 
         public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> queuePacket = new Template.Method<Void>();
         public final Template.Method<Void> sendPos = new Template.Method<Void>();
 
     }

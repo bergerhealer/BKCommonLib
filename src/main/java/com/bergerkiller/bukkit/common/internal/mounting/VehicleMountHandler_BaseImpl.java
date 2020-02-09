@@ -2,16 +2,13 @@ package com.bergerkiller.bukkit.common.internal.mounting;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
@@ -26,7 +23,6 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     private final SpawnedEntity _playerSpawnedEntity;
     private Dimension _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
-    private final Set<Mount> _dirtyMounts;
 
     public VehicleMountHandler_BaseImpl(Player player) {
         this._player = player;
@@ -35,7 +31,6 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         this._playerSpawnedEntity.spawned = true;
         this._spawnedEntities = new IntHashMap<>();
         this._spawnedEntities.put(this._playerSpawnedEntity.id, this._playerSpawnedEntity);
-        this._dirtyMounts = new HashSet<Mount>();
     }
 
     @Override
@@ -83,40 +78,6 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         if (mount.sent) {
             mount.sent = false;
             onUnmountVehicle(vehicle, Collections.singletonList(mount));
-        }
-    }
-
-    /**
-     * Queues a mount for resending later. If it was never sent, the mount is
-     * not sent later.
-     * 
-     * @param mount
-     */
-    protected void queueMount(Mount mount) {
-        if (mount.sent) {
-            mount.sent = false;
-            this._dirtyMounts.add(mount);
-            if (this._dirtyMounts.size() == 1) {
-                CommonUtil.nextTick(() -> { processMounts(); });
-            }
-        }
-    }
-
-    private synchronized void processMounts() {
-        List<Mount> mounts = new ArrayList<Mount>(this._dirtyMounts);
-        this._dirtyMounts.clear();
-        for (Mount dirtyMount : mounts) {
-            if (dirtyMount.passenger.vehicleMount != dirtyMount) {
-                continue; // Mount is no longer valid
-            }
-            if (dirtyMount.sent) {
-                continue; // Was already sent
-            }
-            if (!dirtyMount.passenger.spawned || !dirtyMount.vehicle.spawned) {
-                continue; // Vehicle or passenger not yet spawned / were destroyed
-            }
-            dirtyMount.sent = true;
-            onMountReady(dirtyMount);
         }
     }
 

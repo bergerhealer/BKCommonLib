@@ -298,6 +298,7 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPosition", nms_root + ".PacketPlayInPosition");
             remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPositionLook", nms_root + ".PacketPlayInPositionLook");
             remappings.put(nms_root + ".IChatBaseComponent$ChatSerializer", nms_root + ".ChatSerializer");
+            remappings.put(nms_root + ".NetworkManager$QueuedPacket", nms_root + ".QueuedPacket");
         }
 
         // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API

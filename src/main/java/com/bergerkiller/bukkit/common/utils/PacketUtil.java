@@ -68,10 +68,26 @@ public class PacketUtil {
         CommonPlugin.getInstance().getPacketHandler().receivePacket(player, PacketType.getType(packet), packet);
     }
 
+    /**
+     * Sends a packet to a player. Should not be used from inside a packet listener/monitor as it will cause packet loss,
+     * or unpredictable packet order.
+     * The packet is sent through listeners.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     */
     public static void sendPacket(Player player, CommonPacket packet) {
         sendPacket(player, packet, true);
     }
 
+    /**
+     * Sends a packet to a player. Should not be used from inside a packet listener/monitor as it will cause packet loss,
+     * or unpredictable packet order.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     * @param throughListeners Whether to send the packet through listeners
+     */
     public static void sendPacket(Player player, CommonPacket packet, boolean throughListeners) {
         if (packet != null) {
             Object rawPacket = packet.getHandle();
@@ -81,13 +97,84 @@ public class PacketUtil {
         }
     }
 
+    /**
+     * Sends a packet to a player. Should not be used from inside a packet listener/monitor as it will cause packet loss,
+     * or unpredictable packet order.
+     * The packet is sent through listeners.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     */
     public static void sendPacket(Player player, PacketHandle packet) {
         sendPacket(player, packet, true);
     }
 
+    /**
+     * Sends a packet to a player. Should not be used from inside a packet listener/monitor as it will cause packet loss,
+     * or unpredictable packet order.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     * @param throughListeners Whether to send the packet through listeners
+     */
     public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
         if (packet != null) {
             CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+        }
+    }
+
+    /**
+     * Queues a packet so that it is sent after all packets already in the queue are sent first.
+     * Can be used from inside a packet listener/monitor to reliably send a packet after the current packet.
+     * The packet is sent through listeners.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     */
+    public static void queuePacket(Player player, CommonPacket packet) {
+        queuePacket(player, packet, true);
+    }
+
+    /**
+     * Queues a packet so that it is sent after all packets already in the queue are sent first.
+     * Can be used from inside a packet listener/monitor to reliably send a packet after the current packet.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     * @param throughListeners Whether to send the packet through listeners
+     */
+    public static void queuePacket(Player player, CommonPacket packet, boolean throughListeners) {
+        if (packet != null) {
+            Object rawPacket = packet.getHandle();
+            if (rawPacket != null) {
+                CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getType(), rawPacket, throughListeners);
+            }
+        }
+    }
+
+    /**
+     * Queues a packet so that it is sent after all packets already in the queue are sent first.
+     * Can be used from inside a packet listener/monitor to reliably send a packet after the current packet.
+     * The packet is sent through listeners.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     */
+    public static void queuePacket(Player player, PacketHandle packet) {
+        queuePacket(player, packet, true);
+    }
+
+    /**
+     * Queues a packet so that it is sent after all packets already in the queue are sent first.
+     * Can be used from inside a packet listener/monitor to reliably send a packet after the current packet.
+     * 
+     * @param player The player to send the packet to
+     * @param packet The packet to send
+     * @param throughListeners Whether to send the packet through listeners
+     */
+    public static void queuePacket(Player player, PacketHandle packet, boolean throughListeners) {
+        if (packet != null) {
+            CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
         }
     }
 

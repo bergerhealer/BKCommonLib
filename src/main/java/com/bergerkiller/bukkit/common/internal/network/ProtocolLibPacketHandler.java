@@ -119,7 +119,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void receivePacket(Player player, PacketType type, Object packet) {
-        if (PacketHandlerHooked.getPlayerConnection(player) == null) {
+        if (PlayerConnectionHandle.forPlayer(player) == null) {
             return; // NPC player is not connected
         }
 
@@ -136,7 +136,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners) {
-        PlayerConnectionHandle connection = PacketHandlerHooked.getPlayerConnection(player);
+        PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
         if (connection == null) {
             return; // Player is an NPC or isn't connected
         }
@@ -184,6 +184,28 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             } catch (Throwable t) {
                 throw new RuntimeException("Error while sending packet:", t);
             }
+        }
+    }
+
+    @Override
+    public void queuePacket(Player player, PacketType type, Object packet, boolean throughListeners) {
+        if (throughListeners || this.useSilentPacketQueue) {
+            type.preprocess(packet);
+            PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
+            if (connection == null) {
+                return;
+            }
+
+            if (!throughListeners) {
+                this.silentPacketQueueFallback.add(player, packet);
+            }
+
+            connection.queuePacket(packet);
+        } else {
+            // Run next tick
+            // TODO: Is there a ProtocolLib API to send a packet (not through listeners) and queue it up?
+            //       https://www.spigotmc.org/threads/protocollib-send-packet-after-current-handled-packet.416910/
+            CommonUtil.nextTick(() -> sendPacket(player, type, packet, throughListeners));
         }
     }
 

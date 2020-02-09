@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -15,6 +14,7 @@ import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -52,7 +52,7 @@ public class PlayerUtil extends EntityUtil {
      * @return True if the player is disconnected, False if not
      */
     public static boolean isDisconnected(Player player) {
-        return CommonPacketHandler.getPlayerConnection(player) == null;
+        return PlayerConnectionHandle.forPlayer(player) == null;
     }
 
     /**

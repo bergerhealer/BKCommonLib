@@ -23,6 +23,39 @@ public abstract class NetworkManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract boolean isConnected();
+
+    private static final java.lang.reflect.Constructor _queuedPacketConstructor;
+    static {
+        java.lang.reflect.Constructor c = null;
+        try {
+            Class<?> queuedPacketType = com.bergerkiller.bukkit.common.utils.CommonUtil.getNMSClass("NetworkManager$QueuedPacket");
+            Class<?> listenerType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("io.netty.util.concurrent.GenericFutureListener");
+            if (queuedPacketType == null) {
+                throw new IllegalStateException("Class QueuedPacket does not exist");
+            }
+            if (listenerType == null) {
+                throw new IllegalStateException("Class GenericFutureListener does not exist");
+            }
+            if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+            } else {
+                listenerType = com.bergerkiller.bukkit.common.utils.LogicUtil.getArrayType(listenerType);
+                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+            }
+            c.setAccessible(true);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        _queuedPacketConstructor = c;
+    }
+
+    public static Object createQueuedPacket(Object packet) {
+        try {
+            return _queuedPacketConstructor.newInstance(packet, null);
+        } catch (Throwable t) {
+            throw com.bergerkiller.mountiplex.MountiplexUtil.uncheckedRethrow(t);
+        }
+    }
     public abstract Channel getChannel();
     public abstract void setChannel(Channel value);
     /**
