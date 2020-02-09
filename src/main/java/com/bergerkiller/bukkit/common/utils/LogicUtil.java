@@ -447,7 +447,6 @@ public class LogicUtil {
         }
         T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
         System.arraycopy(input, 0, rval, 0, index);
-        System.arraycopy(input, 0, rval, 0, index);
         System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
         return rval;
     }
