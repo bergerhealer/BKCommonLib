@@ -22,6 +22,10 @@ public abstract class NetworkManagerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static boolean queuePacketUnsafe(Object networkManager, Object packet) {
+        return T.queuePacketUnsafe.invoke(networkManager, packet);
+    }
+
     public abstract boolean isConnected();
 
     private static final java.lang.reflect.Constructor _queuedPacketConstructor;
@@ -64,6 +68,8 @@ public abstract class NetworkManagerHandle extends Template.Handle {
      */
     public static final class NetworkManagerClass extends Template.Class<NetworkManagerHandle> {
         public final Template.Field<Channel> channel = new Template.Field<Channel>();
+
+        public final Template.StaticMethod.Converted<Boolean> queuePacketUnsafe = new Template.StaticMethod.Converted<Boolean>();
 
         public final Template.Method<Boolean> isConnected = new Template.Method<Boolean>();
 

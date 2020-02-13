@@ -17,6 +17,41 @@ class NetworkManager {
     public boolean isConnected:g();
 #endif
 
+    // Unsafe! May not function under some conditions!
+    // Returns true if queuing was successful, false otherwise
+    public static boolean queuePacketUnsafe((Object) net.minecraft.server.NetworkManager networkManager, Object packet) {
+#if version >= 1.13.2
+        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue;
+#elseif version >= 1.8.3
+        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue:i;
+#else
+        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue:h;
+#endif
+        java.util.Queue queue = networkManager#packetQueue;
+        Object queuedPacket = com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.createQueuedPacket(packet);
+
+#if version >= 1.14.4
+        // Uses synchronized
+        synchronized (queue) {
+            queue.add(queuedPacket);
+        }
+#elseif version >= 1.8.3
+        // Uses ReentrantReadWriteLock
+        #require net.minecraft.server.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
+        java.util.concurrent.locks.ReentrantReadWriteLock lock = networkManager#packetQueueRWLock;
+        lock.writeLock().lock();
+        try {
+            queue.add(queuedPacket);
+        } finally {
+            lock.writeLock().unlock();
+        }
+#else
+        // No lock at all (relies on concurrent queue logic)
+        queue.add(queuedPacket);
+#endif
+        return true;
+    }
+
     <code>
     private static final java.lang.reflect.Constructor _queuedPacketConstructor;
     static {
@@ -62,37 +97,73 @@ class PlayerConnection {
     public void sendPacket((Object) Packet packet);
 #endif
 
-    public void queuePacket(Object packet) {
-#if version >= 1.13.2
-        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue;
-#elseif version >= 1.8.3
-        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue:i;
-#else
-        #require net.minecraft.server.NetworkManager private final readonly java.util.Queue packetQueue:h;
-#endif
-        java.util.Queue queue = instance.networkManager#packetQueue;
-        Object queuedPacket = com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.createQueuedPacket(packet);
+    <code>
+    private static final QueuePacketMethod defaultQueuePacketMethod = NetworkManagerHandle::queuePacketUnsafe;
+    private static final java.util.Map<Class<?>, QueuePacketMethod> queuePacketMethods = new java.util.concurrent.ConcurrentHashMap<Class<?>, QueuePacketMethod>(5, 0.75f, 2);
 
-#if version >= 1.14.4
-        // Uses synchronized
-        synchronized (queue) {
-            queue.add(queuedPacket);
-        }
-#elseif version >= 1.8.3
-        // Uses ReentrantReadWriteLock
-        #require net.minecraft.server.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
-        java.util.concurrent.locks.ReentrantReadWriteLock lock = instance.networkManager#packetQueueRWLock;
-        lock.writeLock().lock();
-        try {
-            queue.add(queuedPacket);
-        } finally {
-            lock.writeLock().unlock();
-        }
-#else
-        // No lock at all (relies on concurrent queue logic)
-        queue.add(queuedPacket);
-#endif
+    private static interface QueuePacketMethod {
+        boolean queuePacket(Object networkManager, Object packet);
     }
+
+    static {
+        // Default method when the NetworkManager is vanilla unchanged
+        queuePacketMethods.put(NetworkManagerHandle.T.getType(), defaultQueuePacketMethod);
+    }
+
+    private static QueuePacketMethod findPacketMethod(Class<?> networkManagerType) throws Throwable {
+        String typeName = networkManagerType.getName();
+
+        // Denizens
+        if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("DenizenNetworkManagerImpl")) {
+            final com.bergerkiller.mountiplex.reflection.util.FastField<Object> oldManagerField = new com.bergerkiller.mountiplex.reflection.util.FastField<Object>();
+            oldManagerField.init(networkManagerType.getDeclaredField("oldManager"));
+            oldManagerField.forceInitialization();
+            return (networkManager, packet) -> {
+                Object oldManager = oldManagerField.get(networkManager);
+                return queuePacket(oldManager, packet);
+            };
+        } else if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("FakeNetworkManagerImpl")) {
+            // No base implementation, we can treat it like a vanilla one
+            return defaultQueuePacketMethod;
+        }
+
+        // Unsupported
+        return null;
+    }
+
+    private static boolean queuePacket(Object networkManager, Object packet) {
+        if (networkManager != null) {
+            QueuePacketMethod method = queuePacketMethods.get(networkManager.getClass());
+            if (method == null) {
+                try {
+                    method = findPacketMethod(networkManager.getClass());
+                } catch (Throwable t) {
+                    // Ignore, assume it isn't supported
+                    //t.printStackTrace();
+                }
+                if (method != null) {
+                    queuePacketMethods.put(networkManager.getClass(), method);
+                } else {
+                    queuePacketMethods.put(networkManager.getClass(), (n, p) -> {return false;});
+                    com.bergerkiller.bukkit.common.Logging.LOGGER_NETWORK.warning("Unsupported NetworkManager detected: " + networkManager.getClass().getName());
+                    return false;
+                }
+            }
+            if (method.queuePacket(networkManager, packet)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public void queuePacket(Object packet) {
+        if (!queuePacket(getNetworkManager(), packet)) {
+            // Fallback: execute next tick
+            com.bergerkiller.bukkit.common.utils.CommonUtil.nextTick(() -> sendPacket(packet));
+        }
+    }
+    </code>
 
     <code>
     public boolean isConnected() {
