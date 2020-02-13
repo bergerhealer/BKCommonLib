@@ -45,12 +45,43 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         if (vehicle == null || passenger == null) {
             return false;
         }
-        Mount mount = Mount.create(vehicle, passenger);
-        if (mount == null) {
-            return false;
+
+        // Deal with a previous vehicle
+        Mount prevMount = passenger.vehicleMount;
+        if (prevMount != null) {
+            if (prevMount.vehicle == vehicle) {
+                return true; // Unchanged
+            } else {
+                // Remove previous mount
+                if (prevMount.sent) {
+                    prevMount.sent = false;
+                    onUnmountVehicle(vehicle, Collections.singletonList(prevMount));
+                }
+                prevMount.remove();
+            }
         }
-        if (!mount.sent && vehicle.spawned && passenger.spawned) {
-            // Mount was not synchronized, but both entities are spawned, so we can synchronize right now
+
+        // Create a new mount
+        Mount mount;
+        if (vehicle.passengerMounts.isEmpty()) {
+            mount = new Mount(vehicle, passenger);
+            passenger.vehicleMount = mount;
+            vehicle.passengerMounts = Collections.singletonList(mount);
+        } else if (SUPPORTS_MULTIPLE_PASSENGERS) {
+            mount = new Mount(vehicle, passenger);
+            passenger.vehicleMount = mount;
+            if (vehicle.passengerMounts.size() == 1) {
+                vehicle.passengerMounts = new ArrayList<>(2);
+                vehicle.passengerMounts.add(vehicle.passengerMounts.get(0));
+            }
+            vehicle.passengerMounts.add(mount);
+        } else {
+            return false; // Multiple passengers not supported
+        }
+
+        // Send the mount if we can
+        if (vehicle.spawned && passenger.spawned) {
+            // Both entities are spawned, so we can synchronize right now
             // Collect all the passenger id's for entities that have spawned and send a mount packet right away
             mount.sent = true;
             onMountReady(mount);
@@ -71,8 +102,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         }
 
         // Remove the vehicle mount
-        passenger.vehicleMount = null;
-        vehicle.removePassengerMount(mount);
+        mount.remove();
 
         // If mount was sent, synchronize passengers of vehicle again after the change
         if (mount.sent) {
@@ -101,8 +131,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         // Vehicle of entity
         Mount vehicleMount = entity.vehicleMount;
         if (vehicleMount != null) {
-            entity.vehicleMount = null;
-            vehicleMount.vehicle.removePassengerMount(vehicleMount);
+            entity.vehicleMount.remove();
             if (vehicleMount.sent) {
                 vehicleMount.sent = false;
                 if (handleUnmount) {
@@ -318,8 +347,34 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             }
         }
 
-        public void removePassengerMount(Mount mount) {
-            this.passengerMounts = removeFromImmutableList(this.passengerMounts, mount);
+        @Override
+        public String toString() {
+            return "{id: " + this.id + "}";
+        }
+    }
+
+    /**
+     * Metadata of a single vehicle-passenger mount pair
+     */
+    protected static final class Mount {
+        public final SpawnedEntity vehicle;
+        public final SpawnedEntity passenger;
+        public boolean sent;
+
+        public Mount(SpawnedEntity vehicle, SpawnedEntity passenger) {
+            this.vehicle = vehicle;
+            this.passenger = passenger;
+            this.sent = false;
+        }
+
+        /**
+         * Removes this mount from the vehicle and sets the passenger vehicle mount to null
+         */
+        public void remove() {
+            this.vehicle.passengerMounts = removeFromImmutableList(this.vehicle.passengerMounts, this);
+            if (this.passenger.vehicleMount == this) {
+                this.passenger.vehicleMount = null;
+            }
         }
 
         private static <T> List<T> removeFromImmutableList(List<T> list, T value) {
@@ -339,58 +394,6 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 return Collections.emptyList();
             } else {
                 return list;
-            }
-        }
-
-        @Override
-        public String toString() {
-            return "{id: " + this.id + "}";
-        }
-    }
-
-    /**
-     * Metadata of a single vehicle-passenger mount pair
-     */
-    protected static final class Mount {
-        public final SpawnedEntity vehicle;
-        public final SpawnedEntity passenger;
-        public boolean sent;
-
-        private Mount(SpawnedEntity vehicle, SpawnedEntity passenger) {
-            this.vehicle = vehicle;
-            this.passenger = passenger;
-            this.sent = false;
-        }
-
-        /**
-         * Creates a new mount entry between vehicle and passenger if one does not already exist.
-         * If sent is true then the mount was already sent to the player.
-         * Returns null if a mount is impossible, because the passenger is already
-         * inside a different vehicle, or multiple passengers is not supported.
-         * 
-         * @param vehicle
-         * @param passenger
-         * @return Mount
-         */
-        public static Mount create(SpawnedEntity vehicle, SpawnedEntity passenger) {
-            if (passenger.vehicleMount != null) {
-                return passenger.vehicleMount.vehicle == vehicle ? passenger.vehicleMount : null;
-            } else if (vehicle.passengerMounts.isEmpty()) {
-                Mount mount = new Mount(vehicle, passenger);
-                passenger.vehicleMount = mount;
-                vehicle.passengerMounts = Collections.singletonList(mount);
-                return mount;
-            } else if (SUPPORTS_MULTIPLE_PASSENGERS) {
-                Mount mount = new Mount(vehicle, passenger);
-                passenger.vehicleMount = mount;
-                if (vehicle.passengerMounts.size() == 1) {
-                    vehicle.passengerMounts = new ArrayList<>(2);
-                    vehicle.passengerMounts.add(vehicle.passengerMounts.get(0));
-                }
-                vehicle.passengerMounts.add(mount);
-                return mount;
-            } else {
-                return null; // Multiple passengers supported
             }
         }
     }
