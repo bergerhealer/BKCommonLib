@@ -28,6 +28,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
@@ -52,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public class WorldUtil extends ChunkUtil {
+    private static final Template.Method<Object> getBlockData_raw = CraftBlockHandle.T.getBlockData.raw;
 
     /**
      * Gets BlockData for a particular Block
@@ -60,7 +62,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        return CraftBlockHandle.T.getBlockData.invoke(block);
+        return BlockData.fromBlockData(getBlockData_raw.invoke(block));
     }
 
     /**
