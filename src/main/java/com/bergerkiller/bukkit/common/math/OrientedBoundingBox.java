@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class OrientedBoundingBox {
     private final Vector position = new Vector();
     private final Vector radius = new Vector();
-    private Quaternion orientation_inv = new Quaternion();
+    private final Quaternion orientation_inv = new Quaternion();
 
     /**
      * Default constructor with position {0,0,0}, size {0,0,0} and orientation
@@ -124,7 +124,7 @@ public class OrientedBoundingBox {
      * @param eyeLocation
      * @return distance to the box, Double.MAX_VALUE when not touching.
      */
-    public double hittest(Location eyeLocation) {
+    public double hitTest(Location eyeLocation) {
         // Compute start point
         Vector p = eyeLocation.toVector().subtract(this.position);
         this.orientation_inv.transformPoint(p);
