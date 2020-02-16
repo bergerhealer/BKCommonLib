@@ -528,7 +528,7 @@ public abstract class EntityMoveHandler {
 
             boolean flag1 = that.isWet();
 
-            if (world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001))) {
+            if (this.blockCollisionEnabled && world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001))) {
                 that.burn(1.0f);
                 if (!flag1) {
                     that.setFireTicks(that.getFireTicks() + 1);
