@@ -818,4 +818,99 @@ public class MathUtil {
         dot *= MathUtil.getNormalizationFactor(v1);
         return Math.toDegrees(Math.acos(dot));
     }
+
+    /**
+     * Sets the x, y and z coordinates of a Bukkit Vector
+     * 
+     * @param vector The vector to update
+     * @param value The value to set vector to
+     * @return input vector
+     */
+    public static Vector setVector(Vector vector, Vector value) {
+        return vector.copy(value);
+    }
+
+    /**
+     * Sets the x, y and z coordinates of a Bukkit Vector
+     * 
+     * @param vector The vector to update
+     * @param x The new x-coordinate to set in vector
+     * @param y The new y-coordinate to set in vector
+     * @param z The new z-coordinate to set in vector
+     * @return input vector
+     */
+    public static Vector setVector(Vector vector, double x, double y, double z) {
+        vector.setX(x);
+        vector.setY(y);
+        vector.setZ(z);
+        return vector;
+    }
+
+    /**
+     * Adds the x, y and z coordinate values to the original coordinates of a vector.
+     * The input vector is updated.
+     * 
+     * @param vector The vector to update
+     * @param ax The value to add to the x-coordinate
+     * @param ay The value to add to the y-coordinate
+     * @param az The value to add to the z-coordinate
+     * @return input vector
+     */
+    public static Vector addToVector(Vector vector, double ax, double ay, double az) {
+        vector.setX(vector.getX() + ax);
+        vector.setY(vector.getY() + ay);
+        vector.setZ(vector.getZ() + az);
+        return vector;
+    }
+
+    /**
+     * Subtracts the x, y and z coordinate values from the original coordinates of a vector.
+     * The input vector is updated.
+     * 
+     * @param vector The vector to update
+     * @param sx The value to subtract from the x-coordinate
+     * @param sy The value to subtract from the y-coordinate
+     * @param sz The value to subtract from the z-coordinate
+     * @return input vector
+     */
+    public static Vector subtractFromVector(Vector vector, double sx, double sy, double sz) {
+        vector.setX(vector.getX() - sx);
+        vector.setY(vector.getY() - sy);
+        vector.setZ(vector.getZ() - sz);
+        return vector;
+    }
+
+    /**
+     * Multiplies the x, y and z coordinate values of the original coordinates of a vector.
+     * The input vector is updated.
+     * 
+     * @param vector The vector to update
+     * @param mx The value to multiply the x-coordinate with
+     * @param my The value to multiply the y-coordinate with
+     * @param mz The value to multiply the z-coordinate with
+     * @return input vector
+     */
+    public static Vector multiplyVector(Vector vector, double mx, double my, double mz) {
+        vector.setX(vector.getX() * mx);
+        vector.setY(vector.getY() * my);
+        vector.setZ(vector.getZ() * mz);
+        return vector;
+    }
+
+    /**
+     * Divides the x, y and z coordinate values of the original coordinates of a vector.
+     * The input vector is updated.
+     * 
+     * @param vector The vector to update
+     * @param mx The value to divide the x-coordinate with
+     * @param my The value to divide the y-coordinate with
+     * @param mz The value to divide the z-coordinate with
+     * @return input vector
+     */
+    public static Vector divideVector(Vector vector, double mx, double my, double mz) {
+        vector.setX(vector.getX() / mx);
+        vector.setY(vector.getY() / my);
+        vector.setZ(vector.getZ() / mz);
+        return vector;
+    }
 }
