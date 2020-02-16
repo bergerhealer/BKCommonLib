@@ -293,7 +293,9 @@ public class MapWidgetAnvil extends MapWidget {
                 }
                 ItemUtil.getMetaTag(item).putValue("RepairCost", 0);
                 if (this.getDescription() != null && !this.getDescription().isEmpty()) {
-                    ItemUtil.addLoreName(item, ChatColor.RESET.toString() + this.getDescription());
+                    for (String line : this.getDescription().split("\n")) {
+                        ItemUtil.addLoreName(item, ChatColor.RESET.toString() + line);
+                    }
                 }
                 return item;
             }
