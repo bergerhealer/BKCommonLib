@@ -61,7 +61,6 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.events.map.MapAction;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
-import com.bergerkiller.bukkit.common.internal.CommonMapController.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
@@ -92,7 +91,7 @@ import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 
 public class CommonMapController implements PacketListener, Listener {
     // Stores cached thread-safe lists of item frames by cluster key
-    private final Map<ItemFrameClusterKey, ImplicitlySharedSet<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
+    private final Map<ItemFrameClusterKey, Set<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
@@ -1623,14 +1622,20 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
+            synchronized (CommonMapController.this) {
+                updateMapIds();
+            }
+        }
+
+        public void updateMapIds() {
             // Remove non-existing maps from the internal mapping
             if (idGenerationCounter > GENERATION_COUNTER_CLEANUP_INTERVAL) {
                 idGenerationCounter = 0;
 
                 // Find all map UUIDs that exist on the server
                 HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
-                for (ImplicitlySharedSet<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
-                    for (EntityItemFrameHandle itemFrame : itemFrameSet.cloneAsIterable()) {
+                for (Set<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
+                    for (EntityItemFrameHandle itemFrame : itemFrameSet) {
                         MapUUID mapUUID = getItemFrameMapUUID(itemFrame);
                         if (mapUUID != null) {
                             validUUIDs.add(mapUUID);
@@ -1658,8 +1663,8 @@ public class CommonMapController implements PacketListener, Listener {
             if (!dirtyMaps.isEmpty()) {
                 // Refresh all item frames that display this map
                 // This will result in a new EntityMetadata packets being sent, refreshing the map Id
-                for (ImplicitlySharedSet<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
-                    for (EntityItemFrameHandle itemFrame : itemFrameSet.cloneAsIterable()) {
+                for (Set<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
+                    for (EntityItemFrameHandle itemFrame : itemFrameSet) {
                         UUID mapUUID = itemFrame.getItemMapDisplayUUID();
                         if (dirtyMaps.contains(mapUUID)) {
                             itemFrame.refreshItem();
@@ -1968,9 +1973,11 @@ public class CommonMapController implements PacketListener, Listener {
         @Override
         public void run() {
             Collection<World> worlds = Bukkit.getWorlds();
-            deinitItemFrameListForWorldsNotIn(worlds);
-            for (World world : worlds) {
-                initItemFrameSetOfWorld(world);
+            synchronized (CommonMapController.this) {
+                deinitItemFrameListForWorldsNotIn(worlds);
+                for (World world : worlds) {
+                    initItemFrameSetOfWorld(world);
+                }
             }
         }
     }
@@ -2027,7 +2034,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param itemFrame
      * @return cluster
      */
-    private final ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
+    private final synchronized ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
         UUID itemFrameMapUUID;
         if (!this.isFrameTilingSupported || (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) == null) {
             return new ItemFrameCluster(itemFrame.getFacing(),
@@ -2067,7 +2074,7 @@ public class CommonMapController implements PacketListener, Listener {
             // - Same ItemStack map UUID
 
             ItemFrameClusterKey key = new ItemFrameClusterKey(world, itemFrame.getFacing(), itemFramePosition);
-            for (EntityItemFrameHandle otherFrame : iterateItemFrames(key)) {
+            for (EntityItemFrameHandle otherFrame : getItemFrameEntities(key)) {
                 if (otherFrame.getId() == itemFrame.getId()) {
                     continue;
                 }
@@ -2257,23 +2264,19 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private final void deinitItemFrameListForWorldsNotIn(Collection<World> worlds) {
-        synchronized (this.itemFrameEntities) {
-            Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
-            while (iter.hasNext()) {
-                if (!worlds.contains(iter.next().world)) {
-                    iter.remove();
-                }
+        Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
+        while (iter.hasNext()) {
+            if (!worlds.contains(iter.next().world)) {
+                iter.remove();
             }
         }
     }
 
-    private final void deinitItemFrameSetOfWorld(World world) {
-        synchronized (this.itemFrameEntities) {
-            Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
-            while (iter.hasNext()) {
-                if (iter.next().world == world) {
-                    iter.remove();
-                }
+    private final synchronized void deinitItemFrameSetOfWorld(World world) {
+        Iterator<ItemFrameClusterKey> iter = this.itemFrameEntities.keySet().iterator();
+        while (iter.hasNext()) {
+            if (iter.next().world == world) {
+                iter.remove();
             }
         }
     }
@@ -2290,19 +2293,15 @@ public class CommonMapController implements PacketListener, Listener {
         return itemFrames;
     }
 
-    private final ImplicitlySharedSet<EntityItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
+    private final Set<EntityItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
         synchronized (this.itemFrameEntities) {
-            ImplicitlySharedSet<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
+            Set<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
             if (set == null) {
-                set = new ImplicitlySharedSet<EntityItemFrameHandle>();
+                set = new HashSet<EntityItemFrameHandle>();
                 this.itemFrameEntities.put(key, set);
             }
             return set;
         }
-    }
-
-    private final Iterable<EntityItemFrameHandle> iterateItemFrames(ItemFrameClusterKey key) {
-        return getItemFrameEntities(key).cloneAsIterable();
     }
 
     /**
