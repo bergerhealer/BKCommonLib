@@ -1276,8 +1276,10 @@ public class MapDisplay implements MapDisplayEvents {
         if (mapInfo != null) {
             for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
                 MapDisplay display = session.display;
-                display.setRunning(false);
-                display.setRunning(true);
+                if (display.isRunning()) {
+                    display.setRunning(false);
+                    display.setRunning(true);
+                }
             }
         }
     }

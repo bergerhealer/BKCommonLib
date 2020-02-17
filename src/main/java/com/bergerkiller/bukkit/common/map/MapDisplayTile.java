@@ -41,6 +41,10 @@ public class MapDisplayTile {
         int dstPos = 0;
 
         byte[] liveBuffer = display.getLiveBuffer();
+        if (liveBuffer == null) {
+            return; // Display was not started
+        }
+
         MapClip tileClip = (clip == null) ? null : clip.getArea(startX, startY, RESOLUTION, RESOLUTION);
         if (tileClip == null || tileClip.everything) {
             mapUpdate.write(PacketType.OUT_MAP.xmin, 0);
