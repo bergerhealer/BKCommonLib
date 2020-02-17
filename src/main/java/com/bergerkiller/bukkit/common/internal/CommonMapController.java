@@ -1178,11 +1178,11 @@ public class CommonMapController implements PacketListener, Listener {
                     continue;
                 }
 
-                MapDisplayTile newTile = new MapDisplayTile(session.display, tileX, tileY);
+                MapDisplayTile newTile = new MapDisplayTile(this.uuid, tileX, tileY);
                 session.display.getDisplayTiles().add(newTile);
 
                 for (MapSession.Owner owner : session.onlineOwners) {
-                    newTile.addUpdatePackets(packets, null);
+                    newTile.addUpdatePackets(session.display, packets, null);
                     owner.updateMap(packets);
                     packets.clear();
                 }
@@ -1279,14 +1279,14 @@ public class CommonMapController implements PacketListener, Listener {
             LongHashSet.LongIterator iter = tile_coords.longIterator();
             while (iter.hasNext()) {
                 long coord = iter.next();
-                MapDisplayTile newTile = new MapDisplayTile(display,
+                MapDisplayTile newTile = new MapDisplayTile(this.uuid,
                         MathUtil.longHashMsw(coord), MathUtil.longHashLsw(coord));
                 tiles.add(newTile);
 
                 // Send map packets for the added tile
                 if (!initialize) {
                     for (MapSession.Owner owner : session.onlineOwners) {
-                        newTile.addUpdatePackets(packets, null);
+                        newTile.addUpdatePackets(display, packets, null);
                         owner.updateMap(packets);
                         packets.clear();
                     }

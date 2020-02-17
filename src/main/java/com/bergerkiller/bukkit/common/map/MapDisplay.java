@@ -368,7 +368,7 @@ public class MapDisplay implements MapDisplayEvents {
     private final List<CommonPacket> getUpdatePackets(MapClip clip) {
         List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.size());
         for (MapDisplayTile tile : this.tiles) {
-            tile.addUpdatePackets(packets, clip);
+            tile.addUpdatePackets(this, packets, clip);
         }
         return packets;
     }

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.map.MapCursor;
 
@@ -15,18 +16,16 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 public class MapDisplayTile {
     private static final int RESOLUTION = 128;
 
-    private MapDisplay map;
-    private MapUUID uuid;
-    public int tileX, tileY;
+    private final MapUUID uuid;
+    public final int tileX, tileY;
 
-    public MapDisplayTile(MapDisplay map, int tileX, int tileY) {
-        this.map = map;
+    public MapDisplayTile(UUID mapDisplayUUID, int tileX, int tileY) {
         this.tileX = tileX;
         this.tileY = tileY;
-        this.uuid = new MapUUID(map.getMapInfo().uuid, this.tileX, this.tileY);
+        this.uuid = new MapUUID(mapDisplayUUID, this.tileX, this.tileY);
     }
 
-    public void addUpdatePackets(List<CommonPacket> packets, MapClip clip) {
+    public void addUpdatePackets(MapDisplay display, List<CommonPacket> packets, MapClip clip) {
         int mapId = CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
 
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
@@ -37,11 +36,11 @@ public class MapDisplayTile {
 
         int startX = this.tileX * RESOLUTION;
         int startY = this.tileY * RESOLUTION;
-        int stride = this.map.getWidth();
+        int stride = display.getWidth();
         int srcPos = (startY * stride) + startX;
         int dstPos = 0;
 
-        byte[] liveBuffer = this.map.getLiveBuffer();
+        byte[] liveBuffer = display.getLiveBuffer();
         MapClip tileClip = (clip == null) ? null : clip.getArea(startX, startY, RESOLUTION, RESOLUTION);
         if (tileClip == null || tileClip.everything) {
             mapUpdate.write(PacketType.OUT_MAP.xmin, 0);
