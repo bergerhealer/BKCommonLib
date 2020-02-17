@@ -2294,14 +2294,12 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private final Set<EntityItemFrameHandle> getItemFrameEntities(ItemFrameClusterKey key) {
-        synchronized (this.itemFrameEntities) {
-            Set<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
-            if (set == null) {
-                set = new HashSet<EntityItemFrameHandle>();
-                this.itemFrameEntities.put(key, set);
-            }
-            return set;
+        Set<EntityItemFrameHandle> set = this.itemFrameEntities.get(key);
+        if (set == null) {
+            set = new HashSet<EntityItemFrameHandle>();
+            this.itemFrameEntities.put(key, set);
         }
+        return set;
     }
 
     /**
