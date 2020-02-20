@@ -176,6 +176,17 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     /**
+     * Sets whether blocks like pressure plates and detector rails are activated during the movement
+     * of the entity. Disabling block activation will cause these blocks to stop working, but may
+     * result in a significant boost in performance.
+     * 
+     * @param enabled
+     */
+    public void setBlockActivationEnabled(boolean enabled) {
+        this.moveHandler.setBlockActivationEnabled(enabled);
+    }
+
+    /**
      * Sets whether entity collisions are handled during movement of the entity.
      * Disabling entity collisions causes entities to go right through other entities
      * without being affected, and may result in a significant boost in performance.

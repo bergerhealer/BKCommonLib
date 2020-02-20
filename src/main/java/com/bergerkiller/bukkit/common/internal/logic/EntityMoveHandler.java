@@ -44,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumA
  */
 public abstract class EntityMoveHandler {
     protected boolean blockCollisionEnabled = true;
+    protected boolean blockActivationEnabled = true;
     protected boolean entityCollisionEnabled = true;
     protected Vector customBlockCollisionBounds = null; // null = entity.getBoundingBox() unchanged
     protected EntityController<?> controller;
@@ -71,6 +72,10 @@ public abstract class EntityMoveHandler {
 
     public void setBlockCollisionEnabled(boolean enabled) {
         this.blockCollisionEnabled = enabled;
+    }
+
+    public void setBlockActivationEnabled(boolean enabled) {
+        this.blockActivationEnabled = enabled;
     }
 
     public void setEntityCollisionEnabled(boolean enabled) {
@@ -143,7 +148,9 @@ public abstract class EntityMoveHandler {
             // CraftBukkit start - Don't do anything if we aren't moving
             // We need to do that.regardless of whether or not we are moving thanks to portals
             try {
-                that.checkBlockCollisions();
+                if (this.blockActivationEnabled) {
+                    that.checkBlockCollisions();
+                }
             } catch (Throwable throwable) {
                 CrashReportHandle crashreport = CrashReportHandle.create(throwable, "Checking entity block collision");
                 CrashReportSystemDetailsHandle crashreportsystemdetails = crashreport.getSystemDetails("Entity being checked for collision");

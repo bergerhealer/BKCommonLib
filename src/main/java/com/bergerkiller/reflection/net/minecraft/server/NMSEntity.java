@@ -109,7 +109,7 @@ public class NMSEntity {
      *     ...
      * }
      */
-    private static final MethodAccessor<Void> updateBlockCollision = EntityHandle.T.updateBlockCollision.toMethodAccessor();
+    private static final MethodAccessor<Void> updateBlockCollision = EntityHandle.T.checkBlockCollisions.toMethodAccessor();
 
     /*
      # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {

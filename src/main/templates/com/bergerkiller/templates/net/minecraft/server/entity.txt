@@ -640,17 +640,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
     /*
-     # protected void ##METHODNAME##() {
-     *     AxisAlignedBB axisalignedbb = this.getBoundingBox();
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
-     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
-     *     ...
-     * }
-     */
-    protected void updateBlockCollision:checkBlockCollisions();
-
-    /*
      # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
      *     SoundEffectType soundeffecttype = block.getStepSound();
      *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {

@@ -54,7 +54,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract float getHeight();
     public abstract void setStepCounter(float value);
     public abstract float getStepCounter();
-    public abstract void updateBlockCollision();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
     public abstract void burn(float dmg);
@@ -403,7 +402,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Float> getHeight = new Template.Method<Float>();
         public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
         public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
-        public final Template.Method<Void> updateBlockCollision = new Template.Method<Void>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
         public final Template.Method<Void> burn = new Template.Method<Void>();

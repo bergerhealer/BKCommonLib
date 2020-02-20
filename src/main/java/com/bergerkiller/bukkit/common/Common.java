@@ -17,7 +17,8 @@ public class Common {
      * Used by {@link #hasCapability(String)}
      */
     private static final Set<String> CAPABILITIES = Stream.of(
-            "Common:Capabilities"
+            "Common:Capabilities",
+            "Common:EntityController:SetBlockActivationEnabled"
     ).collect(Collectors.toSet());
 
     /**
