@@ -316,21 +316,22 @@ public class AsyncTextWriter {
         @Override
         public void completed(Integer result, AsyncTextWriter writer) {
             int num = result.intValue();
-            writer._position += num;
+
+            // If we wrote 0 bytes or a negative amount then something fishy is going on
+            // Likely the underlying I/O is overloaded
+            // Stress testing showed that without this sleep the entire VM
+            // can crash at random, which is obviously very bad.
+            if (num <= 0) {
+                try {
+                    Thread.sleep(10);
+                } catch (InterruptedException e) {}
+            } else {
+                writer._position += num;
+            }
 
             synchronized (writer) {
                 ByteBuffer buffer = _getBufferFunction.apply(writer);
                 if (buffer.remaining() > 0) {
-                    // If we wrote 0 bytes then something fishy is going on
-                    // Likely the underlying I/O is overloaded
-                    // Stress testing showed that without this sleep the entire VM
-                    // can crash at random, which is obviously very bad.
-                    if (num == 0) {
-                        try {
-                            Thread.sleep(10);
-                        } catch (InterruptedException e) {}
-                    }
-
                     // Write the remainder of the buffer
                     writer._file.write(buffer, writer._position, writer, this);
                 } else {
