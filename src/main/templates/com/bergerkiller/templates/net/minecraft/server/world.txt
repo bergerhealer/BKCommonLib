@@ -791,10 +791,18 @@ class MovingObjectPosition {
 }
 
 class RegionFile {
-#if methodexists net.minecraft.server.RegionFile public void close()
-    public void close();
+#if version >= 1.15
+    public void closeStream() {
+        try {
+            instance.close();
+        } catch (java.nio.channels.ClosedChannelException ex) {
+            // Suppress
+        }
+    }
+#elseif methodexists net.minecraft.server.RegionFile public void close()
+    public void closeStream:close();
 #else
-    public void close:c();
+    public void closeStream:c();
 #endif
 
 #if version >= 1.15

@@ -103,7 +103,7 @@ public class RegionHandler_1_8 extends RegionHandler {
                         continue;
                     }
                     try {
-                        RegionFileHandle.createHandle(entry.getValue()).close();
+                        RegionFileHandle.createHandle(entry.getValue()).closeStream();
                         iter.remove();
                     } catch (Exception ex) {
                         ex.printStackTrace();

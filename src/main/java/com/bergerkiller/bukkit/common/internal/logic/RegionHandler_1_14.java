@@ -92,7 +92,7 @@ public class RegionHandler_1_14 extends RegionHandler {
     public void closeStreams(World world) {
         Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
         for (Object regionFile : findCacheRegionFileInstances.invoke(null, regionFileCache)) {
-            RegionFileHandle.createHandle(regionFile).close();
+            RegionFileHandle.createHandle(regionFile).closeStream();
         }
     }
 

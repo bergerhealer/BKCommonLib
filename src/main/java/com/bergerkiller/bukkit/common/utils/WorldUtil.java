@@ -527,17 +527,24 @@ public class WorldUtil extends ChunkUtil {
      * @param world to be saved
      */
     public static synchronized void saveToDisk(org.bukkit.World world) {
-        if (Common.evaluateMCVersion(">=", "1.14") && !CommonUtil.isMainThread()) {
+        if (CommonCapabilities.ASYNCHRONOUS_CHUNK_LOADER && !CommonUtil.isMainThread()) {
             // Post to main thread on 1.14, otherwise things break
             // TODO: Is there any step of saveLevel() we could do asynchronously as well?
             //       Like a join on some sort of queue, for example.
             final CompletableFuture<Object> future = new CompletableFuture<Object>();
             CommonUtil.nextTick(() -> {
-                CommonNMS.getHandle(world).saveLevel();
+                saveToDisk(world);
                 future.complete(null);
             });
             future.join();
         } else {
+            // On 1.14 and later, saveLevel() spams errors when the world isn't actually loaded
+            // Check that the world is inside the loaded worlds list before saving
+            if (CommonCapabilities.ASYNCHRONOUS_CHUNK_LOADER && !Bukkit.getWorlds().contains(world)) {
+                return;
+            }
+
+            // Perform save
             CommonNMS.getHandle(world).saveLevel();
         }
     }

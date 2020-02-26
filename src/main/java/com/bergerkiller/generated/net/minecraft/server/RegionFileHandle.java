@@ -21,14 +21,14 @@ public abstract class RegionFileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract void close();
+    public abstract void closeStream();
     public abstract boolean chunkExists(int cx, int cz);
     /**
      * Stores class members for <b>net.minecraft.server.RegionFile</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RegionFileClass extends Template.Class<RegionFileHandle> {
-        public final Template.Method<Void> close = new Template.Method<Void>();
+        public final Template.Method<Void> closeStream = new Template.Method<Void>();
         public final Template.Method<Boolean> chunkExists = new Template.Method<Boolean>();
 
     }
