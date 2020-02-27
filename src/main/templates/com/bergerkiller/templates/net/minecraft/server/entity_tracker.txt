@@ -38,7 +38,7 @@ class EntityTracker {
             return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
         }
 #else
-        #require private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
+        #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
 
         java.util.Set set = instance#trackedEntitiesSet;
 
