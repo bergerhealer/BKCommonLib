@@ -1083,14 +1083,16 @@ public class WorldUtil extends ChunkUtil {
     /**
      * Sets the raw nibble data storing the sky light for a 16x16x16 section of the world asynchronously.
      * The actual update of the lighting information may occur at a later time.
-     * The returned completable future is completed when that happens, which can occur on a light engine worker thread.
-     * If main thread is required, make sure to schedule it onto the main thread yourself.
+     * The returned completable future is completed when that happens, which is executed on the main thread.<br>
+     * <br>
+     * This method is thread-safe.
      * 
      * @param world
      * @param cx - chunk X
      * @param cy - section Y
      * @param cz - chunk Z
      * @param data (must be 2048 length)
+     * @return completable future completed when the light has been updated, executed on the main thread
      */
     public static CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
         return LightingHandler.INSTANCE.setSectionSkyLightAsync(world, cx, cy, cz, data);
@@ -1099,14 +1101,16 @@ public class WorldUtil extends ChunkUtil {
     /**
      * Sets the raw nibble data storing the block light for a 16x16x16 section of the world asynchronously.
      * The actual update of the lighting information may occur at a later time.
-     * The returned completable future is completed when that happens, which can occur on a light engine worker thread.
-     * If main thread is required, make sure to schedule it onto the main thread yourself.
+     * The returned completable future is completed when that happens, which is executed on the main thread.<br>
+     * <br>
+     * This method is thread-safe.
      * 
      * @param world
      * @param cx - chunk X
      * @param cy - section Y
      * @param cz - chunk Z
      * @param data (must be 2048 length)
+     * @return completable future completed when the light has been updated, executed on the main thread
      */
     public static CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
         return LightingHandler.INSTANCE.setSectionBlockLightAsync(world, cx, cy, cz, data);

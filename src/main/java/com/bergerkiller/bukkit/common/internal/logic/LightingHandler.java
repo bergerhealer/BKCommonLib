@@ -42,6 +42,7 @@ public abstract class LightingHandler {
      * @param cy Chunk Section Y-coordinate
      * @param cz Chunk Section Z-coordinate
      * @param data
+     * @return completable future completed when the light has been updated
      */
     public abstract CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data);
 }

@@ -9,7 +9,6 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
-import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -109,43 +108,51 @@ public class LightingHandler_1_14 extends LightingHandler {
 
     @Override
     public CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        final LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
-            final CompletableFuture<Void> future = new CompletableFuture<Void>();
             Object layer = this.light_layer_block.get(engine.getRaw());
-            engine.schedule(cx, cz, this.updateTicket, this.lightUpdateStage, () -> {
-                setLayerStorageData(layer, cx, cy, cz, data);
-                future.complete(null);
-            });
-            return future;
-        } catch (IllegalAccessException ex) {
-            throw MountiplexUtil.uncheckedRethrow(ex);
+            return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
+        } catch (Throwable ex) {
+            return completedExceptionally(ex);
         }
     }
 
     @Override
     public CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        final LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
-            final CompletableFuture<Void> future = new CompletableFuture<Void>();
             Object layer = this.light_layer_sky.get(engine.getRaw());
-            engine.schedule(cx, cz, this.updateTicket, this.lightUpdateStage, () -> {
-                setLayerStorageData(layer, cx, cy, cz, data);
-                future.complete(null);
-            });
-            return future;
-        } catch (IllegalAccessException ex) {
-            throw MountiplexUtil.uncheckedRethrow(ex);
+            return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
+        } catch (Throwable ex) {
+            return completedExceptionally(ex);
         }
     }
 
-    private void setLayerStorageData(Object layer, int cx, int cy, int cz, byte[] data) {
-        try {
-            Object storage = this.light_storage.get(layer);
-            Object storage_live = this.light_storage_live.get(storage);
-            this.light_storage_volatile.set(storage, setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data));
-        } catch (IllegalAccessException ex) {
-            ex.printStackTrace();
-        }
+    private CompletableFuture<Void> scheduleSetLayerStorageData(LightEngineThreadedHandle engine, Object layer, int cx, int cy, int cz, byte[] data) {
+        final CompletableFuture<Void> future = new CompletableFuture<Void>();
+        engine.schedule(cx, cz, this.updateTicket, this.lightUpdateStage, () -> {
+            try {
+                Object storage = this.light_storage.get(layer);
+                Object storage_live = this.light_storage_live.get(storage);
+                this.light_storage_volatile.set(storage, setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data));
+
+                //TODO: Can scheduling it onto the main thread be done differently?
+                CommonUtil.nextTick(() -> {
+                    future.complete(null);
+                });
+            } catch (Throwable t) {
+                //TODO: Can scheduling it onto the main thread be done differently?
+                CommonUtil.nextTick(() -> {
+                    future.completeExceptionally(t);
+                });
+            }
+        });
+        return future;
+    }
+
+    private static CompletableFuture<Void> completedExceptionally(Throwable ex) {
+        CompletableFuture<Void> future = new CompletableFuture<Void>();
+        future.completeExceptionally(ex);
+        return future;
     }
 }

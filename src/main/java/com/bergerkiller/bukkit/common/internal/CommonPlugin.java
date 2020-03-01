@@ -71,8 +71,6 @@ public class CommonPlugin extends PluginBase {
     private EntityMap<Player, CommonPlayerMeta> playerMetadata;
     private CommonListener listener;
     private final ArrayList<SoftReference<EntityMap>> maps = new ArrayList<>();
-    private final List<Runnable> nextTickTasks = new ArrayList<>();
-    private final List<Runnable> nextTickSync = new ArrayList<>();
     private final List<TimingsListener> timingsListeners = new ArrayList<>(1);
     private final List<Task> startedTasks = new ArrayList<>();
     private final ImplicitlySharedSet<org.bukkit.entity.Entity> entitiesRemovedFromServer = new ImplicitlySharedSet<>();
@@ -110,12 +108,6 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isFrameTilingSupported() {
         return isFrameTilingSupported;
-    }
-
-    public void nextTick(Runnable runnable) {
-        synchronized (this.nextTickTasks) {
-            this.nextTickTasks.add(runnable);
-        }
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -464,6 +456,10 @@ public class CommonPlugin extends PluginBase {
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
 
+        // Run any pending tasks in the next tick executor right now, so they are not forgotten
+        // Disable the executor so that future attempts to queue tasks aren't handled by BKCommonLib
+        CommonNextTickExecutor.INSTANCE.disable();
+
         // Dereference
         MountiplexUtil.unloadMountiplex();
         instance = null;
@@ -528,9 +524,13 @@ public class CommonPlugin extends PluginBase {
                 "BKCommonLib > Minecraft.a.b().q.f * Achievement.OBFUSCATED.value",
                 "BKCommonLib isn't a plugin, its a language based on english.",
                 "Updating is like reinventing the wheel for BKCommonLib.",
-                "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999");
+                "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999",
+                "Welcome to the modern era, welcome to callback hell");
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
+
+        // Setup next tick executor
+        CommonNextTickExecutor.INSTANCE.enable(this);
 
         // Initialize LookupEntityClassMap and hook it into the server
         try {
@@ -582,7 +582,6 @@ public class CommonPlugin extends PluginBase {
         PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
         mapController.onEnable(this, startedTasks);
 
-        startedTasks.add(new NextTickHandler(this).start(1, 1));
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
@@ -770,53 +769,6 @@ public class CommonPlugin extends PluginBase {
             if (clearRemovedSet) {
                 plugin.entitiesRemovedFromServer.clear();
             }
-        }
-    }
-
-    private static class NextTickHandler extends Task {
-
-        public NextTickHandler(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            List<Runnable> nextTick = getInstance().nextTickTasks;
-            List<Runnable> nextSync = getInstance().nextTickSync;
-            synchronized (nextTick) {
-                if (nextTick.isEmpty()) {
-                    return;
-                }
-                nextSync.addAll(nextTick);
-                nextTick.clear();
-            }
-            if (!TIMINGS.isActive()) {
-                // No time measurement needed
-                for (Runnable task : nextSync) {
-                    try {
-                        task.run();
-                    } catch (Throwable t) {
-                        instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
-                        CommonUtil.filterStackTrace(t).printStackTrace();
-                    }
-                }
-            } else {
-                // Perform time measurement and call next-tick listeners
-                long startTime, delta, endTime = System.nanoTime();
-                for (Runnable task : nextSync) {
-                    startTime = endTime;
-                    try {
-                        task.run();
-                    } catch (Throwable t) {
-                        instance.log(Level.SEVERE, "An error occurred in next-tick task '" + task.getClass().getName() + "':");
-                        CommonUtil.filterStackTrace(t).printStackTrace();
-                    }
-                    endTime = System.nanoTime();
-                    delta = endTime - startTime;
-                    TIMINGS.onNextTicked(task, delta);
-                }
-            }
-            nextSync.clear();
         }
     }
 

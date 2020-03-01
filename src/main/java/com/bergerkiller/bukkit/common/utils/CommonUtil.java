@@ -1,17 +1,18 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.CommonNextTickExecutor;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.reflection.org.bukkit.BHandlerList;
@@ -41,7 +42,9 @@ import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.zip.Deflater;
@@ -566,73 +569,78 @@ public class CommonUtil {
      * Executes a runnable on the main thread in the next tick.
      * When this method is called from the main thread, the runnable
      * is executed right away. This method blocks the calling thread until
-     * the runnable is successfully executed.
+     * the runnable is successfully executed. Exceptions thrown by the runnable
+     * are rethrown inside this method for the caller to handle.<br>
+     * <br>
+     * To not wait for completion, use {@link #runAsyncMainThread(Runnable)} instead.
      * 
      * @param runnable to execute on the main thread
      */
     public static void syncTick(final Runnable runnable) {
-        // Simplified logic when called from the main thread
-        if (Thread.currentThread() == MAIN_THREAD) {
-            runnable.run();
-            return;
-        }
-
-        // Lock object that keeps us waiting
-        final CountDownLatch lock = new CountDownLatch(1);
-        Runnable r = () -> {
-            try {
-                runnable.run();
-            } finally {
-                lock.countDown();
-            }
-        };
-        nextTick(r);
         try {
-            lock.await();
-        } catch (InterruptedException e) {
+            runAsyncMainThread(runnable).get();
+        } catch (InterruptedException e1) {
+            // Ignore
+        } catch (ExecutionException e) {
+            throw MountiplexUtil.uncheckedRethrow(e.getCause());
         }
     }
 
     /**
-     * Schedules a runnable to execute the next Tick<br>
-     * The BKCommonLib internal plugin will handle this task<br>
-     * This method is thread safe
+     * Schedules a runnable to execute the next Tick.
+     * The BKCommonLib internal plugin will handle this task.
+     * When nextTick is called from inside a nextTick callback, the task
+     * will be delayed by one tick, and is not executed instantly.<br>
+     * <br>
+     * This method is thread-safe
      *
      * @param runnable to execute
      */
     public static void nextTick(Runnable runnable) {
-        if (runnable == null) {
-            return;
-        }
-        if (CommonPlugin.hasInstance()) {
-            // Use BKCommonLib next tick task
-            CommonPlugin.getInstance().nextTick(runnable);
-        } else {
-            // Try to find out what plugin this Runnable belongs to
-            Plugin plugin = CommonUtil.getPluginByClass(runnable.getClass());
-            if (plugin == null) {
-                // Well...ain't that a pickle.
-                // Maybe there is some other plugin we can dump this to?
-                // It's a fallback...it does not have to be fair or perfect!
-                synchronized (Bukkit.getPluginManager()) {
-                    Iterator<Plugin> iter = getPluginsUnsafe().iterator();
-                    while (iter.hasNext()) {
-                        plugin = iter.next();
-                        if (plugin.isEnabled()) {
-                            Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable);
-                            return;
-                        }
-                    }
-                }
-                // Well now we just don't know...
-                Logging.LOGGER.log(Level.SEVERE, "Unable to properly schedule next-tick task: " + runnable.getClass().getName());
-                Logging.LOGGER.log(Level.SEVERE, "The task is executed right away instead...we might recover!");
-                runnable.run();
-            } else {
-                // Use the supposed plugin this Class belongs to
-                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, runnable);
-            }
-        }
+        CommonNextTickExecutor.INSTANCE.execute(runnable);
+    }
+
+    /**
+     * Gets the Executor used to execute tasks the very next tick.
+     * Can be used with {@link java.util.concurrent.CompletableFuture CompletableFuture}
+     * to delegate tasks to the main thread with a delay.<br>
+     * <br>
+     * When the executor is used from within a scheduled task, the task
+     * will be delayed by one tick, and is not executed instantly. If executing instantly is desired,
+     * use {@link #getMainThreadExecutor()} instead.<br>
+     * <br>
+     * This method and the executor itself are thread-safe
+     * 
+     * @return executor
+     */
+    public static Executor getNextTickExecutor() {
+        return CommonNextTickExecutor.INSTANCE;
+    }
+
+    /**
+     * Gets the Executor used to dispatch tasks to the main thread.
+     * Can be used with {@link java.util.concurrent.CompletableFuture CompletableFuture}
+     * to delegate tasks to the main thread.<br>
+     * <br>
+     * If a task is scheduled on the main thread, the task is run instantly instead of scheduling it.<br>
+     * <br>
+     * This method and the executor itself are thread-safe
+     * 
+     * @return executor
+     */
+    public static Executor getMainThreadExecutor() {
+        return CommonNextTickExecutor.MAIN_THREAD;
+    }
+
+    /**
+     * Equivalent to:
+     * <pre>CompletableFuture.runAsync(runnable, getMainThreadExecutor());</pre>
+     * 
+     * @param runnable
+     * @return completable future completed once the task has run
+     */
+    public static CompletableFuture<Void> runAsyncMainThread(Runnable runnable) {
+        return CompletableFuture.runAsync(runnable, CommonNextTickExecutor.MAIN_THREAD);
     }
 
     /**

@@ -49,15 +49,17 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
 
     @Override
     public CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-        setSectionBlockLightMethod.invoke(null, nms_chunk, cy, data);
-        return CompletableFuture.completedFuture(null);
+        return CommonUtil.runAsyncMainThread(() -> {
+            Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
+            setSectionBlockLightMethod.invoke(null, nms_chunk, cy, data);
+        });
     }
 
     @Override
     public CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-        setSectionSkyLightMethod.invoke(null, nms_chunk, cy, data);
-        return CompletableFuture.completedFuture(null);
+        return CommonUtil.runAsyncMainThread(() -> {
+            Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
+            setSectionSkyLightMethod.invoke(null, nms_chunk, cy, data);
+        });
     }
 }
