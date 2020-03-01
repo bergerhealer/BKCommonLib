@@ -526,7 +526,7 @@ public class WorldUtil extends ChunkUtil {
      *
      * @param world to be saved
      */
-    public static synchronized void saveToDisk(org.bukkit.World world) {
+    public static void saveToDisk(org.bukkit.World world) {
         if (CommonCapabilities.ASYNCHRONOUS_CHUNK_LOADER && !CommonUtil.isMainThread()) {
             // Post to main thread on 1.14, otherwise things break
             // TODO: Is there any step of saveLevel() we could do asynchronously as well?
