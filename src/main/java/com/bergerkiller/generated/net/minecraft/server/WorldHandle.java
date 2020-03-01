@@ -48,8 +48,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
-    public abstract void setSectionSkyLight(int cx, int cy, int cz, byte[] data);
-    public abstract void setSectionBlockLight(int cx, int cy, int cz, byte[] data);
     public abstract byte[] getSectionSkyLight(int cx, int cy, int cz);
     public abstract byte[] getSectionBlockLight(int cx, int cy, int cz);
 
@@ -132,8 +130,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
-        public final Template.Method<Void> setSectionSkyLight = new Template.Method<Void>();
-        public final Template.Method<Void> setSectionBlockLight = new Template.Method<Void>();
         public final Template.Method<byte[]> getSectionSkyLight = new Template.Method<byte[]>();
         public final Template.Method<byte[]> getSectionBlockLight = new Template.Method<byte[]>();
 

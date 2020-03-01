@@ -27,6 +27,7 @@ import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ForcedChunkHandle
+import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 
 class World extends IBlockAccess {
     public final Random random;
@@ -260,31 +261,6 @@ class World extends IBlockAccess {
 #if version >= 1.14
     #require net.minecraft.server.LightEngine private final LightEngineLayer<?, ?> light_layer_block:a;
     #require net.minecraft.server.LightEngine private final LightEngineLayer<?, ?> light_layer_sky:b;
-    #require net.minecraft.server.LightEngineLayer protected final (LightEngineStorage) S light_storage:c;
-    #require net.minecraft.server.LightEngineStorage protected volatile (LightEngineStorageArray) M light_storage_volatile:e;
-    #require net.minecraft.server.LightEngineStorage protected final (LightEngineStorageArray) M light_storage_live:f;
-
-    public void setSectionSkyLight(int cx, int cy, int cz, byte[] data) {
-        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
-        LightEngineLayer layer = light#light_layer_sky;
-        LightEngineStorage storage = layer#light_storage;
-        LightEngineStorageArray storage_live = storage#light_storage_live;
-        storage_live.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));
-        LightEngineStorageArray copy = storage_live.b();
-        copy.d();
-        storage#light_storage_volatile = copy;
-    }
-
-    public void setSectionBlockLight(int cx, int cy, int cz, byte[] data) {
-        LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
-        LightEngineLayer layer = light#light_layer_block;
-        LightEngineStorage storage = layer#light_storage;
-        LightEngineStorageArray storage_live = storage#light_storage_live;
-        storage_live.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));
-        LightEngineStorageArray copy = storage_live.b();
-        copy.d();
-        storage#light_storage_volatile = copy;
-    }
 
     public byte[] getSectionSkyLight(int cx, int cy, int cz) {
         LightEngine light = ((ChunkProviderServer) instance.getChunkProvider()).getLightEngine();
@@ -307,30 +283,6 @@ class World extends IBlockAccess {
     }
 #else
     #require net.minecraft.server.Chunk private final ChunkSection[] sections;
-
-    public void setSectionSkyLight(int cx, int cy, int cz, byte[] data) {
-        Chunk chunk = instance.getChunkAt(cx, cz);
-        ChunkSection[] sections = chunk#sections;
-        if (cy < 0 || cy >= sections.length) {
-            return null;
-        }
-        ChunkSection section = sections[cy];
-        if (section != null) {
-            section.b(new NibbleArray(data));
-        }
-    }
-
-    public void setSectionBlockLight(int cx, int cy, int cz, byte[] data) {
-        Chunk chunk = instance.getChunkAt(cx, cz);
-        ChunkSection[] sections = chunk#sections;
-        if (cy < 0 || cy >= sections.length) {
-            return null;
-        }
-        ChunkSection section = sections[cy];
-        if (section != null) {
-            section.a(new NibbleArray(data));
-        }
-    }
 
     public byte[] getSectionSkyLight(int cx, int cy, int cz) {
         Chunk chunk = instance.getChunkAt(cx, cz);
@@ -595,6 +547,16 @@ class WorldServer extends World {
         }
     }
     </code>
+}
+
+// Since MC 1.14
+optional class LightEngineThreaded {
+
+    private void schedule:a(int cx, int cz, java.util.function.IntSupplier ticketLevelSupplier, (Object) LightEngineThreaded.Update lightenginethreaded_update, Runnable runnable);
+
+    public static LightEngineThreadedHandle forWorld((org.bukkit.World) World world) {
+        return com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle.createHandle(((ChunkProviderServer) world.getChunkProvider()).getLightEngine());
+    }
 }
 
 // Since MC 1.13.1

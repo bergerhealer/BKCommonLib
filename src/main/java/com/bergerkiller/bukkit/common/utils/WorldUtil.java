@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -1046,7 +1047,10 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Sets the raw nibble data storing the sky light for a 16x16x16 section of the world
+     * Sets the raw nibble data storing the sky light for a 16x16x16 section of the world.<br>
+     * <br>
+     * <b>Deprecated: this method is synchronous, asynchronous is preferred since Minecraft 1.14.
+     * Since Minecraft 1.14 this method will not guarantee light information is updated when this method completes.</b>
      * 
      * @param world
      * @param cx - chunk X
@@ -1054,12 +1058,16 @@ public class WorldUtil extends ChunkUtil {
      * @param cz - chunk Z
      * @param data (must be 2048 length)
      */
+    @Deprecated
     public static void setSectionSkyLight(World world, int cx, int cy, int cz, byte[] data) {
-        WorldHandle.fromBukkit(world).setSectionSkyLight(cx, cy, cz, data);
+        setSectionSkyLightAsync(world, cx, cy, cz, data);
     }
 
     /**
-     * Sets the raw nibble data storing the block light for a 16x16x16 section of the world
+     * Sets the raw nibble data storing the block light for a 16x16x16 section of the world.<br>
+     * <br>
+     * <b>Deprecated: this method is synchronous, asynchronous is preferred since Minecraft 1.14.
+     * Since Minecraft 1.14 this method will not guarantee light information is updated when this method completes.</b>
      * 
      * @param world
      * @param cx - chunk X
@@ -1067,7 +1075,40 @@ public class WorldUtil extends ChunkUtil {
      * @param cz - chunk Z
      * @param data (must be 2048 length)
      */
+    @Deprecated
     public static void setSectionBlockLight(World world, int cx, int cy, int cz, byte[] data) {
-        WorldHandle.fromBukkit(world).setSectionBlockLight(cx, cy, cz, data);
+        setSectionBlockLightAsync(world, cx, cy, cz, data);
+    }
+
+    /**
+     * Sets the raw nibble data storing the sky light for a 16x16x16 section of the world asynchronously.
+     * The actual update of the lighting information may occur at a later time.
+     * The returned completable future is completed when that happens, which can occur on a light engine worker thread.
+     * If main thread is required, make sure to schedule it onto the main thread yourself.
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @param data (must be 2048 length)
+     */
+    public static CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
+        return LightingHandler.INSTANCE.setSectionSkyLightAsync(world, cx, cy, cz, data);
+    }
+
+    /**
+     * Sets the raw nibble data storing the block light for a 16x16x16 section of the world asynchronously.
+     * The actual update of the lighting information may occur at a later time.
+     * The returned completable future is completed when that happens, which can occur on a light engine worker thread.
+     * If main thread is required, make sure to schedule it onto the main thread yourself.
+     * 
+     * @param world
+     * @param cx - chunk X
+     * @param cy - section Y
+     * @param cz - chunk Z
+     * @param data (must be 2048 length)
+     */
+    public static CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
+        return LightingHandler.INSTANCE.setSectionBlockLightAsync(world, cx, cy, cz, data);
     }
 }
