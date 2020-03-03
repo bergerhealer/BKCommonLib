@@ -63,23 +63,33 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
             resolver.setDeclaredClass(WorldServerHandle.T.getType());
             MethodDeclaration m = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public void initWorldServer(WorldData worldData) {\n" +
-                    "    // Spigot World configuration\n" +
+
+                    // Spigot World configuration
                     "#if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
                     "    #require net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
                     "    org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig(\"DUMMY\");\n" +
                     "    instance#spigotConfig = spigotConfig;\n" +
                     "#endif\n" +
+
+                    // PaperSpigot World configuration
                     "#if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
                     "    #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
                     "    com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(\"DUMMY\", spigotConfig);\n" +
                     "    instance#paperConfig = paperConfig;\n" +
                     "#endif\n" +
-                    "\n" +
-                    "    // worldProvider field\n" +
+
+                    // Purpur World configuration
+                    "#if fieldexists net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;\n" +
+                    "    #require net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;\n" +
+                    "    net.pl3x.purpur.PurpurWorldConfig purpurConfig = new net.pl3x.purpur.PurpurWorldConfig(\"DUMMY\", paperConfig, spigotConfig);\n" +
+                    "    instance#purpurConfig = purpurConfig;\n" +
+                    "#endif\n" +
+
+                    // worldProvider field
                     "    int envId = org.bukkit.World.Environment.NORMAL.getId();\n" +
                     "    instance.worldProvider = DimensionManager.a(envId).getWorldProvider(instance);\n" +
-                    "\n" +
-                    "    // worldData field\n" +
+
+                    // worldData field
                     "    #require net.minecraft.server.World public final WorldData worldData;\n" +
                     "    instance#worldData = worldData;\n" +
                     "}"));
