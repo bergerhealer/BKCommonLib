@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
@@ -52,22 +53,15 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             return false;
         }
 
-        // There is a bug with protocollib where sending a silent packet one tick after the player
-        // joins the server, ProtocolLib still notifies the packet listeners.
-        // This here is a workaround for that, at least for BKCommonLib Packet Listeners.
-        // See: https://github.com/PaperMC/Paper/issues/1934
-        //
-        // UPDATE 2-feb-2020
-        // Looks like silent packet sending is completely broken on PaperSpigot
-        // Their flushQueue() aborts when there are map chunk packets, causing a failure inside ProtocolLib
-        // By default I now set isSendSilentPacketBroken to true to stop using ProtocolLib for this from now on
-        // The reason the x-ray option appears to matter is because that increases the time the queue is stalled
-        // See: https://github.com/dmulloy2/ProtocolLib/issues/763
-        this.useSilentPacketQueue = false;
-        if (Common.IS_PAPERSPIGOT_SERVER) {
+        // Detect silent packet bug
+        if (containsSendSilentPacketBug()) {
             this.useSilentPacketQueue = true;
             this.isSendSilentPacketBroken = true;
+        } else {
+            this.useSilentPacketQueue = false;
+            this.isSendSilentPacketBroken = false;
         }
+
         return true;
     }
 
@@ -276,6 +270,46 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         for (CommonPacketMonitor monitor : monitors) {
             to.addPacketMonitor(monitor.getPlugin(), monitor.monitor, monitor.types);
         }
+    }
+
+    // There is a bug with protocollib where sending a silent packet one tick after the player
+    // joins the server, ProtocolLib still notifies the packet listeners.
+    // This here is a workaround for that, at least for BKCommonLib Packet Listeners.
+    // See: https://github.com/PaperMC/Paper/issues/1934
+    //
+    // UPDATE 2-feb-2020
+    // Looks like silent packet sending is completely broken on PaperSpigot
+    // Their flushQueue() aborts when there are map chunk packets, causing a failure inside ProtocolLib
+    // By default I now set isSendSilentPacketBroken to true to stop using ProtocolLib for this from now on
+    // The reason the x-ray option appears to matter is because that increases the time the queue is stalled
+    // See: https://github.com/dmulloy2/ProtocolLib/issues/763
+    //
+    // Update 5-mar-2020
+    // Issue was fixed in an accepted PR, and will be completely fixed after the release of ProtocolLib 4.5.1.
+    // This means when version 4.5.2 or newer is used, OR a class part of this fix exists on 4.5.1, we can
+    // enable the protocollib's silent packet sending logic.
+    private static boolean containsSendSilentPacketBug() {
+        if (!Common.IS_PAPERSPIGOT_SERVER) {
+            return false;
+        }
+        String protocolLibVersion = Bukkit.getPluginManager().getPlugin("ProtocolLib").getDescription().getVersion();
+        int protocolLibVersionEnd = protocolLibVersion.indexOf('-');
+        if (protocolLibVersionEnd != -1) {
+            protocolLibVersion = protocolLibVersion.substring(0, protocolLibVersionEnd);
+        }
+
+        // Here we check using reflection whether the fix is in place (snapshots)
+        if (protocolLibVersion.equals("4.5.1")) {
+            try {
+                Class.forName("com.comphenix.protocol.injector.netty.PacketFilterQueue");
+                return false;
+            } catch (ClassNotFoundException ex) {
+                return true;
+            }
+        }
+
+        // Bug exists on versions older than this
+        return MountiplexUtil.evaluateText(protocolLibVersion, "<", "4.5.1");
     }
 
     private static com.comphenix.protocol.PacketType getPacketType(PacketType commonType) {
