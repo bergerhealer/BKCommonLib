@@ -196,7 +196,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             if (checkController()) {
                 return controller.getLocalizedName();
             } else {
-                return getName_base();
+                return getName_base(this.instance());
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -208,9 +208,10 @@ public class EntityHook extends ClassHook<EntityHook> {
      * Because the entity type is not registered, there are some issues with the base getName().
      * These issues are fixed here.
      * 
+     * @param instance Object instance
      * @return base name
      */
-    public String getName_base() {
+    public String getName_base(Object instance) {
         // >= 1.13 it is a simple lookup of the name of the EntityTypes field value
         // This is safe, so no special logic is warranted here
         if (Common.evaluateMCVersion(">=", "1.13")) {
@@ -223,7 +224,6 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
 
         // Special handling for some entity types and when a custom name is set
-        Object instance = this.instance();
         if (EntityHumanHandle.T.isAssignableFrom(instance) || EntityItemHandle.T.isAssignableFrom(instance)) {
             return base.getName();
         }
@@ -233,7 +233,7 @@ public class EntityHook extends ClassHook<EntityHook> {
 
         // Only used MC 1.11 to 1.12.2 inclusively
         // Retrieve MinecraftKey of this entity class, and the String internal name from that
-        int typeId = EntityTypesHandle.getEntityTypeId(this.instanceBaseType());
+        int typeId = EntityTypesHandle.getEntityTypeId(EntityHook.findInstanceBaseType(instance));
         String name = EntityTypesHandle.T.opt_typeIdToName_1_11.get().get(typeId);
         if (name == null) {
             name = "generic";
@@ -242,20 +242,20 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
-    public boolean c(Object tag) {
+    public boolean savePassenger(Object tag) {
         Object handle = this.instance();
         if (EntityHandle.T.dead.getBoolean(handle)) {
             return false;
         }
 
         CommonTagCompound commonTag = CommonTagCompound.create(tag);
-        commonTag.putValue("id", getSavedName());
+        commonTag.putValue("id", getSavedName(this.instance()));
         EntityHandle.T.saveToNBT.invoke(handle, commonTag);
         return true;
     }
 
     @HookMethod("public boolean saveEntity:???(NBTTagCompound nbttagcompound)")
-    public boolean d(Object tag) {
+    public boolean saveEntity(Object tag) {
         try {
             Object handle = this.instance();
             if (EntityHandle.T.dead.getBoolean(handle)) {
@@ -266,7 +266,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             }
 
             CommonTagCompound commonTag = CommonTagCompound.create(tag);
-            commonTag.putValue("id", getSavedName());
+            commonTag.putValue("id", getSavedName(this.instance()));
             EntityHandle.T.saveToNBT.invoke(handle, commonTag);
             return true;
         } catch (Throwable t) {
@@ -276,8 +276,8 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     /* This key is used for later de-serializing the entity */
-    private final String getSavedName() {
-        return EntityTypesHandle.getEntityInternalName(this.instanceBaseType());
+    private static final String getSavedName(Object instance) {
+        return EntityTypesHandle.getEntityInternalName(EntityHook.findInstanceBaseType(instance));
     }
 
     @HookMethod("public void collide(Entity entity)")
