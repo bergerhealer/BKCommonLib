@@ -29,8 +29,9 @@ public abstract class WorldServerHandle extends WorldHandle {
 
     public abstract List<EntityPlayerHandle> getPlayers();
     public abstract EntityTracker getEntityTracker();
+    public abstract Object getEntityTrackerHandle();
+    public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
-    public abstract void setEntityTracker(EntityTracker entityTracker);
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
     public abstract WorldNBTStorageHandle getDataManager();
@@ -64,9 +65,10 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
-        public final Template.Method.Converted<EntityTracker> getEntityTracker = new Template.Method.Converted<EntityTracker>();
+        public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();
+        public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
+        public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
-        public final Template.Method.Converted<Void> setEntityTracker = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
         @Template.Optional

@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -15,7 +17,14 @@ import org.bukkit.entity.Player;
 public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
 
     public EntityTracker(Object entityTrackerHandle) {
-        setHandle(EntityTrackerHandle.createHandle(entityTrackerHandle));
+        // When the EntityTracker is temporarily hooked, obtain the original tracker object
+        // This makes sure no bad things happen when changes are made while hooked
+        EntityTrackerHook hook = EntityTrackerHook.get(entityTrackerHandle, EntityTrackerHook.class);
+        if (hook != null) {
+            setHandle(EntityTrackerHandle.createHandle(hook.original));
+        } else {
+            setHandle(EntityTrackerHandle.createHandle(entityTrackerHandle));
+        }
     }
 
     /**

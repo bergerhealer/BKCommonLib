@@ -344,26 +344,40 @@ class WorldServer extends World {
     }
 #endif
 
+    public com.bergerkiller.bukkit.common.wrappers.EntityTracker getEntityTracker() {
+        Object handle = com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getEntityTrackerHandle.invoke(instance_raw);
+
+        // If hooked, make sure to take the original so that changes can be made safely
+        com.bergerkiller.mountiplex.reflection.ClassInterceptor hook;
+        hook = com.bergerkiller.mountiplex.reflection.ClassInterceptor.get(handle, com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook.class);
+        if (hook != null) {
+            handle = ((com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook) hook).original;
+        }
+
+        // Convert to EntityTracker
+        return new com.bergerkiller.bukkit.common.wrappers.EntityTracker(handle);
+    }
+
 #if version >= 1.14
-    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker getEntityTracker() {
+    public Object getEntityTrackerHandle() {
         return instance.getChunkProvider().playerChunkMap;
+    }
+
+    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+        #require net.minecraft.server.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+        instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         return instance.getChunkProvider().playerChunkMap;
     }
-
-    public void setEntityTracker((com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker) {
-        #require net.minecraft.server.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
-        instance.getChunkProvider()#playerChunkMap = entityTracker;
-    }
 #else
-    public (com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker getEntityTracker() {
+    public Object getEntityTrackerHandle() {
         return instance.tracker;
     }
 
-    public void setEntityTracker((com.bergerkiller.bukkit.common.wrappers.EntityTracker) EntityTracker entityTracker) {
-        instance.tracker = entityTracker;
+    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+        instance.tracker = entityTrackerHandle;
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();

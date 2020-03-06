@@ -864,11 +864,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * Hooks the world's EntityTracker temporarily for the sole purpose of blocking calls to track()
      */
     private static EntityTrackerHook hookWorldEntityTracker(Object nmsWorldHandle) {
-        Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
+        Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTrackerHandle.invoke(nmsWorldHandle);
         EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
         if (hook == null) {
             hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-            WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+            WorldServerHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
         }
         return hook;
     }
@@ -878,7 +878,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     private static void unhookWorldEntityTracker(Object nmsWorldHandle, EntityTrackerHook hook) {
         if (hook.ignoredEntities.isEmpty()) {
-            WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
+            WorldServerHandle.T.setEntityTrackerHandle.invoke(nmsWorldHandle, hook.original);
 
             // For Minecraft 1.14 and later:
             // EntityTracker is the PlayerChunkMap on this version of Minecraft.
