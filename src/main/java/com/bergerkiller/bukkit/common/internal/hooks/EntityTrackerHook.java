@@ -23,4 +23,8 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         }
     }
 
+    // Make visible
+    public Object hookedInstance() {
+        return super.instance();
+    }
 }

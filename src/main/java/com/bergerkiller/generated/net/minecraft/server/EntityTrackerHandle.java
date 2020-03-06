@@ -46,6 +46,8 @@ public abstract class EntityTrackerHandle extends Template.Handle {
         public final Template.Method.Converted<Collection<EntityTrackerEntryHandle>> getEntries = new Template.Method.Converted<Collection<EntityTrackerEntryHandle>>();
         public final Template.Method.Converted<EntityTrackerEntryHandle> getEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();
         public final Template.Method.Converted<EntityTrackerEntryHandle> putEntry = new Template.Method.Converted<EntityTrackerEntryHandle>();
+        @Template.Optional
+        public final Template.Method<Void> setVisibleChunksToUpdatingChunks = new Template.Method<Void>();
         public final Template.Method.Converted<Void> sendPacketToEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> untrackEntity = new Template.Method.Converted<Void>();

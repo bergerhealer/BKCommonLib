@@ -25,6 +25,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -580,12 +581,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             if (hasNetworkController) {
                 // Hook the entity tracker to cancel track() on this Entity
                 Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
-                Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
-                EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
-                if (hook == null) {
-                    hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-                    WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
-                }
+                EntityTrackerHook hook = hookWorldEntityTracker(nmsWorldHandle);
                 hook.ignoredEntities.add(this.handle.getRaw());
 
                 try {
@@ -594,9 +590,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 } finally {
                     // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
                     hook.ignoredEntities.remove(this.handle.getRaw());
-                    if (hook.ignoredEntities.isEmpty()) {
-                        WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
-                    }
+                    unhookWorldEntityTracker(nmsWorldHandle, hook);
                 }
             } else {
                 // Simply add the entity, which will register a (default) network controller
@@ -680,12 +674,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (networkController != null && !(networkController instanceof DefaultEntityNetworkController)) {
             // Hook the entity tracker to cancel track() on this Entity
             Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
-            Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
-            EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
-            if (hook == null) {
-                hook = new EntityTrackerHook(nmsEntityTrackerHandle);
-                WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
-            }
+            EntityTrackerHook hook = hookWorldEntityTracker(nmsWorldHandle);
             hook.ignoredEntities.add(entity.getHandle());
 
             try {
@@ -702,9 +691,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             } finally {
                 // Remove the entity from the ignore list, restore Entity Tracker entry if last entity
                 hook.ignoredEntities.remove(entity.getHandle());
-                if (hook.ignoredEntities.isEmpty()) {
-                    WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
-                }
+                unhookWorldEntityTracker(nmsWorldHandle, hook);
             }
 
 
@@ -870,6 +857,39 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         EntityNetworkController<?> controller = commonEntity.getNetworkController();
         if (controller != null && !(controller instanceof DefaultEntityNetworkController)) {
             commonEntity.setNetworkController(new DefaultEntityNetworkController());
+        }
+    }
+
+    /*
+     * Hooks the world's EntityTracker temporarily for the sole purpose of blocking calls to track()
+     */
+    private static EntityTrackerHook hookWorldEntityTracker(Object nmsWorldHandle) {
+        Object nmsEntityTrackerHandle = WorldServerHandle.T.getEntityTracker.raw.invoke(nmsWorldHandle);
+        EntityTrackerHook hook = EntityTrackerHook.get(nmsEntityTrackerHandle, EntityTrackerHook.class);
+        if (hook == null) {
+            hook = new EntityTrackerHook(nmsEntityTrackerHandle);
+            WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.hook(nmsEntityTrackerHandle));
+        }
+        return hook;
+    }
+
+    /*
+     * Unhooks the world's EntityTracker again if no more entity tracks must be ignored
+     */
+    private static void unhookWorldEntityTracker(Object nmsWorldHandle, EntityTrackerHook hook) {
+        if (hook.ignoredEntities.isEmpty()) {
+            WorldServerHandle.T.setEntityTracker.raw.invoke(nmsWorldHandle, hook.original);
+
+            // For Minecraft 1.14 and later:
+            // EntityTracker is the PlayerChunkMap on this version of Minecraft.
+            // VisibleChunks stores a cloned copy of all updating PlayerChunk instances on the world.
+            // If for some reason this EntityTracker is not garbage collected, keeping this around
+            // can cause a memory leak of varying severity.
+            // To completely prevent that from happening, set this field to equal updatingChunks, which
+            // should already equal the same map on the PlayerChunkMap of the world.
+            if (EntityTrackerHandle.T.setVisibleChunksToUpdatingChunks.isAvailable()) {
+                EntityTrackerHandle.T.setVisibleChunksToUpdatingChunks.invoke(hook.hookedInstance());
+            }
         }
     }
 }
