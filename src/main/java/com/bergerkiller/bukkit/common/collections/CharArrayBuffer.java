@@ -8,9 +8,8 @@ import java.util.Arrays;
  */
 public class CharArrayBuffer implements CharSequence {
     private char[] _buffer;
-    private int _buffer_pos;
-    private int _buffer_len;
-    private int _actual_len;
+    private int _position;
+    private int _length;
 
     public CharArrayBuffer() {
         this(new char[0], 0, 0);
@@ -33,8 +32,8 @@ public class CharArrayBuffer implements CharSequence {
      */
     public void assign(char[] buffer, int pos, int len) {
         this._buffer = buffer;
-        this._buffer_len = this._actual_len = len;
-        this._buffer_pos = pos;
+        this._position = pos;
+        this._length = len;
     }
 
     /**
@@ -46,7 +45,7 @@ public class CharArrayBuffer implements CharSequence {
      * @return String
      */
     public String copyToString(int length) {
-        return new String(this._buffer, this._buffer_pos, length);
+        return new String(this._buffer, this._position, length);
     }
 
     /**
@@ -60,7 +59,7 @@ public class CharArrayBuffer implements CharSequence {
      * @param length to copy
      */
     public void copyTo(char[] dest_buffer, int dest_pos, int length) {
-        System.arraycopy(this._buffer, this._buffer_pos, dest_buffer, dest_pos, length);
+        System.arraycopy(this._buffer, this._position, dest_buffer, dest_pos, length);
     }
 
     /**
@@ -73,9 +72,8 @@ public class CharArrayBuffer implements CharSequence {
      */
     public int swapBuffer(char[] buffer, int pos) {
         this._buffer = buffer;
-        this._buffer_pos = pos;
-        this._buffer_len = this._actual_len;
-        return this._buffer_pos + this._buffer_len;
+        this._position = pos;
+        return this._position + this._length;
     }
 
     /**
@@ -87,11 +85,10 @@ public class CharArrayBuffer implements CharSequence {
      * @return end position into the buffer where the value is stored
      */
     public int moveToBuffer(char[] buffer, int position) {
-        System.arraycopy(this._buffer, this._buffer_pos, buffer, position, this._actual_len);
+        System.arraycopy(this._buffer, this._position, buffer, position, this._length);
         this._buffer = buffer;
-        this._buffer_len = this._actual_len;
-        this._buffer_pos = position;
-        return this._buffer_pos + this._buffer_len;
+        this._position = position;
+        return this._position + this._length;
     }
 
     /**
@@ -103,14 +100,14 @@ public class CharArrayBuffer implements CharSequence {
      * @return the change in length of the String compared to the previous value
      */
     public int update(CharArrayBuffer value) {
-        int original_length = this._actual_len;
-        this._actual_len = value._actual_len;
-        if (this._actual_len <= this._buffer_len) {
-            System.arraycopy(value._buffer, value._buffer_pos, this._buffer, this._buffer_pos, this._actual_len);
+        int original_length = this._length;
+        this._length = value._length;
+        if (this._length <= original_length) {
+            System.arraycopy(value._buffer, value._position, this._buffer, this._position, this._length);
         } else {
-            this.assign(Arrays.copyOfRange(value._buffer, value._buffer_pos, this._actual_len), 0, this._actual_len);
+            this.assign(Arrays.copyOfRange(value._buffer, value._position, value._length), 0, value._length);
         }
-        return this._actual_len - original_length;
+        return this._length - original_length;
     }
 
     /**
@@ -122,14 +119,14 @@ public class CharArrayBuffer implements CharSequence {
      * @return the change in length of the String compared to the previous value
      */
     public int update(String value) {
-        int original_length = this._actual_len;
-        this._actual_len = value.length();
-        if (this._actual_len <= this._buffer_len) {
-            value.getChars(0, this._actual_len, this._buffer, this._buffer_pos);
+        int original_length = this._length;
+        this._length = value.length();
+        if (this._length <= original_length) {
+            value.getChars(0, this._length, this._buffer, this._position);
         } else {
-            this.assign(value.toCharArray(), 0, this._actual_len);
+            this.assign(value.toCharArray(), 0, this._length);
         }
-        return this._actual_len - original_length;
+        return this._length - original_length;
     }
 
     /**
@@ -141,15 +138,15 @@ public class CharArrayBuffer implements CharSequence {
      * @return the change in length of the String compared to the previous value
      */
     public int update(CharSequence value) {
-        int original_length = this._actual_len;
-        this._actual_len = value.length();
-        if (this._actual_len > this._buffer_len) {
-            this.assign(new char[this._actual_len], 0, this._actual_len);
+        int original_length = this._length;
+        this._length = value.length();
+        if (this._length > original_length) {
+            this.assign(new char[this._length], 0, this._length);
         }
-        for (int i = 0; i < this._actual_len; i++) {
-            this._buffer[this._buffer_pos + i] = value.charAt(i);
+        for (int i = 0; i < this._length; i++) {
+            this._buffer[this._position + i] = value.charAt(i);
         }
-        return this._actual_len - original_length;
+        return this._length - original_length;
     }
 
     /**
@@ -159,31 +156,31 @@ public class CharArrayBuffer implements CharSequence {
      */
     @Override
     public String toString() {
-        return new String(this._buffer, this._buffer_pos, this._actual_len);
+        return new String(this._buffer, this._position, this._length);
     }
 
     @Override
     public int length() {
-        return this._actual_len;
+        return this._length;
     }
 
     @Override
     public char charAt(int index) {
-        if (index < 0 || index >= this._actual_len) {
+        if (index < 0 || index >= this._length) {
             throw new IndexOutOfBoundsException();
         }
-        return this._buffer[this._buffer_pos + index];
+        return this._buffer[this._position + index];
     }
 
     @Override
     public CharArrayBuffer subSequence(int start, int end) {
-        if (start < 0 || start >= this._actual_len) {
+        if (start < 0 || start >= this._length) {
             throw new IndexOutOfBoundsException("Start index is out of bounds");
         }
-        if (end < start || end > this._actual_len) {
+        if (end < start || end > this._length) {
             throw new IndexOutOfBoundsException("End index is out of bounds");
         }
-        return new CharArrayBuffer(this._buffer, this._buffer_pos + start, end - start);
+        return new CharArrayBuffer(this._buffer, this._position + start, end - start);
     }
 
     /**
@@ -194,11 +191,11 @@ public class CharArrayBuffer implements CharSequence {
      * @return True if equal
      */
     public boolean contentEquals(CharSequence other) {
-        if (other.length() != this._actual_len) {
+        if (other.length() != this._length) {
             return false;
         }
-        for (int i = 0; i < this._actual_len; i++) {
-            if (this._buffer[this._buffer_pos + i] != other.charAt(i)) {
+        for (int i = 0; i < this._length; i++) {
+            if (this._buffer[this._position + i] != other.charAt(i)) {
                 return false;
             }
         }
