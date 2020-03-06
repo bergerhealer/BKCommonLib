@@ -372,10 +372,16 @@ public class MapResourcePack {
     public MapTexture getTexture(String path) {
         MapTexture result = textureCache.get(path);
         if (result == null) {
-            InputStream inputStream = openFileStream(ResourceType.TEXTURES, path);
-            if (inputStream != null) {
-                result = MapTexture.fromStream(inputStream);
+            try {
+                try (InputStream inputStream = openFileStream(ResourceType.TEXTURES, path)) {
+                    if (inputStream != null) {
+                        result = MapTexture.fromStream(inputStream);
+                    }
+                }
+            } catch (IOException ex) {
+                throw new MapTexture.TextureLoadException("Failed to open image stream at " + path, ex);
             }
+
             if (result == null) {
                 if (!path.startsWith("#")) {
                     Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load texture: " + path);
