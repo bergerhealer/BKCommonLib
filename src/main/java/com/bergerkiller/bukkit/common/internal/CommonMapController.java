@@ -1409,6 +1409,7 @@ public class CommonMapController implements PacketListener, Listener {
         public boolean lastFrameItemUpdateNeeded = true; // tells the underlying system to refresh the item
 
         // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
+        private EntityTrackerEntryHandle entityTrackerEntry = null; // Entity tracker entry
         private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
         public ItemFrameInfo(EntityItemFrameHandle itemFrame) {
@@ -1779,23 +1780,29 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
-                    if (info.entityTrackerViewers == null) {
-                        EntityTrackerEntryHandle entityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+                    if (info.entityTrackerEntry == null) {
+                        info.entityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
 
                         // Item Frame isn't tracked on the server, so no players can view it
-                        if (entityTrackerEntry == null) {
+                        if (info.entityTrackerEntry == null) {
                             info.remove();
                             itemFrames_iter.remove();
                             continue;
                         }
 
-                        info.entityTrackerViewers = entityTrackerEntry.getViewers();
+                        info.entityTrackerViewers = info.entityTrackerEntry.getViewers();
                     }
 
                     boolean changes = LogicUtil.synchronizeUnordered(info.viewers, info.entityTrackerViewers, synchronizer);
 
                     if (changes && info.displayInfo != null) {
                         info.displayInfo.hasFrameViewerChanges = true;
+                    }
+
+                    // Reset tick counter to 1 so that the normal WorldMap refreshing never occurs
+                    // Only do this for non-vanilla maps
+                    if (!info.lastMapUUID.isStaticUUID()) {
+                        info.entityTrackerEntry.getState().setTickCounter(1);
                     }
                 }
             }

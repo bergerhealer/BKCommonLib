@@ -87,6 +87,18 @@ public class CommonMapUUIDStore {
     }
 
     /**
+     * Internal use only! Gets whether the UUID of a map is that of a static
+     * id.
+     * 
+     * @param uuid
+     * @return True if static
+     */
+    public static boolean isStaticMapId(UUID uuid) {
+        return uuid.getMostSignificantBits() == 0 &&
+               (uuid.getLeastSignificantBits() & 0xFFFFFFFF00000000L) == 0;
+    }
+
+    /**
      * Internal use only! If the UUID is that of a static map UUID, returns
      * the static Map Id. Returns -1 if the UUID is not static.
      * 
@@ -114,7 +126,7 @@ public class CommonMapUUIDStore {
         UUID uuid;
         do {
             uuid = UUID.randomUUID();
-        } while (getStaticMapId(uuid) != -1);
+        } while (isStaticMapId(uuid));
         return uuid;
     }
 }

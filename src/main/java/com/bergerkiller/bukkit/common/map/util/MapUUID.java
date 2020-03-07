@@ -2,6 +2,8 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import java.util.UUID;
 
+import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
+
 /**
  * Uniquely identifies a Map tile of a map display
  */
@@ -29,6 +31,10 @@ public final class MapUUID {
 
     public final int getTileY() {
         return this.tileY;
+    }
+
+    public boolean isStaticUUID() {
+        return CommonMapUUIDStore.isStaticMapId(this.uuid);
     }
 
     @Override
