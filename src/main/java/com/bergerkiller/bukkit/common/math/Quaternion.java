@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.math;
 
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.internal.CommonTrigMath;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
@@ -216,51 +217,122 @@ public class Quaternion implements Cloneable {
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        double roll;
-        double pitch;
-        double yaw;
+        return getYawPitchRoll(x, y, z, w);
+    }
+
+    /**
+     * Deduces the pitch component (x) of {@link #getYawPitchRoll()}
+     * 
+     * @return pitch
+     */
+    public final double getPitch() {
+        return getPitch(x, y, z, w);
+    }
+
+    /**
+     * Deduces the yaw component (y) of {@link #getYawPitchRoll()}
+     * 
+     * @return yaw
+     */
+    public final double getYaw() {
+        return getYaw(x, y, z, w);
+    }
+
+    /**
+     * Deduces the roll component (z) of {@link #getYawPitchRoll()}
+     * 
+     * @return roll
+     */
+    public final double getRoll() {
+        return getRoll(x, y, z, w);
+    }
+
+    // Helper function reused by Matrix4x4, portion cut out from getYawPitchRoll()
+    protected static double getYaw(double x, double y, double z, double w) {
+        final double test = 2.0 * (w * x - y * z);
+        if (Math.abs(test) < (1.0 - 1E-15)) {
+            double yaw = CommonTrigMath.atan2(-2.0 * (w * y + z * x), 1.0 - 2.0 * (x * x + y * y));
+            double roll_x = 0.5 - (x * x + z * z);
+            if (roll_x <= 0.0 && (Math.abs((w * z + x * y)) > roll_x)) {
+                yaw += (yaw < 0.0) ? Math.PI : -Math.PI;
+            }
+            return Math.toDegrees(yaw);
+        } else if (test < 0.0) {
+            return Math.toDegrees(-2.0 * CommonTrigMath.atan2(z, w));
+        } else {
+            return Math.toDegrees(2.0 * CommonTrigMath.atan2(z, w));
+        }
+    }
+
+    // Helper function reused by Matrix4x4, portion cut out from getYawPitchRoll()
+    protected static double getPitch(double x, double y, double z, double w) {
+        final double test = 2.0 * (w * x - y * z);
+        if (Math.abs(test) < (1.0 - 1E-15)) {
+            double pitch = Math.asin(test);
+            double roll_x = 0.5 - (x * x + z * z);
+            if (roll_x <= 0.0 && (Math.abs((w * z + x * y)) > roll_x)) {
+                pitch = -pitch;
+                pitch += (pitch < 0.0) ? Math.PI : -Math.PI;
+            }
+            return Math.toDegrees(pitch);
+        } else if (test < 0.0) {
+            return -90.0;
+        } else {
+            return 90.0;
+        }
+    }
+
+    // Helper function reused by Matrix4x4, portion cut out from getYawPitchRoll()
+    protected static double getRoll(double x, double y, double z, double w) {
+        final double test = 2.0 * (w * x - y * z);
+        if (Math.abs(test) < (1.0 - 1E-15)) {
+            double roll = CommonTrigMath.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (x * x + z * z));
+            if (Math.abs(roll) > (0.5 * Math.PI)) {
+                roll += (roll < 0.0) ? Math.PI : -Math.PI;
+            }
+            return Math.toDegrees(roll);
+        } else {
+            return 0.0;
+        }
+    }
+
+    // Helper function reused by Matrix4x4
+    protected static Vector getYawPitchRoll(double x, double y, double z, double w) {
         final double test = 2.0 * (w * x - y * z);
         if (Math.abs(test) < (1.0 - 1E-15)) {
             // Standard angle
-            roll = Math.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (x * x + z * z));
-            pitch = Math.asin(test);
-            yaw = Math.atan2(2.0 * (w * y + z * x), 1.0 - 2.0 * (x * x + y * y));
+            double roll = CommonTrigMath.atan2(2.0 * (w * z + x * y), 1.0 - 2.0 * (x * x + z * z));
+            double pitch = Math.asin(test);
+            double yaw = CommonTrigMath.atan2(-2.0 * (w * y + z * x), 1.0 - 2.0 * (x * x + y * y));
 
             // This means the following:
             // roll = Math.atan2(rightVector.getY(), upVector.getY());
             // pitch = Math.asin(-forwardVector.getY());
             // yaw = Math.atan2(forwardVector.getX(), forwardVector.getZ());
 
-        } else {
-            // This is at the pitch=90.0 or pitch=-90.0 singularity
-            // All we can do is yaw (or roll) around the vertical axis
-            final double sign = (test < 0) ? -1.0 : 1.0;
-            roll = 0.0;
-            pitch = sign * Math.PI / 2.0;
-            yaw = -sign * 2.0 * Math.atan2(z, w);
-        }
-        if (yaw > Math.PI) {
-            yaw -= 2.0 * Math.PI;
-        } else if (yaw < -Math.PI) {
-            yaw += 2.0 * Math.PI;
-        }
-
-        // Reduce roll if it is > 90.0 degrees
-        // This can be done thanks to the otherwise annoying 'gymbal lock' effect
-        // We can rotate yaw and roll with 180 degrees, and rotate pitch to adjust
-        // This results in the equivalent rotation
-        if (roll < (-0.5 * Math.PI) || roll > (0.5 * Math.PI)) {
-            pitch += Math.PI - 2.0 * pitch;
-            if (pitch < -Math.PI) {
-                pitch += 2.0 * Math.PI;
-            } else if (pitch > Math.PI) {
-                pitch -= 2.0 * Math.PI;
+            // Reduce roll if it is > 90.0 degrees
+            // This can be done thanks to the otherwise annoying 'gymbal lock' effect
+            // We can rotate yaw and roll with 180 degrees, and invert pitch to adjust
+            // This results in the equivalent rotation
+            if (Math.abs(roll) > (0.5 * Math.PI)) {
+                roll += (roll < 0.0) ? Math.PI : -Math.PI;
+                yaw += (yaw < 0.0) ? Math.PI : -Math.PI;
+                pitch = -pitch;
+                pitch += (pitch < 0.0) ? Math.PI : -Math.PI;
             }
-            roll += (roll < 0.0) ? Math.PI : -Math.PI;
-            yaw += (yaw < 0.0) ? Math.PI : -Math.PI;
-        }
 
-        return new Vector(Math.toDegrees(pitch), Math.toDegrees(-yaw), Math.toDegrees(roll));
+            return new Vector(Math.toDegrees(pitch), Math.toDegrees(yaw), Math.toDegrees(roll));
+
+        } else if (test < 0.0) {
+            // This is at the pitch=-90.0 singularity
+            // All we can do is yaw (or roll) around the vertical axis
+            return new Vector(-90.0, Math.toDegrees(-2.0 * CommonTrigMath.atan2(z, w)), 0.0);
+
+        } else {
+            // This is at the pitch=90.0 singularity
+            // All we can do is yaw (or roll) around the vertical axis
+            return new Vector(90.0, Math.toDegrees(2.0 * CommonTrigMath.atan2(z, w)), 0.0);
+        }
     }
 
     /**

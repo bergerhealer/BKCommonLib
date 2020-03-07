@@ -227,7 +227,7 @@ public class MathUtil {
      * @return inverse tangent angle in degrees
      */
     public static float atan(double value) {
-        return RADTODEG * (float) CommonTrigMath.atan(value);
+        return (float) Math.toDegrees(CommonTrigMath.atan(value));
     }
 
     /**
@@ -238,7 +238,7 @@ public class MathUtil {
      * @return inverse tangent 2 angle in degrees
      */
     public static float atan2(double y, double x) {
-        return RADTODEG * (float) CommonTrigMath.atan2(y, x);
+        return (float) Math.toDegrees(CommonTrigMath.atan2(y, x));
     }
 
     /**
@@ -348,12 +348,12 @@ public class MathUtil {
      */
     public static Vector rotate(float yaw, float pitch, double x, double y, double z) {
         // Conversions found by (a lot of) testing
-        float angle;
-        angle = yaw * DEGTORAD;
+        double angle;
+        angle = Math.toRadians((double) yaw);
         double sinyaw = Math.sin(angle);
         double cosyaw = Math.cos(angle);
 
-        angle = pitch * DEGTORAD;
+        angle = Math.toRadians((double) pitch);
         double sinpitch = Math.sin(angle);
         double cospitch = Math.cos(angle);
 
@@ -532,8 +532,8 @@ public class MathUtil {
      */
     public static Vector getDirection(float yaw, float pitch) {
         Vector vector = new Vector();
-        double rotX = DEGTORAD * yaw;
-        double rotY = DEGTORAD * pitch;
+        double rotX = Math.toRadians((double) yaw);
+        double rotY = Math.toRadians((double) pitch);
         vector.setY(-Math.sin(rotY));
         double h = Math.cos(rotY);
         vector.setX(-h * Math.sin(rotX));

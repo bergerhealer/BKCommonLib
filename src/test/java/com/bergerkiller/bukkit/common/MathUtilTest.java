@@ -31,6 +31,9 @@ public class MathUtilTest {
         assertEquals(-12.0, yawPitchRoll.getX(), 0.001);
         assertEquals(34.0, yawPitchRoll.getY(), 0.001);
         assertEquals(0.0, yawPitchRoll.getZ(), 0.001);
+        assertEquals(yawPitchRoll.getX(), transform.getRotationPitch(), 1e-20);
+        assertEquals(yawPitchRoll.getY(), transform.getRotationYaw(), 1e-20);
+        assertEquals(yawPitchRoll.getZ(), transform.getRotationRoll(), 1e-20);
 
         transform.rotateZ(30.0);
         yawPitchRoll = transform.getYawPitchRoll();
@@ -75,6 +78,7 @@ public class MathUtilTest {
             // Also check that the yaw/pitch/roll is actually valid
             Quaternion q_verify = Quaternion.fromYawPitchRoll(ypr);
             testQuaternionsEqual(q, q_verify);
+            testQuaternionYPRComponents(q);
         }
     }
 
@@ -94,6 +98,7 @@ public class MathUtilTest {
             assertEquals(angle, ypr.getX(), 0.00001);
             assertEquals(90.0, ypr.getY(), 0.00001);
             assertEquals(0.0, ypr.getZ(), 0.00001);
+            testQuaternionYPRComponents(q);
         } while (angle != 90.0);
 
         // Repeat for -90.0
@@ -108,6 +113,7 @@ public class MathUtilTest {
             assertEquals(angle, ypr.getX(), 0.00001);
             assertEquals(90.0, ypr.getY(), 0.00001);
             assertEquals(0.0, ypr.getZ(), 0.00001);
+            testQuaternionYPRComponents(q);
         } while (angle != -90.0);
     }
 
@@ -411,6 +417,14 @@ public class MathUtilTest {
     private static void testQuaternionsEqual(Quaternion expected, Quaternion actual) {
         testVectorsEqual(expected.forwardVector(), actual.forwardVector());
         testVectorsEqual(expected.upVector(), actual.upVector());
+    }
+
+    // checks that the output of getYawPitchRoll matches getYaw, getPitch and getRoll
+    private static void testQuaternionYPRComponents(Quaternion q) {
+        Vector ypr = q.getYawPitchRoll();
+        assertEquals(ypr.getX(), q.getPitch(), 1e-20);
+        assertEquals(ypr.getY(), q.getYaw(), 1e-20);
+        assertEquals(ypr.getZ(), q.getRoll(), 1e-20);
     }
 
     // checks that two vectors are equal

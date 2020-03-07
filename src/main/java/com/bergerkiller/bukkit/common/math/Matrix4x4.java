@@ -438,15 +438,99 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Deduces the pitch component (x) of {@link #getYawPitchRoll()}
+     * 
+     * @return pitch
+     */
+    public final double getRotationPitch() {
+        /* == This portion is repeated and copied from getRotation() == */
+        double x, y, z, w, tr = m00 + m11 + m22;
+        if (tr > 0) {
+            x = m21-m12; y = m02-m20; z = m10-m01; w = 1.0 + tr;
+        } else if ((m00 > m11) && (m00 > m22)) {
+            x = 1.0+m00-m11-m22; y = m01+m10; z = m02+m20; w = m21-m12;
+        } else if (m11 > m22) {
+            x = m01+m10; y = 1.0+m11-m00-m22; z = m12+m21; w = m02-m20;
+        } else {
+            x = m02+m20; y = m12+m21; z = 1.0+m22-m00-m11; w = m10-m01;
+        }
+        double f = MathUtil.getNormalizationFactor(x, y, z, w);
+        x *= f; y *= f; z *= f; w *= f;
+        /* ============================================================ */
+
+        return Quaternion.getPitch(x, y, z, w);
+    }
+
+    /**
+     * Deduces the yaw component (y) of {@link #getYawPitchRoll()}
+     * 
+     * @return yaw
+     */
+    public final double getRotationYaw() {
+        /* == This portion is repeated and copied from getRotation() == */
+        double x, y, z, w, tr = m00 + m11 + m22;
+        if (tr > 0) {
+            x = m21-m12; y = m02-m20; z = m10-m01; w = 1.0 + tr;
+        } else if ((m00 > m11) && (m00 > m22)) {
+            x = 1.0+m00-m11-m22; y = m01+m10; z = m02+m20; w = m21-m12;
+        } else if (m11 > m22) {
+            x = m01+m10; y = 1.0+m11-m00-m22; z = m12+m21; w = m02-m20;
+        } else {
+            x = m02+m20; y = m12+m21; z = 1.0+m22-m00-m11; w = m10-m01;
+        }
+        double f = MathUtil.getNormalizationFactor(x, y, z, w);
+        x *= f; y *= f; z *= f; w *= f;
+        /* ============================================================ */
+
+        return Quaternion.getYaw(x, y, z, w);
+    }
+
+    /**
+     * Deduces the roll component (z) of {@link #getYawPitchRoll()}
+     * 
+     * @return roll
+     */
+    public final double getRotationRoll() {
+        /* == This portion is repeated and copied from getRotation() == */
+        double x, y, z, w, tr = m00 + m11 + m22;
+        if (tr > 0) {
+            x = m21-m12; y = m02-m20; z = m10-m01; w = 1.0 + tr;
+        } else if ((m00 > m11) && (m00 > m22)) {
+            x = 1.0+m00-m11-m22; y = m01+m10; z = m02+m20; w = m21-m12;
+        } else if (m11 > m22) {
+            x = m01+m10; y = 1.0+m11-m00-m22; z = m12+m21; w = m02-m20;
+        } else {
+            x = m02+m20; y = m12+m21; z = 1.0+m22-m00-m11; w = m10-m01;
+        }
+        double f = MathUtil.getNormalizationFactor(x, y, z, w);
+        x *= f; y *= f; z *= f; w *= f;
+        /* ============================================================ */
+
+        return Quaternion.getRoll(x, y, z, w);
+    }
+
+    /**
      * Deduces the yaw/pitch/roll values in degrees that this matrix transforms objects with
      * 
      * @return axis rotations: {x=pitch, y=yaw, z=roll}
      */
     public final Vector getYawPitchRoll() {
-        //TODO: Can we somehow eliminate the temporary quaternion?
-        // I'm using this method for now, because guarantees Quaternion and Matrix
-        // use the same kind of getYawPitchRoll() logic.
-        return this.getRotation().getYawPitchRoll();
+        /* == This portion is repeated and copied from getRotation() == */
+        double x, y, z, w, tr = m00 + m11 + m22;
+        if (tr > 0) {
+            x = m21-m12; y = m02-m20; z = m10-m01; w = 1.0 + tr;
+        } else if ((m00 > m11) && (m00 > m22)) {
+            x = 1.0+m00-m11-m22; y = m01+m10; z = m02+m20; w = m21-m12;
+        } else if (m11 > m22) {
+            x = m01+m10; y = 1.0+m11-m00-m22; z = m12+m21; w = m02-m20;
+        } else {
+            x = m02+m20; y = m12+m21; z = 1.0+m22-m00-m11; w = m10-m01;
+        }
+        double f = MathUtil.getNormalizationFactor(x, y, z, w);
+        x *= f; y *= f; z *= f; w *= f;
+        /* ============================================================ */
+
+        return Quaternion.getYawPitchRoll(x, y, z, w);
     }
 
     /**
