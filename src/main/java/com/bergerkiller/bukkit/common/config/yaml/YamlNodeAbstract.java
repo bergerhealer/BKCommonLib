@@ -863,14 +863,15 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     @Override
     public String toString() {
-        if (this.getYamlPath().depth() == 0) {
+        int depth = this.getYamlPath().depth();
+        if (depth == 0) {
             // Root node: we can include the entire yaml String
             return this._entry.getYaml().toString();
         } else {
             // Descendant of root: only include the yaml of the children
             // Omit indentation at this depth level
             StringBuilder yaml = new StringBuilder();
-            int indent = 2 * this.getYamlPath().depth();
+            int indent = 2 * depth;
             for (YamlEntry child : this._children) {
                 String childYaml = child.getYaml().toString();
                 int lineStart = 0;

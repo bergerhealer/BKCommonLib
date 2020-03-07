@@ -14,14 +14,12 @@ public class YamlPath {
     private final YamlPath parent;
     private final String name;
     private final int hashcode;
-    private final int depth;
 
     // Constructor for ROOT
     private YamlPath() {
         this.parent = null;
         this.name = "";
         this.hashcode = 0;
-        this.depth = 0;
     }
 
     // Constructor used in the static factory methods, parent cannot be null
@@ -29,7 +27,6 @@ public class YamlPath {
         this.parent = parent;
         this.name = name;
         this.hashcode = this.name.hashCode() + 31 * this.parent.hashcode;
-        this.depth = this.parent.depth + 1;
     }
 
     /**
@@ -205,7 +202,7 @@ public class YamlPath {
      * @return depth, 0 if {@link #parent()} == null
      */
     public int depth() {
-        return this.depth;
+        return (this.parent == null) ? 0 : this.parent.depth()+1;
     }
 
     @Override
@@ -220,13 +217,13 @@ public class YamlPath {
         } else if (o instanceof YamlPath) {
             YamlPath p1 = this;
             YamlPath p2 = (YamlPath) o;
-            if (p1.depth() == p2.depth()) {
-                while (p1.name.equals(p2.name)) {
-                    p1 = p1.parent();
-                    p2 = p2.parent();
-                    if (p1 == p2) {
-                        return true;
-                    }
+            while (p1.name.equals(p2.name)) {
+                p1 = p1.parent();
+                p2 = p2.parent();
+                if (p1 == p2) {
+                    return true;
+                } else if (p1 == null || p2 == null) {
+                    return false;
                 }
             }
         }
