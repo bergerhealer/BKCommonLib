@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.util.Vector;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.Vec3D</b>.
@@ -25,6 +26,15 @@ public abstract class Vec3DHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Object fromBukkitRaw(Vector vector) {
+        return T.fromBukkitRaw.invoke(vector);
+    }
+
+    public abstract Vector toBukkit();
+
+    public static Vec3DHandle fromBukkit(org.bukkit.util.Vector vector) {
+        return createHandle(fromBukkitRaw(vector));
+    }
     public abstract double getX();
     public abstract void setX(double value);
     public abstract double getY();
@@ -41,6 +51,10 @@ public abstract class Vec3DHandle extends Template.Handle {
         public final Template.Field.Double x = new Template.Field.Double();
         public final Template.Field.Double y = new Template.Field.Double();
         public final Template.Field.Double z = new Template.Field.Double();
+
+        public final Template.StaticMethod<Object> fromBukkitRaw = new Template.StaticMethod<Object>();
+
+        public final Template.Method<Vector> toBukkit = new Template.Method<Vector>();
 
     }
 

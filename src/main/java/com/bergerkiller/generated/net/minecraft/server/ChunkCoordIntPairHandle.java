@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ChunkCoordIntPair</b>.
@@ -25,6 +26,15 @@ public abstract class ChunkCoordIntPairHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Object fromIntVector2Raw(IntVector2 vector) {
+        return T.fromIntVector2Raw.invoke(vector);
+    }
+
+    public abstract IntVector2 toIntVector2();
+
+    public static ChunkCoordIntPairHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
+        return createHandle(fromIntVector2Raw(vector));
+    }
     public abstract int getX();
     public abstract void setX(int value);
     public abstract int getZ();
@@ -38,6 +48,10 @@ public abstract class ChunkCoordIntPairHandle extends Template.Handle {
 
         public final Template.Field.Integer x = new Template.Field.Integer();
         public final Template.Field.Integer z = new Template.Field.Integer();
+
+        public final Template.StaticMethod<Object> fromIntVector2Raw = new Template.StaticMethod<Object>();
+
+        public final Template.Method<IntVector2> toIntVector2 = new Template.Method<IntVector2>();
 
     }
 

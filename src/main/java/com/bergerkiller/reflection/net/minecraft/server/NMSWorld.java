@@ -1,6 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -42,6 +43,7 @@ public class NMSWorld {
     }
 
     public static boolean updateBlock(Object worldHandle, int x, int y, int z, BlockData data, int updateFlags) {
-        return (Boolean) WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), updateFlags);
+        Object blockPosition = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        return (Boolean) WorldHandle.T.setBlockData.raw.invoke(worldHandle,blockPosition, data.getData(), updateFlags);
     }
 }

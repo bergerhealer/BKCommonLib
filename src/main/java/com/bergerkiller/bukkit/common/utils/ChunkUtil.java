@@ -25,6 +25,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 
 import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 
@@ -180,6 +181,27 @@ public class ChunkUtil {
         Object iBlockData = ChunkHandle.T.getBlockData.raw.invoke(chunkHandleRaw, blockPos);
         return BlockData.fromBlockData(iBlockData);
         */
+    }
+
+    /**
+     * Sets a block type id and data without causing physics or lighting updates
+     *
+     * @param chunk the block is in
+     * @param block - the block coordinates within the chunk to set
+     * @param data to set to
+     */
+    public static void setBlockFast(org.bukkit.Chunk chunk, Block block, BlockData data) {
+        if (block.getY() < 0 || block.getY() >= chunk.getWorld().getMaxHeight()) {
+            return;
+        }
+
+        Object[] sections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
+        final int secIndex = block.getY() >> 4;
+        Object section = sections[secIndex];
+        if (section == null) {
+            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), block.getY()).getRaw();
+        }
+        ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
     }
 
     /**

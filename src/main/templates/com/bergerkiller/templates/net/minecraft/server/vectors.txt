@@ -8,33 +8,58 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 class BaseBlockPosition {
 #if version >= 1.13
     #if paperspigot
-        protected int x;
-        protected int y;
-        protected int z;
+        protected readonly int field_x:x;
+        protected readonly int field_y:y;
+        protected readonly int field_z:z;
     #else
-        private final int x:a;
-        private final int y:b;
-        private final int z:c;
+        private final readonly int field_x:a;
+        private final readonly int field_y:b;
+        private final readonly int field_z:c;
     #endif
 #elseif version >= 1.9.4
-    private final int x:a;
-    private final int y:b;
-    private final int z:c;
+    private final readonly int field_x:a;
+    private final readonly int field_y:b;
+    private final readonly int field_z:c;
 #elseif version >= 1.8.3
-    private final int x:a;
-    private final int y:c;
-    private final int z:d;
+    private final readonly int field_x:a;
+    private final readonly int field_y:c;
+    private final readonly int field_z:d;
 #else
-    private final int x:a;
-    private final int y:b;
-    private final int z:c;
+    private final readonly int field_x:a;
+    private final readonly int field_y:b;
+    private final readonly int field_z:c;
 #endif
+
+    public int getX();
+    public int getY();
+    public int getZ();
+
+    public com.bergerkiller.bukkit.common.bases.IntVector3 toIntVector3() {
+        return new com.bergerkiller.bukkit.common.bases.IntVector3(instance.getX(), instance.getY(), instance.getZ());
+    }
 }
 
 class BlockPosition extends BaseBlockPosition {
 
     public (BlockPositionHandle) BlockPosition(int x, int y, int z);
 
+    <code>
+    public static BlockPositionHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
+        return createHandle(fromIntVector3Raw(vector));
+    }
+
+    public static BlockPositionHandle fromBukkitBlock(org.bukkit.block.Block block) {
+        return createHandle(fromBukkitBlock(block));
+    }
+    </code>
+
+    public static Object fromIntVector3Raw(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
+        return new BlockPosition(vector.x, vector.y, vector.z);
+    }
+
+    public static Object fromBukkitBlockRaw(org.bukkit.block.Block block) {
+        return new BlockPosition(block.getX(), block.getY(), block.getZ());
+    }
 }
 
 class Vec3D {
@@ -42,13 +67,31 @@ class Vec3D {
     public final double x;
     public final double y;
     public final double z;
+
+    public org.bukkit.util.Vector toBukkit() {
+        return new org.bukkit.util.Vector(instance.x, instance.y, instance.z);
+    }
 #else
     public final double x:a;
     public final double y:b;
     public final double z:c;
+
+    public org.bukkit.util.Vector toBukkit() {
+        return new org.bukkit.util.Vector(instance.a, instance.b, instance.c);
+    }
 #endif
 
     public (Vec3DHandle) Vec3D(double x, double y, double z);
+
+    <code>
+    public static Vec3DHandle fromBukkit(org.bukkit.util.Vector vector) {
+        return createHandle(fromBukkitRaw(vector));
+    }
+    </code>
+
+    public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
+        return new Vec3D(vector.getX(), vector.getY(), vector.getZ());
+    }
 }
 
 class ChunkCoordIntPair {
@@ -56,12 +99,51 @@ class ChunkCoordIntPair {
     public final int z;
 
     public (ChunkCoordIntPairHandle) ChunkCoordIntPair(int x, int z);
+
+    public com.bergerkiller.bukkit.common.bases.IntVector2 toIntVector2() {
+        return new com.bergerkiller.bukkit.common.bases.IntVector2(instance.x, instance.z);
+    }
+
+    <code>
+    public static ChunkCoordIntPairHandle fromIntVector2(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
+        return createHandle(fromIntVector2Raw(vector));
+    }
+    </code>
+
+    public static Object fromIntVector2Raw(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
+        return new ChunkCoordIntPair(vector.x, vector.z);
+    }
 }
 
 class Vector3f {
-    public (Vector3fHandle) Vector3f(float x, float y, float z);
-
     public float getX();
     public float getY();
     public float getZ();
+
+    public org.bukkit.util.Vector toBukkit() {
+        return new org.bukkit.util.Vector(instance.getX(), instance.getY(), instance.getZ());
+    }
+
+    public (Vector3fHandle) Vector3f(float x, float y, float z);
+
+    <code>
+    public static Vector3fHandle fromBukkit(org.bukkit.util.Vector vector) {
+        return createHandle(fromBukkitRaw(vector));
+    }
+    </code>
+
+    public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
+#if version >= 1.12
+        Object v3 = com.bergerkiller.generated.net.minecraft.server.Vector3fHandle.T.newInstanceNull();
+        #require net.minecraft.server.Vector3f protected final float x;
+        #require net.minecraft.server.Vector3f protected final float y;
+        #require net.minecraft.server.Vector3f protected final float z;
+        v3#x = (float)vector.getX();
+        v3#y = (float)vector.getY();
+        v3#z = (float)vector.getZ();
+        return v3;
+#else
+        return new Vector3f((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
+#endif
+    }
 }

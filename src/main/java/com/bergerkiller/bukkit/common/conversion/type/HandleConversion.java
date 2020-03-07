@@ -44,6 +44,7 @@ import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
@@ -58,6 +59,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -73,8 +75,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilH
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 
 public class HandleConversion {
 
@@ -237,27 +237,27 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.ChunkCoordIntPair")
     public static Object toChunkCoordIntPairHandle(IntVector2 intVector2) {
-        return NMSVector.newPair(intVector2.x, intVector2.z);
+        return ChunkCoordIntPairHandle.T.fromIntVector2Raw.invoke(intVector2);
     }
 
     @ConverterMethod(output="net.minecraft.server.BlockPosition")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
-        return NMSVector.newPosition(intVector3.x, intVector3.y, intVector3.z);
+        return BlockPositionHandle.T.fromIntVector3Raw.invoke(intVector3);
     }
 
     @ConverterMethod(output="net.minecraft.server.BlockPosition")
     public static Object toBlockPositionHandle(Block block) {
-        return NMSVector.newPosition(block.getX(), block.getY(), block.getZ());
+        return BlockPositionHandle.T.fromBukkitBlockRaw.invoke(block);
     }
 
     @ConverterMethod(output="net.minecraft.server.Vec3D")
     public static Object toVec3DHandle(Vector vector) {
-        return NMSVector.newVec(vector.getX(), vector.getY(), vector.getZ());
+        return Vec3DHandle.T.fromBukkitRaw.invoke(vector);
     }
 
     @ConverterMethod(output="net.minecraft.server.Vector3f")
     public static Object toVector3fHandle(Vector vector) {
-        return Vector3fHandle.T.constr_x_y_z.raw.newInstance((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
+        return Vector3fHandle.T.fromBukkitRaw.invoke(vector);
     }
 
     @ConverterMethod(output="net.minecraft.server.PlayerAbilities")

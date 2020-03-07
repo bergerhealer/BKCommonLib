@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import org.bukkit.World;
+import org.bukkit.block.Block;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.ChunkSection</b>.
@@ -32,6 +33,7 @@ public abstract class ChunkSectionHandle extends Template.Handle {
     public abstract DataPaletteBlockHandle getBlockPalette();
     public abstract BlockData getBlockData(int x, int y, int z);
     public abstract void setBlockData(int x, int y, int z, BlockData data);
+    public abstract void setBlockDataAtBlock(Block block, BlockData data);
     /**
      * Stores class members for <b>net.minecraft.server.ChunkSection</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -44,6 +46,7 @@ public abstract class ChunkSectionHandle extends Template.Handle {
         public final Template.Method.Converted<DataPaletteBlockHandle> getBlockPalette = new Template.Method.Converted<DataPaletteBlockHandle>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Void> setBlockData = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> setBlockDataAtBlock = new Template.Method.Converted<Void>();
 
     }
 

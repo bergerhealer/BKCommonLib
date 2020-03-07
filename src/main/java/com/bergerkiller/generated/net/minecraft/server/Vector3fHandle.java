@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.util.Vector;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.Vector3f</b>.
@@ -25,9 +26,18 @@ public abstract class Vector3fHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Object fromBukkitRaw(Vector vector) {
+        return T.fromBukkitRaw.invoke(vector);
+    }
+
     public abstract float getX();
     public abstract float getY();
     public abstract float getZ();
+    public abstract Vector toBukkit();
+
+    public static Vector3fHandle fromBukkit(org.bukkit.util.Vector vector) {
+        return createHandle(fromBukkitRaw(vector));
+    }
     /**
      * Stores class members for <b>net.minecraft.server.Vector3f</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -35,9 +45,12 @@ public abstract class Vector3fHandle extends Template.Handle {
     public static final class Vector3fClass extends Template.Class<Vector3fHandle> {
         public final Template.Constructor.Converted<Vector3fHandle> constr_x_y_z = new Template.Constructor.Converted<Vector3fHandle>();
 
+        public final Template.StaticMethod<Object> fromBukkitRaw = new Template.StaticMethod<Object>();
+
         public final Template.Method<Float> getX = new Template.Method<Float>();
         public final Template.Method<Float> getY = new Template.Method<Float>();
         public final Template.Method<Float> getZ = new Template.Method<Float>();
+        public final Template.Method<Vector> toBukkit = new Template.Method<Vector>();
 
     }
 

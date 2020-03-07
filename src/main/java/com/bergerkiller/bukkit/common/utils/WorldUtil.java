@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -30,7 +31,6 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import org.bukkit.Bukkit;
@@ -127,7 +127,9 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockData(org.bukkit.block.Block block, BlockData data) {
-        setBlockData(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
+        Object worldHandle = HandleConversion.toWorldHandle(block.getWorld());
+        Object blockPosition = BlockPositionHandle.T.fromBukkitBlockRaw.invoke(block);
+        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -138,7 +140,9 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockData(org.bukkit.World world, IntVector3 position, BlockData data) {
-        setBlockData(world, position.x, position.y, position.z, data);
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        Object blockPosition = BlockPositionHandle.T.fromIntVector3Raw.invoke(position);
+        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -152,7 +156,8 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setBlockData(org.bukkit.World world, int x, int y, int z, BlockData data) {
         Object worldHandle = HandleConversion.toWorldHandle(world);
-        WorldHandle.T.setBlockData.raw.invoke(worldHandle, NMSVector.newPosition(x, y, z), data.getData(), WorldHandle.UPDATE_DEFAULT);
+        Object blockPosition = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+        WorldHandle.T.setBlockData.raw.invoke(worldHandle, blockPosition, data.getData(), WorldHandle.UPDATE_DEFAULT);
     }
 
     /**
@@ -185,7 +190,7 @@ public class WorldUtil extends ChunkUtil {
      * @param data to set to
      */
     public static void setBlockDataFast(org.bukkit.block.Block block, BlockData data) {
-        ChunkUtil.setBlockFast(block.getChunk(), block.getX(), block.getY(), block.getZ(), data);
+        ChunkUtil.setBlockFast(block.getChunk(), block, data);
 
         //setBlockDataFast(block.getWorld(), block.getX(), block.getY(), block.getZ(), data);
     }
@@ -464,7 +469,7 @@ public class WorldUtil extends ChunkUtil {
 
         Object worldHandle = Conversion.toWorldHandle.convert(world);
         Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
-        Object axisAlignedBB = NMSVector.newAxisAlignedBB(xmin, ymin, zmin, xmax, ymax, zmax);
+        Object axisAlignedBB = AxisAlignedBBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstanceVA(xmin, ymin, zmin, xmax, ymax, zmax);
         List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, ignoreHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }
@@ -482,7 +487,7 @@ public class WorldUtil extends ChunkUtil {
         Object worldHandle = Conversion.toWorldHandle.convert(entity.getWorld());
         Object entityHandle = Conversion.toEntityHandle.convert(entity);
         Object entityBounds = EntityHandle.T.getBoundingBox.raw.invoke(entityHandle);
-        Object axisAlignedBB = NMSVector.growAxisAlignedBB(entityBounds, radX, radY, radZ);
+        Object axisAlignedBB = AxisAlignedBBHandle.T.grow.raw.invoke(entityBounds, radX, radY, radZ);
         List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, entityHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
     }

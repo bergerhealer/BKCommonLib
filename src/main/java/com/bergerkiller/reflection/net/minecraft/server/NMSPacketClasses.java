@@ -107,6 +107,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHa
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWorldParticlesHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -1062,10 +1063,10 @@ public class NMSPacketClasses {
         }
 
         public CommonPacket newInstance(double x, double y, double z, float radius, List<IntVector3> blocks, Vector pushedForce) {
-            Object vec = (pushedForce == null) ? null : NMSVector.newVec(pushedForce.getX(), pushedForce.getY(), pushedForce.getZ());
+            Object vec = (pushedForce == null) ? null : Vec3DHandle.T.fromBukkitRaw.invoke(pushedForce);
             List<Object> blocksHandles = new ArrayList<Object>(blocks.size());
             for (IntVector3 block : blocks) {
-                blocksHandles.add(NMSVector.newPosition(block.x, block.y, block.z));
+                blocksHandles.add(BlockPositionHandle.T.fromIntVector3Raw.invoke(block));
             }
             return constructor1.newInstance(x, y, z, radius, blocksHandles, vec);
         }

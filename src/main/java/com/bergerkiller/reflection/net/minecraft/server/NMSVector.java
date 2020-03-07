@@ -13,8 +13,12 @@ import org.bukkit.util.Vector;
 /**
  * All NMS Vector related classes can be used here. Vec3D,
  * ChunkCoordIntPair and BlockPosition are supported. No reflection is used
- * to minimize overhead.
+ * to minimize overhead.<br>
+ * <br>
+ * <b>Deprecated: these methods suffer performance problems, use the Handle declared conversion
+ * methods instead</b>
  */
+@Deprecated
 public class NMSVector {
 
     /* ============================================================== */
@@ -81,21 +85,21 @@ public class NMSVector {
     }
 
     public static IntVector3 getPosition(Object blockPosition) {
-        return new IntVector3(BaseBlockPositionHandle.T.x.getInteger(blockPosition),
-                BaseBlockPositionHandle.T.y.getInteger(blockPosition),
-                BaseBlockPositionHandle.T.z.getInteger(blockPosition));
+        return new IntVector3(BaseBlockPositionHandle.T.field_x.getInteger(blockPosition),
+                BaseBlockPositionHandle.T.field_y.getInteger(blockPosition),
+                BaseBlockPositionHandle.T.field_z.getInteger(blockPosition));
     }
 
     public static int getPositionX(Object blockPosition) {
-        return BaseBlockPositionHandle.T.x.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.field_x.getInteger(blockPosition);
     }
 
     public static int getPositionY(Object blockPosition) {
-        return BaseBlockPositionHandle.T.y.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.field_y.getInteger(blockPosition);
     }
 
     public static int getPositionZ(Object blockPosition) {
-        return BaseBlockPositionHandle.T.z.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.field_z.getInteger(blockPosition);
     }
 
     public static boolean isPosition(Object blockPosition) {
@@ -103,9 +107,9 @@ public class NMSVector {
     }
 
     public static boolean isPositionInBox(Object blockPosition, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax) {
-        int x = BaseBlockPositionHandle.T.x.getInteger(blockPosition);
-        int y = BaseBlockPositionHandle.T.y.getInteger(blockPosition);
-        int z = BaseBlockPositionHandle.T.z.getInteger(blockPosition);
+        int x = BaseBlockPositionHandle.T.field_x.getInteger(blockPosition);
+        int y = BaseBlockPositionHandle.T.field_y.getInteger(blockPosition);
+        int z = BaseBlockPositionHandle.T.field_z.getInteger(blockPosition);
         return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
     }
 

@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -511,7 +512,8 @@ public class BlockUtil extends MaterialUtil {
         try {
             if (radiusX == 0 && radiusY == 0 && radiusZ == 0) {
                 // find a single BlockState at this position
-                Object tile = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), NMSVector.newPosition(x, y, z));
+                Object blockPosition = BlockPositionHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+                Object tile = WorldHandle.T.getTileEntity.raw.invoke(HandleConversion.toWorldHandle(world), blockPosition);
                 if (tile != null) {
                     blockStateBuff.add(WrapperConversion.toBlockState(tile));
                 }

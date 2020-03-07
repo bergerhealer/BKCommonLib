@@ -40,8 +40,10 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.server.BaseBlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
@@ -61,6 +63,7 @@ import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
@@ -77,7 +80,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 public class WrapperConversion {
@@ -340,12 +342,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ChunkCoordIntPair")
     public static IntVector2 toIntVector2(Object nmsChunkCoordIntPairHandle) {
-        return NMSVector.getPair(nmsChunkCoordIntPairHandle);
+        return ChunkCoordIntPairHandle.T.toIntVector2.invoke(nmsChunkCoordIntPairHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.BlockPosition")
     public static IntVector3 toIntVector3(Object nmsBlockPositionHandle) {
-        return NMSVector.getPosition(nmsBlockPositionHandle);
+        return BaseBlockPositionHandle.T.toIntVector3.invoke(nmsBlockPositionHandle);
     }
 
     @ConverterMethod
@@ -355,7 +357,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Vec3D")
     public static Vector toVector(Object nmsVec3DHandle) {
-        return NMSVector.getVec(nmsVec3DHandle);
+        return Vec3DHandle.T.toBukkit.invoke(nmsVec3DHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.Vector3f")

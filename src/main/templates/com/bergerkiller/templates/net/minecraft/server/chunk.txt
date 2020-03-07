@@ -199,6 +199,10 @@ class ChunkSection {
 #else
     public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
 #endif
+
+    public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) IBlockData data) {
+        instance.setType(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
+    }
 }
 
 // This is only used on CraftBukkit servers
