@@ -67,6 +67,7 @@ public class CommonEventFactory {
      */
     public void handleEntityMove() {
         if (!CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
+            this.entityMoveEntities.clear();
             return;
         }
 
