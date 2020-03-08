@@ -23,7 +23,6 @@ public class CommonDisabledEntity {
                     if (method.getName().equals("a") && method.getParameterCount() == 1) {
                         Class<?> argType = method.getParameters()[0].getType();
                         if (DataWatcherObjectHandle.T.isAssignableFrom(argType)) {
-                            System.out.println("DO NOTHING");
                             return new NullInvokable();
                         }
                     }
