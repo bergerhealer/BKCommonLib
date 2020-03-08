@@ -40,7 +40,9 @@ public abstract class EntityHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract Vector getMot();
+    public abstract void setMotVector(Vector mot);
     public abstract void setMot(double x, double y, double z);
+    public abstract void fixMotNaN();
     public abstract void setMotX(double x);
     public abstract void setMotY(double y);
     public abstract void setMotZ(double z);
@@ -388,7 +390,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
+        public final Template.Method<Void> setMotVector = new Template.Method<Void>();
         public final Template.Method<Void> setMot = new Template.Method<Void>();
+        public final Template.Method<Void> fixMotNaN = new Template.Method<Void>();
         public final Template.Method<Void> setMotX = new Template.Method<Void>();
         public final Template.Method<Void> setMotY = new Template.Method<Void>();
         public final Template.Method<Void> setMotZ = new Template.Method<Void>();

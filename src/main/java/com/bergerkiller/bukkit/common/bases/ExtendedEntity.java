@@ -164,31 +164,60 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
     };
     public final VectorAbstract vel = new VectorAbstract() {
+        @Override
         public double getX() {
             return ExtendedEntity.this.handle.getMotX();
         }
 
+        @Override
         public double getY() {
             return ExtendedEntity.this.handle.getMotY();
         }
 
+        @Override
         public double getZ() {
             return ExtendedEntity.this.handle.getMotZ();
         }
 
+        @Override
+        public VectorAbstract fixNaN() {
+            ExtendedEntity.this.handle.fixMotNaN();
+            return this;
+        }
+
+        @Override
         public VectorAbstract setX(double x) {
             ExtendedEntity.this.handle.setMotX(x);
             return this;
         }
 
+        @Override
         public VectorAbstract setY(double y) {
             ExtendedEntity.this.handle.setMotY(y);
             return this;
         }
 
+        @Override
         public VectorAbstract setZ(double z) {
             ExtendedEntity.this.handle.setMotZ(z);
             return this;
+        }
+
+        @Override
+        public VectorAbstract set(double x, double y, double z) {
+            ExtendedEntity.this.handle.setMot(x, y, z);
+            return this;
+        }
+
+        @Override
+        public VectorAbstract set(Vector value) {
+            ExtendedEntity.this.handle.setMotVector(value);
+            return this;
+        }
+
+        @Override
+        public Vector vector() {
+            return ExtendedEntity.this.handle.getMot();
         }
     };
 

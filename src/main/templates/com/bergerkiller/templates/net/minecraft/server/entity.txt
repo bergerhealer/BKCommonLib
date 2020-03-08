@@ -163,8 +163,25 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
     }
 
+    public void setMotVector(org.bukkit.util.Vector mot) {
+        instance.setMot(new Vec3D(mot.getX(), mot.getY(), mot.getZ()));
+    }
+
     public void setMot(double x, double y, double z) {
         instance.setMot(new Vec3D(x, y, z));
+    }
+
+    public void fixMotNaN() {
+        Vec3D mot = instance.getMot();
+        if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
+            double x = mot.x;
+            double y = mot.y;
+            double z = mot.z;
+            if (Double.isNaN(x)) x = 0.0;
+            if (Double.isNaN(y)) y = 0.0;
+            if (Double.isNaN(z)) z = 0.0;
+            instance.setMot(new Vec3D(x, y, z));
+        }
     }
 
     public void setMotX(double x) {
@@ -198,10 +215,28 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return new org.bukkit.util.Vector(instance.motX, instance.motY, instance.motZ);
     }
 
+    public void setMotVector(org.bukkit.util.Vector mot) {
+        instance.motX = mot.getX();
+        instance.motY = mot.getY();
+        instance.motZ = mot.getZ();
+    }
+
     public void setMot(double x, double y, double z) {
         instance.motX = x;
         instance.motY = y;
         instance.motZ = z;
+    }
+
+    public void fixMotNaN() {
+        if (Double.isNaN(instance.motX)) {
+            instance.motX = 0.0;
+        }
+        if (Double.isNaN(instance.motY)) {
+            instance.motY = 0.0;
+        }
+        if (Double.isNaN(instance.motZ)) {
+            instance.motZ = 0.0;
+        }
     }
 
     public void setMotX(double x) {

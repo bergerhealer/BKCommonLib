@@ -113,12 +113,12 @@ public abstract class VectorAbstract {
      */
     public abstract VectorAbstract setZ(double z);
 
-    public VectorAbstract setZero() {
-        return setX(0.0).setY(0.0).setZ(0.0);
-    }
-
     public VectorAbstract set(double x, double y, double z) {
         return setX(x).setY(y).setZ(z);
+    }
+
+    public VectorAbstract setZero() {
+        return set(0.0, 0.0, 0.0);
     }
 
     public VectorAbstract set(VectorAbstract value) {
@@ -142,7 +142,7 @@ public abstract class VectorAbstract {
     }
 
     public VectorAbstract add(double x, double y, double z) {
-        return setX(getX() + x).setY(getY() + y).setZ(getZ() + z);
+        return set(getX() + x, getY() + y, getZ() + z);
     }
 
     public VectorAbstract add(Vector vector) {
@@ -162,7 +162,7 @@ public abstract class VectorAbstract {
     }
 
     public VectorAbstract subtract(double x, double y, double z) {
-        return setX(getX() - x).setY(getY() - y).setZ(getZ() - z);
+        return set(getX() - x, getY() - y, getZ() - z);
     }
 
     public VectorAbstract subtract(Vector vector) {
@@ -182,7 +182,7 @@ public abstract class VectorAbstract {
     }
 
     public VectorAbstract multiply(double mx, double my, double mz) {
-        return setX(getX() * mx).setY(getY() * my).setZ(getZ() * mz);
+        return set(getX() * mx, getY() * my, getZ() * mz);
     }
 
     public VectorAbstract multiply(Vector vector) {
@@ -190,7 +190,7 @@ public abstract class VectorAbstract {
     }
 
     public VectorAbstract divide(double dx, double dy, double dz) {
-        return setX(getX() / dx).setY(getY() / dy).setZ(getZ() / dz);
+        return set(getX() / dx, getY() / dy, getZ() / dz);
     }
 
     public VectorAbstract divide(Vector vector) {
