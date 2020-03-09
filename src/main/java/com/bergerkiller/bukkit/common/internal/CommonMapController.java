@@ -85,6 +85,7 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
@@ -1409,7 +1410,7 @@ public class CommonMapController implements PacketListener, Listener {
         public boolean lastFrameItemUpdateNeeded = true; // tells the underlying system to refresh the item
 
         // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
-        private EntityTrackerEntryHandle entityTrackerEntry = null; // Entity tracker entry
+        private EntityTrackerEntryStateHandle entityTrackerEntryState = null; // Entity tracker entry state for resetting tick timer
         private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
         public ItemFrameInfo(EntityItemFrameHandle itemFrame) {
@@ -1780,17 +1781,18 @@ public class CommonMapController implements PacketListener, Listener {
 
                 // Update list of players for item frames showing maps
                 if (info.lastMapUUID != null) {
-                    if (info.entityTrackerEntry == null) {
-                        info.entityTrackerEntry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
+                    if (info.entityTrackerEntryState == null) {
+                        EntityTrackerEntryHandle entry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
 
                         // Item Frame isn't tracked on the server, so no players can view it
-                        if (info.entityTrackerEntry == null) {
+                        if (entry == null) {
                             info.remove();
                             itemFrames_iter.remove();
                             continue;
                         }
 
-                        info.entityTrackerViewers = info.entityTrackerEntry.getViewers();
+                        info.entityTrackerEntryState = entry.getState();
+                        info.entityTrackerViewers = entry.getViewers();
                     }
 
                     boolean changes = LogicUtil.synchronizeUnordered(info.viewers, info.entityTrackerViewers, synchronizer);
@@ -1802,7 +1804,7 @@ public class CommonMapController implements PacketListener, Listener {
                     // Reset tick counter to 1 so that the normal WorldMap refreshing never occurs
                     // Only do this for non-vanilla maps
                     if (!info.lastMapUUID.isStaticUUID()) {
-                        info.entityTrackerEntry.getState().setTickCounter(1);
+                        info.entityTrackerEntryState.setTickCounter(1);
                     }
                 }
             }
