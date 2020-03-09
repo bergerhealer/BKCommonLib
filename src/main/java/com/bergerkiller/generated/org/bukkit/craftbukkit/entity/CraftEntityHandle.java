@@ -42,7 +42,7 @@ public abstract class CraftEntityHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<Entity> createCraftEntity = new Template.StaticMethod.Converted<Entity>();
 
         public final Template.Method.Converted<Void> setHandle = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getHandle = new Template.Method<Object>();
 
     }
 

@@ -27,7 +27,7 @@ public abstract class CraftChunkHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftChunkClass extends Template.Class<CraftChunkHandle> {
-        public final Template.Method.Converted<Object> getHandle = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getHandle = new Template.Method<Object>();
 
     }
 

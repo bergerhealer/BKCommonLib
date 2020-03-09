@@ -32,7 +32,7 @@ public abstract class ChatMessageTypeHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChatMessageTypeClass extends Template.Class<ChatMessageTypeHandle> {
-        public final Template.StaticMethod.Converted<Object> getRawById = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Object> getRawById = new Template.StaticMethod<Object>();
 
         public final Template.Method<Byte> getId = new Template.Method<Byte>();
 

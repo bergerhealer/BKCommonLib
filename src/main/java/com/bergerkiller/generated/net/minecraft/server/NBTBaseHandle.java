@@ -163,7 +163,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
         public final Template.StaticMethod<NBTBaseHandle> createHandle = new Template.StaticMethod<NBTBaseHandle>();
 
         public final Template.Method<Byte> getTypeId = new Template.Method<Byte>();
-        public final Template.Method.Converted<Object> raw_clone = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> raw_clone = new Template.Method<Object>();
 
     }
 

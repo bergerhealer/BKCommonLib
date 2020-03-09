@@ -11,5 +11,5 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 public class NMSEntityInsentient extends NMSEntityLiving {
     public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityInsentient");
 
-    public static final MethodAccessor<Object> getNavigation = EntityInsentientHandle.T.getNavigation.raw.toMethodAccessor();
+    public static final MethodAccessor<Object> getNavigation = EntityInsentientHandle.T.getNavigation.toMethodAccessor();
 }

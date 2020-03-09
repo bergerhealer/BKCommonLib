@@ -52,10 +52,10 @@ public abstract class CraftArtHandle extends Template.Handle {
      */
     public static final class CraftArtClass extends Template.Class<CraftArtHandle> {
         public final Template.StaticMethod.Converted<Art> NotchToBukkit = new Template.StaticMethod.Converted<Art>();
-        public final Template.StaticMethod.Converted<Object> BukkitToNotch = new Template.StaticMethod.Converted<Object>();
-        public final Template.StaticMethod.Converted<Object> NotchFromInternalId = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Object> BukkitToNotch = new Template.StaticMethod<Object>();
+        public final Template.StaticMethod<Object> NotchFromInternalId = new Template.StaticMethod<Object>();
         public final Template.StaticMethod.Converted<Integer> NotchToInternalId = new Template.StaticMethod.Converted<Integer>();
-        public final Template.StaticMethod.Converted<Object> NotchFromInternalName = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Object> NotchFromInternalName = new Template.StaticMethod<Object>();
         public final Template.StaticMethod.Converted<String> NotchToInternalName = new Template.StaticMethod.Converted<String>();
 
     }

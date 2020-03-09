@@ -103,7 +103,7 @@ public abstract class ItemStackHandle extends Template.Handle {
 
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
-        public final Template.Method.Converted<Object> getItem = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getItem = new Template.Method<Object>();
         public final Template.Method.Converted<ChatText> getName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> setName = new Template.Method.Converted<Void>();
         @Template.Optional

@@ -25,8 +25,9 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
+import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * BlockState conversion used on MC 1.12.2 and before
@@ -36,7 +37,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     private final World proxy_world;
     private final Chunk proxy_chunk;
     private final Block proxy_block;
-    private final Invokable non_instrumented_invokable = (instance, args) -> {
+    private final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
         String name = instance.getClass().getSuperclass().getSimpleName();
         throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
     };
@@ -51,7 +52,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         // - getCraftWorld() -> returns the proxy world (final fallback in getState() requires this)
         proxy_chunk = (Chunk) new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 // Gets the proxy world
                 if (method.getName().equals("getCraftWorld")) {
                     return (instance, args) -> proxy_world;
@@ -67,7 +68,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         // All other methods will fail.
         proxy_world = (World) new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 // Gets our requested tile entity
                 if (method.getName().equals("getTileEntityAt")) {
                     return (instance, args) -> input_state.tileEntity;
@@ -85,10 +86,10 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
         proxy_block = (Block) new ClassInterceptor() {
             @SuppressWarnings("deprecation")
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 String name = method.getName();
                 if (name.equals("getWorld")) {
-                    return new NullInvokable(proxy_world);
+                    return new NullInvoker<World>(proxy_world);
                 } else if (name.equals("getChunk")) {
                     return (instance, args) -> input_state.block.getChunk();
                 } else if (name.equals("getType")) {

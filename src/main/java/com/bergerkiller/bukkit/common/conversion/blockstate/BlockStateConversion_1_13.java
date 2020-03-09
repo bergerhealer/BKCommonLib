@@ -14,15 +14,12 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -31,9 +28,10 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
+import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
+import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * BlockState conversion used on MC 1.13 and after
@@ -47,7 +45,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final Map<Material, NullInstantiator<BlockState>> blockStateInstantiators;
     private final Class<?> craftBlockEntityState_type;
     private final SafeField<?> craftBlockEntityState_snapshot_field;
-    private final Invokable non_instrumented_invokable = (instance, args) -> {
+    private final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
         String name = instance.getClass().getSuperclass().getSimpleName();
         throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
     };
@@ -69,7 +67,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // NMS World Proxy has a 'TickListServer' object that is requested by TileEntityCommand
         proxy_nms_world_ticklist = new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 if (method.getReturnType().equals(boolean.class)) {
                     // Boolean return value expected, so return false always
                     return (instance, args) -> Boolean.FALSE;
@@ -86,7 +84,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // Create a NMS World proxy for handling the getTileEntity call
         proxy_nms_world = new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 String methodName = method.getName();
                 Class<?>[] params = method.getParameterTypes();
 
@@ -130,7 +128,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // All other methods will fail.
         proxy_world = (World) new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 // Gets our requested tile entity
                 if (method.getName().equals("getTileEntityAt")) {
                     return (instance, args) -> input_state.tileEntity;
@@ -152,10 +150,10 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // All other methods will fail.
         proxy_block = (Block) new ClassInterceptor() {
             @Override
-            protected Invokable getCallback(Method method) {
+            protected Invoker<?> getCallback(Method method) {
                 String name = method.getName();
                 if (name.equals("getWorld")) {
-                    return new NullInvokable(proxy_world);
+                    return new NullInvoker<World>(proxy_world);
                 } else if (name.equals("getChunk")) {
                     return (instance, args) -> input_state.chunk;
                 } else if (name.equals("getType")) {

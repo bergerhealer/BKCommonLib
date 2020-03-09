@@ -6,7 +6,8 @@ import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
-import com.bergerkiller.mountiplex.reflection.Invokable;
+import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
+import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 public class CommonDisabledEntity {
     public static final EntityHandle INSTANCE;
@@ -19,11 +20,11 @@ public class CommonDisabledEntity {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
             entity = new ClassInterceptor() {
                 @Override
-                protected Invokable getCallback(Method method) {
+                protected Invoker<?> getCallback(Method method) {
                     if (method.getName().equals("a") && method.getParameterCount() == 1) {
                         Class<?> argType = method.getParameters()[0].getType();
                         if (DataWatcherObjectHandle.T.isAssignableFrom(argType)) {
-                            return new NullInvokable();
+                            return new NullInvoker<Object>();
                         }
                     }
 

@@ -47,7 +47,7 @@ public abstract class IntHashMapHandle extends Template.Handle {
         public final Template.Method.Converted<Void> put = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> containsKey = new Template.Method<Boolean>();
         public final Template.Method<Void> clear = new Template.Method<Void>();
-        public final Template.Method.Converted<Object> getEntry = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getEntry = new Template.Method<Object>();
         public final Template.Method<List<Entry>> getEntries = new Template.Method<List<Entry>>();
         public final Template.Method<List<Object>> getValues = new Template.Method<List<Object>>();
 

@@ -33,7 +33,7 @@ public abstract class RegistryMaterialsHandle extends Template.Handle {
         public final Template.Field<Map<Object, Object>> opt_inverseLookupField = new Template.Field<Map<Object, Object>>();
 
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
-        public final Template.Method.Converted<Object> getKey = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getKey = new Template.Method<Object>();
 
     }
 

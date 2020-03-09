@@ -43,7 +43,7 @@ public abstract class CraftItemStackHandle extends Template.Handle {
     public static final class CraftItemStackClass extends Template.Class<CraftItemStackHandle> {
         public final Template.Field.Converted<Object> handle = new Template.Field.Converted<Object>();
 
-        public final Template.StaticMethod.Converted<Object> asNMSCopy = new Template.StaticMethod.Converted<Object>();
+        public final Template.StaticMethod<Object> asNMSCopy = new Template.StaticMethod<Object>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
 

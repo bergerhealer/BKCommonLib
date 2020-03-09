@@ -108,7 +108,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional
-        public final Template.Method.Converted<Object> getChunkProvider = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getChunkProvider = new Template.Method<Object>();
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();

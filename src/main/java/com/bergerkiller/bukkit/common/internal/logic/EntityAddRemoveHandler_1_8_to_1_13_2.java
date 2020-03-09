@@ -28,9 +28,10 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.mountiplex.reflection.Invokable;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
+import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
+import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * From MC 1.8 to MC 1.13.2 there was an IWorldAccess listener list we could subscribe to.
@@ -126,9 +127,9 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         }
 
         @Override
-        protected Invokable getCallback(Method method) {
+        protected Invoker<?> getCallback(Method method) {
             // First check if this method is hooked
-            Invokable result = super.getCallback(method);
+            Invoker<?> result = super.getCallback(method);
             if (result != null) {
                 return result;
             }
@@ -139,7 +140,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             }
 
             // All others are ignored
-            return new NullInvokable(method);
+            return new NullInvoker<Object>(method.getReturnType());
         }
 
         @HookMethod("public void onEntityAdded:a(Entity entity)")

@@ -32,7 +32,7 @@ public abstract class DataWatcherObjectHandle extends Template.Handle {
         public final Template.Constructor.Converted<DataWatcherObjectHandle> constr_index = new Template.Constructor.Converted<DataWatcherObjectHandle>();
 
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
-        public final Template.Method.Converted<Object> getSerializer = new Template.Method.Converted<Object>();
+        public final Template.Method<Object> getSerializer = new Template.Method<Object>();
 
     }
 
