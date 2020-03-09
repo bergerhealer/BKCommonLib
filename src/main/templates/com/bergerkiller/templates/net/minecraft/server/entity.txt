@@ -140,6 +140,18 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double locZ;
 #endif
 
+#if version >= 1.15
+    public boolean isLastAndCurrentPositionDifferent() {
+        return instance.locX() != instance.lastX || instance.locY() != instance.lastY || instance.locZ() != instance.lastZ ||
+               instance.yaw != instance.lastYaw || instance.pitch != instance.lastPitch;
+    }
+#else
+    public boolean isLastAndCurrentPositionDifferent() {
+        return instance.locX != instance.lastX || instance.locY != instance.lastY || instance.locZ != instance.lastZ ||
+               instance.yaw != instance.lastYaw || instance.pitch != instance.lastPitch;
+    }
+#endif
+
     // locX/Y/Z fields became private on 1.15
     // The added method 'setPositionRaw' is faster now
     // TODO: Mountiplex causes the double values to turn into Double and back

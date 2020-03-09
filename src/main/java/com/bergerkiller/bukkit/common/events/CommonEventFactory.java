@@ -15,6 +15,7 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -23,7 +24,7 @@ import java.util.List;
 public class CommonEventFactory {
 
     private final EntityMoveEvent entityMoveEvent = new EntityMoveEvent();
-    private final List<EntityHandle> entityMoveEntities = new ArrayList<EntityHandle>();
+    private final List<EntityHandle> entityMoveEntities = new LinkedList<EntityHandle>();
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
 
     private final InstanceBuffer<BiomeMetaHandle> creaturePreSpawnMobs = new InstanceBuffer<BiomeMetaHandle>() {
@@ -76,9 +77,7 @@ public class CommonEventFactory {
 
         // Fire all events
         for (EntityHandle entity : entityMoveEntities) {
-            if (entity.getLocX() != entity.getLastX() || entity.getLocY() != entity.getLastY() || entity.getLocZ() != entity.getLastZ()
-                    || entity.getYaw() != entity.getLastYaw() || entity.getPitch() != entity.getLastPitch()) {
-
+            if (entity.isLastAndCurrentPositionDifferent()) {
                 entityMoveEvent.setEntity(entity);
                 CommonUtil.callEvent(entityMoveEvent);
             }

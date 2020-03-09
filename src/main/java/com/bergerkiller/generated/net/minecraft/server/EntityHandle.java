@@ -39,6 +39,7 @@ public abstract class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
     public abstract void setMotVector(Vector mot);
     public abstract void setMot(double x, double y, double z);
@@ -389,6 +390,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
+        public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
         public final Template.Method<Void> setMotVector = new Template.Method<Void>();
         public final Template.Method<Void> setMot = new Template.Method<Void>();
