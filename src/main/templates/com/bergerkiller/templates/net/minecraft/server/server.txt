@@ -20,7 +20,7 @@ class MinecraftServer {
     public String getResourcePackHash();
 
     public String getProperty(String key, String defaultValue) {
-        DedicatedServer dedicatedServer = (DedicatedServer) instance_raw;
+        DedicatedServer dedicatedServer = (DedicatedServer) instance;
 #if version >= 1.14
         return dedicatedServer.getDedicatedServerProperties().properties.getProperty(key, defaultValue);
 #else

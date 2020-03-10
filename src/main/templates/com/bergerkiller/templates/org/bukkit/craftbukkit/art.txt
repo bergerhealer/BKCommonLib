@@ -7,9 +7,9 @@ class CraftArt {
 
     public static (Object) net.minecraft.server.Paintings NotchFromInternalId(int internalId) {
 #if version >= 1.13.1
-        return net.minecraft.server.IRegistry.MOTIVE.fromId(internalId);
+        return (net.minecraft.server.Paintings) net.minecraft.server.IRegistry.MOTIVE.fromId(internalId);
 #elseif version >= 1.13
-        return net.minecraft.server.Paintings.a.getId(internalId);
+        return (net.minecraft.server.Paintings) net.minecraft.server.Paintings.a.getId(internalId);
 #else
         net.minecraft.server.Paintings[] values = net.minecraft.server.Paintings.values();
         if (internalId >= 0 && internalId < values.length) {
@@ -32,10 +32,10 @@ class CraftArt {
     public static (Object) net.minecraft.server.Paintings NotchFromInternalName(String internalName) {
 #if version >= 1.13.1
         net.minecraft.server.MinecraftKey key = new net.minecraft.server.MinecraftKey(internalName);
-        return net.minecraft.server.IRegistry.MOTIVE.get(key);
+        return (net.minecraft.server.Paintings) net.minecraft.server.IRegistry.MOTIVE.get(key);
 #elseif version >= 1.13
         net.minecraft.server.MinecraftKey key = new net.minecraft.server.MinecraftKey(internalName);
-        return net.minecraft.server.Paintings.a.get(key);
+        return (net.minecraft.server.Paintings) net.minecraft.server.Paintings.a.get(key);
 #else
         net.minecraft.server.Paintings[] values = net.minecraft.server.Paintings.values();
         for (int i = 0; i < values.length; i++) {

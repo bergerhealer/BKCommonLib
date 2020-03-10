@@ -41,7 +41,7 @@ class Item {
     }
 #else
     public List<org.bukkit.inventory.ItemStack> getItemVariants((CreativeModeTabHandle) CreativeModeTab creativemodetab) {
-        org.bukkit.Material type = com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toMaterialFromItemHandle(instance_raw);
+        org.bukkit.Material type = com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toMaterialFromItemHandle(instance);
         java.util.ArrayList result = new java.util.ArrayList();
         com.bergerkiller.bukkit.common.internal.proxy.ItemVariants_pre_1_12_1.addVariants(type, result);
         return result;

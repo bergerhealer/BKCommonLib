@@ -82,7 +82,7 @@ public class RegionHandler_1_14 extends RegionHandler {
             MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver,
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
                     "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
-                    "    return cache.get(coord);\n" +
+                    "    return (RegionFile) cache.get(coord);\n" +
                     "}");
             findRegionFileAt.init(findRegionFileAtMethod);
         }

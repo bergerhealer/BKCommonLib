@@ -41,7 +41,7 @@ class SoundEffectType {
 class SoundEffect {
 #if version >= 1.13.1
     public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry() {
-        return IRegistry.SOUND_EVENT;
+        return (RegistryMaterials) IRegistry.SOUND_EVENT;
     }
 
     private final (MinecraftKeyHandle) MinecraftKey name:a;

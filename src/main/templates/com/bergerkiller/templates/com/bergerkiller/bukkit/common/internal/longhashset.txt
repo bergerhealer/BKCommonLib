@@ -63,10 +63,10 @@ class LongHashSet {
     }
 
     public void trim() {
-        if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) {
-            ((it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) instance_raw).trim();
-        } else if (instance_raw instanceof it.unimi.dsi.fastutil.longs.LongOpenHashSet) {
-            ((it.unimi.dsi.fastutil.longs.LongOpenHashSet) instance_raw).trim();
+        if (instance instanceof it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) {
+            ((it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet) instance).trim();
+        } else if (instance instanceof it.unimi.dsi.fastutil.longs.LongOpenHashSet) {
+            ((it.unimi.dsi.fastutil.longs.LongOpenHashSet) instance).trim();
         }
     }
 #else

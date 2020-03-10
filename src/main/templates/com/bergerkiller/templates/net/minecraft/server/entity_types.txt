@@ -35,11 +35,11 @@ class EntityTypes {
 
 #if version >= 1.13.1
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-        return IRegistry.ENTITY_TYPE;
+        return (RegistryMaterials) IRegistry.ENTITY_TYPE;
     }
 #elseif version >= 1.13
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-        return EntityTypes.REGISTRY;
+        return (RegistryMaterials) EntityTypes.REGISTRY;
     }
 #elseif version >= 1.11
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
@@ -55,7 +55,7 @@ class EntityTypes {
     }
 
     public optional int getTypeId() {
-        return IRegistry.ENTITY_TYPE.a(instance_raw);
+        return IRegistry.ENTITY_TYPE.a(instance);
     }
 #elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();

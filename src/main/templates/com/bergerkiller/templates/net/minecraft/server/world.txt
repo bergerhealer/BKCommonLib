@@ -269,7 +269,7 @@ class World extends IBlockAccess {
         if (array == null) {
             return null;
         }
-        return array#getNibbleData().clone();
+        return (byte[]) array#getNibbleData().clone();
     }
 
     public byte[] getSectionBlockLight(int cx, int cy, int cz) {
@@ -279,7 +279,7 @@ class World extends IBlockAccess {
         if (array == null) {
             return null;
         }
-        return array#getNibbleData().clone();
+        return (byte[]) array#getNibbleData().clone();
     }
 #else
     #require net.minecraft.server.Chunk private final ChunkSection[] sections;
@@ -298,7 +298,7 @@ class World extends IBlockAccess {
         if (array == null) {
             return null;
         }
-        return array#getNibbleData().clone();
+        return (byte[]) array#getNibbleData().clone();
     }
 
     public byte[] getSectionBlockLight(int cx, int cy, int cz) {
@@ -315,7 +315,7 @@ class World extends IBlockAccess {
         if (array == null) {
             return null;
         }
-        return array#getNibbleData().clone();
+        return (byte[]) array#getNibbleData().clone();
     }
 #endif
 
@@ -345,7 +345,7 @@ class WorldServer extends World {
 #endif
 
     public com.bergerkiller.bukkit.common.wrappers.EntityTracker getEntityTracker() {
-        Object handle = com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getEntityTrackerHandle.invoke(instance_raw);
+        Object handle = com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getEntityTrackerHandle.invoke(instance);
 
         // If hooked, make sure to take the original so that changes can be made safely
         com.bergerkiller.mountiplex.reflection.ClassInterceptor hook;
@@ -454,7 +454,7 @@ class WorldServer extends World {
     public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
         com.bergerkiller.mountiplex.reflection.declarations.Template.Method getForcedChunkMethod;
         getForcedChunkMethod = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.T.getForcedChunk.raw;
-        ForcedChunk forcedchunk = (ForcedChunk) getForcedChunkMethod.invoke(instance_raw);
+        ForcedChunk forcedchunk = (ForcedChunk) getForcedChunkMethod.invoke(instance);
 
   #if version >= 1.14
         long key = ChunkCoordIntPair.pair(x, z);
@@ -585,7 +585,7 @@ class ChunkProviderServer {
 
 #if version >= 1.14
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
+        return (Chunk) instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
     }
 #elseif version >= 1.13.1
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
@@ -626,7 +626,7 @@ class ChunkProviderServer {
 #else
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy proxy;
-        proxy = new com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy(consumer, instance_raw, cx, cz);
+        proxy = new com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy(consumer, instance, cx, cz);
         instance.getChunkAt(cx, cz, proxy);
     }
 #endif
@@ -755,8 +755,8 @@ class MovingObjectPosition {
 
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
 #if version >= 1.14
-        if (instance_raw instanceof MovingObjectPositionBlock) {
-            return ((MovingObjectPositionBlock) instance_raw).getDirection();
+        if (instance instanceof MovingObjectPositionBlock) {
+            return ((MovingObjectPositionBlock) instance).getDirection();
         } else {
             return EnumDirection.DOWN;
         }

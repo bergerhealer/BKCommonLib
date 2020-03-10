@@ -180,7 +180,7 @@ class PlayerChunkMap {
 #if version >= 1.14
     public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z) {
         #require net.minecraft.server.PlayerChunkMap protected (Object) PlayerChunk getChunk_1_14:getVisibleChunk(long i);
-        return instance#getChunk_1_14(ChunkCoordIntPair.pair(x, z));
+        return (PlayerChunk) instance#getChunk_1_14(ChunkCoordIntPair.pair(x, z));
     }
 #elseif version >= 1.9.4
     public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z);

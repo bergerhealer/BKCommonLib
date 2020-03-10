@@ -296,7 +296,7 @@ class HeightMap {
     // The server offers no method on these versions to do so.
     public void initialize() {
         com.bergerkiller.generated.net.minecraft.server.HeightMapHandle handle;
-        handle = com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.createHandle(instance_raw);
+        handle = com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.createHandle(instance);
 
         com.bergerkiller.generated.net.minecraft.server.ChunkHandle chunkHandle = handle.getChunk();
         org.bukkit.World world = chunkHandle.getBukkitChunk().getWorld();

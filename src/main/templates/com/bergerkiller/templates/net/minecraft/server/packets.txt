@@ -282,7 +282,7 @@ class PacketPlayInUseItem extends Packet {
         return instance.c().getDirection();
     }
     public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance);
         instance.c()#direction_face = direction;
     }
 #elseif version >= 1.9
@@ -329,7 +329,7 @@ class PacketPlayInUseItem extends Packet {
         return instance.c().getBlockPosition();
     }
     public void setPosition((IntVector3) BlockPosition blockPosition) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance);
 
         // Make sure to preserve deltas
         Vec3D position = instance.c().getPos();
@@ -353,19 +353,19 @@ class PacketPlayInUseItem extends Packet {
         return (float) (instance.c().getPos().z - (double) instance.c().getBlockPosition().getZ());
     }
     public void setDeltaX(float dx) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance);
         Vec3D old_position = instance.c().getPos();
         Vec3D new_position = new Vec3D((double) dx + instance.c().getBlockPosition().getX(), old_position.y, old_position.z);
         instance.c()#position = new_position;
     }
     public void setDeltaY(float dy) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance);
         Vec3D old_position = instance.c().getPos();
         Vec3D new_position = new Vec3D(old_position.x, (double) dy + instance.c().getBlockPosition().getY(), old_position.z);
         instance.c()#position = new_position;
     }
     public void setDeltaZ(float dz) {
-        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance_raw);
+        com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseItemHandle.T.initMovingObject.invoke(instance);
         Vec3D old_position = instance.c().getPos();
         Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + instance.c().getBlockPosition().getZ());
         instance.c()#position = new_position;
