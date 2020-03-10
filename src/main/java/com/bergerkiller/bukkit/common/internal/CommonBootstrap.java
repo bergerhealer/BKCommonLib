@@ -83,9 +83,10 @@ public class CommonBootstrap {
                 initLog4j();
 
                 // Always Spigot server
-                _commonServer = new SpigotServer();
-                _commonServer.init();
-                _commonServer.postInit();
+                CommonServer server = new SpigotServer();
+                server.init();
+                server.postInit();
+                _commonServer = server;
             } else {
                 // Autodetect most likely server type
                 List<CommonServer> servers = new ArrayList<>();
