@@ -28,7 +28,7 @@ public abstract class BlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Iterable<?> getRegistry() {
-        return T.getRegistry.invoke();
+        return T.getRegistry.invoker.invoke(null);
     }
 
     public static IBlockDataHandle getByCombinedId(int combinedId) {

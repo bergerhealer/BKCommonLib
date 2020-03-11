@@ -23,7 +23,7 @@ public abstract class IRegistryHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static int getWindowIdFromName(String name) {
-        return T.getWindowIdFromName.invoke(name);
+        return T.getWindowIdFromName.invoker.invoke(null,name);
     }
 
     /**

@@ -31,15 +31,15 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
     }
 
     public static Object getItemFromMaterial(Material material) {
-        return T.getItemFromMaterial.invoke(material);
+        return T.getItemFromMaterial.invoker.invoke(null,material);
     }
 
     public static Object getBlockFromMaterial(Material material) {
-        return T.getBlockFromMaterial.invoke(material);
+        return T.getBlockFromMaterial.invoker.invoke(null,material);
     }
 
     public static int getDataVersion() {
-        return T.getDataVersion.invoke();
+        return T.getDataVersion.invoker.invoke(null);
     }
 
 

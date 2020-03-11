@@ -27,7 +27,7 @@ public abstract class CraftPotionUtilHandle extends Template.Handle {
     }
 
     public static Object fromBukkit(PotionEffect effect) {
-        return T.fromBukkit.invoke(effect);
+        return T.fromBukkit.invoker.invoke(null,effect);
     }
 
     /**

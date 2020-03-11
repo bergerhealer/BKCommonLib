@@ -27,7 +27,7 @@ public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object fromIntVector2Raw(IntVector2 vector) {
-        return T.fromIntVector2Raw.invoke(vector);
+        return T.fromIntVector2Raw.invoker.invoke(null,vector);
     }
 
     public abstract IntVector2 toIntVector2();

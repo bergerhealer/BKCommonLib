@@ -24,11 +24,11 @@ public abstract class CraftBlockHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object getBlockPosition(Block block) {
-        return T.getBlockPosition.invoke(block);
+        return T.getBlockPosition.invoker.invoke(null,block);
     }
 
     public static Block createBlockAtTileEntity(Object nmsTileEntity) {
-        return T.createBlockAtTileEntity.invoke(nmsTileEntity);
+        return T.createBlockAtTileEntity.invoker.invoke(null,nmsTileEntity);
     }
 
     public abstract BlockData getBlockData();

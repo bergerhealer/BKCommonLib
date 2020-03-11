@@ -27,11 +27,11 @@ public abstract class CraftArtHandle extends Template.Handle {
     }
 
     public static Object BukkitToNotch(Art art) {
-        return T.BukkitToNotch.invoke(art);
+        return T.BukkitToNotch.invoker.invoke(null,art);
     }
 
     public static Object NotchFromInternalId(int internalId) {
-        return T.NotchFromInternalId.invoke(internalId);
+        return T.NotchFromInternalId.invoker.invoke(null,internalId);
     }
 
     public static int NotchToInternalId(Object art) {
@@ -39,7 +39,7 @@ public abstract class CraftArtHandle extends Template.Handle {
     }
 
     public static Object NotchFromInternalName(String internalName) {
-        return T.NotchFromInternalName.invoke(internalName);
+        return T.NotchFromInternalName.invoker.invoke(null,internalName);
     }
 
     public static String NotchToInternalName(Object art) {

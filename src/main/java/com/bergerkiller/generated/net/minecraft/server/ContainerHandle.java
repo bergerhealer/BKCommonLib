@@ -25,7 +25,7 @@ public abstract class ContainerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static ContainerHandle fromBukkit(InventoryView bukkitView) {
-        return T.fromBukkit.invoke(bukkitView);
+        return T.fromBukkit.invoker.invoke(null,bukkitView);
     }
 
     public abstract InventoryView getBukkitView();

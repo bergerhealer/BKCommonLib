@@ -27,7 +27,7 @@ public abstract class Vec3DHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object fromBukkitRaw(Vector vector) {
-        return T.fromBukkitRaw.invoke(vector);
+        return T.fromBukkitRaw.invoker.invoke(null,vector);
     }
 
     public abstract Vector toBukkit();

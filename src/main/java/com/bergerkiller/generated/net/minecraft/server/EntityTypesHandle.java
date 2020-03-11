@@ -24,15 +24,15 @@ public abstract class EntityTypesHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Class<?> getEntityClass(String internalEntityName) {
-        return T.getEntityClass.invoke(internalEntityName);
+        return T.getEntityClass.invoker.invoke(null,internalEntityName);
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        return T.getEntityInternalName.invoke(entityType);
+        return T.getEntityInternalName.invoker.invoke(null,entityType);
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-        return T.getEntityTypeId.invoke(entityType);
+        return T.getEntityTypeId.invoker.invoke(null,entityType);
     }
 
     /**

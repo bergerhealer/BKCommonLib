@@ -23,7 +23,7 @@ public abstract class DimensionManagerHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object fromId(int i) {
-        return T.fromId.invoke(i);
+        return T.fromId.invoker.invoke(null,i);
     }
 
     public abstract int getId();

@@ -23,7 +23,7 @@ public abstract class ContainerAnvilHandle extends ContainerHandle {
     /* ============================================================================== */
 
     public static ContainerAnvilHandle fromBukkit(InventoryView bukkitView) {
-        return T.fromBukkit.invoke(bukkitView);
+        return T.fromBukkit.invoker.invoke(null,bukkitView);
     }
 
     public abstract String getRenameText();

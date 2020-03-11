@@ -28,11 +28,11 @@ public abstract class BlockPositionHandle extends BaseBlockPositionHandle {
     /* ============================================================================== */
 
     public static Object fromIntVector3Raw(IntVector3 vector) {
-        return T.fromIntVector3Raw.invoke(vector);
+        return T.fromIntVector3Raw.invoker.invoke(null,vector);
     }
 
     public static Object fromBukkitBlockRaw(Block block) {
-        return T.fromBukkitBlockRaw.invoke(block);
+        return T.fromBukkitBlockRaw.invoker.invoke(null,block);
     }
 
 

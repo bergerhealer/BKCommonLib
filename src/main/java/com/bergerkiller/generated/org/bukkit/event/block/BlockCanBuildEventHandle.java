@@ -25,7 +25,7 @@ public abstract class BlockCanBuildEventHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static BlockCanBuildEvent create(Block block, BlockData data, boolean canBuild) {
-        return T.create.invoke(block, data, canBuild);
+        return T.create.invoker.invoke(null,block, data, canBuild);
     }
 
     /**

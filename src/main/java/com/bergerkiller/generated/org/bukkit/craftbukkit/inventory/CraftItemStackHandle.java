@@ -23,7 +23,7 @@ public abstract class CraftItemStackHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Object asNMSCopy(ItemStack original) {
-        return T.asNMSCopy.invoke(original);
+        return T.asNMSCopy.invoker.invoke(null,original);
     }
 
     public static ItemStack asCraftCopy(ItemStack original) {

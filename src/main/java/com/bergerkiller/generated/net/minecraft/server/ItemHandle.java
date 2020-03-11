@@ -24,7 +24,7 @@ public abstract class ItemHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static Iterable<?> getRegistry() {
-        return T.getRegistry.invoke();
+        return T.getRegistry.invoker.invoke(null);
     }
 
     public abstract int getMaxStackSize();

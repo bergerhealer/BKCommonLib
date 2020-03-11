@@ -23,7 +23,7 @@ public abstract class CraftSoundHandle extends Template.Handle {
     /* ============================================================================== */
 
     public static String getSoundName(Sound sound) {
-        return T.getSoundName.invoke(sound);
+        return T.getSoundName.invoker.invoke(null,sound);
     }
 
     /**

@@ -23,7 +23,7 @@ public abstract class PlayerInventoryHandle extends IInventoryHandle {
     /* ============================================================================== */
 
     public static int getHotbarSize() {
-        return T.getHotbarSize.invoke();
+        return T.getHotbarSize.invoker.invoke(null);
     }
 
     public abstract CommonTagList saveToNBT(CommonTagList nbttaglist);
