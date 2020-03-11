@@ -40,7 +40,7 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
 
     public int getSectionsMask() {
         if (T.sectionsMask.isAvailable()) {
-            return T.sectionsMask.get(getRaw());
+            return T.sectionsMask.getInteger(getRaw());
         } else {
             return T.chunkInfo.get(getRaw()).getSectionsMask();
         }

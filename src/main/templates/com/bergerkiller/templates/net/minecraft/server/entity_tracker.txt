@@ -102,7 +102,14 @@ class EntityTrackerEntry {
     private final int trackingDistance;
 
     public int getPlayerViewDistance() {
-        return 10; // TODO: PlayerChunkMap.this.A
+        #require net.minecraft.server.EntityTrackerEntry final PlayerChunkMap entityTracker:this$0;
+  #if version >= 1.14.1
+        #require net.minecraft.server.PlayerChunkMap private int playerViewDistance:viewDistance;
+  #else
+        #require net.minecraft.server.PlayerChunkMap private int playerViewDistance:A;
+  #endif
+        Object playerChunkMap = instance#entityTracker;
+        return playerChunkMap#playerViewDistance;
     }
 #elseif version >= 1.9
     private final int trackingDistance:e;

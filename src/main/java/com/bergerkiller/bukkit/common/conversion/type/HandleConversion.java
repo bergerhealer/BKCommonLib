@@ -81,7 +81,7 @@ public class HandleConversion {
     @ConverterMethod(output="T extends net.minecraft.server.Entity")
     public static Object toEntityHandle(org.bukkit.entity.Entity entity) {
         if (CraftEntityHandle.T.isAssignableFrom(entity)) {
-            return CraftEntityHandle.T.getHandle.invoke(entity);
+            return CraftEntityHandle.T.getHandle.invoker.invoke(entity);
         } else {
             return null;
         }
@@ -90,7 +90,7 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.WorldServer")
     public static Object toWorldHandle(org.bukkit.World world) {
         if (CraftWorldHandle.T.isAssignableFrom(world)) {
-            return CraftWorldHandle.T.getHandle.invoke(world);
+            return CraftWorldHandle.T.getHandle.invoker.invoke(world);
         } else {
             return null;
         }
@@ -99,7 +99,7 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.Chunk")
     public static Object toChunkHandle(org.bukkit.Chunk chunk) {
         if (CraftChunkHandle.T.isAssignableFrom(chunk)) {
-            return CraftChunkHandle.T.getHandle.invoke(chunk);
+            return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
         } else {
             return null;
         }
@@ -237,27 +237,27 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.ChunkCoordIntPair")
     public static Object toChunkCoordIntPairHandle(IntVector2 intVector2) {
-        return ChunkCoordIntPairHandle.T.fromIntVector2Raw.invoke(intVector2);
+        return ChunkCoordIntPairHandle.T.fromIntVector2Raw.invoker.invoke(null, intVector2);
     }
 
     @ConverterMethod(output="net.minecraft.server.BlockPosition")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
-        return BlockPositionHandle.T.fromIntVector3Raw.invoke(intVector3);
+        return BlockPositionHandle.T.fromIntVector3Raw.invoker.invoke(null, intVector3);
     }
 
     @ConverterMethod(output="net.minecraft.server.BlockPosition")
     public static Object toBlockPositionHandle(Block block) {
-        return BlockPositionHandle.T.fromBukkitBlockRaw.invoke(block);
+        return BlockPositionHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
     }
 
     @ConverterMethod(output="net.minecraft.server.Vec3D")
     public static Object toVec3DHandle(Vector vector) {
-        return Vec3DHandle.T.fromBukkitRaw.invoke(vector);
+        return Vec3DHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
     @ConverterMethod(output="net.minecraft.server.Vector3f")
     public static Object toVector3fHandle(Vector vector) {
-        return Vector3fHandle.T.fromBukkitRaw.invoke(vector);
+        return Vector3fHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
     @ConverterMethod(output="net.minecraft.server.PlayerAbilities")
@@ -410,7 +410,7 @@ public class HandleConversion {
 
     @ConverterMethod(input="net.minecraft.server.SoundCategory", optional=true)
     public static String getNameFromSoundCategory(Object soundCategoryHandle) {
-        return SoundCategoryHandle.T.getName.invoke(soundCategoryHandle);
+        return SoundCategoryHandle.T.getName.invoker.invoke(soundCategoryHandle);
     }
 
     @ConverterMethod(output="net.minecraft.server.SoundCategory", optional=true)

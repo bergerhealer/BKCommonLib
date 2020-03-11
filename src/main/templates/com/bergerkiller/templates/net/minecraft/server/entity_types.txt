@@ -144,7 +144,7 @@ class EntityTypes {
     }
 #elseif version >= 1.11
     public static Class<?> getEntityClass(String internalEntityName) {
-        return EntityTypes.b.get(new MinecraftKey(internalEntityName));
+        return (Class) EntityTypes.b.get(new MinecraftKey(internalEntityName));
     }
 
     public static String getEntityInternalName(Class<?> entityType) {

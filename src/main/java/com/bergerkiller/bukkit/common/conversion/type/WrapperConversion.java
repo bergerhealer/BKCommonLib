@@ -69,6 +69,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
@@ -80,7 +81,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
-import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftEntity;
 
 public class WrapperConversion {
 
@@ -90,7 +90,7 @@ public class WrapperConversion {
             // We need this to avoid NPE's for non-spawned entities!
             org.bukkit.entity.Entity entity = EntityHandle.T.bukkitEntityField.get(nmsEntityHandle);
             if (entity == null) {
-                entity = CBCraftEntity.getEntity.invoke(null, Bukkit.getServer(), nmsEntityHandle);
+                entity = (org.bukkit.entity.Entity) CraftEntityHandle.T.createCraftEntity.raw.invoke(null, Bukkit.getServer(), nmsEntityHandle);
                 EntityHandle.T.bukkitEntityField.set(nmsEntityHandle, entity);
             }
             return entity;
@@ -258,7 +258,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Container")
     public static org.bukkit.inventory.InventoryView toInventoryView(Object nmsContainerHandle) {
-        return ContainerHandle.T.getBukkitView.invoke(nmsContainerHandle);
+        return ContainerHandle.T.getBukkitView.invoker.invoke(nmsContainerHandle);
     }
 
     @ConverterMethod
@@ -269,7 +269,7 @@ public class WrapperConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.server.EnumDifficulty")
     public static org.bukkit.Difficulty toDifficulty(Object nmsEnumDifficultyHandle) {
-        Integer id = EnumDifficultyHandle.T.getId.invoke(nmsEnumDifficultyHandle);
+        Integer id = EnumDifficultyHandle.T.getId.invoker.invoke(nmsEnumDifficultyHandle);
         return Difficulty.getByValue(id.intValue());
     }
 
@@ -342,12 +342,12 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ChunkCoordIntPair")
     public static IntVector2 toIntVector2(Object nmsChunkCoordIntPairHandle) {
-        return ChunkCoordIntPairHandle.T.toIntVector2.invoke(nmsChunkCoordIntPairHandle);
+        return ChunkCoordIntPairHandle.T.toIntVector2.invoker.invoke(nmsChunkCoordIntPairHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.BlockPosition")
     public static IntVector3 toIntVector3(Object nmsBlockPositionHandle) {
-        return BaseBlockPositionHandle.T.toIntVector3.invoke(nmsBlockPositionHandle);
+        return BaseBlockPositionHandle.T.toIntVector3.invoker.invoke(nmsBlockPositionHandle);
     }
 
     @ConverterMethod
@@ -357,7 +357,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Vec3D")
     public static Vector toVector(Object nmsVec3DHandle) {
-        return Vec3DHandle.T.toBukkit.invoke(nmsVec3DHandle);
+        return Vec3DHandle.T.toBukkit.invoker.invoke(nmsVec3DHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.Vector3f")
@@ -521,7 +521,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
     public static int enumItemSlotToIndex(Object nmsEnumItemSlot) {
-        return EnumItemSlotHandle.T.getIndex.invoke(nmsEnumItemSlot);
+        return EnumItemSlotHandle.T.getIndex.invoker.invoke(nmsEnumItemSlot);
     }
 
     @ConverterMethod
@@ -536,7 +536,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ChatMessageType", optional=true)
     public static ChatMessageType toChatMessageType(Object nmsChatMessageType) {
-        return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoke(nmsChatMessageType).byteValue());
+        return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoker.invoke(nmsChatMessageType).byteValue());
     }
 
     @ConverterMethod()
