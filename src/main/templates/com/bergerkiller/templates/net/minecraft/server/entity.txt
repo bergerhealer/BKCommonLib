@@ -131,14 +131,36 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double lastZ;
 
 #if version >= 1.15
-    private double locX;
-    private double locY;
-    private double locZ;
+    private double locXField:locX;
+    private double locYField:locY;
+    private double locZField:locZ;
+
+    public double getLocX:locX();
+    public double getLocY:locY();
+    public double getLocZ:locZ();
+
+    public void setLoc:setPositionRaw(double x, double y, double z);
 #else
-    public double locX;
-    public double locY;
-    public double locZ;
+    public double locXField:locX;
+    public double locYField:locY;
+    public double locZField:locZ;
+
+    public double getLocX() { return instance.locX; }
+    public double getLocY() { return instance.locY; }
+    public double getLocZ() { return instance.locZ; }
+
+    public void setLoc(double x, double y, double z) {
+        instance.locX = x;
+        instance.locY = y;
+        instance.locZ = z;
+    }
 #endif
+
+    <code>
+    public void setLocX(double value) { setLocXField(value); }
+    public void setLocY(double value) { setLocYField(value); }
+    public void setLocZ(double value) { setLocZField(value); }
+    </code>
 
 #if version >= 1.15
     public boolean isLastAndCurrentPositionDifferent() {

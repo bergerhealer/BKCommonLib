@@ -28,50 +28,62 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
         return HandleConversion.toEntityHandle(entity);
     }
 
+    @Deprecated
     public static double getLocX(Entity entity) {
-        return EntityHandle.T.locX.getDouble(h(entity));
+        return EntityHandle.T.locXField.getDouble(h(entity));
     }
 
+    @Deprecated
     public static void setLocX(Entity entity, double value) {
-        EntityHandle.T.locX.setDouble(h(entity), value);
+        EntityHandle.T.locXField.setDouble(h(entity), value);
     }
 
+    @Deprecated
     public static double getLocY(Entity entity) {
-        return EntityHandle.T.locY.getDouble(h(entity));
+        return EntityHandle.T.locYField.getDouble(h(entity));
     }
 
+    @Deprecated
     public static void setLocY(Entity entity, double value) {
-        EntityHandle.T.locY.setDouble(h(entity), value);
+        EntityHandle.T.locYField.setDouble(h(entity), value);
     }
 
+    @Deprecated
     public static double getLocZ(Entity entity) {
-        return EntityHandle.T.locZ.getDouble(h(entity));
+        return EntityHandle.T.locZField.getDouble(h(entity));
     }
 
+    @Deprecated
     public static void setLocZ(Entity entity, double value) {
-        EntityHandle.T.locZ.setDouble(h(entity), value);
+        EntityHandle.T.locZField.setDouble(h(entity), value);
     }
 
+    @Deprecated
     public static double getMotX(Entity entity) {
         return EntityHandle.T.getMotX.invoke(h(entity));
     }
 
+    @Deprecated
     public static void setMotX(Entity entity, double value) {
         EntityHandle.T.setMotX.invoke(h(entity), value);
     }
 
+    @Deprecated
     public static double getMotY(Entity entity) {
         return EntityHandle.T.getMotY.invoke(h(entity));
     }
 
+    @Deprecated
     public static void setMotY(Entity entity, double value) {
         EntityHandle.T.setMotY.invoke(h(entity), value);
     }
 
+    @Deprecated
     public static double getMotZ(Entity entity) {
         return EntityHandle.T.getMotZ.invoke(h(entity));
     }
 
+    @Deprecated
     public static void setMotZ(Entity entity, double value) {
         EntityHandle.T.setMotZ.invoke(h(entity), value);
     }

@@ -39,6 +39,10 @@ public abstract class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract double getLocX();
+    public abstract double getLocY();
+    public abstract double getLocZ();
+    public abstract void setLoc(double x, double y, double z);
     public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
     public abstract void setMotVector(Vector mot);
@@ -148,6 +152,11 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
 
+    public void setLocX(double value) { setLocXField(value); }
+    public void setLocY(double value) { setLocYField(value); }
+    public void setLocZ(double value) { setLocZField(value); }
+
+
     public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
     public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.Type.INTEGER.createKey(T.DATA_AIR_TICKS, 1);
     public static final DataWatcher.Key<ChatText> DATA_CUSTOM_NAME;
@@ -250,12 +259,12 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLastY(double value);
     public abstract double getLastZ();
     public abstract void setLastZ(double value);
-    public abstract double getLocX();
-    public abstract void setLocX(double value);
-    public abstract double getLocY();
-    public abstract void setLocY(double value);
-    public abstract double getLocZ();
-    public abstract void setLocZ(double value);
+    public abstract double getLocXField();
+    public abstract void setLocXField(double value);
+    public abstract double getLocYField();
+    public abstract void setLocYField(double value);
+    public abstract double getLocZField();
+    public abstract void setLocZField(double value);
     public abstract float getYaw();
     public abstract void setYaw(float value);
     public abstract float getPitch();
@@ -351,9 +360,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Double lastX = new Template.Field.Double();
         public final Template.Field.Double lastY = new Template.Field.Double();
         public final Template.Field.Double lastZ = new Template.Field.Double();
-        public final Template.Field.Double locX = new Template.Field.Double();
-        public final Template.Field.Double locY = new Template.Field.Double();
-        public final Template.Field.Double locZ = new Template.Field.Double();
+        public final Template.Field.Double locXField = new Template.Field.Double();
+        public final Template.Field.Double locYField = new Template.Field.Double();
+        public final Template.Field.Double locZField = new Template.Field.Double();
         public final Template.Field.Float yaw = new Template.Field.Float();
         public final Template.Field.Float pitch = new Template.Field.Float();
         public final Template.Field.Float lastYaw = new Template.Field.Float();
@@ -390,6 +399,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
+        public final Template.Method<Double> getLocX = new Template.Method<Double>();
+        public final Template.Method<Double> getLocY = new Template.Method<Double>();
+        public final Template.Method<Double> getLocZ = new Template.Method<Double>();
+        public final Template.Method<Void> setLoc = new Template.Method<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
         public final Template.Method<Void> setMotVector = new Template.Method<Void>();

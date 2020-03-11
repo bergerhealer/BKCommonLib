@@ -91,6 +91,11 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return this;
         }
 
+        public LocationAbstract set(double x, double y, double z) {
+            ExtendedEntity.this.handle.setLoc(x, y, z);
+            return this;
+        }
+
         public float getYaw() {
             return ExtendedEntity.this.handle.getYaw();
         }
