@@ -63,7 +63,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.block.Block block) {
-        return BlockData.fromBlockData(getBlockData_raw.invoke(block));
+        return BlockData.fromBlockData(getBlockData_raw.invoker.invoke(block));
     }
 
     /**
