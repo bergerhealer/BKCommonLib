@@ -87,7 +87,7 @@ public class WorldUtil extends ChunkUtil {
      * @return BlockData
      */
     public static BlockData getBlockData(org.bukkit.World world, int x, int y, int z) {
-        return WorldHandle.T.getBlockDataAtCoord.invoke(HandleConversion.toWorldHandle(world), x, y, z);
+        return WorldHandle.T.getBlockDataAtCoord.invoker.invoke(HandleConversion.toWorldHandle(world), x, y, z);
 
         /*
         Object worldHandleRaw = HandleConversion.toWorldHandle(world);

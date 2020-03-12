@@ -81,7 +81,11 @@ class World extends IBlockAccess {
         if (y >= 0 && y < 256) {
             ChunkSection section = instance.getChunkAt(x >> 4, z >> 4).getSections()[y >> 4];
             if (section != null) {
-                IBlockData blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
+#if version >= 1.9
+                Object blockData = section.getBlocks().a(x & 0xF, y & 0xF, z & 0xF);
+#else
+                Object blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
+#endif
                 return com.bergerkiller.bukkit.common.wrappers.BlockData.fromBlockData(blockData);
             }
         }
