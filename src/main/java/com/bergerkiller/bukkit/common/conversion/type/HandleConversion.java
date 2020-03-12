@@ -80,28 +80,40 @@ public class HandleConversion {
 
     @ConverterMethod(output="T extends net.minecraft.server.Entity")
     public static Object toEntityHandle(org.bukkit.entity.Entity entity) {
-        if (CraftEntityHandle.T.isAssignableFrom(entity)) {
+        try {
             return CraftEntityHandle.T.getHandle.invoker.invoke(entity);
-        } else {
-            return null;
+        } catch (RuntimeException ex) {
+            if (CraftEntityHandle.T.isAssignableFrom(entity)) {
+                throw ex;
+            } else {
+                return null;
+            }
         }
     }
 
     @ConverterMethod(output="net.minecraft.server.WorldServer")
     public static Object toWorldHandle(org.bukkit.World world) {
-        if (CraftWorldHandle.T.isAssignableFrom(world)) {
+        try {
             return CraftWorldHandle.T.getHandle.invoker.invoke(world);
-        } else {
-            return null;
+        } catch (RuntimeException ex) {
+            if (CraftWorldHandle.T.isAssignableFrom(world)) {
+                throw ex;
+            } else {
+                return null;
+            }
         }
     }
 
     @ConverterMethod(output="net.minecraft.server.Chunk")
     public static Object toChunkHandle(org.bukkit.Chunk chunk) {
-        if (CraftChunkHandle.T.isAssignableFrom(chunk)) {
+        try {
             return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
-        } else {
-            return null;
+        } catch (RuntimeException ex) {
+            if (CraftChunkHandle.T.isAssignableFrom(chunk)) {
+                throw ex;
+            } else {
+                return null;
+            }
         }
     }
 
