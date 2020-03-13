@@ -9,9 +9,11 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -25,18 +27,28 @@ import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 
 /**
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is
  * to hook the 'entitiesByUUID' map, and override the methods that add/remove from it.
  */
 public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
-    private final SafeField<?> entitiesByIdField;
+    private final FastField<?> entitiesByIdField = new FastField<Object>();
     private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
 
+    //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
     public EntityAddRemoveHandler_1_14() {
-        this.entitiesByIdField = SafeField.create(WorldServerHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
+        try {
+            entitiesByIdField.init(WorldServerHandle.T.getType().getDeclaredField("entitiesById"));
+            if (!IntHashMapHandle.T.isAssignableFrom(entitiesByIdField.getType())) {
+                throw new IllegalStateException("Field not assignable to IntHashmap");
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesById field: " + t.getMessage(), t);
+            entitiesByIdField.initUnavailable("entitiesById");
+        }
         this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), "entitiesToAdd", Queue.class));
     }
 

@@ -195,7 +195,11 @@ class PlayerChunkMap {
 
 #if version >= 1.14
     public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
+  #if exists net.minecraft.server.PlayerChunkMap public final com.tuinity.tuinity.chunk.QueuedChangesMapLong2Object<net.minecraft.server.PlayerChunk> chunkMap;
+        PlayerChunk chunk = (PlayerChunk) instance.chunkMap.getVisible(ChunkCoordIntPair.pair(chunkX, chunkZ));
+  #else
         PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
+  #endif
         if (chunk == null || chunk.getChunk() == null) {
             return false;
         }
