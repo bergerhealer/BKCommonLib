@@ -68,6 +68,11 @@ public class Common {
      */
     public static final boolean IS_PAPERSPIGOT_SERVER;
     /**
+     * Gets whether the current server software used is the Purpur
+     * implementation (based on Paper Spigot)
+     */
+    public static final boolean IS_PURPUR_SERVER;
+    /**
      * Whether BKCommonLib is compatible with the server it is currently running
      * on
      */
@@ -105,6 +110,7 @@ public class Common {
         MC_VERSION = SERVER.getMinecraftVersion();
         IS_SPIGOT_SERVER = CommonBootstrap.isSpigotServer();
         IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
+        IS_PURPUR_SERVER = SERVER instanceof PurpurServer;
         IS_COMPATIBLE = SERVER.isCompatible();
         TEMPLATE_RESOLVER = CommonBootstrap.initTemplates();
     }

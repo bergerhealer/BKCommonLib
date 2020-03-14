@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
 import com.bergerkiller.bukkit.common.server.PaperSpigotServer;
+import com.bergerkiller.bukkit.common.server.PurpurServer;
 import com.bergerkiller.bukkit.common.server.SpigotServer;
 import com.bergerkiller.bukkit.common.server.SportBukkitServer;
 import com.bergerkiller.bukkit.common.server.TestServerFactory;
@@ -91,6 +92,7 @@ public class CommonBootstrap {
                 // Autodetect most likely server type
                 List<CommonServer> servers = new ArrayList<>();
                 servers.add(new MCPCPlusServer());
+                servers.add(new PurpurServer());
                 servers.add(new PaperSpigotServer());
                 servers.add(new SpigotServer());
                 servers.add(new SportBukkitServer());

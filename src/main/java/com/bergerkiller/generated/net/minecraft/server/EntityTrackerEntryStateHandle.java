@@ -292,6 +292,10 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Converted<Entity> opt_vehicle = new Template.Field.Converted<Entity>();
 
+        @Template.Optional
+        public final Template.Method.Converted<Void> onViewerAdded_purpur = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method<Void> removeViewerFromMap_purpur = new Template.Method<Void>();
         public final Template.Method<Boolean> checkTrackNeeded = new Template.Method<Boolean>();
         public final Template.Method.Converted<CommonPacket> getSpawnPacket = new Template.Method.Converted<CommonPacket>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();

@@ -3,10 +3,12 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 import java.util.logging.Level;
 
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -62,7 +64,13 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
     public void updatePlayer(Object entityplayer) {
         if (entityplayer != controller.getEntity().getHandle()) {
             try {
-                controller.updateViewer(Conversion.toPlayer.convert(entityplayer));
+                // Add or remove the viewer depending on whether this entity is viewable by the viewer
+                Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
+                if (controller.isViewable(viewer)) {
+                    controller.addViewer(viewer);
+                } else {
+                    controller.removeViewer(viewer);
+                }
             } catch (Throwable t) {
                 Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer:");
                 t.printStackTrace();
@@ -95,6 +103,26 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
                 t.printStackTrace();
             }
             handle.setTickCounter(handle.getTickCounter() + 1);
+        }
+
+        // This hook is only used on Purpur server to handle adding a player as a viewer
+        // Normally we handle updatePlayer() causing this method to never be called
+        @HookMethod(value="public void onViewerAdded_purpur:???(EntityPlayer entityplayer)", optional=true)
+        public void addViewerPurpur(Object entityplayer) {
+            try {
+                // Before this method was called, the player was added as viewer to the viewers mapping
+                // Remove from this mapping so that isViewable can cancel it, and addViewer() works as expected
+                EntityTrackerEntryStateHandle.T.removeViewerFromMap_purpur.invoker.invoke(instance(), entityplayer);
+
+                // If viewable, add as a viewer (and add it back to the mapping)
+                Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
+                if (controller.isViewable(viewer)) {
+                    controller.addViewer(viewer);
+                }
+            } catch (Throwable t) {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to add viewer:");
+                t.printStackTrace();
+            }
         }
     }
 }

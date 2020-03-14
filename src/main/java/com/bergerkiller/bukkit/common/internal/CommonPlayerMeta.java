@@ -154,7 +154,9 @@ public class CommonPlayerMeta {
                 if (pendingEntity == null || pendingEntity.getWorld() != viewer.getWorld()) {
                     continue; // not bound or wrong world
                 }
-                pending.updateViewer(viewer);
+                if (pending.isViewable(viewer)) {
+                    pending.addViewer(viewer);
+                }
             }
         }
     }

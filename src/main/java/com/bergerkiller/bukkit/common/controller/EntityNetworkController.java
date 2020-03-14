@@ -447,32 +447,28 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
-     * Adds or removes a viewer based on viewer distance
-     *
-     * @param viewer to update
+     * Checks whether a particular viewer can see this entity
+     * 
+     * @param viewer
+     * @return True if visible
      */
-    public final void updateViewer(Player viewer) {
+    public final boolean isViewable(Player viewer) {
         // If viewer has blindness due to respawning, do not make it visible just yet
         // When blindness runs out, perform an updateViewer again to make this entity visible quickly
         if (!CommonPlugin.getInstance().getPlayerMeta(viewer).respawnBlindnessCheck(this)) {
-            return;
+            return false;
         }
 
-        // Add or remove the viewer depending on whether this entity is viewable by the viewer
-        if (isViewable(viewer)) {
-            addViewer(viewer);
-        } else {
-            removeViewer(viewer);
-        }
+        return isViewable_self_or_passenger(viewer);
     }
 
-    private boolean isViewable(Player viewer) {
+    private boolean isViewable_self_or_passenger(Player viewer) {
         if (isViewable_self(viewer)) {
             return true;
         }
         for (Entity passenger : entity.getPassengers()) {
             EntityNetworkController<?> network = CommonEntity.get(passenger).getNetworkController();
-            if (network != null && network.isViewable(viewer)) {
+            if (network != null && network.isViewable_self_or_passenger(viewer)) {
                 return true;
             }
         }

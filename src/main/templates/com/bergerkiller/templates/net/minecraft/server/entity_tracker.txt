@@ -420,6 +420,19 @@ class EntityTrackerEntryState {
     }
     </code>
 
+    // Special handler for the hook to use on Purpur server
+#if purpur
+    public optional void onViewerAdded_purpur:b((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    public optional void removeViewerFromMap_purpur(Object entityplayer) {
+        #require net.minecraft.server.EntityTrackerEntryState final java.util.Set<net.minecraft.server.EntityPlayer> purpur_trackedPlayers:trackedPlayers;
+        java.util.Set set = instance#purpur_trackedPlayers;
+        set.remove(entityplayer);
+    }
+#else
+    public optional void onViewerAdded_purpur:###((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    public optional void removeViewerFromMap_purpur:###(Object entityplayer);
+#endif
+
 #if version >= 1.14
     // On Minecraft 1.14 this resync distance check is no longer done
     public boolean checkTrackNeeded() {

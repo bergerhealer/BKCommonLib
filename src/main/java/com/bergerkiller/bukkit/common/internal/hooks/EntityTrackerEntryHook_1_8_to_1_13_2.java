@@ -4,10 +4,12 @@ import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.World;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -91,7 +93,13 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
     public void updatePlayer(Object entityplayer) {
         if (entityplayer != controller.getEntity().getHandle()) {
             try {
-                controller.updateViewer(Conversion.toPlayer.convert(entityplayer));
+                // Add or remove the viewer depending on whether this entity is viewable by the viewer
+                Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
+                if (controller.isViewable(viewer)) {
+                    controller.addViewer(viewer);
+                } else {
+                    controller.removeViewer(viewer);
+                }
             } catch (Throwable t) {
                 Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer:");
                 t.printStackTrace();
