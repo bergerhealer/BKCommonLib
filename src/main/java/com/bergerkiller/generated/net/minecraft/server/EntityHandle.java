@@ -438,6 +438,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isInWater = new Template.Method<Boolean>();
         public final Template.Method<Boolean> hasMovementSound = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> updateFalling = new Template.Method.Converted<Void>();
+        @Template.Optional
+        public final Template.Method<Void> setLegacyTrackingEntity = new Template.Method<Void>();
         public final Template.Method<Boolean> isOutsideWorldBorder = new Template.Method<Boolean>();
         public final Template.Method<Void> setOutsideWorldBorder = new Template.Method<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();

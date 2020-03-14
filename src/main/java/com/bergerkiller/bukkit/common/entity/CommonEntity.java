@@ -154,6 +154,15 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             oldController.bind(null, storedEntry.getRaw());
         }
 
+        // Purpur: enable or disable legacy tracking logic when controllers are/not used
+        if (EntityHandle.T.setLegacyTrackingEntity.isAvailable()) {
+            if (controller instanceof DefaultEntityNetworkController) {
+                EntityHandle.T.setLegacyTrackingEntity.invoker.invoke(getHandle(), Boolean.FALSE);
+            } else {
+                EntityHandle.T.setLegacyTrackingEntity.invoker.invoke(getHandle(), Boolean.TRUE);
+            }
+        }
+
         final EntityTrackerEntryHandle newEntry;
         if (controller instanceof DefaultEntityNetworkController) {
             // Assign the default Entity Tracker Entry
@@ -672,6 +681,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // When setting a custom entity network controller, avoid the creation of a default network controller
         // We do this by temporarily hooking the EntityTracker, cancelling track() for the entity we don't want
         if (networkController != null && !(networkController instanceof DefaultEntityNetworkController)) {
+            // Purpur: enable legacy tracking logic when controllers are used
+            if (EntityHandle.T.setLegacyTrackingEntity.isAvailable()) {
+                EntityHandle.T.setLegacyTrackingEntity.invoker.invoke(entity.getHandle(), Boolean.TRUE);
+            }
+
             // Hook the entity tracker to cancel track() on this Entity
             Object nmsWorldHandle = HandleConversion.toWorldHandle(location.getWorld());
             EntityTrackerHook hook = hookWorldEntityTracker(nmsWorldHandle);

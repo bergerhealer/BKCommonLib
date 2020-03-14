@@ -898,6 +898,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
 #endif
 
+    // Purpur: enables the use of legacy entity tracking, which calls updateViewer() every tick
+    public optional final void setLegacyTrackingEntity(boolean isLegacyTrackingEntity);
+
     // See outsideWorldBorderField - is set and returned by these methods
 #if version >= 1.14
     // Removed
