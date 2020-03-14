@@ -304,24 +304,12 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.getChunkX();
     }
 
-    public void setChunkX(int value) {
-        this.handle.setChunkX(value);
-    }
-
     public int getChunkY() {
         return this.handle.getChunkY();
     }
 
-    public void setChunkY(int value) {
-        this.handle.setChunkY(value);
-    }
-
     public int getChunkZ() {
         return this.handle.getChunkZ();
-    }
-
-    public void setChunkZ(int value) {
-        this.handle.setChunkZ(value);
     }
 
     /**

@@ -307,12 +307,12 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setDatawatcherField(DataWatcher value);
     public abstract boolean isLoaded();
     public abstract void setIsLoaded(boolean value);
+    @Template.Readonly
     public abstract int getChunkX();
-    public abstract void setChunkX(int value);
+    @Template.Readonly
     public abstract int getChunkY();
-    public abstract void setChunkY(int value);
+    @Template.Readonly
     public abstract int getChunkZ();
-    public abstract void setChunkZ(int value);
     public abstract boolean isPositionChanged();
     public abstract void setPositionChanged(boolean value);
     public abstract int getPortalCooldown();
@@ -386,8 +386,11 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
+        @Template.Readonly
         public final Template.Field.Integer chunkX = new Template.Field.Integer();
+        @Template.Readonly
         public final Template.Field.Integer chunkY = new Template.Field.Integer();
+        @Template.Readonly
         public final Template.Field.Integer chunkZ = new Template.Field.Integer();
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();

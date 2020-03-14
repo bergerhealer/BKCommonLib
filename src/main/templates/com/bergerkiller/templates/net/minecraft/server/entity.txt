@@ -606,13 +606,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.13
     public boolean isLoaded:inChunk;
   #if fieldexists net.minecraft.server.Entity public int chunkX
-      public int chunkX;
-      public int chunkY;
-      public int chunkZ;
+      public readonly int chunkX;
+      public readonly int chunkY;
+      public readonly int chunkZ;
   #else
-      public int chunkX:ae;
-      public int chunkY:af;
-      public int chunkZ:ag;
+      public readonly int chunkX:ae;
+      public readonly int chunkY:af;
+      public readonly int chunkZ:ag;
   #endif
     public boolean positionChanged:impulse;
 #elseif version >= 1.11
