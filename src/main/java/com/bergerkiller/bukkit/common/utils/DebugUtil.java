@@ -267,14 +267,18 @@ public class DebugUtil {
                 if (f_type.isPrimitive()) continue;
                 if (Class.class.isAssignableFrom(f_type)) continue;
 
-                SecureField sf = new SecureField();
-                sf.init(f);
-                sf.read();
-
-                if (Modifier.isStatic(f.getModifiers())) {
-                    staticFields.add(f);
-                } else {
-                    localFields.add(f);
+                try {
+                    SecureField sf = new SecureField();
+                    sf.init(f);
+                    sf.read();
+                    
+                    if (Modifier.isStatic(f.getModifiers())) {
+                        staticFields.add(f);
+                    } else {
+                        localFields.add(f);
+                    }
+                } catch (RuntimeException ex) {
+                    
                 }
             }
         } while ((t = t.getSuperclass()) != null);
