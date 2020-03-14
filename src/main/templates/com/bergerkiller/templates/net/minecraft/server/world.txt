@@ -408,8 +408,8 @@ class WorldServer extends World {
 #if version >= 1.14
         long key = ChunkCoordIntPair.pair(cx, cz);
 
-  #if exists net.minecraft.server.PlayerChunkMap public final com.tuinity.tuinity.chunk.QueuedChangesMapLong2Object<net.minecraft.server.PlayerChunk> chunkMap;
-        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.chunkMap.getVisible(key);
+  #if purpur && exists net.minecraft.server.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
+        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.getVisibleChunk(key);
   #else
         PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
   #endif
