@@ -295,9 +295,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return chunk
      */
     public Chunk getChunk() {
-        World world = this.getWorld();
-        return (world == null || !this.handle.isLoaded()) ? null :
-            world.getChunkAt(this.handle.getChunkX(), this.handle.getChunkZ());
+        return handle.getCurrentChunk();
     }
 
     public int getChunkX() {

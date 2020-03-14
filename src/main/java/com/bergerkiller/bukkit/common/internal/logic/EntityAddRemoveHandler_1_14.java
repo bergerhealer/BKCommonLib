@@ -248,7 +248,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldInstance.getRaw());
+        // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
     private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {

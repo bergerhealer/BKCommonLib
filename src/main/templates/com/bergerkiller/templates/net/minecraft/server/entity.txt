@@ -617,43 +617,63 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean positionChanged:impulse;
 #elseif version >= 1.11
     public boolean isLoaded:aa;
-    public int chunkX:ab;
-    public int chunkY:ac;
-    public int chunkZ:ad;
+    public readonly int chunkX:ab;
+    public readonly int chunkY:ac;
+    public readonly int chunkZ:ad;
     public unknown boolean ah;
     public boolean positionChanged:impulse;
 #elseif version >= 1.10.2
     public boolean isLoaded:ab;
-    public int chunkX:ac;
-    public int chunkY:ad;
-    public int chunkZ:ae;
+    public readonly int chunkX:ac;
+    public readonly int chunkY:ad;
+    public readonly int chunkZ:ae;
     public unknown boolean ai;
     public boolean positionChanged:impulse;
 #elseif version >= 1.9
     public boolean isLoaded:aa;
-    public int chunkX:ab;
-    public int chunkY:ac;
-    public int chunkZ:ad;
+    public readonly int chunkX:ab;
+    public readonly int chunkY:ac;
+    public readonly int chunkZ:ad;
     public unknown boolean ah;
     public boolean positionChanged:impulse;
 #elseif version >= 1.8.3
     private unknown double ar;
     private unknown double as;
     public boolean isLoaded:ad;
-    public int chunkX:ae;
-    public int chunkY:af;
-    public int chunkZ:ag;
+    public readonly int chunkX:ae;
+    public readonly int chunkY:af;
+    public readonly int chunkZ:ag;
     public unknown boolean ah;
     public boolean positionChanged:ai;
 #else
     private unknown double ap;
     private unknown double aq;
     public boolean isLoaded:ad;
-    public int chunkX:ae;
-    public int chunkY:af;
-    public int chunkZ:ag;
+    public readonly int chunkX:ae;
+    public readonly int chunkY:af;
+    public readonly int chunkZ:ag;
     public unknown boolean ah;
     public boolean positionChanged:ai;
+#endif
+
+#if exists net.minecraft.server.Entity public net.minecraft.server.Chunk getCurrentChunk();
+    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+#elseif version >= 1.13 && exists net.minecraft.server.Entity public int chunkX;
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        if (!instance.inChunk) {
+            return null;
+        }
+        return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+    }
+#else
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        if (!com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.isLoaded.getBoolean(instance)) {
+            return null;
+        }
+        int chunkX = com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkX.getInteger(instance);
+        int chunkZ = com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkZ.getInteger(instance);
+        return instance.world.getChunkIfLoaded(chunkX, chunkZ);
+    }
 #endif
 
     public int portalCooldown;

@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -61,6 +62,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract float getHeight();
     public abstract void setStepCounter(float value);
     public abstract float getStepCounter();
+    public abstract Chunk getCurrentChunk();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
     public abstract void burn(float dmg);
@@ -424,6 +426,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Float> getHeight = new Template.Method<Float>();
         public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
         public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
+        public final Template.Method.Converted<Chunk> getCurrentChunk = new Template.Method.Converted<Chunk>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
         public final Template.Method<Void> burn = new Template.Method<Void>();
