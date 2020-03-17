@@ -107,12 +107,12 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
 
         // This hook is only used on Purpur server to handle adding a player as a viewer
         // Normally we handle updatePlayer() causing this method to never be called
-        @HookMethod(value="public void onViewerAdded_purpur:???(EntityPlayer entityplayer)", optional=true)
+        @HookMethod(value="public void onViewerAdded_tuinity:???(EntityPlayer entityplayer)", optional=true)
         public void addViewerPurpur(Object entityplayer) {
             try {
                 // Before this method was called, the player was added as viewer to the viewers mapping
                 // Remove from this mapping so that isViewable can cancel it, and addViewer() works as expected
-                EntityTrackerEntryStateHandle.T.removeViewerFromMap_purpur.invoker.invoke(instance(), entityplayer);
+                EntityTrackerEntryStateHandle.T.removeViewerFromMap_tuinity.invoker.invoke(instance(), entityplayer);
 
                 // If viewable, add as a viewer (and add it back to the mapping)
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);

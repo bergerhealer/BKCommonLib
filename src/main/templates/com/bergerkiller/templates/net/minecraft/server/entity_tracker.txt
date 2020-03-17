@@ -420,17 +420,18 @@ class EntityTrackerEntryState {
     }
     </code>
 
-    // Special handler for the hook to use on Purpur server
-#if purpur
-    public optional void onViewerAdded_purpur:b((org.bukkit.entity.Player) EntityPlayer entityplayer);
-    public optional void removeViewerFromMap_purpur(Object entityplayer) {
-        #require net.minecraft.server.EntityTrackerEntryState final java.util.Set<net.minecraft.server.EntityPlayer> purpur_trackedPlayers:trackedPlayers;
-        java.util.Set set = instance#purpur_trackedPlayers;
+    // Special handler for the hook to use on Tuinity server
+    // Detect this by checking for the tuinity-added onTrack method
+#if exists net.minecraft.server.EntityTrackerEntryState public final void onTrack(net.minecraft.server.EntityPlayer player);
+    public optional void onViewerAdded_tuinity:b((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    public optional void removeViewerFromMap_tuinity(Object entityplayer) {
+        #require net.minecraft.server.EntityTrackerEntryState final java.util.Set<net.minecraft.server.EntityPlayer> tuinity_trackedPlayers:trackedPlayers;
+        java.util.Set set = instance#tuinity_trackedPlayers;
         set.remove(entityplayer);
     }
 #else
-    public optional void onViewerAdded_purpur:###((org.bukkit.entity.Player) EntityPlayer entityplayer);
-    public optional void removeViewerFromMap_purpur:###(Object entityplayer);
+    public optional void onViewerAdded_tuinity:###((org.bukkit.entity.Player) EntityPlayer entityplayer);
+    public optional void removeViewerFromMap_tuinity:###(Object entityplayer);
 #endif
 
 #if version >= 1.14
