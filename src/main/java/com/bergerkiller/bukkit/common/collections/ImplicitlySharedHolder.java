@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.collections;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Base class for a class that allows multiple instances to hold the same value,
@@ -9,15 +8,15 @@ import java.util.concurrent.locks.ReentrantLock;
  * more than one instance is holding ownership over the data.
  */
 public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
-    protected Reference<T> ref;
+    protected volatile Reference<T> ref;
 
     public ImplicitlySharedHolder(T value) {
-        this(new Reference<T>(value));
+        this.ref = new Reference<T>(value, 1);
     }
 
     protected ImplicitlySharedHolder(Reference<T> reference) {
+        reference.openRead();
         this.ref = reference;
-        this.ref.increment();
     }
 
     /**
@@ -28,9 +27,14 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * @param sharedHolder to assign
      */
     public final void assign(ImplicitlySharedHolder<T> sharedHolder) {
-        this.close();
-        this.ref = sharedHolder.ref;
-        this.ref.increment();
+        // Note assign to self will work fine, the openRead() and close() make parity
+        Reference<T> old_ref = this.ref;
+        Reference<T> new_ref = sharedHolder.ref;
+        new_ref.openRead();
+        this.ref = new_ref;
+        if (old_ref != null) {
+            old_ref.close();
+        }
     }
 
     /**
@@ -51,9 +55,12 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      */
     @Override
     public final void close() {
-        if (this.ref != null) {
-            this.ref.decrement();
-            this.ref = null;
+        //TODO: Not truly atomic, multiple assign/close calls from different threads
+        //      may cause this to become incorrect.
+        Reference<T> old_ref = this.ref;
+        this.ref = null;
+        if (old_ref != null) {
+            old_ref.close();
         }
     }
 
@@ -70,31 +77,44 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
 
     /**
      * Opens exclusive write access, creating a copy of underlying data if required.
-     * The returned reference should be closed, preferably using a try-with-resources.
+     * The returned reference should be closed, preferably using a try-with-resources.<br>
+     * <br>
+     * <b>This method is not re-entrant, and write() should not be called more than once
+     * from one thread!</b>
      * 
      * @return reference to the data that should be modified next
      */
     protected final Reference<T> write() {
-        Reference<T> old_ref = this.read();
+        Reference<T> old_ref = this.ref;
 
-        // If old_ref has more than one instance using it,
-        // we must create a copy of it and assign it to this instance.
-        if (old_ref.ctr > 1) {
-            old_ref.ctr--;
-
-            // Create a clone (while having old_ref locked!)
-            // Lock this clone, so it can not be modified the moment it is assigned
-            Reference<T> new_ref = new Reference<T>(this.cloneValue(old_ref.val));
-            new_ref.ctr++;
-            new_ref.open();
-
-            // Assign the clone and unlock the old ref we had locked.
-            this.ref = new_ref;
-            old_ref.close();
-
-            return new_ref;
+        try {
+            // Fast: if readers is 1, set to WRITER_TOKEN to indicate exclusive write access
+            // If this succeeds, then we can start writing right away
+            // If this throws an exception, very likely ref is null.
+            // In that case, throw a controlled SharedResourceClosedException instead.
+            if (old_ref.openWrite()) {
+                return old_ref;
+            }
+        } catch (RuntimeException ex) {
+            if (old_ref == null) {
+                throw new SharedResourceClosedException();
+            } else {
+                throw ex;
+            }
         }
-        return old_ref;
+
+        // Can't write to this reference, a copy must be created
+        // If another writer is busy with the reference, we must wait for it
+        old_ref.openRead();
+        try {
+            // Having gained read access, create a copy of the data and swap the reference in use
+            Reference<T> new_ref = new Reference<T>(this.cloneValue(old_ref.val), Reference.WRITE_TOKEN);
+            this.ref = new_ref;
+            return new_ref;
+        } finally {
+            // Close read access to the original reference
+            old_ref.close();
+        }
     }
 
     /**
@@ -104,21 +124,21 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * @return reference to the data that should be read from.
      */
     protected final Reference<T> read() {
-        // Acquire exclusive lock of the 'ref'
-        // After a lock succeeds, the 'ref' parameter may have changed
-        // In that case re-lock using the appropriate new ref
-        // until the lock succeeds.
-        Reference<T> old_ref;
-        for (;;) {
-            old_ref = this.ref;
-            old_ref.open();
-            if (old_ref == this.ref) {
-                break;
+        Reference<T> ref = this.ref;
+        try {
+            // Increment counter one more time, making it at least 2.
+            // This will wait until read access is available (nobody is writing).
+            // If this throws an exception, very likely ref is null.
+            // In that case, throw a controlled SharedResourceClosedException instead.
+            ref.openRead();
+            return ref;
+        } catch (RuntimeException ex) {
+            if (ref == null) {
+                throw new SharedResourceClosedException();
             } else {
-                old_ref.close();
+                throw ex;
             }
         }
-        return old_ref;
     }
 
     /**
@@ -133,39 +153,45 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
      * Base class for implicit sharing logic
      */
     protected static final class Reference<T> implements AutoCloseable {
-        private final Lock lock;
-        private int ctr;
+        /// The readers field is set to this value when someone has exclusive write access
+        /// This is a very low value, low enough that multiple increment() operations can
+        /// not result in the value going positive. The write does close it, which will
+        /// cause a single decrement(), which means we need one decrement step.
+        private static final int WRITE_TOKEN = Integer.MIN_VALUE+1;
+        /// Number of currently active read operations
+        /// If this is -1, then somebody has exclusive access to write
+        /// If this is 0, nobody is using it, and it can be written to without copying
+        private final AtomicInteger readers;
         public final T val;
 
-        public Reference(T value) {
-            this.lock = new ReentrantLock();
-            this.ctr = 0;
+        private Reference(T value, int initialReaders) {
+            this.readers = new AtomicInteger(initialReaders);
             this.val = value;
         }
 
         /**
-         * Decrements the reference counter by one
+         * Tries to write to the value stored by this reference.
+         * Only if nobody is currently reading will this method return true.
+         * 
+         * @return True if writing was possible
          */
-        public final void decrement() {
-            this.lock.lock();
-            this.ctr--;
-            this.lock.unlock();
+        public final boolean openWrite() {
+            return this.readers.compareAndSet(1, WRITE_TOKEN);
         }
 
         /**
-         * Increments the reference counter by one
+         * Gains read access to this reference, and waits until anyone
+         * writing to this reference has finished. If writing, it assumes
+         * writing will take a very short time.
          */
-        public final void increment() {
-            this.lock.lock();
-            this.ctr++;
-            this.lock.unlock();
-        }
-
-        /**
-         * Opens exclusive access to this reference
-         */
-        public final void open() {
-            this.lock.lock();
+        public final void openRead() {
+            int value;
+            while ((value = this.readers.incrementAndGet()) < 0) {
+                // Prevent the reader count from going up, reset to WRITE_TOKEN
+                this.readers.compareAndSet(value, WRITE_TOKEN);
+                // Yield (busy wait)
+                Thread.yield();
+            }
         }
 
         /**
@@ -173,8 +199,24 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
          */
         @Override
         public final void close() {
-            this.lock.unlock();
+            // Decrement readers by one. If the count is negative, then
+            // we previously opened as a writer, and the reader count
+            // must be reset to 1.
+            if (this.readers.decrementAndGet() < 0) {
+                this.readers.set(1);
+            }
         }
     }
 
+    /**
+     * Exception thrown when a shared resource is accessed after close() was called
+     * on the resource. This means the resource no longer exists.
+     */
+    public static final class SharedResourceClosedException extends RuntimeException {
+        private static final long serialVersionUID = -5807941780901855505L;
+
+        public SharedResourceClosedException() {
+            super("Shared resource was accessed after it was closed");
+        }
+    }
 }

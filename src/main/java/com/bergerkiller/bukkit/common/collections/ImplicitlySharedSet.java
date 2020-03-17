@@ -256,7 +256,7 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
                     this.baseIter.remove();
                 } else {
                     // Remove from the writable set, we can not modify what we are iterating over
-                    ImplicitlySharedSet.this.remove(this.lastElement);
+                    ref_writable.val.remove(this.lastElement);
                 }
             }
         }

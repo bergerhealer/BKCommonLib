@@ -420,7 +420,7 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
                     this.baseIter.remove();
                 } else {
                     // Remove from the writable set, we can not modify what we are iterating over
-                    ImplicitlySharedList.this.remove(this.index);
+                    ref_writable.val.remove(this.index);
                 }
                 this.index--;
             }
