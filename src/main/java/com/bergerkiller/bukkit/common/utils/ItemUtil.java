@@ -745,7 +745,8 @@ public class ItemUtil {
      * @return True if a custom name is set, False if not
      */
     public static boolean hasDisplayName(org.bukkit.inventory.ItemStack stack) {
-        return CommonNMS.getHandle(stack).hasName();
+        ItemStackHandle handle = CommonNMS.getHandle(stack);
+        return (handle == null) ? false : handle.hasName();
     }
 
     /**
