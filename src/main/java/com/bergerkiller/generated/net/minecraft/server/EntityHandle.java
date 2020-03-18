@@ -62,6 +62,9 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract float getHeight();
     public abstract void setStepCounter(float value);
     public abstract float getStepCounter();
+    public abstract void setChunkX(int value);
+    public abstract void setChunkY(int value);
+    public abstract void setChunkZ(int value);
     public abstract Chunk getCurrentChunk();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
@@ -181,6 +184,17 @@ public abstract class EntityHandle extends Template.Handle {
     public static final int DATA_FLAG_INVISIBLE = (1 << 5);
     public static final int DATA_FLAG_GLOWING = (1 << 6);
     public static final int DATA_FLAG_FLYING = (1 << 7);
+
+
+    public int getChunkX() {
+        return T.chunkX.getInteger(getRaw());
+    }
+    public int getChunkY() {
+        return T.chunkY.getInteger(getRaw());
+    }
+    public int getChunkZ() {
+        return T.chunkZ.getInteger(getRaw());
+    }
 
 
     public boolean isPassenger() {
@@ -309,12 +323,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setDatawatcherField(DataWatcher value);
     public abstract boolean isLoaded();
     public abstract void setIsLoaded(boolean value);
-    @Template.Readonly
-    public abstract int getChunkX();
-    @Template.Readonly
-    public abstract int getChunkY();
-    @Template.Readonly
-    public abstract int getChunkZ();
     public abstract boolean isPositionChanged();
     public abstract void setPositionChanged(boolean value);
     public abstract int getPortalCooldown();
@@ -388,11 +396,11 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
         public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
-        @Template.Readonly
+        @Template.Optional
         public final Template.Field.Integer chunkX = new Template.Field.Integer();
-        @Template.Readonly
+        @Template.Optional
         public final Template.Field.Integer chunkY = new Template.Field.Integer();
-        @Template.Readonly
+        @Template.Optional
         public final Template.Field.Integer chunkZ = new Template.Field.Integer();
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
@@ -426,6 +434,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Float> getHeight = new Template.Method<Float>();
         public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
         public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
+        public final Template.Method<Void> setChunkX = new Template.Method<Void>();
+        public final Template.Method<Void> setChunkY = new Template.Method<Void>();
+        public final Template.Method<Void> setChunkZ = new Template.Method<Void>();
         public final Template.Method.Converted<Chunk> getCurrentChunk = new Template.Method.Converted<Chunk>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();

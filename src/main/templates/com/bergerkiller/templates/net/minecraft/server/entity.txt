@@ -606,55 +606,92 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.13
     public boolean isLoaded:inChunk;
   #if fieldexists net.minecraft.server.Entity public int chunkX
-      public readonly int chunkX;
-      public readonly int chunkY;
-      public readonly int chunkZ;
+      public optional int chunkX;
+      public optional int chunkY;
+      public optional int chunkZ;
   #else
-      public readonly int chunkX:ae;
-      public readonly int chunkY:af;
-      public readonly int chunkZ:ag;
+      public optional int chunkX:ae;
+      public optional int chunkY:af;
+      public optional int chunkZ:ag;
   #endif
     public boolean positionChanged:impulse;
 #elseif version >= 1.11
     public boolean isLoaded:aa;
-    public readonly int chunkX:ab;
-    public readonly int chunkY:ac;
-    public readonly int chunkZ:ad;
+    public optional int chunkX:ab;
+    public optional int chunkY:ac;
+    public optional int chunkZ:ad;
     public unknown boolean ah;
     public boolean positionChanged:impulse;
 #elseif version >= 1.10.2
     public boolean isLoaded:ab;
-    public readonly int chunkX:ac;
-    public readonly int chunkY:ad;
-    public readonly int chunkZ:ae;
+    public optional int chunkX:ac;
+    public optional int chunkY:ad;
+    public optional int chunkZ:ae;
     public unknown boolean ai;
     public boolean positionChanged:impulse;
 #elseif version >= 1.9
     public boolean isLoaded:aa;
-    public readonly int chunkX:ab;
-    public readonly int chunkY:ac;
-    public readonly int chunkZ:ad;
+    public optionalint chunkX:ab;
+    public optional int chunkY:ac;
+    public optional int chunkZ:ad;
     public unknown boolean ah;
     public boolean positionChanged:impulse;
 #elseif version >= 1.8.3
     private unknown double ar;
     private unknown double as;
     public boolean isLoaded:ad;
-    public readonly int chunkX:ae;
-    public readonly int chunkY:af;
-    public readonly int chunkZ:ag;
+    public optional int chunkX:ae;
+    public optional int chunkY:af;
+    public optional int chunkZ:ag;
     public unknown boolean ah;
     public boolean positionChanged:ai;
 #else
     private unknown double ap;
     private unknown double aq;
     public boolean isLoaded:ad;
-    public readonly int chunkX:ae;
-    public readonly int chunkY:af;
-    public readonly int chunkZ:ag;
+    public optional int chunkX:ae;
+    public optional int chunkY:af;
+    public optional int chunkZ:ag;
     public unknown boolean ah;
     public boolean positionChanged:ai;
 #endif
+
+#if exists net.minecraft.server.Entity public void setCurrentChunk(net.minecraft.server.Chunk chunk);
+    public void setChunkX(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkX.setInteger(instance, value);
+    }
+    public void setChunkY(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkY.setInteger(instance, value);
+    }
+    public void setChunkZ(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkZ.setInteger(instance, value);
+    }
+#else
+    public void setChunkX(int value) {
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkX.setInteger(instance, value);
+    }
+    public void setChunkY(int value) {
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkY.setInteger(instance, value);
+    }
+    public void setChunkZ(int value) {
+        com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.chunkZ.setInteger(instance, value);
+    }
+#endif
+
+    <code>
+    public int getChunkX() {
+        return T.chunkX.getInteger(getRaw());
+    }
+    public int getChunkY() {
+        return T.chunkY.getInteger(getRaw());
+    }
+    public int getChunkZ() {
+        return T.chunkZ.getInteger(getRaw());
+    }
+    </code>
 
 #if exists net.minecraft.server.Entity public net.minecraft.server.Chunk getCurrentChunk();
     public (org.bukkit.Chunk) Chunk getCurrentChunk();
