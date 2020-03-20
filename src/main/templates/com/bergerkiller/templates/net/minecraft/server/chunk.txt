@@ -153,6 +153,18 @@ class Chunk {
     public void markDirty:e();
 #endif
 
+    // this.someField = true in a(Entity) when entity is added
+    // There is an accessor method which does the same, call that
+    public void markEntitiesDirty() {
+#if version >= 1.14
+        instance.d(true);
+#elseif version >= 1.13
+        instance.f(true);
+#else
+        instance.g(true);
+#endif
+    }
+
     <code>
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {

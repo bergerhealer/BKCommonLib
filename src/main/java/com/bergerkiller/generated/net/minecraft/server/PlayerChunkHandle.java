@@ -50,6 +50,8 @@ public abstract class PlayerChunkHandle extends Template.Handle {
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method<Void> markAllLightDirty = new Template.Method<Void>();
         public final Template.Method.Converted<List<Player>> getPlayers = new Template.Method.Converted<List<Player>>();
+        @Template.Optional
+        public final Template.Method.Converted<Chunk> opt_getChunkTryHard_1_14 = new Template.Method.Converted<Chunk>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
 
     }

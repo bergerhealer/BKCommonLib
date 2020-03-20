@@ -288,6 +288,15 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
+     * Gets the internally used EntityHandle instance
+     * 
+     * @return wrapped handle as EntityHandle
+     */
+    public EntityHandle getWrappedHandle() {
+        return this.handle;
+    }
+
+    /**
      * Gets the Chunk the entity is currently assigned to.
      * Null is returned if the entity was never assigned to a World,
      * was never assigned to a chunk or the chunk the entity was assigned to is not loaded.

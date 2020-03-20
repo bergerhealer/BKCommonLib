@@ -58,7 +58,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     private void markEntityChunkDirty() {
         Chunk chunk = this.entity.getChunk();
         if (chunk != null) {
-            ChunkHandle.fromBukkit(chunk).markDirty();
+            ChunkHandle.fromBukkit(chunk).markEntitiesDirty();
         }
     }
 
@@ -150,7 +150,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @param dz offset to move
      */
     public void onMove(MoveType moveType, double dx, double dy, double dz) {
-        moveHandler.move(moveType, dx, dy ,dz);
+        moveHandler.move(this.entity.getWrappedHandle(), moveType, dx, dy ,dz);
         //hook.base.onMove(com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle.SELF.getRaw(), dx, dy, dz);
     }
 

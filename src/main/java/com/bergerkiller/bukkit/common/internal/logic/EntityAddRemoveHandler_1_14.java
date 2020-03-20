@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -23,7 +24,10 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -203,30 +207,44 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
 
     @Override
     public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
+        Object worldHandle = oldEntity.getWorld().getRaw();
+
         // *** Remove from the entities to add queue ***
         Queue<Object> entitiesToAdd = this.entitiesToAddField.get(oldEntity.getWorld().getRaw());
         entitiesToAdd.remove(oldEntity.getRaw());
 
         // *** Entities By UUID Map ***
-        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(oldEntity.getWorld().getRaw());
-        if (!newEntity.equals(entitiesByUUID.get(newEntity.getUniqueID()))) {
-            entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+        {
+            Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
+            EntityHandle storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
+            if (storedEntityHandle != null && storedEntityHandle.getRaw() != newEntity.getRaw()) {
+                if (!oldEntity.getUniqueID().equals(newEntity.getUniqueID())) {
+                    entitiesByUUID.remove(oldEntity.getUniqueID());
+                }
+                entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+            }
         }
 
         // *** Entities by Id Map ***
-        IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(oldEntity.getWorld().getRaw()));
-        if (entitiesById.get(oldEntity.getId()) != newEntity.getRaw()) {
-            entitiesById.put(oldEntity.getId(), newEntity.getRaw());
+        {
+            IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(worldHandle));
+            Object storedEntityHandle = entitiesById.get(oldEntity.getIdField());
+            if (storedEntityHandle != null && storedEntityHandle != newEntity.getRaw()) {
+                if (oldEntity.getIdField() != newEntity.getIdField()) {
+                    entitiesById.remove(oldEntity.getIdField());
+                }
+                entitiesById.put(newEntity.getIdField(), newEntity.getRaw());
+            }
         }
 
         // *** EntityTrackerEntry ***
-        replaceInEntityTracker(newEntity.getId(), newEntity);
-        if (newEntity.getVehicle() != null) {
-            replaceInEntityTracker(newEntity.getVehicle().getId(), newEntity);
+        replaceInEntityTracker(oldEntity, oldEntity, newEntity);
+        if (oldEntity.getVehicle() != null) {
+            replaceInEntityTracker(oldEntity.getVehicle(), oldEntity, newEntity);
         }
-        if (newEntity.getPassengers() != null) {
-            for (EntityHandle passenger : newEntity.getPassengers()) {
-                replaceInEntityTracker(passenger.getId(), newEntity);
+        if (oldEntity.getPassengers() != null) {
+            for (EntityHandle passenger : oldEntity.getPassengers()) {
+                replaceInEntityTracker(passenger, oldEntity, newEntity);
             }
         }
 
@@ -234,16 +252,22 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         final int chunkX = newEntity.getChunkX();
         final int chunkY = newEntity.getChunkY();
         final int chunkZ = newEntity.getChunkZ();
-        Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newEntity.getWorld().getWorld(), chunkX, chunkZ));
-        if (chunkHandle != null) {
-            final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
-            if (!replaceInList(entitySlices[chunkY], newEntity)) {
-                for (int y = 0; y < entitySlices.length; y++) {
-                    if (y != chunkY && replaceInList(entitySlices[y], newEntity)) {
-                        break;
-                    }
-                }
+        PlayerChunkMapHandle playerChunks = WorldServerHandle.T.getPlayerChunkMap.invoke(worldHandle);
+        Chunk loadedChunk = WorldUtil.getChunk(newEntity.getBukkitWorld(), chunkX, chunkZ);
+        if (loadedChunk != null) {
+            replaceInChunk(loadedChunk, chunkY, oldEntity, newEntity);
+        } else {
+            // Chunk isn't loaded at this time. This gets difficult!
+            // It might still be in the updating chunks mapping
+            PlayerChunkHandle updatingChunk = playerChunks.getUpdatingChunk(chunkX, chunkZ);
+            Chunk loadedUpdatingChunk = (updatingChunk == null) ? null : updatingChunk.getChunkIfLoaded();
+            if (loadedUpdatingChunk == null && updatingChunk != null) {
+                // Try hard time! This allows any status the chunk is in.
+                loadedUpdatingChunk = PlayerChunkHandle.T.opt_getChunkTryHard_1_14.invoke(updatingChunk.getRaw());
             }
+
+            // Let's go!
+            replaceInChunk(loadedUpdatingChunk, chunkY, oldEntity, newEntity);
         }
 
         // See where the object is still referenced to check we aren't missing any places to replace
@@ -251,24 +275,46 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
-    private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {
-        final EntityTracker trackerMap = WorldUtil.getTracker(newInstance.getWorld().getWorld());
-        EntityTrackerEntryHandle entry = trackerMap.getEntry(entityId);
-        if (entry != null) {
+    private static void replaceInChunk(Chunk chunk, int chunkY, EntityHandle oldEntity, EntityHandle newEntity) {
+        Object chunkHandle = HandleConversion.toChunkHandle(chunk);
+        if (chunkHandle != null) {
+            final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
+            if (!replaceInList(entitySlices[chunkY], oldEntity, newEntity)) {
+                for (int y = 0; y < entitySlices.length; y++) {
+                    if (y != chunkY && replaceInList(entitySlices[y], oldEntity, newEntity)) {
+                        break;
+                    }
+                }
+            }
+        }
+    }
 
-            EntityHandle tracker = entry.getEntity();
-            if (tracker != null && tracker.getId() == newInstance.getId()) {
-                entry.setEntity(newInstance);
+    @SuppressWarnings("unchecked")
+    private static void replaceInEntityTracker(EntityHandle entity, EntityHandle oldEntity, EntityHandle newEntity) {
+        final EntityTracker trackerMap = WorldUtil.getTracker(newEntity.getBukkitWorld());
+        EntityTrackerEntryHandle entry = trackerMap.getEntry(entity.getIdField());
+        if (entry != null) {
+            // PlayerChunkMap$EntityTracker entity
+            EntityHandle entryEntity = entry.getEntity();
+            if (entryEntity != null && entryEntity.getIdField() == oldEntity.getIdField()) {
+                entry.setEntity(newEntity);
             }
 
-            List<EntityHandle> passengers = new ArrayList<EntityHandle>(tracker.getPassengers());
-            replaceInList(passengers, newInstance);
-            tracker.setPassengers(passengers);
+            // EntityTrackerEntry 'tracker' entity
+            EntityTrackerEntryStateHandle stateHandle = entry.getState();
+            EntityHandle stateEntity = stateHandle.getEntity();
+            if (stateEntity != null && stateEntity.getIdField() == oldEntity.getIdField() && stateEntity.getRaw() != newEntity.getRaw()) {
+                stateHandle.setEntity(newEntity);
+            }
+
+            // EntityTrackerEntry List of passengers
+            List<Object> statePassengers = (List<Object>) EntityTrackerEntryStateHandle.T.opt_passengers.raw.get(stateHandle.getRaw());
+            replaceInList(statePassengers, oldEntity, newEntity);
         }
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static boolean replaceInList(List list, EntityHandle entity) {
+    private static boolean replaceInList(List list, EntityHandle oldEntity, EntityHandle newEntity) {
         if (list == null) {
             return false;
         }
@@ -277,13 +323,13 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Object obj = iter.next();
             if (obj instanceof EntityHandle) {
                 EntityHandle obj_e = (EntityHandle) obj;
-                if (obj_e.getIdField() == entity.getIdField()) {
-                    iter.set(entity);
+                if (obj_e.getIdField() == oldEntity.getIdField()) {
+                    iter.set(newEntity);
                 }
             } else if (EntityHandle.T.isAssignableFrom(obj)) {
                 int obj_id = EntityHandle.T.idField.getInteger(obj);
-                if (obj_id == entity.getIdField()) {
-                    iter.set(entity.getRaw());
+                if (obj_id == oldEntity.getIdField()) {
+                    iter.set(newEntity.getRaw());
                 }
             }
         }

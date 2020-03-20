@@ -621,7 +621,7 @@ public class WorldUtil extends ChunkUtil {
         if (CommonCapabilities.NEW_LIGHT_ENGINE) {
             // Send light update packet
             PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
-            PlayerChunkHandle playerChunk = playerChunkMap.getChunk(chunkX, chunkZ);
+            PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
             if (playerChunk == null || playerChunk.getPlayers().isEmpty() || playerChunk.getChunkIfLoaded() == null) {
                 return false;
             }
@@ -658,7 +658,7 @@ public class WorldUtil extends ChunkUtil {
      */
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
         PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
-        PlayerChunkHandle playerChunk = playerChunkMap.getChunk(chunkX, chunkZ);
+        PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
         if (playerChunk == null) {
             return false;
         }

@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityTrackerEntryState</b>.
@@ -237,8 +238,8 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public float getHeadYaw() {
         return getRotationFromProtocol(T.raw_headYaw.getInteger(getRaw()));
     }
-    @Template.Readonly
     public abstract EntityHandle getEntity();
+    public abstract void setEntity(EntityHandle value);
     public abstract int getUpdateInterval();
     public abstract void setUpdateInterval(int value);
     public abstract boolean isMobile();
@@ -258,10 +259,11 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityTrackerEntryStateClass extends Template.Class<EntityTrackerEntryStateHandle> {
-        @Template.Readonly
         public final Template.Field.Converted<EntityHandle> entity = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Integer updateInterval = new Template.Field.Integer();
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
+        @Template.Optional
+        public final Template.Field<Consumer> broadcastMethod = new Template.Field<Consumer>();
         @Template.Optional
         public final Template.Field.Long long_xLoc = new Template.Field.Long();
         @Template.Optional

@@ -115,6 +115,34 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
     //     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
     // #endif
 
+// Only used on 1.14 and onwards to patch up chunks that have unloaded
+#if version >= 1.14
+    public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14() {
+        #require net.minecraft.server.PlayerChunk private static final java.util.List<net.minecraft.server.ChunkStatus> CHUNK_STATUSES;
+        java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
+        for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
+            java.util.concurrent.CompletableFuture future;
+  #if version >= 1.14.1
+            future = instance.getStatusFutureUnchecked((ChunkStatus) chunk_statuses.get(i));
+  #else
+            future = instance.a((ChunkStatus) chunk_statuses.get(i));
+  #endif
+            if (!future.isCompletedExceptionally()) {
+                com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);
+                if (either != null) {
+                    java.util.Optional chunkOpt = either.left();
+                    if (chunkOpt != null) {
+                        return (Chunk) chunkOpt.get();
+                    }
+                }
+            }
+        }
+        return null;
+    }
+#else
+    public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14:###();
+#endif
+
 #if version >= 1.14
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getChunk();
 #elseif version >= 1.9
@@ -178,17 +206,26 @@ class PlayerChunkMap {
     //    private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
 #if version >= 1.14
-    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z) {
-        #require net.minecraft.server.PlayerChunkMap protected (Object) PlayerChunk getChunk_1_14:getVisibleChunk(long i);
-        return (PlayerChunk) instance#getChunk_1_14(ChunkCoordIntPair.pair(x, z));
+    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
+        #require net.minecraft.server.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunk(long i);
+        return (PlayerChunk) instance#getVisibleChunk_1_14(ChunkCoordIntPair.pair(x, z));
+    }
+    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
+        #require net.minecraft.server.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunk(long i);
+        return (PlayerChunk) instance#getUpdatingChunk_1_14(ChunkCoordIntPair.pair(x, z));
     }
 #elseif version >= 1.9.4
-    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z);
+    public (PlayerChunkHandle) PlayerChunk getVisibleChunk:getChunk(int x, int z);
+    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:getChunk(int x, int z);
 #elseif version >= 1.9
-    public (PlayerChunkHandle) PlayerChunk getChunk:b(int x, int z);
+    public (PlayerChunkHandle) PlayerChunk getVisibleChunk:b(int x, int z);
+    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:b(int x, int z);
 #else
-    public (PlayerChunkHandle) PlayerChunk getChunk(int x, int z) {
-        #require net.minecraft.server.PlayerChunkMap private (Object) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+    #require net.minecraft.server.PlayerChunkMap private (Object) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
+        return instance#getChunk_1_8_8(x, z, false);
+    }
+    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
         return instance#getChunk_1_8_8(x, z, false);
     }
 #endif

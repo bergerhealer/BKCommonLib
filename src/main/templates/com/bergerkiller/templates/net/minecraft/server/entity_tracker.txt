@@ -252,10 +252,12 @@ class EntityTrackerEntry {
 // main handle on 1.14 it is renamed to differentiate the two.
 class EntityTrackerEntryState {
 #if version >= 1.14
-    private final readonly (EntityHandle) Entity entity:tracker;
+    private final (EntityHandle) Entity entity:tracker;
 
     private final int updateInterval:d;
     private final boolean isMobile:e;
+
+    private optional final java.util.function.Consumer broadcastMethod:f;
 
     private optional long long_xLoc:xLoc;
     private optional long long_yLoc:yLoc;
@@ -272,6 +274,8 @@ class EntityTrackerEntryState {
 
     private final int updateInterval:g;
 
+    private optional final java.util.function.Consumer broadcastMethod:###;
+
     private optional long long_xLoc:xLoc;
     private optional long long_yLoc:yLoc;
     private optional long long_zLoc:zLoc;
@@ -286,6 +290,8 @@ class EntityTrackerEntryState {
     public final readonly (EntityHandle) Entity entity:tracker;
 
     public int updateInterval:c;
+
+    private optional final java.util.function.Consumer broadcastMethod:###;
 
     public optional long long_xLoc:###;
     public optional long long_yLoc:###;

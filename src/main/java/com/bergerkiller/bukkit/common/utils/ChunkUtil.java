@@ -422,12 +422,12 @@ public class ChunkUtil {
         final int sliceY = MathUtil.clamp(MathUtil.toChunk(EntityUtil.getLocY(entity)), 0, slices.length - 1);
         final Object handle = HandleConversion.toEntityHandle(entity);
         if (slices[sliceY].remove(handle)) {
-            chunkHandle.markDirty();
+            chunkHandle.markEntitiesDirty();
             return true;
         } else {
             for (int y = 0; y < slices.length; y++) {
                 if (y != sliceY && slices[y].remove(handle)) {
-                    chunkHandle.markDirty();
+                    chunkHandle.markEntitiesDirty();
                     return true;
                 }
             }

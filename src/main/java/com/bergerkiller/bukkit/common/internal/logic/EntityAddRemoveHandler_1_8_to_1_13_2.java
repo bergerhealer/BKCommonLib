@@ -166,45 +166,69 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
-    public void replace(World world, EntityHandle oldInstance, EntityHandle newInstance) {
-        Object worldHandle = oldInstance.getWorld().getRaw();
+    public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
+        Object worldHandle = oldEntity.getWorld().getRaw();
+
+        // *** Entities By UUID Map ***
+        {
+            Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
+            EntityHandle storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
+            if (storedEntityHandle != null && storedEntityHandle.getRaw() != newEntity.getRaw()) {
+                if (!oldEntity.getUniqueID().equals(newEntity.getUniqueID())) {
+                    entitiesByUUID.remove(oldEntity.getUniqueID());
+                }
+                entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+            }
+        }
+
+        // *** Entities by Id Map ***
+        {
+            IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(worldHandle));
+            Object storedEntityHandle = entitiesById.get(oldEntity.getId());
+            if (storedEntityHandle != null && storedEntityHandle != newEntity.getRaw()) {
+                if (oldEntity.getId() != newEntity.getId()) {
+                    entitiesById.remove(oldEntity.getId());
+                }
+                entitiesById.put(newEntity.getId(), newEntity.getRaw());
+            }
+        }
 
         // *** Entities By UUID Map ***
         final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
-        entitiesByUUID.put(newInstance.getUniqueID(), newInstance);
+        entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
 
         // *** Entities by Id Map ***
         IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(worldHandle));
-        entitiesById.put(newInstance.getId(), newInstance.getRaw());
+        entitiesById.put(newEntity.getId(), newEntity.getRaw());
 
         // *** EntityTrackerEntry ***
-        replaceInEntityTracker(newInstance.getId(), newInstance);
-        if (newInstance.getVehicle() != null) {
-            replaceInEntityTracker(newInstance.getVehicle().getId(), newInstance);
+        replaceInEntityTracker(newEntity.getId(), newEntity);
+        if (newEntity.getVehicle() != null) {
+            replaceInEntityTracker(newEntity.getVehicle().getId(), newEntity);
         }
-        if (newInstance.getPassengers() != null) {
-            for (EntityHandle passenger : newInstance.getPassengers()) {
-                replaceInEntityTracker(passenger.getId(), newInstance);
+        if (newEntity.getPassengers() != null) {
+            for (EntityHandle passenger : newEntity.getPassengers()) {
+                replaceInEntityTracker(passenger.getId(), newEntity);
             }
         }
 
         // *** World ***
-        replaceInList(entityListField.get(worldHandle), newInstance);
+        replaceInList(entityListField.get(worldHandle), newEntity);
         // Fixes for PaperSpigot
         // if (!Common.IS_PAPERSPIGOT_SERVER) {
         //     replaceInList(WorldRef.entityRemovalList.get(oldInstance.world), newInstance);
         // }
 
         // *** Entity Current Chunk ***
-        final int chunkX = newInstance.getChunkX();
-        final int chunkY = newInstance.getChunkY();
-        final int chunkZ = newInstance.getChunkZ();
-        Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newInstance.getWorld().getWorld(), chunkX, chunkZ));
+        final int chunkX = newEntity.getChunkX();
+        final int chunkY = newEntity.getChunkY();
+        final int chunkZ = newEntity.getChunkZ();
+        Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newEntity.getWorld().getWorld(), chunkX, chunkZ));
         if (chunkHandle != null) {
             final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
-            if (!replaceInList(entitySlices[chunkY], newInstance)) {
+            if (!replaceInList(entitySlices[chunkY], newEntity)) {
                 for (int y = 0; y < entitySlices.length; y++) {
-                    if (y != chunkY && replaceInList(entitySlices[y], newInstance)) {
+                    if (y != chunkY && replaceInList(entitySlices[y], newEntity)) {
                         break;
                     }
                 }

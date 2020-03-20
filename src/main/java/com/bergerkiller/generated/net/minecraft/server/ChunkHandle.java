@@ -42,6 +42,7 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract void addEntities();
     public abstract boolean checkCanSave(boolean isNotAutosave);
     public abstract void markDirty();
+    public abstract void markEntitiesDirty();
 
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
@@ -82,6 +83,7 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method<Void> addEntities = new Template.Method<Void>();
         public final Template.Method<Boolean> checkCanSave = new Template.Method<Boolean>();
         public final Template.Method<Void> markDirty = new Template.Method<Void>();
+        public final Template.Method<Void> markEntitiesDirty = new Template.Method<Void>();
 
     }
 

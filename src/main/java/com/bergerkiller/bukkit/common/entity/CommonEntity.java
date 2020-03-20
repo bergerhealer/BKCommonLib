@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -25,6 +26,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
@@ -174,7 +176,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 newEntry = EntityTypingHandler.INSTANCE.createEntityTrackerEntry(tracker, entity);
                 // Transfer data if needed
                 if (storedEntry != null) {
-                    EntityTrackerEntryHandle.T.copyHandle(storedEntry, newEntry);
+                    copyEntityTrackerEntry(storedEntry, newEntry);
                 }
             }
         } else if (controller instanceof ExternalEntityNetworkController) {
@@ -182,7 +184,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             newEntry = EntityTrackerEntryHandle.createHandle(controller.getHandle());
             // Be sure to refresh stats using the old entry
             if (storedEntry != null && newEntry != null) {
-                EntityTrackerEntryHandle.T.copyHandle(storedEntry, newEntry);
+                copyEntityTrackerEntry(storedEntry, newEntry);
             }
         } else if (hook != null) {
             // Use the previous hooked entry - hotswap the controller
@@ -214,6 +216,24 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         } else {
             newEntry.scanPlayers(getWorld().getPlayers());
+        }
+    }
+
+    private static void copyEntityTrackerEntry(EntityTrackerEntryHandle from, EntityTrackerEntryHandle to) {
+        if (EntityTrackerEntryHandle.T.getType() == EntityTrackerEntryStateHandle.T.getType()) {
+            // Pre-1.14: same class
+            EntityTrackerEntryHandle.T.copyHandle(from, to);
+        } else {
+            // Post-1.14: got to copy state separately
+            // Make sure to preserve the state field in the EntityTrackerEntry!
+            EntityTrackerEntryStateHandle to_state = to.getState();
+            EntityTrackerEntryHandle.T.copyHandle(from, to);
+            EntityTrackerEntryHandle.T.setState.invoke(to.getRaw(), to_state);
+
+            // Copy state too. Preserve the 'broadcast()' lambda, as it refers to the entry we want to keep!
+            java.util.function.Consumer<?> to_state_broadcastMethod = EntityTrackerEntryStateHandle.T.broadcastMethod.get(to_state.getRaw());
+            EntityTrackerEntryStateHandle.T.copyHandle(from.getState(), to_state);
+            EntityTrackerEntryStateHandle.T.broadcastMethod.set(to_state.getRaw(), to_state_broadcastMethod);
         }
     }
 
@@ -485,14 +505,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (isLoaded && changedChunks) {
             final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, oldcx, oldcz);
             if (chunk != null) {
-                WorldUtil.removeEntity(chunk, entity);
+                ChunkUtil.removeEntity(chunk, entity);
             }
         }
         // Add to the new chunk
         if (!isLoaded || changedChunks) {
             final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, newcx, newcz);
             if (isLoaded = chunk != null) {
-                WorldUtil.addEntity(chunk, entity);
+                ChunkUtil.addEntity(chunk, entity);
             }
             this.handle.setIsLoaded(isLoaded);
         }
@@ -846,7 +866,16 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         Object oldInstance = commonEntity.getHandle();
         EntityHook oldHook = EntityHook.get(oldInstance, EntityHook.class);
 
+        // Unhook network controller
+        {
+            EntityNetworkController<?> controller = commonEntity.getNetworkController();
+            if (controller != null && !(controller instanceof DefaultEntityNetworkController)) {
+                commonEntity.setNetworkController(new DefaultEntityNetworkController());
+            }
+        }
+
         // Detach controller and undo hook Entity replacement
+        // Must be done after the network controller, otherwise messy things happen!
         if (oldHook != null) {
             try {
                 CommonEntityController<?> controller = oldHook.getController();
@@ -865,12 +894,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                 Logging.LOGGER.log(Level.SEVERE, "Failed to unhook Common Entity Controller:");
                 t.printStackTrace();
             }
-        }
-
-        // Unhook network controller
-        EntityNetworkController<?> controller = commonEntity.getNetworkController();
-        if (controller != null && !(controller instanceof DefaultEntityNetworkController)) {
-            commonEntity.setNetworkController(new DefaultEntityNetworkController());
         }
     }
 

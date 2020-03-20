@@ -120,6 +120,22 @@ public abstract class EntityMoveHandler {
     protected abstract Stream<VoxelShapeHandle> world_getCollisionShapes(EntityHandle entity, double dx, double dy, double dz);
 
     /**
+     * Calls {@link #moveImpl(MoveType, double, double, double)}. Should be called to
+     * set the entity to move.
+     * 
+     * @param entity
+     * @param movetype
+     * @param d0
+     * @param d1
+     * @param d2
+     */
+    public void move(EntityHandle entity, MoveType movetype, double d0, double d1, double d2) {
+        that = entity;
+        moveImpl(movetype, d0, d1, d2);
+        that = null;
+    }
+
+    /**
      * This is the move function based on the original move function in the nms.Entity class.
      * It has been modified so it can run externally, outside the Entity class.
      * Calls to this.world.getCubes(this, this.getBoundingBox().b(a,b,c)) have been replaced with a callback.
@@ -130,7 +146,7 @@ public abstract class EntityMoveHandler {
      * @param d1 dy
      * @param d2 dz
      */
-    public void move(MoveType movetype, double d0, double d1, double d2) {
+    public void moveImpl(MoveType movetype, double d0, double d1, double d2) {
         entity = controller.getEntity();
         if (entity == null) {
             throw new IllegalStateException("Entity Controller is not attached to an Entity");

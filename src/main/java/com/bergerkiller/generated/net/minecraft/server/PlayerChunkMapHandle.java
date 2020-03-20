@@ -21,14 +21,16 @@ public abstract class PlayerChunkMapHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract PlayerChunkHandle getChunk(int x, int z);
+    public abstract PlayerChunkHandle getVisibleChunk(int x, int z);
+    public abstract PlayerChunkHandle getUpdatingChunk(int x, int z);
     public abstract boolean isChunkEntered(EntityPlayerHandle entityplayer, int chunkX, int chunkZ);
     /**
      * Stores class members for <b>net.minecraft.server.PlayerChunkMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PlayerChunkMapClass extends Template.Class<PlayerChunkMapHandle> {
-        public final Template.Method.Converted<PlayerChunkHandle> getChunk = new Template.Method.Converted<PlayerChunkHandle>();
+        public final Template.Method.Converted<PlayerChunkHandle> getVisibleChunk = new Template.Method.Converted<PlayerChunkHandle>();
+        public final Template.Method.Converted<PlayerChunkHandle> getUpdatingChunk = new Template.Method.Converted<PlayerChunkHandle>();
         public final Template.Method.Converted<Boolean> isChunkEntered = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Void> trackEntity = new Template.Method.Converted<Void>();
