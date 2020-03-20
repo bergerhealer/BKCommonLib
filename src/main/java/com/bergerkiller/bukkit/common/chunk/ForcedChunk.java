@@ -9,7 +9,7 @@ import org.bukkit.World;
  * A single forced chunk that is kept loaded for as long as this object exists,
  * until {@link #close()} is called.
  */
-public class ForcedChunk implements AutoCloseable {
+public class ForcedChunk implements AutoCloseable, Cloneable {
     private final AtomicReference<ForcedChunkManager.ForcedChunkEntry> entry;
 
     protected ForcedChunk(ForcedChunkManager.ForcedChunkEntry entry) {
@@ -119,6 +119,20 @@ public class ForcedChunk implements AutoCloseable {
         if (entry != null) {
             entry.remove();
         }
+    }
+
+    /**
+     * Clones this ForcedChunk. This causes the returned forced chunk instance to also
+     * keep the chunk loaded, and if this forced chunk is closed, the chunk will not unload.
+     * The returned forced chunk should be closed when no longer used.
+     */
+    @Override
+    public ForcedChunk clone() {
+        ForcedChunkManager.ForcedChunkEntry entry = this.entry.get();
+        if (entry != null) {
+            entry.add();
+        }
+        return new ForcedChunk(entry);
     }
 
     // Just a safeguard in case the plugin never calls close() itself to prevent memory leaks
