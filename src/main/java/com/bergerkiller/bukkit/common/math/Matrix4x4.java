@@ -695,11 +695,12 @@ public class Matrix4x4 implements Cloneable {
      * @param point to transform
      */
     public final void transformPoint(Vector point) {
-        Vector3 tmp = new Vector3(point);
-        this.transformPoint(tmp);
-        point.setX(tmp.x);
-        point.setY(tmp.y);
-        point.setZ(tmp.z);
+        double x = m00*point.getX() + m01*point.getY() + m02*point.getZ() + m03;
+        double y = m10*point.getX() + m11*point.getY() + m12*point.getZ() + m13;
+        double z = m20*point.getX() + m21*point.getY() + m22*point.getZ() + m23;
+        point.setX(x);
+        point.setY(y);
+        point.setZ(z);
     }
 
     /**
@@ -709,12 +710,12 @@ public class Matrix4x4 implements Cloneable {
      * @param point to transform
      */
     public final void transformPoint(Vector3 point) {
-        double x,y;
-        x = m00*point.x + m01*point.y + m02*point.z + m03;
-        y = m10*point.x + m11*point.y + m12*point.z + m13;
-        point.z = m20*point.x + m21*point.y + m22*point.z + m23;
+        double x = m00*point.x + m01*point.y + m02*point.z + m03;
+        double y = m10*point.x + m11*point.y + m12*point.z + m13;
+        double z = m20*point.x + m21*point.y + m22*point.z + m23;
         point.x = x;
         point.y = y;
+        point.z = z;
     }
 
     /**
@@ -753,9 +754,7 @@ public class Matrix4x4 implements Cloneable {
      * @return position vector
      */
     public Vector3 toVector3() {
-        Vector3 result = new Vector3(0.0, 0.0, 0.0);
-        this.transformPoint(result);
-        return result;
+        return new Vector3(m03, m13, m23);
     }
 
     /**
@@ -765,9 +764,7 @@ public class Matrix4x4 implements Cloneable {
      * @return position vector
      */
     public Vector toVector() {
-        Vector result = new Vector(0.0, 0.0, 0.0);
-        this.transformPoint(result);
-        return result;
+        return new Vector(m03, m13, m23);
     }
 
     @Override
