@@ -10,7 +10,7 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.blocks.type.FluidRenderingProvider;
 import com.bergerkiller.bukkit.common.internal.blocks.type.GrassRenderingProvider;
 import com.bergerkiller.bukkit.common.internal.blocks.type.RedstoneWireRenderingProvider;
@@ -30,8 +30,9 @@ public abstract class BlockRenderProvider {
     private static final Map<Material, BlockRenderProvider> providers = new EnumMap<Material, BlockRenderProvider>(Material.class);
 
     static {
-        String tex_root = Common.evaluateMCVersion(">=",  "1.13") ? "block/" : "blocks/";
-        register(new FluidRenderingProvider(tex_root + "water_overlay", tex_root + "water_still", "#456ef5", MaterialUtil.ISWATER.getMaterials()));
+        String tex_root = CommonBootstrap.evaluateMCVersion(">=",  "1.13") ? "block/" : "blocks/";
+        String water_overlay = CommonBootstrap.evaluateMCVersion(">=", "1.9") ? "water_overlay" : "water_still";
+        register(new FluidRenderingProvider(tex_root + water_overlay, tex_root + "water_still", "#456ef5", MaterialUtil.ISWATER.getMaterials()));
         register(new FluidRenderingProvider(tex_root + "lava_still", tex_root + "lava_still", null, MaterialUtil.ISLAVA.getMaterials()));
         register(new GrassRenderingProvider());
         register(new RedstoneWireRenderingProvider());
