@@ -79,7 +79,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
         java.util.function.Function.identity()
     );
 
-    private static void registerTypeInfo(Class<?> dataType,
+    protected static void registerTypeInfo(Class<?> dataType,
                                          Template.Class<? extends NBTBaseHandle> handleClass,
                                          java.util.function.Function<Object, Object> constructor,
                                          java.util.function.Function<Object, Object> get_data)
@@ -139,21 +139,22 @@ public abstract class NBTBaseHandle extends Template.Handle {
     }
 
     static {
-        registerTypeInfo(String.class, NBTTagStringHandle.T, NBTTagStringHandle.T.create.raw::invoke, NBTTagStringHandle.T.getData::invoke);
-        registerTypeInfo(byte.class, NBTTagByteHandle.T, NBTTagByteHandle.T.create.raw::invoke, NBTTagByteHandle.T.getByteData::invoke);
-        registerTypeInfo(short.class, NBTTagShortHandle.T, NBTTagShortHandle.T.create.raw::invoke, NBTTagShortHandle.T.getShortData::invoke);
-        registerTypeInfo(int.class, NBTTagIntHandle.T, NBTTagIntHandle.T.create.raw::invoke, NBTTagIntHandle.T.getIntegerData::invoke);
-        registerTypeInfo(long.class, NBTTagLongHandle.T, NBTTagLongHandle.T.create.raw::invoke, NBTTagLongHandle.T.getLongData::invoke);
-        registerTypeInfo(float.class, NBTTagFloatHandle.T, NBTTagFloatHandle.T.create.raw::invoke, NBTTagFloatHandle.T.getFloatData::invoke);
-        registerTypeInfo(double.class, NBTTagDoubleHandle.T, NBTTagDoubleHandle.T.create.raw::invoke, NBTTagDoubleHandle.T.getDoubleData::invoke);
-        registerTypeInfo(byte[].class, NBTTagByteArrayHandle.T, NBTTagByteArrayHandle.T.create.raw::invoke, NBTTagByteArrayHandle.T.getData::invoke);
-        registerTypeInfo(int[].class, NBTTagIntArrayHandle.T, NBTTagIntArrayHandle.T.create.raw::invoke, NBTTagIntArrayHandle.T.getData::invoke);
-        if (NBTTagLongArrayHandle.T.isAvailable()) {
-            registerTypeInfo(long[].class, NBTTagLongArrayHandle.T, NBTTagLongArrayHandle.T.create.raw::invoke, NBTTagLongArrayHandle.T.getData::invoke);
+        try {
+            Class.forName(NBTTagStringHandle.class.getName());
+            Class.forName(NBTTagByteHandle.class.getName());
+            Class.forName(NBTTagShortHandle.class.getName());
+            Class.forName(NBTTagIntHandle.class.getName());
+            Class.forName(NBTTagLongHandle.class.getName());
+            Class.forName(NBTTagFloatHandle.class.getName());
+            Class.forName(NBTTagDoubleHandle.class.getName());
+            Class.forName(NBTTagByteArrayHandle.class.getName());
+            Class.forName(NBTTagIntArrayHandle.class.getName());
+            Class.forName(NBTTagLongArrayHandle.class.getName());
+            Class.forName(NBTTagListHandle.class.getName());
+            Class.forName(NBTTagCompoundHandle.class.getName());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
-
-        registerTypeInfo(java.util.Collection.class, NBTTagListHandle.T, NBTTagListHandle.T.create.raw::invoke, NBTTagListHandle.T.data.raw::get);
-        registerTypeInfo(java.util.Map.class, NBTTagCompoundHandle.T, NBTTagCompoundHandle.T.create.raw::invoke, NBTTagCompoundHandle.T.data.raw::get);
     }
     /**
      * Stores class members for <b>net.minecraft.server.NBTBase</b>.
@@ -191,6 +192,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract String getData();
+
+        static {
+            registerTypeInfo(String.class, T, T.create.raw::invoke, T.getData::invoke);
+        }
 
         public NBTBaseHandle.NBTTagStringHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
@@ -233,6 +238,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
 
         public abstract byte getByteData();
 
+        static {
+            registerTypeInfo(byte.class, T, T.create.raw::invoke, T.getByteData::invoke);
+        }
+
         public NBTBaseHandle.NBTTagByteHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
@@ -274,6 +283,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract short getShortData();
+
+        static {
+            registerTypeInfo(short.class, T, T.create.raw::invoke, T.getShortData::invoke);
+        }
 
         public static Object createRaw(Object data) { return T.create.raw.invoke(data); }
         public NBTBaseHandle.NBTTagShortHandle clone() {
@@ -318,6 +331,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
 
         public abstract int getIntegerData();
 
+        static {
+            registerTypeInfo(int.class, T, T.create.raw::invoke, T.getIntegerData::invoke);
+        }
+
         public NBTBaseHandle.NBTTagIntHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
@@ -359,6 +376,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract long getLongData();
+
+        static {
+            registerTypeInfo(long.class, T, T.create.raw::invoke, T.getLongData::invoke);
+        }
 
         public NBTBaseHandle.NBTTagLongHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
@@ -402,6 +423,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
 
         public abstract float getFloatData();
 
+        static {
+            registerTypeInfo(float.class, T, T.create.raw::invoke, T.getFloatData::invoke);
+        }
+
         public NBTBaseHandle.NBTTagFloatHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
@@ -444,6 +469,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
 
         public abstract double getDoubleData();
 
+        static {
+            registerTypeInfo(double.class, T, T.create.raw::invoke, T.getDoubleData::invoke);
+        }
+
         public NBTBaseHandle.NBTTagDoubleHandle clone() {
             return com.bergerkiller.bukkit.common.internal.CommonCapabilities.IMMUTABLE_NBT_PRIMITIVES ? this : createHandle(raw_clone());
         }
@@ -485,6 +514,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract byte[] getData();
+
+        static {
+            registerTypeInfo(byte[].class, T, T.create.raw::invoke, T.getData::invoke);
+        }
         /**
          * Stores class members for <b>net.minecraft.server.NBTTagByteArray</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
@@ -522,6 +555,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract int[] getData();
+
+        static {
+            registerTypeInfo(int[].class, T, T.create.raw::invoke, T.getData::invoke);
+        }
         /**
          * Stores class members for <b>net.minecraft.server.NBTTagIntArray</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
@@ -560,6 +597,12 @@ public abstract class NBTBaseHandle extends Template.Handle {
         }
 
         public abstract long[] getData();
+
+        static {
+            if (T.isAvailable()) {
+                registerTypeInfo(long[].class, T, T.create.raw::invoke, T.getData::invoke);
+            }
+        }
         /**
          * Stores class members for <b>net.minecraft.server.NBTTagLongArray</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
