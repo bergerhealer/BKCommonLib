@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.resources.ResourceOverrides;
 import com.bergerkiller.bukkit.common.internal.resources.builtin.GeneratedModel;
@@ -446,7 +447,7 @@ public class MapResourcePack {
             } else {
                 // Default variant based on block name
                 BlockModelState.Variant variant = new BlockModelState.Variant();
-                variant.modelName = blockName;
+                variant.modelName = "block/" + blockName;
                 variants = Arrays.asList(variant);
             }
 
@@ -531,9 +532,19 @@ public class MapResourcePack {
             }
         }
 
+        // On Minecraft 1.8-1.8.8 the base block/block model is not defined, here we add it ourselves
+        // This fixes several display render bugs
+        String parentModelName = model.getParentName();
+        if (parentModelName == null &&
+            !CommonCapabilities.RESOURCE_PACK_MODEL_BASE_TRANSFORMS &&
+            !path.equals("block/block"))
+        {
+            parentModelName = "block/block";
+        }
+
         // Insert the parent model as required
-        if (model.getParentName() != null) {
-            Model parentModel = this.loadModel(model.getParentName(), options);
+        if (parentModelName != null) {
+            Model parentModel = this.loadModel(parentModelName, options);
             if (parentModel == null || parentModel.placeholder) {
                 Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Parent of model " + path + " not found: " + model.getParentName());
                 return null;

@@ -103,9 +103,13 @@ public class ModelInfoLookup {
         String name = options.getBlockData().getBlockName();
         String variant = options.get("variant");
 
-        // MC 1.13 sign -> standing_sign
-        if (name.equals("sign")) {
-            name = "standing_sign";
+        // MC 1.13 sign -> legacy_standing_sign and wall_sign -> legacy_wall_sign
+        if (!CommonCapabilities.HAS_MATERIAL_SIGN_TYPES) {
+            if (name.equals("sign") || name.equals("standing_sign")) {
+                name = "legacy_sign";
+            } else if (name.equals("wall_sign")) {
+                name = "legacy_wall_sign";
+            }
         }
 
         // Not all slabs are equal
@@ -206,7 +210,7 @@ public class ModelInfoLookup {
         if (name.equals("end_gateway")) {
             name = "end_portal_frame";
         }
-        
+
         // Now add the variant!
         if (variant != null) {
             if (name.length() > 0) {

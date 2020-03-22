@@ -17,6 +17,13 @@ public class CommonCapabilities {
     public static final boolean PLACE_PACKETS_MERGED = CommonBootstrap.evaluateMCVersion("<=", "1.8.8");
 
     /**
+     * Minecraft 1.9 and later specifies block/block as parent for block models,
+     * which stores the transformations in different display modes. This is missing
+     * on 1.8-1.8.8.
+     */
+    public static final boolean RESOURCE_PACK_MODEL_BASE_TRANSFORMS = CommonBootstrap.evaluateMCVersion(">=", "1.9");
+
+    /**
      * Since Minecraft 1.9, effect names changed from simple names to longer keys with namespace
      * to improve mapping and sound system handling. As a result, random.fizz turned into block.fire.extinguish.
      */

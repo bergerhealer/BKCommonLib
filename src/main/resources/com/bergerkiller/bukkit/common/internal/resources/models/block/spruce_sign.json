@@ -1,0 +1,6 @@
+{
+    "parent": "block/standing_sign_base",
+    "textures": {
+        "sign": "entity/signs/spruce"
+    }
+}

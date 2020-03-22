@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "block/legacy_wall_sign" },
+        "facing=south": { "model": "block/legacy_wall_sign", "y": 180 },
+        "facing=west":  { "model": "block/legacy_wall_sign", "y": 270 },
+        "facing=east":  { "model": "block/legacy_wall_sign", "y": 90 }
+    }
+}

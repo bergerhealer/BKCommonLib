@@ -32,7 +32,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 
 public class MapModelRenderTest
 {
-
     public static final int RES_WIDTH = 1280;
     public static final int RES_HEIGHT = 720;
 
@@ -40,8 +39,8 @@ public class MapModelRenderTest
     @Test
     public void test3DRender() {
 
-        //createAndShowGUI(MapResourcePack.VANILLA);
-        createAndShowGUI(new MapResourcePack("TestPack.zip"));
+        createAndShowGUI(MapResourcePack.VANILLA);
+        //createAndShowGUI(new MapResourcePack("TestPack.zip"));
 
         while (true) {
             AsyncTask.sleep(5000);
@@ -115,7 +114,7 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterialData(Material.RAIL, 6).getDefaultRenderOptions();
+        BlockRenderOptions opt = BlockData.fromMaterial(Material.CHEST).getDefaultRenderOptions();
 
         //System.out.println(opt);
 

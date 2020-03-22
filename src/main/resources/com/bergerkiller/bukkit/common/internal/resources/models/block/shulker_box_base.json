@@ -1,24 +1,25 @@
-{   "parent": "block/block",
+{
+    "parent": "block/block",
     "ambientocclusion": false,
     "elements": [
         {   "from": [ 0, 4, 0 ],
             "to": [ 16, 16, 16 ],
             "faces": {
-                "up": { "uv": [ 16, 0, 32, 16 ], "texture": "#shulker" },
-                "west":   { "uv": [ 0, 16, 16, 28 ], "texture": "#shulker" },
-                "north":   { "uv": [ 16, 16, 32, 28 ], "texture": "#shulker" },
-                "east":   { "uv": [ 32, 16, 48, 28 ], "texture": "#shulker" },
-                "south":   { "uv": [ 48, 16, 64, 28 ], "texture": "#shulker" }
+                "up":    { "uv": [ 4, 0, 8, 4 ], "texture": "#shulker" },
+                "west":  { "uv": [ 0, 4, 4, 7 ], "texture": "#shulker" },
+                "north": { "uv": [ 4, 4, 8, 7 ], "texture": "#shulker" },
+                "east":  { "uv": [ 8, 4, 12, 7 ], "texture": "#shulker" },
+                "south": { "uv": [ 12, 4, 16, 7 ], "texture": "#shulker" }
             }
         },
         {   "from": [ 0, 0, 0 ],
             "to": [ 16, 8, 16 ],
             "faces": {
-                "down": { "uv": [ 32, 28, 48, 44 ], "texture": "#shulker" },
-                "west":   { "uv": [ 0, 44, 16, 52 ], "texture": "#shulker" },
-                "north":   { "uv": [ 16, 44, 32, 52 ], "texture": "#shulker" },
-                "east":   { "uv": [ 32, 44, 48, 52 ], "texture": "#shulker" },
-                "south":   { "uv": [ 48, 44, 64, 52 ], "texture": "#shulker" }
+                "down":  { "uv": [ 8, 7, 12, 11 ], "texture": "#shulker" },
+                "west":  { "uv": [ 0, 11, 4, 13 ], "texture": "#shulker" },
+                "north": { "uv": [ 4, 11, 8, 13 ], "texture": "#shulker" },
+                "east":  { "uv": [ 8, 11, 12, 13 ], "texture": "#shulker" },
+                "south": { "uv": [ 12, 11, 16, 13 ], "texture": "#shulker" }
             }
         }
     ]
