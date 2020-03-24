@@ -11,6 +11,7 @@ import java.util.UUID;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -156,7 +157,8 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);
 
             // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
-            if (this.handler.entityRemoveQueue.isValid()) {
+            // Note: this is disabled on Paperspigot, because it caused a concurrent modification exception at runtime
+            if (this.handler.entityRemoveQueue.isValid() && !Common.IS_PAPERSPIGOT_SERVER) {
                 Collection<?> removeQueue = this.handler.entityRemoveQueue.get(HandleConversion.toWorldHandle(world));
                 if (removeQueue != null && removeQueue.contains(entity)) {
                     CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
