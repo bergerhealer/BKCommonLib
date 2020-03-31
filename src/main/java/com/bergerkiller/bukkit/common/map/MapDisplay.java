@@ -1233,6 +1233,9 @@ public class MapDisplay implements MapDisplayEvents {
      * @return map item
      */
     public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
+        if (!CommonPlugin.getInstance().isMapDisplaysEnabled()) {
+            throw new UnsupportedOperationException("Map displays are disabled in BKCommonLib's config.yml!");
+        }
         ItemStack mapItem = ItemUtil.createItem(CommonMapUUIDStore.FILLED_MAP_TYPE, 1);
         CommonMapUUIDStore.setItemMapId(mapItem, 0);
         CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);

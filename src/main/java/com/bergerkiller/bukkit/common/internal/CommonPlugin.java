@@ -86,6 +86,7 @@ public class CommonPlugin extends PluginBase {
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
     private boolean isFrameTilingSupported = true;
+    private boolean isMapDisplaysEnabled = true;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -108,6 +109,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isFrameTilingSupported() {
         return isFrameTilingSupported;
+    }
+
+    public boolean isMapDisplaysEnabled() {
+        return isMapDisplaysEnabled;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -491,10 +496,18 @@ public class CommonPlugin extends PluginBase {
         // Load configuration
         FileConfiguration config = new FileConfiguration(this);
         config.load();
-        config.setHeader("enableItemFrameTiling", "Whether multiple item frames next to each other can merge to show one large display");
+        config.setHeader("This is the main configuration file of BKCommonLib");
+        config.addHeader("Normally you should not have to make changes to this file");
+        config.addHeader("Unused components of the library can be disabled to improve performance");
+        config.addHeader("By default all components and features are enabled");
+        config.setHeader("enableItemFrameTiling", "\nWhether multiple item frames next to each other can merge to show one large display");
         config.addHeader("enableItemFrameTiling", "This allows Map Displays to be displayed on multiple item frames at a larger resolution");
         config.addHeader("enableItemFrameTiling", "The tiling detection logic poses some overhead on the server, and if unused, can be disabled");
         this.isFrameTilingSupported = config.get("enableItemFrameTiling", true);
+        config.setHeader("enableMapDisplays", "\nWhether the Map Display engine is enabled, running in the background to refresh and render maps");
+        config.addHeader("enableMapDisplays", "When enabled, the map item tracking may impose a slight overhead");
+        config.addHeader("enableMapDisplays", "If no plugin is using map displays, then this can be safely disabled to improve performance");
+        this.isMapDisplaysEnabled = config.get("enableMapDisplays", true);
         config.save();
 
         // Welcome message
@@ -578,9 +591,12 @@ public class CommonPlugin extends PluginBase {
         register(tabController);
         PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
 
-        register(mapController = new CommonMapController());
-        PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
-        mapController.onEnable(this, startedTasks);
+        mapController = new CommonMapController();
+        if (this.isMapDisplaysEnabled) {
+            register(mapController);
+            PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
+            mapController.onEnable(this, startedTasks);
+        }
 
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));

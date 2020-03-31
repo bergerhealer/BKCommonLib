@@ -120,6 +120,8 @@ public class CommonMapController implements PacketListener, Listener {
     private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
     // Caches used while executing findNeighbours()
     private FindNeighboursCache findNeighboursCache = null;
+    // Whether this controller has been enabled
+    private boolean isEnabled = false;
     // Whether tiling is supported. Disables findNeighbours() if false.
     private boolean isFrameTilingSupported = true;
     // Neighbours of item frames to check for either x-aligned or z-aligned
@@ -357,15 +359,21 @@ public class CommonMapController implements PacketListener, Listener {
                 onAddItemFrame(itemFrame);
             }
         }
+
+        // Done!
+        this.isEnabled = true;
     }
 
     /**
      * Cleans up all running map displays and de-initializes all map display logic
      */
     public void onDisable() {
-        for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
-            for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
-                session.display.setRunning(false);
+        if (this.isEnabled) {
+            this.isEnabled = false;
+            for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
+                for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                    session.display.setRunning(false);
+                }
             }
         }
     }
