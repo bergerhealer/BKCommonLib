@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "block/player_wall_head" },
+        "facing=south": { "model": "block/player_wall_head", "y": 180 },
+        "facing=west":  { "model": "block/player_wall_head", "y": 270 },
+        "facing=east":  { "model": "block/player_wall_head", "y": 90 }
+    }
+}

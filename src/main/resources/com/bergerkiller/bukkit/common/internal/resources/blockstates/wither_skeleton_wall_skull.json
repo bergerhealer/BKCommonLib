@@ -1,0 +1,8 @@
+{
+    "variants": {
+        "facing=north": { "model": "block/wither_skeleton_wall_skull" },
+        "facing=south": { "model": "block/wither_skeleton_wall_skull", "y": 180 },
+        "facing=west":  { "model": "block/wither_skeleton_wall_skull", "y": 270 },
+        "facing=east":  { "model": "block/wither_skeleton_wall_skull", "y": 90 }
+    }
+}

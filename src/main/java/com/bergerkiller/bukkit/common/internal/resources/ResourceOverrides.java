@@ -39,6 +39,18 @@ public class ResourceOverrides {
                 "assets/minecraft/models/item/" + name + ".json",
                 "assets/minecraft/blockstates/" + name + ".json"))
         .forEach(_overrided::add);
+
+        // Skulls and heads. All have a wall variant too.
+        Stream.of("player_head", "skeleton_skull", "wither_skeleton_skull",
+                  "creeper_head", "zombie_head")
+        .flatMap(name -> {
+            int idx = name.lastIndexOf('_');
+            return Stream.of(name, name.substring(0, idx)+"_wall"+name.substring(idx));
+        }).flatMap(name -> Stream.of(
+                "assets/minecraft/models/block/" + name + ".json",
+                "assets/minecraft/models/item/" + name + ".json",
+                "assets/minecraft/blockstates/" + name + ".json"))
+        .forEach(_overrided::add);
     }
 
     /**

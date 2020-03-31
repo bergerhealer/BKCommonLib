@@ -114,9 +114,9 @@ class Pseudo3DImagePanel extends JPanel
 
         System.out.println("Yaw=" + yaw + " Pitch=" + pitch);
 
-        BlockRenderOptions opt = BlockData.fromMaterial(Material.CHEST).getDefaultRenderOptions();
+        BlockRenderOptions opt = BlockData.fromMaterial(Material.PLAYER_HEAD).getDefaultRenderOptions();
 
-        //System.out.println(opt);
+        System.out.println(opt);
 
         ItemStack item = ItemUtil.createItem(Material.GOLDEN_PICKAXE, 15, 1);
         ItemUtil.getMetaTag(item, true).putValue("Unbreakable", true);

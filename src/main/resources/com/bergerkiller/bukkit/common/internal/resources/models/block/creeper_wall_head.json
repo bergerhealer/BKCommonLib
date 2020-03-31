@@ -1,0 +1,19 @@
+{
+    "parent": "block/skull_base",
+    "textures": {
+        "skull": "entity/creeper/creeper"
+    },
+    "elements": [
+        {   "from": [ 4, 4, 8 ],
+            "to": [ 12, 12, 16 ],
+            "faces": {
+                "up":    { "uv": [ 2, 0, 4, 4 ], "texture": "#skull" },
+                "down":  { "uv": [ 4, 0, 6, 4 ], "texture": "#skull" },
+                "north": { "uv": [ 2, 4, 4, 8 ], "texture": "#skull" },
+                "east":  { "uv": [ 0, 4, 2, 8 ], "texture": "#skull" },
+                "south": { "uv": [ 6, 4, 8, 8 ], "texture": "#skull" },
+                "west":  { "uv": [ 4, 4, 6, 8 ], "texture": "#skull" } 
+            }
+        }
+    ]
+}

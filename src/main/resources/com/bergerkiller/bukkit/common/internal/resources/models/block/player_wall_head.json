@@ -1,0 +1,19 @@
+{
+    "parent": "block/skull_base",
+    "textures": {
+        "skull": "entity/steve"
+    },
+    "elements": [
+        {   "from": [ 4, 4, 8 ],
+            "to": [ 12, 12, 16 ],
+            "faces": {
+                "up":    { "uv": [ 2, 0, 4, 2 ], "texture": "#skull" },
+                "down":  { "uv": [ 4, 0, 6, 2 ], "texture": "#skull" },
+                "north": { "uv": [ 2, 2, 4, 4 ], "texture": "#skull" },
+                "east":  { "uv": [ 0, 2, 2, 4 ], "texture": "#skull" },
+                "south": { "uv": [ 6, 2, 8, 4 ], "texture": "#skull" },
+                "west":  { "uv": [ 4, 2, 6, 4 ], "texture": "#skull" } 
+            }
+        }
+    ]
+}
