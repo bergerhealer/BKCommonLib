@@ -45,6 +45,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
+    private final FastMethod<Object> paperspigotSwapEntityInChunkEntityListMethod = new FastMethod<Object>();
 
     //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
     public EntityAddRemoveHandler_1_14() {
@@ -71,7 +72,23 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
                         "        instance.loadedEntities.add(newEntity);\n" +
                         "    }\n" +
                         "}"
-                        ));
+                ));
+            }
+        } catch (ClassNotFoundException ignore) {}
+
+        // Paperspigot support: 'entities' field of Chunk
+        try {
+            Class<?> entityListType = Class.forName("com.destroystokyo.paper.util.maplist.EntityList");
+            if (SafeField.contains(ChunkHandle.T.getType(), "entities", entityListType)) {
+                ClassResolver resolver = new ClassResolver();
+                resolver.setDeclaredClass(ChunkHandle.T.getType());
+                paperspigotSwapEntityInChunkEntityListMethod.init(new MethodDeclaration(resolver,
+                        "public void swap(Entity oldEntity, Entity newEntity) {\n" +
+                        "    if (instance.entities.remove(oldEntity)) {\n" +
+                        "        instance.entities.add(newEntity);\n" +
+                        "    }\n" +
+                        "}"
+                ));
             }
         } catch (ClassNotFoundException ignore) {}
     }
@@ -300,7 +317,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
         //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
-    private static void replaceInChunk(Chunk chunk, int chunkY, EntityHandle oldEntity, EntityHandle newEntity) {
+    private void replaceInChunk(Chunk chunk, int chunkY, EntityHandle oldEntity, EntityHandle newEntity) {
         Object chunkHandle = HandleConversion.toChunkHandle(chunk);
         if (chunkHandle != null) {
             final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
@@ -310,6 +327,9 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
                         break;
                     }
                 }
+            }
+            if (paperspigotSwapEntityInChunkEntityListMethod.isAvailable()) {
+                paperspigotSwapEntityInChunkEntityListMethod.invoke(chunkHandle, oldEntity.getRaw(), newEntity.getRaw());
             }
         }
     }
