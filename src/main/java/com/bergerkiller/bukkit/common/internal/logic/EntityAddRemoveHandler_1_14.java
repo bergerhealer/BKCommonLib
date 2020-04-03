@@ -31,7 +31,10 @@ import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is
@@ -41,6 +44,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private final FastField<?> entitiesByIdField = new FastField<Object>();
     private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
+    private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
 
     //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
     public EntityAddRemoveHandler_1_14() {
@@ -54,6 +58,22 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             entitiesByIdField.initUnavailable("entitiesById");
         }
         this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), "entitiesToAdd", Queue.class));
+
+        // Tuinity support: 'loadedEntities' field of WorldServer
+        try {
+            Class<?> entityListType = Class.forName("com.tuinity.tuinity.util.EntityList");
+            if (SafeField.contains(WorldServerHandle.T.getType(), "loadedEntities", entityListType)) {
+                ClassResolver resolver = new ClassResolver();
+                resolver.setDeclaredClass(WorldServerHandle.T.getType());
+                tuinitySwapEntityInWorldEntityListMethod.init(new MethodDeclaration(resolver,
+                        "public void swap(Entity oldEntity, Entity newEntity) {\n" +
+                        "    if (instance.loadedEntities.remove(oldEntity)) {\n" +
+                        "        instance.loadedEntities.add(newEntity);\n" +
+                        "    }\n" +
+                        "}"
+                        ));
+            }
+        } catch (ClassNotFoundException ignore) {}
     }
 
     @Override
@@ -237,6 +257,11 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             }
         }
 
+        // *** Tuinity World EntityList field ***
+        if (tuinitySwapEntityInWorldEntityListMethod.isAvailable()) {
+            tuinitySwapEntityInWorldEntityListMethod.invoke(worldHandle, oldEntity.getRaw(), newEntity.getRaw());
+        }
+
         // *** EntityTrackerEntry ***
         replaceInEntityTracker(oldEntity, oldEntity, newEntity);
         if (oldEntity.getVehicle() != null) {
@@ -272,7 +297,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
+        //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
     private static void replaceInChunk(Chunk chunk, int chunkY, EntityHandle oldEntity, EntityHandle newEntity) {
