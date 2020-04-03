@@ -174,7 +174,7 @@ public class IBlockDataToMaterialData {
                                          iblockdata.set("facing", BlockFace.WEST));
                 }
             }.setTypes("JUNGLE_BUTTON", "SPRUCE_BUTTON", "ACACIA_BUTTON",
-                       "BIRCH_BUTTON", "DARK_OAK_BUTTON")
+                       "BIRCH_BUTTON", "DARK_OAK_BUTTON", "OAK_BUTTON", "STONE_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }

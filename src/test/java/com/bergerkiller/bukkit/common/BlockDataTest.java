@@ -15,6 +15,8 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
+import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -47,6 +49,7 @@ public class BlockDataTest {
         legacyDataRanges.put(getLegacyMaterial("DOUBLE_STEP"), createRange(0, 7));
         legacyDataRanges.put(getLegacyMaterial("WALL_BANNER"), createRange(2, 5));
         legacyDataRanges.put(getLegacyMaterial("PORTAL"), createRange(1, 2));
+        legacyDataRanges.put(getLegacyMaterial("STONE_BUTTON"), new int[] {0,1,2,3,4,5, 8,9,10,11,12,13});
         // ==================================================================================
 
         for (Material material : getAllLegacyMaterials()) {
@@ -61,6 +64,35 @@ public class BlockDataTest {
                 }
             } else {
                 testLegacyMaterial(material, 0);
+            }
+        }
+    }
+
+    @Test
+    public void testButtons() {
+        for (Material material : MaterialsByName.getAllByName("STONE_BUTTON", "ACACIA_BUTTON",
+                "BIRCH_BUTTON", "DARK_OAK_BUTTON", "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON"))
+        {
+            BlockData d = BlockData.fromMaterial(material);
+
+            // Facing
+            for (BlockFace facing : FaceUtil.BLOCK_SIDES) {
+                if (facing == BlockFace.UP) {
+                    d = d.setState("face", "ceiling");
+                } else if (facing == BlockFace.DOWN) {
+                    d = d.setState("face", "floor");
+                } else {
+                    d = d.setState("face", "wall");
+                    d = d.setState("facing", facing);
+                }
+
+                d = d.setState("powered", false);
+                assertFalse("isPowered()==false failed for " + facing + " material " + material,
+                        ((org.bukkit.material.Button) d.getMaterialData()).isPowered());
+
+                d = d.setState("powered", true);
+                assertTrue("isPowered()==true failed for " + facing + " material " + material,
+                        ((org.bukkit.material.Button) d.getMaterialData()).isPowered());
             }
         }
     }
