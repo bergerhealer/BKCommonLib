@@ -3,15 +3,20 @@ package com.bergerkiller.bukkit.common.internal.mounting;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Supplier;
 
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
 /**
@@ -23,14 +28,16 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     private final SpawnedEntity _playerSpawnedEntity;
     private Dimension _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
+    private final Queue<PacketHandle> _queuedPackets;
 
     public VehicleMountHandler_BaseImpl(Player player) {
         this._player = player;
-        this._playerDimension = WorldUtil.getDimension(player.getWorld());
+        this._playerDimension = PlayerUtil.getPlayerDimension(player);
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
         this._playerSpawnedEntity.spawned = true;
         this._spawnedEntities = new IntHashMap<>();
         this._spawnedEntities.put(this._playerSpawnedEntity.id, this._playerSpawnedEntity);
+        this._queuedPackets = new ConcurrentLinkedQueue<PacketHandle>();
     }
 
     @Override
@@ -39,92 +46,100 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     @Override
-    public synchronized boolean mount(int vehicleEntityId, int passengerEntityId) {
-        SpawnedEntity vehicle = getSpawnedEntity(vehicleEntityId, true);
-        SpawnedEntity passenger = getSpawnedEntity(passengerEntityId, true);
-        if (vehicle == null || passenger == null) {
-            return false;
-        }
+    public boolean mount(int vehicleEntityId, int passengerEntityId) {
+        return synchronizeAndQueuePackets(() -> {
+            SpawnedEntity vehicle = getSpawnedEntity(vehicleEntityId, true);
+            SpawnedEntity passenger = getSpawnedEntity(passengerEntityId, true);
+            if (vehicle == null || passenger == null) {
+                return false;
+            }
 
-        // Deal with a previous vehicle
-        Mount prevMount = passenger.vehicleMount;
-        if (prevMount != null) {
-            if (prevMount.vehicle == vehicle) {
-                return true; // Unchanged
-            } else {
-                // Remove previous mount
-                if (prevMount.sent) {
-                    prevMount.sent = false;
-                    onUnmountVehicle(vehicle, Collections.singletonList(prevMount));
+            // Deal with a previous vehicle
+            Mount prevMount = passenger.vehicleMount;
+            if (prevMount != null) {
+                if (prevMount.vehicle == vehicle) {
+                    return true; // Unchanged
+                } else {
+                    // Remove previous mount
+                    if (prevMount.sent) {
+                        prevMount.sent = false;
+                        onUnmountVehicle(vehicle, Collections.singletonList(prevMount));
+                    }
+                    prevMount.remove();
                 }
-                prevMount.remove();
             }
-        }
 
-        // Create a new mount
-        Mount mount;
-        if (vehicle.passengerMounts.isEmpty()) {
-            mount = new Mount(vehicle, passenger);
-            passenger.vehicleMount = mount;
-            vehicle.passengerMounts = Collections.singletonList(mount);
-        } else if (SUPPORTS_MULTIPLE_PASSENGERS) {
-            mount = new Mount(vehicle, passenger);
-            passenger.vehicleMount = mount;
-            if (vehicle.passengerMounts.size() == 1) {
-                vehicle.passengerMounts = new ArrayList<>(2);
-                vehicle.passengerMounts.add(vehicle.passengerMounts.get(0));
+            // Create a new mount
+            Mount mount;
+            if (vehicle.passengerMounts.isEmpty()) {
+                mount = new Mount(vehicle, passenger);
+                passenger.vehicleMount = mount;
+                vehicle.passengerMounts = Collections.singletonList(mount);
+            } else if (SUPPORTS_MULTIPLE_PASSENGERS) {
+                mount = new Mount(vehicle, passenger);
+                passenger.vehicleMount = mount;
+                if (vehicle.passengerMounts.size() == 1) {
+                    vehicle.passengerMounts = new ArrayList<>(2);
+                    vehicle.passengerMounts.add(vehicle.passengerMounts.get(0));
+                }
+                vehicle.passengerMounts.add(mount);
+            } else {
+                return false; // Multiple passengers not supported
             }
-            vehicle.passengerMounts.add(mount);
-        } else {
-            return false; // Multiple passengers not supported
-        }
 
-        // Send the mount if we can
-        if (vehicle.spawned && passenger.spawned) {
-            // Both entities are spawned, so we can synchronize right now
-            // Collect all the passenger id's for entities that have spawned and send a mount packet right away
-            mount.sent = true;
-            onMountReady(mount);
-        }
-        return true;
+            // Send the mount if we can
+            if (vehicle.spawned && passenger.spawned) {
+                // Both entities are spawned, so we can synchronize right now
+                // Collect all the passenger id's for entities that have spawned and send a mount packet right away
+                mount.sent = true;
+                onMountReady(mount);
+            }
+            return true;
+        });
     }
 
     @Override
-    public synchronized void unmount(int vehicleEntityId, int passengerEntityId) {
-        SpawnedEntity vehicle = getSpawnedEntity(vehicleEntityId, false);
-        SpawnedEntity passenger = getSpawnedEntity(passengerEntityId, false);
-        if (vehicle == null || passenger == null) {
-            return;
-        }
-        Mount mount = passenger.vehicleMount;
-        if (mount == null || mount.vehicle != vehicle) {
-            return;
-        }
+    public void unmount(int vehicleEntityId, int passengerEntityId) {
+        synchronizeAndQueuePackets(() -> {
+            SpawnedEntity vehicle = getSpawnedEntity(vehicleEntityId, false);
+            SpawnedEntity passenger = getSpawnedEntity(passengerEntityId, false);
+            if (vehicle == null || passenger == null) {
+                return;
+            }
+            Mount mount = passenger.vehicleMount;
+            if (mount == null || mount.vehicle != vehicle) {
+                return;
+            }
 
-        // Remove the vehicle mount
-        mount.remove();
+            // Remove the vehicle mount
+            mount.remove();
 
-        // If mount was sent, synchronize passengers of vehicle again after the change
-        if (mount.sent) {
-            mount.sent = false;
-            onUnmountVehicle(vehicle, Collections.singletonList(mount));
-        }
+            // If mount was sent, synchronize passengers of vehicle again after the change
+            if (mount.sent) {
+                mount.sent = false;
+                onUnmountVehicle(vehicle, Collections.singletonList(mount));
+            }
+        });
     }
 
     @Override
-    public synchronized void remove(int entityId) {
-        SpawnedEntity entity = getSpawnedEntity(entityId, false);
-        if (entity != null) {
-            clear(entity, false);
-        }
+    public void remove(int entityId) {
+        synchronizeAndQueuePackets(() -> {
+            SpawnedEntity entity = getSpawnedEntity(entityId, false);
+            if (entity != null) {
+                clear(entity, false);
+            }
+        });
     }
 
     @Override
-    public synchronized void clear(int entityId) {
-        SpawnedEntity entity = getSpawnedEntity(entityId, false);
-        if (entity != null) {
-            clear(entity, true);
-        }
+    public void clear(int entityId) {
+        synchronizeAndQueuePackets(() -> {
+            SpawnedEntity entity = getSpawnedEntity(entityId, false);
+            if (entity != null) {
+                clear(entity, true);
+            } 
+        });
     }
 
     private void clear(SpawnedEntity entity, boolean handleUnmount) {
@@ -164,25 +179,60 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      * 
      * @param packet The packet received
      */
-    public final synchronized void onPacketReceive(CommonPacket packet) {
-        PacketType type = packet.getType();
-        if (type == PacketType.OUT_ENTITY_SPAWN) {
-            handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN.entityId));
-        } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
-            handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId));
-        } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
-            handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_NAMED.entityId));
-        } else if (type == PacketType.OUT_ENTITY_DESTROY) {
-            for (int entityId : packet.read(PacketType.OUT_ENTITY_DESTROY.entityIds)) {
-                handleDespawn(entityId);
+    public final void onPacketReceive(CommonPacket packet) {
+        synchronizeAndQueuePackets(() -> {
+            // Refresh player dimension if none could be set (temporary player, pre-join)
+            if (this._playerDimension == null) {
+                this._playerDimension = PlayerUtil.getPlayerDimension(this._player);
             }
-        } else if (type == PacketType.OUT_RESPAWN) {
-            Dimension dimension = packet.read(PacketType.OUT_RESPAWN.dimension);
-            if (dimension != null && !dimension.equals(this._playerDimension)) {
-                this._playerDimension = dimension;
-                handleReset();
+
+            // Handle packets
+            PacketType type = packet.getType();
+            if (type == PacketType.OUT_ENTITY_SPAWN) {
+                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN.entityId));
+            } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
+                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId));
+            } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
+                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_NAMED.entityId));
+            } else if (type == PacketType.OUT_ENTITY_DESTROY) {
+                for (int entityId : packet.read(PacketType.OUT_ENTITY_DESTROY.entityIds)) {
+                    handleDespawn(entityId);
+                }
+            } else if (type == PacketType.OUT_RESPAWN) {
+                Dimension dimension = packet.read(PacketType.OUT_RESPAWN.dimension);
+                if (dimension != null && !dimension.equals(this._playerDimension)) {
+                    this._playerDimension = dimension;
+                    handleReset();
+                }
             }
-        }  
+        });
+    }
+
+    // Calls a runnable while synchronized, afterwards flushes all queued packets
+    private final void synchronizeAndQueuePackets(Runnable r) {
+        synchronized (this) {
+            r.run();
+        }
+
+        PacketHandle p;
+        while ((p = this._queuedPackets.poll()) != null) {
+            PacketUtil.queuePacket(this._player, p);
+        }
+    }
+
+    // Calls a method while synchronized, afterwards flushes all queued packets and returns the return value
+    private final <T> T synchronizeAndQueuePackets(Supplier<T> s) {
+        T result;
+        synchronized (this) {
+            result = s.get();
+        }
+
+        PacketHandle p;
+        while ((p = this._queuedPackets.poll()) != null) {
+            PacketUtil.queuePacket(this._player, p);
+        }
+
+        return result;
     }
 
     private final void handleSpawn(int entityId) {
@@ -269,6 +319,15 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     protected final boolean isSpawned(int entityId) {
         SpawnedEntity spawnedEntity = this._spawnedEntities.get(entityId);
         return spawnedEntity != null && spawnedEntity.spawned;
+    }
+
+    /**
+     * Queues a packet for sending after the handler finished processing
+     * 
+     * @param packet
+     */
+    protected final void queuePacket(PacketHandle packet) {
+        this._queuedPackets.add(packet);
     }
 
     /**

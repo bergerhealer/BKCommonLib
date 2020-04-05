@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
 /**
@@ -103,7 +102,7 @@ public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_
     private final void sendVehicleMounts(SpawnedEntity vehicle, boolean sendEmptyList) {
         int[] passengerIds = vehicle.collectSentPassengerIds();
         if (sendEmptyList || passengerIds.length > 0) {
-            PacketUtil.queuePacket(getPlayer(), PacketPlayOutMountHandle.createNew(vehicle.id, vehicle.collectSentPassengerIds()));
+            queuePacket(PacketPlayOutMountHandle.createNew(vehicle.id, vehicle.collectSentPassengerIds()));
         }
     }
 }

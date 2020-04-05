@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
 
 /**
@@ -69,6 +68,6 @@ public class VehicleMountHandler_SinglePassenger extends VehicleMountHandler_Bas
         PacketPlayOutAttachEntityHandle attach = PacketPlayOutAttachEntityHandle.T.newHandleNull();
         attach.setVehicleId((vehicle == null) ? -1 : vehicle.id);
         attach.setPassengerId(passenger.id);
-        PacketUtil.queuePacket(getPlayer(), attach);
+        queuePacket(attach);
     }
 }

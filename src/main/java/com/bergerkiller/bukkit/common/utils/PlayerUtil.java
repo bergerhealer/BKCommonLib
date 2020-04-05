@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -404,6 +405,23 @@ public class PlayerUtil extends EntityUtil {
     public static void playSound(Player player, Location location, ResourceKey soundKey, float volume, float pitch) {
         if (soundKey != null) {
             player.playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
+        }
+    }
+
+    /**
+     * Gets the dimension of a world a player is on, which is guaranteed to have a valid
+     * registration in the server. This dimension will be OVERWORLD for all normal-type worlds,
+     * THE_END for end worlds, etc. This method returns null for ProtocolLib's TemporaryPlayer.
+     * (player before joining a world)
+     *
+     * @param player to get a world for
+     * @return world dimension
+     */
+    public static Dimension getPlayerDimension(Player player) {
+        if (CBCraftPlayer.T.isAssignableFrom(player.getClass())) {
+            return WorldUtil.getDimension(player.getWorld());
+        } else {
+            return null;
         }
     }
 }
