@@ -11,6 +11,8 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -95,15 +97,17 @@ public class CommonPlayer extends CommonHumanEntity<Player> {
      * to all nearby player viewers
      */
     public void flushEntityRemoveQueue() {
-        final List<Integer> ids = getEntityRemoveQueue();
+        final Collection<Integer> ids = getEntityRemoveQueue();
         if (ids.isEmpty()) {
             return;
         }
         // Take care of more than 127 entities (multiple packets)
         while (ids.size() >= 128) {
             final int[] rawIds = new int[127];
+            Iterator<Integer> iter = ids.iterator();
             for (int i = 0; i < rawIds.length; i++) {
-                rawIds[i] = ids.remove(0).intValue();
+                rawIds[i] = iter.next().intValue();
+                iter.remove();
             }
             sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstance(rawIds));
         }
@@ -117,7 +121,7 @@ public class CommonPlayer extends CommonHumanEntity<Player> {
      *
      * @return list of entity ids to send destroy packets for
      */
-    public List<Integer> getEntityRemoveQueue() {
+    public Collection<Integer> getEntityRemoveQueue() {
         return PlayerUtil.getEntityRemoveQueue(entity);
     }
 

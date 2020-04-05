@@ -15,6 +15,7 @@ import org.bukkit.entity.Player;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,20 +26,20 @@ public class CommonPlayerMeta {
 
     private final LongHashSet visibleChunks = new LongHashSet(441);
     private final WeakReference<Player> playerRef;
-    private final List<Integer> removeQueue;
+    private final Collection<Integer> removeQueue;
     private List<EntityNetworkController<?>> pendingViewerUpdates = Collections.emptyList();
     private int respawnBlindnessEndTick = 0;
 
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
-        if (EntityPlayerHandle.T.removeQueue.isAvailable()) {
-            removeQueue = EntityPlayerHandle.T.removeQueue.get(Conversion.toEntityHandle.convert(player));
+        if (EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
+            removeQueue = EntityPlayerHandle.T.getRemoveQueue.invoke(Conversion.toEntityHandle.convert(player));
         } else {
             removeQueue = new ArrayList<Integer>();
         }
     }
 
-    public List<Integer> getRemoveQueue() {
+    public Collection<Integer> getRemoveQueue() {
         return this.removeQueue;
     }
 

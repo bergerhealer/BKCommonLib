@@ -3,7 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.InventoryView;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.EntityPlayer</b>.
@@ -38,10 +38,10 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
-        @Template.Optional
-        public final Template.Field<List<Integer>> removeQueue = new Template.Field<List<Integer>>();
         public final Template.Field.Integer ping = new Template.Field.Integer();
 
+        @Template.Optional
+        public final Template.Method<Collection<Integer>> getRemoveQueue = new Template.Method<Collection<Integer>>();
         public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();
 
     }

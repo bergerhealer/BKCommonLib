@@ -28,6 +28,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -242,7 +243,7 @@ public class PlayerUtil extends EntityUtil {
      * @param player to get it for
      * @return Entity Remove Queue
      */
-    public static List<Integer> getEntityRemoveQueue(Player player) {
+    public static Collection<Integer> getEntityRemoveQueue(Player player) {
         return CommonPlugin.getInstance().getPlayerMeta(player).getRemoveQueue();
     }
 

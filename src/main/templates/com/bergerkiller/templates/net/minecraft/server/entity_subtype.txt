@@ -366,8 +366,19 @@ class EntityPlayer extends EntityHuman {
     public (PlayerConnectionHandle) PlayerConnection playerConnection;
     // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
     // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
-    public final optional List<Integer> removeQueue;
     public int ping;
+
+#if exists net.minecraft.server.EntityPlayer public final java.util.List<Integer> removeQueue;
+    public optional Collection<Integer> getRemoveQueue() {
+        return instance.removeQueue;
+    }
+#elseif exists net.minecraft.server.EntityPlayer public final java.util.Deque<Integer> removeQueue;
+    public optional Collection<Integer> getRemoveQueue() {
+        return instance.removeQueue;
+    }
+#else
+    public optional Collection<Integer> getRemoveQueue:###();
+#endif
 
     public org.bukkit.inventory.InventoryView openAnvilWindow() {
         String titleStr = (String) com.bergerkiller.generated.net.minecraft.server.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);

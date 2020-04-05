@@ -605,7 +605,7 @@ public class CommonPlugin extends PluginBase {
 
         // Some servers do not have an Entity Remove Queue.
         // For those servers, we handle them using our own system
-        if (!EntityPlayerHandle.T.removeQueue.isAvailable()) {
+        if (!EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
             startedTasks.add(new EntityRemoveQueueSyncTask(this).start(1, 1));
         }
 
