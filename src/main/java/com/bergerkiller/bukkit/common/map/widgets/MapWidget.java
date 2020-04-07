@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
@@ -1051,6 +1054,12 @@ public class MapWidget implements MapDisplayEvents {
 
     @Override
     public void onMapItemChanged() {
+    }
+
+    @Override
+    public boolean onItemDrop(Player player, ItemStack item) {
+        MapWidget next = this.getNextInputWidget();
+        return next != null && next.onItemDrop(player, item);
     }
 
     private MapWidget getInputWidget() {

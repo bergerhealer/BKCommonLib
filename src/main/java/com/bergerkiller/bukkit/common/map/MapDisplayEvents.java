@@ -1,5 +1,8 @@
 package com.bergerkiller.bukkit.common.map;
 
+import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+
 import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
@@ -79,4 +82,18 @@ public interface MapDisplayEvents extends Tickable {
      * @param event of the status change
      */
     public void onStatusChanged(MapStatusEvent event);
+
+    /**
+     * Callback function called when a player holding this display in either hand drops an item from
+     * the inventory onto the display.<br>
+     * <br>
+     * Return true from this callback to cancel the item drop, indicating the drop
+     * was handled by the display. By default the callback should return false, allowing the drop
+     * to occur like normal.
+     * 
+     * @param player The player that dropped the item
+     * @param item ItemStack of the item dropped by the player
+     * @return True if the drop was handled and the item drop should be cancelled
+     */
+    public boolean onItemDrop(Player player, ItemStack item);
 }

@@ -5,11 +5,13 @@ import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 
 import org.bukkit.entity.Entity;
@@ -20,6 +22,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
+import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -31,6 +34,7 @@ import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.inventory.ItemStack;
 
 public class CommonListener implements Listener {
     /**
@@ -131,6 +135,32 @@ public class CommonListener implements Listener {
         // When block physics events occur while looking up the render options
         // for a block, log a warning of this (once).
         BLOCK_PHYSICS_FIRED = true;
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST)
+    public void onPlayerItemDrop(PlayerDropItemEvent event) {
+        Player p = event.getPlayer();
+        MapDisplay display;
+
+        // Try map held in main hand first
+        display = MapDisplay.getViewedDisplay(p, HumanHand.getItemInMainHand(event.getPlayer()));
+        if (display != null) {
+            ItemStack item = event.getItemDrop().getItemStack();
+            if (display.onItemDrop(p, item) || display.getRootWidget().onItemDrop(p, item)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
+
+        // Try map held in off hand second
+        display = MapDisplay.getViewedDisplay(p, HumanHand.getItemInOffHand(event.getPlayer()));
+        if (display != null) {
+            ItemStack item = event.getItemDrop().getItemStack();
+            if (display.onItemDrop(p, item) || display.getRootWidget().onItemDrop(p, item)) {
+                event.setCancelled(true);
+                return;
+            }
+        }
     }
 
     /*

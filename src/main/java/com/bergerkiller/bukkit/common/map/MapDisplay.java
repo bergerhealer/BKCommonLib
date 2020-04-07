@@ -1209,6 +1209,9 @@ public class MapDisplay implements MapDisplayEvents {
     @Override
     public void onStatusChanged(MapStatusEvent event) {};
 
+    @Override
+    public boolean onItemDrop(Player player, ItemStack item) { return false; }
+
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
      * when viewed
