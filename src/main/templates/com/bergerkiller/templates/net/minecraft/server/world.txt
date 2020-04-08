@@ -408,10 +408,10 @@ class WorldServer extends World {
 #if version >= 1.14
         long key = ChunkCoordIntPair.pair(cx, cz);
 
-  #if exists net.minecraft.server.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.PlayerChunk> visibleChunks;
-        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
-  #else
+  #if exists net.minecraft.server.PlayerChunkMap public net.minecraft.server.PlayerChunk getVisibleChunk(long key);
         PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.getVisibleChunk(key);
+  #else
+        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
   #endif
 
         if (chunk != null) {

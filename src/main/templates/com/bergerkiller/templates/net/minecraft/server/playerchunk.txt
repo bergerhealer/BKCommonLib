@@ -232,10 +232,10 @@ class PlayerChunkMap {
 
 #if version >= 1.14
     public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
-  #if exists net.minecraft.server.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.PlayerChunk> visibleChunks;
-        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
-  #else
+  #if exists net.minecraft.server.PlayerChunkMap public net.minecraft.server.PlayerChunk getVisibleChunk(long key);
         PlayerChunk chunk = instance.getVisibleChunk(ChunkCoordIntPair.pair(chunkX, chunkZ));
+  #else
+        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
   #endif
 
         if (chunk == null || chunk.getChunk() == null) {
