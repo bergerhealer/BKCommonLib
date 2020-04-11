@@ -479,15 +479,16 @@ public abstract class EntityMoveHandler {
                 int bl_x = MathUtil.floor(that.getLocX());
                 int bl_y = MathUtil.floor(that.getLocY());
                 int bl_z = MathUtil.floor(that.getLocZ());
-                if (d6 > d0) {
+                if (d7 > d0) {
                     bl_x++;
-                } else if (d6 < d0) {
+                } else if (d7 < d0) {
                     bl_x--;
-                } else if (d8 > d2) {
+                } else if (d9 > d2) {
                     bl_z++;
-                } else if (d8 < d2) {
+                } else if (d9 < d2) {
                     bl_z--;
                 }
+
                 if (!WorldUtil.getBlockData(bl_world, bl_x, bl_y, bl_z).isType(org.bukkit.Material.AIR)) {
                     org.bukkit.block.Block bl = bl_world.getBlockAt(bl_x, bl_y, bl_z);
                     Vehicle vehicle = (Vehicle) that.getBukkitEntity();

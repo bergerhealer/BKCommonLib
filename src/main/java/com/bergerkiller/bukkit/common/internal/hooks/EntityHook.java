@@ -19,6 +19,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
+import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 public class EntityHook extends ClassHook<EntityHook> {
@@ -150,8 +151,18 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
+    // Minecraft 1.14 and later
+    @HookMethod(value="public void move(EnumMoveType enummovetype, Vec3D vec3d)", optional=true)
+    public void onMove_v3(Object enumMoveType, Object vec3d) {
+        double dx = Vec3DHandle.T.x.getDouble(vec3d);
+        double dy = Vec3DHandle.T.y.getDouble(vec3d);
+        double dz = Vec3DHandle.T.z.getDouble(vec3d);
+        this.onMove_v2(enumMoveType, dx, dy, dz);
+    }
+
+    // Minecraft 1.11.2 and later
     @HookMethod(value="public void move(EnumMoveType enummovetype, double d0, double d1, double d2)", optional=true)
-    public void onMove(Object enumMoveType, double dx, double dy, double dz) {
+    public void onMove_v2(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {
                 if (CommonCapabilities.ENTITY_MOVE_VER2) {
@@ -160,10 +171,12 @@ public class EntityHook extends ClassHook<EntityHook> {
                     controller.onMove(MoveType.SELF, dx, dy, dz);
                 }
             } else {
-                if (CommonCapabilities.ENTITY_MOVE_VER2) {
-                    base.onMove(enumMoveType, dx, dy, dz);
+                if (CommonCapabilities.ENTITY_MOVE_VER3) {
+                    base.onMove_v3(enumMoveType, Vec3DHandle.T.constr_x_y_z.raw.newInstance(dx, dy, dz));
+                } else if (CommonCapabilities.ENTITY_MOVE_VER2) {
+                    base.onMove_v2(enumMoveType, dx, dy, dz);
                 } else {
-                    base.onMove_old(dx, dy, dz);
+                    base.onMove_v1(dx, dy, dz);
                 }
             }
         } catch (Throwable t) {
@@ -171,10 +184,10 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @Deprecated
+    // Beginning of time
     @HookMethod(value="public void move(double d0, double d1, double d2)", optional=true)
-    public void onMove_old(double dx, double dy, double dz) {
-        this.onMove(MoveType.SELF.getHandle(), dx, dy, dz);
+    public void onMove_v1(double dx, double dy, double dz) {
+        this.onMove_v2(MoveType.SELF.getHandle(), dx, dy, dz);
     }
 
     @HookMethod("public void die()")

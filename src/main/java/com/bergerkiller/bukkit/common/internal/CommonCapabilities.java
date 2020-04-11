@@ -53,6 +53,12 @@ public class CommonCapabilities {
     public static final boolean ENTITY_MOVE_VER2 = CommonBootstrap.evaluateMCVersion(">=", "1.11.2");
 
     /**
+     * Since Minecraft 1.14 the Entity move function had some changes, replacing the
+     * x/y/z delta coordinates with a Vec3D object. This changed the function signature.
+     */
+    public static final boolean ENTITY_MOVE_VER3 = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
      * Since Minecraft 1.11.2 the World Provider 'isDarkWorld' boolean property was inverted.
      */
     public static final boolean WORLD_LIGHT_DARK_INVERTED = CommonBootstrap.evaluateMCVersion(">=", "1.11.2");
