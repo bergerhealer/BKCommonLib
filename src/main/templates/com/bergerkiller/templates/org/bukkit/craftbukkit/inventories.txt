@@ -13,6 +13,29 @@ class CraftItemStack {
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftCopy(org.bukkit.inventory.ItemStack original);
 
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.server.ItemStack nmsItemStack);
+
+    public static java.util.Map<String, Object> serialize(org.bukkit.inventory.ItemStack item) {
+        if (item == null) {
+            return java.util.Collections.emptyMap();
+        }
+        java.util.Map values = item.serialize();
+        Object meta = values.get("meta");
+        if (meta instanceof org.bukkit.inventory.meta.ItemMeta) {
+            values.put("meta", ((org.bukkit.inventory.meta.ItemMeta) meta).serialize());
+        }
+        return values;
+    }
+
+    public static org.bukkit.inventory.ItemStack deserialize(java.util.Map<String, Object> values) {
+        if (values == null || values.isEmpty()) {
+            return null;
+        }
+        Object meta = values.get("meta");
+        if (meta instanceof java.util.Map) {
+            values.put("meta", CraftMetaItem$SerializableMeta.deserialize((java.util.Map) meta));
+        }
+        return org.bukkit.inventory.ItemStack.deserialize(values);
+    }
 }
 
 class CraftInventory extends org.bukkit.inventory.Inventory {
