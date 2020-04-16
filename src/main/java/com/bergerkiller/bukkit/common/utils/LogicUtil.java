@@ -4,6 +4,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.Map.Entry;
 import org.bukkit.block.Block;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
+import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.google.common.collect.BiMap;
@@ -833,4 +835,21 @@ public class LogicUtil {
         return changed;
     }
 
+    /**
+     * Version of {@link Arrays#asList(Object...)} that produces an immutable list. Set
+     * calls will not work, unlike the Java one. Empty arrays are optimized to return
+     * the {@link Collections#emptyList()} instance.
+     * 
+     * @param array
+     * @return List
+     * @throw NullPointerException if input array is null
+     */
+    @SuppressWarnings("unchecked")
+    public static <E> List<E> asImmutableList(E... array) {
+        if (array.length == 0) {
+            return Collections.EMPTY_LIST;
+        } else {
+            return new ImmutableArrayList<E>(array);
+        }
+    }
 }
