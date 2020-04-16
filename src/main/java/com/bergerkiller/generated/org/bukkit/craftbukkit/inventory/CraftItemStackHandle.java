@@ -3,6 +3,7 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import java.util.Map;
 
 /**
@@ -35,12 +36,8 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         return T.asCraftMirror.invoke(nmsItemStack);
     }
 
-    public static Map<String, Object> serialize(ItemStack item) {
-        return T.serialize.invoker.invoke(null,item);
-    }
-
-    public static ItemStack deserialize(Map<String, Object> values) {
-        return T.deserialize.invoker.invoke(null,values);
+    public static ItemMeta deserializeItemMeta(Map<String, Object> values) {
+        return T.deserializeItemMeta.invoker.invoke(null,values);
     }
 
     public abstract Object getHandle();
@@ -55,8 +52,7 @@ public abstract class CraftItemStackHandle extends Template.Handle {
         public final Template.StaticMethod<Object> asNMSCopy = new Template.StaticMethod<Object>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftCopy = new Template.StaticMethod.Converted<ItemStack>();
         public final Template.StaticMethod.Converted<ItemStack> asCraftMirror = new Template.StaticMethod.Converted<ItemStack>();
-        public final Template.StaticMethod<Map<String, Object>> serialize = new Template.StaticMethod<Map<String, Object>>();
-        public final Template.StaticMethod<ItemStack> deserialize = new Template.StaticMethod<ItemStack>();
+        public final Template.StaticMethod<ItemMeta> deserializeItemMeta = new Template.StaticMethod<ItemMeta>();
 
     }
 

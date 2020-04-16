@@ -18,6 +18,7 @@ import org.yaml.snakeyaml.nodes.Tag;
 
 import com.bergerkiller.bukkit.common.config.HeaderBuilder;
 import com.bergerkiller.bukkit.common.config.NodeBuilder;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
@@ -288,7 +289,7 @@ public class YamlDeserializer {
         public YamlConstructor() {
             this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
             this.custom_builders = new HashMap<>();
-            this.register("org.bukkit.inventory.ItemStack", new YamlItemStackDeserializer());
+            this.register("org.bukkit.inventory.ItemStack", ItemStackDeserializer.INSTANCE);
         }
 
         private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {

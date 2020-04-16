@@ -1,26 +1,32 @@
-package com.bergerkiller.bukkit.common.config.yaml;
+package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 /**
- * Deserializes Bukkit ItemStack objects from raw yaml, with the added feature
- * of supporting yaml produced on mc versions newer than the one it is running on.
+ * Deserializes Bukkit ItemStack objects from a key-value map, with the added feature
+ * of supporting configuration produced on mc versions newer than the one it is running on.<br>
+ * <br>
+ * This class also replaces ItemStack properties that were saved as raw maps with the serialized classes,
+ * and double -> integer conversion, to add support for deserialization from JSON.
  */
-public class YamlItemStackDeserializer implements Function<Map<String, Object>, ItemStack> {
+public class ItemStackDeserializer implements Function<Map<String, Object>, ItemStack> {
+    public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
     private static final Function<Map<String, Object>, Boolean> NO_CONVERSION = map -> { return Boolean.TRUE; };
     private final List<ItemStackConverter> converters;
     private final int curr_version;
     private final int max_version;
 
-    public YamlItemStackDeserializer() {
+    private ItemStackDeserializer() {
         this.converters = new ArrayList<>();
         this.curr_version = CraftMagicNumbersHandle.getDataVersion();
 
@@ -167,6 +173,8 @@ public class YamlItemStackDeserializer implements Function<Map<String, Object>, 
 
     @Override
     public ItemStack apply(Map<String, Object> args) {
+        deserializeMaps(args);
+
         Object version_raw = args.get("v");
         if (version_raw instanceof Number) {
             int version = ((Number) version_raw).intValue();
@@ -194,6 +202,99 @@ public class YamlItemStackDeserializer implements Function<Map<String, Object>, 
         }
 
         return ItemStack.deserialize(args);
+    }
+
+    /**
+     * Deserializes ItemStack properties that are stored as just maps into the correct
+     * metadata type, and converts Double to Integer where needed.
+     * 
+     * @param map
+     */
+    private void deserializeMaps(Map<String, Object> values) {
+        convertNumberToIntegerInMap(values, "amount");
+        convertNumberToIntegerInMapValues(values, "enchantments");
+        replaceMapInMap(values, "meta", meta -> {
+            convertNumberToIntegerInMap(meta, "custom-model-data");
+            convertNumberToIntegerInMap(meta, "repair-cost");
+            convertNumberToIntegerInMap(meta, "Damage");
+            convertNumberToIntegerInMap(meta, "generation");
+            convertNumberToIntegerInMap(meta, "power");
+            convertNumberToIntegerInMap(meta, "map-id");
+            convertNumberToIntegerInMap(meta, "fish-variant");
+            convertNumberToIntegerInMapValues(meta, "enchants");
+            replaceMapInMap(meta, "color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(meta, "display-map-color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(meta, "custom-color", ItemStackDeserializer::deserializeColor);
+            replaceMapInMap(meta, "firework-effect", ItemStackDeserializer::deserializeFireworkEffect);
+            replaceListOfMapsInMap(meta, "firework-effects", ItemStackDeserializer::deserializeFireworkEffect);
+            replaceListOfMapsInMap(meta, "patterns", org.bukkit.block.banner.Pattern::new);
+            replaceListOfMapsInMap(meta, "charged-projectiles", ItemStackDeserializer.this);
+            replaceListOfMapsInMap(meta, "custom-effects", potionEffect -> {
+                convertNumberToIntegerInMap(potionEffect, "amplifier");
+                convertNumberToIntegerInMap(potionEffect, "duration");
+                return new org.bukkit.potion.PotionEffect(potionEffect);
+            });
+
+            return CraftItemStackHandle.deserializeItemMeta(meta);
+        });
+    }
+
+    private static ConfigurationSerializable deserializeFireworkEffect(java.util.Map<String, Object> values) {
+        replaceListOfMapsInMap(values, "colors", ItemStackDeserializer::deserializeColor);
+        replaceListOfMapsInMap(values, "fade-colors", ItemStackDeserializer::deserializeColor);
+        return org.bukkit.FireworkEffect.deserialize(values);
+    }
+
+    private static org.bukkit.Color deserializeColor(java.util.Map<String, Object> values) {
+        convertNumberToIntegerInMapValues(values);
+        return org.bukkit.Color.deserialize(values);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void replaceListOfMapsInMap(java.util.Map<String, Object> map, String key, Function<java.util.Map<String, Object>, ?> mapper) {
+        Object value = map.get(key);
+        if (value instanceof java.util.List) {
+            java.util.List<Object> list = (java.util.List<Object>) value;
+            for (int i = 0; i < list.size(); i++) {
+                Object list_item = list.get(i);
+                if (list_item instanceof java.util.Map) {
+                    list.set(i, mapper.apply((java.util.Map<String, Object>) list_item));
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void replaceMapInMap(java.util.Map<String, Object> map, String key, Function<java.util.Map<String, Object>, ?> mapper) {
+        Object value = map.get(key);
+        if (value instanceof java.util.Map) {
+            map.put(key, mapper.apply((Map<String, Object>) value));
+        }
+    }
+
+    private static void convertNumberToIntegerInMapValues(java.util.Map<String, Object> map, String key) {
+        Object mapAtKey = map.get(key);
+        if (mapAtKey instanceof java.util.Map) {
+            convertNumberToIntegerInMapValues((java.util.Map<?, ?>) mapAtKey);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static void convertNumberToIntegerInMap(Map<?, ?> map, Object key) {
+        Object old = map.get(key);
+        if (old instanceof Number && !(old instanceof Integer)) {
+            ((Map<Object, Object>) map).put(key, Integer.valueOf(((Number) old).intValue()));
+        }
+    }
+
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static void convertNumberToIntegerInMapValues(Map<?, ?> map) {
+        for (Map.Entry entry : map.entrySet()) {
+            Object old = entry.getValue();
+            if (old instanceof Number && !(old instanceof Integer)) {
+                entry.setValue(Integer.valueOf(((Number) old).intValue()));
+            }
+        }
     }
 
     /**

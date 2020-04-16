@@ -4,7 +4,8 @@ import java.util.Map;
 
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Helper class to make GSON accessible from outside BKCommonLib.
@@ -14,7 +15,7 @@ public class JsonSerializer {
     private final com.google.gson.Gson gson = new com.google.gson.Gson();
 
     public ItemStack fromJsonToItemStack(String json) throws JsonSyntaxException {
-        return CraftItemStackHandle.deserialize(jsonToMap(json));
+        return ItemStackDeserializer.INSTANCE.apply(jsonToMap(json));
     }
 
     @SuppressWarnings("unchecked")
@@ -31,7 +32,7 @@ public class JsonSerializer {
     }
 
     public String itemStackToJson(ItemStack item) {
-        return mapToJson(CraftItemStackHandle.serialize(item));
+        return mapToJson(LogicUtil.serializeDeep(item));
     }
 
     public String mapToJson(Map<String, Object> map) {

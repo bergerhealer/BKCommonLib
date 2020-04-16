@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.bukkit.block.Block;
+import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
@@ -851,5 +852,26 @@ public class LogicUtil {
         } else {
             return new ImmutableArrayList<E>(array);
         }
+    }
+
+    /**
+     * Serializes a configuration serializable to a map of key-value pairs. Also serializes any objects
+     * in the output that are serializable, such as embedded Color or metadata values.
+     * 
+     * @param serializable
+     * @return serialized contents, empty map if serializable is null
+     */
+    public static Map<String, Object> serializeDeep(ConfigurationSerializable serializable) {
+        if (serializable == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, Object> values = serializable.serialize();
+        for (Map.Entry<String, Object> entry : values.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof ConfigurationSerializable) {
+                entry.setValue(serializeDeep((ConfigurationSerializable) value));
+            }
+        }
+        return values;
     }
 }
