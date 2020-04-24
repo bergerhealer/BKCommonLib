@@ -721,7 +721,7 @@ public abstract class PluginBase extends JavaPlugin {
         this.permissionconfig.addHeader("These permissions are ignored if the permission is set for a group or player.");
         this.permissionconfig.addHeader("Use the defaults as a base to keep the permissions file small");
         this.permissionconfig.addHeader("Need help with this file? Please visit:");
-        this.permissionconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/general/permission-defaults/");
+        this.permissionconfig.addHeader("https://dev.bukkit.org/projects/bkcommonlib/pages/general/permission-defaults");
 
         // Load localization configuration
         this.localizationconfig = new FileConfiguration(this, "Localization.yml");
@@ -734,7 +734,7 @@ public abstract class PluginBase extends JavaPlugin {
         this.localizationconfig.setHeader("Below are the localization nodes set for plugin '" + this.getName() + "'.");
         this.localizationconfig.addHeader("For colors, use the & character followed up by 0 - F");
         this.localizationconfig.addHeader("Need help with this file? Please visit:");
-        this.localizationconfig.addHeader("http://dev.bukkit.org/server-mods/bkcommonlib/pages/general/localization/");
+        this.localizationconfig.addHeader("https://dev.bukkit.org/projects/bkcommonlib/pages/general/localization");
 
         // Load plugin.yml configuration
         try {
