@@ -58,7 +58,6 @@ public class MapDisplay implements MapDisplayEvents {
     private final MapSession session = new MapSession(this);
     private int width, height;
     private final MapClip clip = new MapClip();
-    private List<MapDisplayTile> tiles = new ArrayList<MapDisplayTile>();
     private byte[] zbuffer = null;
     private byte[] livebuffer = null;
     private Layer layerStack;
@@ -123,7 +122,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @return tiles
      */
     public List<MapDisplayTile> getDisplayTiles() {
-        return this.tiles;
+        return this.session.tiles;
     }
 
     /**
@@ -134,7 +133,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @return True if the tile exists
      */
     public boolean containsTile(int tileX, int tileY) {
-        for (MapDisplayTile tile : this.tiles) {
+        for (MapDisplayTile tile : this.session.tiles) {
             if (tile.tileX == tileX && tile.tileY == tileY) {
                 return true;
             }
@@ -366,8 +365,8 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     private final List<CommonPacket> getUpdatePackets(MapClip clip) {
-        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.tiles.size());
-        for (MapDisplayTile tile : this.tiles) {
+        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.session.tiles.size());
+        for (MapDisplayTile tile : this.session.tiles) {
             tile.addUpdatePackets(this, packets, clip);
         }
         return packets;

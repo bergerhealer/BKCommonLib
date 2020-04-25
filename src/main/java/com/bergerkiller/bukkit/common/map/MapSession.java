@@ -27,6 +27,7 @@ public class MapSession {
     public boolean hasNewViewers = false;
     public boolean refreshResolutionRequested = false;
     public MapSessionMode mode = MapSessionMode.ONLINE;
+    public List<MapDisplayTile> tiles = new ArrayList<MapDisplayTile>();
 
     public MapSession(MapDisplay display) {
         this.display = display;

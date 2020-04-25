@@ -1148,7 +1148,7 @@ public class CommonMapController implements PacketListener, Listener {
                 if (session.refreshResolutionRequested) {
                     continue;
                 }
-                Iterator<MapDisplayTile> iter = session.display.getDisplayTiles().iterator();
+                Iterator<MapDisplayTile> iter = session.tiles.iterator();
                 while (iter.hasNext()) {
                     MapDisplayTile tile = iter.next();
                     if (tile.tileX == tileX && tile.tileY == tileY) {
@@ -1188,7 +1188,7 @@ public class CommonMapController implements PacketListener, Listener {
                 }
 
                 MapDisplayTile newTile = new MapDisplayTile(this.uuid, tileX, tileY);
-                session.display.getDisplayTiles().add(newTile);
+                session.tiles.add(newTile);
 
                 for (MapSession.Owner owner : session.onlineOwners) {
                     newTile.addUpdatePackets(session.display, packets, null);
@@ -1251,9 +1251,6 @@ public class CommonMapController implements PacketListener, Listener {
          * @param initialize Whether the tiles are initialized, and contents are not yet drawn
          */
         public void loadTiles(MapSession session, boolean initialize) {
-            MapDisplay display = session.display;
-            List<MapDisplayTile> tiles = display.getDisplayTiles();
-
             // Collect all tile x/y coordinates into a long hashset
             LongHashSet tile_coords = new LongHashSet();
             for (ItemFrameInfo itemFrame : this.itemFrames) {
@@ -1266,12 +1263,12 @@ public class CommonMapController implements PacketListener, Listener {
 
             if (initialize) {
                 // Wipe previous tiles when initializing
-                tiles.clear();
+                session.tiles.clear();
             } else {
                 // Remove tiles from the display that are no longer present
                 // Remove existing tiles from the set at the same time
                 // We are left with a set containing tiles that must be added
-                Iterator<MapDisplayTile> iter = tiles.iterator();
+                Iterator<MapDisplayTile> iter = session.tiles.iterator();
                 while (iter.hasNext()) {
                     MapDisplayTile tile = iter.next();
                     if (!tile_coords.remove(tile.tileX, tile.tileY)) {
@@ -1290,12 +1287,12 @@ public class CommonMapController implements PacketListener, Listener {
                 long coord = iter.next();
                 MapDisplayTile newTile = new MapDisplayTile(this.uuid,
                         MathUtil.longHashMsw(coord), MathUtil.longHashLsw(coord));
-                tiles.add(newTile);
+                session.tiles.add(newTile);
 
                 // Send map packets for the added tile
                 if (!initialize) {
                     for (MapSession.Owner owner : session.onlineOwners) {
-                        newTile.addUpdatePackets(display, packets, null);
+                        newTile.addUpdatePackets(session.display, packets, null);
                         owner.updateMap(packets);
                         packets.clear();
                     }
