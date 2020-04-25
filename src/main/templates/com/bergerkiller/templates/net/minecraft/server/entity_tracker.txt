@@ -34,8 +34,12 @@ class EntityTracker {
 #if version >= 1.14
         if (entry == null) {
             return (PlayerChunkMap$EntityTracker) instance.trackedEntities.remove(entityId);
-        } else {
+        } else if (instance.trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
             return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
+        } else {
+            // ProtocolSupport (or other hooks): bypass put() callback handler to guarantee it is put
+            instance.trackedEntities.remove(entityId);
+            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.putIfAbsent(entityId, entry);
         }
 #else
         #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
