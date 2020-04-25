@@ -1027,10 +1027,18 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         locSynched.set(posX, posY, posZ, yaw, pitch);
 
         // Update last synchronization time
-        state.setTimeSinceLocationSync(0);
+        this.markLocationSyncedAbsolute();
 
         // Send synchronization messages
         broadcast(getLocationPacket(posX, posY, posZ, yaw, pitch));
+    }
+
+    /**
+     * Resets the absolute update timer, marking the entity's location as synchronized absolutely.
+     * After calling this method, {@link #getTicksSinceLocationSync()} will return 0.
+     */
+    public void markLocationSyncedAbsolute() {
+        state.setTimeSinceLocationSync(0);
     }
 
     /**
