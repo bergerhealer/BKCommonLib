@@ -286,6 +286,24 @@ public class MapDisplay implements MapDisplayEvents {
             return;
         }
 
+        // Reset the display when resolution changes
+        // Note: must be done after sesion.update() as it changes the hasViewers property!
+        if (this.session.refreshResolutionRequested && session.hasViewers) {
+            this.session.refreshResolutionRequested = false;
+            if (this.getWidth() == this.info.getDesiredWidth() &&
+                this.getHeight() == this.info.getDesiredHeight())
+            {
+                // Resolution did not change, but the visible tiles may have. Refresh those.
+                this.info.loadTiles(this.session, false);
+            } else {
+                // Re-initialize the display
+                this.handleStopRunning();
+                this.handleStartRunning();
+
+                // Continue updating as normal (running = true)
+            }
+        }
+
         // Intercept player input when set
         if (this._receiveInputWhenHolding) {
             for (MapSession.Owner owner : this.session.onlineOwners) {
@@ -781,39 +799,49 @@ public class MapDisplay implements MapDisplayEvents {
         if (running) {
             if (this.plugin != null && this.updateTaskId == -1) {
                 this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, this::update, 1, 1);
-
                 CommonPlugin.getInstance().getMapController().getDisplays().add(getClass(), this);
-
-                if (this.info != null) {
-                    this.preRunInitialize();
-
-                    this.info.sessions.add(this.session);
-                }
-
-                this.session.initOwners();
-
-                this.onAttached();
+                this.handleStartRunning();
             }
         } else {
             if (this.updateTaskId != -1) {
-                // Disable input interception for owners still lingering
-                for (MapSession.Owner owner : this.session.onlineOwners) {
-                    owner.input.handleDisplayUpdate(this, false);
-                }
-
-                // Handle onDetached
-                this.onDetached();
-                this.widgets.clearWidgets();
-                this.refreshMapItem();
+                this.handleStopRunning();
 
                 // Clean up
                 Bukkit.getScheduler().cancelTask(this.updateTaskId);
                 this.updateTaskId = -1;
-                if (this.info != null) {
-                    this.info.sessions.remove(this.session);
-                }
                 CommonPlugin.getInstance().getMapController().getDisplays().remove(getClass(), this);
             }
+        }
+    }
+
+    // Initializes the display state and calls onAttached() when done
+    // Called from setRunning(true), and when restarting a display (resolution change)
+    private void handleStartRunning() {
+        if (this.info != null) {
+            this.preRunInitialize();
+            this.info.sessions.add(this.session);
+        }
+
+        this.session.initOwners();
+        this.onAttached();
+    }
+
+    // Tears down the display state and calls onDetached() before
+    // Called from setRunning(false), and when restarting a display (resolution change)
+    private void handleStopRunning() {
+        // Disable input interception for owners still lingering
+        for (MapSession.Owner owner : this.session.onlineOwners) {
+            owner.input.handleDisplayUpdate(this, false);
+        }
+
+        // Handle onDetached
+        this.onDetached();
+        this.widgets.clearWidgets();
+        this.refreshMapItem();
+
+        // Remove session
+        if (this.info != null) {
+            this.info.sessions.remove(this.session);
         }
     }
 
@@ -1282,8 +1310,8 @@ public class MapDisplay implements MapDisplayEvents {
             for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
                 MapDisplay display = session.display;
                 if (display.isRunning()) {
-                    display.setRunning(false);
-                    display.setRunning(true);
+                    display.handleStopRunning();
+                    display.handleStartRunning();
                 }
             }
         }

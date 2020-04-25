@@ -1815,7 +1815,6 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Update the player viewers of all map displays
-            List<MapDisplay> displaysToReset = new ArrayList<MapDisplay>();
             for (MapDisplayInfo map : maps.values()) {
                 if (map.hasFrameViewerChanges) {
                     map.hasFrameViewerChanges = false;
@@ -1840,29 +1839,6 @@ public class CommonMapController implements PacketListener, Listener {
                     }
                     map.refreshResolution();
                     map.refreshItemFramesRequest = false;
-                }
-
-                // Refresh resolution of map sessions
-                displaysToReset.clear();
-                for (MapSession session : map.sessions) {
-                    if (session.refreshResolutionRequested && session.hasViewers) {
-                        session.refreshResolutionRequested = false;
-                        if (session.display.getWidth() == map.getDesiredWidth() &&
-                            session.display.getHeight() == map.getDesiredHeight())
-                        {
-                            // Resolution did not change, but the visible tiles may have. Refresh those.
-                            map.loadTiles(session, false);
-                        } else {
-                            // Resolution changed, reset the map display
-                            displaysToReset.add(session.display);
-                        }
-                    }
-                }
-
-                // Reset displays that changed resolution
-                for (MapDisplay display : displaysToReset) {
-                    display.setRunning(false);
-                    display.setRunning(true);
                 }
             }
 

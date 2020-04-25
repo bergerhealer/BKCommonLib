@@ -26,6 +26,16 @@ public class MapDisplayTile {
     }
 
     public void addUpdatePackets(MapDisplay display, List<CommonPacket> packets, MapClip clip) {
+        int startX = this.tileX * RESOLUTION;
+        int startY = this.tileY * RESOLUTION;
+
+        // If this tile is out of bounds of the display resolution, do nothing
+        // This happening is technically a bug! But this at least prevents an error spam
+        if (startX >= display.getWidth() || startY >= display.getHeight()) {
+            //System.err.println("Invalid tile [" + this.tileX + ", " + this.tileY + "] added to display!");
+            return;
+        }
+
         int mapId = CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
 
         CommonPacket mapUpdate = PacketType.OUT_MAP.newInstance();
@@ -34,8 +44,6 @@ public class MapDisplayTile {
         mapUpdate.write(PacketType.OUT_MAP.scale, (byte) 1);
         mapUpdate.write(PacketType.OUT_MAP.track, false);
 
-        int startX = this.tileX * RESOLUTION;
-        int startY = this.tileY * RESOLUTION;
         int stride = display.getWidth();
         int srcPos = (startY * stride) + startX;
         int dstPos = 0;
