@@ -1178,7 +1178,6 @@ public class CommonMapController implements PacketListener, Listener {
                 return;
             }
 
-            List<CommonPacket> packets = new ArrayList<CommonPacket>();
             for (MapSession session : this.sessions) {
                 if (session.refreshResolutionRequested) {
                     continue;
@@ -1191,9 +1190,7 @@ public class CommonMapController implements PacketListener, Listener {
                 session.tiles.add(newTile);
 
                 for (MapSession.Owner owner : session.onlineOwners) {
-                    newTile.addUpdatePackets(session.display, packets, null);
-                    owner.updateMap(packets);
-                    packets.clear();
+                    owner.sendDirtyTile(newTile);
                 }
             }
         }
@@ -1277,10 +1274,6 @@ public class CommonMapController implements PacketListener, Listener {
                 }
             }
 
-            // Packets to fill with map contents to send for new tiles added
-            // When initializing we don't send any map data, so leave empty
-            List<CommonPacket> packets = initialize ? Collections.emptyList() : new ArrayList<CommonPacket>();
-
             // Add all remaining tiles to the display
             LongHashSet.LongIterator iter = tile_coords.longIterator();
             while (iter.hasNext()) {
@@ -1292,9 +1285,7 @@ public class CommonMapController implements PacketListener, Listener {
                 // Send map packets for the added tile
                 if (!initialize) {
                     for (MapSession.Owner owner : session.onlineOwners) {
-                        newTile.addUpdatePackets(session.display, packets, null);
-                        owner.updateMap(packets);
-                        packets.clear();
+                        owner.sendDirtyTile(newTile);
                     }
                 }
             }

@@ -237,5 +237,35 @@ public class MapSession {
                 PacketUtil.sendPacket(this.player, packet, false);
             }
         }
+
+        public void sendDirtyTile(MapDisplayTile tile) {
+            int x = tile.tileX << 7;
+            int y = tile.tileY << 7;
+            int w = 128;
+            int h = 128;
+
+            // When not viewing, just mark the clip dirty
+            // This makes sure that whenever the player does view it, the tile is sent
+            if (!this.viewing) {
+                this.clip.markDirty(x, y, w, h);
+                return;
+            }
+
+            MapClip clip = this.clip.getArea(x, y, w, h);
+            if (!clip.dirty) {
+                // Clip was not dirty, so we can send packets right away
+                // Do so without affecting the clip of this owner, so do not use updateMap!
+                ArrayList<CommonPacket> packets = new ArrayList<CommonPacket>(1);
+                tile.addUpdatePackets(this.display, packets, null);
+                for (CommonPacket packet : packets) {
+                    PacketUtil.sendPacket(this.player, packet, false);
+                }
+            } else if (!clip.everything) {
+                // Clip is dirty, so the display will send changes anyway
+                // Make sure that we then resent the entire tile
+                // No need to do this if the entire clip is already dirty
+                this.clip.markDirty(x, y, w, h);
+            }
+        }
     }
 }

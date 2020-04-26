@@ -160,6 +160,9 @@ public class MapClip {
             result.clearDirty();
         } else if (this.everything) {
             result.markEverythingDirty();
+        } else if (this.dirty_x1 <= x && this.dirty_y1 <= y && this.dirty_x2 >= (x+width) && this.dirty_y2 >= (y+height)) {
+            // The area is inside a much larger area that is all dirty, so the entire clip area is dirty
+            result.markEverythingDirty();
         } else if (this.dirty_x1 > (x + width) || this.dirty_y1 > (y + height)) {
             // Dirty area is out of bounds (too far to the right)
             result.clearDirty();
