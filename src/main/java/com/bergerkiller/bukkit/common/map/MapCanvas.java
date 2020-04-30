@@ -1516,7 +1516,11 @@ public abstract class MapCanvas {
      * @return view
      */
     public final MapCanvas getView(int x, int y, int w, int h) {
-        return new View(this, x, y, w, h);
+        if (x == 0 && y == 0 && w == this.getWidth() && h == this.getHeight()) {
+            return this;
+        } else {
+            return new View(this, x, y, w, h);
+        }
     }
 
     /**
@@ -1646,6 +1650,10 @@ public abstract class MapCanvas {
             }
         }
 
+        @Override
+        public String toString() {
+            return "{view x=" + this.x + ",y=" + this.y + ",w=" +this.w + ",h=" +this.h + "} of " + this.parent.toString();
+        }
     }
 
 }

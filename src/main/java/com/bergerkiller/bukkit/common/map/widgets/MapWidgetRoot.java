@@ -130,6 +130,21 @@ public class MapWidgetRoot extends MapWidget {
         this._focusHistory.clear();
     }
 
+    @Override
+    public void handleDetach() {
+        // Detach, but keep the display referenced
+        MapDisplay display = this.display;
+        super.handleDetach();
+        this.parent = null;
+        this.display = display;
+        this.root = this;
+    }
+
+    @Override
+    public void performTickUpdates() {
+        super.performTickUpdates();
+    }
+
     public MapWidget getActivatedWidget() {
         return this._activatedWidget;
     }
@@ -197,11 +212,10 @@ public class MapWidgetRoot extends MapWidget {
             }
         }
     }
-    
+
     @Override
     public void onAttached() {
         this.setFocusable(true);
-        this.setBounds(0, 0, display.getWidth(), display.getHeight());
         this.activate();
     }
 

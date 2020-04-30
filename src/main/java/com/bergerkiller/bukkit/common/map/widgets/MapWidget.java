@@ -690,7 +690,7 @@ public class MapWidget implements MapDisplayEvents {
      * needed to run in the background. Attaches newly added widgets before any updates are performed.
      * This method is called by the internal implementation.
      */
-    public final void performTickUpdates() {
+    void performTickUpdates() {
         this.handleAttach();
         this.clearInvalidatedAreas();
         this.handleTick();
@@ -809,8 +809,13 @@ public class MapWidget implements MapDisplayEvents {
                 this.root = this.parent.root;
                 this.display = this.parent.display;
                 this.layer = this.parent.layer.next();
+            } else if (this.display != null) {
+                // This is done for the root node (covers entire display)
+                this.layer = this.display.getTopLayer().next();
+            }
 
-                // Use the depth offset to switch layers
+            // Use the depth offset to switch layers
+            if (this.layer != null) {
                 int n = this._z;
                 while (n > 0) {
                     this.layer = this.layer.next();
@@ -820,13 +825,10 @@ public class MapWidget implements MapDisplayEvents {
                     this.layer = this.layer.previous();
                     n++;
                 }
-
-                this.refreshView();
-            } else if (this.layer == null && this.display != null) {
-                // This is done for the root node (covers entire display)
-                this.layer = this.display.getTopLayer().next();
-                this.view = this.layer;
             }
+
+            this.refreshView();
+
             this.onAttached();
 
             // If the attached widget can be focused, and no widget is focused yet, focus it
@@ -934,7 +936,7 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     // Handles detachment of this widget and all its children
-    private final void handleDetach() {
+    void handleDetach() {
         if (this._attached) {
             this._attached = false;
 

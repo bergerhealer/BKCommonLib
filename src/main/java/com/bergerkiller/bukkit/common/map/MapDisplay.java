@@ -113,6 +113,7 @@ public class MapDisplay implements MapDisplayEvents {
         this.zbuffer = new byte[this.width * this.height];
         this.livebuffer = new byte[this.width * this.height];
         this.layerStack = new Layer(this, this.width, this.height);
+        this.widgets.setBounds(0, 0, this.width, this.height);
         this.clip.markEverythingDirty();
     }
 
@@ -837,6 +838,7 @@ public class MapDisplay implements MapDisplayEvents {
         // Handle onDetached
         this.onDetached();
         this.widgets.clearWidgets();
+        this.widgets.handleDetach();
         this.refreshMapItem();
 
         // Remove session
@@ -1203,6 +1205,11 @@ public class MapDisplay implements MapDisplayEvents {
                 }
             }
             return dst_buffer;
+        }
+
+        @Override
+        public String toString() {
+            return "{layer z=" + this.z_index + ",w=" + this.width + ",h=" + this.height + "} of " + this.map.toString();
         }
     }
 
