@@ -26,6 +26,7 @@ import com.google.gson.GsonBuilder;
 public class MapResourcePackClientArchive implements MapResourcePackArchive {
     private final Logger log;
     private final File clientJarFile;
+    private final File clientJarTempFile;
     private JarFile archive = null;
 
     public MapResourcePackClientArchive() {
@@ -42,6 +43,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
         file.mkdirs();
 
         this.clientJarFile = new File(file, Common.MC_VERSION + ".jar");
+        this.clientJarTempFile = new File(file, Common.MC_VERSION + ".jar.tmp");
         this.loadArchive();
     }
 
@@ -98,7 +100,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
 
                 // Download the file
                 log.warning("> Fetching Minecraft Client " + Common.MC_VERSION + " from Mojang servers: " + download.url);
-                FileOutputStream outStream = new FileOutputStream(this.clientJarFile);
+                FileOutputStream outStream = new FileOutputStream(this.clientJarTempFile);
                 try {
                     URL dlUrl = new URL(download.url);
                     InputStream dlInputStream = dlUrl.openStream();
@@ -125,6 +127,10 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                     outStream.close();
                 }
 
+                // Done, move temporary file to final destination
+                this.clientJarFile.delete();
+                this.clientJarTempFile.renameTo(this.clientJarFile);
+
                 // Load the archive that we downloaded now
                 this.loadArchive();
                 if (this.archive == null) {
@@ -133,10 +139,12 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
             } catch (DownloadFailure f) {
                 log.severe("Failed to download the Minecraft " + Common.MC_VERSION + " client: " + f.getMessage());
                 this.clientJarFile.delete();
+                this.clientJarTempFile.delete();
                 logAlternative();
             } catch (Throwable t) {
                 log.log(Level.SEVERE, "Failed to download the Minecraft " + Common.MC_VERSION + " client:", t);
                 this.clientJarFile.delete();
+                this.clientJarTempFile.delete();
                 logAlternative();
             }
         }
