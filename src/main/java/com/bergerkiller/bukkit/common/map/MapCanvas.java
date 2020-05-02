@@ -1719,14 +1719,7 @@ public abstract class MapCanvas {
                 return dst_buffer;
             } else {
                 // Pixel by pixel. TODO: Could be made more efficient!
-
-                // Number of pixels between x and this clipped area's start coordinate
-                int x_front = Math.max(0, this.x0 - x);
-                // Number of pixels clipped out at the end of the width
-                int x_after = Math.max(0, (x+w) - this.x1);
-                // Number of pixels actually inside this clipped area
-                int x_cover = w - x_front - x_after;
-
+                int xp_end = x + w;
                 int y_end = y + h;
                 int index = 0;
                 for (int yp = y; yp < y_end; yp++) {
@@ -1736,24 +1729,13 @@ public abstract class MapCanvas {
                         Arrays.fill(dst_buffer, index, index_end, (byte) 0);
                         index = index_end;
                     } else {
-                        // Skip area outside clip in front
-                        int xp = x_front;
-                        if (xp > 0) {
-                            int index_end = index + xp;
-                            Arrays.fill(dst_buffer, index, index_end, (byte) 0);
-                            index = index_end;
-                        }
-
-                        // Covered area
-                        for (int n = 0; n < x_cover; n++) {
-                            dst_buffer[index++] = this.parent.readPixel(xp++, yp);
-                        }
-
-                        // Remainder after
-                        if (x_after > 0) {
-                            int index_end = index + x_after;
-                            Arrays.fill(dst_buffer, index, index_end, (byte) 0);
-                            index = index_end;
+                        // Read pixel by pixel if in bounds
+                        for (int xp = x; xp < xp_end; xp++) {
+                            if (xp >= this.x0 && xp < this.x1) {
+                                dst_buffer[index++] = this.parent.readPixel(xp, yp);
+                            } else {
+                                dst_buffer[index++] = (byte) 0;
+                            }
                         }
                     }
                 }
