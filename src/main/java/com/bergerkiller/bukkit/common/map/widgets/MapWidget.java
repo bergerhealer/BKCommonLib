@@ -39,6 +39,7 @@ public class MapWidget implements MapDisplayEvents {
     private boolean _boundsChanged;
     private boolean _wasFocused;
     private boolean _retainChildren;
+    private boolean _clipParent;
     private boolean _visible;
     private MapWidget[] _children;
 
@@ -50,6 +51,7 @@ public class MapWidget implements MapDisplayEvents {
         this._focusable = false;
         this._attached = false;
         this._retainChildren = false;
+        this._clipParent = false;
         this._visible = true;
         this._children = new MapWidget[0];
         this.display = null;
@@ -266,6 +268,31 @@ public class MapWidget implements MapDisplayEvents {
      */
     public final void setFocusable(boolean focusable) {
         this._focusable = focusable;
+    }
+
+    /**
+     * Gets whether or not the view area of this widget is clipped by the view area
+     * of the parent. When true, only areas on top of the parent can be drawn on.
+     * When false, this widget can draw outside of the parent's bounds.
+     * 
+     * @return True if the view area is clipped by the parent's view area
+     */
+    public final boolean isClipParent() {
+        return this._clipParent;
+    }
+
+    /**
+     * Sets whether or not the view area of this widget is clipped by the view area
+     * of the parent. When true, only areas on top of the parent can be drawn on.
+     * When false, this widget can draw outside of the parent's bounds.
+     * 
+     * @param clipParent Whether the view area is clipped by the parent's view area
+     */
+    public final void setClipParent(boolean clipParent) {
+        if (this._clipParent != clipParent) {
+            this._clipParent = clipParent;
+            this.refreshView();
+        }
     }
 
     /**
@@ -752,8 +779,34 @@ public class MapWidget implements MapDisplayEvents {
 
     private final void refreshView() {
         if (this.layer != null) {
-            this.view = this.layer.getView(this.getAbsoluteX(), this.getAbsoluteY(), this._width, this._height);
+            this.refreshView(this.getAbsoluteX(), this.getAbsoluteY());
         }
+    }
+
+    private final void refreshView(int absoluteX, int absoluteY) {
+        this.view = this.createParentClip(this.layer).getView(absoluteX, absoluteY, this._width, this._height);
+    }
+
+    // Creates the view of the layer canvas, clipping parent areas if enabled
+    private final MapCanvas createParentClip(MapDisplay.Layer layer) {
+        // If no clipping is used or possible, return the layer itself
+        if (!this._clipParent || this.parent == null) {
+            return layer;
+        }
+
+        // Check whether this widget sits entirely within the parent's widget
+        // If so, no clipping is required here, and ask the parent only
+        if (this._x >= 0 && this._y >= 0 &&
+            (this._x + this._width) < this.parent.getWidth() &&
+            (this._y + this._height) < this.parent.getHeight())
+        {
+            return this.parent.createParentClip(layer);
+        }
+
+        // Clip it
+        return this.parent.createParentClip(layer).getClip(
+                this.parent.getAbsoluteX(), this.parent.getAbsoluteY(),
+                this.parent.getWidth(), this.parent.getHeight());
     }
 
     // Convenience method, see below
@@ -897,7 +950,7 @@ public class MapWidget implements MapDisplayEvents {
 
         // If invalidated, redraw
         if (this._invalidated) {
-            this.view = this.layer.getView(absoluteX, absoluteY, this._width, this._height);
+            this.refreshView(absoluteX, absoluteY);
             if (this.isVisible()) {
                 this.onDraw();
             }

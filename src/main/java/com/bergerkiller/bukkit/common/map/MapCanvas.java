@@ -1507,7 +1507,28 @@ public abstract class MapCanvas {
     }
 
     /**
-     * Obtains a view into this canvas for a viewport area
+     * Obtains a view into this canvas for a viewport area.
+     * Drawing operations are done relative to this canvas's coordinates,
+     * but only inside the viewport area.
+     * 
+     * @param x - coordinate of the top-left corner of the viewport
+     * @param y - coordinate of the top-left corner of the viewport
+     * @param w - width of the viewport
+     * @param h - height of the viewport
+     * @return clip
+     */
+    public final MapCanvas getClip(int x, int y, int w, int h) {
+        if (x <= 0 && y <= 0 && (x+w) >= this.getWidth() && (y+h) >= this.getHeight()) {
+            return this;
+        } else {
+            return new Clip(this, x, y, w, h);
+        }
+    }
+
+    /**
+     * Obtains a view into this canvas for a viewport area.
+     * Drawing operations are done relative to these coordinates and only
+     * inside the view portarea.
      * 
      * @param x - coordinate of the top-left corner of the viewport
      * @param y - coordinate of the top-left corner of the viewport
@@ -1652,8 +1673,130 @@ public abstract class MapCanvas {
 
         @Override
         public String toString() {
-            return "{view x=" + this.x + ",y=" + this.y + ",w=" +this.w + ",h=" +this.h + "} of " + this.parent.toString();
+            return "{view x=" + this.x + ",y=" + this.y + ",w=" + this.w + ",h=" + this.h + "} of " + this.parent.toString();
         }
     }
 
+    /**
+     * A clipping viewport into the portion of another canvas
+     */
+    private static final class Clip extends MapCanvas {
+        private final MapCanvas parent;
+        private final int x0, y0, x1, y1;
+
+        public Clip(MapCanvas parent, int x, int y, int w, int h) {
+            this.parent = parent;
+            this.x0 = x;
+            this.y0 = y;
+            this.x1 = x + w;
+            this.y1 = y + h;
+        }
+
+        @Override
+        public int getWidth() {
+            return this.parent.getWidth();
+        }
+
+        @Override
+        public int getHeight() {
+            return this.parent.getHeight();
+        }
+
+        @Override
+        public byte[] getBuffer() {
+            byte[] buffer = new byte[this.parent.getWidth() * this.parent.getHeight()];
+            return this.readPixels(0, 0, this.parent.getWidth(), this.parent.getHeight(), buffer);
+        }
+
+        @Override
+        public byte[] readPixels(int x, int y, int w, int h, byte[] dst_buffer) {
+            if (x >= this.x0 && y >= this.y0 && (x+w) <= this.x1 && (y+h) <= this.y1) {
+                // If entirely within the clipped viewport area, we can just ask the parent no problem
+                return this.parent.readPixels(x, y, w, h, dst_buffer);
+            } else if (x <= this.x1 || y <= this.y1) {
+                // Entirely outside the clipped area, fill with 0
+                Arrays.fill(dst_buffer, 0, w*h, (byte) 0);
+                return dst_buffer;
+            } else {
+                // Pixel by pixel. TODO: Could be made more efficient!
+
+                // Number of pixels between x and this clipped area's start coordinate
+                int x_front = Math.max(0, this.x0 - x);
+                // Number of pixels clipped out at the end of the width
+                int x_after = Math.max(0, this.x1 - (x+w));
+                // Number of pixels actually inside this clipped area
+                int x_cover = w - x_front - x_after;
+
+                int y_end = y + h;
+                int index = 0;
+                for (int yp = y; yp < y_end; yp++) {
+                    if (yp < this.y0 || yp >= this.y1) {
+                        // Out of bounds row, fill with 0
+                        int index_end = index + w;
+                        Arrays.fill(dst_buffer, index, index_end, (byte) 0);
+                        index = index_end;
+                    } else {
+                        // Skip area outside clip in front
+                        int xp = x_front;
+                        if (xp > 0) {
+                            int index_end = index + xp;
+                            Arrays.fill(dst_buffer, index, index_end, (byte) 0);
+                            index = index_end;
+                        }
+
+                        // Covered area
+                        for (int n = 0; n < x_cover; n++) {
+                            dst_buffer[index++] = this.readPixel(xp++, yp);
+                        }
+
+                        // Remainder after
+                        if (x_after > 0) {
+                            int index_end = index + x_after;
+                            Arrays.fill(dst_buffer, index, index_end, (byte) 0);
+                            index = index_end;
+                        }
+                    }
+                }
+                return dst_buffer;
+            }
+        }
+
+        @Override
+        public void writePixel(int x, int y, byte color) {
+            if (x >= this.x0 && y >= this.y0 && x < this.x1 && y < this.y1) {
+                this.parent.writePixel(x, y, color);
+            }
+        }
+
+        @Override
+        public byte readPixel(int x, int y) {
+            if (x >= this.x0 && y >= this.y0 && x < this.x1 && y < this.y1) {
+                return this.parent.readPixel(x, y);
+            }
+            return (byte) 0;
+        }
+
+        @Override
+        public MapCanvas writePixels(int x, int y, int w, int h, byte[] colorData) {
+            if (x >= this.x0 && y >= this.y0 && (x + w) <= this.x1 && (y + h) <= this.y1) {
+                return this.parent.writePixels(x, y, w, h, colorData);
+            } else {
+                return super.writePixels(x, y, w, h, colorData);
+            }
+        }
+
+        @Override
+        public MapCanvas writePixelsFill(int x, int y, int w, int h, byte color) {
+            if (x >= this.x0 && y >= this.y0 && (x + w) <= this.x1 && (y + h) <= this.y1) {
+                return this.parent.writePixelsFill(x, y, w, h, color);
+            } else {
+                return super.writePixelsFill(x, y, w, h, color);
+            }
+        }
+
+        @Override
+        public String toString() {
+            return "{clip x=" + this.x0 + ",y=" + this.y0 + ",w=" + (this.x1-this.x0) + ",h=" + (this.y1-this.y0) + "} of " + this.parent.toString();
+        }
+    }
 }
