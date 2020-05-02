@@ -1713,7 +1713,7 @@ public abstract class MapCanvas {
             if (x >= this.x0 && y >= this.y0 && (x+w) <= this.x1 && (y+h) <= this.y1) {
                 // If entirely within the clipped viewport area, we can just ask the parent no problem
                 return this.parent.readPixels(x, y, w, h, dst_buffer);
-            } else if (x <= this.x1 || y <= this.y1) {
+            } else if (x >= this.x1 || y >= this.y1 || (x+w) <= this.x0 || (y+h) <= this.y0) {
                 // Entirely outside the clipped area, fill with 0
                 Arrays.fill(dst_buffer, 0, w*h, (byte) 0);
                 return dst_buffer;
