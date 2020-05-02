@@ -1723,7 +1723,7 @@ public abstract class MapCanvas {
                 // Number of pixels between x and this clipped area's start coordinate
                 int x_front = Math.max(0, this.x0 - x);
                 // Number of pixels clipped out at the end of the width
-                int x_after = Math.max(0, this.x1 - (x+w));
+                int x_after = Math.max(0, (x+w) - this.x1);
                 // Number of pixels actually inside this clipped area
                 int x_cover = w - x_front - x_after;
 
@@ -1746,7 +1746,7 @@ public abstract class MapCanvas {
 
                         // Covered area
                         for (int n = 0; n < x_cover; n++) {
-                            dst_buffer[index++] = this.readPixel(xp++, yp);
+                            dst_buffer[index++] = this.parent.readPixel(xp++, yp);
                         }
 
                         // Remainder after
