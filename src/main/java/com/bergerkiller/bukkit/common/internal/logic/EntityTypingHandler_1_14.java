@@ -104,6 +104,9 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         registerEntityTypes("AREA_EFFECT_CLOUD", "EntityAreaEffectCloud");
         registerEntityTypes("ENDER_DRAGON", "EntityEnderDragon");
         registerEntityTypes("FIREBALL", "EntityLargeFireball");
+        registerEntityTypes("FISHING_BOBBER", "EntityFishingHook");
+        registerEntityTypes("LIGHTNING_BOLT", "EntityLightning");
+        registerEntityTypes("PLAYER", "EntityPlayer");
         registerEntityTypes("WITHER", "EntityWither"); // scoreboard things
 
         // Initialize method that creates new EntityTrackerEntry instances (which are actually PlayerChunkMap$EntityTracker)

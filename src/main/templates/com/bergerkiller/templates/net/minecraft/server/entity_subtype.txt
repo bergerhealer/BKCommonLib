@@ -796,3 +796,19 @@ class EntityEnderCrystal extends Entity {
     public static final Key<IntVector3> DATA_BEAM_TARGET = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEAM_TARGET, -1);
     </code>
 }
+
+class EntityFishingHook extends Entity {
+    #if version >= 1.14
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:c;
+    #elseif version >= 1.11
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:b;
+    #elseif version >= 1.9
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:c;
+    #else
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:###;
+    #endif
+
+    <code>
+    public static final Key<java.util.OptionalInt> DATA_HOOKED_ENTITY_ID = Key.Type.ENTITY_ID.createKey(T.DATA_HOOKED_ENTITY_ID, -1);
+    </code>
+}

@@ -623,6 +623,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
             public static final Type<BlockFace> DIRECTION = getForType(BlockFace.class);
+            public static final Type<java.util.OptionalInt> ENTITY_ID = new Type<java.util.OptionalInt>(INTEGER._token, new EntityIdTypeConverter());
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
                 if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
@@ -852,6 +853,47 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
              */
             public T getDefaultValue() {
                 return this._defaultValue;
+            }
+        }
+
+        /**
+         * Used to convert between Integer and Optional<Integer>.
+         * Internally it stores the int value incremented or decremented by one, to allow for 0 as 'not set'
+         */
+        private static final class EntityIdTypeConverter extends DuplexConverter<Object, java.util.OptionalInt> {
+
+            public EntityIdTypeConverter() {
+                super(Integer.class, java.util.OptionalInt.class);
+            }
+
+            @Override
+            public java.util.OptionalInt convertInput(Object value) {
+                if (value instanceof Integer) {
+                    int intValue = ((Integer) value).intValue();
+                    if (intValue > 0) {
+                        return java.util.OptionalInt.of(intValue - 1);
+                    }
+                }
+                return java.util.OptionalInt.empty();
+            }
+
+            @Override
+            public Object convertOutput(java.util.OptionalInt value) {
+                if (value == null || value.isPresent()) {
+                    return Integer.valueOf(value.getAsInt() + 1);
+                } else {
+                    return Integer.valueOf(0);
+                }
+            }
+
+            @Override
+            public boolean acceptsNullInput() {
+                return true;
+            }
+
+            @Override
+            public boolean acceptsNullOutput() {
+                return true;
             }
         }
     }
