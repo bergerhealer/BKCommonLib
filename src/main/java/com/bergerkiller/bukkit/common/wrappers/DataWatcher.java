@@ -879,7 +879,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
 
             @Override
             public Object convertOutput(java.util.OptionalInt value) {
-                if (value == null || value.isPresent()) {
+                if (value != null && value.isPresent()) {
                     return Integer.valueOf(value.getAsInt() + 1);
                 } else {
                     return Integer.valueOf(0);
