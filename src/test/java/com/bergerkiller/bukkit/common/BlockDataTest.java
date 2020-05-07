@@ -16,6 +16,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
+import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -218,6 +219,28 @@ public class BlockDataTest {
             testSignMaterial(MaterialUtil.getMaterial("SIGN"), false);
             testSignMaterial(MaterialUtil.getMaterial("WALL_SIGN"), true);
         }
+    }
+
+    @Test
+    public void testSerialize() {
+        // Retrieve some complicated BlockData
+        BlockData blockData = BlockData.fromMaterial(Material.FURNACE)
+                .setState("lit", true)
+                .setState("facing", BlockFace.EAST);
+        // Serialize
+        String output = BlockDataSerializer.INSTANCE.serialize(blockData);
+        assertEquals("minecraft:furnace[facing=east,lit=true]", output);
+    }
+
+    @Test
+    public void testDeserialize() {
+        // Uses output of Serialize
+        String input = "minecraft:furnace[facing=east,lit=true]";
+        // Deserialize
+        BlockData blockData = BlockDataSerializer.INSTANCE.deserialize(input);
+        assertEquals(Material.FURNACE, blockData.getType());
+        assertTrue(blockData.getState("lit", Boolean.class));
+        assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
     }
 
     private void testSignMaterial(Material material, boolean isWallSign) {

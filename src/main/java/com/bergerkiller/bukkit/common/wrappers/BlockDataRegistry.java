@@ -7,6 +7,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
@@ -149,6 +150,21 @@ public class BlockDataRegistry {
     @Deprecated
     public static BlockData fromCombinedId(int combinedId) {
         return fromBlockData(BlockHandle.T.getByCombinedId.raw.invoke(combinedId));
+    }
+
+    /**
+     * Deserializes a String previously serialized using {@link BlockData#serializeToString()}
+     * into BlockData. Returns null if deserialization fails.
+     * This deserialization is cross-version compatible.<br>
+     * <br>
+     * Example input:
+     * <pre>minecraft:furnace[facing=east,lit=true]</pre>
+     * 
+     * @param serializedString Input serialized text</i>
+     * @return deserialized BlockData, or null if deserialization failed
+     */
+    public static BlockData fromString(String serializedString) {
+        return BlockDataSerializer.INSTANCE.deserialize(serializedString);
     }
 
     /**

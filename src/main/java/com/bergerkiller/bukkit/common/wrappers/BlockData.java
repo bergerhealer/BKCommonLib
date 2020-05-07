@@ -111,6 +111,18 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract String getBlockName();
 
     /**
+     * Serializes this BlockData to a String, preserving the block information and the
+     * states set. This same BlockData can then be obtained using {@link BlockDataRegistry#fromString(String)}.
+     * The serialized text is cross-version compatible.<br>
+     * <br>
+     * Example output:
+     * <pre>minecraft:furnace[facing=east,lit=true]</pre>
+     * 
+     * @return serialized String representation of this BlockData
+     */
+    public abstract String serializeToString();
+
+    /**
      * Gets a mapping of key:value pairs for all the default data-encoded render options set for this BlockData.
      * For example, stairs will add the <i>facing: west</i> key-value pair.
      * The returned options are as if the Block is free-standing in an empty void of Air.

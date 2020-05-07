@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.internal.CommonListener;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
+import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -315,6 +316,11 @@ public class BlockDataImpl extends BlockData {
     public String getBlockName() {
         Object minecraftKey = RegistryMaterialsHandle.T.getKey.invoke(BlockHandle.getRegistry(), this.getBlockRaw());
         return MinecraftKeyHandle.T.name.get(minecraftKey);
+    }
+
+    @Override
+    public String serializeToString() {
+        return BlockDataSerializer.INSTANCE.serialize(this);
     }
 
     @Override
