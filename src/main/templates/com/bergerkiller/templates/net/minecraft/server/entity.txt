@@ -631,7 +631,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean positionChanged:impulse;
 #elseif version >= 1.9
     public boolean isLoaded:aa;
-    public optionalint chunkX:ab;
+    public optional int chunkX:ab;
     public optional int chunkY:ac;
     public optional int chunkZ:ad;
     public unknown boolean ah;
