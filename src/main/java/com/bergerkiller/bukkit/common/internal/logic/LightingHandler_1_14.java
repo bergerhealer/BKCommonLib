@@ -81,7 +81,17 @@ public class LightingHandler_1_14 extends LightingHandler {
             throw new IllegalStateException("LightEngineStorage light_storage_live field is not of type LightEngineStorageArray");
         }
 
-        this.light_storage_volatile = lightEngineStorageType.getDeclaredField("e");
+        // Renamed (de-obfuscated) by Paper devs
+        {
+            Field f;
+            try {
+                f = lightEngineStorageType.getDeclaredField("e_visible");
+            } catch (NoSuchFieldException ex) {
+                f = lightEngineStorageType.getDeclaredField("e");
+            }
+            this.light_storage_volatile = f;
+        }
+
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_volatile.getType())) {
             throw new IllegalStateException("LightEngineStorage light_storage_volatile field is not of type LightEngineStorageArray");
         }
