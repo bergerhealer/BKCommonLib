@@ -41,6 +41,11 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
     public abstract void add_at(int index, NBTBaseHandle value);
     public abstract boolean add(NBTBaseHandle value);
 
+    public NBTTagListHandle clone() {
+        return createHandle(raw_clone());
+    }
+
+
     static {
         registerTypeInfo(java.util.Collection.class, T, T.create.raw::invoke, T.data.raw::get);
     }

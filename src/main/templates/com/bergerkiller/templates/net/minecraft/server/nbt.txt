@@ -435,6 +435,12 @@ class NBTTagList extends NBTBase {
         return result;
     }
 
+    <code>
+    public NBTTagListHandle clone() {
+        return createHandle(raw_clone());
+    }
+    </code>
+
     public int size();
     public boolean isEmpty();
 
@@ -599,6 +605,12 @@ class NBTTagCompound extends NBTBase {
         }
         return result;
     }
+
+    <code>
+    public NBTTagCompoundHandle clone() {
+        return createHandle(raw_clone());
+    }
+    </code>
 
     public boolean isEmpty();
 
