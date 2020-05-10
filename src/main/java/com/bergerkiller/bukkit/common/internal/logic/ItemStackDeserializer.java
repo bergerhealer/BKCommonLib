@@ -20,8 +20,8 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
  * and double -> integer conversion, to add support for deserialization from JSON.
  */
 public class ItemStackDeserializer implements Function<Map<String, Object>, ItemStack> {
+    private static final ConverterFunction NO_CONVERSION = map -> { return true; };
     public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
-    private static final Function<Map<String, Object>, Boolean> NO_CONVERSION = map -> { return Boolean.TRUE; };
     private final List<ItemStackConverter> converters;
     private final int curr_version;
     private final int max_version;
@@ -38,7 +38,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             Object type = map.get("type");
             if (type instanceof String && ((String) type).startsWith("LEGACY_")) {
                 map.put("type", ((String) type).substring(7));
-                return Boolean.TRUE;
+                return true;
             }
 
             if ("BEETROOTS".equals(type)) {
@@ -48,7 +48,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             }
 
             //TODO: There are a lot more changes here!
-            return Boolean.TRUE;
+            return true;
         });
 
         // From MC 1.13.1 to 1.13 (dead coral types no longer valid)
@@ -59,9 +59,9 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                     "DEAD_FIRE_CORAL", "DEAD_HORN_CORAL",
                     "DEAD_TUBE_CORAL"
             )) {
-                return Boolean.FALSE;
+                return false;
             }
-            return Boolean.TRUE;
+            return true;
         });
 
         // From MC 1.13.2 to 1.13.1 (no changes)
@@ -122,9 +122,9 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                     "SWEET_BERRIES", "SWEET_BERRY_BUSH", "TRADER_LLAMA_SPAWN_EGG",
                     "WANDERING_TRADER_SPAWN_EGG", "WHITE_DYE", "WITHER_ROSE"
             )) {
-                return Boolean.FALSE;
+                return false;
             }
-            return Boolean.TRUE;
+            return true;
         });
 
         // From MC 1.14.1 to 1.14 (no changes)
@@ -147,9 +147,9 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                     "HONEYCOMB", "HONEYCOMB_BLOCK",
                     "HONEY_BLOCK", "HONEY_BOTTLE"
             )) {
-                return Boolean.FALSE;
+                return false;
             }
-            return Boolean.TRUE;
+            return true;
         });
 
         // From MC 1.15.1 to 1.15 (no changes)
@@ -164,7 +164,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     // Registers a converter if it can convert from a future data version only
     // Current or older data versions are already natively supported by the server
-    private void register(int data_version, Function<Map<String, Object>, Boolean> converter) {
+    private void register(int data_version, ConverterFunction converter) {
         if (data_version <= this.curr_version && !this.converters.isEmpty()) {
             this.converters.remove(0);
         }
@@ -182,7 +182,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 // Requires conversion, go down the list of item stack converters and process those applicable
                 for (ItemStackConverter converter : this.converters) {
                     if (version > converter.output_version) {
-                        if (converter.converter.apply(args).booleanValue()) {
+                        if (converter.converter.convert(args)) {
                             // Successful conversion
                             version = converter.output_version;
                         } else {
@@ -302,11 +302,18 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
      */
     private static final class ItemStackConverter {
         public final int output_version;
-        public final Function<Map<String, Object>, Boolean> converter;
+        public final ConverterFunction converter;
 
-        public ItemStackConverter(int output_version, Function<Map<String, Object>, Boolean> converter) {
+        public ItemStackConverter(int output_version, ConverterFunction converter) {
+            if (converter == null) {
+                throw new IllegalArgumentException("Converter can not be null");
+            }
             this.output_version = output_version;
             this.converter = converter;
         }
+    }
+
+    private static interface ConverterFunction {
+        boolean convert(Map<String, Object> values);
     }
 }
