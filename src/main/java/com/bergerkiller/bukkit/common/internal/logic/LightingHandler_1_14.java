@@ -25,6 +25,7 @@ public class LightingHandler_1_14 extends LightingHandler {
     private final Field light_storage;
     private final Field light_storage_live;
     private final Field light_storage_volatile;
+    private final Field light_storage_paper_lock;
     private final FastMethod<Object> setStorageDataAndCopyMethod = new FastMethod<Object>();
 
     public LightingHandler_1_14() throws Throwable {
@@ -92,6 +93,17 @@ public class LightingHandler_1_14 extends LightingHandler {
             this.light_storage_volatile = f;
         }
 
+        // On paperspigot there is a lock object when the e_visible is updated
+        {
+            Field f;
+            try {
+                f = lightEngineStorageType.getDeclaredField("visibleUpdateLock");
+            } catch (NoSuchFieldException ex) {
+                f = null;
+            }
+            this.light_storage_paper_lock = f;
+        }
+
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_volatile.getType())) {
             throw new IllegalStateException("LightEngineStorage light_storage_volatile field is not of type LightEngineStorageArray");
         }
@@ -102,6 +114,9 @@ public class LightingHandler_1_14 extends LightingHandler {
         this.light_storage.setAccessible(true);
         this.light_storage_live.setAccessible(true);
         this.light_storage_volatile.setAccessible(true);
+        if (this.light_storage_paper_lock != null) {
+            this.light_storage_paper_lock.setAccessible(true);
+        }
 
         // This generated method updates the contents in a live layer, creates a copy of the data and returns it
         ClassResolver resolver = new ClassResolver();
@@ -144,7 +159,14 @@ public class LightingHandler_1_14 extends LightingHandler {
             try {
                 Object storage = this.light_storage.get(layer);
                 Object storage_live = this.light_storage_live.get(storage);
-                this.light_storage_volatile.set(storage, setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data));
+                Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
+                if (light_storage_paper_lock != null) {
+                    synchronized (light_storage_paper_lock.get(storage)) {
+                        this.light_storage_volatile.set(storage, layer_data);
+                    }
+                } else {
+                    this.light_storage_volatile.set(storage, layer_data);
+                }
 
                 //TODO: Can scheduling it onto the main thread be done differently?
                 CommonUtil.nextTick(() -> {
