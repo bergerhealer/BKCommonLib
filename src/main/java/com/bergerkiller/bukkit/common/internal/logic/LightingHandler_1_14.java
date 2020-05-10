@@ -158,13 +158,15 @@ public class LightingHandler_1_14 extends LightingHandler {
         engine.schedule(cx, cz, this.updateTicket, this.lightUpdateStage, () -> {
             try {
                 Object storage = this.light_storage.get(layer);
-                Object storage_live = this.light_storage_live.get(storage);
-                Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
                 if (light_storage_paper_lock != null) {
                     synchronized (light_storage_paper_lock.get(storage)) {
+                        Object storage_live = this.light_storage_live.get(storage);
+                        Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
                         this.light_storage_volatile.set(storage, layer_data);
                     }
                 } else {
+                    Object storage_live = this.light_storage_live.get(storage);
+                    Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
                     this.light_storage_volatile.set(storage, layer_data);
                 }
 
