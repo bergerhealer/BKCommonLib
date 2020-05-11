@@ -1,11 +1,13 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -297,8 +299,21 @@ public class EntityHook extends ClassHook<EntityHook> {
     public void collide(Object entity) {
         try {
             if (checkController()) {
-                if (controller.onEntityCollision(Conversion.toEntity.convert(entity))) {
-                    base.collide(entity);
+                org.bukkit.entity.Entity bukkitEntity = WrapperConversion.toEntity(entity);
+
+                // If entity is a passenger of a vehicle, nobody can collide with it
+                if (bukkitEntity.isInsideVehicle()) {
+                    return;
+                }
+
+                // If entity is a passenger of this entity, ignore the collision
+                if (isPassengerOfRecursive(controller.getEntity().getEntity(), bukkitEntity)) {
+                    return;
+                }
+
+                // If collision is allowed with this Entity, then perform the bump
+                if (controller.onEntityCollision(bukkitEntity)) {
+                    controller.onEntityBump(bukkitEntity);
                 }
             } else {
                 base.collide(entity);
@@ -306,6 +321,20 @@ public class EntityHook extends ClassHook<EntityHook> {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+    }
+
+    private boolean isPassengerOfRecursive(org.bukkit.entity.Entity vehicle, org.bukkit.entity.Entity passenger) {
+        List<org.bukkit.entity.Entity> vehiclePassengers;
+        vehiclePassengers = com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.getPassengers.invoker.invoke(vehicle);
+        if (!vehiclePassengers.isEmpty()) {
+            for (org.bukkit.entity.Entity vehiclePassenger : vehiclePassengers) {
+                if (vehiclePassenger == passenger) {
+                    return true;
+                }
+                return isPassengerOfRecursive(vehiclePassenger, passenger);
+            }
+        }
+        return false;
     }
 
     @HookMethod(value="public void setItem(int i, ItemStack itemstack)", optional=true)

@@ -108,6 +108,22 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     /**
+     * Handles the collision of another Entity with this minecart.
+     * Prior to calling this callback the {@link #onEntityCollision(entity)} is called
+     * as well. The default implementation executes the 'bump' code of this entity,
+     * which handles the velocity changes when other entities bump into this entity.
+     * This can be overrided for custom velocity adjustments.<br>
+     * <br>
+     * Passengers of this Entity can never bump with this Entity, and if this Entity
+     * is inside a vehicle, it also cannot be bumped with.
+     * 
+     * @param e The entity that is bumping into this Entity
+     */
+    public void onEntityBump(org.bukkit.entity.Entity e) {
+        hook.base.collide(HandleConversion.toEntityHandle(e));
+    }
+
+    /**
      * Handles the collision of this minecart with a Block
      *
      * @param block with which this minecart collided
