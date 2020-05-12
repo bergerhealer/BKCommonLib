@@ -40,6 +40,17 @@ public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
         packet.setIsLeash(true);
         return packet;
     }
+
+    public static PacketPlayOutAttachEntityHandle createNewMount(int passengerEntityId, int vehicleEntityId) {
+        if (!T.leashId.isAvailable()) {
+            throw new UnsupportedOperationException("Not supported >= MC 1.9, use Mount packet instead");
+        }
+        PacketPlayOutAttachEntityHandle packet = T.newHandleNull();
+        packet.setVehicleId(vehicleEntityId);
+        packet.setPassengerId(passengerEntityId);
+        packet.setIsLeash(false);
+        return packet;
+    }
     public abstract int getPassengerId();
     public abstract void setPassengerId(int value);
     public abstract int getVehicleId();
