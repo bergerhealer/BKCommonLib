@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -80,12 +82,10 @@ public class MaterialsByName {
         // Legacy block materials are excluded when on 1.13 or later
         {
             ArrayList<Material> blocks = new ArrayList<Material>();
-            for (Material material :  MaterialsByName.getAllMaterials()) {
-                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && isLegacy(material)) {
-                    continue;
-                }
-                if (material.isBlock()) {
-                    blocks.add(material);
+            for (Object block : BlockHandle.getRegistry()) {
+                Material mat = WrapperConversion.toMaterialFromBlockHandle(block);
+                if (mat != null) {
+                    blocks.add(mat);
                 }
             }
             allBlockMaterialValues = blocks.toArray(new Material[0]);
