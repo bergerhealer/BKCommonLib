@@ -38,7 +38,7 @@ public class BlockState<T extends Comparable<?>> extends BasicWrapper<IBlockStat
      * @param value
      * @return value name
      */
-    public String valueName(T value) {
+    public String valueName(Comparable<?> value) {
         return handle.getValueToken(value);
     }
 }
