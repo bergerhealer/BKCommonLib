@@ -38,6 +38,9 @@ import com.bergerkiller.generated.net.minecraft.server.RegistryIDHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
+import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
+import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 @SuppressWarnings("deprecation")
 public class BlockDataImpl extends BlockData {
@@ -495,8 +498,44 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
+    public BlockData setState(BlockState<?> state, Object value) {
+        IBlockDataHandle updated_data = this.data.set(state.getBackingHandle(), value);
+        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(updated_data.getRaw());
+        if (data != null) {
+            return data;
+        }
+
+        // Store in map (should only rarely happen)
+        BlockDataConstant c = new BlockDataImpl.BlockDataConstant(updated_data);
+        BY_BLOCK_DATA.put(updated_data.getRaw(), c);
+        return c;
+    }
+
+    @Override
     public <T> T getState(String key, Class<T> type) {
         return this.data.get(key, type);
+    }
+
+    @Override
+    public <T extends Comparable<?>> T getState(BlockState<T> state) {
+        return CommonUtil.unsafeCast(this.data.get(state.getBackingHandle()));
+    }
+
+    @Override
+    public Map<BlockState<?>, Comparable<?>> getStates() {
+        DuplexConverter<IBlockStateHandle, BlockState<?>> keyConverter = new DuplexConverter<IBlockStateHandle, BlockState<?>>(IBlockStateHandle.class, BlockState.class) {
+            @Override
+            public BlockState<?> convertInput(IBlockStateHandle value) {
+                return new BlockState<Comparable<?>>(value);
+            }
+
+            @Override
+            public IBlockStateHandle convertOutput(BlockState<?> value) {
+                return value.getBackingHandle();
+            }
+        };
+        DuplexConverter<Comparable<?>, Comparable<?>> valueConverter = DuplexConverter.createNull(TypeDeclaration.fromClass(Comparable.class));
+        return new ConvertingMap<BlockState<?>, Comparable<?>>(this.data.getStates(), keyConverter, valueConverter);
     }
 
     @Override

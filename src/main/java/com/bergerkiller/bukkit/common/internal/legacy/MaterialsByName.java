@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.legacy;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,6 +21,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  */
 public class MaterialsByName {
     private static final Material[] allMaterialValues;
+    private static final Material[] allBlockMaterialValues;
     private static final Map<String, Material> allMaterialValuesByName = new HashMap<String, Material>();
     private static final FastMethod<Boolean> isLegacyMethod = new FastMethod<Boolean>();
 
@@ -73,6 +75,21 @@ public class MaterialsByName {
         } catch (Throwable t) {
             t.printStackTrace();
         }
+
+        // Fill the allBlockMaterialValues array with all the materials that are blocks
+        // Legacy block materials are excluded when on 1.13 or later
+        {
+            ArrayList<Material> blocks = new ArrayList<Material>();
+            for (Material material :  MaterialsByName.getAllMaterials()) {
+                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && isLegacy(material)) {
+                    continue;
+                }
+                if (material.isBlock()) {
+                    blocks.add(material);
+                }
+            }
+            allBlockMaterialValues = blocks.toArray(new Material[0]);
+        }
     }
 
     /**
@@ -83,6 +100,16 @@ public class MaterialsByName {
      */
     public static Material[] getAllMaterials() {
         return allMaterialValues;
+    }
+
+    /**
+     * Gets an array of all Material enum values that are blocks. This array does not contain duplicates
+     * due to legacy/non-legacy. On 1.13 and later, no legacy block materials are included.
+     * 
+     * @return all block material enum values
+     */
+    public static Material[] getAllBlocks() {
+        return allBlockMaterialValues;
     }
 
     /**

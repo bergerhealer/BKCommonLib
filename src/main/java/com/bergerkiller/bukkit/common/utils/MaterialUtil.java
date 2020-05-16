@@ -194,6 +194,28 @@ public class MaterialUtil {
     }
 
     /**
+     * Gets an array of all materials in the Material enum, unaffected
+     * by the remapping logic of the server. This array contains both legacy
+     * and new materials, together.
+     * 
+     * @return all materials
+     */
+    public static Material[] getAllMaterials() {
+        return MaterialsByName.getAllMaterials();
+    }
+
+    /**
+     * Gets an array of all block materials in the Material enum. This array contains
+     * only post-1.13 materials, or only legacy materials, depending on the version of the
+     * server. No duplicate block materials are contained.
+     * 
+     * @return all block materials
+     */
+    public static Material[] getAllBlocks() {
+        return MaterialsByName.getAllBlocks();
+    }
+
+    /**
      * The material is a type of door block.
      * Materials of this type are guaranteed to have a Door MaterialData.
      */

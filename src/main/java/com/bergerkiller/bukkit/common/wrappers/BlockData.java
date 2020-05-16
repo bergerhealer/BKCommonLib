@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.Map;
+
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -211,9 +213,18 @@ public abstract class BlockData extends BlockDataRegistry {
      * 
      * @param key of the state
      * @param value to set the state to
-     * @return updated state
+     * @return updated block data
      */
     public abstract BlockData setState(String key, Object value);
+
+    /**
+     * Changes a state of this BlockData, returning the BlockData with the state updated.
+     * 
+     * @param state the state to change
+     * @param value to set the state to
+     * @return updated block data
+     */
+    public abstract BlockData setState(BlockState<?> state, Object value);
 
     /**
      * Reads a state from this BlockData
@@ -223,6 +234,22 @@ public abstract class BlockData extends BlockDataRegistry {
      * @return state value
      */
     public abstract <T> T getState(String key, Class<T> type);
+
+    /**
+     * Reads a state from this BlockData
+     * 
+     * @param state the state to get
+     * @return state value
+     */
+    public abstract <T extends Comparable<?>> T getState(BlockState<T> state);
+
+    /**
+     * Gets a mapping of all possible block states of this block, and their
+     * current state value.
+     * 
+     * @return block states map
+     */
+    public abstract Map<BlockState<?>, Comparable<?>> getStates();
 
     /**
      * Gets whether this BlockData is of a certain Material type.

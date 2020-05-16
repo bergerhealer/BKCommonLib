@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.IBlockState</b>.
@@ -23,6 +24,7 @@ public abstract class IBlockStateHandle extends Template.Handle {
 
     public abstract String getKeyToken();
     public abstract String getValueToken(Comparable value);
+    public abstract Collection getValues();
     /**
      * Stores class members for <b>net.minecraft.server.IBlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -30,6 +32,7 @@ public abstract class IBlockStateHandle extends Template.Handle {
     public static final class IBlockStateClass extends Template.Class<IBlockStateHandle> {
         public final Template.Method<String> getKeyToken = new Template.Method<String>();
         public final Template.Method.Converted<String> getValueToken = new Template.Method.Converted<String>();
+        public final Template.Method<Collection> getValues = new Template.Method<Collection>();
 
     }
 

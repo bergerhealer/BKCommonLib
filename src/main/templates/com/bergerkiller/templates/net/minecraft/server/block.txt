@@ -428,4 +428,12 @@ interface IBlockState {
 #else
     public abstract String getValueToken:a((Comparable) Comparable value);
 #endif
+
+#if version >= 1.14.4
+    public abstract java.util.Collection getValues();
+#elseif version >= 1.13
+    public abstract java.util.Collection getValues:d();
+#else
+    public abstract java.util.Collection getValues:c();
+#endif
 }
