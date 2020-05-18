@@ -25,6 +25,7 @@ public abstract class BaseBlockPositionHandle extends Template.Handle {
     public abstract int getX();
     public abstract int getY();
     public abstract int getZ();
+    public abstract boolean isPositionInBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax);
     public abstract IntVector3 toIntVector3();
     @Template.Readonly
     public abstract int getField_x();
@@ -47,6 +48,7 @@ public abstract class BaseBlockPositionHandle extends Template.Handle {
         public final Template.Method<Integer> getX = new Template.Method<Integer>();
         public final Template.Method<Integer> getY = new Template.Method<Integer>();
         public final Template.Method<Integer> getZ = new Template.Method<Integer>();
+        public final Template.Method<Boolean> isPositionInBox = new Template.Method<Boolean>();
         public final Template.Method<IntVector3> toIntVector3 = new Template.Method<IntVector3>();
 
     }

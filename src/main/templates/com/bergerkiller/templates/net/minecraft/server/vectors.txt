@@ -34,6 +34,13 @@ class BaseBlockPosition {
     public int getY();
     public int getZ();
 
+    public boolean isPositionInBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax) {
+        int x = instance.getX();
+        int y = instance.getY();
+        int z = instance.getZ();
+        return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
+    }
+
     public com.bergerkiller.bukkit.common.bases.IntVector3 toIntVector3() {
         return new com.bergerkiller.bukkit.common.bases.IntVector3(instance.getX(), instance.getY(), instance.getZ());
     }

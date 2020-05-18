@@ -12,9 +12,7 @@ import org.bukkit.block.Chest;
 import org.bukkit.block.Sign;
 import org.bukkit.event.block.BlockRedstoneEvent;
 import org.bukkit.material.Directional;
-import org.bukkit.material.Lever;
 import org.bukkit.material.MaterialData;
-import org.bukkit.material.Rails;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
@@ -30,7 +28,6 @@ import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.event.block.BlockCanBuildEventHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSVector;
 
 /**
  * Multiple Block utilities you can use to manipulate blocks and get block
@@ -372,7 +369,7 @@ public class BlockUtil extends MaterialUtil {
     @SuppressWarnings("deprecation")
     public static void setLever(org.bukkit.block.Block lever, boolean down) {
         int data = getRawData(lever);
-        Lever newMaterialData = (Lever) getData(Material.LEVER, data);
+        org.bukkit.material.Lever newMaterialData = (org.bukkit.material.Lever) getData(Material.LEVER, data);
         newMaterialData.setPowered(down);
         if (getRawData(newMaterialData) != data) {
             // CraftBukkit start - Redstone event for lever
@@ -450,7 +447,7 @@ public class BlockUtil extends MaterialUtil {
         BlockData data = WorldUtil.getBlockData(rails);
         if (MaterialUtil.ISRAILS.get(data)) {
             int olddata = data.getRawData();
-            Rails r = data.newMaterialData(Rails.class);
+            org.bukkit.material.Rails r = data.newMaterialData(org.bukkit.material.Rails.class);
             r.setDirection(FaceUtil.toRailsDirection(direction), r.isOnSlope());
 
             // If changed, update the data
@@ -482,8 +479,8 @@ public class BlockUtil extends MaterialUtil {
         return CommonUtil.tryCast(getState(block), type);
     }
 
-    public static Rails getRails(org.bukkit.block.Block railsblock) {
-        return getData(railsblock, Rails.class);
+    public static org.bukkit.material.Rails getRails(org.bukkit.block.Block railsblock) {
+        return getData(railsblock, org.bukkit.material.Rails.class);
     }
 
     public static Sign getSign(org.bukkit.block.Block signblock) {
@@ -543,8 +540,9 @@ public class BlockUtil extends MaterialUtil {
                         ChunkBlockStateConverter converter = null;
                         Collection<?> rawTiles = ChunkHandle.T.getRawTileEntities.invoke(HandleConversion.toChunkHandle(chunk));
                         for (Object tile : rawTiles) {
-                            Object blockPosition = TileEntityHandle.T.position_field.raw.get(tile);
-                            if (NMSVector.isPositionInBox(blockPosition, xMin, yMin, zMin, xMax, yMax, zMax)) {
+                            BlockPositionHandle blockPosition;
+                            blockPosition = BlockPositionHandle.createHandle(TileEntityHandle.T.position_field.raw.get(tile));
+                            if (blockPosition.isPositionInBox(xMin, yMin, zMin, xMax, yMax, zMax)) {
                                 if (converter == null) {
                                     converter = new ChunkBlockStateConverter(chunk);
                                 }
