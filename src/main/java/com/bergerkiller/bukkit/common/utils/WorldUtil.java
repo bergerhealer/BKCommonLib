@@ -1035,7 +1035,7 @@ public class WorldUtil extends ChunkUtil {
      * @return sky light data
      */
     public static byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
-        return WorldHandle.fromBukkit(world).getSectionSkyLight(cx, cy, cz);
+        return LightingHandler.INSTANCE.getSectionSkyLight(world, cx, cy, cz);
     }
 
     /**
@@ -1048,7 +1048,7 @@ public class WorldUtil extends ChunkUtil {
      * @return block light data
      */
     public static byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
-        return WorldHandle.fromBukkit(world).getSectionBlockLight(cx, cy, cz);
+        return LightingHandler.INSTANCE.getSectionBlockLight(world, cx, cy, cz);
     }
 
     /**

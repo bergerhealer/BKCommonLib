@@ -3,9 +3,11 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.lang.reflect.Field;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.IntSupplier;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
@@ -27,6 +29,7 @@ public class LightingHandler_1_14 extends LightingHandler {
     private final Field light_storage_volatile;
     private final Field light_storage_paper_lock;
     private final FastMethod<Object> setStorageDataAndCopyMethod = new FastMethod<Object>();
+    private final FastMethod<byte[]> getLayerDataMethod = new FastMethod<byte[]>();
 
     public LightingHandler_1_14() throws Throwable {
         { // Update ticket intsupplier
@@ -119,9 +122,9 @@ public class LightingHandler_1_14 extends LightingHandler {
         }
 
         // This generated method updates the contents in a live layer, creates a copy of the data and returns it
-        ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(lightEngineStorageArrayType);
-        this.setStorageDataAndCopyMethod.init(new MethodDeclaration(resolver,
+        ClassResolver storage_resolver = new ClassResolver();
+        storage_resolver.setDeclaredClass(lightEngineStorageArrayType);
+        this.setStorageDataAndCopyMethod.init(new MethodDeclaration(storage_resolver,
                 "public LightEngineStorageArray setDataAndCopy(int cx, int cy, int cz, byte[] data) {\n" +
                 "    instance.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));\n" +
                 "    LightEngineStorageArray copy = instance.b();\n" +
@@ -129,6 +132,56 @@ public class LightingHandler_1_14 extends LightingHandler {
                 "    return copy;\n" +
                 "}"));
         this.setStorageDataAndCopyMethod.forceInitialization();
+
+        // This generated method simply reads the nibblearray data and returns a byte[] copy
+        ClassResolver layer_resolver = new ClassResolver();
+        layer_resolver.setDeclaredClass(lightEngineLayerType);
+        this.getLayerDataMethod.init(new MethodDeclaration(layer_resolver,
+                "public byte[] getData(int cx, int cy, int cz) {\n" +
+                "    NibbleArray array = instance.a(SectionPosition.a(cx, cy, cz));\n" +
+                "    if (array == null) {\n" +
+                "        return null;\n" +
+                "    }\n" +
+                "    return array.asBytes();\n" +
+                "}"));
+        this.getLayerDataMethod.forceInitialization();
+    }
+
+    @Override
+    public byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
+        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        try {
+            Object layer = this.light_layer_block.get(engine.getRaw());
+            return readLayerData(engine, layer, cx, cy, cz);
+        } catch (Throwable ex) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
+            return null;
+        }
+    }
+
+    @Override
+    public byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
+        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+        try {
+            Object layer = this.light_layer_sky.get(engine.getRaw());
+            return readLayerData(engine, layer, cx, cy, cz);
+        } catch (Throwable ex) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
+            return null;
+        }
+    }
+
+    private byte[] readLayerData(LightEngineThreadedHandle engine, Object layer, int cx, int cy, int cz) throws Throwable {
+        if (layer == null) {
+            return null;
+        } else if (light_storage_paper_lock != null) {
+            Object storage = this.light_storage.get(layer);
+            synchronized (light_storage_paper_lock.get(storage)) {
+                return getLayerDataMethod.invoke(layer, cx, cy, cz);
+            }
+        } else {
+            return getLayerDataMethod.invoke(layer, cx, cy, cz);
+        }
     }
 
     @Override
@@ -136,6 +189,9 @@ public class LightingHandler_1_14 extends LightingHandler {
         LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
             Object layer = this.light_layer_block.get(engine.getRaw());
+            if (layer == null) {
+                throw new UnsupportedOperationException("This world has no block light data");
+            }
             return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
         } catch (Throwable ex) {
             return completedExceptionally(ex);
@@ -147,6 +203,9 @@ public class LightingHandler_1_14 extends LightingHandler {
         LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
             Object layer = this.light_layer_sky.get(engine.getRaw());
+            if (layer == null) {
+                throw new UnsupportedOperationException("This world has no sky light data");
+            }
             return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
         } catch (Throwable ex) {
             return completedExceptionally(ex);

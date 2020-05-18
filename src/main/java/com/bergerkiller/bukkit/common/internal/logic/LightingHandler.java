@@ -23,6 +23,28 @@ public abstract class LightingHandler {
     }
 
     /**
+     * Gets the sky light values for a single 16x16x16 section of blocks
+     * 
+     * @param world World
+     * @param cx Chunk Section X-coordinate
+     * @param cy Chunk Section Y-coordinate
+     * @param cz Chunk Section Z-coordinate
+     * @return 4096-size array of sky lighting data
+     */
+    public abstract byte[] getSectionSkyLight(World world, int cx, int cy, int cz);
+
+    /**
+     * Gets the block light values for a single 16x16x16 section of blocks
+     * 
+     * @param world World
+     * @param cx Chunk Section X-coordinate
+     * @param cy Chunk Section Y-coordinate
+     * @param cz Chunk Section Z-coordinate
+     * @return 4096-size array of block lighting data
+     */
+    public abstract byte[] getSectionBlockLight(World world, int cx, int cy, int cz);
+
+    /**
      * Sets the sky light values for a single 16x16x16 section of blocks asynchronously
      * 
      * @param world World
