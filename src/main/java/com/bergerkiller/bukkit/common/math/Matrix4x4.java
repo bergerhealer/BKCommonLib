@@ -797,6 +797,35 @@ public class Matrix4x4 implements Cloneable {
                 0.0, 0.0, 0.0, 1.0);
     }
 
+    /**
+     * Creates a new 4x4 identity matrix. This has the initial values:
+     * <pre>
+     * 1 0 0 0
+     * 0 1 0 0
+     * 0 0 1 0
+     * 0 0 0 1
+     * </pre>
+     * 
+     * @return identity matrix
+     */
+    public static Matrix4x4 identity() {
+        return new Matrix4x4();
+    }
+
+    /**
+     * Computes the difference transformation between two matrices
+     * 
+     * @param m1 Old transformation matrix
+     * @param m2 New transformation matrix
+     * @return Matrix that transforms the old matrix into the new matrix
+     */
+    public static Matrix4x4 diff(Matrix4x4 m1, Matrix4x4 m2) {
+        Matrix4x4 diff = m1.clone();
+        diff.invert();
+        diff.multiply(m2);
+        return diff;
+    }
+
     // From https://math.stackexchange.com/questions/296794
     public static Matrix4x4 computeProjectionMatrix(Vector3 p[])
     {
