@@ -1825,8 +1825,8 @@ public class CommonMapController implements PacketListener, Listener {
                 // Refresh all item frames' items showing this map
                 // It is possible their UUID changed as a result of the new tiling
                 if (map.refreshItemFramesRequest) {
-                    for (ItemFrameInfo itemFrame : map.itemFrames) {
-                        itemFrame.recalculateUUID();
+                    for (int i = map.itemFrames.size()-1; i >= 0; i--) {
+                        map.itemFrames.get(i).recalculateUUID();
                     }
                     map.refreshResolution();
                     map.refreshItemFramesRequest = false;
