@@ -200,18 +200,18 @@ public class Hastebin {
                     }
 
                     // Return the results
-                    complete(result, new DownloadResult(true, url, contentBuffer, null));
+                    complete(result, DownloadResult.content(url, contentBuffer));
                     break;
                 }
             } catch (IOException ex1) {
-                complete(result, new DownloadResult(false, url, null, "I/O Exception occurred: " + ex1.getMessage()));
+                complete(result, DownloadResult.error(url, "I/O Exception occurred: " + ex1.getMessage()));
             } catch (InvalidServerURLException ex2) {
-                complete(result, new DownloadResult(false, url, null, "Invalid URL: " + session.getServer()));
+                complete(result, DownloadResult.error(url, "Invalid URL: " + session.getServer()));
             } catch (InvalidServerResponseException ex3) {
-                complete(result, new DownloadResult(false, url, null, ex3.getMessage()));
+                complete(result, DownloadResult.error(url, ex3.getMessage()));
             } catch (Throwable t) {
                 t.printStackTrace();
-                complete(result, new DownloadResult(false, url, null, "Error occurred: " + t.getMessage()));
+                complete(result, DownloadResult.error(url, "Error occurred: " + t.getMessage()));
             }
         });
         return result;
@@ -244,6 +244,29 @@ public class Hastebin {
             this._url = url;
             this._content = content;
             this._error = error;
+        }
+
+        /**
+         * Creates a download result for when the content could not be downloaded
+         * 
+         * @param url The url downloaded
+         * @param error The error that occurred
+         * @return DownloadResult
+         */
+        public static DownloadResult error(String url, String error) {
+            return new DownloadResult(false, url, null, error);
+        }
+
+        /**
+         * Creates a download result for when the content was downloaded and a content
+         * stream is available
+         * 
+         * @param url The url downloaded
+         * @param content Stream of content data
+         * @return DownloadResult
+         */
+        public static DownloadResult content(String url, ByteArrayIOStream content) {
+            return new DownloadResult(true, url, content, null);
         }
 
         /**
