@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.ParseUtil;
 
 /**
  * Stores a Class Type and a value for type-safe generics
@@ -28,11 +30,19 @@ public class TypedValue<T> {
      * @param text to set to
      */
     public void parseSet(String text) {
-        value = Conversion.convert(text, type, value);
+        if (this.type == boolean.class || this.type == Boolean.class) {
+            value = CommonUtil.unsafeCast(ParseUtil.parseBool(text));
+        } else {
+            value = Conversion.convert(text, type, value);
+        }
     }
 
     @Override
     public String toString() {
-        return Conversion.toString.convert(value, "null");
+        if (this.type == boolean.class || this.type == Boolean.class) {
+            return (this.value == Boolean.TRUE) ? "true" : "false";
+        } else {
+            return Conversion.toString.convert(value, "null");
+        }
     }
 }

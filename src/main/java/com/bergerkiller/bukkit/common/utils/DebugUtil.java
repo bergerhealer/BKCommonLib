@@ -180,6 +180,17 @@ public class DebugUtil {
     }
 
     /**
+     * Gets the value of a bool debug variable that can be changed using the /debug command
+     * 
+     * @param name of the value
+     * @param value default
+     * @return value of the variable
+     */
+    public static boolean getBooleanValue(String name, boolean value) {
+        return getVariableValue(name, Boolean.valueOf(value)).booleanValue();
+    }
+
+    /**
      * Gets the value of a Vector debug variable that can be changed using the /debug command.
      * The x/y/z values can be specified after name. If name is 'test', then 'testx', 'testy' and 'testz'
      * are added as debug variables.
