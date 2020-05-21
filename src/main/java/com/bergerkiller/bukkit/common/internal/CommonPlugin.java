@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
+import com.bergerkiller.bukkit.common.collections.ObjectCache;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -602,6 +603,7 @@ public class CommonPlugin extends PluginBase {
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
         startedTasks.add(new TabUpdater(this).start(1, 1));
         startedTasks.add(new CreaturePreSpawnEventHandlerDetectorTask(this).start(0, 20));
+        startedTasks.add(new ObjectCacheCleanupTask(this).start(10, 20*60*30));
 
         // Some servers do not have an Entity Remove Queue.
         // For those servers, we handle them using our own system
@@ -835,6 +837,21 @@ public class CommonPlugin extends PluginBase {
                     }
                 }
             }
+        }
+    }
+
+    // Runs every so often (30 minutes) to wipe all the default ObjectCache instances
+    // Makes sure that if somebody uses a lot of them once, they can be freed up
+    // Also makes sure that collections that grow internal buffers get cleaned up
+    private static class ObjectCacheCleanupTask extends Task {
+
+        public ObjectCacheCleanupTask(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            ObjectCache.clearDefaultCaches();
         }
     }
 
