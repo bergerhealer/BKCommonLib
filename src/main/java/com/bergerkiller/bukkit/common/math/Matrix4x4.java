@@ -826,6 +826,17 @@ public class Matrix4x4 implements Cloneable {
         return diff;
     }
 
+    /**
+     * Computes the difference rotation transformation between two matrices
+     * 
+     * @param m1 Old transformation matrix
+     * @param m2 New transformation matrix
+     * @return Quaternion that rotates {@link #getRotation()} of the old matrix into the new matrix
+     */
+    public static Quaternion diffRotation(Matrix4x4 m1, Matrix4x4 m2) {
+        return diff(m1, m2).getRotation();
+    }
+
     // From https://math.stackexchange.com/questions/296794
     public static Matrix4x4 computeProjectionMatrix(Vector3 p[])
     {

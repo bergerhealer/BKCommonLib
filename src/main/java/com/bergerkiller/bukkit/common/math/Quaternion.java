@@ -536,6 +536,20 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Computes the difference transformation between two quaternions
+     * 
+     * @param q1 Old rotation transformation quaternion
+     * @param q2 New rotation transformation quaternion
+     * @return Quaternion that rotates the old quaternion into the new quaternion
+     */
+    public static Quaternion diff(Quaternion q1, Quaternion q2) {
+        Quaternion diff = q1.clone();
+        diff.invert();
+        diff.multiply(q2);
+        return diff;
+    }
+
+    /**
      * Creates a quaternion for a rotation around an axis
      * 
      * @param axis
