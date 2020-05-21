@@ -35,6 +35,8 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityMetadataHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle.EnumPlayerTeleportFlagsHandle;
 
 class Packet {
     <code>
@@ -951,7 +953,7 @@ class PacketPlayOutPosition extends Packet {
     private double z:c;
     private float yaw:d;
     private float pitch:e;
-    private (Set<?>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:f;
+    private (Set<EnumPlayerTeleportFlagsHandle>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:f;
 
     // >= MC 1.9
     private optional int teleportWaitTimer:g;
@@ -970,7 +972,73 @@ class PacketPlayOutPosition extends Packet {
             T.teleportWaitTimer.setInteger(getRaw(), ticks);
         }
     }
+
+    public void setRotationRelative(boolean relative) {
+        Set<EnumPlayerTeleportFlagsHandle> flags = getTeleportFlags();
+        if (relative) {
+            flags.add(EnumPlayerTeleportFlagsHandle.Y_ROT);
+            flags.add(EnumPlayerTeleportFlagsHandle.X_ROT);
+        } else {
+            flags.remove(EnumPlayerTeleportFlagsHandle.Y_ROT);
+            flags.remove(EnumPlayerTeleportFlagsHandle.X_ROT);
+        }
+    }
+
+    public void setPositionRelative(boolean relative) {
+        Set<EnumPlayerTeleportFlagsHandle> flags = getTeleportFlags();
+        if (relative) {
+            flags.add(EnumPlayerTeleportFlagsHandle.X);
+            flags.add(EnumPlayerTeleportFlagsHandle.Y);
+            flags.add(EnumPlayerTeleportFlagsHandle.Z);
+        } else {
+            flags.remove(EnumPlayerTeleportFlagsHandle.X);
+            flags.remove(EnumPlayerTeleportFlagsHandle.Y);
+            flags.remove(EnumPlayerTeleportFlagsHandle.Z);
+        }
+    }
     </code>
+
+    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
+        java.util.Set flags = com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allRelative();
+#if version >= 1.9
+        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
+#else
+        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags);
+#endif
+    }
+
+    <code>
+    public static PacketPlayOutPositionHandle createAbsolute(org.bukkit.Location location) {
+        return createAbsolute(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
+    }
+    </code>
+
+    public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createAbsolute(double x, double y, double z, float yaw, float pitch) {
+        java.util.Set flags = com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allAbsolute();
+#if version >= 1.9
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
+#else
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags);
+#endif
+    }
+
+    class PacketPlayOutPosition.EnumPlayerTeleportFlags {
+        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags X;
+        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Y;
+        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Z;
+        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Y_ROT;
+        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags X_ROT;
+
+        <code>
+        public static Set<?> allAbsolute() {
+            return java.util.EnumSet.noneOf((Class) T.getType());
+        }
+
+        public static Set<?> allRelative() {
+            return java.util.EnumSet.allOf((Class) T.getType());
+        }
+        </code>
+    }
 }
 
 // Available >= MC 1.9

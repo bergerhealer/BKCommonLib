@@ -1451,8 +1451,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> z = PacketPlayOutPositionHandle.T.z.toFieldAccessor();
         public final FieldAccessor<Float> yaw = PacketPlayOutPositionHandle.T.yaw.toFieldAccessor();
         public final FieldAccessor<Float> pitch = PacketPlayOutPositionHandle.T.pitch.toFieldAccessor();
-        public final FieldAccessor<Set<?>> teleportFlags = PacketPlayOutPositionHandle.T.teleportFlags.toFieldAccessor();
-        public final FieldAccessor<Integer> unknown1 = new SafeDirectField<Integer>() {
+        public final FieldAccessor<Set<?>> teleportFlags = CommonUtil.unsafeCast(PacketPlayOutPositionHandle.T.teleportFlags.raw.toFieldAccessor());
+        public final FieldAccessor<Integer> teleportWaitTimer = new SafeDirectField<Integer>() {
             @Override
             public Integer get(Object instance) {
                 return PacketPlayOutPositionHandle.createHandle(instance).getTeleportWaitTimer();
@@ -1464,6 +1464,8 @@ public class NMSPacketClasses {
                 return true;
             }
         };
+        @Deprecated
+        public final FieldAccessor<Integer> unknown1 = teleportWaitTimer;
     }
 
     public static class NMSPacketPlayOutRemoveEntityEffect extends NMSPacket {

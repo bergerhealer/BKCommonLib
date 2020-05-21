@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.map;
 
-import java.util.HashSet;
 import java.util.UUID;
 
 import org.bukkit.Location;
@@ -509,14 +508,7 @@ public class MapPlayerInput implements Tickable {
 
             // Resend current player position to the player
             Location loc = this.player.getLocation();
-            PacketPlayOutPositionHandle positionPacket = PacketPlayOutPositionHandle.T.newHandleNull();
-            positionPacket.setTeleportFlags(new HashSet<Object>());
-            positionPacket.setTeleportWaitTimer(0);
-            positionPacket.setYaw(loc.getYaw());
-            positionPacket.setPitch(loc.getPitch());
-            positionPacket.setX(loc.getX());
-            positionPacket.setY(loc.getY());
-            positionPacket.setZ(loc.getZ());
+            PacketPlayOutPositionHandle positionPacket = PacketPlayOutPositionHandle.createAbsolute(loc);
             PacketUtil.sendPacket(player, positionPacket);
             return;
         }
