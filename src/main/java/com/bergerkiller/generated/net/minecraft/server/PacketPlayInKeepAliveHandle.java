@@ -21,14 +21,15 @@ public abstract class PacketPlayInKeepAliveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public abstract Long getKey();
-    public abstract void setKey(Long value);
+    public abstract long getKey();
+    public abstract void setKey(long key);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayInKeepAlive</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInKeepAliveClass extends Template.Class<PacketPlayInKeepAliveHandle> {
-        public final Template.Field.Converted<Long> key = new Template.Field.Converted<Long>();
+        public final Template.Method<Long> getKey = new Template.Method<Long>();
+        public final Template.Method<Void> setKey = new Template.Method<Void>();
 
     }
 

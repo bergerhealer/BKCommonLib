@@ -21,14 +21,21 @@ public abstract class PacketPlayOutKeepAliveHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public abstract Long getKey();
-    public abstract void setKey(Long value);
+    public static PacketPlayOutKeepAliveHandle createNew(long key) {
+        return T.createNew.invoke(key);
+    }
+
+    public abstract long getKey();
+    public abstract void setKey(long key);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutKeepAlive</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutKeepAliveClass extends Template.Class<PacketPlayOutKeepAliveHandle> {
-        public final Template.Field.Converted<Long> key = new Template.Field.Converted<Long>();
+        public final Template.StaticMethod.Converted<PacketPlayOutKeepAliveHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutKeepAliveHandle>();
+
+        public final Template.Method<Long> getKey = new Template.Method<Long>();
+        public final Template.Method<Void> setKey = new Template.Method<Void>();
 
     }
 

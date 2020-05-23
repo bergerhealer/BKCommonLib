@@ -86,6 +86,7 @@ public class CommonPlugin extends PluginBase {
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
+    private CommonSyncPacketDispatcher syncPacketdispatcher = null;
     private boolean isFrameTilingSupported = true;
     private boolean isMapDisplaysEnabled = true;
 
@@ -307,6 +308,15 @@ public class CommonPlugin extends PluginBase {
         return this.vehicleMountManager;
     }
 
+    /**
+     * Gets the sync packet dispatcher, which sends packets at the start of a client's tick
+     * 
+     * @return sync packet dispatcher
+     */
+    public CommonSyncPacketDispatcher getSyncPacketDispatcher() {
+        return this.syncPacketdispatcher;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -424,6 +434,10 @@ public class CommonPlugin extends PluginBase {
         this.vehicleMountManager.disable();
         this.vehicleMountManager = null;
 
+        // Disable packet dispatcher
+        this.syncPacketdispatcher.disable(this);
+        this.syncPacketdispatcher = null;
+
         // Clear running tasks
         for (Task task : startedTasks) {
             task.stop();
@@ -493,6 +507,10 @@ public class CommonPlugin extends PluginBase {
             this.onCriticalFailure();
             return;
         }
+
+        // Initialize sync packet sender right after now that the packet handler is available
+        this.syncPacketdispatcher = new CommonSyncPacketDispatcher();
+        this.syncPacketdispatcher.enable(this);
 
         // Load configuration
         FileConfiguration config = new FileConfiguration(this);

@@ -37,6 +37,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandl
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle.EnumPlayerTeleportFlagsHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHandle;
 
 class Packet {
     <code>
@@ -171,18 +172,50 @@ class PacketPlayOutEntityDestroy extends Packet {
 
 class PacketPlayInKeepAlive extends Packet {
 #if version >= 1.12.2
-    private (Long) long key:a;
+    #require net.minecraft.server.PacketPlayInKeepAlive private long key:a;
+    public long getKey() {
+        return instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = key;
+    }
 #else
-    private (Long) int key:a;
+    #require net.minecraft.server.PacketPlayInKeepAlive private int key:a;
+    public long getKey() {
+        return (long) instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = (int)key;
+    }
 #endif
 }
 
 class PacketPlayOutKeepAlive extends Packet {
 #if version >= 1.12.2
-    private (Long) long key:a;
+    #require net.minecraft.server.PacketPlayInKeepAlive private long key:a;
+    public long getKey() {
+        return instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = key;
+    }
 #else
-    private (Long) int key:a;
+    #require net.minecraft.server.PacketPlayInKeepAlive private int key:a;
+    public long getKey() {
+        return (long) instance#key;
+    }
+    public void setKey(long key) {
+        instance#key = (int)key;
+    }
 #endif
+
+    public static (PacketPlayOutKeepAliveHandle) PacketPlayOutKeepAlive createNew(long key) {
+#if version >= 1.12.2
+        return new PacketPlayOutKeepAlive(key);
+#else
+        return new PacketPlayOutKeepAlive((int) key);
+#endif
+    }
 }
 
 class PacketPlayOutScoreboardScore extends Packet {

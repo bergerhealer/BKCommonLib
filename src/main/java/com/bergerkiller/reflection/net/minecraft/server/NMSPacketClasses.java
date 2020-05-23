@@ -430,7 +430,18 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInKeepAlive extends NMSPacket {
 
-        public final FieldAccessor<Long> key = PacketPlayInKeepAliveHandle.T.key.toFieldAccessor();
+        public final FieldAccessor<Long> key = new SafeDirectField<Long>() {
+            @Override
+            public Long get(Object instance) {
+                return Long.valueOf(PacketPlayInKeepAliveHandle.createHandle(instance).getKey());
+            }
+
+            @Override
+            public boolean set(Object instance, Long value) {
+                PacketPlayInKeepAliveHandle.createHandle(instance).setKey(value.longValue());
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayInResourcePackStatus extends NMSPacket {
@@ -1085,7 +1096,18 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutKeepAlive extends NMSPacket {
 
-        public final FieldAccessor<Long> key = PacketPlayOutKeepAliveHandle.T.key.toFieldAccessor();
+        public final FieldAccessor<Long> key = new SafeDirectField<Long>() {
+            @Override
+            public Long get(Object instance) {
+                return Long.valueOf(PacketPlayOutKeepAliveHandle.createHandle(instance).getKey());
+            }
+
+            @Override
+            public boolean set(Object instance, Long value) {
+                PacketPlayOutKeepAliveHandle.createHandle(instance).setKey(value.longValue());
+                return true;
+            }
+        };
     }
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
