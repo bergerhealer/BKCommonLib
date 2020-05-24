@@ -434,7 +434,7 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="target/${project.finalNameBase}.jar" tofile="target/${project.name}.jar"/>
+                                <copy file="target/${project.finalNameBase}.jar" tofile="target/static/${project.name}.jar"/>
                             </target>
                         </configuration>
                     </execution>
