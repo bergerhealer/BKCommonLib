@@ -28,8 +28,11 @@ import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
  * Sends packets to clients asynchronously, synchronized to that client's tick
  * "phase". The phase depends on the client performance compared to that
  * of the server. The dispatcher attempts to send packets at the start of the client's
- * tick, right before other packets are received.
+ * tick, right before other packets are received.<br>
+ * <br>
+ * <b>UNUSED: This feature did not work as well as we hoped it would. Here for archival purposes</b>
  */
+@Deprecated
 public class CommonSyncPacketDispatcher extends AsyncTask implements PacketListener {
     private static final long TICK_SPAN_NANOS = 50000000L;
     private static final PacketType[] MONITORED_PACKET_TYPES = new PacketType[] {

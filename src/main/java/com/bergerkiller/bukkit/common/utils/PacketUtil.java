@@ -179,42 +179,6 @@ public class PacketUtil {
     }
 
     /**
-     * Sends a packet to a player, synchronized to that player's personal client tick. This guarantees
-     * the packet is received by the player at the beginning of the tick, before any other packets.
-     * The packet will not be handled by packet listeners as to avoid synchronization problems.<br>
-     * <br>
-     * When this method is called on the main thread, all the packets for the current server tick
-     * are grouped together and sent at once. This avoids multiple packets on the same server tick
-     * being sent to the client on different client ticks.
-     * 
-     * @param player Player to send the packet to
-     * @param packet Packet to send
-     */
-    public static void sendSyncPacket(Player player, PacketHandle packet) {
-        if (packet != null) {
-            CommonPlugin.getInstance().getSyncPacketDispatcher().sendPacket(player, packet);
-        }
-    }
-
-    /**
-     * Sends a packet to a player, synchronized to that player's personal client tick. This guarantees
-     * the packet is received by the player at the beginning of the tick, before any other packets.
-     * The packet will not be handled by packet listeners as to avoid synchronization problems.<br>
-     * <br>
-     * When this method is called on the main thread, all the packets for the current server tick
-     * are grouped together and sent at once. This avoids multiple packets on the same server tick
-     * being sent to the client on different client ticks.
-     * 
-     * @param player Player to send the packet to
-     * @param packet Packet to send
-     */
-    public static void sendSyncPacket(Player player, CommonPacket packet) {
-        if (packet != null) {
-            CommonPlugin.getInstance().getSyncPacketDispatcher().sendPacket(player, packet);
-        }
-    }
-
-    /**
      * Sends the spawn packet for a living entity. On MC 1.15 and later the metadata for the entity is sent separate
      * from the spawn packet of the living entity.
      * 
