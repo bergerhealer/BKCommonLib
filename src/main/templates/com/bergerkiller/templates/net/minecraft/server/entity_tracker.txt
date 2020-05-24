@@ -61,7 +61,9 @@ class EntityTracker {
     }
 
 #if version >= 1.14
-  #if exists net.minecraft.server.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.PlayerChunk> visibleChunksClone;
+  #if exists net.minecraft.server.PlayerChunkMap.ProtectedVisibleChunksMap
+    public optional void setVisibleChunksToUpdatingChunks:###();
+  #elseif exists net.minecraft.server.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.PlayerChunk> visibleChunksClone;
     public optional void setVisibleChunksToUpdatingChunks() {
         // Used on newer builds of paperspigot
         synchronized (instance.visibleChunks) {
