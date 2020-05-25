@@ -568,7 +568,7 @@ public abstract class PluginBase extends JavaPlugin {
         } else {
             String pluginCause = getName();
             if (CommonUtil.isInstance(reason, NoClassDefFoundError.class, NoSuchMethodError.class, NoSuchFieldError.class, IllegalAccessError.class)) {
-                String fixedReason = StringUtil.trimStart(reason.getMessage(), "tried to access ");
+                String fixedReason = StringUtil.trimStart(LogicUtil.fixNull(reason.getMessage(), ""), "tried to access ");
                 String path = StringUtil.trimStart(fixedReason, "method ", "field ", "class ");
                 if (path.startsWith(Common.NMS_ROOT)) {
                     log(Level.SEVERE, "This version of the plugin is incompatible with this Minecraft version:");
