@@ -38,6 +38,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHa
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle.EnumPlayerTeleportFlagsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateAttributesHandle;
 
 class Packet {
     <code>
@@ -1343,6 +1344,27 @@ class PacketPlayOutEntityMetadata extends Packet {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_METADATA;
     }
     </code>
+}
+
+class PacketPlayOutUpdateAttributes extends Packet {
+    private int entityId:a;
+
+    public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createZeroMaxHealth(int entityId) {
+        // Internal code calls a callback on this instance, so we need a dummy one to catch that
+        AttributeMapBase attributeMapBase = (AttributeMapBase) com.bergerkiller.bukkit.common.internal.proxy.DummyAttributeMapBase.INSTANCE;
+
+        // Create a modifiable attribute for MAX_HEALTH, and set the value to 0
+#if version >= 1.14
+        AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.MAX_HEALTH);
+#else
+        AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.maxHealth);
+#endif
+        attribute.setValue(0.0);
+
+        // Create packet sending just this one attribute
+        java.util.Collection attributes = java.util.Collections.singleton(attribute);
+        return new PacketPlayOutUpdateAttributes(entityId, attributes);
+    }
 }
 
 class PacketPlayInUpdateSign extends Packet {

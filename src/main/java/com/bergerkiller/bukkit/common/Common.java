@@ -18,7 +18,8 @@ public class Common {
      */
     private static final Set<String> CAPABILITIES = Stream.of(
             "Common:Capabilities",
-            "Common:EntityController:SetBlockActivationEnabled"
+            "Common:EntityController:SetBlockActivationEnabled",
+            "Common:PacketPlayOutUpdateAttributes:createZeroMaxHealth"
     ).collect(Collectors.toSet());
 
     /**

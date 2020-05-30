@@ -21,6 +21,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 /**
@@ -544,6 +545,9 @@ public class MapPlayerInput implements Tickable {
                     packet.setPosY(pos.getY());
                     packet.setPosZ(pos.getZ());
                     PacketUtil.sendEntityLivingSpawnPacket(player, packet, data);
+
+                    // Send attribute for max health = 0 to hide the health bar
+                    PacketUtil.sendPacket(player, PacketPlayOutUpdateAttributesHandle.createZeroMaxHealth(this._fakeMountId));
                 }
                 {
                     if (PacketType.OUT_MOUNT.getType() != null) {
