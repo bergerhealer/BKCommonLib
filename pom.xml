@@ -6,7 +6,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.15.2-v4-SNAPSHOT</version>
+    <version>1.15.2-v4</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -419,7 +419,8 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Invoke ANT tasks -->
+
+            <!-- Copy the produced target to the static directory with just a base name -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-antrun-plugin</artifactId>
@@ -440,6 +441,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <!-- Install the jars as artifacts into the local repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
