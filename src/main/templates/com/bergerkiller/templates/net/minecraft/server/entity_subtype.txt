@@ -21,7 +21,14 @@ import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 class EntityLiving extends Entity {
 
-#if version >= 1.15
+#if version >= 1.16
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:an;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bo;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bq;
+#elseif version >= 1.15
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ao;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
@@ -115,7 +122,12 @@ class EntityLiving extends Entity {
 
     public float lastDamage;
 
-#if version >= 1.15
+#if version >= 1.16
+    protected unknown boolean jumping;
+    public float sideMovement:aY;
+    public unknown float aZ;
+    public float forwardMovement:ba;
+#elseif version >= 1.15
     protected unknown boolean jumping;
     public float sideMovement:aZ;
     public unknown float ba;
