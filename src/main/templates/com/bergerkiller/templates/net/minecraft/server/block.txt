@@ -55,7 +55,9 @@ class Block {
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 #endif
 
-#if version >= 1.15
+#if version >= 1.16
+    public String getTitle:i();
+#elseif version >= 1.15
     public String getTitle:k();
 #elseif version >= 1.14
     public String getTitle:l();
@@ -73,24 +75,39 @@ class Block {
 #if version >= 1.14
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-  #if version >= 1.15
+  #if version >= 1.16
+        return instance.f(iblockdata, world, new BlockPosition(x, y, z));
+  #elseif version >= 1.15
         return instance.l(iblockdata, world, new BlockPosition(x, y, z));
   #else
         return instance.k(iblockdata, world, new BlockPosition(x, y, z));
   #endif
     }
 
+  #if version >= 1.16
+    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata) {
+        return iblockdata.f();
+    }
+  #else
     public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);
+  #endif
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        IBlockAccess iblockaccess = world;
+    #if version >= 1.16
+        return iblockdata.isOccluding(world, new BlockPosition(x, y, z));
+    #else
         return instance.isOccluding(iblockdata, world, new BlockPosition(x, y, z));
+    #endif
     }
 
     public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
         IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
         BlockPosition blockposition = block.getPosition();
+    #if version >= 1.16
+        return iblockdata.isOccluding(iblockaccess, blockposition);
+    #else
         return instance.isOccluding(iblockdata, iblockaccess, blockposition);
+    #endif
     }
 
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
@@ -99,7 +116,11 @@ class Block {
             return false;
         }
 
+  #if version >= 1.16
+        #require net.minecraft.server.Block private static final VoxelShape checkShape:b;
+  #else
         #require net.minecraft.server.Block private static final VoxelShape checkShape:c;
+  #endif
         VoxelShape checkShape = Block#checkShape;
 
         IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
@@ -296,25 +317,28 @@ class Block {
 
 #if version >= 1.13
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
-#if version >= 1.14
+  #if version >= 1.16
+        VoxelShape shape = instance.b(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.a());
+  #elseif version >= 1.14
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.a());
-#else
+  #else
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition);
-#endif
-#if version >= 1.13.2
+  #endif
+  #if version >= 1.13.2
         if (shape == null || shape.isEmpty()) {
-#else
+  #else
         if (shape == null || shape.b()) {
-#endif
+  #endif
             return null;
         } else {
-#if methodexists net.minecraft.server.VoxelShape public AxisAlignedBB getBoundingBox();
+  #if methodexists net.minecraft.server.VoxelShape public AxisAlignedBB getBoundingBox();
             return shape.getBoundingBox();
-#else
+  #else
             return shape.a();
-#endif
+  #endif
         }
     }
+
 #elseif version >= 1.9
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition);
 #else
