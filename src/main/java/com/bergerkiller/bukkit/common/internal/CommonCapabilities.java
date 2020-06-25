@@ -113,9 +113,11 @@ public class CommonCapabilities {
     public static final boolean EMPTY_ITEM_NAME = CommonBootstrap.evaluateMCVersion(">=", "1.13");
 
     /**
-     * Since Minecraft 1.13.1 the dimension field of Entity is a dimension manager, instead of an int
+     * Since Minecraft 1.13.1 the dimension field of Entity is a dimension manager, instead of an int.
+     * Since Minecraft 1.16 the dimension field is gone entirely
      */
-    public static final boolean ENTITY_USES_DIMENSION_MANAGER = CommonBootstrap.evaluateMCVersion(">=", "1.13.1");
+    public static final boolean ENTITY_USES_DIMENSION_MANAGER = CommonBootstrap.evaluateMCVersion(">=", "1.13.1") &&
+                                                                !CommonBootstrap.evaluateMCVersion(">=", "1.16");
 
     /**
      * Deprecated: use ENTITY_USES_DIMENSION_MANAGER instead

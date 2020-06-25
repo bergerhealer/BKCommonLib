@@ -401,7 +401,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return;
         }
         this.handle.setWorld(WorldHandle.fromBukkit(world));
-        this.handle.setDimension(WorldUtil.getDimension(world));
+        if (EntityHandle.T.dimension.isAvailable()) {
+            EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(world));
+        }
     }
 
     public void setDead(boolean dead) {

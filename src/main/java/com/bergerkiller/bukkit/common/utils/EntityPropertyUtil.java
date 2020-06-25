@@ -30,32 +30,32 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
 
     @Deprecated
     public static double getLocX(Entity entity) {
-        return EntityHandle.T.locXField.getDouble(h(entity));
+        return EntityHandle.T.getLocX.invoke(h(entity));
     }
 
     @Deprecated
     public static void setLocX(Entity entity, double value) {
-        EntityHandle.T.locXField.setDouble(h(entity), value);
+        EntityHandle.T.setLocX.invoke(h(entity), value);
     }
 
     @Deprecated
     public static double getLocY(Entity entity) {
-        return EntityHandle.T.locYField.getDouble(h(entity));
+        return EntityHandle.T.getLocY.invoke(h(entity));
     }
 
     @Deprecated
     public static void setLocY(Entity entity, double value) {
-        EntityHandle.T.locYField.setDouble(h(entity), value);
+        EntityHandle.T.setLocY.invoke(h(entity), value);
     }
 
     @Deprecated
     public static double getLocZ(Entity entity) {
-        return EntityHandle.T.locZField.getDouble(h(entity));
+        return EntityHandle.T.getLocZ.invoke(h(entity));
     }
 
     @Deprecated
     public static void setLocZ(Entity entity, double value) {
-        EntityHandle.T.locZField.setDouble(h(entity), value);
+        EntityHandle.T.setLocZ.invoke(h(entity), value);
     }
 
     @Deprecated

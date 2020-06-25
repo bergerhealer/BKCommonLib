@@ -131,23 +131,52 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double lastZ;
 
 #if version >= 1.15
-    private double locXField:locX;
-    private double locYField:locY;
-    private double locZField:locZ;
-
+    // locX/Y/Z fields became private on 1.15
     public double getLocX:locX();
     public double getLocY:locY();
     public double getLocZ:locZ();
 
+  #if version >= 1.16
+    // Since 1.16 they got merged into a 'Vec3D loc' field
+    // It is better and safer to just call setPositionRaw
+    public void setLocX(double x) {
+        instance.setPositionRaw(x, instance.locY(), instance.locZ());
+    }
+
+    public void setLocY(double y) {
+        instance.setPositionRaw(instance.locX(), y, instance.locZ());
+    }
+
+    public void setLocZ(double z) {
+        instance.setPositionRaw(instance.locX(), instance.locY(), z);
+    }
+  #else
+    // We can use reflection to set the individual fields efficiently
+    public void setLocX(double x) {
+        #require net.minecraft.server.Entity private double locX;
+        instance#locX = x;
+    }
+
+    public void setLocY(double y) {
+        #require net.minecraft.server.Entity private double locY;
+        instance#locY = y;
+    }
+
+    public void setLocZ(double z) {
+        #require net.minecraft.server.Entity private double locZ;
+        instance#locZ = z;
+    }
+  #endif
+
     public void setLoc:setPositionRaw(double x, double y, double z);
 #else
-    public double locXField:locX;
-    public double locYField:locY;
-    public double locZField:locZ;
-
     public double getLocX() { return instance.locX; }
     public double getLocY() { return instance.locY; }
     public double getLocZ() { return instance.locZ; }
+
+    public void setLocX(double x) { instance.locX = x; }
+    public void setLocY(double y) { instance.locY = y; }
+    public void setLocZ(double z) { instance.locZ = z; }
 
     public void setLoc(double x, double y, double z) {
         instance.locX = x;
@@ -155,12 +184,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.locZ = z;
     }
 #endif
-
-    <code>
-    public void setLocX(double value) { setLocXField(value); }
-    public void setLocY(double value) { setLocYField(value); }
-    public void setLocZ(double value) { setLocZField(value); }
-    </code>
 
 #if version >= 1.15
     public boolean isLastAndCurrentPositionDifferent() {
@@ -173,20 +196,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
                instance.yaw != instance.lastYaw || instance.pitch != instance.lastPitch;
     }
 #endif
-
-    // locX/Y/Z fields became private on 1.15
-    // The added method 'setPositionRaw' is faster now
-    // TODO: Mountiplex causes the double values to turn into Double and back
-    //       This makes this method way too slow :(
-    // #if version >= 1.15
-    //     public void setLoc:setPositionRaw(double x, double y, double z);
-    // #else
-    //     public void setLoc(double x, double y, double z) {
-    //         instance.locX = x;
-    //         instance.locY = y;
-    //         instance.locZ = z;
-    //     }
-    // #endif
 
     // motX/Y/Z is private 'mot' field on 1.14
     // For performance reasons, use the getMot/setMot methods
@@ -303,10 +312,21 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public float lastYaw;
     public float lastPitch;
     private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
+
+#if version >= 1.16
+    protected boolean onGround;
+#else
     public boolean onGround;
+#endif
+
     public boolean horizontalMovementImpaired:positionChanged;
 
-#if version >= 1.15
+#if version >= 1.16
+    public boolean verticalMovementImpaired:v;
+    public boolean movementImpaired:v;
+    public unknown boolean w;
+    public boolean velocityChanged;
+#elseif version >= 1.15
     public boolean verticalMovementImpaired:v;
     public boolean movementImpaired:w;
     public boolean velocityChanged;
@@ -331,7 +351,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.14
     // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
     // If this is greater than 1.0E-7D then the factor should be applied
-  #if version >= 1.15
+  #if version >= 1.16
+    #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:x;
+  #elseif version >= 1.15
     #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:y;
   #else
     #require net.minecraft.server.Entity protected Vec3D collidingWithBlockMultiplier:B;
@@ -410,7 +432,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
-#if version >= 1.15
+#if version >= 1.16
+    public unknown float z;
+    public float walkedDistanceXZ:A;
+    public float walkedDistanceXYZ:B;
+#elseif version >= 1.15
     public unknown float A;
     public float walkedDistanceXZ:B;
     public float walkedDistanceXYZ:C;
@@ -434,7 +460,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public float fallDistance;
 
-#if version >= 1.14
+#if version >= 1.16
+    #require net.minecraft.server.Entity private float stepCounter:at;
+#elseif version >= 1.14
     #require net.minecraft.server.Entity private float stepCounter:av;
 #elseif version >= 1.13
     #require net.minecraft.server.Entity private float stepCounter:aA;
@@ -460,7 +488,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return (float) instance#stepCounter;
     }
 
-#if version >= 1.15
+#if version >= 1.16
+    public unknown double D;
+    public unknown double E;
+    public unknown double F;
+    public float heightOffset:G;
+    public boolean noclip;
+    public unknown float I;
+#elseif version >= 1.15
     public unknown double E;
     public unknown double F;
     public unknown double G;
@@ -510,7 +545,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
-#if version >= 1.14
+#if version >= 1.16
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:ax;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ay;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:az;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aA;
+
+#elseif version >= 1.14
   #if version >= 1.15
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
   #else
@@ -715,7 +758,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public int portalCooldown;
 
-#if version >= 1.15
+#if version >= 1.16
+    protected boolean allowTeleportation:inPortal;
+    protected unknown int portalTicks;
+#elseif version >= 1.15
     protected boolean allowTeleportation:af;
     protected unknown int ag;
 #elseif version >= 1.14
@@ -735,13 +781,18 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     protected unknown int al;
 #endif
 
-#if version >= 1.13.1
-    public (Dimension) DimensionManager dimension;
+#if version >= 1.16
+    public optional (Dimension) DimensionManager dimension:###;
+#elseif version >= 1.13.1
+    public optional (Dimension) DimensionManager dimension;
 #else
-    public (Dimension) int dimension;
+    public optional (Dimension) int dimension;
 #endif
 
-#if version >= 1.14
+#if version >= 1.16
+    optional private final double[] move_SomeArray:aF;
+    optional private long move_SomeState:aG;
+#elseif version >= 1.14
     optional private final double[] move_SomeArray:aG;
     optional private long move_SomeState:aH;
 #elseif version >= 1.13
@@ -849,10 +900,35 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.9
+#if version >= 1.16
+    public void makeSound:playSound((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
+#elseif version >= 1.9
     public void makeSound:a((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
 #else
     public void makeSound:makeSound((ResourceKey) String soundeffect, float volume, float pitch);
+#endif
+
+    // Note: counts rain too as being wet!
+#if version >= 1.16
+    public boolean isWet:aC();
+#elseif version >= 1.15
+    public boolean isWet:ay();
+#elseif version >= 1.14.3
+    public boolean isWet:au();
+#elseif version >= 1.14
+    public boolean isWet:at();
+#elseif version >= 1.13
+    public boolean isWet:ap();
+#elseif version >= 1.12
+    public boolean isWet:an();
+#elseif version >= 1.10.2
+    public boolean isWet:ai();
+#elseif version >= 1.9.4
+    public boolean isWet:ah();
+#elseif version >= 1.9
+    public boolean isWet:ah();
+#else
+    public boolean isWet:U();
 #endif
 
     /*
@@ -864,8 +940,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.15
-    public boolean isInWaterUpdate:ay();
+    // Note: checks just standing in water! Rain does not count.
+#if version >= 1.16
+    public boolean isInWaterUpdate:aD();
+#elseif version >= 1.15
+    public boolean isInWaterUpdate:az();
 #elseif version >= 1.14
     public boolean isInWaterUpdate:au();
 #elseif version >= 1.12
@@ -1044,7 +1123,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.15
+#if version >= 1.16
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
+#elseif version >= 1.15
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
 #elseif version >= 1.14.3
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
@@ -1108,26 +1189,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
     </code>
 
-#if version >= 1.15
-    public boolean isWet:ay();
-#elseif version >= 1.14.3
-    public boolean isWet:au();
-#elseif version >= 1.14
-    public boolean isWet:at();
-#elseif version >= 1.13
-    public boolean isWet:ap();
-#elseif version >= 1.12
-    public boolean isWet:an();
-#elseif version >= 1.10.2
-    public boolean isWet:ai();
-#elseif version >= 1.9.4
-    public boolean isWet:ah();
-#elseif version >= 1.9
-    public boolean isWet:ah();
-#else
-    public boolean isWet:U();
-#endif
-
 #if version >= 1.14
     public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
@@ -1188,9 +1249,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void onTick:s_();
 #endif
 
+#if version >= 1.16
+    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public boolean savePassenger:a_((CommonTagCompound) NBTTagCompound compound);
+#else
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
-
     public boolean savePassenger:c((CommonTagCompound) NBTTagCompound compound);
+#endif
 
     public boolean saveEntity:d((CommonTagCompound) NBTTagCompound compound);
 
@@ -1239,7 +1304,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return 300;
      * }
      */
-#if version >= 1.15
+#if version >= 1.16
+    public int getPortalCooldownMaximum:getDefaultPortalCooldown();
+#elseif version >= 1.15
     public int getPortalCooldownMaximum:ba();
 #elseif version >= 1.14.3
     public int getPortalCooldownMaximum:aX();

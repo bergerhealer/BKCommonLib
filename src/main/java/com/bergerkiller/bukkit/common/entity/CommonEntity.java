@@ -449,13 +449,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      */
     private void fixInvalidDimension() {
         // Since MC 1.13.1 this is an issue
+        // Since MC 1.16 the field is gone, and this code isn't executed
         if (!CommonCapabilities.ENTITY_USES_DIMENSION_MANAGER) {
             return;
         }
 
         Object raw_dim = EntityHandle.T.dimension.raw.get(this.handle.getRaw());
         if (raw_dim == null || !Dimension.fromDimensionManagerHandle(raw_dim).isSerializable()) {
-            this.handle.setDimension(WorldUtil.getDimension(this.handle.getWorld().getWorld()));
+            EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(this.handle.getWorld().getWorld()));
             // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
         }
     }
@@ -604,7 +605,9 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             this.handle.getWorldServer().removeEntity(this.handle);
             this.handle.setDead(false);
             this.handle.setWorld(newworld);
-            this.handle.setDimension(WorldUtil.getDimension(newworld.getWorld()));
+            if (EntityHandle.T.dimension.isAvailable()) {
+                EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(newworld.getWorld()));
+            }
             this.handle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
             if (hasNetworkController) {

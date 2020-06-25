@@ -305,7 +305,8 @@ public class CommonEntityType {
         }
 
         // Debug: verify the 'dimension' field is set for the Entity
-        if (DimensionManagerHandle.T.isAvailable()) {
+        // Field is gone since MC 1.16
+        if (DimensionManagerHandle.T.isAvailable() && EntityHandle.T.dimension.isAvailable()) {
             Object raw_dim = EntityHandle.T.dimension.raw.get(entity.getHandle());
             if (raw_dim == null) {
                 throw new IllegalStateException("Entity dimension field is null");
