@@ -36,8 +36,8 @@ public abstract class PacketPlayInSettingsHandle extends PacketHandle {
             T.mainHand.set(getRaw(), mainHand);
         }
     }
-    public abstract String getLang();
-    public abstract void setLang(String value);
+    public abstract String getLocale();
+    public abstract void setLocale(String value);
     public abstract int getView();
     public abstract void setView(int value);
     public abstract Object getChatVisibility();
@@ -51,7 +51,7 @@ public abstract class PacketPlayInSettingsHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInSettingsClass extends Template.Class<PacketPlayInSettingsHandle> {
-        public final Template.Field<String> lang = new Template.Field<String>();
+        public final Template.Field<String> locale = new Template.Field<String>();
         public final Template.Field.Integer view = new Template.Field.Integer();
         public final Template.Field.Converted<Object> chatVisibility = new Template.Field.Converted<Object>();
         public final Template.Field.Boolean enableColors = new Template.Field.Boolean();

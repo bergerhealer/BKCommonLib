@@ -253,7 +253,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         if (name == null) {
             name = "generic";
         }
-        return LocaleLanguageHandle.INSTANCE.get("entity." + name + ".name");
+        return LocaleLanguageHandle.INSTANCE().get("entity." + name + ".name");
     }
 
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")

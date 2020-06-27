@@ -62,7 +62,9 @@ class PlayerInventory extends IInventory {
 class InventoryEnderChest extends IInventory {
     public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
 
-#if version >= 1.14
+#if version >= 1.16
+    public (CommonTagList) NBTTagList saveToNBT:g()
+#elseif version >= 1.14
     public (CommonTagList) NBTTagList saveToNBT:f()
 #elseif version >= 1.11
     public (CommonTagList) NBTTagList saveToNBT:i()

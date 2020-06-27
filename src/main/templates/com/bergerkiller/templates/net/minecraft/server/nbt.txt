@@ -444,16 +444,18 @@ class NBTTagList extends NBTBase {
     public int size();
     public boolean isEmpty();
 
-#if version >= 1.14
-    public int getElementTypeId:a_();
+#if version >= 1.16
+    public (byte) byte getElementTypeId:d_();
+#elseif version >= 1.14
+    public (byte) int getElementTypeId:a_();
 #elseif version >= 1.13
-    public int getElementTypeId:d();
+    public (byte) int getElementTypeId:d();
 #elseif version >= 1.10.2
-    public int getElementTypeId:g();
+    public (byte) int getElementTypeId:g();
 #elseif version >= 1.9
-    public int getElementTypeId:d();
+    public (byte) int getElementTypeId:d();
 #else
-    public int getElementTypeId:f();
+    public (byte) int getElementTypeId:f();
 #endif
 
 #if version >= 1.13

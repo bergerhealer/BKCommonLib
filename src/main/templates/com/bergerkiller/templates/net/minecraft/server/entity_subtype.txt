@@ -260,7 +260,11 @@ class EntityHuman extends EntityLiving {
 
     public int sleepTicks;
 
-#if version >= 1.15
+#if version >= 1.16
+    //TODO!!!!
+    private (IntVector3) BlockPosition spawnCoord:FIELDREMOVED;
+    private boolean spawnForced:FIELDREMOVED;
+#elseif version >= 1.15
     protected unknown boolean bJ;
     private (IntVector3) BlockPosition spawnCoord:g;
     private boolean spawnForced:bR;
@@ -327,7 +331,12 @@ class EntityHuman extends EntityLiving {
     public int expTotal;
     public float exp;
 
-#if version >= 1.15
+#if version >= 1.16
+    protected unknown int bN;
+    protected unknown final float bO;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bQ;
+#elseif version >= 1.15
     protected unknown int bO;
     protected unknown final float bP;
     private unknown int bS;
@@ -394,7 +403,12 @@ class EntityHuman extends EntityLiving {
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bF;
 #endif
 
+#if version >= 1.16
+    //TODO!!!!!
+    public String spawnWorld:FIELDREMOVED;
+#else
     public String spawnWorld;
+#endif
 
     public void attack((org.bukkit.entity.Entity) Entity entity);
 }
@@ -635,7 +649,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
-#if version >= 1.14
+#if version >= 1.16
+    public void prime:u();
+#elseif version >= 1.14
     public void prime:v();
 #elseif version >= 1.13
     public void prime:f();

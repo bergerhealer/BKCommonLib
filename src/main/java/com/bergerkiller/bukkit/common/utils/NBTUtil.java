@@ -12,6 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
@@ -210,7 +211,7 @@ public class NBTUtil {
      * @param data to load into the blockState
      */
     public static void loadBlockState(BlockState blockState, CommonTagCompound data) {
-        TileEntityHandle.fromBukkit(blockState).load(data);
+        TileEntityHandle.fromBukkit(blockState).load(BlockStateHandle.T.getBlockData.invoke(blockState), data);
     }
 
     /**

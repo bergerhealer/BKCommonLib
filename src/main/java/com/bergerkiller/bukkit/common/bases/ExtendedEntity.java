@@ -479,26 +479,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.isLoaded();
     }
 
-    /**
-     * Gets whether the entity is hitting something, like an Entity or Block. If
-     * this returns True, then the Entity is unable to move freely.
-     *
-     * @return True if movement is impaired, False if not
-     */
-    public boolean isMovementImpaired() {
-        return this.handle.isHorizontalMovementImpaired();
-    }
-
-    /**
-     * Sets whether the entity is hitting something, and as a result can not
-     * move freely
-     *
-     * @param impaired state to set to
-     */
-    public void setMovementImpaired(boolean impaired) {
-        this.handle.setHorizontalMovementImpaired(impaired);
-    }
-
     public Random getRandom() {
         return this.handle.getRandom();
     }

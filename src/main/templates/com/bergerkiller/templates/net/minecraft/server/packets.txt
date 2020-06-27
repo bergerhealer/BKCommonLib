@@ -621,7 +621,39 @@ class PacketPlayOutLogin extends Packet {
     private (org.bukkit.GameMode) EnumGamemode gameMode:c;
 #endif
 
-#if version >= 1.15
+    // Since 1.16 the previous game mode of the player is also sent
+    // This allows the player to toggle back and forth between modes
+#if version >= 1.16
+    #require net.minecraft.server.PacketPlayOutLogin private EnumGamemode previousGameMode:e;
+
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        EnumGamemode mode = instance#previousGameMode;
+        if (mode == EnumGamemode.NOT_SET) {
+            return null;
+        } else {
+            return mode;
+        }
+    }
+
+    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+        if (gameMode == null) {
+            gameMode = EnumGamemode.NOT_SET;
+        }
+        instance#previousGameMode = gameMode;
+    }
+#else
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        return null;
+    }
+
+    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+    }
+#endif
+
+#if version >= 1.16
+    //TODO!!!!
+    private (Dimension) DimensionManager dimension:OHNOTHISISBAD;
+#elseif version >= 1.15
     private (Dimension) DimensionManager dimension:e;
 #elseif version >= 1.13.1
     private (Dimension) DimensionManager dimension:d;
@@ -630,25 +662,40 @@ class PacketPlayOutLogin extends Packet {
 #endif
 
     // Difficulty field only exists <= 1.13.2
-    // View distance field only exists >= 1.14
-#if version >= 1.15
+#if version >= 1.14
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
+#else
+    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
+#endif
+
+    // View distance field only exists >= 1.14
+#if version >= 1.16
+    private int maxPlayers:j;
+
+    //TODO!!!!
+    private (org.bukkit.WorldType) WorldType worldType:OHNOTHISISBAD;
+
+    private optional int viewDistance:k;
+#elseif version >= 1.15
     private int maxPlayers:f;
     private (org.bukkit.WorldType) WorldType worldType:g;
     private optional int viewDistance:h;
 #elseif version >= 1.14
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
     private int maxPlayers:e;
     private (org.bukkit.WorldType) WorldType worldType:f;
     private optional int viewDistance:g;
 #else
-    private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:e;
     private int maxPlayers:f;
     private (org.bukkit.WorldType) WorldType worldType:g;
     private optional int viewDistance:###;
 #endif
 
-#if version >= 1.15
+#if version >= 1.16
+    private boolean reducedDebugInfo:l;
+    private unknown boolean noImmediateRespawn:m;
+    private unknown boolean isDebugWorld:n;
+    private unknown boolean isFlatWorld:o;
+#elseif version >= 1.15
     private boolean reducedDebugInfo:i;
     private unknown boolean noImmediateRespawn:j;
 #else
@@ -672,6 +719,10 @@ class PacketPlayOutRespawn extends Packet {
     private (Dimension) int dimension:a;
 #endif
 
+    // Dimension and WorldType are now resource keys
+    // private ResourceKey<DimensionManager> a;
+    // private ResourceKey<World> b;
+
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:###;
@@ -679,7 +730,17 @@ class PacketPlayOutRespawn extends Packet {
     private optional (org.bukkit.Difficulty) EnumDifficulty difficulty:b;
 #endif
 
-#if version >= 1.15
+#if version >= 1.16
+    private unknown long encryptedWorldSeed:c;
+    private (org.bukkit.GameMode) EnumGamemode gamemode:d;
+
+    //TODO!!!!
+    private (org.bukkit.WorldType) WorldType worldType:OHNOTHISISBAD;
+
+    private unknown boolean isDebugWorld:f;
+    private unknown boolean isFlatWorld:g;
+    private unknown boolean unknownAlwaysTrue:h;
+#elseif version >= 1.15
     private unknown long encryptedWorldSeed:b;
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
     private (org.bukkit.WorldType) WorldType worldType:d;
@@ -689,6 +750,35 @@ class PacketPlayOutRespawn extends Packet {
 #else
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
     private (org.bukkit.WorldType) WorldType worldType:d;
+#endif
+
+    // Since 1.16 the previous game mode of the player is also sent
+    // This allows the player to toggle back and forth between modes
+#if version >= 1.16
+    #require net.minecraft.server.PacketPlayOutRespawn private EnumGamemode previousGameMode:e;
+
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        EnumGamemode mode = instance#previousGameMode;
+        if (mode == EnumGamemode.NOT_SET) {
+            return null;
+        } else {
+            return mode;
+        }
+    }
+
+    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+        if (gameMode == null) {
+            gameMode = EnumGamemode.NOT_SET;
+        }
+        instance#previousGameMode = gameMode;
+    }
+#else
+    public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
+        return null;
+    }
+
+    public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+    }
 #endif
 
     // Encrypted world seed field was added on MC 1.15
@@ -1275,7 +1365,11 @@ class PacketPlayOutScoreboardTeam extends Packet {
 }
 
 class PacketPlayInSettings extends Packet {
-    private String lang:a;
+#if version >= 1.16
+    public String locale;
+#else
+    private String locale:a;
+#endif
 #if fieldexists net.minecraft.server.PacketPlayInSettings public int viewDistance
     public int view:viewDistance;
 #else

@@ -26,12 +26,14 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
 
 #if version >= 1.14
     public void markAllLightDirty() {
-  #if version >= 1.14.1
-        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
+    
+  #if version >= 1.16
+        #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
+  #elseif version >= 1.14.1
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:t;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:u;
   #else
-        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
   #endif
@@ -39,7 +41,16 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         // Set all these masks to 'all layers' (18) to refresh them
         instance#pc_dirtyBlockLightMask = 0x3FFFF;
         instance#pc_dirtySkyLightMask = 0x3FFFF;
+
+        // Only used before MC 1.16
+  #if version < 1.16
+    #if version >= 1.14.1
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
+    #else
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
+    #endif
         instance#pc_layerLightMask = 0x3FFFF;
+  #endif
 
         // Update now
         Chunk chunk = instance.getChunk();

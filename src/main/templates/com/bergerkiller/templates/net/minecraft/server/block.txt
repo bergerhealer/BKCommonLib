@@ -445,7 +445,11 @@ interface IBlockData {
 }
 
 interface IBlockState {
+#if version >= 1.16
+    public abstract String getKeyToken:getName();
+#else
     public abstract String getKeyToken:a();
+#endif
 
 #if version >= 1.8.3
     public abstract String getValueToken:a((Comparable) T value);

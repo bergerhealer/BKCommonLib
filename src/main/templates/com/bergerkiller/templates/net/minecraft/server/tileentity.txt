@@ -44,6 +44,18 @@ class TileEntity {
 #endif
     }
 
+#if version >= 1.16
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound);
+#elseif version >= 1.12.1
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+        instance.load(nbttagcompound);
+    }
+#else
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+        instance.a(nbttagcompound);
+    }
+#endif
+
 #if version >= 1.13
     public (BlockData) IBlockData getBlockData:getBlock();
 
@@ -54,9 +66,7 @@ class TileEntity {
     public optional int getLegacyData:###();
 
     public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
-    public void load((CommonTagCompound) NBTTagCompound nbttagcompound);
     public (void) NBTTagCompound save((CommonTagCompound) NBTTagCompound nbttagcompound);
-
 #else
 
     public (BlockData) IBlockData getBlockData() {
@@ -84,25 +94,20 @@ class TileEntity {
     #if version >= 1.12.1
         public (org.bukkit.Material) Block getType:getBlock();
         public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
-        public void load((CommonTagCompound) NBTTagCompound nbttagcompound);
         public (void) NBTTagCompound save((CommonTagCompound) NBTTagCompound nbttagcompound);
     #elseif version >= 1.9.4
         public (org.bukkit.Material) Block getType:getBlock();
         public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
-        public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);
         public (void) NBTTagCompound save((CommonTagCompound) NBTTagCompound nbttagcompound);
     #elseif version >= 1.9
         public (org.bukkit.Material) Block getType:getBlock();
         public (CommonPacket) Packet<?> getUpdatePacket();
-        public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);
         public (void) void save((CommonTagCompound) NBTTagCompound nbttagcompound);
     #else
         public (org.bukkit.Material) Block getType:w();
         public (CommonPacket) Packet getUpdatePacket();
-        public void load:a((CommonTagCompound) NBTTagCompound nbttagcompound);
         public void save:b((CommonTagCompound) NBTTagCompound nbttagcompound);
     #endif
-
 #endif
 
     <code>

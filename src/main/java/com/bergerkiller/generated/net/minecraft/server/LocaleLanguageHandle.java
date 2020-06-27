@@ -13,7 +13,6 @@ public abstract class LocaleLanguageHandle extends Template.Handle {
     public static final LocaleLanguageClass T = new LocaleLanguageClass();
     static final StaticInitHelper _init_helper = new StaticInitHelper(LocaleLanguageHandle.class, "net.minecraft.server.LocaleLanguage", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
 
-    public static final LocaleLanguageHandle INSTANCE = T.INSTANCE.getSafe();
     /* ============================================================================== */
 
     public static LocaleLanguageHandle createHandle(Object handleInstance) {
@@ -21,6 +20,14 @@ public abstract class LocaleLanguageHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public static LocaleLanguageHandle INSTANCE() {
+        return T.INSTANCE.get();
+    }
+
+    public static void INSTANCE_set(LocaleLanguageHandle value) {
+        T.INSTANCE.set(value);
+    }
 
     public abstract String get(String s);
     /**

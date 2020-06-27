@@ -6,7 +6,17 @@ import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 
 class BaseBlockPosition {
-#if version >= 1.13
+#if version >= 1.16
+    #if paperspigot
+        protected readonly int field_x:x;
+        protected readonly int field_y:y;
+        protected readonly int field_z:z;
+    #else
+        private readonly int field_x:a;
+        private readonly int field_y:b;
+        private readonly int field_z:e;
+    #endif
+#elseif version >= 1.13
     #if paperspigot
         protected readonly int field_x:x;
         protected readonly int field_y:y;

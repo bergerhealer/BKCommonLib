@@ -319,34 +319,86 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean onGround;
 #endif
 
-    public boolean horizontalMovementImpaired:positionChanged;
+    public readonly boolean horizontalMovementBlocked:positionChanged;
 
 #if version >= 1.16
-    public boolean verticalMovementImpaired:v;
-    public boolean movementImpaired:v;
-    public unknown boolean w;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:v;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.E = blocked;
+    }
 #elseif version >= 1.15
-    public boolean verticalMovementImpaired:v;
-    public boolean movementImpaired:w;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:v;
+    public unknown boolean movementBlocked:w;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.w = instance.positionChanged || instance.v;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.v = blocked;
+        instance.w = instance.positionChanged || instance.v;
+    }
 #elseif version >= 1.14
-    public boolean verticalMovementImpaired:y;
-    public boolean movementImpaired:z;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:y;
+    public unknown boolean movementBlocked:z;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.z = instance.positionChanged || instance.y;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.y = blocked;
+        instance.z = instance.positionChanged || instance.y;
+    }
 #elseif version >= 1.13
-    public boolean verticalMovementImpaired:C;
-    public boolean movementImpaired:D;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:C;
+    public unknown boolean movementBlocked:D;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.D = instance.positionChanged || instance.C;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.C = blocked;
+        instance.D = instance.positionChanged || instance.C;
+    }
 #elseif version >= 1.9
-    public boolean verticalMovementImpaired:B;
-    public boolean movementImpaired:C;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:B;
+    public unknown boolean movementBlocked:C;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.C = instance.positionChanged || instance.B;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.B = blocked;
+        instance.C = instance.positionChanged || instance.B;
+    }
 #else
-    public boolean verticalMovementImpaired:E;
-    public boolean movementImpaired:F;
-    public boolean velocityChanged;
+    public readonly boolean verticalMovementBlocked:E;
+    public unknown boolean movementBlocked:F;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.F = instance.positionChanged || instance.E;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.E = blocked;
+        instance.F = instance.positionChanged || instance.E;
+    }
 #endif
+
+    public boolean velocityChanged;
 
 #if version >= 1.14
     // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply

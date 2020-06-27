@@ -44,7 +44,11 @@ class SoundEffect {
         return (RegistryMaterials) IRegistry.SOUND_EVENT;
     }
 
+  #if version >= 1.16
+    private final (MinecraftKeyHandle) MinecraftKey name:b;
+  #else
     private final (MinecraftKeyHandle) MinecraftKey name:a;
+  #endif
 
     public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
 #elseif version >= 1.9

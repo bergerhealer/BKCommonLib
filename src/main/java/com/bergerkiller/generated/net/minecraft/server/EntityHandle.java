@@ -58,6 +58,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract double getMotX();
     public abstract double getMotY();
     public abstract double getMotZ();
+    public abstract void setHorizontalMovementBlocked(boolean blocked);
+    public abstract void setVerticalMovementBlocked(boolean blocked);
     public abstract boolean isCollidingWithBlock();
     public abstract Vector getBlockCollisionMultiplier();
     public abstract void setNotCollidingWithBlock();
@@ -285,12 +287,10 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setBoundingBoxField(AxisAlignedBBHandle value);
     public abstract boolean isOnGround();
     public abstract void setOnGround(boolean value);
-    public abstract boolean isHorizontalMovementImpaired();
-    public abstract void setHorizontalMovementImpaired(boolean value);
-    public abstract boolean isVerticalMovementImpaired();
-    public abstract void setVerticalMovementImpaired(boolean value);
-    public abstract boolean isMovementImpaired();
-    public abstract void setMovementImpaired(boolean value);
+    @Template.Readonly
+    public abstract boolean isHorizontalMovementBlocked();
+    @Template.Readonly
+    public abstract boolean isVerticalMovementBlocked();
     public abstract boolean isVelocityChanged();
     public abstract void setVelocityChanged(boolean value);
     public abstract boolean isDead();
@@ -366,9 +366,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float lastPitch = new Template.Field.Float();
         public final Template.Field.Converted<AxisAlignedBBHandle> boundingBoxField = new Template.Field.Converted<AxisAlignedBBHandle>();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
-        public final Template.Field.Boolean horizontalMovementImpaired = new Template.Field.Boolean();
-        public final Template.Field.Boolean verticalMovementImpaired = new Template.Field.Boolean();
-        public final Template.Field.Boolean movementImpaired = new Template.Field.Boolean();
+        @Template.Readonly
+        public final Template.Field.Boolean horizontalMovementBlocked = new Template.Field.Boolean();
+        @Template.Readonly
+        public final Template.Field.Boolean verticalMovementBlocked = new Template.Field.Boolean();
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
         public final Template.Field.Boolean dead = new Template.Field.Boolean();
         public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
@@ -418,6 +419,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Double> getMotX = new Template.Method<Double>();
         public final Template.Method<Double> getMotY = new Template.Method<Double>();
         public final Template.Method<Double> getMotZ = new Template.Method<Double>();
+        public final Template.Method<Void> setHorizontalMovementBlocked = new Template.Method<Void>();
+        public final Template.Method<Void> setVerticalMovementBlocked = new Template.Method<Void>();
         public final Template.Method<Boolean> isCollidingWithBlock = new Template.Method<Boolean>();
         public final Template.Method<Vector> getBlockCollisionMultiplier = new Template.Method<Vector>();
         public final Template.Method<Void> setNotCollidingWithBlock = new Template.Method<Void>();

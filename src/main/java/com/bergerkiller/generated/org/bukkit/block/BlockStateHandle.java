@@ -22,6 +22,7 @@ public abstract class BlockStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract BlockData getBlockData();
     /**
      * Stores class members for <b>org.bukkit.block.BlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -29,7 +30,6 @@ public abstract class BlockStateHandle extends Template.Handle {
     public static final class BlockStateClass extends Template.Class<BlockStateHandle> {
         @Template.Optional
         public final Template.Method<Boolean> isPlaced = new Template.Method<Boolean>();
-        @Template.Optional
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
 
     }

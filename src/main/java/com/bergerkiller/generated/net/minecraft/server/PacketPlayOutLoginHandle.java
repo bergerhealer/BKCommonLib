@@ -26,6 +26,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract GameMode getPreviousGameMode();
+    public abstract void setPreviousGameMode(GameMode gameMode);
     public abstract void setEncryptedWorldSeed(World world);
     public abstract int getPlayerId();
     public abstract void setPlayerId(int value);
@@ -58,6 +60,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         public final Template.Field.Boolean reducedDebugInfo = new Template.Field.Boolean();
 
+        public final Template.Method.Converted<GameMode> getPreviousGameMode = new Template.Method.Converted<GameMode>();
+        public final Template.Method.Converted<Void> setPreviousGameMode = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> setEncryptedWorldSeed = new Template.Method.Converted<Void>();
 
     }

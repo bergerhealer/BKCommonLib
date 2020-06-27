@@ -413,10 +413,9 @@ public abstract class EntityMoveHandler {
             world.method_profiler_begin("rest");
 
             that.recalcPosition();
-            that.setHorizontalMovementImpaired(d7 != d0 || d9 != d2);
-            that.setVerticalMovementImpaired(d1 != d8); // CraftBukkit - decompile error
-            that.setOnGround(that.isVerticalMovementImpaired() && d8 < 0.0);
-            that.setMovementImpaired(that.isHorizontalMovementImpaired() || that.isVerticalMovementImpaired());
+            that.setHorizontalMovementBlocked(d7 != d0 || d9 != d2);
+            that.setVerticalMovementBlocked(d1 != d8); // CraftBukkit - decompile error
+            that.setOnGround(that.isVerticalMovementBlocked() && d8 < 0.0);
 
             int l = MathUtil.floor(that.getLocX());
             int k4 = MathUtil.floor(that.getLocY() - 0.2);
@@ -451,7 +450,7 @@ public abstract class EntityMoveHandler {
             }
 
             // CraftBukkit start
-            if (that.isHorizontalMovementImpaired() && that.getBukkitEntity() instanceof Vehicle) {
+            if (that.isHorizontalMovementBlocked() && that.getBukkitEntity() instanceof Vehicle) {
 
                 /*
                 Vehicle vehicle = (Vehicle) that.getBukkitEntity();

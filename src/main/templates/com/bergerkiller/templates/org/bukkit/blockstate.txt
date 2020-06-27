@@ -4,8 +4,8 @@ class BlockState {
     public optional boolean isPlaced();
 
 #if version >= 1.13
-    public optional (com.bergerkiller.bukkit.common.wrappers.BlockData) org.bukkit.block.data.BlockData getBlockData();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) org.bukkit.block.data.BlockData getBlockData();
 #else
-    public optional (com.bergerkiller.bukkit.common.wrappers.BlockData) org.bukkit.block.data.BlockData getBlockData:###();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) org.bukkit.material.MaterialData getBlockData:getData();
 #endif
 }

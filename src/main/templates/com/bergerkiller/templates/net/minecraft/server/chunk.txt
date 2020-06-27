@@ -16,7 +16,12 @@ import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
 class Chunk {
     private final (ChunkSectionHandle[]) ChunkSection[] sections;
+
+#if version >= 1.16
+    public final (WorldHandle) WorldServer world;
+#else
     public final (WorldHandle) World world;
+#endif
 
 #if version >= 1.14
     public int getLocX() {

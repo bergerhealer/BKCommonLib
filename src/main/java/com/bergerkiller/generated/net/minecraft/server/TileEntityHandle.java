@@ -30,10 +30,10 @@ public abstract class TileEntityHandle extends Template.Handle {
     public abstract WorldHandle getWorld();
     public abstract BlockPositionHandle getPosition();
     public abstract BlockData getBlockDataIfCached();
+    public abstract void load(BlockData blockData, CommonTagCompound nbttagcompound);
     public abstract BlockData getBlockData();
     public abstract Material getType();
     public abstract CommonPacket getUpdatePacket();
-    public abstract void load(CommonTagCompound nbttagcompound);
     public abstract void save(CommonTagCompound nbttagcompound);
 
     public org.bukkit.block.BlockState toBukkit() {
@@ -58,12 +58,12 @@ public abstract class TileEntityHandle extends Template.Handle {
         public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method.Converted<BlockPositionHandle> getPosition = new Template.Method.Converted<BlockPositionHandle>();
         public final Template.Method.Converted<BlockData> getBlockDataIfCached = new Template.Method.Converted<BlockData>();
+        public final Template.Method.Converted<Void> load = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<Material> getType = new Template.Method.Converted<Material>();
         @Template.Optional
         public final Template.Method<Integer> getLegacyData = new Template.Method<Integer>();
         public final Template.Method.Converted<CommonPacket> getUpdatePacket = new Template.Method.Converted<CommonPacket>();
-        public final Template.Method.Converted<Void> load = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> save = new Template.Method.Converted<Void>();
 
     }

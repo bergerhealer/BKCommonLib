@@ -33,7 +33,7 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
 
     public abstract int size();
     public abstract boolean isEmpty();
-    public abstract int getElementTypeId();
+    public abstract byte getElementTypeId();
     public abstract NBTBaseHandle get_at(int index);
     public abstract void clear();
     public abstract NBTBaseHandle set_at(int index, NBTBaseHandle nbt_value);
@@ -88,7 +88,7 @@ public abstract class NBTTagListHandle extends NBTBaseHandle {
 
         public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
-        public final Template.Method<Integer> getElementTypeId = new Template.Method<Integer>();
+        public final Template.Method.Converted<Byte> getElementTypeId = new Template.Method.Converted<Byte>();
         public final Template.Method.Converted<NBTBaseHandle> get_at = new Template.Method.Converted<NBTBaseHandle>();
         public final Template.Method<Void> clear = new Template.Method<Void>();
         public final Template.Method.Converted<NBTBaseHandle> set_at = new Template.Method.Converted<NBTBaseHandle>();

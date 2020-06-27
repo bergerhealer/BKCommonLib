@@ -459,7 +459,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInSettings extends NMSPacket {
 
-        public final FieldAccessor<String> lang = PacketPlayInSettingsHandle.T.lang.toFieldAccessor();
+        public final FieldAccessor<String> locale = PacketPlayInSettingsHandle.T.locale.toFieldAccessor();
         public final FieldAccessor<Integer> view = PacketPlayInSettingsHandle.T.view.toFieldAccessor();
         public final FieldAccessor<Object> chatVisibility = PacketPlayInSettingsHandle.T.chatVisibility.toFieldAccessor();
         public final FieldAccessor<Boolean> enableColors = PacketPlayInSettingsHandle.T.enableColors.toFieldAccessor();

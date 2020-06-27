@@ -3,12 +3,26 @@ package net.minecraft.server;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 
 class IChatBaseComponent {
+#if version >= 1.16
+    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).addSibling(sibling);
+        } else {
+            return instance.mutableCopy().addSibling(sibling);
+        }
+    }
+#else
     public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling);
+#endif
 
     class IChatBaseComponent.ChatSerializer {
         public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
 
+#if version >= 1.16
+        public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:a(String jsonString);
+#else
         public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
+#endif
 
         public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
             return new ChatComponentText("");
