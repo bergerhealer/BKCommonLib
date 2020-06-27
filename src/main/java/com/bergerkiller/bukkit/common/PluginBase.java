@@ -882,7 +882,8 @@ public abstract class PluginBase extends JavaPlugin {
      * @return True if the version command was handled
      */
     public boolean onVersionCommand(String command, CommandSender sender) {
-        sender.sendMessage(ChatColor.GREEN + this.getName() + " v" + this.getDebugVersion() + " using BKCommonLib v" + CommonPlugin.getInstance().getDebugVersion());
+        sender.sendMessage(ChatColor.GREEN + this.getName() + ": v" + this.getDebugVersion());
+        sender.sendMessage(ChatColor.GREEN + "BKCommonLib: v" + CommonPlugin.getInstance().getDebugVersion());
         sender.sendMessage(ChatColor.GREEN + "Server: " + getServer().getVersion());
         return true;
     }
