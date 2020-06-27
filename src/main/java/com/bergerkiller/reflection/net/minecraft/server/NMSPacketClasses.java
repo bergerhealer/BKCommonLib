@@ -47,6 +47,7 @@ import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
@@ -103,6 +104,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityL
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityPaintingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityWeatherHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
@@ -2008,12 +2010,10 @@ public class NMSPacketClasses {
          * A list of NMS.Attribute elements - may require further API to work
          * with. For now, use reflection.
          */
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<List<?>> attributeSnapshots = nextFieldSignature("private final List<AttributeSnapshot> b");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, Collection.class);
+        public final FieldAccessor<Integer> entityId = PacketPlayOutUpdateAttributesHandle.T.entityId.toFieldAccessor();
 
-        public CommonPacket newInstance(int entityId, Collection<?> attributes) {
-            return constructor1.newInstance(entityId, attributes);
+        public CommonPacket newInstance(int entityId, Collection<AttributeModifiableHandle> attributes) {
+            return PacketPlayOutUpdateAttributesHandle.createNew(entityId, attributes).toCommonPacket();
         }
     }
 

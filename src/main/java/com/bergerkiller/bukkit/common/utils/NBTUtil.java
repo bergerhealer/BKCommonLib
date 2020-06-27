@@ -1,15 +1,12 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.FoodMetaDataHandle;
-import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.server.InventoryEnderChestHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
@@ -179,11 +176,7 @@ public class NBTUtil {
      * @param livingEntity to reset
      */
     public static void resetAttributes(LivingEntity livingEntity) {
-        Object livingHandle = Conversion.toEntityHandle.convert(livingEntity);
-        AttributeMapServerHandle ams = AttributeMapServerHandle.createNew();
-
-        // Clear old attributes and force a re-create
-        EntityLivingHandle.createHandle(livingHandle).setAttributeMapField(ams);
+        EntityLivingHandle.fromBukkit(livingEntity).resetAttributes();
     }
 
     /**
@@ -197,8 +190,7 @@ public class NBTUtil {
         if (data == null) {
             throw new IllegalArgumentException("Data can not be null");
         }
-        AttributeMapServerHandle map = CommonNMS.getEntityAttributes(livingEntity);
-        GenericAttributesHandle.loadFromNBT(map, data);
+        EntityLivingHandle.fromBukkit(livingEntity).getAttributeMap().loadFromNBT(data);
     }
 
     /**
@@ -208,8 +200,7 @@ public class NBTUtil {
      * @return CommonTagList containing the saved data
      */
     public static CommonTagList saveAttributes(LivingEntity livingEntity) {
-        AttributeMapServerHandle map = CommonNMS.getEntityAttributes(livingEntity);
-        return GenericAttributesHandle.saveToNBT(map);
+        return EntityLivingHandle.fromBukkit(livingEntity).getAttributeMap().saveToNBT();
     }
 
     /**

@@ -8,13 +8,13 @@ import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.server.AttributeInstanceHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
@@ -102,16 +102,51 @@ class EntityLiving extends Entity {
     public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
     </code>
 
-#if version >= 1.11
-    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:attributeMap;
-#elseif version >= 1.10.2
-    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:br;
-#elseif version >= 1.9.4
-    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:bq;
-#elseif version >= 1.9
-    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:bp;
+    public void resetAttributes() {
+#if version >= 1.16
+        // Is only set in constructor, so we'll have to force it
+        // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
+        #require net.minecraft.server.EntityLiving private final AttributeMapBase attributeMapField:attributeMap;
+        #require net.minecraft.server.EntityLiving private final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
+        AttributeMapBase new_attributes = new AttributeMapBase(AttributeDefaults.a(instance.getEntityType()));
+        org.bukkit.craftbukkit.attribute.CraftAttributeMap new_craftAttributes = new org.bukkit.craftbukkit.attribute.CraftAttributeMap(new_attributes);
+        instance#attributeMapField = new_attributes;
+        instance#craftAttributes = new_craftAttributes;
 #else
-    private (AttributeMapServerHandle) AttributeMapBase attributeMapField:c;
+        // Set attributeMapField to null and call getAttributeMap()
+        // This will initialize the field (and possibly related CraftAttributeMap >= 1.11)
+        #if version >= 1.11
+            #require net.minecraft.server.EntityLiving private AttributeMapBase attributeMapField:attributeMap;
+        #elseif version >= 1.10.2
+            #require net.minecraft.server.EntityLiving private AttributeMapBase attributeMapField:br;
+        #elseif version >= 1.9.4
+            #require net.minecraft.server.EntityLiving private AttributeMapBase attributeMapField:bq;
+        #elseif version >= 1.9
+            #require net.minecraft.server.EntityLiving private AttributeMapBase attributeMapField:bp;
+        #else
+            #require net.minecraft.server.EntityLiving private AttributeMapBase attributeMapField:c;
+        #endif
+        instance#attributeMapField = null;
+        instance.getAttributeMap();
+
+        // Then call initAttributes() to initialize the values used by the entity
+        #if version >= 1.8.3
+            #require net.minecraft.server.EntityLiving protected void initAttributes();
+        #else
+            #require net.minecraft.server.EntityLiving protected void initAttributes:aW();
+        #endif
+        instance#initAttributes();
+#endif
+    }
+
+    public (AttributeMapBaseHandle) AttributeMapBase getAttributeMap();
+
+#if version >= 1.16
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Object) AttributeBase iattribute);
+#else
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) IAttribute iattribute) {
+        return (AttributeModifiable) instance.getAttributeInstance(iattribute);
+    }
 #endif
 
 #if version >= 1.9
@@ -191,16 +226,6 @@ class EntityLiving extends Entity {
 #else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
 #endif
-
-#if version >= 1.8.3
-    protected void resetAttributes:initAttributes();
-#else
-    protected void resetAttributes:aW();
-#endif
-
-    public (AttributeMapServerHandle) AttributeMapBase getAttributeMap();
-
-    public (AttributeInstanceHandle) AttributeInstance getAttributeInstance((Object) IAttribute iattribute);
 
     public final float getHealth();
 

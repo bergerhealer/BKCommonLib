@@ -19,7 +19,6 @@ public class NMSEntityLiving extends NMSEntity {
     public static final DataWatcher.Key<Boolean> DATA_PARTICLES_HIDDEN = EntityLivingHandle.DATA_PARTICLES_HIDDEN;
     public static final DataWatcher.Key<Integer> DATA_UNKNOWN1 = EntityLivingHandle.DATA_UNKNOWN1;
 
-    public static final FieldAccessor<Object> attributeMap = EntityLivingHandle.T.attributeMapField.raw.toFieldAccessor();
     public static final FieldAccessor<Boolean> updateEffects = EntityLivingHandle.T.updateEffects.toFieldAccessor();
 
     public static final FieldAccessor<Float> lastDamage = EntityLivingHandle.T.lastDamage.toFieldAccessor();

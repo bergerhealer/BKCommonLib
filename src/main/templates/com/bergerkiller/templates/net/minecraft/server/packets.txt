@@ -17,6 +17,7 @@ import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
@@ -1348,6 +1349,8 @@ class PacketPlayOutEntityMetadata extends Packet {
 
 class PacketPlayOutUpdateAttributes extends Packet {
     private int entityId:a;
+
+    public (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> collection) {
 
     public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createZeroMaxHealth(int entityId) {
         // Internal code calls a callback on this instance, so we need a dummy one to catch that

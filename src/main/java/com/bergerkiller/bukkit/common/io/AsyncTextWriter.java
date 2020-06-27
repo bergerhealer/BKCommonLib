@@ -67,6 +67,7 @@ public class AsyncTextWriter {
             fail(t);
         }
         try {
+            _file.force(true);
             _file.close();
         } catch (Throwable t) {
             fail(t);
@@ -226,6 +227,7 @@ public class AsyncTextWriter {
             }
 
             // Create the writer and initiate it
+            System.out.println("WRITING [" + file.toString() + "] SIZE=" + len + " BUFFER=" + bufferSize);
             AsyncTextWriter writer = new AsyncTextWriter(fileChannel, inputData, bufferSize);
             writer.start(LOCK_FILE);
             return writer._future;
@@ -310,6 +312,7 @@ public class AsyncTextWriter {
 
         @Override
         public void start(AsyncTextWriter writer) {
+            System.out.println("START WRITE AT " + writer._position + " SIZE=" + _getBufferFunction.apply(writer).remaining());
             writer._file.write(_getBufferFunction.apply(writer), writer._position, writer, this);
         }
 
@@ -328,6 +331,8 @@ public class AsyncTextWriter {
             } else {
                 writer._position += num;
             }
+
+            System.out.println("WROTE NUM=" + num + " POSITION=" + writer._position);
 
             synchronized (writer) {
                 ByteBuffer buffer = _getBufferFunction.apply(writer);

@@ -161,7 +161,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      */
     public void setPathfindingRange(double range) {
         EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
-        nmsEntity.getAttributeInstance(GenericAttributesHandle.FOLLOW_RANGE).setValue(range);
+        nmsEntity.getAttribute(GenericAttributesHandle.FOLLOW_RANGE).setValue(range);
     }
 
     /**
@@ -171,7 +171,7 @@ public class CommonLivingEntity<T extends LivingEntity> extends CommonEntity<T> 
      */
     public double getPathfindingRange() {
         EntityLivingHandle nmsEntity = this.handle.cast(EntityLivingHandle.T);
-        return nmsEntity.getAttributeInstance(GenericAttributesHandle.FOLLOW_RANGE).getValue();
+        return nmsEntity.getAttribute(GenericAttributesHandle.FOLLOW_RANGE).getValue();
     }
 
 //	/**

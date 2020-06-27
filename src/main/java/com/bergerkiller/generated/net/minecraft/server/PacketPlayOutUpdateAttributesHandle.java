@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutUpdateAttributes</b>.
@@ -19,6 +20,10 @@ public abstract class PacketPlayOutUpdateAttributesHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
+    public static final PacketPlayOutUpdateAttributesHandle createNew(int entityId, Collection<AttributeModifiableHandle> collection) {
+        return T.constr_entityId_collection.newInstance(entityId, collection);
+    }
+
     /* ============================================================================== */
 
     public static PacketPlayOutUpdateAttributesHandle createZeroMaxHealth(int entityId) {
@@ -32,6 +37,8 @@ public abstract class PacketPlayOutUpdateAttributesHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutUpdateAttributesClass extends Template.Class<PacketPlayOutUpdateAttributesHandle> {
+        public final Template.Constructor.Converted<PacketPlayOutUpdateAttributesHandle> constr_entityId_collection = new Template.Constructor.Converted<PacketPlayOutUpdateAttributesHandle>();
+
         public final Template.Field.Integer entityId = new Template.Field.Integer();
 
         public final Template.StaticMethod.Converted<PacketPlayOutUpdateAttributesHandle> createZeroMaxHealth = new Template.StaticMethod.Converted<PacketPlayOutUpdateAttributesHandle>();

@@ -40,7 +40,6 @@ import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
@@ -369,15 +368,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
     public static Object toEnumItemSlotHandle(EquipmentSlot equipmentSlot) {
         return ItemSlotConversion.getEnumItemSlot(equipmentSlot);
-    }
-
-    @ConverterMethod(input="net.minecraft.server.AttributeMapBase")
-    public static AttributeMapServerHandle toAttributeMapServer(Object attributeMapBaseHandle) {
-        if (AttributeMapServerHandle.T.isAssignableFrom(attributeMapBaseHandle)) {
-            return AttributeMapServerHandle.createHandle(attributeMapBaseHandle);
-        } else {
-            return null;
-        }
     }
 
     @ConverterMethod(output="net.minecraft.server.ChatMessageType", optional=true)

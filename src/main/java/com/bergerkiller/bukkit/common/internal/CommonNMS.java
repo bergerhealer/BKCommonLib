@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -150,9 +149,4 @@ public class CommonNMS {
     public static DedicatedPlayerListHandle getPlayerList() {
         return CraftServerHandle.instance().getPlayerList();
     }
-
-    public static AttributeMapServerHandle getEntityAttributes(org.bukkit.entity.LivingEntity entity) {
-        return EntityLivingHandle.T.getAttributeMap.invoke(HandleConversion.toEntityHandle(entity));
-    }
-
 }

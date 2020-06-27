@@ -2,30 +2,51 @@ package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 
-class AttributeMapServer {
-    public (AttributeMapServerHandle) AttributeMapServer();
-
-    public (Collection<Object>) Collection<AttributeInstance> attributes:c();
-}
-
-class AttributeInstance {
+class AttributeModifiable {
     public abstract void setValue(double value);
 
     public abstract double getValue();
 }
 
+class AttributeMapBase {
+#if version >= 1.16
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes();
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:b();
+#else
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes() {
+        return ((AttributeMapServer) instance).getAttributes();
+    }
+
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes() {
+        return ((AttributeMapServer) instance).c();
+    }
+#endif
+
+#if version >= 1.16
+    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist);
+    public (CommonTagList) NBTTagList saveToNBT:c();
+#else
+    public void loadFromNBT((CommonTagList) NBTTagList nbttaglist) {
+        GenericAttributes.a(instance, nbttaglist);
+    }
+    public (CommonTagList) NBTTagList saveToNBT() {
+        return GenericAttributes.a(instance);
+    }
+#endif
+}
+
 class GenericAttributes {
-#if version >= 1.8.4
+#if version >= 1.16
+    public static final (Object) AttributeBase FOLLOW_RANGE;
+    public static final (Object) AttributeBase MOVEMENT_SPEED;
+#elseif version >= 1.8.4
     public static final (Object) IAttribute FOLLOW_RANGE;
     public static final (Object) IAttribute MOVEMENT_SPEED;
 #else
     public static final (Object) IAttribute FOLLOW_RANGE:b;
     public static final (Object) IAttribute MOVEMENT_SPEED:d;
 #endif
-
-    public static void loadFromNBT:a((AttributeMapServerHandle) AttributeMapBase attributemapbase, (CommonTagList) NBTTagList nbttaglist);
-
-    public static (CommonTagList) NBTTagList saveToNBT:a((AttributeMapServerHandle) AttributeMapBase attributemapbase);
 }

@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
@@ -654,8 +654,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
 
             // Entity Attributes
-            AttributeMapServerHandle attributeMap = living.getAttributeMap();
-            Collection<?> attributes = attributeMap.attributes();
+            Collection<AttributeModifiableHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
             if (!attributes.isEmpty()) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes));
             }
@@ -862,8 +861,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             EntityLivingHandle living = EntityLivingHandle.createHandle(entityHandle);
 
             // Entity Attributes
-            AttributeMapServerHandle attributeMap = living.getAttributeMap();
-            Collection<?> attributes = attributeMap.attributes();;
+            Collection<AttributeModifiableHandle> attributes = living.getAttributeMap().getSynchronizedAttributes();
             if (!attributes.isEmpty()) {
                 this.broadcast(PacketType.OUT_ENTITY_UPDATE_ATTRIBUTES.newInstance(entity.getEntityId(), attributes), true);
             }
