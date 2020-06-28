@@ -794,7 +794,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         if (!instance.inChunk) {
             return null;
         }
+  #if version >= 1.16
+        return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+  #else
         return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+  #endif
     }
 #else
     public (org.bukkit.Chunk) Chunk getCurrentChunk() {

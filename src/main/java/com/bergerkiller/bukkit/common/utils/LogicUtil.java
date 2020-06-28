@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Consumer;
 
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -26,6 +27,7 @@ import com.google.common.collect.BiMap;
  */
 public class LogicUtil {
     private static final Map<Class<?>, Method> _cloneMethodCache = new HashMap<>();
+    private static final Consumer<Object> _noopConsumer = obj -> {};
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -873,5 +875,15 @@ public class LogicUtil {
             }
         }
         return values;
+    }
+
+    /**
+     * Gets a no-operation consumer, which accepts anything but does nothing
+     * 
+     * @return no-op consumer
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Consumer<T> noopConsumer() {
+        return (Consumer<T>) _noopConsumer;
     }
 }

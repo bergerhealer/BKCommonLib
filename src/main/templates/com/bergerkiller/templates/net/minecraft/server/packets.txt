@@ -1257,40 +1257,40 @@ class PacketPlayOutEntityEquipment extends Packet {
     private int entityId:a;
 
 #if version >= 1.16
-    #require net.minecraft.server.PacketPlayOutEntityEquipment private final List<com.mojang.datafixers.util.Pair<EnumItemSlot, ItemStack>> slots:b;
+    #require net.minecraft.server.PacketPlayOutEntityEquipment private final java.util.List<com.mojang.datafixers.util.Pair<EnumItemSlot, ItemStack>> slots:b;
 
     // Multiple slots are possible
     public int getSlotCount() {
-        List slots = instance#slots;
+        java.util.List slots = instance#slots;
         return slots.size();
     }
 
     public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
-        List slots = com.google.common.collect.Lists.newArrayList();
+        java.util.List slots = com.google.common.collect.Lists.newArrayList();
         slots.add(com.mojang.datafixers.util.Pair.of(slot, itemStack));
         return new PacketPlayOutEntityEquipment(entityId, slots);
     }
 
     public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(int index) {
-        List slots = instance#slots;
+        java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         return (EnumItemSlot) entry.getFirst();
     }
 
     public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
-        List slots = instance#slots;
+        java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         slots.set(index, com.mojang.datafixers.util.Pair.of(slot, entry.getSecond()));
     }
 
     public (org.bukkit.inventory.ItemStack) ItemStack getItemStack(int index) {
-        List slots = instance#slots;
+        java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         return (ItemStack) entry.getSecond();
     }
 
     public void setItemStack(int index, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
-        List slots = instance#slots;
+        java.util.List slots = instance#slots;
         com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
         slots.set(index, com.mojang.datafixers.util.Pair.of(entry.getFirst(), itemStack));
     }
@@ -1527,14 +1527,20 @@ class PacketPlayOutUpdateAttributes extends Packet {
     public (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> collection) {
 
     public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createZeroMaxHealth(int entityId) {
+#if version >= 1.16
+        // Internal code uses a Consumer for callbacks, so no need to create a proxy for that
+        java.util.function.Consumer callback = com.bergerkiller.bukkit.common.utils.LogicUtil.noopConsumer();
+        AttributeModifiable attribute = new AttributeModifiable(GenericAttributes.MAX_HEALTH, callback);
+#else
         // Internal code calls a callback on this instance, so we need a dummy one to catch that
         AttributeMapBase attributeMapBase = (AttributeMapBase) com.bergerkiller.bukkit.common.internal.proxy.DummyAttributeMapBase.INSTANCE;
 
         // Create a modifiable attribute for MAX_HEALTH, and set the value to 0
-#if version >= 1.14
+  #if version >= 1.14
         AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.MAX_HEALTH);
-#else
+  #else
         AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.maxHealth);
+  #endif
 #endif
         attribute.setValue(0.0);
 

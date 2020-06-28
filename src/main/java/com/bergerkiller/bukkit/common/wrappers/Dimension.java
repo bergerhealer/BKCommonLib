@@ -107,9 +107,9 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
 
     // Uses internal lookup table, if available
     private static Dimension fromIdFallback(int id) {
-        Object handle = DimensionManagerHandle.T.fromId.invoke(id);
+        DimensionManagerHandle handle = DimensionManagerHandle.fromId(id);
         if (handle != null) {
-            return new Dimension(DimensionManagerHandle.createHandle(handle));
+            return new Dimension(handle);
         } else {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }

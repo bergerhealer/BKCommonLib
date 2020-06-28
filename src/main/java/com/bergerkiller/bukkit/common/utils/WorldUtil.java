@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -936,7 +937,7 @@ public class WorldUtil extends ChunkUtil {
      * @param volume of the sound
      * @param pitch of the sound
      */
-    public static void playSound(Location location, ResourceKey soundKey, float volume, float pitch) {
+    public static void playSound(Location location, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         if (WorldHandle.T.makeSound.isAvailable()) {
             // MC 1.8.8: use world makeSound function
             WorldHandle.T.makeSound.invokeVA(HandleConversion.toWorldHandle(location.getWorld()),

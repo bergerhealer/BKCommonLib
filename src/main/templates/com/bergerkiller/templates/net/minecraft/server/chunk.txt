@@ -65,7 +65,11 @@ class Chunk {
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 #endif
 
-#if version >= 1.14
+#if version >= 1.16
+    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getType(new BlockPosition(x, y, z));
+    }
+#elseif version >= 1.14
     public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
         BlockPosition$PooledBlockPosition blockPos = BlockPosition$PooledBlockPosition.f(x, y, z);
         try {

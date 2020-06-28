@@ -7,7 +7,6 @@ import org.bukkit.entity.HumanEntity;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -121,19 +120,6 @@ public class EntityHook extends ClassHook<EntityHook> {
                 controller.onTick();
             } else {
                 base.onTick();
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-    }
-
-    @HookMethod("protected void burn(float i)")
-    public void onBurn(float damage) {
-        try {
-            if (checkController()) {
-                controller.onBurnDamage((double) damage);
-            } else {
-                base.onBurn(damage);
             }
         } catch (Throwable t) {
             t.printStackTrace();

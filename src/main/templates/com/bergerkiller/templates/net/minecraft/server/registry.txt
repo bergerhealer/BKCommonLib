@@ -49,7 +49,9 @@ class DimensionManager {
 
 #if version >= 1.16
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey getKey() {
-        java.util.Optional key_opt = IRegistryCustom$Dimension.a().c(instance);
+        MinecraftServer server = MinecraftServer.getServer();
+        IRegistryCustom$Dimension registry = server.f;
+        java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
             return key_opt.get();
         } else {
@@ -62,12 +64,11 @@ class DimensionManager {
         java.util.Optional key_opt = IRegistryCustom$Dimension.a().c(instance);
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
-            MinecraftKey key = res_key.a();
-            if (key.equals(DimensionManager.OVERWORLD)) {
+            if (res_key == DimensionManager.OVERWORLD) {
                 return 0;
-            } else if (key.equals(DimensionManager.THE_NETHER)) {
+            } else if (res_key == DimensionManager.THE_NETHER) {
                 return -1;
-            } else if (key.equals(DimensionManager.THE_END)) {
+            } else if (res_key == DimensionManager.THE_END) {
                 return 1;
             }
         }
@@ -85,7 +86,9 @@ class DimensionManager {
         } else {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }
-        return IRegistryCustom$Dimension.a().a(res_key);
+        MinecraftServer server = MinecraftServer.getServer();
+        IRegistryCustom$Dimension registry = server.f;
+        return registry.a().a(res_key);
     }
 #else
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey getKey() {

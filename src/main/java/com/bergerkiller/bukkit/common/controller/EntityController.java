@@ -135,15 +135,6 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     /**
-     * Fired when the entity is getting burned by something
-     *
-     * @param damage dealt
-     */
-    public void onBurnDamage(double damage) {
-        hook.base.onBurn((float) damage);
-    }
-
-    /**
      * Gets the localized name of this Entity. Override this method to change
      * the name.
      *
