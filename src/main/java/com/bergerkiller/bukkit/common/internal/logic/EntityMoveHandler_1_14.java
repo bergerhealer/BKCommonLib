@@ -38,10 +38,13 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
 
         boolean success = true;
         ClassResolver resolver = new ClassResolver();
+        resolver.setVariable("version", Common.MC_VERSION);
         resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
         try {
             String method_path;
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_16_getBlockCollisions.txt";
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_1_getBlockCollisions.txt";
             } else {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
@@ -49,12 +52,9 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
             try (InputStream input = EntityMoveHandler_1_14.class.getResourceAsStream(method_path)) {
                 try (Scanner scanner = new Scanner(input, "UTF-8")) {
                     scanner.useDelimiter("\\A");
-                    String set_str = "#set version " + Common.MC_VERSION + "\n";
-                    String method_body = set_str + scanner.next();
-
-                    method_body = SourceDeclaration.preprocess(method_body);
+                    String method_body = scanner.next();
+                    method_body = SourceDeclaration.preprocess(method_body, resolver);
                     method_body = method_body.replaceAll("this", "instance");
-                    method_body = method_body.replace(set_str, ""); // Note: this should be fixed!
                     method_body = method_body.trim();
 
                     getBlockCollisions_method.init(new MethodDeclaration(resolver, method_body));
