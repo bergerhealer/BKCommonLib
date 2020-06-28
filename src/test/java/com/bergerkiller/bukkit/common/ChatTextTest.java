@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.bukkit.ChatColor;
 import org.junit.Test;
 
@@ -16,16 +19,20 @@ public class ChatTextTest {
         ChatText text = ChatText.fromMessage(msg);
         assertEquals(msg, text.getMessage());
 
-        String expected;
+        Set<String> allowed = new HashSet<String>();
+        if (Common.evaluateMCVersion(">=", "1.16")) {
+            // Spigot 1.16 has a (temporary?) bug of including all style modes in the json
+            // might get fixed in the future
+            allowed.add("{\"extra\":[{\"text\":\"Hello, \"},{\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false,\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}");
+        }
         if (CommonCapabilities.CHAT_TEXT_JSON_VER2) {
-            expected = "{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
+            allowed.add("{\"extra\":[{\"text\":\"Hello, \"},{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}");
         } else {
-            expected = "{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}";
+            allowed.add("{\"extra\":[\"Hello, \",{\"color\":\"red\",\"text\":\"World!\"}],\"text\":\"\"}");
         }
         String result = text.getJson();
-        if (!expected.equals(result)) {
-            System.out.println("EXPECTED: " + expected);
-            System.out.println("INSTEAD : " + result);;
+        if (!allowed.contains(result)) {
+            System.out.println("Incorrect JSON: " + result);
             fail("Chat text conversion to JSON is not working correctly");
         }
     }
@@ -50,12 +57,19 @@ public class ChatTextTest {
     public void testStyleOnly() {
         String msg = ChatColor.RED.toString();
         ChatText text = ChatText.fromMessage(msg);
+
+        Set<String> allowed = new HashSet<String>();
+        allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
         if (Common.evaluateMCVersion(">=", "1.16")) {
             // For some reason Minecraft repeats the color twice now in the json
             // It's still functionally identical, so we'll allow it I guess.
-            assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
-        } else {
-            assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
+            allowed.add("{\"extra\":[{\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
+            // It's even more messed up now :(
+            allowed.add("{\"extra\":[{\"bold\":false,\"italic\":false,\"underlined\":false,\"strikethrough\":false,\"obfuscated\":false,\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}");
+        }
+        String json = text.getJson();
+        if (!allowed.contains(json)) {
+            fail("Invalid JSON: " + json);
         }
         assertEquals(msg, text.getMessage());
     }
