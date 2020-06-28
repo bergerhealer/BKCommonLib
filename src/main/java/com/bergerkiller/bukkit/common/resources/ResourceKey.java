@@ -84,7 +84,7 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
      */
     public static <T> ResourceKey<T> fromMinecraftKey(ResourceCategory<T> category, MinecraftKeyHandle minecraftKey) {
         if (minecraftKey != null) {
-            Object resourceKeyHandle = ResourceKeyHandle.T.create.raw.invoke(category, minecraftKey);
+            Object resourceKeyHandle = ResourceKeyHandle.T.create.raw.invoke(category.getCategoryKey().getRaw(), minecraftKey.getRaw());
             return fromResourceKeyHandle(resourceKeyHandle);
         } else {
             return null;
