@@ -56,13 +56,19 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         // Initialize a dummy field with the sole purpose of constructing an entity without errors
         this.nmsWorldHandle = WorldServerHandle.T.newInstanceNull();
         {
-            // Create WorldData instance by calling the protected empty constructor
-            Object nmsWorldData = ClassTemplate.createNMS("WorldData").getConstructor().newInstance();
+            // Create WorldData instance by null-constructing it
+            Object nmsWorldData;
+            if (Common.evaluateMCVersion(">=", "1.16")) {
+                nmsWorldData = ClassTemplate.createNMS("WorldDataServer").newInstanceNull();
+            } else {
+                nmsWorldData = ClassTemplate.createNMS("WorldDataServer").getConstructor().newInstance();
+            }
 
             ClassResolver resolver = new ClassResolver();
             resolver.setDeclaredClass(WorldServerHandle.T.getType());
+            resolver.setVariable("version", Common.MC_VERSION);
             MethodDeclaration m = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public void initWorldServer(WorldData worldData) {\n" +
+                    "public void initWorldServer(WorldDataServer worldData) {\n" +
 
                     // Spigot World configuration
                     "#if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
@@ -85,6 +91,15 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                     "    instance#purpurConfig = purpurConfig;\n" +
                     "#endif\n" +
 
+                    "#if version >= 1.16\n" +
+                    // WorldDataMutable and WorldDataServer fields
+                    "    #require net.minecraft.server.World public final WorldDataMutable worldData;\n" +
+                    "    #require net.minecraft.server.WorldServer public final WorldDataServer worldDataServer;\n" +
+                    "    instance#worldData = worldData;\n" +
+                    "    instance#worldDataServer = worldData;\n" +
+
+                    "#else\n" +
+
                     // worldProvider field
                     "    int envId = org.bukkit.World.Environment.NORMAL.getId();\n" +
                     "    instance.worldProvider = DimensionManager.a(envId).getWorldProvider(instance);\n" +
@@ -92,7 +107,8 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                     // worldData field
                     "    #require net.minecraft.server.World public final WorldData worldData;\n" +
                     "    instance#worldData = worldData;\n" +
-                    "}"));
+                    "#endif\n" +
+                    "}", resolver));
             FastMethod<Void> fm = new FastMethod<Void>();
             fm.init(m);
             fm.invoke(this.nmsWorldHandle, nmsWorldData);
