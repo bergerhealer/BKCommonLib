@@ -182,7 +182,19 @@ class World extends IBlockAccess {
     public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
 #endif
 
-#if version >= 1.15
+#if version >= 1.16
+    public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
+        java.util.stream.Stream iblockdata_in_bounds_stream = instance.c(bounds);
+        java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
+        while (iter.hasNext()) {
+            IBlockData iblockdata1 = (IBlockData) iter.next();
+            if (iblockdata1.a((Tag) TagsBlock.FIRE) || iblockdata1.a(Blocks.LAVA)) {
+                return true;
+            }
+        }
+        return false;
+    }
+#elseif version >= 1.15
     public boolean isBurnArea:c((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #elseif version >= 1.13
     public boolean isBurnArea:b((AxisAlignedBBHandle) AxisAlignedBB bounds);

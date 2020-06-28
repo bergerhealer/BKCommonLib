@@ -909,7 +909,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
+#if version >= 1.16
+    public void burn(float dmg) {
+        if (!instance.isFireProof()) {
+            instance.damageEntity(DamageSource.FIRE, dmg);
+        }
+    }
+#else
     protected void burn(float dmg);
+#endif
 
 #if version >= 1.13
     public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {

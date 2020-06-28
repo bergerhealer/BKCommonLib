@@ -183,4 +183,9 @@ public class CommonCapabilities {
      * and are immutable (no setters).
      */
     public static final boolean IMMUTABLE_NBT_PRIMITIVES = CommonBootstrap.evaluateMCVersion(">=", "1.15");
+
+    /**
+     * Since Minecraft 1.16 damage from lava and fire is no longer handled inside the entity move function
+     */
+    public static final boolean ENTITY_FIRE_DAMAGE_IN_MOVE_HANDLER = CommonBootstrap.evaluateMCVersion("<", "1.16");
 }
