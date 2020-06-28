@@ -6,12 +6,8 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 import org.bukkit.World;
@@ -25,20 +21,6 @@ public class NMSChunk {
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();
 
     public static final TranslatorFieldAccessor<World> world = ChunkHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
-
-    public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
-    public static final FieldAccessor<Boolean> hasSkyLight = new SafeDirectField<Boolean>() {
-
-        @Override
-        public Boolean get(Object instance) {
-            return WorldProviderHandle.createHandle(instance).hasSkyLight();
-        }
-
-        @Override
-        public boolean set(Object instance, Boolean value) {
-            return false;
-        }
-    };
 
     public static final int XZ_MASK = 0xf;
     public static final int Y_MASK = 0xff;

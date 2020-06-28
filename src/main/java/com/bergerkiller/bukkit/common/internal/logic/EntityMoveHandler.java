@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.io.StreamAccumulator;
-import com.bergerkiller.bukkit.common.resources.CommonSounds;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -571,7 +571,7 @@ public abstract class EntityMoveHandler {
             }
 
             if (flag1 && that.isBurning()) {
-                that.makeSound(CommonSounds.EXTINGUISH, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
+                that.makeSound(SoundEffect.EXTINGUISH, 0.7F, 1.6F + (this_random.nextFloat() - this_random.nextFloat()) * 0.4F);
                 that.setFireTicks(-that.getMaxFireTicks());
             }
 

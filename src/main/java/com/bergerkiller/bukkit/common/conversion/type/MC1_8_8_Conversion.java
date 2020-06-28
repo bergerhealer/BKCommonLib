@@ -36,7 +36,7 @@ public class MC1_8_8_Conversion {
     }
 
     @ConverterMethod()
-    public static com.bergerkiller.bukkit.common.internal.proxy.SoundEffect soundEffectFromName(String name) {
-        return new com.bergerkiller.bukkit.common.internal.proxy.SoundEffect(MinecraftKeyHandle.createNew(name));
+    public static com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8 soundEffectFromName(String name) {
+        return new com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8(MinecraftKeyHandle.createNew(name));
     }
 }

@@ -10,13 +10,14 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
@@ -390,7 +391,7 @@ public class WorldUtil extends ChunkUtil {
      * @return players folder
      */
     public static File getPlayersFolder(org.bukkit.World world) {
-        return WorldServerHandle.fromBukkit(world).getDataManager().getPlayerDir();
+        return PlayerFileDataHandler.INSTANCE.getPlayerDataFolder(world);
     }
 
     /**
@@ -402,11 +403,7 @@ public class WorldUtil extends ChunkUtil {
      * @return world dimension
      */
     public static Dimension getDimension(org.bukkit.World world) {
-        Dimension dimension = WorldServerHandle.fromBukkit(world).getWorldProvider().getDimension();
-        if (dimension == null || !dimension.isSerializable()) {
-            dimension = Dimension.OVERWORLD;
-        }
-        return dimension;
+        return WorldHandle.fromBukkit(world).getDimension();
     }
 
     /**
@@ -944,12 +941,12 @@ public class WorldUtil extends ChunkUtil {
             // MC 1.8.8: use world makeSound function
             WorldHandle.T.makeSound.invokeVA(HandleConversion.toWorldHandle(location.getWorld()),
                     location.getX(), location.getY(), location.getZ(),
-                    soundKey.toMinecraftKey().getName(),
+                    soundKey.getName().getName(),
                     volume, pitch);
         } else {
             // MC >= 1.9: we can use Bukkit's API for this!
             com.bergerkiller.generated.org.bukkit.WorldHandle.T.playSound.invoke(location.getWorld(),
-                    location, soundKey.toMinecraftKey().getName(), volume, pitch);
+                    location, soundKey.getName().getName(), volume, pitch);
         }
     }
 

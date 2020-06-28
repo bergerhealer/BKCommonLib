@@ -2,7 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutNamedSoundEffect</b>.
@@ -54,8 +55,8 @@ public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
         } else {
         }
     }
-    public abstract ResourceKey getSound();
-    public abstract void setSound(ResourceKey value);
+    public abstract ResourceKey<SoundEffect> getSound();
+    public abstract void setSound(ResourceKey<SoundEffect> value);
     public abstract int getX();
     public abstract void setX(int value);
     public abstract int getY();
@@ -69,7 +70,7 @@ public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutNamedSoundEffectClass extends Template.Class<PacketPlayOutNamedSoundEffectHandle> {
-        public final Template.Field.Converted<ResourceKey> sound = new Template.Field.Converted<ResourceKey>();
+        public final Template.Field.Converted<ResourceKey<SoundEffect>> sound = new Template.Field.Converted<ResourceKey<SoundEffect>>();
         @Template.Optional
         public final Template.Field.Converted<String> category_1_10_2 = new Template.Field.Converted<String>();
         public final Template.Field.Integer x = new Template.Field.Integer();

@@ -1,8 +1,6 @@
 package com.bergerkiller.bukkit.common.controller;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.internal.hooks.PlayerFileDataHook;
-import com.bergerkiller.bukkit.common.internal.hooks.PlayerFileDataHook.HookAction;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import org.bukkit.entity.HumanEntity;
@@ -12,10 +10,10 @@ import org.bukkit.entity.HumanEntity;
  * to the server, call {@link #assign()}.
  */
 public class PlayerDataController {
-    private PlayerFileDataHook hook = null;
+    private PlayerFileDataHandler.Hook hook = null;
 
     public String[] getSeenPlayers() {
-        return hook.base.getSeenPlayers();
+        return hook.base_getSeenPlayers();
     }
 
     /**
@@ -26,7 +24,7 @@ public class PlayerDataController {
      * @return the loaded data
      */
     public CommonTagCompound onLoad(HumanEntity humanEntity) {
-        return CommonTagCompound.create(hook.base.load(Conversion.toEntityHandle.convert(humanEntity)));
+        return hook.base_load(humanEntity);
     }
 
     /**
@@ -36,23 +34,23 @@ public class PlayerDataController {
      * @param humanEntity to save
      */
     public void onSave(HumanEntity humanEntity) {
-        hook.base.save(Conversion.toEntityHandle.convert(humanEntity));
+        hook.base_save(humanEntity);
     }
 
     /**
      * Assigns this PlayerDataController to the server
      */
     public void assign() {
-        this.hook = PlayerFileDataHook.update(HookAction.HOOK);
-        this.hook.controller = this;
+        hook = PlayerFileDataHandler.INSTANCE.hook(this);
     }
 
     /**
      * Detaches this PlayerDataController from the server; it will no longer be used
      */
     public void detach() {
-        if (this.hook != null && this.hook.controller == this) {
-            this.hook = PlayerFileDataHook.update(HookAction.UNHOOK);
+        if (this.hook != null) {
+            PlayerFileDataHandler.INSTANCE.unhook(this.hook, this);
+            this.hook = null;
         }
     }
 
@@ -64,14 +62,11 @@ public class PlayerDataController {
      * @return the currently assigned Player Data Controller
      */
     public static PlayerDataController get() {
-        PlayerFileDataHook hook =  PlayerFileDataHook.update(HookAction.MOCK);
-        if (hook.controller == null) {
-            PlayerDataController controller = new PlayerDataController();
-            controller.hook = hook;
-            return controller;
-        } else {
-            return hook.controller;
+        PlayerDataController controller = PlayerFileDataHandler.INSTANCE.get();
+        if (controller == null) {
+            controller = new PlayerDataController();
+            controller.hook = PlayerFileDataHandler.INSTANCE.mock(controller);
         }
+        return controller;
     }
-
 }

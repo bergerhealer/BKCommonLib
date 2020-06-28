@@ -30,6 +30,9 @@ import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.ResourceCategory;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -37,7 +40,6 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
@@ -511,10 +513,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void makeSound(String soundName, float volume, float pitch) {
-        makeSound(ResourceKey.fromPath(soundName), volume, pitch);
+        makeSound(ResourceCategory.sound_effect.createKey(soundName), volume, pitch);
     }
 
-    public void makeSound(ResourceKey sound, float volume, float pitch) {
+    public void makeSound(ResourceKey<SoundEffect> sound, float volume, float pitch) {
         if (sound != null) {
             handle.makeSound(sound, volume, pitch);
         }

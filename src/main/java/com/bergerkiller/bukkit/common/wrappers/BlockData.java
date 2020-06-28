@@ -12,6 +12,8 @@ import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -360,14 +362,14 @@ public abstract class BlockData extends BlockDataRegistry {
      * 
      * @return place sound
      */
-    public abstract ResourceKey getPlaceSound();
+    public abstract ResourceKey<SoundEffect> getPlaceSound();
 
     /**
      * Gets the name of the sound effect played when breaking this Block
      * 
      * @return break sound
      */
-    public abstract ResourceKey getBreakSound();
+    public abstract ResourceKey<SoundEffect> getBreakSound();
 
     /**
      * Gets the opacity of the Block, a value between 0 and 15.

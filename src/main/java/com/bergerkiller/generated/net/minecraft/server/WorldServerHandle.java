@@ -32,9 +32,9 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract Object getEntityTrackerHandle();
     public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract WorldDataServerHandle getWorldData();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
-    public abstract WorldNBTStorageHandle getDataManager();
     public abstract Collection<EntityHandle> getEntities();
     public abstract void removeEntity(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
@@ -69,13 +69,13 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
         public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
+        public final Template.Method.Converted<WorldDataServerHandle> getWorldData = new Template.Method.Converted<WorldDataServerHandle>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
         @Template.Optional
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();
-        public final Template.Method.Converted<WorldNBTStorageHandle> getDataManager = new Template.Method.Converted<WorldNBTStorageHandle>();
         public final Template.Method.Converted<Collection<EntityHandle>> getEntities = new Template.Method.Converted<Collection<EntityHandle>>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();

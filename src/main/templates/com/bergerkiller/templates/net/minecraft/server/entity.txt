@@ -4,7 +4,6 @@ import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -929,15 +928,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      * }
      */
 #if version >= 1.14
-    protected (ResourceKey) SoundEffect getSwimSound:getSoundSwim();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSoundSwim();
 #elseif version >= 1.13
-    protected (ResourceKey) SoundEffect getSwimSound:ad();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ad();
 #elseif version >= 1.12
-    protected (ResourceKey) SoundEffect getSwimSound:ae();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ae();
 #elseif version >= 1.9
-    protected (ResourceKey) SoundEffect getSwimSound:aa();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:aa();
 #else
-    protected (ResourceKey) String getSwimSound:P();
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound:P();
 #endif
 
     /*
@@ -953,11 +952,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      * }
      */
 #if version >= 1.16
-    public void makeSound:playSound((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
+    public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
 #elseif version >= 1.9
-    public void makeSound:a((ResourceKey) SoundEffect soundeffect, float volume, float pitch);
+    public void makeSound:a((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
 #else
-    public void makeSound:makeSound((ResourceKey) String soundeffect, float volume, float pitch);
+    public void makeSound:makeSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundeffect, float volume, float pitch);
 #endif
 
     // Note: counts rain too as being wet!

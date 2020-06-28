@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -37,12 +38,12 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract long getTime();
+    public abstract Dimension getDimension();
     public abstract boolean isWithinWorldBorder(EntityHandle entity);
     public abstract boolean isNotCollidingWithBlocks(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
     public abstract List<EntityHandle> getNearbyEntities(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract TileEntityHandle getTileEntity(IntVector3 blockposition);
-    public abstract WorldDataHandle getWorldData();
     public abstract boolean isBurnArea(AxisAlignedBBHandle bounds);
     public abstract Entity getEntityById(int entityId);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
@@ -77,8 +78,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     }
     public abstract Random getRandom();
     public abstract void setRandom(Random value);
-    public abstract WorldProviderHandle getWorldProvider();
-    public abstract void setWorldProvider(WorldProviderHandle value);
     public abstract World getBukkitWorld();
     public abstract void setBukkitWorld(World value);
     public abstract boolean isKeepSpawnInMemory();
@@ -89,7 +88,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field<Random> random = new Template.Field<Random>();
-        public final Template.Field.Converted<WorldProviderHandle> worldProvider = new Template.Field.Converted<WorldProviderHandle>();
         @Template.Optional
         public final Template.Field.Converted<Object> navigationListener = new Template.Field.Converted<Object>();
         @Template.Optional
@@ -107,6 +105,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional
         public final Template.Method<Object> getChunkProvider = new Template.Method<Object>();
+        public final Template.Method.Converted<Dimension> getDimension = new Template.Method.Converted<Dimension>();
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();
@@ -116,7 +115,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<List<?>> getRawEntitiesOfType = new Template.Method.Converted<List<?>>();
         public final Template.Method.Converted<List<EntityHandle>> getNearbyEntities = new Template.Method.Converted<List<EntityHandle>>();
         public final Template.Method.Converted<TileEntityHandle> getTileEntity = new Template.Method.Converted<TileEntityHandle>();
-        public final Template.Method.Converted<WorldDataHandle> getWorldData = new Template.Method.Converted<WorldDataHandle>();
         @Template.Optional
         public final Template.Method<Void> makeSound = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> isBurnArea = new Template.Method.Converted<Boolean>();

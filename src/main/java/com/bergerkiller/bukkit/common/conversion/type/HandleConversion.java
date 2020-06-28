@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
@@ -62,7 +63,6 @@ import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -231,11 +231,6 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.WorldType")
-    public static Object toWorldTypeHandle(org.bukkit.WorldType worldType) {
-        return WorldTypeHandle.T.getType.raw.invoke(worldType.getName());
-    }
-
     @ConverterMethod(output="T extends net.minecraft.server.Packet")
     public static Object toPacketHandle(CommonPacket commonPacket) {
         return commonPacket.getHandle();
@@ -343,6 +338,11 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.DataWatcher.Item<V>")
     public static Object toDataWatcherItemHandle(DataWatcher.Item<?> itemWrapper) {
         return itemWrapper.getRawHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.server.ResourceKey<V>")
+    public static Object toResourceKeyHandle(ResourceKey<?> resourceKeyWrapper) {
+        return resourceKeyWrapper.getRawHandle();
     }
 
     @ConverterMethod(output="net.minecraft.server.MapIcon")
@@ -528,14 +528,12 @@ public class HandleConversion {
         return dimension.getId();
     }
 
-    // Since MC 1.9
-    @ConverterMethod(input="net.minecraft.server.DimensionManager", optional=true)
+    @ConverterMethod(input="net.minecraft.server.DimensionManager")
     public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return Dimension.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
-    // Since MC 1.9
-    @ConverterMethod(output="net.minecraft.server.DimensionManager", optional=true)
+    @ConverterMethod(output="net.minecraft.server.DimensionManager")
     public static Object dimensionManagerFromDimension(Dimension dimension) {
         return dimension.getDimensionManagerHandle();
     }

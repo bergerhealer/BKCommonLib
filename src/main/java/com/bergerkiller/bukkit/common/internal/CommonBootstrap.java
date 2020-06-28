@@ -266,7 +266,8 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
             remappings.put(nms_root + ".DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
             remappings.put(nms_root + ".MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
-            remappings.put(nms_root + ".SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect");
+            remappings.put(nms_root + ".SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
+            remappings.put(nms_root + ".DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
         }
 
         // Some classes were moved before around 1.8
@@ -367,6 +368,16 @@ public class CommonBootstrap {
             (evaluateMCVersion("==", "1.15.2") && CommonUtil.getCBClass("legacy.CraftLegacy") == null))
         {
             remappings.put(cb_root + ".legacy.CraftLegacy", cb_root + ".util.CraftLegacy");
+        }
+
+        // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
+        if (evaluateMCVersion("<", "1.16")) {
+            remappings.put(nms_root + ".ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
+        }
+
+        // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
+        if (evaluateMCVersion("<", "1.16")) {
+            remappings.put(nms_root + ".WorldDataServer", nms_root + ".WorldData");
         }
 
         // If remappings exist, add a resolver for them

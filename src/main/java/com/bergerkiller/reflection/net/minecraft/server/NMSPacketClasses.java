@@ -33,6 +33,8 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -43,7 +45,6 @@ import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
@@ -718,7 +719,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {
 
-        public final FieldAccessor<ResourceKey> sound = PacketPlayOutCustomSoundEffectHandle.T.sound.toFieldAccessor();
+        public final FieldAccessor<ResourceKey<SoundEffect>> sound = PacketPlayOutCustomSoundEffectHandle.T.sound.toFieldAccessor();
         public final FieldAccessor<String> category = PacketPlayOutCustomSoundEffectHandle.T.category.toFieldAccessor();
         public final FieldAccessor<Integer> x = PacketPlayOutCustomSoundEffectHandle.T.x.toFieldAccessor();
         public final FieldAccessor<Integer> y = PacketPlayOutCustomSoundEffectHandle.T.y.toFieldAccessor();
@@ -1414,7 +1415,7 @@ public class NMSPacketClasses {
             }
         };
 
-        public final FieldAccessor<ResourceKey> sound = PacketPlayOutNamedSoundEffectHandle.T.sound.toFieldAccessor();
+        public final FieldAccessor<ResourceKey<SoundEffect>> sound = PacketPlayOutNamedSoundEffectHandle.T.sound.toFieldAccessor();
         public final FieldAccessor<Integer> x = PacketPlayOutNamedSoundEffectHandle.T.x.toFieldAccessor();
         public final FieldAccessor<Integer> y = PacketPlayOutNamedSoundEffectHandle.T.y.toFieldAccessor();
         public final FieldAccessor<Integer> z = PacketPlayOutNamedSoundEffectHandle.T.z.toFieldAccessor();

@@ -12,7 +12,6 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
-import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
 public class CommonMethods {
@@ -27,10 +26,6 @@ public class CommonMethods {
 
     public static ExplosionHandle Explosion_new(org.bukkit.World world, double x, double y, double z) {
         return ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true);
-    }
-
-    public static void setPlayerFileData(IPlayerFileDataHandle playerFileData) {
-        CommonNMS.getPlayerList().setPlayerFileData(playerFileData);
     }
 
     public static DamageSourceHandle DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {

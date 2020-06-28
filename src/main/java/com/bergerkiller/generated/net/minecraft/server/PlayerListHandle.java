@@ -25,11 +25,10 @@ public abstract class PlayerListHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract void savePlayers();
+    public abstract void savePlayerFile(Player entityplayer);
     public abstract void sendRawPacketNearby(World world, double x, double y, double z, double radius, Object packet);
     public abstract List<Player> getPlayers();
     public abstract void setPlayers(List<Player> value);
-    public abstract IPlayerFileDataHandle getPlayerFileData();
-    public abstract void setPlayerFileData(IPlayerFileDataHandle value);
     public abstract int getMaxPlayers();
     public abstract void setMaxPlayers(int value);
     /**
@@ -38,10 +37,10 @@ public abstract class PlayerListHandle extends Template.Handle {
      */
     public static final class PlayerListClass extends Template.Class<PlayerListHandle> {
         public final Template.Field.Converted<List<Player>> players = new Template.Field.Converted<List<Player>>();
-        public final Template.Field.Converted<IPlayerFileDataHandle> playerFileData = new Template.Field.Converted<IPlayerFileDataHandle>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
 
         public final Template.Method<Void> savePlayers = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> savePlayerFile = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> sendRawPacketNearby = new Template.Method.Converted<Void>();
 
     }

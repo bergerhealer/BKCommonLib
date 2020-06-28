@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
@@ -705,7 +704,10 @@ class PacketPlayOutLogin extends Packet {
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
     public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
-#if version >= 1.15
+#if version >= 1.16
+        #require net.minecraft.server.PacketPlayOutLogin private long encryptedWorldSeed:b;
+        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+#elseif version >= 1.15
         #require net.minecraft.server.PacketPlayOutLogin private long encryptedWorldSeed:b;
         instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
@@ -784,7 +786,10 @@ class PacketPlayOutRespawn extends Packet {
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
     public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
-#if version >= 1.15
+#if version >= 1.16
+        #require net.minecraft.server.PacketPlayOutRespawn private long encryptedWorldSeed:c;
+        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+#elseif version >= 1.15
         #require net.minecraft.server.PacketPlayOutRespawn private long encryptedWorldSeed:b;
         instance#encryptedWorldSeed = WorldData.c(world.getWorldData().getSeed());
 #endif
@@ -952,7 +957,7 @@ class PacketPlayOutMapChunk extends Packet {
         if (T.constr_chunk_sectionsMask.isAvailable()) {
             return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
         } else {
-            boolean flag = WorldHandle.fromBukkit(chunk.getWorld()).getWorldProvider().isDarkWorld();
+            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimension().hasSkyLight();
             return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
         }
     }
@@ -973,7 +978,7 @@ optional class PacketPlayOutUnloadChunk extends Packet {
 
 class PacketPlayOutNamedSoundEffect extends Packet {
 #if version >= 1.9
-    private (ResourceKey) SoundEffect sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect sound:a;
     private optional (String) SoundCategory category_1_10_2:b;
     private int x:c;
     private int y:d;
@@ -982,7 +987,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     private optional int pitch_1_8_8:###;
     private optional float pitch_1_10_2:g;
 #else
-    private (ResourceKey) String sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
     private optional (String) SoundCategory category_1_10_2:###;
     private int x:b;
     private int y:c;
@@ -1036,9 +1041,9 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 // Since MC 1.9
 optional class PacketPlayOutCustomSoundEffect extends Packet {
 #if version >= 1.13
-    private (ResourceKey) MinecraftKey sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) MinecraftKey sound:a;
 #else
-    private (ResourceKey) String sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
 #endif
     private (String) SoundCategory category:b;
     private int x:c;

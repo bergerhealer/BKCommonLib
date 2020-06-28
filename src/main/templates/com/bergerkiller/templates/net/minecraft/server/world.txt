@@ -8,7 +8,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldDataServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
@@ -17,7 +17,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle;
+import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
@@ -31,7 +31,6 @@ import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle
 
 class World extends IBlockAccess {
     public final Random random;
-    public (WorldProviderHandle) WorldProvider worldProvider;
 
     // Only available >= MC 1.9
     protected optional (Object) NavigationListener navigationListener:t;
@@ -106,6 +105,18 @@ class World extends IBlockAccess {
 
     public optional (Object) IChunkProvider getChunkProvider();
 
+#if version >= 1.16
+    public (Dimension) DimensionManager getDimension:getDimensionManager();
+#elseif version >= 1.9
+    public (Dimension) DimensionManager getDimension() {
+        return instance.worldProvider.getDimensionManager();
+    }
+#else
+    public (Dimension) DimensionManager getDimension() {
+        return DimensionManager.a(instance.worldProvider.getDimension());
+    }
+#endif
+
 #if version >= 1.13
     public boolean isWithinWorldBorder:i((EntityHandle) Entity entity);
 #elseif version >= 1.11.2
@@ -163,8 +174,6 @@ class World extends IBlockAccess {
     public (List<EntityHandle>) List<Entity> getNearbyEntities:getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
     public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
-
-    public (WorldDataHandle) WorldData getWorldData();
 
     // Used on MC 1.8.8 only!
 #if version >= 1.9
@@ -320,6 +329,14 @@ class WorldServer extends World {
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 #endif
 
+#if version >= 1.16
+    public (WorldDataServerHandle) WorldDataServer getWorldData() {
+        return instance.worldDataServer;
+    }
+#else
+    public (WorldDataServerHandle) WorldDataServer getWorldData();
+#endif
+
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
 #if version >= 1.9
         return (ChunkProviderServer) instance.getChunkProvider();
@@ -446,14 +463,6 @@ class WorldServer extends World {
     }
 #else
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
-#endif
-
-#if version >= 1.14
-    public (WorldNBTStorageHandle) WorldNBTStorage getDataManager();
-#else
-    public (WorldNBTStorageHandle) WorldNBTStorage getDataManager() {
-        return (WorldNBTStorage) instance.getDataManager();
-    }
 #endif
 
 #if version >= 1.14
@@ -598,63 +607,13 @@ class ChunkProviderServer {
 #endif
 }
 
-class WorldData {
-    public (WorldTypeHandle) WorldType getType();
-
-#if version >= 1.13
+class WorldDataServer {
+#if version >= 1.16.1
+    public void setClearTimer:a(int ticks);
+#elseif version >= 1.13
     public void setClearTimer:g(int ticks);
 #else
     public void setClearTimer:i(int ticks);
-#endif
-}
-
-class WorldType {
-    private final String name;
-
-#if version >= 1.13
-    #if pre == 7
-        public (Dimension) int getDimension:h();
-    #else
-        public (Dimension) int getDimension:i();
-    #endif
-#else
-    public (Dimension) int getDimension:g();
-#endif
-
-    public static (WorldTypeHandle) WorldType getType(String name)
-}
-
-class WorldProvider {
-    // See: Chunk initLighting()
-    // if (this.world.worldProvider.m()) {
-    //     l = 15;
-    //     ...
-#if version >= 1.15
-    public boolean hasSkyLight:f();
-#elseif version >= 1.13
-    public boolean hasSkyLight:g();
-#elseif version >= 1.11
-    public boolean hasSkyLight:m();
-#elseif version >= 1.9
-    public boolean hasSkyLight() {
-        return !instance.m();
-    }
-#else
-    public boolean hasSkyLight() {
-        return !instance.o();
-    }
-#endif
-
-<code>
-    public boolean isDarkWorld() {
-        return !hasSkyLight();
-    }
-</code>
-
-#if version >= 1.9
-    public (Dimension) DimensionManager getDimension:getDimensionManager();
-#else
-    public (Dimension) int getDimension();
 #endif
 }
 
@@ -695,10 +654,6 @@ class BiomeBase {
 }
 
 interface IBlockAccess {
-}
-
-class WorldNBTStorage {
-    public java.io.File getPlayerDir();
 }
 
 class MovingObjectPosition {

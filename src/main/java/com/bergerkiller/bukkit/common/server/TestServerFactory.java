@@ -584,6 +584,11 @@ public class TestServerFactory {
                 setField(mc_server, "dataPackResources", datapackresources);
             }
 
+            // Initialize the dimension root registry for the server
+            // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
+            // this.f = iregistrycustom_dimension; (MinecraftServer.java)
+            setField(mc_server, "f", createFromCode(minecraftServerType, "return IRegistryCustom.b();"));
+
             // Initialize the server further, loading the resource packs, by calling MinecraftServer.a(File, WorldData)
             File serverDir = new File(System.getProperty("user.dir"), "target");
             Class<?> worldDataType = Class.forName(nms_root + "WorldData");

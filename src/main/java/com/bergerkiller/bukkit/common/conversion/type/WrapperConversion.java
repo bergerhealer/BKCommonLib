@@ -23,6 +23,9 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.resources.ResourceCategory;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -37,7 +40,6 @@ import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.server.BaseBlockPositionHandle;
@@ -66,7 +68,6 @@ import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
@@ -284,11 +285,6 @@ public class WrapperConversion {
         return ParseUtil.parseEnum(Difficulty.class, text, null);
     }
 
-    @ConverterMethod(input="net.minecraft.server.WorldType")
-    public static org.bukkit.WorldType toWorldType(Object nmsWorldTypeHandle) {
-        return org.bukkit.WorldType.getByName(WorldTypeHandle.T.name.get(nmsWorldTypeHandle));
-    }
-
     @ConverterMethod
     public static org.bukkit.WorldType parseWorldType(String text) {
         return ParseUtil.parseEnum(org.bukkit.WorldType.class, text, null);
@@ -490,6 +486,11 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
     }
 
+    @ConverterMethod
+    public static <T> com.bergerkiller.bukkit.common.resources.ResourceKey<T> toResourceKey(Object nmsResourceKeyHandle) {
+        return com.bergerkiller.bukkit.common.resources.ResourceKey.fromResourceKeyHandle(nmsResourceKeyHandle);
+    }
+
     @ConverterMethod(input="net.minecraft.server.MapIcon")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
         return MapIconHandle.createHandle(nmsMapCursorHandle).toCursor();
@@ -569,14 +570,14 @@ public class WrapperConversion {
     }
 
     @ConverterMethod(input="net.minecraft.server.SoundEffect")
-    public static ResourceKey soundEffectToResourceKey(Object nmsSoundEffectHandle) {
-        return ResourceKey.fromMinecraftKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle));
+    public static ResourceKey<SoundEffect> soundEffectToResourceKey(Object nmsSoundEffectHandle) {
+        return ResourceCategory.sound_effect.createKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle));
     }
 
     @ConverterMethod(output="net.minecraft.server.SoundEffect")
-    public static Object soundEffectFromResourceKey(ResourceKey soundKey) {
+    public static Object soundEffectFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         if (SoundEffectHandle.T.opt_getRegistry.isAvailable()) {
-            Object mcKey = soundKey.toMinecraftKey().getRaw();
+            Object mcKey = soundKey.getName().getRaw();
             Object effect = SoundEffectHandle.T.opt_getRegistry.invoke().get(mcKey);
             if (effect == null) {
                 effect = SoundEffectHandle.T.constr_minecraftkey.raw.newInstance(mcKey);
@@ -587,19 +588,29 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.MobSpawnerAbstract")
-    public static MobSpawner toMobSpawner(Object nmsMobSpawnerAbstractHandle) {
-        return new MobSpawner(nmsMobSpawnerAbstractHandle);
+    @ConverterMethod
+    public static ResourceKey<SoundEffect> soundNameToResourceKey(String name) {
+        return SoundEffect.fromName(name);
     }
 
-    @ConverterMethod()
-    public static String resourceKeyToPath(ResourceKey key) {
+    @ConverterMethod
+    public static String soundNameFromResourceKey(ResourceKey<SoundEffect> key) {
         return key.getPath();
     }
 
-    @ConverterMethod()
-    public static ResourceKey resourceKeyFromPath(String path) {
-        return ResourceKey.fromPath(path);
+    @ConverterMethod(output="net.minecraft.server.MinecraftKey")
+    public static Object resourceKeyToMinecraftKey(ResourceKey<?> key) {
+        return key.getName().getRaw();
+    }
+
+    @ConverterMethod(input="net.minecraft.server.MinecraftKey")
+    public static ResourceKey<SoundEffect> minecraftKeyToSoundEffectResourceKey(Object minecraftKeyHandle) {
+        return ResourceCategory.sound_effect.createKey(MinecraftKeyHandle.createHandle(minecraftKeyHandle));
+    }
+
+    @ConverterMethod(input="net.minecraft.server.MobSpawnerAbstract")
+    public static MobSpawner toMobSpawner(Object nmsMobSpawnerAbstractHandle) {
+        return new MobSpawner(nmsMobSpawnerAbstractHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.InventoryClickType", optional=true)

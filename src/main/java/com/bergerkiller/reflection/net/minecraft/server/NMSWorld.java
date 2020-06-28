@@ -20,8 +20,6 @@ public class NMSWorld {
 
     public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
 
-    public static final FieldAccessor<Object> worldProvider = WorldHandle.T.worldProvider.raw.toFieldAccessor();
-
     /**
      * This field is only available >= MC 1.10.2
      */

@@ -23,6 +23,9 @@ import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
+import com.bergerkiller.bukkit.common.resources.ResourceCategory;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -397,18 +400,18 @@ public class BlockDataImpl extends BlockData {
     /* ====================================================================== */
 
     @Override
-    public final ResourceKey getStepSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getStepSound().getName());
+    public final ResourceKey<SoundEffect> getStepSound() {
+        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getStepSound().getName());
     }
 
     @Override
-    public final ResourceKey getPlaceSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getPlaceSound().getName());
+    public final ResourceKey<SoundEffect> getPlaceSound() {
+        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getPlaceSound().getName());
     }
 
     @Override
-    public final ResourceKey getBreakSound() {
-        return ResourceKey.fromMinecraftKey(block.getSoundType(data).getBreakSound().getName());
+    public final ResourceKey<SoundEffect> getBreakSound() {
+        return ResourceCategory.sound_effect.createKey(block.getSoundType(data).getBreakSound().getName());
     }
 
     @Override

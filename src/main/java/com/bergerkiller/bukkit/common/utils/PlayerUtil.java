@@ -7,9 +7,9 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
@@ -390,7 +390,7 @@ public class PlayerUtil extends EntityUtil {
      */
     public static void playSound(Player player, ResourceKey soundKey, float volume, float pitch) {
         if (soundKey != null) {
-            player.playSound(player.getEyeLocation(), soundKey.toMinecraftKey().getName(), volume, pitch);
+            player.playSound(player.getEyeLocation(), soundKey.getName().getName(), volume, pitch);
         }
     }
 
@@ -405,7 +405,7 @@ public class PlayerUtil extends EntityUtil {
      */
     public static void playSound(Player player, Location location, ResourceKey soundKey, float volume, float pitch) {
         if (soundKey != null) {
-            player.playSound(location, soundKey.toMinecraftKey().getName(), volume, pitch);
+            player.playSound(location, soundKey.getName().getName(), volume, pitch);
         }
     }
 

@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonItem;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonPlayer;
-import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
@@ -21,7 +20,6 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
@@ -406,9 +404,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         oldInstance.setBukkitEntityField(CraftEntityHandle.createCraftEntity(Bukkit.getServer(), oldInstance));
         this.handle = newInstance;
 
-        // *** Fix invalid dimension that occurred during 1.13.2 rollout ***
-        this.fixInvalidDimension();
-
         // *** Replace entity in passenger and vehicle fields ***
         EntityHandle vehicle = newInstance.getVehicle();
         if (vehicle != null) {
@@ -439,25 +434,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (this.isHooked()) {
             DefaultEntityController controller = new DefaultEntityController();
             controller.bind(this, true);
-        }
-    }
-
-    /**
-     * Spigot used a dimension for flat worlds that is not part of the internal dimension lookup table.
-     * This caused very buggy behavior when saving entities, as an Id is saved it cannot restore from
-     * the table again. This method detects this occurring and corrects the dimension.
-     */
-    private void fixInvalidDimension() {
-        // Since MC 1.13.1 this is an issue
-        // Since MC 1.16 the field is gone, and this code isn't executed
-        if (!CommonCapabilities.ENTITY_USES_DIMENSION_MANAGER) {
-            return;
-        }
-
-        Object raw_dim = EntityHandle.T.dimension.raw.get(this.handle.getRaw());
-        if (raw_dim == null || !Dimension.fromDimensionManagerHandle(raw_dim).isSerializable()) {
-            EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(this.handle.getWorld().getWorld()));
-            // Logging.LOGGER.log(Level.WARNING, "Entity had no valid dimension field set! Logging stack trace:", new RuntimeException());
         }
     }
 

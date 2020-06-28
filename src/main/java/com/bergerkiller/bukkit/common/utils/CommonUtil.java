@@ -5,12 +5,10 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonNextTickExecutor;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-import com.bergerkiller.generated.net.minecraft.server.IPlayerFileDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -201,22 +199,14 @@ public class CommonUtil {
     }
 
     /**
-     * Sets the Player File Data used to load and save player information on the
-     * server
-     *
-     * @param playerFileData to set to
-     */
-    public static void setPlayerFileData(Object playerFileData) {
-        CommonMethods.setPlayerFileData(IPlayerFileDataHandle.createHandle(playerFileData));
-    }
-
-    /**
      * Saves the specified human information to file
      *
      * @param human to save
      */
     public static void savePlayer(HumanEntity human) {
-        CommonNMS.getPlayerList().getPlayerFileData().save(human);
+        if (human instanceof Player) {
+            CommonNMS.getPlayerList().savePlayerFile((Player) human);
+        }
     }
 
     /**
