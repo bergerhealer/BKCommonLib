@@ -28,6 +28,34 @@ class IChatBaseComponent {
             return new ChatComponentText("");
         }
 
+#if version >= 1.16
+        // ChatModifier is immutable since 1.16
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+            ChatModifier initial_modifier = ChatModifier.b;
+
+            ChatModifier modifier = initial_modifier;
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = initial_modifier;
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier = modifier.setBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier = modifier.setItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier = modifier.setStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier = modifier.setUnderline(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier = modifier.setRandom(Boolean.TRUE);
+                } else {
+                    modifier = initial_modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+                }
+            }
+            return new ChatComponentText("").setChatModifier(modifier);
+        }
+#else
         public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
             ChatModifier modifier = new ChatModifier();
             java.util.Iterator iter = colors.iterator();
@@ -47,17 +75,18 @@ class IChatBaseComponent {
                     modifier.setRandom(Boolean.TRUE);
                 } else {
                     modifier = new ChatModifier();
-#if version >= 1.12
+  #if version >= 1.12
                     modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
-#else
+  #else
                     #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.EnumChatFormat> formatMap;
                     java.util.Map formats = #formatMap;
                     Object format = formats.get(Character.valueOf(color.getChar()));
                     modifier.setColor((EnumChatFormat) format);
-#endif
+  #endif
                 }
             }
             return new ChatComponentText("").setChatModifier(modifier);
         }
+#endif
     }
 }

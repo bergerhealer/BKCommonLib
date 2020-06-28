@@ -78,25 +78,63 @@ class CraftChatMessage {
 
         StringBuilder out = new StringBuilder();
         java.util.Iterator iter = ((Iterable) component).iterator();
+
+        net.minecraft.server.EnumChatFormat prev_color_format = null;
+        boolean prev_was_bold = false;
+        boolean prev_was_italic = false;
+        boolean prev_was_underlined = false;
+        boolean prev_was_strikeThrough = false;
+        boolean prev_was_obfuscated = false;
+
         while (iter.hasNext()) {
             net.minecraft.server.IChatBaseComponent c = (net.minecraft.server.IChatBaseComponent) iter.next();
             net.minecraft.server.ChatModifier modi = c.getChatModifier();
-            if (modi.getColor() != null) {
-                out.append(modi.getColor());
+
+            // Place reset character when too many style flags are active
+            if ((prev_was_bold && !modi.isBold()) ||
+                (prev_was_italic && !modi.isItalic()) ||
+                (prev_was_underlined && !modi.isUnderlined()) ||
+                (prev_was_strikeThrough && !modi.isStrikethrough()) ||
+                (prev_was_obfuscated && !modi.isRandom()))
+            {
+                prev_color_format = null;
+                prev_was_bold = false;
+                prev_was_italic = false;
+                prev_was_underlined = false;
+                prev_was_strikeThrough = false;
+                prev_was_obfuscated = false;
+                out.append(net.minecraft.server.EnumChatFormat.RESET);
             }
-            if (modi.isBold()) {
+
+            if (modi.getColor() != null) {
+#if version >= 1.16
+                net.minecraft.server.EnumChatFormat color_format = modi.getColor().format;
+                if (prev_color_format != color_format) {
+                    prev_color_format = color_format;
+                    out.append(color_format);
+                }
+#else
+                out.append(modi.getColor());
+#endif
+            }
+            if (modi.isBold() && !prev_was_bold) {
+                prev_was_bold = true;
                 out.append(net.minecraft.server.EnumChatFormat.BOLD);
             }
-            if (modi.isItalic()) {
+            if (modi.isItalic() && !prev_was_italic) {
+                prev_was_italic = true;
                 out.append(net.minecraft.server.EnumChatFormat.ITALIC);
             }
-            if (modi.isUnderlined()) {
+            if (modi.isUnderlined() && !prev_was_underlined) {
+                prev_was_underlined = true;
                 out.append(net.minecraft.server.EnumChatFormat.UNDERLINE);
             }
-            if (modi.isStrikethrough()) {
+            if (modi.isStrikethrough() && !prev_was_strikeThrough) {
+                prev_was_strikeThrough = true;
                 out.append(net.minecraft.server.EnumChatFormat.STRIKETHROUGH);
             }
-            if (modi.isRandom()) {
+            if (modi.isRandom() && !prev_was_obfuscated) {
+                prev_was_obfuscated = true;
                 out.append(net.minecraft.server.EnumChatFormat.OBFUSCATED);
             }
             out.append(c.getText());

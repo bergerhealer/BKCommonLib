@@ -50,7 +50,13 @@ public class ChatTextTest {
     public void testStyleOnly() {
         String msg = ChatColor.RED.toString();
         ChatText text = ChatText.fromMessage(msg);
-        assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
+        if (Common.evaluateMCVersion(">=", "1.16")) {
+            // For some reason Minecraft repeats the color twice now in the json
+            // It's still functionally identical, so we'll allow it I guess.
+            assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"},{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
+        } else {
+            assertEquals("{\"extra\":[{\"color\":\"red\",\"text\":\"\"}],\"text\":\"\"}", text.getJson());
+        }
         assertEquals(msg, text.getMessage());
     }
 
