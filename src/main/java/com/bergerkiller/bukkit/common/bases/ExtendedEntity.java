@@ -456,6 +456,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         this.handle.setOnGround(onGround);
     }
 
+    public boolean isHorizontalMovementBlocked() {
+        return this.handle.isHorizontalMovementBlocked();
+    }
+
+    public boolean isVerticalMovementBlocked() {
+        return this.handle.isVerticalMovementBlocked();
+    }
+
+    public boolean isMovementBlocked() {
+        return this.handle.isHorizontalMovementBlocked() || this.handle.isVerticalMovementBlocked();
+    }
+
     public boolean isPositionChanged() {
         return this.handle.isPositionChanged();
     }
