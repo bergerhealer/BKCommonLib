@@ -243,6 +243,12 @@ public class BlockDataTest {
         assertEquals(BlockFace.EAST, blockData.getState("facing", BlockFace.class));
     }
 
+    @Test
+    public void testBlockModelName() {
+        BlockData blockData = BlockData.fromMaterial(Material.FURNACE);
+        assertEquals("furnace", blockData.getBlockName());
+    }
+
     private void testSignMaterial(Material material, boolean isWallSign) {
         assertNotNull(material);
         BlockData signData = BlockData.fromMaterial(material);

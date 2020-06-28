@@ -729,11 +729,16 @@ public class MapResourcePack {
         }
 
         public String makePath(String path) {
-            return "assets/minecraft/" + this.root + path + this.ext;
+            return "assets/minecraft/" + this.root + stripNS(path) + this.ext;
         }
 
         public String makeBKCPath(String path) {
-            return "/com/bergerkiller/bukkit/common/internal/resources/" + this.root + path + this.ext;
+            return "/com/bergerkiller/bukkit/common/internal/resources/" + this.root + stripNS(path) + this.ext;
+        }
+
+        private static String stripNS(String path) {
+            int namespaceIndex = path.indexOf(':');
+            return (namespaceIndex == -1) ? path : path.substring(namespaceIndex+1);
         }
     }
 
