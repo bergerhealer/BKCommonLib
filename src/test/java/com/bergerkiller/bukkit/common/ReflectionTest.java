@@ -52,7 +52,6 @@ public class ReflectionTest {
              * System.out.println(obj.k);
              */
 
-            loadClass(NMSBlock.class);
             loadClass(NMSChunk.class);
             loadClass(NMSChunkSection.class);
             loadClass(NMSEntity.class);
