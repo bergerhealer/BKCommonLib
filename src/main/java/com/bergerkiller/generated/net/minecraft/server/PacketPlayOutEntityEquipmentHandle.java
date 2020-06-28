@@ -21,28 +21,33 @@ public abstract class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityEquipmentHandle createNew(int entityId, EquipmentSlot slot, ItemStack itemStack) {
-        return T.constr_entityId_slot_itemStack.newInstance(entityId, slot, itemStack);
-    }
-
     /* ============================================================================== */
 
+    public static PacketPlayOutEntityEquipmentHandle createNew(int entityId, EquipmentSlot slot, ItemStack itemStack) {
+        return T.createNew.invoke(entityId, slot, itemStack);
+    }
+
+    public abstract int getSlotCount();
+    public abstract EquipmentSlot getEquipmentSlot(int index);
+    public abstract void setEquipmentSlot(int index, EquipmentSlot slot);
+    public abstract ItemStack getItemStack(int index);
+    public abstract void setItemStack(int index, ItemStack itemStack);
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract EquipmentSlot getSlot();
-    public abstract void setSlot(EquipmentSlot value);
-    public abstract ItemStack getItemStack();
-    public abstract void setItemStack(ItemStack value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutEntityEquipment</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityEquipmentClass extends Template.Class<PacketPlayOutEntityEquipmentHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityEquipmentHandle> constr_entityId_slot_itemStack = new Template.Constructor.Converted<PacketPlayOutEntityEquipmentHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        public final Template.Field.Converted<EquipmentSlot> slot = new Template.Field.Converted<EquipmentSlot>();
-        public final Template.Field.Converted<ItemStack> itemStack = new Template.Field.Converted<ItemStack>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityEquipmentHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityEquipmentHandle>();
+
+        public final Template.Method<Integer> getSlotCount = new Template.Method<Integer>();
+        public final Template.Method.Converted<EquipmentSlot> getEquipmentSlot = new Template.Method.Converted<EquipmentSlot>();
+        public final Template.Method.Converted<Void> setEquipmentSlot = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<ItemStack> getItemStack = new Template.Method.Converted<ItemStack>();
+        public final Template.Method.Converted<Void> setItemStack = new Template.Method.Converted<Void>();
 
     }
 

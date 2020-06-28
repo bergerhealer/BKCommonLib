@@ -1255,17 +1255,92 @@ class PacketPlayOutAttachEntity extends Packet {
 
 class PacketPlayOutEntityEquipment extends Packet {
     private int entityId:a;
-#if version >= 1.9
-    private (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot:b;
-#else
-    private (org.bukkit.inventory.EquipmentSlot) int slot:b;
-#endif
-    private (org.bukkit.inventory.ItemStack) ItemStack itemStack:c;
 
-#if version >= 1.9
-    public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
+#if version >= 1.16
+    #require net.minecraft.server.PacketPlayOutEntityEquipment private final List<com.mojang.datafixers.util.Pair<EnumItemSlot, ItemStack>> slots:b;
+
+    // Multiple slots are possible
+    public int getSlotCount() {
+        List slots = instance#slots;
+        return slots.size();
+    }
+
+    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+        List slots = com.google.common.collect.Lists.newArrayList();
+        slots.add(com.mojang.datafixers.util.Pair.of(slot, itemStack));
+        return new PacketPlayOutEntityEquipment(entityId, slots);
+    }
+
+    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(int index) {
+        List slots = instance#slots;
+        com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
+        return (EnumItemSlot) entry.getFirst();
+    }
+
+    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+        List slots = instance#slots;
+        com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
+        slots.set(index, com.mojang.datafixers.util.Pair.of(slot, entry.getSecond()));
+    }
+
+    public (org.bukkit.inventory.ItemStack) ItemStack getItemStack(int index) {
+        List slots = instance#slots;
+        com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
+        return (ItemStack) entry.getSecond();
+    }
+
+    public void setItemStack(int index, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+        List slots = instance#slots;
+        com.mojang.datafixers.util.Pair entry = (com.mojang.datafixers.util.Pair) slots.get(index);
+        slots.set(index, com.mojang.datafixers.util.Pair.of(entry.getFirst(), itemStack));
+    }
 #else
-    public (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment(int entityId, (org.bukkit.inventory.EquipmentSlot) int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack);
+    // Only one slot is possible
+    public int getSlotCount() {
+        return 1;
+    }
+
+  #if version >= 1.9
+    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+        return new PacketPlayOutEntityEquipment(entityId, slot, itemStack);
+    }
+  #else
+    public static (PacketPlayOutEntityEquipmentHandle) PacketPlayOutEntityEquipment createNew(int entityId, (org.bukkit.inventory.EquipmentSlot) int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+        return new PacketPlayOutEntityEquipment(entityId, slot, itemStack);
+    }
+  #endif
+
+  #if version >= 1.9
+    #require net.minecraft.server.PacketPlayOutEntityEquipment private EnumItemSlot slot:b;
+    public (org.bukkit.inventory.EquipmentSlot) EnumItemSlot getEquipmentSlot(int index) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        return instance#slot;
+    }
+    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) EnumItemSlot slot) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        instance#slot = slot;
+    }
+  #else
+    #require net.minecraft.server.PacketPlayOutEntityEquipment private (org.bukkit.inventory.EquipmentSlot) int slot:b;
+    public (org.bukkit.inventory.EquipmentSlot) int getEquipmentSlot(int index) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        return instance#slot;
+    }
+    public void setEquipmentSlot(int index, (org.bukkit.inventory.EquipmentSlot) int slot) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        instance#slot = slot;
+    }
+  #endif
+
+    #require net.minecraft.server.PacketPlayOutEntityEquipment private ItemStack itemStack:c;
+    public (org.bukkit.inventory.ItemStack) ItemStack getItemStack(int index) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        return instance#itemStack;
+    }
+    public void setItemStack(int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+        if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
+        instance#itemStack = itemStack;
+    }
 #endif
 }
 

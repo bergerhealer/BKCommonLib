@@ -899,11 +899,13 @@ public class NMSPacketClasses {
         }
     }
 
+    /**
+     * <b>Deprecated: please use {@link PacketPlayOutEntityEquipmentHandle} instead.</b>
+     */
+    @Deprecated
     public static class NMSPacketPlayOutEntityEquipment extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutEntityEquipmentHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<EquipmentSlot> slot = PacketPlayOutEntityEquipmentHandle.T.slot.toFieldAccessor();
-        public final TranslatorFieldAccessor<ItemStack> item = PacketPlayOutEntityEquipmentHandle.T.itemStack.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, EquipmentSlot equipmentSlot, ItemStack item) {
             return PacketPlayOutEntityEquipmentHandle.createNew(entityId, equipmentSlot, item).toCommonPacket();
