@@ -10,7 +10,6 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.WorldType;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -59,7 +58,6 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, Inventory> inventory = pair(toInventory, toInventoryHandle);
     public static final DuplexConverter<Object, Difficulty> difficulty = pair(toDifficulty, toDifficultyHandle);
     public static final DuplexConverter<Object, GameMode> gameMode = pair(toGameMode, toGameModeHandle);
-    public static final DuplexConverter<Object, WorldType> worldType = pair(toWorldType, toWorldTypeHandle);
     public static final DuplexConverter<Object, DataWatcher> dataWatcher = pair(toDataWatcher, toDataWatcherHandle);
     public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = pair(toDataWatcherKey, toDataWatcherObjectHandle);
     public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = pair(toDataWatcherItem, toDataWatcherItemHandle);
