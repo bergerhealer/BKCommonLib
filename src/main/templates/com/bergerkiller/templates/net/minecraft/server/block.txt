@@ -417,7 +417,12 @@ interface IBlockData {
 
     public (IBlockDataHandle) IBlockData set((IBlockStateHandle) IBlockState state, Object value) {
         if (state != null) {
-            Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, state.b(), null);
+#if version >= 1.16
+            Class type = state.getType();
+#else
+            Class type = state.b();
+#endif
+            Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, type, null);
             if (converted != null) {
                 return (IBlockData) instance.set(state, (Comparable) converted);
             }
