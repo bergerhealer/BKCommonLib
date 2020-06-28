@@ -53,7 +53,7 @@ class DimensionManager {
         IRegistryCustom$Dimension registry = server.f;
         java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
-            return key_opt.get();
+            return (ResourceKey) key_opt.get();
         } else {
             throw new IllegalArgumentException("This dimension is not registered");
         }
@@ -88,7 +88,7 @@ class DimensionManager {
         }
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server.f;
-        return registry.a().a(res_key);
+        return (DimensionManager) registry.a().a(res_key);
     }
 #else
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey getKey() {
