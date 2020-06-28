@@ -1,7 +1,5 @@
 package com.bergerkiller.reflection.org.bukkit.craftbukkit;
 
-import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
@@ -9,7 +7,6 @@ import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 /**
  * Deprecated: use {@link BlockStateConversion} and {@link CraftBlockStateHandle} instead to perform BlockState
@@ -18,8 +15,6 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 @Deprecated
 public class CBCraftBlockState {
     public static final ClassTemplate<?> T = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
-    @Deprecated public static final FieldAccessor<World> world  = CraftBlockStateHandle.T.world.toFieldAccessor();
-    @Deprecated public static final FieldAccessor<Chunk> chunk  = CraftBlockStateHandle.T.chunk.toFieldAccessor();
 
     public static Object toTileEntity(BlockState state) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(state);

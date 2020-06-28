@@ -2,8 +2,6 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit.block;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import org.bukkit.Chunk;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
@@ -29,10 +27,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract World getWorld();
-    public abstract void setWorld(World value);
-    public abstract Chunk getChunk();
-    public abstract void setChunk(Chunk value);
     public abstract int getFlag();
     public abstract void setFlag(int value);
     /**
@@ -42,8 +36,6 @@ public abstract class CraftBlockStateHandle extends Template.Handle {
     public static final class CraftBlockStateClass extends Template.Class<CraftBlockStateHandle> {
         public final Template.Constructor.Converted<BlockState> constr_block = new Template.Constructor.Converted<BlockState>();
 
-        public final Template.Field.Converted<World> world = new Template.Field.Converted<World>();
-        public final Template.Field.Converted<Chunk> chunk = new Template.Field.Converted<Chunk>();
         public final Template.Field.Integer flag = new Template.Field.Integer();
 
         @Template.Optional

@@ -8,8 +8,6 @@ import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 import net.minecraft.server.TileEntity;
 
 class CraftBlockState {
-    private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld world;
-    private final (org.bukkit.Chunk) org.bukkit.craftbukkit.CraftChunk chunk;
 #if version >= 1.13
     protected unknown net.minecraft.server.IBlockData data;
 #else
@@ -24,22 +22,27 @@ class CraftBlockState {
     // Not supported on earlier versions, instantiation worked differently there
 #if version >= 1.13
     public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, net.minecraft.server.IBlockData blockData, net.minecraft.server.TileEntity tileEntity) {
+  #if exists org.bukkit.craftbukkit.block.CraftBlockState private final CraftWorld world;
         #require org.bukkit.craftbukkit.block.CraftBlockState private final CraftWorld blockState_world:world;
-        #require org.bukkit.craftbukkit.block.CraftBlockState private final CraftChunk blockState_chunk:chunk;
         instance#blockState_world = block.getWorld();
-        instance#blockState_chunk = chunk;
+  #endif
 
-#if version >= 1.13.2
+  #if exists org.bukkit.craftbukkit.block.CraftBlockState private final CraftChunk chunk;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final CraftChunk blockState_chunk:chunk;
+        instance#blockState_chunk = chunk;
+  #endif
+
+  #if version >= 1.13.2
         #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.server.BlockPosition blockState_position:position;
         instance#blockState_position = ((CraftBlock) block).getPosition();
-#else
+  #else
         #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_x:x;
         #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_y:y;
         #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_z:z;
         instance#blockState_x = block.getX();
         instance#blockState_y = block.getY();
         instance#blockState_z = block.getZ();
-#endif
+  #endif
 
         instance.setData(blockData);
         instance.setFlag(3);
