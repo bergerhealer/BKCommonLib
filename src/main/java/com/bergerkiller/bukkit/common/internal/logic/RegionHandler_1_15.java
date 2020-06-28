@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
@@ -33,6 +34,7 @@ public class RegionHandler_1_15 extends RegionHandler {
     public RegionHandler_1_15() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClass(CommonUtil.getNMSClass("RegionFileCache"));
+        resolver.setVariable("version", Common.MC_VERSION);
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         // This is slightly different on PaperSpigot, where they changed the IChunkLoader to extend RegionFileCache, rather than adding a field
@@ -48,17 +50,21 @@ public class RegionHandler_1_15 extends RegionHandler {
             findRegionFileCache.init(findRegionFileCacheMethod);
         } else {
             // Spigot/CraftBukkit/vanilla NMS
-            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
                     "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
                     "    #require net.minecraft.server.IChunkLoader private final IOWorker ioworker:a;\n" +
                     "    IOWorker ioworker = icl#ioworker;\n" +
+                    "#if version >= 1.16\n" +
+                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:d;\n" +
+                    "#else\n" +
                     "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:e;\n" +
+                    "#endif\n" +
                     "    RegionFileCache rfc = ioworker#cache;\n" +
                     "    return rfc.cache;\n" +
-                    "}");
+                    "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
         }
 

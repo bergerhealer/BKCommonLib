@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandler_Broken;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 
 /**
@@ -33,5 +34,10 @@ public class InternalLogicInitializeTest {
     @Test
     public void testRegionHandler() {
         assertNotNull(RegionHandler.INSTANCE);
+    }
+
+    @Test
+    public void testPlayerFileDataHandler() {
+        assertNotNull(PlayerFileDataHandler.INSTANCE);
     }
 }
