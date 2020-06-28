@@ -589,15 +589,24 @@ public class TestServerFactory {
             // this.f = iregistrycustom_dimension; (MinecraftServer.java)
             setField(mc_server, "f", createFromCode(minecraftServerType, "return IRegistryCustom.b();"));
 
+            // Initialize WorldDataServer instance
+            // public WorldDataServer(WorldSettings worldsettings, GeneratorSettings generatorsettings, Lifecycle lifecycle)
+            Object worldData;
+            {
+                Object worldSettings = createFromCode(minecraftServerType, "return MinecraftServer.c;");
+                Object generatorSettings = createFromCode(minecraftServerType, "return GeneratorSettings.a();");
+                Object lifeCycle = createFromCode(minecraftServerType, "return com.mojang.serialization.Lifecycle.stable();");
+                Class<?> worldDataType = Class.forName(nms_root + "WorldDataServer");
+                worldData = construct(worldDataType, worldSettings, generatorSettings, lifeCycle);
+            }
+
+            /*
             // Initialize the server further, loading the resource packs, by calling MinecraftServer.a(File, WorldData)
             File serverDir = new File(System.getProperty("user.dir"), "target");
-            Class<?> worldDataType = Class.forName(nms_root + "WorldData");
-            java.lang.reflect.Constructor<?> con = worldDataType.getDeclaredConstructor();
-            con.setAccessible(true);
-            Object worldData = con.newInstance();
             java.lang.reflect.Method m = minecraftServerType.getDeclaredMethod("a", File.class, worldDataType);
             m.setAccessible(true);
             m.invoke(mc_server, serverDir, worldData);
+            */
         } catch (Throwable t) {
             System.err.println("Failed to initialize server under test");
             System.out.println("Detected server class under test: " + CommonServerBase.SERVER_CLASS);
@@ -679,9 +688,16 @@ public class TestServerFactory {
                     boolean suitable = true;
                     for (int i = 0; i < paramTypes.length; i++) {
                         if (parameters[i] == null) {
+                            // Primitive types can not be assigned null
+                            if (parameters[i].getClass().isPrimitive()) {
+                                suitable = false;
+                                break;
+                            }
                             continue;
                         }
-                        if (!paramTypes[i].isAssignableFrom(parameters[i].getClass())) {
+
+                        Class<?> paramTypeFixed = LogicUtil.tryBoxType(paramTypes[i]);
+                        if (!paramTypeFixed.isAssignableFrom(parameters[i].getClass())) {
                             suitable = false;
                             break;
                         }
