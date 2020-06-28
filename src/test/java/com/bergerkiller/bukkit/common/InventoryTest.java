@@ -10,6 +10,7 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -18,6 +19,13 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
  * Tests whether the base implementation for Bukkit inventories works correctly
  */
 public class InventoryTest {
+
+    @Test
+    public void testEmptyItemConstant() {
+        if (CommonCapabilities.ITEMSTACK_EMPTY_STATE) {
+            assertNotNull(ItemStackHandle.EMPTY_ITEM.getRaw());
+        }
+    }
 
     @Test
     public void testItemStackConversion() {

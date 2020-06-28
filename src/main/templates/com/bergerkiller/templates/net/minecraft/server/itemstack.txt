@@ -7,7 +7,9 @@ import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 class ItemStack {
-#if version >= 1.11
+#if version >= 1.16
+    public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:b;
+#elseif version >= 1.11
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:a;
 #else
     public optional static final (ItemStackHandle) ItemStack OPT_EMPTY_ITEM:###;
