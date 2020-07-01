@@ -3,6 +3,11 @@
 
 #if version >= 1.13
 // ======================= New >= 1.13 ========================
+ISAIR:
+  AIR
+  CAVE_AIR
+  VOID_AIR
+
 ISDOOR:
   ACACIA_DOOR
   BIRCH_DOOR
@@ -93,13 +98,6 @@ ISSIGN:
   SIGN
   LEGACY_SIGN_POST
   LEGACY_WALL_SIGN
-#endif
-
-ISAIR:
-  AIR
-#if version >= 1.13
-  CAVE_AIR
-  VOID_AIR
 #endif
 
 ISPRESSUREPLATE:
@@ -337,6 +335,9 @@ ISPOTION:
 // ============================================================
 #else
 // ===================== Legacy <= 1.12.2 =====================
+ISAIR:
+  AIR
+
 ISDOOR:
   LEGACY_WOODEN_DOOR
   LEGACY_JUNGLE_DOOR
