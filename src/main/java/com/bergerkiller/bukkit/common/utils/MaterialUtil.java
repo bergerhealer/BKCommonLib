@@ -216,6 +216,11 @@ public class MaterialUtil {
     }
 
     /**
+     * The material is a type of air block.
+     */
+    public static final MaterialTypeProperty ISAIR = TYPE_PROPERTIES.get("ISAIR");
+    
+    /**
      * The material is a type of door block.
      * Materials of this type are guaranteed to have a Door MaterialData.
      */
