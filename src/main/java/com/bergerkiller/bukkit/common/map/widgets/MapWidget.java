@@ -841,7 +841,7 @@ public class MapWidget implements MapDisplayEvents {
 
             // Clear old region when invalidated
             if (this._invalidated) {
-                this.layer.clearRectangle(this._lastX, this._lastY, this._lastWidth, this._lastHeight);
+                this.createParentClip(this.layer).clearRectangle(this._lastX, this._lastY, this._lastWidth, this._lastHeight);
                 this._lastWidth = 0;
                 this._lastHeight = 0;
             }
