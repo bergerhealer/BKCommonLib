@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.lang.reflect.Modifier;
 import java.util.List;
+import java.util.function.Function;
 
 import org.bukkit.World;
 
@@ -18,9 +19,10 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 
-public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
+public class ChunkGeneratorHook {
     private static final SafeField<Object> cpsChunkGeneratorField;
-    private final World world;
+    private static final Class<? extends ClassHook<?>> hookType;
+    private static final Function<World, ? extends ClassHook<?>> hookConstructor;
 
     static {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
@@ -30,19 +32,22 @@ public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
             cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
                     "chunkProvider", CommonUtil.getNMSClass("IChunkProvider")));
         }
-    }
-
-    public ChunkGeneratorHook(World world) {
-        this.world = world;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+            hookType = ChunkGeneratorHook_1_16.class;
+            hookConstructor = ChunkGeneratorHook_1_16::new;
+        } else {
+            hookType = ChunkGeneratorHook_1_8_to_1_15_2.class;
+            hookConstructor = ChunkGeneratorHook_1_8_to_1_15_2::new;
+        }
     }
 
     public static void hook(org.bukkit.World world) {
         Object cps = getCPS(world);
         Object generator = cpsChunkGeneratorField.get(cps);
-        ChunkGeneratorHook hook = ChunkGeneratorHook.get(generator, ChunkGeneratorHook.class);
+        ClassHook<?> hook = ClassHook.get(generator, hookType);
         if (hook == null && generator != null && !Modifier.isFinal(generator.getClass().getModifiers())) {
             try {
-                hook = new ChunkGeneratorHook(world);
+                hook = hookConstructor.apply(world);
                 generator = hook.hook(generator);
                 cpsChunkGeneratorField.set(cps, generator);
             } catch (Throwable t) {
@@ -54,10 +59,10 @@ public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
     public static void unhook(org.bukkit.World world) {
         Object cps = getCPS(world);
         Object generator = cpsChunkGeneratorField.get(cps);
-        ChunkGeneratorHook hook = ChunkGeneratorHook.get(generator, ChunkGeneratorHook.class);
+        ClassHook<?> hook = ClassHook.get(generator, hookType);
         if (hook != null) {
             try {
-                generator = ChunkGeneratorHook.unhook(generator);
+                generator = ClassHook.unhook(generator);
                 cpsChunkGeneratorField.set(cps, generator);
             } catch (Throwable t) {
                 t.printStackTrace();
@@ -69,24 +74,61 @@ public class ChunkGeneratorHook extends ClassHook<ChunkGeneratorHook> {
         return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
-    @HookMethod("public List getMobsFor(net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
-    public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
-        List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
-        if (CommonPlugin.hasInstance()) {
-            // First check if anyone is even interested in this information
-            // There is no use wasting CPU time when no one handles the event!
-            if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
+    private static class ChunkGeneratorHook_1_16 extends ClassHook<ChunkGeneratorHook_1_16> {
+        private final World world;
+
+        public ChunkGeneratorHook_1_16(World world) {
+            this.world = world;
+        }
+
+        @HookMethod("public List getMobsFor(net.minecraft.server.BiomeBase, net.minecraft.server.StructureManager, net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
+        public List<?> getMobsFor(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
+            List<?> mobs = base.getMobsFor(biomeBase, structureManager, enumcreaturetype, blockposition);
+            if (CommonPlugin.hasInstance()) {
+                // First check if anyone is even interested in this information
+                // There is no use wasting CPU time when no one handles the event!
+                if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
+                    return mobs;
+                }
+                // Wrap the parameters and send the event along
+                BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
+                List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+                mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
+                        pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
+
+                return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
+            } else {
                 return mobs;
             }
-            // Wrap the parameters and send the event along
-            BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
-            List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
-            mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
-                    pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
+        }
+    }
 
-            return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
-        } else {
-            return mobs;
+    private static class ChunkGeneratorHook_1_8_to_1_15_2 extends ClassHook<ChunkGeneratorHook_1_8_to_1_15_2> {
+        private final World world;
+
+        public ChunkGeneratorHook_1_8_to_1_15_2(World world) {
+            this.world = world;
+        }
+
+        @HookMethod("public List getMobsFor(net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
+        public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
+            List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
+            if (CommonPlugin.hasInstance()) {
+                // First check if anyone is even interested in this information
+                // There is no use wasting CPU time when no one handles the event!
+                if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
+                    return mobs;
+                }
+                // Wrap the parameters and send the event along
+                BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
+                List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+                mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
+                        pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
+
+                return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
+            } else {
+                return mobs;
+            }
         }
     }
 }
