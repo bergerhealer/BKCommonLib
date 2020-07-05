@@ -418,6 +418,29 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets the key that uniquely identified the world as a dimension. The first three default
+     * main worlds are called overworld, the_nether and the_end. Worlds beyond that use
+     * a custom key with the world name.
+     * 
+     * @param world
+     * @return dimension key
+     */
+    public static ResourceKey<org.bukkit.World> getDimensionKey(org.bukkit.World world) {
+        return WorldServerHandle.fromBukkit(world).getDimensionKey();
+    }
+
+    /**
+     * Gets the world by the dimension key that represents it. See the format of this key in
+     * {@link #getDimensionKey(World)}.
+     * 
+     * @param dimensionKey the dimension key to get the world of
+     * @return world of this dimension key, null if the dimension has no loaded world
+     */
+    public static org.bukkit.World getWorldByDimensionKey(ResourceKey<org.bukkit.World> dimensionKey) {
+        return WorldServerHandle.getByDimensionKey(dimensionKey);
+    }
+
+    /**
      * Gets the server a world object is running on
      *
      * @param world to get the server of

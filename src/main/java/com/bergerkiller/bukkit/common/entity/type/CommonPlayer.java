@@ -1,24 +1,27 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.BlockLocation;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 
 import org.bukkit.Location;
+import org.bukkit.World;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 /**
  * A Common Entity implementation for Players
  */
-public class CommonPlayer extends CommonHumanEntity<Player> {
+public class CommonPlayer extends CommonLivingEntity<Player> {
 
     public CommonPlayer(Player entity) {
         super(entity);
@@ -126,15 +129,36 @@ public class CommonPlayer extends CommonHumanEntity<Player> {
     }
 
     /**
-     * Gets a list of IntVector2 chunk coordinates for chunks that still have to
-     * be sent
-     *
-     * @return list of chunk coordinates pending for sending
+     * Gets the block location of the respawn point for the player.
+     * If none is available, null is returned instead.
+     * 
+     * @return spawn point coordinates, or null if none are available
      */
-    //?
-    @Deprecated
-    public List<IntVector2> getChunkSendQueue() {
-    	throw new RuntimeException("BROKEN!!!");
-//        return new ConvertingList<IntVector2>(getHandle(EntityPlayer.class).chunkCoordIntPairQueue, ConversionPairs.chunkIntPair);
+    public Block getSpawnPoint() {
+        EntityPlayerHandle handle = this.getHandle(EntityPlayerHandle.class);
+        World world = handle.getSpawnWorld();
+        IntVector3 coords = handle.getSpawnCoord();
+        if (world != null && coords != null) {
+            return coords.toBlock(world);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Sets the block location of the respawn point for the human entity.
+     * To clear the respawn point and set it to 'none', set it to null.
+     * 
+     * @param spawnPoint to set to
+     */
+    public void setSpawnPoint(Block spawnPoint) {
+        EntityPlayerHandle handle = EntityPlayerHandle.createHandle(this.getHandle());
+        if (spawnPoint == null) {
+            handle.setSpawnWorld(null);
+            handle.setSpawnCoord(null);
+        } else {
+            handle.setSpawnWorld(spawnPoint.getWorld());
+            handle.setSpawnCoord(new IntVector3(spawnPoint));
+        }
     }
 }

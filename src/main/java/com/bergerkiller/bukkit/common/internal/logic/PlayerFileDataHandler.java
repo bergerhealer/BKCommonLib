@@ -5,13 +5,15 @@ import java.util.logging.Level;
 
 import org.bukkit.World;
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 /**
@@ -55,30 +57,34 @@ public abstract class PlayerFileDataHandler {
 
         @HookMethod("public abstract NBTTagCompound load(EntityHuman paramEntityHuman)")
         public Object load(Object entityHuman) {
-            if (this.controller == null) {
-                return this.base.load(entityHuman);
-            } else {
-                CommonTagCompound compound = null;
-                try {
-                    compound = this.controller.onLoad((HumanEntity) Conversion.toEntity.convert(entityHuman));
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+            if (this.controller != null) {
+                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                if (player != null) {
+                    CommonTagCompound compound = null;
+                    try {
+                        compound = this.controller.onLoad(player);
+                    } catch (Throwable t) {
+                        Logging.LOGGER.log(Level.SEVERE, "Failed to handle onLoad() on " + this.controller, t);
+                    }
+                    return (compound == null) ? null : compound.getRawHandle();
                 }
-                return (compound == null) ? null : compound.getRawHandle();
             }
+            return this.base.load(entityHuman);
         }
 
         @HookMethod("public abstract void save(EntityHuman paramEntityHuman)")
         public void save(Object entityHuman) {
-            if (this.controller == null) {
-                this.base.save(entityHuman);
-            } else {
-                try {
-                    this.controller.onSave((HumanEntity) Conversion.toEntity.convert(entityHuman));
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to handle onSave() on " + this.controller, t);
+            if (this.controller != null) {
+                Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
+                if (player != null) {
+                    try {
+                        this.controller.onSave(player);
+                    } catch (Throwable t) {
+                        Logging.LOGGER.log(Level.SEVERE, "Failed to handle onSave() on " + this.controller, t);
+                    }
                 }
             }
+            this.base.save(entityHuman);
         }
 
         @Override

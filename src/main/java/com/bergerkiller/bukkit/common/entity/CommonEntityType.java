@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
-import com.bergerkiller.bukkit.common.entity.type.CommonHumanEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -21,7 +20,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
@@ -457,7 +455,6 @@ public class CommonEntityType {
         // Order is important, the first pair that can be used is selected
         // Since humans are living entities, they must be put before living entities
         commonPairs = new CommonPair[] {
-                new CommonPair(HumanEntity.class, CommonHumanEntity.class),
                 new CommonPair(LivingEntity.class, CommonLivingEntity.class),
                 new CommonPair(Minecart.class, CommonMinecart.class)
         };

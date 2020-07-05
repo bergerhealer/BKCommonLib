@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import org.bukkit.entity.Entity;
@@ -36,10 +35,6 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
     public abstract void setFoodDataRaw(Object value);
     public abstract int getSleepTicks();
     public abstract void setSleepTicks(int value);
-    public abstract IntVector3 getSpawnCoord();
-    public abstract void setSpawnCoord(IntVector3 value);
-    public abstract boolean isSpawnForced();
-    public abstract void setSpawnForced(boolean value);
     public abstract PlayerAbilities getAbilities();
     public abstract void setAbilities(PlayerAbilities value);
     public abstract int getExpLevel();
@@ -50,8 +45,6 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
     public abstract void setExp(float value);
     public abstract GameProfileHandle getGameProfile();
     public abstract void setGameProfile(GameProfileHandle value);
-    public abstract String getSpawnWorld();
-    public abstract void setSpawnWorld(String value);
     /**
      * Stores class members for <b>net.minecraft.server.EntityHuman</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -62,14 +55,11 @@ public abstract class EntityHumanHandle extends EntityLivingHandle {
         public final Template.Field.Converted<ContainerHandle> activeContainer = new Template.Field.Converted<ContainerHandle>();
         public final Template.Field.Converted<Object> foodDataRaw = new Template.Field.Converted<Object>();
         public final Template.Field.Integer sleepTicks = new Template.Field.Integer();
-        public final Template.Field.Converted<IntVector3> spawnCoord = new Template.Field.Converted<IntVector3>();
-        public final Template.Field.Boolean spawnForced = new Template.Field.Boolean();
         public final Template.Field.Converted<PlayerAbilities> abilities = new Template.Field.Converted<PlayerAbilities>();
         public final Template.Field.Integer expLevel = new Template.Field.Integer();
         public final Template.Field.Integer expTotal = new Template.Field.Integer();
         public final Template.Field.Float exp = new Template.Field.Float();
         public final Template.Field.Converted<GameProfileHandle> gameProfile = new Template.Field.Converted<GameProfileHandle>();
-        public final Template.Field<String> spawnWorld = new Template.Field<String>();
 
         public final Template.Method.Converted<Void> attack = new Template.Method.Converted<Void>();
 

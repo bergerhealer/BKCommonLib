@@ -2,8 +2,10 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import org.bukkit.Chunk;
+import org.bukkit.World;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -27,11 +29,16 @@ public abstract class WorldServerHandle extends WorldHandle {
 
     /* ============================================================================== */
 
+    public static World getByDimensionKey(ResourceKey<World> key) {
+        return T.getByDimensionKey.invoke(key);
+    }
+
     public abstract List<EntityPlayerHandle> getPlayers();
     public abstract EntityTracker getEntityTracker();
     public abstract Object getEntityTrackerHandle();
     public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract ResourceKey<World> getDimensionKey();
     public abstract WorldDataServerHandle getWorldData();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
@@ -64,11 +71,14 @@ public abstract class WorldServerHandle extends WorldHandle {
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 
+        public final Template.StaticMethod.Converted<World> getByDimensionKey = new Template.StaticMethod.Converted<World>();
+
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
         public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();
         public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
         public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
+        public final Template.Method.Converted<ResourceKey<World>> getDimensionKey = new Template.Method.Converted<ResourceKey<World>>();
         public final Template.Method.Converted<WorldDataServerHandle> getWorldData = new Template.Method.Converted<WorldDataServerHandle>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();

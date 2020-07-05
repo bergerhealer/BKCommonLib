@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import org.bukkit.entity.HumanEntity;
+import org.bukkit.entity.Player;
 
 /**
  * A controller for dealing with player data loading and saving. To hook it up
@@ -17,24 +18,24 @@ public class PlayerDataController {
     }
 
     /**
-     * Called when the entity data for a human entity has to be loaded By
+     * Called when the entity data for a player has to be loaded. By
      * default, this method redirects to the underlying implementation.
      *
-     * @param humanEntity to load
+     * @param player to load
      * @return the loaded data
      */
-    public CommonTagCompound onLoad(HumanEntity humanEntity) {
-        return hook.base_load(humanEntity);
+    public CommonTagCompound onLoad(Player player) {
+        return hook.base_load(player);
     }
 
     /**
-     * Called when the entity data of a human entity has to be saved. By
+     * Called when the entity data of a player has to be saved. By
      * default, this method redirects to the underlying implementation.
      *
-     * @param humanEntity to save
+     * @param player to save
      */
-    public void onSave(HumanEntity humanEntity) {
-        hook.base_save(humanEntity);
+    public void onSave(Player player) {
+        hook.base_save(player);
     }
 
     /**

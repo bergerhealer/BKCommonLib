@@ -260,72 +260,6 @@ class EntityHuman extends EntityLiving {
 
     public int sleepTicks;
 
-#if version >= 1.16
-    //TODO!!!!
-    private (IntVector3) BlockPosition spawnCoord:FIELDREMOVED;
-    private boolean spawnForced:FIELDREMOVED;
-#elseif version >= 1.15
-    protected unknown boolean bJ;
-    private (IntVector3) BlockPosition spawnCoord:g;
-    private boolean spawnForced:bR;
-#elseif version >= 1.14.4
-    protected unknown boolean bM;
-    private (IntVector3) BlockPosition spawnCoord:g;
-    private boolean spawnForced:bU;
-#elseif version >= 1.14
-    protected unknown boolean bM;
-    private (IntVector3) BlockPosition spawnCoord:f;
-    private boolean spawnForced:g;
-#elseif version >= 1.13
-    public unknown float bS;
-    public unknown float bT;
-    private unknown boolean d;
-    protected unknown boolean bU;
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
-#elseif version >= 1.12
-    public unknown float bM;
-    public unknown float bN;
-    private (IntVector3) BlockPosition spawnCoord:d;
-    private boolean spawnForced:e;
-#elseif version >= 1.11
-    public unknown float bI;
-    public unknown float bJ;
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
-    private unknown BlockPosition g;
-#elseif version >= 1.10.2
-    public unknown float bJ;
-    public unknown float bK;
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
-    private unknown BlockPosition g;
-#elseif version >= 1.9.4
-    public unknown float bI;
-    public unknown float bJ;
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
-    private unknown BlockPosition g;    
-#elseif version >= 1.9
-    public unknown float bH;
-    public unknown float bI;
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
-    private unknown BlockPosition g;
-#elseif version >= 1.8.3
-    public unknown float by;
-    public unknown float bz;
-    private (IntVector3) BlockPosition spawnCoord:c;
-    private boolean spawnForced:d;
-    private unknown BlockPosition e;
-#else
-    public unknown float bw;
-    public unknown float bx;
-    private (IntVector3) BlockPosition spawnCoord:c;
-    private boolean spawnForced:d;
-    private unknown BlockPosition e;
-#endif
-
     public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
     public int expLevel;
     public int expTotal;
@@ -403,13 +337,6 @@ class EntityHuman extends EntityLiving {
     private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bF;
 #endif
 
-#if version >= 1.16
-    //TODO!!!!!
-    public String spawnWorld:FIELDREMOVED;
-#else
-    public String spawnWorld;
-#endif
-
     public void attack((org.bukkit.entity.Entity) Entity entity);
 }
 
@@ -417,7 +344,68 @@ class EntityPlayer extends EntityHuman {
     public (PlayerConnectionHandle) PlayerConnection playerConnection;
     // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
     // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
+
+#if version >= 1.16
+    private (IntVector3) BlockPosition spawnCoord:spawn;
+    private boolean spawnForced;
+#elseif version >= 1.15
+    private (IntVector3) BlockPosition spawnCoord:g;
+    private boolean spawnForced:bR;
+#elseif version >= 1.14.4
+    private (IntVector3) BlockPosition spawnCoord:g;
+    private boolean spawnForced:bU;
+#elseif version >= 1.14
+    private (IntVector3) BlockPosition spawnCoord:f;
+    private boolean spawnForced:g;
+#elseif version >= 1.13
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+#elseif version >= 1.12
+    private (IntVector3) BlockPosition spawnCoord:d;
+    private boolean spawnForced:e;
+#elseif version >= 1.11
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+#elseif version >= 1.10.2
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+#elseif version >= 1.9.4
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f; 
+#elseif version >= 1.9
+    private (IntVector3) BlockPosition spawnCoord:e;
+    private boolean spawnForced:f;
+#elseif version >= 1.8.3
+    private (IntVector3) BlockPosition spawnCoord:c;
+    private boolean spawnForced:d;
+#else
+    private (IntVector3) BlockPosition spawnCoord:c;
+    private boolean spawnForced:d;
+#endif
+
     public int ping;
+
+#if version >= 1.16
+    // World dimension on 1.16 and later
+    public org.bukkit.World getSpawnWorld() {
+        ResourceKey<World> spawn = instance.getSpawnDimension();
+        World world = MinecraftServer.getServer().getWorldServer(spawn);
+        return (world == null) ? null : world.getWorld();
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        #require net.minecraft.server.EntityPlayer private ResourceKey<World> spawnDimension;
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
+        instance#spawnDimension = key;
+    }
+#else
+    // World name on 1.15.2 and earlier
+    public org.bukkit.World getSpawnWorld() {
+        return org.bukkit.Bukkit.getWorld(instance.spawnWorld);
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        instance.spawnWorld = (world == null) ? "" : world.getName();
+    }
+#endif
 
 #if exists net.minecraft.server.EntityPlayer public final java.util.List<Integer> removeQueue;
     public optional Collection<Integer> getRemoveQueue() {

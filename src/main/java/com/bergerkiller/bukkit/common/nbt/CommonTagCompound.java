@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTCompressedStreamToolsHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle;
@@ -122,6 +123,12 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
             Integer z = putGetRemove(op, key + "Z", Integer.class, (pos == null) ? null : pos.z);
             if (x != null && y != null && z != null) {
                 return (T) new IntVector3(x.intValue(), y.intValue(), z.intValue());
+            }
+        } else if (type == MinecraftKeyHandle.class) {
+            // == MinecraftKeyHandle ==
+            String v = putGetRemove(op, key, String.class, (value == null) ? null : ((MinecraftKeyHandle) value).toString());
+            if (v != null) {
+                return (T) MinecraftKeyHandle.createNew(v);
             }
         } else if (type == boolean.class || type == Boolean.class) {
             // == Booleans (serialized as Byte) ==
@@ -348,6 +355,27 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      */
     public void putUUID(String key, UUID data) {
         putValue(key, UUID.class, data);
+    }
+
+    /**
+     * Gets the MinecraftKey Handle value stored at a key as a String, decoding it into
+     * a MinecraftKey.
+     * 
+     * @param key to read
+     * @return value at the key
+     */
+    public MinecraftKeyHandle getMinecraftKey(String key) {
+        return getValue(key, MinecraftKeyHandle.class);
+    }
+
+    /**
+     * Puts a MinecraftKey Handle value at a key, converting it to a String when stored.
+     * 
+     * @param key to put at
+     * @param minecraftKey value to put
+     */
+    public void putMinecraftKey(String key, MinecraftKeyHandle minecraftKey) {
+        putValue(key, MinecraftKeyHandle.class, minecraftKey);
     }
 
     /**

@@ -108,19 +108,45 @@ class World extends IBlockAccess {
 #if version >= 1.16
     public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
-#elseif version >= 1.9
-    public (DimensionType) DimensionManager getDimensionType() {
-        return instance.worldProvider.getDimensionManager();
-    }
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager getDimensionTypeKey() {
-        return instance.worldProvider.getDimensionManager();
-    }
 #else
     public (DimensionType) DimensionManager getDimensionType() {
+  #if version >= 1.14.1
+        // Since 1.14.1 Bukkit added a method to easily obtain the dimension type
+        return instance.worldProvider.getDimensionManager().getType();
+
+  #elseif version >= 1.14
+        // Since 1.14 the DimensionManager has multiple instances for many worlds
+        // As a result, it is not an accurate way to obtain the world type
+        // There is no getType() we can use yet, so the next best way is to check the type of world provider
+        if (instance.worldProvider instanceof WorldProviderHell) {
+            return DimensionManager.NETHER;
+        } else if (instance.worldProvider instanceof WorldProviderTheEnd) {
+            return DimensionManager.THE_END;
+        } else {
+            return DimensionManager.OVERWORLD;
+        }
+  #elseif version >= 1.9
+        // Uses DimensionManager. Since 1.13.1 DimensionManager is no longer an enum.
+        // However, WorldProvider does not return the DimensionManager of the world, but
+        // rather the enum constants, so the result of WorldProvider:getDimensionManager()
+        // is safe to use!
+        return instance.worldProvider.getDimensionManager();
+  #else
+        // Uses a dimension ID, instead of a DimensionManager instance.
+        // WorldProvider:getDimension() only returns -1, 0 or 1, as set in the constructor
         return DimensionManager.a(instance.worldProvider.getDimension());
+  #endif
     }
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager getDimensionTypeKey() {
-        return DimensionManager.a(instance.worldProvider.getDimension());
+
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey getDimensionTypeKey() {
+        DimensionManager dimensionType = (DimensionManager) com.bergerkiller.generated.net.minecraft.server.WorldHandle.T.getDimensionType.raw.invoke(instance);
+        if (dimensionType == DimensionManager.NETHER) {
+            return ResourceKey.WORLD_DIMENSION_TYPE_THE_NETHER;
+        } else if (dimensionType == DimensionManager.THE_END) {
+            return ResourceKey.WORLD_DIMENSION_TYPE_THE_END;
+        } else {
+            return ResourceKey.WORLD_DIMENSION_TYPE_OVERWORLD;
+        }
     }
 #endif
 
@@ -346,6 +372,64 @@ class WorldServer extends World {
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+#endif
+
+#if version >= 1.16
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey();
+
+    public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+        return MinecraftServer.getServer().getWorldServer(key);
+    }
+#else
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey() {
+        // If one of the main worlds (world, world_nether, world_the_end), then use the overworld, the_nether or the_end constants
+        // Otherwise, create a new resource key using the world name
+    #if version >= 1.13.1
+        int dimension = instance.dimension.getDimensionID();
+    #else
+        int dimension = instance.dimension;
+    #endif
+        // First three default main worlds
+        if (dimension == 0) {
+            return ResourceKey.WORLD_DIMENSION_OVERWORLD;
+        } else if (dimension == -1) {
+            return ResourceKey.WORLD_DIMENSION_THE_NETHER;
+        } else if (dimension == 1) {
+            return ResourceKey.WORLD_DIMENSION_THE_END;
+        }
+
+        // Custom world, dimension key is by world name lower-cased
+        String name = instance.worldData.getName().toLowerCase(java.util.Locale.ENGLISH);
+        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, new MinecraftKey(name));
+    }
+
+    public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+        String name = (String) com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle.T.name.get(key.name);
+        MinecraftServer server = MinecraftServer.getServer();
+
+  #if version >= 1.13.1
+        // Uses DimensionManager, rather than dimension id's
+        if (name.equals("overworld")) {
+            return server.getWorldServer(DimensionManager.OVERWORLD);
+        } else if (name.equals("the_nether")) {
+            return server.getWorldServer(DimensionManager.THE_NETHER);
+        } else if (name.equals("the_end")) {
+            return server.getWorldServer(DimensionManager.THE_END);
+        }
+  #else
+        // Uses dimension id's
+        if (name.equals("overworld")) {
+            return server.getWorldServer(0);
+        } else if (name.equals("the_nether")) {
+            return server.getWorldServer(-1);
+        } else if (name.equals("the_end")) {
+            return server.getWorldServer(1);
+        }
+  #endif
+
+        // Non-main world, get by name
+        return ((org.bukkit.craftbukkit.CraftWorld) server.server.getWorld(name)).getHandle();
+    }
 #endif
 
 #if version >= 1.16
