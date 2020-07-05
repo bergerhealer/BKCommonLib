@@ -186,9 +186,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return instance.world;
     }
 
-    public (WorldServerHandle) WorldServer getWorldServer() {
-        return (WorldServer) instance.world;
+    <code>
+    public WorldServerHandle getWorldServer() {
+        return WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
+    </code>
 
     public void setWorld((WorldHandle) World world) {
         instance.world = world;

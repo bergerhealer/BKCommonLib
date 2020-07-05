@@ -48,7 +48,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocZ(double z);
     public abstract void setLoc(double x, double y, double z);
     public abstract WorldHandle getWorld();
-    public abstract WorldServerHandle getWorldServer();
     public abstract void setWorld(WorldHandle world);
     public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
@@ -162,6 +161,11 @@ public abstract class EntityHandle extends Template.Handle {
         } else {
             T.opt_passenger.set(getRaw(), passengers.get(0));
         }
+    }
+
+
+    public WorldServerHandle getWorldServer() {
+        return WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
 
 
@@ -399,7 +403,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocZ = new Template.Method<Void>();
         public final Template.Method<Void> setLoc = new Template.Method<Void>();
         public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
-        public final Template.Method.Converted<WorldServerHandle> getWorldServer = new Template.Method.Converted<WorldServerHandle>();
         public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
