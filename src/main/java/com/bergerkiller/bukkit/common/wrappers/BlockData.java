@@ -513,25 +513,6 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract void dropNaturally(World world, int x, int y, int z, float yield, int chance);
 
     /**
-     * Ignites the block (for example, ignites TNT)
-     *
-     * @param block to ignite at
-     */
-    public final void ignite(Block block) {
-        ignite(block.getWorld(), block.getX(), block.getY(), block.getZ());
-    }
-
-    /**
-     * Ignites the block (for example, ignites TNT)
-     *
-     * @param world the block is in
-     * @param x - coordinate of the block
-     * @param y - coordinate of the block
-     * @param z - coordinate of the block
-     */
-    public abstract void ignite(World world, int x, int y, int z);
-
-    /**
      * Destroys the block, spawning item drops naturally in the process
      *
      * @param block to destroy

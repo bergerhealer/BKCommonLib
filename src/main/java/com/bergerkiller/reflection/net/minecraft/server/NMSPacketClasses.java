@@ -150,18 +150,8 @@ public class NMSPacketClasses {
      */
 
     public static class NMSPacketPlayInAbilities extends NMSPacket {
-
-        public final FieldAccessor<Boolean> isInvulnerable = nextField("private boolean a");
-        public final FieldAccessor<Boolean> isFlying = nextFieldSignature("private boolean b");
-        public final FieldAccessor<Boolean> canFly = nextFieldSignature("private boolean c");
-        public final FieldAccessor<Boolean> canInstantlyBuild = nextFieldSignature("private boolean d");
-        public final FieldAccessor<Float> flySpeed = nextField("private float e");
-        public final FieldAccessor<Float> walkSpeed = nextField("private float f");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSPlayerAbilities.T.getType());
-
-        public CommonPacket newInstance(PlayerAbilities abilities) {
-            return constructor1.newInstance(abilities.getRawHandle());
-        }
+        //TODO: Only has 'isFlying' property since 1.16
+        //      We don't use this packet anywhere so for now, it's empty.
     }
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {
@@ -1088,9 +1078,7 @@ public class NMSPacketClasses {
     }
     
     public static class NMSPacketPlayOutGameStateChange extends NMSPacket {
-
-        public final FieldAccessor<Integer> unknown1 = nextField("private int b");
-        public final FieldAccessor<Float> unknown2 = nextFieldSignature("private float c");
+        //TODO: What does it all mean???
     }
 
     public static class NMSPacketPlayOutHeldItemSlot extends NMSPacket {

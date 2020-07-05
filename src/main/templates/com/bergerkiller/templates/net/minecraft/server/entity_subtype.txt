@@ -388,7 +388,7 @@ class EntityPlayer extends EntityHuman {
 #if version >= 1.16
     // World dimension on 1.16 and later
     public org.bukkit.World getSpawnWorld() {
-        ResourceKey<World> spawn = instance.getSpawnDimension();
+        ResourceKey spawn = instance.getSpawnDimension();
         World world = MinecraftServer.getServer().getWorldServer(spawn);
         return (world == null) ? null : world.getWorld();
     }

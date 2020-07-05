@@ -67,7 +67,9 @@ class DimensionManager {
 
     // deprecated fallback
     public int getId() {
-        java.util.Optional key_opt = IRegistryCustom$Dimension.a().c(instance);
+        MinecraftServer server = MinecraftServer.getServer();
+        IRegistryCustom$Dimension registry = server.f;
+        java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
             if (res_key == DimensionManager.OVERWORLD) {

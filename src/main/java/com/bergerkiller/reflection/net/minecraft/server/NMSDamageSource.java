@@ -53,10 +53,6 @@ public class NMSDamageSource {
         return DamageSourceHandle.thorns(damagedEntity).getRaw();
     }
 
-    public static Object forExplosion(Entity explodableEntity) {
-        return DamageSourceHandle.entityExplosion(explodableEntity).getRaw();
-    }
-
     public static Entity getEntity(Object damageSource) {
         return DamageSourceHandle.createHandle(damageSource).getEntity();
     }

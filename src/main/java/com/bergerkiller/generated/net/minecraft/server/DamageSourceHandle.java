@@ -49,23 +49,9 @@ public abstract class DamageSourceHandle extends Template.Handle {
         return T.thorns.invoke(entity);
     }
 
-    public static DamageSourceHandle explosion(ExplosionHandle explosion) {
-        return T.explosion.invoke(explosion);
-    }
-
     public abstract boolean isExplosion();
     public abstract boolean isFireDamage();
     public abstract Entity getEntity();
-
-    public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {
-        ExplosionHandle explosionHandle = null;
-        if (explodableEntity != null) {
-            org.bukkit.Location loc = explodableEntity.getLocation();
-            explosionHandle = ExplosionHandle.createNew(explodableEntity.getWorld(), explodableEntity, loc.getX(), loc.getY(), loc.getZ(), 0.0f, false, true);
-        }
-        return explosion(explosionHandle);
-    }
-
 
     private static final java.util.HashMap<String, DamageSourceHandle> _values = new java.util.HashMap<String, DamageSourceHandle>();
     public static DamageSourceHandle byName(String name) {
@@ -96,7 +82,6 @@ public abstract class DamageSourceHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<DamageSourceHandle> thrownHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> magicHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> thorns = new Template.StaticMethod.Converted<DamageSourceHandle>();
-        public final Template.StaticMethod.Converted<DamageSourceHandle> explosion = new Template.StaticMethod.Converted<DamageSourceHandle>();
 
         public final Template.Method<Boolean> isExplosion = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isFireDamage = new Template.Method<Boolean>();

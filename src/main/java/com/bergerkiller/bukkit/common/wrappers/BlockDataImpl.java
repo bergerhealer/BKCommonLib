@@ -31,7 +31,6 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -467,12 +466,6 @@ public class BlockDataImpl extends BlockData {
     @Override
     public final void dropNaturally(org.bukkit.World world, int x, int y, int z, float yield, int chance) {
         this.block.dropNaturally(this.data, world, new IntVector3(x, y, z), yield, chance);
-    }
-
-    @Override
-    public final void ignite(org.bukkit.World world, int x, int y, int z) {
-        ExplosionHandle ex = ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true);
-        this.block.ignite(world, new IntVector3(x, y, z), ex);
     }
 
     @Override

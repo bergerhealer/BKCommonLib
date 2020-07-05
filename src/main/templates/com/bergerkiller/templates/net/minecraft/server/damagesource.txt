@@ -1,7 +1,6 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
-import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 
 class DamageSource {
     public String translationIndex;
@@ -36,20 +35,6 @@ class DamageSource {
 #endif
 
     public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
-
-    public static (DamageSourceHandle) DamageSource explosion((ExplosionHandle) Explosion explosion);
-
-    /* Create explosion from Entity */
-    <code>
-    public static DamageSourceHandle entityExplosion(org.bukkit.entity.Entity explodableEntity) {
-        ExplosionHandle explosionHandle = null;
-        if (explodableEntity != null) {
-            org.bukkit.Location loc = explodableEntity.getLocation();
-            explosionHandle = ExplosionHandle.createNew(explodableEntity.getWorld(), explodableEntity, loc.getX(), loc.getY(), loc.getZ(), 0.0f, false, true);
-        }
-        return explosion(explosionHandle);
-    }
-    </code>
 
     /* Get damage source by translationIndex key */
     <code>

@@ -50,7 +50,6 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract boolean canSupportTop(IBlockDataHandle iblockdata, Block block);
     public abstract float getDamageResillience();
     public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
-    public abstract void ignite(World world, IntVector3 blockposition, ExplosionHandle explosion);
     public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, World world, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
@@ -78,7 +77,6 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> canSupportTop = new Template.Method.Converted<Boolean>();
         public final Template.Method<Float> getDamageResillience = new Template.Method<Float>();
         public final Template.Method.Converted<Void> dropNaturally = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Void> ignite = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> stepOn = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<IBlockDataHandle> updateState = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();

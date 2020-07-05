@@ -556,7 +556,10 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
     </code>
 }
 
-class PacketPlayOutSpawnEntityWeather extends Packet {
+// This class is used from Minecraft 1.8 to 1.15.2
+// Since Minecraft 1.16 the PacketPlayOutSpawnEntity packet is used instead,
+// and this packet was removed.
+optional class PacketPlayOutSpawnEntityWeather extends Packet {
     private int entityId:a;
 
 #if version >= 1.9

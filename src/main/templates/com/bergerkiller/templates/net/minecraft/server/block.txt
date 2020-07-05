@@ -13,7 +13,6 @@ import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
@@ -270,11 +269,17 @@ class Block {
     // Call that one. See Explosion.java for details
     public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
         Block block = iblockdata.getBlock();
+  #if version >= 1.16
+        ItemStack EMPTY_ITEM = ItemStack.b;
+  #else
+        ItemStack EMPTY_ITEM = ItemStack.a;
+  #endif
+
         TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(world.random);
         loottableinfo_builder.set(LootContextParameters.POSITION, blockposition);
-        loottableinfo_builder.set(LootContextParameters.TOOL, ItemStack.a);
+        loottableinfo_builder.set(LootContextParameters.TOOL, EMPTY_ITEM);
         loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
         loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
   #if version >= 1.15
@@ -283,7 +288,7 @@ class Block {
             ItemStack item = (ItemStack) items_iter.next();
             Block.a(world, blockposition, item);
         }
-        iblockdata.dropNaturally(world, blockposition, ItemStack.a);
+        iblockdata.dropNaturally(world, blockposition, EMPTY_ITEM);
   #else
         Block.b(iblockdata, loottableinfo_builder);
   #endif
@@ -298,8 +303,6 @@ class Block {
         instance.dropNaturally(world, blockposition, iblockdata, yield, chance);
     }
 #endif
-
-    public void ignite:wasExploded((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (ExplosionHandle) Explosion explosion);
 
 #if version >= 1.9
     public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);

@@ -39,7 +39,6 @@
 #include /net/minecraft/server/registry.txt
 #include /net/minecraft/server/mobeffect.txt
 #include /net/minecraft/server/damagesource.txt
-#include /net/minecraft/server/explosion.txt
 #include /net/minecraft/server/attributes.txt
 #include /net/minecraft/server/chat.txt
 #include /net/minecraft/server/player.txt

@@ -8,6 +8,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.Optional
 public abstract class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityWeatherClass} */
     public static final PacketPlayOutSpawnEntityWeatherClass T = new PacketPlayOutSpawnEntityWeatherClass();

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.HumanEntity;
@@ -10,8 +9,6 @@ import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.ExplosionHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
 public class CommonMethods {
@@ -22,35 +19,6 @@ public class CommonMethods {
 
     public static ChunkSectionHandle ChunkSection_new(org.bukkit.World world, int y) {
         return ChunkSectionHandle.createNew(world, y >> 4 << 4);
-    }
-
-    public static ExplosionHandle Explosion_new(org.bukkit.World world, double x, double y, double z) {
-        return ExplosionHandle.createNew(world, null, x, y, z, 4.0f, true, true);
-    }
-
-    public static DamageSourceHandle DamageSource_explosion(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
-        Location loc = entity.getLocation();
-        ExplosionHandle ex = Explosion_new(loc.getWorld(), loc.getX(), loc.getY(), loc.getZ());
-        return DamageSourceHandle.explosion(ex);
-    }
-
-    /**
-     * @deprecated use the double damage version instead
-     */
-    @Deprecated
-    public static void damage_explode(org.bukkit.entity.Entity entity, int damage, ExplosionHandle explosion) {
-        damage_explode(entity, (double) damage, explosion);
-    }
-
-    /**
-     * Damages an entity with the reason of an explosion
-     *
-     * @param entity to be demaged
-     * @param damage of the damage
-     * @param explosion wich has damaged the player
-     */
-    public static void damage_explode(org.bukkit.entity.Entity entity, double damage, ExplosionHandle explosion) {
-        EntityHandle.fromBukkit(entity).damageEntity(DamageSourceHandle.explosion(explosion), (float) damage);
     }
 
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {
