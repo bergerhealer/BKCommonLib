@@ -71,7 +71,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      */
     public void updateViewer(Player player) {
         for (EntityTrackerEntryHandle entry : handle.getEntries()) {
-            if (entry.getEntity().toBukkit() != player) {
+            if (entry.getEntity().getBukkitEntity() != player) {
                 entry.updatePlayer(player);
             }
         }

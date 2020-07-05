@@ -32,7 +32,18 @@ public class NMSEntity {
     public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntityField.toFieldAccessor();
     public static final TranslatorFieldAccessor<Entity> vehicleField = EntityHandle.T.vehicle.raw.toFieldAccessor().translate(DuplexConversion.entity);
     public static final FieldAccessor<Boolean> ignoreChunkCheck = EntityHandle.T.ignoreChunkCheck.toFieldAccessor();
-    public static final TranslatorFieldAccessor<World>  world = EntityHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
+    public static final TranslatorFieldAccessor<World>  world = new SafeDirectField<Object>() {
+        @Override
+        public Object get(Object instance) {
+            return EntityHandle.T.getWorld.raw.invoke(instance);
+        }
+
+        @Override
+        public boolean set(Object instance, Object value) {
+            EntityHandle.T.setWorld.raw.invoke(instance, value);
+            return true;
+        }
+    }.translate(DuplexConversion.world);
     public static final FieldAccessor<Double> lastX = EntityHandle.T.lastX.toFieldAccessor();
     public static final FieldAccessor<Double> lastY = EntityHandle.T.lastY.toFieldAccessor();
     public static final FieldAccessor<Double> lastZ = EntityHandle.T.lastZ.toFieldAccessor();

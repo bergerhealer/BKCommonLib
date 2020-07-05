@@ -715,14 +715,35 @@ class PacketPlayOutLogin extends Packet {
 }
 
 class PacketPlayOutRespawn extends Packet {
-#if version >= 1.13.1
-    private (Dimension) DimensionManager dimension:a;
+#if version >= 1.16
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) ResourceKey<DimensionManager> dimension:a;
+#elseif version >= 1.13.1
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) DimensionManager dimension:a;
 #else
-    private (Dimension) int dimension:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) int dimension:a;
+#endif
+
+    // Since Minecraft 1.16: World environment has a resource key, too!
+#if version >= 1.16
+    #require net.minecraft.server.PacketPlayOutRespawn private ResourceKey<World> worldName:b;
+
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+        return instance#worldName;
+    }
+    
+    public void setWorldName((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> worldType) {
+        instance#worldName = worldType;
+    }
+#else
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
+        return null;
+    }
+
+    public void setWorldName((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> worldType) {
+    }
 #endif
 
     // Dimension and WorldType are now resource keys
-    // private ResourceKey<DimensionManager> a;
     // private ResourceKey<World> b;
 
     // Difficulty field only exists <= 1.13.2
@@ -733,6 +754,8 @@ class PacketPlayOutRespawn extends Packet {
 #endif
 
 #if version >= 1.16
+    // private ResourceKey<World> b;
+
     private unknown long encryptedWorldSeed:c;
     private (org.bukkit.GameMode) EnumGamemode gamemode:d;
 

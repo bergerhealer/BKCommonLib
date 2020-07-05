@@ -45,6 +45,7 @@ import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
+import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
@@ -528,6 +529,17 @@ public class HandleConversion {
         return dimension.getId();
     }
 
+    @ConverterMethod
+    public static ResourceKey<Dimension> dimensionKeyFromId(int dimensionId) {
+        return Dimension.fromId(dimensionId).getKey();
+    }
+
+    @ConverterMethod
+    public static int dimensionKeyToId(ResourceKey<Dimension> dimensionKey) {
+        DimensionManagerHandle dim = DimensionManagerHandle.fromKey(dimensionKey);
+        return (dim == null) ? 0 : dim.getId();
+    }
+
     @ConverterMethod(input="net.minecraft.server.DimensionManager")
     public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return Dimension.fromDimensionManagerHandle(nmsDimensionManagerHandle);
@@ -536,6 +548,16 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.DimensionManager")
     public static Object dimensionManagerFromDimension(Dimension dimension) {
         return dimension.getDimensionManagerHandle();
+    }
+
+    @ConverterMethod(input="net.minecraft.server.DimensionManager")
+    public static ResourceKey<Dimension> dimensionKeyFromDimensionManager(Object nmsDimensionManagerHandle) {
+        return DimensionManagerHandle.T.getKey.invoke(nmsDimensionManagerHandle);
+    }
+
+    @ConverterMethod(output="net.minecraft.server.DimensionManager")
+    public static Object dimensionManagerFromKey(ResourceKey<Dimension> key) {
+        return DimensionManagerHandle.T.fromKey.raw.invoke(key.getRawHandle());
     }
 
     @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>")

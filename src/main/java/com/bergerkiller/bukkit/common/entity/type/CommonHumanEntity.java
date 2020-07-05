@@ -22,6 +22,9 @@ public class CommonHumanEntity<T extends HumanEntity> extends CommonLivingEntity
      * @return spawn point coordinates, or null if none are available
      */
     public BlockLocation getSpawnPoint() {
+        if (true) {
+            return null;
+        }
         Object handle = getHandle();
         String world = EntityHumanHandle.T.spawnWorld.get(handle);
         IntVector3 coords = EntityHumanHandle.T.spawnCoord.get(handle);
@@ -39,6 +42,7 @@ public class CommonHumanEntity<T extends HumanEntity> extends CommonLivingEntity
      * @param spawnPoint to set to
      */
     public void setSpawnPoint(BlockLocation spawnPoint) {
+        /*
         Object handle = getHandle();
         IntVector3 coord = null;
         String world = "";
@@ -48,6 +52,7 @@ public class CommonHumanEntity<T extends HumanEntity> extends CommonLivingEntity
         }
         EntityHumanHandle.T.spawnWorld.set(handle, world);
         EntityHumanHandle.T.spawnCoord.set(handle, coord);
+        */
     }
 
 }

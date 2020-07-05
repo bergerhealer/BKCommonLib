@@ -27,7 +27,7 @@ public class EntityMoveEvent extends EntityEvent {
      */
     public void setEntity(EntityHandle entityHandle) {
         this.entityHandle = entityHandle;
-        this.entity = this.entityHandle.toBukkit();
+        this.entity = this.entityHandle.getBukkitEntity();
     }
 
     /**

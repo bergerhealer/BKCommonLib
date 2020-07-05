@@ -1513,7 +1513,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
-        public final FieldAccessor<Dimension> dimension = PacketPlayOutRespawnHandle.T.dimension.toFieldAccessor();
+        public final FieldAccessor<ResourceKey<Dimension>> dimension = PacketPlayOutRespawnHandle.T.dimension.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
         public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutRespawnHandle.T.worldType.toFieldAccessor();
 

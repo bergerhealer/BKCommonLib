@@ -1410,7 +1410,7 @@ public class CommonMapController implements PacketListener, Listener {
         private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
         public ItemFrameInfo(EntityItemFrameHandle itemFrame) {
-            this.itemFrame = (ItemFrame) itemFrame.toBukkit();
+            this.itemFrame = (ItemFrame) itemFrame.getBukkitEntity();
             this.itemFrameHandle = itemFrame;
             this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
             this.viewers = new HashSet<Player>();

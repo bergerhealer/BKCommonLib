@@ -62,7 +62,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
 
         public LocationAbstract setWorld(World world) {
-            ExtendedEntity.this.setWorld(world);
+            if (this.getWorld() != world) {
+                ExtendedEntity.this.setWorld(world);
+            }
             return this;
         }
 
@@ -403,9 +405,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return;
         }
         this.handle.setWorld(WorldHandle.fromBukkit(world));
-        if (EntityHandle.T.dimension.isAvailable()) {
-            EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(world));
-        }
     }
 
     public void setDead(boolean dead) {
@@ -799,7 +798,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             EntityInsentientHandle insHandle = EntityInsentientHandle.createHandle(handle.getRaw());
             EntityHandle holder = insHandle.getLeashHolder();
             if (holder != null) {
-                return holder.toBukkit();
+                return holder.getBukkitEntity();
             }
         }
         return null;

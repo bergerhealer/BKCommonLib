@@ -12,12 +12,14 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRespawnHandle;
 
 /**
  * Base implementation for vehicle mount handlers
@@ -26,13 +28,13 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     public static boolean SUPPORTS_MULTIPLE_PASSENGERS = PacketPlayOutMountHandle.T.isAvailable();
     private final Player _player;
     private final SpawnedEntity _playerSpawnedEntity;
-    private Dimension _playerDimension;
+    private ResourceKey<Dimension> _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
     private final Queue<PacketHandle> _queuedPackets;
 
     public VehicleMountHandler_BaseImpl(Player player) {
         this._player = player;
-        this._playerDimension = PlayerUtil.getPlayerDimension(player);
+        this._playerDimension = PlayerUtil.getPlayerDimension(player).getKey();
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
         this._playerSpawnedEntity.spawned = true;
         this._spawnedEntities = new IntHashMap<>();
@@ -183,7 +185,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         synchronizeAndQueuePackets(() -> {
             // Refresh player dimension if none could be set (temporary player, pre-join)
             if (this._playerDimension == null) {
-                this._playerDimension = PlayerUtil.getPlayerDimension(this._player);
+                this._playerDimension = PlayerUtil.getPlayerDimension(this._player).getKey();
             }
 
             // Handle packets
@@ -199,7 +201,11 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                     handleDespawn(entityId);
                 }
             } else if (type == PacketType.OUT_RESPAWN) {
-                Dimension dimension = packet.read(PacketType.OUT_RESPAWN.dimension);
+                PacketPlayOutRespawnHandle p = PacketPlayOutRespawnHandle.createHandle(packet.getHandle());
+                System.out.println("DIMENSION: " + p.getDimension());
+                System.out.println("WORLD: " + p.getWorldName());
+
+                ResourceKey<Dimension> dimension = packet.read(PacketType.OUT_RESPAWN.dimension);
                 if (dimension != null && !dimension.equals(this._playerDimension)) {
                     this._playerDimension = dimension;
                     handleReset();

@@ -581,9 +581,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             this.handle.getWorldServer().removeEntity(this.handle);
             this.handle.setDead(false);
             this.handle.setWorld(newworld);
-            if (EntityHandle.T.dimension.isAvailable()) {
-                EntityHandle.T.dimension.set(this.handle.getRaw(), WorldUtil.getDimension(newworld.getWorld()));
-            }
             this.handle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 
             if (hasNetworkController) {

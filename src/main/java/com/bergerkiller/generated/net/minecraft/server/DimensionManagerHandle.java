@@ -23,6 +23,10 @@ public abstract class DimensionManagerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static DimensionManagerHandle fromKey(ResourceKey<Dimension> key) {
+        return T.fromKey.invoke(key);
+    }
+
     public static DimensionManagerHandle fromId(int id) {
         return T.fromId.invoke(id);
     }
@@ -35,6 +39,7 @@ public abstract class DimensionManagerHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DimensionManagerClass extends Template.Class<DimensionManagerHandle> {
+        public final Template.StaticMethod.Converted<DimensionManagerHandle> fromKey = new Template.StaticMethod.Converted<DimensionManagerHandle>();
         public final Template.StaticMethod.Converted<DimensionManagerHandle> fromId = new Template.StaticMethod.Converted<DimensionManagerHandle>();
 
         public final Template.Method<Boolean> hasSkyLight = new Template.Method<Boolean>();

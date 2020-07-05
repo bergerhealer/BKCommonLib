@@ -10,7 +10,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -48,6 +47,9 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocY(double y);
     public abstract void setLocZ(double z);
     public abstract void setLoc(double x, double y, double z);
+    public abstract WorldHandle getWorld();
+    public abstract WorldServerHandle getWorldServer();
+    public abstract void setWorld(WorldHandle world);
     public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
     public abstract void setMotVector(Vector mot);
@@ -116,8 +118,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean hasCustomName();
     public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
-    public abstract Entity getBukkitEntity();
     public abstract World getBukkitWorld();
+    public abstract Entity getBukkitEntity();
 
     public List<EntityHandle> getPassengers() {
         if (T.opt_passengers.isAvailable()) {
@@ -247,14 +249,6 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
 
-    public WorldServerHandle getWorldServer() {
-        return WorldServerHandle.createHandle(T.world.raw.get(getRaw()));
-    }
-
-    public org.bukkit.entity.Entity toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(getRaw());
-    }
-
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }
@@ -268,8 +262,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setVehicle(EntityHandle value);
     public abstract boolean isIgnoreChunkCheck();
     public abstract void setIgnoreChunkCheck(boolean value);
-    public abstract WorldHandle getWorld();
-    public abstract void setWorld(WorldHandle value);
     public abstract double getLastX();
     public abstract void setLastX(double value);
     public abstract double getLastY();
@@ -357,7 +349,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Converted<EntityHandle> opt_passenger = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
-        public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
         public final Template.Field.Double lastX = new Template.Field.Double();
         public final Template.Field.Double lastY = new Template.Field.Double();
         public final Template.Field.Double lastZ = new Template.Field.Double();
@@ -395,8 +386,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
         @Template.Optional
-        public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
-        @Template.Optional
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         @Template.Optional
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
@@ -409,6 +398,9 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocY = new Template.Method<Void>();
         public final Template.Method<Void> setLocZ = new Template.Method<Void>();
         public final Template.Method<Void> setLoc = new Template.Method<Void>();
+        public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
+        public final Template.Method.Converted<WorldServerHandle> getWorldServer = new Template.Method.Converted<WorldServerHandle>();
+        public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
         public final Template.Method<Void> setMotVector = new Template.Method<Void>();
@@ -495,8 +487,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Entity> getBukkitEntity = new Template.Method.Converted<Entity>();
         public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
+        public final Template.Method<Entity> getBukkitEntity = new Template.Method<Entity>();
 
     }
 

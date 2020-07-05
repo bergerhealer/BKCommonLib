@@ -59,6 +59,12 @@ class DimensionManager {
         }
     }
 
+    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey key) {
+        MinecraftServer server = MinecraftServer.getServer();
+        IRegistryCustom$Dimension registry = server.f;
+        return (DimensionManager) registry.a().a(key);
+    }
+
     // deprecated fallback
     public int getId() {
         java.util.Optional key_opt = IRegistryCustom$Dimension.a().c(instance);
@@ -102,11 +108,9 @@ class DimensionManager {
         }
   #else
         // Is an enum here, with always only 3 possible values anyway
-        int id = instance.getDimensionID();
-        MinecraftKey name;
-        if (id == -1) {
+        if (instance == DimensionManager.NETHER) {
             name = new MinecraftKey("the_nether");
-        } else if (id == 1) {
+        } else if (instance == DimensionManager.THE_END) {
             name = new MinecraftKey("the_end");
         } else {
             name = new MinecraftKey("overworld");
@@ -114,6 +118,31 @@ class DimensionManager {
   #endif
 
         return ResourceKey.create(category, name);
+    }
+
+    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey key) {
+        MinecraftKey mc_key = (MinecraftKey) key.name;
+
+  #if version >= 1.13.1
+        return (DimensionManager) IRegistry.DIMENSION_TYPE.get(mc_key);
+  #else
+        // Is an enum here, with always only 3 possible values anyway
+        String name;
+    #if version >= 1.12
+        name = mc_key.getKey();
+    #else
+        name = mc_key.a();
+    #endif
+        if (name.equals("overworld")) {
+            return DimensionManager.OVERWORLD;
+        } else if (name.equals("the_nether")) {
+            return DimensionManager.NETHER;
+        } else if (name.equals("the_end")) {
+            return DimensionManager.THE_END;
+        } else {
+            return null;
+        }
+  #endif
     }
 
     // mapped to id on 1.15.2 and before

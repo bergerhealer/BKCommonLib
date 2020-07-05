@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.List;
 
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.Location;
@@ -70,7 +69,6 @@ import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBrewerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryCraftingHandle;
@@ -87,17 +85,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.Entity", output="T extends org.bukkit.entity.Entity")
     public static org.bukkit.entity.Entity toEntity(Object nmsEntityHandle) {
-        if (EntityHandle.T.world.raw.get(nmsEntityHandle) == null) {
-            // We need this to avoid NPE's for non-spawned entities!
-            org.bukkit.entity.Entity entity = EntityHandle.T.bukkitEntityField.get(nmsEntityHandle);
-            if (entity == null) {
-                entity = (org.bukkit.entity.Entity) CraftEntityHandle.T.createCraftEntity.raw.invoke(null, Bukkit.getServer(), nmsEntityHandle);
-                EntityHandle.T.bukkitEntityField.set(nmsEntityHandle, entity);
-            }
-            return entity;
-        } else {
-            return EntityHandle.T.getBukkitEntity.invoke(nmsEntityHandle);
-        }
+        return EntityHandle.T.getBukkitEntity.invoker.invoke(nmsEntityHandle);
     }
 
     @ConverterMethod(input="net.minecraft.server.World")

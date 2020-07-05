@@ -124,7 +124,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     /* ====== END OF PASSENGER AND VEHICLE LOGIC ====== */
 
     public boolean ignoreChunkCheck:attachedToPlayer;
-    public (WorldHandle) World world;
     public double lastX;
     public double lastY;
     public double lastZ;
@@ -183,6 +182,35 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.locZ = z;
     }
 #endif
+
+    public (WorldHandle) World getWorld() {
+        return instance.world;
+    }
+
+    public (WorldServerHandle) WorldServer getWorldServer() {
+        return (WorldServer) instance.world;
+    }
+
+    public void setWorld((WorldHandle) World world) {
+        instance.world = world;
+#if version < 1.16
+        if (world != null) {
+  #if version >= 1.13.1
+            instance.dimension = world.worldProvider.getDimensionManager();
+  #elseif version >= 1.9
+            instance.dimension = world.worldProvider.getDimensionManager().getDimensionID();
+  #else
+            instance.dimension = world.worldProvider.getDimension();
+  #endif
+        } else {
+  #if version >= 1.13.1
+            instance.dimension = null;
+  #else
+            instance.dimension = 0;
+  #endif
+        }
+#endif
+    }
 
 #if version >= 1.15
     public boolean isLastAndCurrentPositionDifferent() {
@@ -837,14 +865,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #if version >= 1.16
-    public optional (Dimension) DimensionManager dimension:###;
-#elseif version >= 1.13.1
-    public optional (Dimension) DimensionManager dimension;
-#else
-    public optional (Dimension) int dimension;
-#endif
-
-#if version >= 1.16
     optional private final double[] move_SomeArray:aF;
     optional private long move_SomeState:aG;
 #elseif version >= 1.14
@@ -1408,21 +1428,27 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void collide((EntityHandle) Entity entity);
 
-    public (org.bukkit.entity.Entity) org.bukkit.craftbukkit.entity.CraftEntity getBukkitEntity();
-
     public org.bukkit.World getBukkitWorld() {
         return instance.world.getWorld();
     }
 
+    public org.bukkit.entity.Entity getBukkitEntity() {
+        if (instance.world == null) {
+            // We need this to avoid NPE's for non-spawned entities!
+            #require net.minecraft.server.Entity protected org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity;
+            org.bukkit.entity.Entity entity = instance#bukkitEntity;
+            if (entity == null) {
+                org.bukkit.craftbukkit.CraftServer server = (org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer();
+                entity = org.bukkit.craftbukkit.entity.CraftEntity.getEntity(server, instance);
+                instance#bukkitEntity = entity;
+            }
+            return entity;
+        } else {
+            return instance.getBukkitEntity();
+        }
+    }
+
     <code>
-    public WorldServerHandle getWorldServer() {
-        return WorldServerHandle.createHandle(T.world.raw.get(getRaw()));
-    }
-
-    public org.bukkit.entity.Entity toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toEntity(getRaw());
-    }
-
     public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
     }

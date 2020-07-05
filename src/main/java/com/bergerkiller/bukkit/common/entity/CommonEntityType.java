@@ -12,8 +12,6 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -296,21 +294,12 @@ public class CommonEntityType {
         }
 
         CommonEntity<T> entity = createCommonEntityFromHandle(handle);
-        entity.loc.set(entity.last.set(location));
+        entity.loc.set(entity.last.set(location)); //Note: sets world also!
 
         // Refreshes bounding box when the constructor without x/y/z is called
         // The constructor with x/y/z parameters does this automatically
         if (!this.hasWorldCoordConstructor) {
             entity.setPosition(location.getX(), location.getY(), location.getZ());
-        }
-
-        // Debug: verify the 'dimension' field is set for the Entity
-        // Field is gone since MC 1.16
-        if (DimensionManagerHandle.T.isAvailable() && EntityHandle.T.dimension.isAvailable()) {
-            Object raw_dim = EntityHandle.T.dimension.raw.get(entity.getHandle());
-            if (raw_dim == null) {
-                throw new IllegalStateException("Entity dimension field is null");
-            }
         }
 
         DefaultEntityController controller = new DefaultEntityController();

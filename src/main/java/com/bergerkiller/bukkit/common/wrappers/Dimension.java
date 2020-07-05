@@ -82,6 +82,16 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
     }
 
     /**
+     * Gets a dimension by its key. Returns null if not found.
+     * 
+     * @param dimensionKey
+     * @return dimension by this key, null if not found
+     */
+    public static Dimension fromKey(ResourceKey<Dimension> dimensionKey) {
+        return fromDimensionManagerHandle(DimensionManagerHandle.T.fromKey.raw.invoke(dimensionKey.getRawHandle()));
+    }
+
+    /**
      * Gets a dimension by its 1.9+ DimensionManager handle.
      * 
      * @param dimensionManagerHandle
