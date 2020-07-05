@@ -13,10 +13,12 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
@@ -175,6 +177,8 @@ public class IBlockDataToMaterialData {
                 }
             }.setTypes("JUNGLE_BUTTON", "SPRUCE_BUTTON", "ACACIA_BUTTON",
                        "BIRCH_BUTTON", "DARK_OAK_BUTTON", "OAK_BUTTON", "STONE_BUTTON")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.16"),
+                       "CRIMSON_BUTTON", "WARPED_BUTTON", "POLISHED_BLACKSTONE_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }
@@ -193,6 +197,8 @@ public class IBlockDataToMaterialData {
                 }
             }.setTypes("JUNGLE_PRESSURE_PLATE", "SPRUCE_PRESSURE_PLATE", "ACACIA_PRESSURE_PLATE",
                        "BIRCH_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.16"),
+                       "CRIMSON_PRESSURE_PLATE", "WARPED_PRESSURE_PLATE", "POLISHED_BLACKSTONE_PRESSURE_PLATE")
              .setDataValues(0, 1)
              .build();
         }
@@ -463,6 +469,23 @@ public class IBlockDataToMaterialData {
                  .build();
             }
         }
+
+        // Minecraft 1.16 added a Target block, for which we have added a custom material class to support it
+        if (Common.evaluateMCVersion(">=", "1.16")) {
+            new CustomMaterialDataBuilder<CommonTargetDataFix>() {
+                @Override
+                public CommonTargetDataFix create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new CommonTargetDataFix(material_type, legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, CommonTargetDataFix target) {
+                    return Collections.singletonList(iblockdata.set("power", Integer.valueOf(target.getData())));
+                }
+            }.setTypes("TARGET")
+             .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+             .build();
+        }
     }
 
     private static void storeMaterialDataGen(String legacyTypeName, int data_start, int data_end) {
@@ -600,6 +623,20 @@ public class IBlockDataToMaterialData {
          */
         public CustomMaterialDataBuilder<T> setTypes(String... names) {
             this.types = CommonLegacyMaterials.getAllByName(names);
+            return this;
+        }
+
+        /**
+         * Adds additional Material types if the condition is True. See {@link #setTypes(names...)}.
+         * 
+         * @param condition Names are added when this is True
+         * @param names Names to add
+         * @return this
+         */
+        public CustomMaterialDataBuilder<T> addTypesIf(boolean condition, String... names) {
+            if (condition) {
+                this.types = LogicUtil.appendArray(this.types, CommonLegacyMaterials.getAllByName(names));
+            }
             return this;
         }
 
