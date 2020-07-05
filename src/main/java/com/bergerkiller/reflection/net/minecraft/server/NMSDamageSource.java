@@ -2,7 +2,6 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 
@@ -40,10 +39,6 @@ public class NMSDamageSource {
 
     public static Object forArrowHit(Arrow arrowEntity, Entity hitEntity) {
         return DamageSourceHandle.arrowHit(arrowEntity, hitEntity).getRaw();
-    }
-
-    public static Object forFireballHit(Fireball fireballEntity, Entity hitEntity) {
-        return DamageSourceHandle.fireballHit(fireballEntity, hitEntity).getRaw();
     }
 
     public static Object forThrownHit(Entity projectile, Entity hitEntity) {

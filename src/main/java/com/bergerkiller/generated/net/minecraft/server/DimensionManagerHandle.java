@@ -2,8 +2,8 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.DimensionManager</b>.
@@ -23,7 +23,7 @@ public abstract class DimensionManagerHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static DimensionManagerHandle fromKey(ResourceKey<Dimension> key) {
+    public static DimensionManagerHandle fromKey(ResourceKey<DimensionType> key) {
         return T.fromKey.invoke(key);
     }
 
@@ -32,7 +32,7 @@ public abstract class DimensionManagerHandle extends Template.Handle {
     }
 
     public abstract boolean hasSkyLight();
-    public abstract ResourceKey<Dimension> getKey();
+    public abstract ResourceKey<DimensionType> getKey();
     public abstract int getId();
     /**
      * Stores class members for <b>net.minecraft.server.DimensionManager</b>.
@@ -43,7 +43,7 @@ public abstract class DimensionManagerHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<DimensionManagerHandle> fromId = new Template.StaticMethod.Converted<DimensionManagerHandle>();
 
         public final Template.Method<Boolean> hasSkyLight = new Template.Method<Boolean>();
-        public final Template.Method.Converted<ResourceKey<Dimension>> getKey = new Template.Method.Converted<ResourceKey<Dimension>>();
+        public final Template.Method.Converted<ResourceKey<DimensionType>> getKey = new Template.Method.Converted<ResourceKey<DimensionType>>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
 
     }

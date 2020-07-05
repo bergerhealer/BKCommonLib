@@ -1,7 +1,6 @@
-package com.bergerkiller.bukkit.common.wrappers;
+package com.bergerkiller.bukkit.common.resources;
 
-import com.bergerkiller.bukkit.common.resources.ResourceCategory;
-import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 
 /**
@@ -10,22 +9,22 @@ import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
  * It is discouraged to access these dimensions by their id's (-1, 0, 1) since this is legacy behavior
  * and as of Minecraft 1.16 will no longer work for any new dimensions.
  */
-public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
-    public static final Dimension OVERWORLD = fromIdFallback(0);
-    public static final Dimension THE_NETHER = fromIdFallback(-1);
-    public static final Dimension THE_END = fromIdFallback(1);
+public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
+    public static final DimensionType OVERWORLD = fromIdFallback(0);
+    public static final DimensionType THE_NETHER = fromIdFallback(-1);
+    public static final DimensionType THE_END = fromIdFallback(1);
 
     /**
      * The resource keys used to refer to different dimension types.
-     * Is more efficient than using {@link Dimension#getKey()}.
+     * Is more efficient than using {@link DimensionType#getKey()}.
      */
     public static final class Key {
-        public static final ResourceKey<Dimension> OVERWORLD = ResourceCategory.dimension_type.createKey("overworld");
-        public static final ResourceKey<Dimension> THE_NETHER = ResourceCategory.dimension_type.createKey("the_nether");
-        public static final ResourceKey<Dimension> THE_END = ResourceCategory.dimension_type.createKey("the_end");
+        public static final ResourceKey<DimensionType> OVERWORLD = ResourceCategory.dimension_type.createKey("overworld");
+        public static final ResourceKey<DimensionType> THE_NETHER = ResourceCategory.dimension_type.createKey("the_nether");
+        public static final ResourceKey<DimensionType> THE_END = ResourceCategory.dimension_type.createKey("the_end");
     }
 
-    private Dimension(DimensionManagerHandle handle) {
+    private DimensionType(DimensionManagerHandle handle) {
         this.setHandle(handle);
     }
 
@@ -52,7 +51,7 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
      * 
      * @return dimension type key
      */
-    public ResourceKey<Dimension> getKey() {
+    public ResourceKey<DimensionType> getKey() {
         return handle.getKey();
     }
 
@@ -72,7 +71,7 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
      * @param id
      * @return dimension
      */
-    public static Dimension fromId(int id) {
+    public static DimensionType fromId(int id) {
         switch (id) {
         case 0: return OVERWORLD;
         case -1: return THE_NETHER;
@@ -87,7 +86,7 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
      * @param dimensionKey
      * @return dimension by this key, null if not found
      */
-    public static Dimension fromKey(ResourceKey<Dimension> dimensionKey) {
+    public static DimensionType fromKey(ResourceKey<DimensionType> dimensionKey) {
         return fromDimensionManagerHandle(DimensionManagerHandle.T.fromKey.raw.invoke(dimensionKey.getRawHandle()));
     }
 
@@ -97,7 +96,7 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
      * @param dimensionManagerHandle
      * @return Dimension
      */
-    public static Dimension fromDimensionManagerHandle(Object dimensionManagerHandle) {
+    public static DimensionType fromDimensionManagerHandle(Object dimensionManagerHandle) {
         if (dimensionManagerHandle == null) {
             return null;
         }
@@ -112,14 +111,14 @@ public final class Dimension extends BasicWrapper<DimensionManagerHandle> {
         }
 
         // Return new instance
-        return new Dimension(DimensionManagerHandle.createHandle(dimensionManagerHandle));
+        return new DimensionType(DimensionManagerHandle.createHandle(dimensionManagerHandle));
     }
 
     // Uses internal lookup table, if available
-    private static Dimension fromIdFallback(int id) {
+    private static DimensionType fromIdFallback(int id) {
         DimensionManagerHandle handle = DimensionManagerHandle.fromId(id);
         if (handle != null) {
-            return new Dimension(handle);
+            return new DimensionType(handle);
         } else {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }

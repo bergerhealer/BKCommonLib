@@ -14,10 +14,10 @@ import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.WeatherState;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
@@ -396,15 +396,25 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Gets the dimension of a world, which is guaranteed to be non-null and have a valid
+     * Gets the type of dimension of a world, which is guaranteed to be non-null and have a valid
      * registration in the server. This dimension will be OVERWORLD for all normal-type worlds,
-     * THE_END for end worlds, etc.
+     * THE_END for end worlds, etc. Flat worlds will have dimension type OVERWORLD.
      *
      * @param world to get from
-     * @return world dimension
+     * @return world dimension type
      */
-    public static Dimension getDimension(org.bukkit.World world) {
-        return WorldHandle.fromBukkit(world).getDimension();
+    public static DimensionType getDimensionType(org.bukkit.World world) {
+        return WorldHandle.fromBukkit(world).getDimensionType();
+    }
+
+    /**
+     * Gets the key of the dimension type of a world. See also: {@link #getDimensionType(World)}
+     * 
+     * @param world to get from
+     * @return world dimension type key
+     */
+    public static ResourceKey<DimensionType> getDimensionTypeKey(org.bukkit.World world) {
+        return WorldHandle.fromBukkit(world).getDimensionTypeKey();
     }
 
     /**

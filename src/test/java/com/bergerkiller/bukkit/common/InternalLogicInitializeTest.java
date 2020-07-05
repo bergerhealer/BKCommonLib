@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandler_Broken;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 
 /**
  * Test the initialization of internally used logic helpers
@@ -44,6 +44,6 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testDimensionWrapper() {
-        assertNotNull(Dimension.OVERWORLD);
+        assertNotNull(DimensionType.OVERWORLD);
     }
 }

@@ -90,7 +90,7 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
         if (T.constr_chunk_sectionsMask.isAvailable()) {
             return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
         } else {
-            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimension().hasSkyLight();
+            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimensionType().hasSkyLight();
             return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
         }
     }

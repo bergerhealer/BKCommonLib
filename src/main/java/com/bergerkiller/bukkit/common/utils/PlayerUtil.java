@@ -7,8 +7,8 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
@@ -418,9 +418,9 @@ public class PlayerUtil extends EntityUtil {
      * @param player to get a world for
      * @return world dimension
      */
-    public static Dimension getPlayerDimension(Player player) {
+    public static DimensionType getPlayerDimension(Player player) {
         if (CBCraftPlayer.T.isAssignableFrom(player.getClass())) {
-            return WorldUtil.getDimension(player.getWorld());
+            return WorldUtil.getDimensionType(player.getWorld());
         } else {
             return null;
         }

@@ -48,7 +48,7 @@ class DimensionManager {
 #endif
 
 #if version >= 1.16
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey getKey() {
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server.f;
         java.util.Optional key_opt = registry.a().c(instance);
@@ -59,7 +59,7 @@ class DimensionManager {
         }
     }
 
-    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey key) {
+    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server.f;
         return (DimensionManager) registry.a().a(key);
@@ -97,7 +97,7 @@ class DimensionManager {
         return (DimensionManager) registry.a().a(res_key);
     }
 #else
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey getKey() {
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         ResourceKey category = (ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();
         MinecraftKey name;
 
@@ -120,7 +120,7 @@ class DimensionManager {
         return ResourceKey.create(category, name);
     }
 
-    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.wrappers.Dimension>) ResourceKey key) {
+    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
         MinecraftKey mc_key = (MinecraftKey) key.name;
 
   #if version >= 1.13.1

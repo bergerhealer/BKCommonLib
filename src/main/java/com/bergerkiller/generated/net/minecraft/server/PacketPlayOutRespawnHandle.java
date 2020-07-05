@@ -2,12 +2,11 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
-import org.bukkit.WorldType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutRespawn</b>.
@@ -32,22 +31,19 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
     public abstract GameMode getPreviousGameMode();
     public abstract void setPreviousGameMode(GameMode gameMode);
     public abstract void setEncryptedWorldSeed(World world);
-    public abstract ResourceKey<Dimension> getDimension();
-    public abstract void setDimension(ResourceKey<Dimension> value);
+    public abstract ResourceKey<DimensionType> getDimensionType();
+    public abstract void setDimensionType(ResourceKey<DimensionType> value);
     public abstract GameMode getGamemode();
     public abstract void setGamemode(GameMode value);
-    public abstract WorldType getWorldType();
-    public abstract void setWorldType(WorldType value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutRespawn</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutRespawnClass extends Template.Class<PacketPlayOutRespawnHandle> {
-        public final Template.Field.Converted<ResourceKey<Dimension>> dimension = new Template.Field.Converted<ResourceKey<Dimension>>();
+        public final Template.Field.Converted<ResourceKey<DimensionType>> dimensionType = new Template.Field.Converted<ResourceKey<DimensionType>>();
         @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Converted<GameMode> gamemode = new Template.Field.Converted<GameMode>();
-        public final Template.Field.Converted<WorldType> worldType = new Template.Field.Converted<WorldType>();
 
         public final Template.Method.Converted<ResourceKey<World>> getWorldName = new Template.Method.Converted<ResourceKey<World>>();
         public final Template.Method.Converted<Void> setWorldName = new Template.Method.Converted<Void>();

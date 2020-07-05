@@ -1,7 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
@@ -106,13 +106,20 @@ class World extends IBlockAccess {
     public optional (Object) IChunkProvider getChunkProvider();
 
 #if version >= 1.16
-    public (Dimension) DimensionManager getDimension:getDimensionManager();
+    public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
 #elseif version >= 1.9
-    public (Dimension) DimensionManager getDimension() {
+    public (DimensionType) DimensionManager getDimensionType() {
+        return instance.worldProvider.getDimensionManager();
+    }
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager getDimensionTypeKey() {
         return instance.worldProvider.getDimensionManager();
     }
 #else
-    public (Dimension) DimensionManager getDimension() {
+    public (DimensionType) DimensionManager getDimensionType() {
+        return DimensionManager.a(instance.worldProvider.getDimension());
+    }
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager getDimensionTypeKey() {
         return DimensionManager.a(instance.worldProvider.getDimension());
     }
 #endif

@@ -4,7 +4,6 @@ import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Fireball;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 
@@ -36,10 +35,6 @@ public abstract class DamageSourceHandle extends Template.Handle {
 
     public static DamageSourceHandle arrowHit(Arrow arrow, Entity damager) {
         return T.arrowHit.invoke(arrow, damager);
-    }
-
-    public static DamageSourceHandle fireballHit(Fireball fireball, Entity damager) {
-        return T.fireballHit.invoke(fireball, damager);
     }
 
     public static DamageSourceHandle thrownHit(Entity projectile, Entity damager) {
@@ -98,7 +93,6 @@ public abstract class DamageSourceHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<DamageSourceHandle> mobAttack = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> playerAttack = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> arrowHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
-        public final Template.StaticMethod.Converted<DamageSourceHandle> fireballHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> thrownHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> magicHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> thorns = new Template.StaticMethod.Converted<DamageSourceHandle>();

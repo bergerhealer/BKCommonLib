@@ -4,7 +4,6 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ResourceKeyHandle;
 
@@ -17,7 +16,7 @@ public final class ResourceCategory<T> {
     @SuppressWarnings("rawtypes")
     private static final Map<Object, ResourceCategory> cache = Collections.synchronizedMap(new IdentityHashMap<Object, ResourceCategory>());
     public static final ResourceCategory<SoundEffect> sound_effect = create("sound_event");
-    public static final ResourceCategory<Dimension> dimension_type = create("dimension_type");
+    public static final ResourceCategory<DimensionType> dimension_type = create("dimension_type");
     public static final ResourceCategory<org.bukkit.World> dimension = create("dimension");
 
     private final ResourceKeyHandle categoryKey;

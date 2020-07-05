@@ -6,7 +6,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -650,14 +650,13 @@ class PacketPlayOutLogin extends Packet {
 #endif
 
 #if version >= 1.16
-    //TODO!!!!
-    private (Dimension) DimensionManager dimension:OHNOTHISISBAD;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:h;
 #elseif version >= 1.15
-    private (Dimension) DimensionManager dimension:e;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:e;
 #elseif version >= 1.13.1
-    private (Dimension) DimensionManager dimension:d;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:d;
 #else
-    private (Dimension) int dimension:d;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) int dimensionType:d;
 #endif
 
     // Difficulty field only exists <= 1.13.2
@@ -671,21 +670,21 @@ class PacketPlayOutLogin extends Packet {
 #if version >= 1.16
     private int maxPlayers:j;
 
-    //TODO!!!!
-    private (org.bukkit.WorldType) WorldType worldType:OHNOTHISISBAD;
-
     private optional int viewDistance:k;
 #elseif version >= 1.15
     private int maxPlayers:f;
-    private (org.bukkit.WorldType) WorldType worldType:g;
+    //TODO: Removed on 1.16. Keep this?
+    // private (org.bukkit.WorldType) WorldType worldType:g;
     private optional int viewDistance:h;
 #elseif version >= 1.14
     private int maxPlayers:e;
-    private (org.bukkit.WorldType) WorldType worldType:f;
+    //TODO: Removed on 1.16. Keep this?
+    // private (org.bukkit.WorldType) WorldType worldType:f;
     private optional int viewDistance:g;
 #else
     private int maxPlayers:f;
-    private (org.bukkit.WorldType) WorldType worldType:g;
+    //TODO: Removed on 1.16. Keep this?
+    // private (org.bukkit.WorldType) WorldType worldType:g;
     private optional int viewDistance:###;
 #endif
 
@@ -716,11 +715,11 @@ class PacketPlayOutLogin extends Packet {
 
 class PacketPlayOutRespawn extends Packet {
 #if version >= 1.16
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) ResourceKey<DimensionManager> dimension:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:a;
 #elseif version >= 1.13.1
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) DimensionManager dimension:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:a;
 #else
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<Dimension>) int dimension:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) int dimensionType:a;
 #endif
 
     // Since Minecraft 1.16: World environment has a resource key, too!
@@ -754,13 +753,10 @@ class PacketPlayOutRespawn extends Packet {
 #endif
 
 #if version >= 1.16
-    // private ResourceKey<World> b;
+    //TODO: private ResourceKey<World> b;
 
     private unknown long encryptedWorldSeed:c;
     private (org.bukkit.GameMode) EnumGamemode gamemode:d;
-
-    //TODO!!!!
-    private (org.bukkit.WorldType) WorldType worldType:OHNOTHISISBAD;
 
     private unknown boolean isDebugWorld:f;
     private unknown boolean isFlatWorld:g;
@@ -768,13 +764,19 @@ class PacketPlayOutRespawn extends Packet {
 #elseif version >= 1.15
     private unknown long encryptedWorldSeed:b;
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
-    private (org.bukkit.WorldType) WorldType worldType:d;
+
+    //TODO: Was removed on 1.16, do anything with this?
+    // private (org.bukkit.WorldType) WorldType worldType:d;
 #elseif version >= 1.14
     private (org.bukkit.GameMode) EnumGamemode gamemode:b;
-    private (org.bukkit.WorldType) WorldType worldType:c;
+
+    //TODO: Was removed on 1.16, do anything with this?
+    // private (org.bukkit.WorldType) WorldType worldType:c;
 #else
     private (org.bukkit.GameMode) EnumGamemode gamemode:c;
-    private (org.bukkit.WorldType) WorldType worldType:d;
+
+    //TODO: Was removed on 1.16, do anything with this?
+    // private (org.bukkit.WorldType) WorldType worldType:d;
 #endif
 
     // Since 1.16 the previous game mode of the player is also sent
@@ -980,7 +982,7 @@ class PacketPlayOutMapChunk extends Packet {
         if (T.constr_chunk_sectionsMask.isAvailable()) {
             return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
         } else {
-            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimension().hasSkyLight();
+            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimensionType().hasSkyLight();
             return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
         }
     }

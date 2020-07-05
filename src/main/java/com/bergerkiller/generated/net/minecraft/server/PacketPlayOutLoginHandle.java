@@ -2,11 +2,11 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.World;
-import org.bukkit.WorldType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutLogin</b>.
@@ -35,12 +35,10 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     public abstract void setHardcore(boolean value);
     public abstract GameMode getGameMode();
     public abstract void setGameMode(GameMode value);
-    public abstract Dimension getDimension();
-    public abstract void setDimension(Dimension value);
+    public abstract ResourceKey<DimensionType> getDimensionType();
+    public abstract void setDimensionType(ResourceKey<DimensionType> value);
     public abstract int getMaxPlayers();
     public abstract void setMaxPlayers(int value);
-    public abstract WorldType getWorldType();
-    public abstract void setWorldType(WorldType value);
     public abstract boolean isReducedDebugInfo();
     public abstract void setReducedDebugInfo(boolean value);
     /**
@@ -51,11 +49,10 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         public final Template.Field.Integer playerId = new Template.Field.Integer();
         public final Template.Field.Boolean hardcore = new Template.Field.Boolean();
         public final Template.Field.Converted<GameMode> gameMode = new Template.Field.Converted<GameMode>();
-        public final Template.Field.Converted<Dimension> dimension = new Template.Field.Converted<Dimension>();
+        public final Template.Field.Converted<ResourceKey<DimensionType>> dimensionType = new Template.Field.Converted<ResourceKey<DimensionType>>();
         @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();
-        public final Template.Field.Converted<WorldType> worldType = new Template.Field.Converted<WorldType>();
         @Template.Optional
         public final Template.Field.Integer viewDistance = new Template.Field.Integer();
         public final Template.Field.Boolean reducedDebugInfo = new Template.Field.Boolean();

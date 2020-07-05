@@ -3,8 +3,9 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
@@ -38,7 +39,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract long getTime();
-    public abstract Dimension getDimension();
+    public abstract DimensionType getDimensionType();
+    public abstract ResourceKey<DimensionType> getDimensionTypeKey();
     public abstract boolean isWithinWorldBorder(EntityHandle entity);
     public abstract boolean isNotCollidingWithBlocks(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
@@ -105,7 +107,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional
         public final Template.Method<Object> getChunkProvider = new Template.Method<Object>();
-        public final Template.Method.Converted<Dimension> getDimension = new Template.Method.Converted<Dimension>();
+        public final Template.Method.Converted<DimensionType> getDimensionType = new Template.Method.Converted<DimensionType>();
+        public final Template.Method.Converted<ResourceKey<DimensionType>> getDimensionTypeKey = new Template.Method.Converted<ResourceKey<DimensionType>>();
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();

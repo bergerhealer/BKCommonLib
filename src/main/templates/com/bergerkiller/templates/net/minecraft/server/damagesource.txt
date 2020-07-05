@@ -24,7 +24,8 @@ class DamageSource {
 
     public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) EntityArrow arrow, (org.bukkit.entity.Entity) Entity damager);
 
-    public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
+    // Now uses EntityFireballFireball but no clue what that is?
+    //public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
 
     public static (DamageSourceHandle) DamageSource thrownHit:projectile((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
 

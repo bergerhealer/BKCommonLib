@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -30,7 +31,6 @@ import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -520,43 +520,43 @@ public class HandleConversion {
     }
 
     @ConverterMethod
-    public static Dimension dimensionFromId(int dimensionId) {
-        return Dimension.fromId(dimensionId);
+    public static DimensionType dimensionFromId(int dimensionId) {
+        return DimensionType.fromId(dimensionId);
     }
 
     @ConverterMethod
-    public static int dimensionToId(Dimension dimension) {
+    public static int dimensionToId(DimensionType dimension) {
         return dimension.getId();
     }
 
     @ConverterMethod
-    public static ResourceKey<Dimension> dimensionKeyFromId(int dimensionId) {
-        return Dimension.fromId(dimensionId).getKey();
+    public static ResourceKey<DimensionType> dimensionKeyFromId(int dimensionId) {
+        return DimensionType.fromId(dimensionId).getKey();
     }
 
     @ConverterMethod
-    public static int dimensionKeyToId(ResourceKey<Dimension> dimensionKey) {
+    public static int dimensionKeyToId(ResourceKey<DimensionType> dimensionKey) {
         DimensionManagerHandle dim = DimensionManagerHandle.fromKey(dimensionKey);
         return (dim == null) ? 0 : dim.getId();
     }
 
     @ConverterMethod(input="net.minecraft.server.DimensionManager")
-    public static Dimension dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
-        return Dimension.fromDimensionManagerHandle(nmsDimensionManagerHandle);
+    public static DimensionType dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
+        return DimensionType.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
     @ConverterMethod(output="net.minecraft.server.DimensionManager")
-    public static Object dimensionManagerFromDimension(Dimension dimension) {
+    public static Object dimensionManagerFromDimension(DimensionType dimension) {
         return dimension.getDimensionManagerHandle();
     }
 
     @ConverterMethod(input="net.minecraft.server.DimensionManager")
-    public static ResourceKey<Dimension> dimensionKeyFromDimensionManager(Object nmsDimensionManagerHandle) {
+    public static ResourceKey<DimensionType> dimensionKeyFromDimensionManager(Object nmsDimensionManagerHandle) {
         return DimensionManagerHandle.T.getKey.invoke(nmsDimensionManagerHandle);
     }
 
     @ConverterMethod(output="net.minecraft.server.DimensionManager")
-    public static Object dimensionManagerFromKey(ResourceKey<Dimension> key) {
+    public static Object dimensionManagerFromKey(ResourceKey<DimensionType> key) {
         return DimensionManagerHandle.T.fromKey.raw.invoke(key.getRawHandle());
     }
 

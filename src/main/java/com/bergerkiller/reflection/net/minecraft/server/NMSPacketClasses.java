@@ -13,7 +13,6 @@ import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.WorldType;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.EntityType;
@@ -33,6 +32,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
@@ -41,7 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.Dimension;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
@@ -1125,9 +1124,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
-        public final FieldAccessor<Dimension> dimension = PacketPlayOutLoginHandle.T.dimension.toFieldAccessor();
+        public final FieldAccessor<ResourceKey<DimensionType>> dimensionType = PacketPlayOutLoginHandle.T.dimensionType.toFieldAccessor();
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
-        public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutLoginHandle.T.worldType.toFieldAccessor();
         public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
 
         public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
@@ -1513,9 +1511,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
-        public final FieldAccessor<ResourceKey<Dimension>> dimension = PacketPlayOutRespawnHandle.T.dimension.toFieldAccessor();
+        public final FieldAccessor<ResourceKey<DimensionType>> dimensionType = PacketPlayOutRespawnHandle.T.dimensionType.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
-        public final TranslatorFieldAccessor<WorldType> worldType = PacketPlayOutRespawnHandle.T.worldType.toFieldAccessor();
 
         public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
             @Override
