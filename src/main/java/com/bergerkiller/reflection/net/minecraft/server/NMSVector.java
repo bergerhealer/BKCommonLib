@@ -85,21 +85,22 @@ public class NMSVector {
     }
 
     public static IntVector3 getPosition(Object blockPosition) {
-        return new IntVector3(BaseBlockPositionHandle.T.field_x.getInteger(blockPosition),
-                BaseBlockPositionHandle.T.field_y.getInteger(blockPosition),
-                BaseBlockPositionHandle.T.field_z.getInteger(blockPosition));
+        return BaseBlockPositionHandle.T.toIntVector3.invoke(blockPosition);
     }
 
+    @Deprecated
     public static int getPositionX(Object blockPosition) {
-        return BaseBlockPositionHandle.T.field_x.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.getX.invoke(blockPosition);
     }
 
+    @Deprecated
     public static int getPositionY(Object blockPosition) {
-        return BaseBlockPositionHandle.T.field_y.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.getY.invoke(blockPosition);
     }
 
+    @Deprecated
     public static int getPositionZ(Object blockPosition) {
-        return BaseBlockPositionHandle.T.field_z.getInteger(blockPosition);
+        return BaseBlockPositionHandle.T.getZ.invoke(blockPosition);
     }
 
     public static boolean isPosition(Object blockPosition) {
@@ -107,10 +108,7 @@ public class NMSVector {
     }
 
     public static boolean isPositionInBox(Object blockPosition, int xMin, int yMin, int zMin, int xMax, int yMax, int zMax) {
-        int x = BaseBlockPositionHandle.T.field_x.getInteger(blockPosition);
-        int y = BaseBlockPositionHandle.T.field_y.getInteger(blockPosition);
-        int z = BaseBlockPositionHandle.T.field_z.getInteger(blockPosition);
-        return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
+        return BaseBlockPositionHandle.createHandle(blockPosition).isPositionInBox(xMin, yMin, zMin, xMax, yMax, zMax);
     }
 
     /* ============================================================== */

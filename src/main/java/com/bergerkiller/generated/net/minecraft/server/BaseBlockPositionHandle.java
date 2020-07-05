@@ -27,24 +27,11 @@ public abstract class BaseBlockPositionHandle extends Template.Handle {
     public abstract int getZ();
     public abstract boolean isPositionInBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax);
     public abstract IntVector3 toIntVector3();
-    @Template.Readonly
-    public abstract int getField_x();
-    @Template.Readonly
-    public abstract int getField_y();
-    @Template.Readonly
-    public abstract int getField_z();
     /**
      * Stores class members for <b>net.minecraft.server.BaseBlockPosition</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class BaseBlockPositionClass extends Template.Class<BaseBlockPositionHandle> {
-        @Template.Readonly
-        public final Template.Field.Integer field_x = new Template.Field.Integer();
-        @Template.Readonly
-        public final Template.Field.Integer field_y = new Template.Field.Integer();
-        @Template.Readonly
-        public final Template.Field.Integer field_z = new Template.Field.Integer();
-
         public final Template.Method<Integer> getX = new Template.Method<Integer>();
         public final Template.Method<Integer> getY = new Template.Method<Integer>();
         public final Template.Method<Integer> getZ = new Template.Method<Integer>();
