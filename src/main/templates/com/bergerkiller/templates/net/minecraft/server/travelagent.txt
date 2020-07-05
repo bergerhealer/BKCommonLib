@@ -28,7 +28,11 @@ class PortalTravelAgent {
 #if version >= 1.14
         // Special handling for END dimensions. This code is found in the old 1.13.2 PortalTravelAgent code.
         // Bukkit also separated this, but with 1.14 this was removed for some reason.
+  #if version >= 1.16
+        if (world.getTypeKey() == DimensionManager.THE_END) {
+  #else
         if (world.worldProvider.getDimensionManager() == DimensionManager.THE_END) {
+  #endif
             int i = MathHelper.floor(x);
             int j = MathHelper.floor(y) - 1;
             int k = MathHelper.floor(z);
@@ -111,7 +115,12 @@ class PortalTravelAgent {
         // Bukkit also separated this, but with 1.14 this was removed for some reason.
         #require net.minecraft.server.PortalTravelAgent private final WorldServer world;
         WorldServer world = instance#world;
+
+  #if version >= 1.16
+        if (world.getTypeKey() == DimensionManager.THE_END) {
+  #else
         if (world.worldProvider.getDimensionManager() == DimensionManager.THE_END) {
+  #endif
             int i = MathHelper.floor(x);
             int j = MathHelper.floor(y) - 1;
             int k = MathHelper.floor(z);
