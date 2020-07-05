@@ -55,14 +55,21 @@ public class RegionHandler_1_15 extends RegionHandler {
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
                     "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
+                    "#if exists net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    /*   Paperspigot compatible code  */
+                    "    #require net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    "    RegionFileCache rfc = icl#regionFileCache;\n" +
+                    "#else\n" +
+                    /*   Normal Spigot code */
                     "    #require net.minecraft.server.IChunkLoader private final IOWorker ioworker:a;\n" +
                     "    IOWorker ioworker = icl#ioworker;\n" +
-                    "#if version >= 1.16\n" +
+                    "  #if version >= 1.16\n" +
                     "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:d;\n" +
-                    "#else\n" +
+                    "  #else\n" +
                     "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:e;\n" +
-                    "#endif\n" +
+                    "  #endif\n" +
                     "    RegionFileCache rfc = ioworker#cache;\n" +
+                    "#endif\n" +
                     "    return rfc.cache;\n" +
                     "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
