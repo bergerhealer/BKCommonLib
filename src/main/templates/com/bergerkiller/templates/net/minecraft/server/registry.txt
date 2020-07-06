@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.server.MinecraftKey;
+import net.minecraft.server.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.server.ResourceKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
@@ -183,19 +185,19 @@ class ResourceKey {
     public static (ResourceKeyHandle) ResourceKey createCategory:a((MinecraftKeyHandle) MinecraftKey categoryName);
 #else
     public (MinecraftKeyHandle) MinecraftKey getCategory() {
-        return (MinecraftKey) instance.category;
+        return (net.minecraft.server.MinecraftKey) instance.category;
     }
 
     public (MinecraftKeyHandle) MinecraftKey getName() {
-        return (MinecraftKey) instance.name;
+        return (net.minecraft.server.MinecraftKey) instance.name;
     }
 
     public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name) {
-        return ResourceKey.create(category, name);
+        return ResourceKey.create(category, (Object) name);
     }
 
     public static (ResourceKeyHandle) ResourceKey createCategory((MinecraftKeyHandle) MinecraftKey categoryName) {
-        return ResourceKey.createCategory(categoryName);
+        return ResourceKey.createCategory((Object) categoryName);
     }
 #endif
 }

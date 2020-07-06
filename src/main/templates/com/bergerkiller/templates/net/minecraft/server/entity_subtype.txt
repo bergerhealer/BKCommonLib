@@ -346,42 +346,58 @@ class EntityPlayer extends EntityHuman {
     // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
 
 #if version >= 1.16
-    private (IntVector3) BlockPosition spawnCoord:spawn;
-    private boolean spawnForced;
+    #require net.minecraft.server.EntityPlayer private BlockPosition spawnCoord:spawn;
+    #require net.minecraft.server.EntityPlayer private boolean spawnForced;
 #elseif version >= 1.15
-    private (IntVector3) BlockPosition spawnCoord:g;
-    private boolean spawnForced:bR;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:g;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:bR;
 #elseif version >= 1.14.4
-    private (IntVector3) BlockPosition spawnCoord:g;
-    private boolean spawnForced:bU;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:g;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:bU;
 #elseif version >= 1.14
-    private (IntVector3) BlockPosition spawnCoord:f;
-    private boolean spawnForced:g;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:f;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:g;
 #elseif version >= 1.13
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:e;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:f;
 #elseif version >= 1.12
-    private (IntVector3) BlockPosition spawnCoord:d;
-    private boolean spawnForced:e;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:d;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:e;
 #elseif version >= 1.11
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:e;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:f;
 #elseif version >= 1.10.2
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:e;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:f;
 #elseif version >= 1.9.4
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f; 
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:e;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:f; 
 #elseif version >= 1.9
-    private (IntVector3) BlockPosition spawnCoord:e;
-    private boolean spawnForced:f;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:e;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:f;
 #elseif version >= 1.8.3
-    private (IntVector3) BlockPosition spawnCoord:c;
-    private boolean spawnForced:d;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:c;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:d;
 #else
-    private (IntVector3) BlockPosition spawnCoord:c;
-    private boolean spawnForced:d;
+    #require net.minecraft.server.EntityHuman private BlockPosition spawnCoord:c;
+    #require net.minecraft.server.EntityHuman private boolean spawnForced:d;
 #endif
+
+    public (IntVector3) BlockPosition getSpawnCoord() {
+        return instance#spawnCoord;
+    }
+
+    public void setSpawnCoord((IntVector3) BlockPosition coord) {
+        instance#spawnCoord = coord;
+    }
+
+    public boolean isSpawnForced() {
+        return instance#spawnForced;
+    }
+
+    public void setSpawnForced(boolean forced) {
+        instance#spawnForced = forced;
+    }
 
     public int ping;
 

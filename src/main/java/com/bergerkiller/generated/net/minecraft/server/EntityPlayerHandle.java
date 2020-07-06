@@ -25,6 +25,10 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
 
     /* ============================================================================== */
 
+    public abstract IntVector3 getSpawnCoord();
+    public abstract void setSpawnCoord(IntVector3 coord);
+    public abstract boolean isSpawnForced();
+    public abstract void setSpawnForced(boolean forced);
     public abstract World getSpawnWorld();
     public abstract void setSpawnWorld(World world);
     public abstract InventoryView openAnvilWindow();
@@ -34,10 +38,6 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     }
     public abstract PlayerConnectionHandle getPlayerConnection();
     public abstract void setPlayerConnection(PlayerConnectionHandle value);
-    public abstract IntVector3 getSpawnCoord();
-    public abstract void setSpawnCoord(IntVector3 value);
-    public abstract boolean isSpawnForced();
-    public abstract void setSpawnForced(boolean value);
     public abstract int getPing();
     public abstract void setPing(int value);
     /**
@@ -46,10 +46,12 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
-        public final Template.Field.Converted<IntVector3> spawnCoord = new Template.Field.Converted<IntVector3>();
-        public final Template.Field.Boolean spawnForced = new Template.Field.Boolean();
         public final Template.Field.Integer ping = new Template.Field.Integer();
 
+        public final Template.Method.Converted<IntVector3> getSpawnCoord = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<Void> setSpawnCoord = new Template.Method.Converted<Void>();
+        public final Template.Method<Boolean> isSpawnForced = new Template.Method<Boolean>();
+        public final Template.Method<Void> setSpawnForced = new Template.Method<Void>();
         public final Template.Method<World> getSpawnWorld = new Template.Method<World>();
         public final Template.Method<Void> setSpawnWorld = new Template.Method<Void>();
         @Template.Optional

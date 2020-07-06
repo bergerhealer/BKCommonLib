@@ -1549,7 +1549,9 @@ class PacketPlayOutEntityMetadata extends Packet {
 class PacketPlayOutUpdateAttributes extends Packet {
     private int entityId:a;
 
-    public (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> collection) {
+    public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createNew(int entityId, (java.util.Collection<AttributeModifiableHandle>) java.util.Collection<AttributeModifiable> attributes) {
+        return new PacketPlayOutUpdateAttributes(entityId, attributes);
+    }
 
     public static (PacketPlayOutUpdateAttributesHandle) PacketPlayOutUpdateAttributes createZeroMaxHealth(int entityId) {
 #if version >= 1.16
