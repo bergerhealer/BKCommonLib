@@ -4,6 +4,7 @@
 #if version >= 1.13
 // ======================= New >= 1.13 ========================
 ISAIR:
+  LEGACY_AIR
   AIR
   CAVE_AIR
   VOID_AIR
@@ -346,7 +347,7 @@ ISPOTION:
 #else
 // ===================== Legacy <= 1.12.2 =====================
 ISAIR:
-  AIR
+  LEGACY_AIR
 
 ISDOOR:
   LEGACY_WOODEN_DOOR

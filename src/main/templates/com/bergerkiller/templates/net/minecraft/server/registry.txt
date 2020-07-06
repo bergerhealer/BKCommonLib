@@ -2,6 +2,8 @@ package net.minecraft.server;
 
 import net.minecraft.server.MinecraftKey;
 import net.minecraft.server.ResourceKey;
+import net.minecraft.server.DimensionManager;
+
 import com.bergerkiller.generated.net.minecraft.server.ResourceKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
@@ -102,8 +104,8 @@ class DimensionManager {
     }
 #else
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
-        ResourceKey category = (ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();
-        MinecraftKey name;
+        net.minecraft.server.ResourceKey category = (net.minecraft.server.ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();
+        net.minecraft.server.MinecraftKey name;
 
   #if version >= 1.13.1
         name = IRegistry.DIMENSION_TYPE.getKey(instance);
@@ -113,19 +115,19 @@ class DimensionManager {
   #else
         // Is an enum here, with always only 3 possible values anyway
         if (instance == DimensionManager.NETHER) {
-            name = new MinecraftKey("the_nether");
+            name = new net.minecraft.server.MinecraftKey("the_nether");
         } else if (instance == DimensionManager.THE_END) {
-            name = new MinecraftKey("the_end");
+            name = new net.minecraft.server.MinecraftKey("the_end");
         } else {
-            name = new MinecraftKey("overworld");
+            name = new net.minecraft.server.MinecraftKey("overworld");
         }
   #endif
 
-        return ResourceKey.create(category, name);
+        return net.minecraft.server.ResourceKey.create(category, name);
     }
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
-        MinecraftKey mc_key = (MinecraftKey) key.name;
+        net.minecraft.server.MinecraftKey mc_key = (net.minecraft.server.MinecraftKey) key.name;
 
   #if version >= 1.13.1
         return (DimensionManager) IRegistry.DIMENSION_TYPE.get(mc_key);
@@ -193,11 +195,11 @@ class ResourceKey {
     }
 
     public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name) {
-        return ResourceKey.create(category, (Object) name);
+        return net.minecraft.server.ResourceKey.create(category, (Object) name);
     }
 
     public static (ResourceKeyHandle) ResourceKey createCategory((MinecraftKeyHandle) MinecraftKey categoryName) {
-        return ResourceKey.createCategory((Object) categoryName);
+        return net.minecraft.server.ResourceKey.createCategory((Object) categoryName);
     }
 #endif
 }

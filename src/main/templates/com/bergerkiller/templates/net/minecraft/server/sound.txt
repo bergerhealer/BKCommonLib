@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+import net.minecraft.server.SoundEffect;
 
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
