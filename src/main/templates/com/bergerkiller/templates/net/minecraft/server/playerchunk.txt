@@ -24,33 +24,50 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
 #endif
 }
 
-#if version >= 1.14
-    public void markAllLightDirty() {
-    
-  #if version >= 1.16
+#if version >= 1.16
+    // Since Minecraft 1.16 the sending of lighting is broken and nothing gets updated
+    // We must send the light update packet ourselves
+    public void resendAllLighting() {
+        Chunk chunk = instance.getChunk();
+        if (chunk == null) {
+            return;
+        }
+
+        // Reset dirty mask so it does not send twice
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
-  #elseif version >= 1.14.1
+        instance#pc_dirtyBlockLightMask = 0;
+        instance#pc_dirtySkyLightMask = 0;
+
+        // Retrieve LightEngine (used to make the update packet)
+        #require net.minecraft.server.PlayerChunk private final LightEngine lightEngine;
+        LightEngine lightEngine = instance#lightEngine;
+
+        // Create a lighting update packet, similar to how it is done in PlayerChunk
+        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);
+
+        // Send the packet, with flag=false (!) to make sure it actually works
+        // There appears to be a bug that the server only sends the packet with flag=true,
+        // which looking at the code, causes the packet to only be sent to players exactly [viewdistance]
+        // away from the chunk. This makes no sense whatsoever.
+        #require net.minecraft.server.PlayerChunk private void a(Packet<?> packet, boolean flag);
+        instance#a(packet,false);
+    }
+#elseif version >= 1.14
+    public void resendAllLighting() {
+  #if version >= 1.14.1
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:t;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:u;
   #else
+        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
   #endif
-
         // Set all these masks to 'all layers' (18) to refresh them
+        instance#pc_layerLightMask = 0x3FFFF;
         instance#pc_dirtyBlockLightMask = 0x3FFFF;
         instance#pc_dirtySkyLightMask = 0x3FFFF;
-
-        // Only used before MC 1.16
-  #if version < 1.16
-    #if version >= 1.14.1
-        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
-    #else
-        #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:r;
-    #endif
-        instance#pc_layerLightMask = 0x3FFFF;
-  #endif
 
         // Update now
         Chunk chunk = instance.getChunk();
@@ -59,7 +76,7 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         }
     }
 #else
-    public void markAllLightDirty() {
+    public void resendAllLighting() {
         // Unavailable < 1.14
     }
 #endif

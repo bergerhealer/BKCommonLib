@@ -658,7 +658,7 @@ public class WorldUtil extends ChunkUtil {
             }
 
             // Force a refresh of all chunk lighting information
-            playerChunk.markAllLightDirty();
+            playerChunk.resendAllLighting();
             return true;
         } else {
             // Light data is sent with chunk data below MC 1.14
@@ -707,7 +707,7 @@ public class WorldUtil extends ChunkUtil {
 
         // Send light packets first on MC 1.14 and later
         if (CommonCapabilities.NEW_LIGHT_ENGINE) {
-            playerChunk.markAllLightDirty();
+            playerChunk.resendAllLighting();
         }
 
         // Send chunk data itself to all the players
