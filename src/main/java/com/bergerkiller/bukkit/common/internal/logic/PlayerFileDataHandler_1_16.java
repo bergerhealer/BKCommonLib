@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.PlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -29,8 +30,8 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public static java.io.File getPlayerDir() {\n" +
-                    "    return MinecraftServer.getServer().worldNBTStorage.getPlayerDir();\n" +
+                    "public java.io.File getPlayerDir() {\n" +
+                    "    return new java.io.File(instance.convertable.a(instance.getDimensionKey()), \"playerdata\");\n" +
                     "}"));
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
@@ -71,7 +72,7 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
     @Override
     public File getPlayerDataFolder(World world) {
-        return getPlayerFolderOfWorld.invoke(null);
+        return getPlayerFolderOfWorld.invoke(HandleConversion.toWorldHandle(world));
     }
 
     public PlayerFileDataHook update(HookAction action) {
