@@ -3,9 +3,11 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 import java.lang.reflect.Modifier;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -84,12 +86,14 @@ public class ChunkGeneratorHook {
         @HookMethod("public List getMobsFor(net.minecraft.server.BiomeBase, net.minecraft.server.StructureManager, net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
         public List<?> getMobsFor(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             List<?> mobs = base.getMobsFor(biomeBase, structureManager, enumcreaturetype, blockposition);
-            if (CommonPlugin.hasInstance()) {
+
+            try {
                 // First check if anyone is even interested in this information
                 // There is no use wasting CPU time when no one handles the event!
                 if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
                     return mobs;
                 }
+
                 // Wrap the parameters and send the event along
                 BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
                 List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
@@ -97,9 +101,11 @@ public class ChunkGeneratorHook {
                         pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
 
                 return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
-            } else {
-                return mobs;
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to handle mob pre-spawn event", t);
             }
+
+            return mobs;
         }
     }
 
@@ -113,22 +119,27 @@ public class ChunkGeneratorHook {
         @HookMethod("public List getMobsFor(net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
         public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
             List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
-            if (CommonPlugin.hasInstance()) {
-                // First check if anyone is even interested in this information
-                // There is no use wasting CPU time when no one handles the event!
-                if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
-                    return mobs;
-                }
-                // Wrap the parameters and send the event along
-                BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
-                List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
-                mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
-                        pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
 
-                return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
-            } else {
-                return mobs;
+            try {
+                if (CommonPlugin.hasInstance()) {
+                    // First check if anyone is even interested in this information
+                    // There is no use wasting CPU time when no one handles the event!
+                    if (LogicUtil.nullOrEmpty(mobs) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
+                        return mobs;
+                    }
+                    // Wrap the parameters and send the event along
+                    BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
+                    List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+                    mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
+                            pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
+
+                    return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
+                }
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to handle mob pre-spawn event", t);
             }
+
+            return mobs;
         }
     }
 }

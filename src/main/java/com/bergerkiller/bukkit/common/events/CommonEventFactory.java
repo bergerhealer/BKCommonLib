@@ -30,7 +30,7 @@ public class CommonEventFactory {
     private final InstanceBuffer<BiomeMetaHandle> creaturePreSpawnMobs = new InstanceBuffer<BiomeMetaHandle>() {
         @Override
         public BiomeMetaHandle createElement() {
-            return BiomeMetaHandle.createNew(null, 0, 0, 0);
+            return BiomeMetaHandle.T.newHandleNull();
         }
     };
 
