@@ -135,7 +135,7 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
      * @return spawn point coordinates, or null if none are available
      */
     public Block getSpawnPoint() {
-        EntityPlayerHandle handle = this.getHandle(EntityPlayerHandle.class);
+        EntityPlayerHandle handle = EntityPlayerHandle.createHandle(this.getHandle());
         World world = handle.getSpawnWorld();
         IntVector3 coords = handle.getSpawnCoord();
         if (world != null && coords != null) {
