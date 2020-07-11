@@ -35,6 +35,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
@@ -676,5 +677,11 @@ public class WrapperConversion {
     @ConverterMethod
     public static org.bukkit.Art artFromInternalId(int internalId) {
         return CraftArtHandle.NotchToBukkit(CraftArtHandle.NotchFromInternalId(internalId));
+    }
+
+    // Since Minecraft 1.9
+    @ConverterMethod(input="net.minecraft.server.EnumInteractionResult", optional = true)
+    public static InteractionResult interactionResultFromNMSEnumInteractionResult(Object nmsEnumInteractionResultHandle) {
+        return InteractionResult.fromHandle(nmsEnumInteractionResultHandle);
     }
 }

@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
@@ -53,15 +54,17 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.controller = controller;
     }
 
-    public boolean base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
+    public InteractionResult base_onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
         Object entityHumanHandle = HandleConversion.toEntityHandle(humanEntity);
-        if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
-            return base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity));
+        if (EntityHandle.T.onInteractBy_1_16.isAvailable()) {
+            return InteractionResult.fromHandle(base.onInteractBy_1_16(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity)));
+        } else if (EntityHandle.T.onInteractBy_1_11_2.isAvailable()) {
+            return InteractionResult.fromTruthy(base.onInteractBy_1_11_2(entityHumanHandle, humanHand.toNMSEnumHand(humanEntity)));
         } else if (EntityHandle.T.onInteractBy_1_9.isAvailable()) {
             Object item = HandleConversion.toItemStackHandle(HumanHand.getHeldItem(humanEntity, humanHand));
-            return base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSEnumHand(humanEntity));
+            return InteractionResult.fromTruthy(base.onInteractBy_1_10_2(entityHumanHandle, item, humanHand.toNMSEnumHand(humanEntity)));
         } else if (EntityHandle.T.onInteractBy_1_8_8.isAvailable()) {
-            return base.onInteractBy_1_8_8(entityHumanHandle);
+            return InteractionResult.fromTruthy(base.onInteractBy_1_8_8(entityHumanHandle));
         } else {
             throw new UnsupportedOperationException("Don't know what interact method is used!");
         }
@@ -70,7 +73,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @Deprecated
     @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)", optional=true)
     public boolean onInteractBy_1_8_8(Object entityHuman) {
-        return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT);
+        return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT).isTruthy();
     }
 
     @Deprecated
@@ -83,10 +86,17 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod(value="public boolean onInteractBy_1_11_2:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
     public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
-        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand));
+        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).isTruthy();
     }
 
-    public boolean onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
+    @Deprecated
+    @HookMethod(value="public EnumInteractionResult onInteractBy_1_16:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
+    public Object onInteractBy_1_16(Object entityHuman, Object enumHand) {
+        HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
+        return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).getRawHandle();
+    }
+
+    public InteractionResult onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
         try {
             if (checkController()) {
                 return controller.onInteractBy(humanEntity, humanHand);
@@ -95,7 +105,7 @@ public class EntityHook extends ClassHook<EntityHook> {
             }
         } catch (Throwable t) {
             t.printStackTrace();
-            return false;
+            return InteractionResult.FAIL;
         }
     }
 

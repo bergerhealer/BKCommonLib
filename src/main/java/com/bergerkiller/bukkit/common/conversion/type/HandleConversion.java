@@ -35,6 +35,7 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
@@ -565,4 +566,9 @@ public class HandleConversion {
         return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
     }
 
+    // Since Minecraft 1.9
+    @ConverterMethod(output="net.minecraft.server.EnumInteractionResult", optional = true)
+    public static Object nmsEnumInteractionResultFromInteractionResult(InteractionResult result) {
+        return result.getRawHandle();
+    }
 }

@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -253,7 +254,7 @@ public class TemplateTest {
     @Test
     public void testBlockPlaceSound() {
         assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey stepName = BlockData.fromMaterial(Material.GRASS).getPlaceSound();
+        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(Material.GRASS).getPlaceSound();
         if (CommonCapabilities.KEYED_EFFECTS) {
             assertEquals("minecraft:block.grass.place", stepName.getPath());
         } else {
@@ -266,6 +267,14 @@ public class TemplateTest {
         testChatColor(ChatColor.BLACK, 0);
         testChatColor(ChatColor.RED, 12);
         testChatColor(ChatColor.RESET, -1);
+    }
+
+    @Test
+    public void testEntityInteractFunction() {
+        assertTrue(EntityHandle.T.onInteractBy_1_16.isAvailable() ||
+                   EntityHandle.T.onInteractBy_1_11_2.isAvailable() ||
+                   EntityHandle.T.onInteractBy_1_9.isAvailable() ||
+                   EntityHandle.T.onInteractBy_1_8_8.isAvailable());
     }
 
     private static void testChatColor(ChatColor expectedColor, int expectedIndex) {

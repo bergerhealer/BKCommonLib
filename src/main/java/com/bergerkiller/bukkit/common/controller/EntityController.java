@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityController;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 
@@ -83,7 +84,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @param hand that is used
      * @return True if interaction occurred, False if not
      */
-    public boolean onInteractBy(HumanEntity interacter, HumanHand hand) {
+    public InteractionResult onInteractBy(HumanEntity interacter, HumanHand hand) {
         return this.hook.base_onInteractBy(interacter, hand);
     }
 
