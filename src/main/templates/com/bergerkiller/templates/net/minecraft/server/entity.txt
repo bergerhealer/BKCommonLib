@@ -357,7 +357,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public void setVerticalMovementBlocked(boolean blocked) {
-        instance.E = blocked;
+        instance.v = blocked;
     }
 #elseif version >= 1.15
     public readonly boolean verticalMovementBlocked:v;
