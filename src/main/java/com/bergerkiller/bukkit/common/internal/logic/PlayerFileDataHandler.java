@@ -82,6 +82,7 @@ public abstract class PlayerFileDataHandler {
                     } catch (Throwable t) {
                         Logging.LOGGER.log(Level.SEVERE, "Failed to handle onSave() on " + this.controller, t);
                     }
+                    return;
                 }
             }
             this.base.save(entityHuman);
