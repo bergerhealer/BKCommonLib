@@ -14,6 +14,7 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -398,6 +399,8 @@ public class IBlockDataToMaterialData {
                     }
                 }.setTypes("ACACIA_WALL_SIGN", "BIRCH_WALL_SIGN", "DARK_OAK_WALL_SIGN", "JUNGLE_WALL_SIGN", "OAK_WALL_SIGN", "SPRUCE_WALL_SIGN",
                            "LEGACY_WALL_SIGN")
+                 .addTypesIf(CommonBootstrap.evaluateMCVersion(">=", "1.16"),
+                           "CRIMSON_WALL_SIGN", "WARPED_WALL_SIGN")
                  .setDataValues(2, 3, 4, 5)
                  .build();
             }
@@ -427,6 +430,8 @@ public class IBlockDataToMaterialData {
                     }
                 }.setTypes("ACACIA_SIGN", "BIRCH_SIGN", "DARK_OAK_SIGN", "JUNGLE_SIGN", "OAK_SIGN", "SPRUCE_SIGN",
                            "LEGACY_SIGN_POST")
+                 .addTypesIf(CommonBootstrap.evaluateMCVersion(">=", "1.16"),
+                           "CRIMSON_SIGN", "WARPED_SIGN")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();
             }
