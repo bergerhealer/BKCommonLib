@@ -188,4 +188,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.16 damage from lava and fire is no longer handled inside the entity move function
      */
     public static final boolean ENTITY_FIRE_DAMAGE_IN_MOVE_HANDLER = CommonBootstrap.evaluateMCVersion("<", "1.16");
+
+    /**
+     * Since Minecraft 1.16 it is not possible to cancel a vehicle exit event, resulting in the player
+     * desynchronizing from the server if attempted.
+     */
+    public static final boolean VEHICLE_EXIT_CANCELLABLE = CommonBootstrap.evaluateMCVersion("<", "1.16");
 }

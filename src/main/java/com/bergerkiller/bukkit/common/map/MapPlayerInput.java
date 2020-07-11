@@ -7,9 +7,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.TickTracker;
 import com.bergerkiller.bukkit.common.controller.Tickable;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
@@ -459,6 +462,17 @@ public class MapPlayerInput implements Tickable {
         } else {
             key_repeat_timer = 0;
         }
+
+        // Must send the mount packet again, with a slight delay, when shift is pressed post-1.16
+        // After 4 ticks we may no longer be sending our input, and nothing happens
+        if (!CommonCapabilities.VEHICLE_EXIT_CANCELLABLE && this._fakeMountShown && dz < 0) {
+            new Task(CommonPlugin.getInstance()) {
+                public void run() {
+                    sendMountPacket();
+                }
+            }.start(4);
+        }
+
         return this._isIntercepting;
     }
 
@@ -471,6 +485,12 @@ public class MapPlayerInput implements Tickable {
 
         // If the player is already inside a vehicle, we can not fake-mount him
         if (player.isInsideVehicle()) {
+            updateInputInterception(false);
+            return;
+        }
+
+        // Since Minecraft 1.16, it is not possible to be on the mount while sneaking
+        if (!CommonCapabilities.VEHICLE_EXIT_CANCELLABLE && player.isSneaking()) {
             updateInputInterception(false);
             return;
         }
@@ -549,19 +569,7 @@ public class MapPlayerInput implements Tickable {
                     // Send attribute for max health = 0 to hide the health bar
                     PacketUtil.sendPacket(player, PacketPlayOutUpdateAttributesHandle.createZeroMaxHealth(this._fakeMountId));
                 }
-                {
-                    if (PacketType.OUT_MOUNT.getType() != null) {
-                        CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
-                        packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
-                        packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
-                        PacketUtil.sendPacket(player, packet);
-                    } else {
-                        CommonPacket packet = PacketType.OUT_ENTITY_ATTACH.newInstance();
-                        packet.write(PacketType.OUT_ENTITY_ATTACH.vehicleId, this._fakeMountId);
-                        packet.write(PacketType.OUT_ENTITY_ATTACH.passengerId, player.getEntityId());
-                        PacketUtil.sendPacket(player, packet);
-                    }
-                }
+                sendMountPacket();
             }
 
             // When player position changes, refresh mount position with a simple teleport packet
@@ -573,6 +581,22 @@ public class MapPlayerInput implements Tickable {
                         pos.getX(), pos.getY(), pos.getZ(),
                         0.0f, 0.0f, false);
                 PacketUtil.sendPacket(player, tp_packet);
+            }
+        }
+    }
+
+    public void sendMountPacket() {
+        if (this._fakeMountShown) {
+            if (PacketType.OUT_MOUNT.getType() != null) {
+                CommonPacket packet = PacketType.OUT_MOUNT.newInstance();
+                packet.write(PacketType.OUT_MOUNT.entityId, this._fakeMountId);
+                packet.write(PacketType.OUT_MOUNT.mountedEntityIds, new int[] {player.getEntityId()});
+                PacketUtil.sendPacket(player, packet);
+            } else {
+                CommonPacket packet = PacketType.OUT_ENTITY_ATTACH.newInstance();
+                packet.write(PacketType.OUT_ENTITY_ATTACH.vehicleId, this._fakeMountId);
+                packet.write(PacketType.OUT_ENTITY_ATTACH.passengerId, player.getEntityId());
+                PacketUtil.sendPacket(player, packet);
             }
         }
     }
