@@ -520,7 +520,7 @@ public class CommonPlugin extends PluginBase {
                 "Completely virus-free and scanned by various Bukkit-dev-staff watching eyes.",
                 "Hosts all the features that are impossible to include in a single Class",
                 "CraftBukkit: redone, reworked, translated and interfaced.",
-                "Having an error? *gasp* Don't forget to file a ticket on dev.bukkit.org!",
+                "Having an error? *gasp* Don't forget to file a ticket on github!",
                 "Package versioning is what brought BKCommonLib and CraftBukkit closer together!",
                 "For all the haters out there: BKCommonLib at least tries!",
                 "Want fries with that? We have hidden fries in the FoodUtil class.",
@@ -539,7 +539,12 @@ public class CommonPlugin extends PluginBase {
                 "BKCommonLib isn't a plugin, its a language based on english.",
                 "Updating is like reinventing the wheel for BKCommonLib.",
                 "Say thanks to our wonderful devs: Friwi, KamikazePlatypus and mg_1999",
-                "Welcome to the modern era, welcome to callback hell");
+                "Welcome to the modern era, welcome to callback hell",
+                "Soon generating lambda expressions from thin air!",
+                "We have a Discord!",
+                "Years of Minecraft history carefully catalogued",
+                "50% generated, 50% crafted by an artificial intelligence");
+
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
 
