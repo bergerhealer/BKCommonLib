@@ -299,4 +299,8 @@ public abstract class InventoryBase implements Inventory {
         }
     }
 
+    //@Override // Only on paperspigot
+    public InventoryHolder getHolder(boolean b) {
+        return getHolder();
+    }
 }
