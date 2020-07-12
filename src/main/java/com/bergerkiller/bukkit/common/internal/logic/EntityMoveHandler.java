@@ -551,31 +551,24 @@ public abstract class EntityMoveHandler {
 
             boolean flag1 = that.isWet();
 
-            if (CommonCapabilities.ENTITY_FIRE_DAMAGE_IN_MOVE_HANDLER) {
-                // Handle damage here
-                if (this.blockCollisionEnabled && world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001))) {
-                    that.burn(1.0f);
-                    if (!flag1) {
-                        that.setFireTicks(that.getFireTicks() + 1);
-                        if (that.getFireTicks() == 0) {
-                            // CraftBukkit start
-                            EntityCombustEvent event = new org.bukkit.event.entity.EntityCombustByBlockEvent(null, entity.getEntity(), 8);
-                            Bukkit.getPluginManager().callEvent(event);
+            // Handle damage here
+            if (this.blockCollisionEnabled && world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001))) {
+                that.burn(1.0f);
+                if (!flag1) {
+                    that.setFireTicks(that.getFireTicks() + 1);
+                    if (that.getFireTicks() == 0) {
+                        // CraftBukkit start
+                        EntityCombustEvent event = new org.bukkit.event.entity.EntityCombustByBlockEvent(null, entity.getEntity(), 8);
+                        Bukkit.getPluginManager().callEvent(event);
 
-                            if (!event.isCancelled()) {
-                                that.setOnFire(event.getDuration());
-                            }
-                            // CraftBukkit end
+                        if (!event.isCancelled()) {
+                            that.setOnFire(event.getDuration());
                         }
+                        // CraftBukkit end
                     }
-                } else if (that.getFireTicks() <= 0) {
-                    that.setFireTicks(-that.getMaxFireTicks());
                 }
-            } else {
-                // All we do in here is reset, nothing else
-                if (that.getFireTicks() <= 0 && (!this.blockCollisionEnabled || !world.isBurnArea(that.getBoundingBox().shrinkUniform(0.001)))) {
-                    that.setFireTicks(-that.getMaxFireTicks());
-                }
+            } else if (that.getFireTicks() <= 0) {
+                that.setFireTicks(-that.getMaxFireTicks());
             }
 
             if (flag1 && that.isBurning()) {
