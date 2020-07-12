@@ -235,6 +235,11 @@ class PacketPlayInUseEntity extends Packet {
 #else
     private optional (Object) EnumHand enumHand:###;
 #endif
+#if version >= 1.16
+    private optional boolean sneaking:e;
+#else
+    private optional boolean sneaking:###;
+#endif
 
     <code>
     public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
@@ -243,6 +248,16 @@ class PacketPlayInUseEntity extends Packet {
 
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
         internalSetHand(T.enumHand, humanEntity, hand);
+    }
+
+    public boolean isSneaking() {
+        return T.sneaking.isAvailable() && T.sneaking.getBoolean(getRaw());
+    }
+
+    public void setSneaking(boolean sneaking) {
+        if (T.sneaking.isAvailable()) {
+            T.sneaking.setBoolean(getRaw(), sneaking);
+        }
     }
     </code>
 

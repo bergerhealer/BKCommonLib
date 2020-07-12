@@ -31,6 +31,16 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
     public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
         internalSetHand(T.enumHand, humanEntity, hand);
     }
+
+    public boolean isSneaking() {
+        return T.sneaking.isAvailable() && T.sneaking.getBoolean(getRaw());
+    }
+
+    public void setSneaking(boolean sneaking) {
+        if (T.sneaking.isAvailable()) {
+            T.sneaking.setBoolean(getRaw(), sneaking);
+        }
+    }
     public abstract int getUsedEntityId();
     public abstract void setUsedEntityId(int value);
     public abstract UseAction getAction();
@@ -47,6 +57,8 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
         public final Template.Field.Converted<Vector> offset = new Template.Field.Converted<Vector>();
         @Template.Optional
         public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
+        @Template.Optional
+        public final Template.Field.Boolean sneaking = new Template.Field.Boolean();
 
     }
 
