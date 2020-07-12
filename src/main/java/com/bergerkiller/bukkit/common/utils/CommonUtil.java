@@ -957,10 +957,14 @@ public class CommonUtil {
      * @throws RuntimeException: Event class has no handler list
      */
     public static HandlerList getEventHandlerList(Class<?> eventClass) {
-        try {
-            return (HandlerList) eventClass.getDeclaredMethod("getHandlerList").invoke(null);
-        } catch (Throwable t) {
+        Class<?> classWithHandlerList = eventClass;
+        while (classWithHandlerList != null && Event.class.isAssignableFrom(classWithHandlerList)) {
+            try {
+                return (HandlerList) classWithHandlerList.getDeclaredMethod("getHandlerList").invoke(null);
+            } catch (Throwable t) {}
+            classWithHandlerList = classWithHandlerList.getSuperclass();
         }
+
         throw new RuntimeException("Class '" + eventClass.getName() + "' does not have a handler list");
     }
 
