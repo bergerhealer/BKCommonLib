@@ -4,15 +4,18 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
 
 /**
  * Used on MC 1.8.8 and before, when only a single passenger per vehicle was possible.
  * The ATTACH packet is used.
  */
-public class VehicleMountHandler_SinglePassenger extends VehicleMountHandler_BaseImpl {
+public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseImpl {
+    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_ENTITY_ATTACH};
 
-    public VehicleMountHandler_SinglePassenger(Player player) {
+    public VehicleMountHandler_1_8_to_1_8_8(Player player) {
         super(player);
     }
 
@@ -23,7 +26,7 @@ public class VehicleMountHandler_SinglePassenger extends VehicleMountHandler_Bas
      * 
      * @param packet
      */
-    public synchronized void processAttachEntityPacket(PacketPlayOutAttachEntityHandle packet) {
+    private void processAttachEntityPacket(PacketPlayOutAttachEntityHandle packet) {
         SpawnedEntity passenger = getSpawnedEntity(packet.getPassengerId(), false);
         SpawnedEntity vehicle = getSpawnedEntity(packet.getVehicleId(), false);
         if (passenger != null && passenger.vehicleMount != null) {
@@ -60,6 +63,16 @@ public class VehicleMountHandler_SinglePassenger extends VehicleMountHandler_Bas
             if (m.passenger.spawned) {
                 m.sent = true;
                 sendAttach(entity, m.passenger);
+            }
+        }
+    }
+
+    @Override
+    protected void onPacketSend(CommonPacket packet) {
+        if (packet.getType() == PacketType.OUT_ENTITY_ATTACH) {
+            PacketPlayOutAttachEntityHandle packet_ae = PacketPlayOutAttachEntityHandle.createHandle(packet.getHandle());
+            if (!packet_ae.isLeash()) {
+                processAttachEntityPacket(packet_ae);
             }
         }
     }

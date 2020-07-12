@@ -5,15 +5,18 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
 /**
  * Used on MC 1.9 and later, when multiple passengers could be mounted inside a vehicle.
  * The MOUNT packet is used.
  */
-public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_BaseImpl {
+public class VehicleMountHandler_1_9_to_1_15_2 extends VehicleMountHandler_BaseImpl {
+    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_MOUNT};
 
-    public VehicleMountHandler_MultiplePassengers(Player player) {
+    public VehicleMountHandler_1_9_to_1_15_2(Player player) {
         super(player);
     }
 
@@ -23,7 +26,7 @@ public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_
      * 
      * @param packet
      */
-    public synchronized void processMountPacket(PacketPlayOutMountHandle packet) {
+    private void processMountPacket(PacketPlayOutMountHandle packet) {
         SpawnedEntity vehicle = getSpawnedEntity(packet.getEntityId(), false);
 
         // All passengers specified in the packet, with separate tracking of length/changed
@@ -97,6 +100,13 @@ public class VehicleMountHandler_MultiplePassengers extends VehicleMountHandler_
             }
         }
         sendVehicleMounts(entity, false);
+    }
+
+    @Override
+    protected void onPacketSend(CommonPacket packet) {
+        if (packet.getType() == PacketType.OUT_MOUNT) {
+            processMountPacket(PacketPlayOutMountHandle.createHandle(packet.getHandle()));
+        }
     }
 
     private final void sendVehicleMounts(SpawnedEntity vehicle, boolean sendEmptyList) {

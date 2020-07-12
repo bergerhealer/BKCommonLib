@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.function.Function;
 
 import org.bukkit.entity.Player;
 
@@ -10,15 +11,14 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_BaseImpl;
-import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_MultiplePassengers;
-import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_SinglePassenger;
+import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_9_to_1_15_2;
+import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_16;
+import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_8_to_1_8_8;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
 /**
  * Does a whole lot of tracking to detect when entities are spawned and despawned for a Player.
@@ -28,6 +28,8 @@ public class CommonVehicleMountManager {
     private final PacketMonitor monitor;
     private final PacketListener listener;
     private final Task cleanupTask;
+    private final Function<Player, VehicleMountHandler_BaseImpl> _handlerMaker;
+    private final PacketType[] _listenedPackets;
 
     public CommonVehicleMountManager(CommonPlugin plugin) {
         // Runs occasionally to remove handlers for players that are no longer online
@@ -45,41 +47,34 @@ public class CommonVehicleMountManager {
 
             @Override
             public void onMonitorPacketSend(CommonPacket packet, Player player) {
-                get(player).onPacketReceive(packet);
+                get(player).handlePacketSend(packet);
             }
         };
 
-        // Listens for mount/attach packets, making corrections if needed
-        if (VehicleMountHandler_BaseImpl.SUPPORTS_MULTIPLE_PASSENGERS) {
-            // Listen for mount packet
-            this.listener = new PacketListener() {
-                @Override
-                public void onPacketReceive(PacketReceiveEvent event) {
-                }
+        // Listens to packets and calls the handlers
+        // These handlers can change the contents of the packet
+        this.listener = new PacketListener() {
+            @Override
+            public void onPacketReceive(PacketReceiveEvent event) {
+                get(event.getPlayer()).handlePacketReceive(event.getPacket());
+            }
 
-                @Override
-                public void onPacketSend(PacketSendEvent event) {
-                    PacketPlayOutMountHandle packet = PacketPlayOutMountHandle.createHandle(event.getPacket().getHandle());
-                    VehicleMountHandler_MultiplePassengers handler = (VehicleMountHandler_MultiplePassengers) get(event.getPlayer());
-                    handler.processMountPacket(packet);
-                }
-            };
+            @Override
+            public void onPacketSend(PacketSendEvent event) {
+                get(event.getPlayer()).handlePacketSend(event.getPacket());
+            }
+        };
+
+        // Factory for creating handlers for players
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+            this._handlerMaker = VehicleMountHandler_1_16::new;
+            this._listenedPackets = VehicleMountHandler_1_16.LISTENED_PACKETS;
+        } else if (VehicleMountHandler_BaseImpl.SUPPORTS_MULTIPLE_PASSENGERS) {
+            this._handlerMaker = VehicleMountHandler_1_9_to_1_15_2::new;
+            this._listenedPackets = VehicleMountHandler_1_9_to_1_15_2.LISTENED_PACKETS;
         } else {
-            // Listen for attach packet (when leash is false)
-            this.listener = new PacketListener() {
-                @Override
-                public void onPacketReceive(PacketReceiveEvent event) {
-                }
-
-                @Override
-                public void onPacketSend(PacketSendEvent event) {
-                    PacketPlayOutAttachEntityHandle packet = PacketPlayOutAttachEntityHandle.createHandle(event.getPacket().getHandle());
-                    if (!packet.isLeash()) {
-                        VehicleMountHandler_SinglePassenger handler = (VehicleMountHandler_SinglePassenger) get(event.getPlayer());
-                        handler.processAttachEntityPacket(packet);
-                    }
-                }
-            };
+            this._handlerMaker = VehicleMountHandler_1_8_to_1_8_8::new;
+            this._listenedPackets = VehicleMountHandler_1_8_to_1_8_8.LISTENED_PACKETS;
         }
     }
 
@@ -93,11 +88,7 @@ public class CommonVehicleMountManager {
                 PacketType.OUT_ENTITY_DESTROY,
                 PacketType.OUT_RESPAWN);
 
-        if (VehicleMountHandler_BaseImpl.SUPPORTS_MULTIPLE_PASSENGERS) {
-            PacketUtil.addPacketListener(this.cleanupTask.getPlugin(), this.listener, PacketType.OUT_MOUNT);
-        } else {
-            PacketUtil.addPacketListener(this.cleanupTask.getPlugin(), this.listener, PacketType.OUT_ENTITY_ATTACH);
-        }
+        PacketUtil.addPacketListener(this.cleanupTask.getPlugin(), this.listener, this._listenedPackets);
     }
 
     public void disable() {
@@ -120,15 +111,6 @@ public class CommonVehicleMountManager {
     }
 
     public synchronized VehicleMountHandler_BaseImpl get(Player player) {
-        VehicleMountHandler_BaseImpl handler = this._players.get(player);
-        if (handler == null) {
-            if (VehicleMountHandler_BaseImpl.SUPPORTS_MULTIPLE_PASSENGERS) {
-                handler = new VehicleMountHandler_MultiplePassengers(player);
-            } else {
-                handler = new VehicleMountHandler_SinglePassenger(player);
-            }
-            this._players.put(player, handler);
-        }
-        return handler;
+        return this._players.computeIfAbsent(player, this._handlerMaker);
     }
 }

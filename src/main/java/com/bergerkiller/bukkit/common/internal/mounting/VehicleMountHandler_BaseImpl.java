@@ -176,16 +176,19 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     /**
-     * Called when a relevant packet is received
+     * Call this to handle a relevant packet that was sent from the server to the client
      * 
-     * @param packet The packet received
+     * @param packet The packet sent
      */
-    public final void onPacketReceive(CommonPacket packet) {
+    public final void handlePacketSend(CommonPacket packet) {
         synchronizeAndQueuePackets(() -> {
             // Refresh player dimension if none could be set (temporary player, pre-join)
             if (this._playerDimension == null) {
                 this._playerDimension = PlayerUtil.getPlayerDimension(this._player).getKey();
             }
+
+            // Event handler for further implementations
+            onPacketSend(packet);
 
             // Handle packets
             PacketType type = packet.getType();
@@ -206,6 +209,17 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                     handleReset();
                 }
             }
+        });
+    }
+
+    /**
+     * Call this to handle a relevant packet that was received by the server from the client
+     * 
+     * @param packet The packet received
+     */
+    public final void handlePacketReceive(CommonPacket packet) {
+        synchronizeAndQueuePackets(() -> {
+            onPacketReceive(packet); 
         });
     }
 
@@ -273,7 +287,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
     /**
      * Called when an Entiy is despawned for the player.
-     * This method is already synchronized by {@link #onPacketReceive(packet)}.
+     * This method is already synchronized by {@link #handlePacketSend(packet)}.
      * 
      * @param entity
      */
@@ -349,11 +363,25 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
     /**
      * Called when an Entity is spawned for the player.
-     * This method is already synchronized by {@link #onPacketReceive(packet)}.
+     * This method is already synchronized by {@link #handlePacketSend(packet)}.
      * 
      * @param entity
      */
     protected abstract void onSpawned(SpawnedEntity entity);
+
+    /**
+     * Called when a packet is sent from the server to the player
+     * 
+     * @param packet
+     */
+    protected void onPacketSend(CommonPacket packet) {}
+
+    /**
+     * Called when a packet is received from the player by the server
+     * 
+     * @param packet
+     */
+    protected void onPacketReceive(CommonPacket packet) {}
 
     /**
      * Metadata of a single spawned entity
