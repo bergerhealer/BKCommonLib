@@ -10,6 +10,7 @@ import java.util.function.Supplier;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
@@ -26,12 +27,14 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 public abstract class VehicleMountHandler_BaseImpl implements VehicleMountController {
     public static boolean SUPPORTS_MULTIPLE_PASSENGERS = PacketPlayOutMountHandle.T.isAvailable();
     private final Player _player;
-    private final SpawnedEntity _playerSpawnedEntity;
+    protected final CommonPlugin _plugin;
+    protected final SpawnedEntity _playerSpawnedEntity;
     private ResourceKey<DimensionType> _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
     private final Queue<PacketHandle> _queuedPackets;
 
-    public VehicleMountHandler_BaseImpl(Player player) {
+    public VehicleMountHandler_BaseImpl(CommonPlugin plugin, Player player) {
+        this._plugin = plugin;
         this._player = player;
         this._playerDimension = PlayerUtil.getPlayerDimension(player).getKey();
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
@@ -223,8 +226,17 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         });
     }
 
+    /**
+     * Call this to tell the handler it has been removed (player is offline)
+     */
+    public final void handleRemoved() {
+        synchronizeAndQueuePackets(() -> {
+            onRemoved();
+        });
+    }
+
     // Calls a runnable while synchronized, afterwards flushes all queued packets
-    private final void synchronizeAndQueuePackets(Runnable r) {
+    protected final void synchronizeAndQueuePackets(Runnable r) {
         synchronized (this) {
             r.run();
         }
@@ -236,7 +248,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     // Calls a method while synchronized, afterwards flushes all queued packets and returns the return value
-    private final <T> T synchronizeAndQueuePackets(Supplier<T> s) {
+    protected final <T> T synchronizeAndQueuePackets(Supplier<T> s) {
         T result;
         synchronized (this) {
             result = s.get();
@@ -346,6 +358,11 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     /**
+     * Called when this handler is removed (player has logged off)
+     */
+    protected void onRemoved() {}
+
+    /**
      * Called when some or all passengers were removed from a vehicle
      * 
      * @param vehicle The vehicle from which mounts were removed
@@ -374,14 +391,14 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      * 
      * @param packet
      */
-    protected void onPacketSend(CommonPacket packet) {}
+    protected abstract void onPacketSend(CommonPacket packet);
 
     /**
      * Called when a packet is received from the player by the server
      * 
      * @param packet
      */
-    protected void onPacketReceive(CommonPacket packet) {}
+    protected abstract void onPacketReceive(CommonPacket packet);
 
     /**
      * Metadata of a single spawned entity

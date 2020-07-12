@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 import org.bukkit.entity.Player;
 
@@ -27,11 +27,14 @@ public class CommonVehicleMountManager {
     private final Map<Player, VehicleMountHandler_BaseImpl> _players = new IdentityHashMap<Player, VehicleMountHandler_BaseImpl>();
     private final PacketMonitor monitor;
     private final PacketListener listener;
+    private final CommonPlugin plugin;
     private final Task cleanupTask;
-    private final Function<Player, VehicleMountHandler_BaseImpl> _handlerMaker;
+    private final BiFunction<CommonPlugin, Player, VehicleMountHandler_BaseImpl> _handlerMaker;
     private final PacketType[] _listenedPackets;
 
     public CommonVehicleMountManager(CommonPlugin plugin) {
+        this.plugin = plugin;
+
         // Runs occasionally to remove handlers for players that are no longer online
         this.cleanupTask = new Task(plugin) {
             @Override
@@ -81,14 +84,14 @@ public class CommonVehicleMountManager {
     public void enable() {
         this.cleanupTask.start(100, 100);
 
-        PacketUtil.addPacketMonitor(this.cleanupTask.getPlugin(), this.monitor,
+        PacketUtil.addPacketMonitor(this.plugin, this.monitor,
                 PacketType.OUT_ENTITY_SPAWN,
                 PacketType.OUT_ENTITY_SPAWN_LIVING,
                 PacketType.OUT_ENTITY_SPAWN_NAMED,
                 PacketType.OUT_ENTITY_DESTROY,
                 PacketType.OUT_RESPAWN);
 
-        PacketUtil.addPacketListener(this.cleanupTask.getPlugin(), this.listener, this._listenedPackets);
+        PacketUtil.addPacketListener(this.plugin, this.listener, this._listenedPackets);
     }
 
     public void disable() {
@@ -98,19 +101,24 @@ public class CommonVehicleMountManager {
     }
 
     public synchronized void cleanup() {
-        Iterator<Player> iter = this._players.keySet().iterator();
+        Iterator<Map.Entry<Player, VehicleMountHandler_BaseImpl>> iter = this._players.entrySet().iterator();
         while (iter.hasNext()) {
-            if (!iter.next().isOnline()) {
+            Map.Entry<Player, VehicleMountHandler_BaseImpl> entry = iter.next();
+            if (!entry.getKey().isOnline()) {
                 iter.remove();
+                entry.getValue().handleRemoved();
             }
         }
     }
 
     public synchronized void remove(Player player) {
-        this._players.remove(player);
+        VehicleMountHandler_BaseImpl handler = this._players.remove(player);
+        if (handler != null) {
+            handler.handleRemoved();
+        }
     }
 
     public synchronized VehicleMountHandler_BaseImpl get(Player player) {
-        return this._players.computeIfAbsent(player, this._handlerMaker);
+        return this._players.computeIfAbsent(player, (p) -> this._handlerMaker.apply(this.plugin, p));
     }
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
@@ -15,8 +16,8 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntity
 public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseImpl {
     public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_ENTITY_ATTACH};
 
-    public VehicleMountHandler_1_8_to_1_8_8(Player player) {
-        super(player);
+    public VehicleMountHandler_1_8_to_1_8_8(CommonPlugin plugin, Player player) {
+        super(plugin, player);
     }
 
     /**
@@ -65,6 +66,10 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
                 sendAttach(entity, m.passenger);
             }
         }
+    }
+
+    @Override
+    protected void onPacketReceive(CommonPacket packet) {
     }
 
     @Override
