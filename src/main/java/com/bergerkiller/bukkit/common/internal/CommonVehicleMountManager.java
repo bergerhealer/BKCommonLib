@@ -105,8 +105,9 @@ public class CommonVehicleMountManager {
         while (iter.hasNext()) {
             Map.Entry<Player, VehicleMountHandler_BaseImpl> entry = iter.next();
             if (!entry.getKey().isOnline()) {
+                VehicleMountHandler_BaseImpl handler = entry.getValue();
                 iter.remove();
-                entry.getValue().handleRemoved();
+                handler.handleRemoved();
             }
         }
     }
