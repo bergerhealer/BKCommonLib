@@ -83,8 +83,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 mount = new Mount(vehicle, passenger);
                 passenger.vehicleMount = mount;
                 if (vehicle.passengerMounts.size() == 1) {
-                    vehicle.passengerMounts = new ArrayList<>(2);
-                    vehicle.passengerMounts.add(vehicle.passengerMounts.get(0));
+                    vehicle.passengerMounts = new ArrayList<>(vehicle.passengerMounts);
                 }
                 vehicle.passengerMounts.add(mount);
             } else {
