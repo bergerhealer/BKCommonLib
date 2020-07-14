@@ -10,6 +10,7 @@ import java.util.Map;
 import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -460,7 +461,18 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final boolean canSupportTop(Block block) {
-        return this.block.canSupportTop(this.data, block);
+        return this.block.canSupportOnFace(this.data, block, BlockFace.UP);
+    }
+
+    /**
+     * Gets whether the given block face of a Block is capable of supporting other blocks, like torches and minecart track.
+     * 
+     * @param block position where this BlockData exists
+     * @param face BlockFace to check
+     * @return True if supporting blocks on this face
+     */
+    public final boolean canSupportOnFace(Block block, BlockFace face) {
+        return this.block.canSupportOnFace(this.data, block, face);
     }
 
     @Override

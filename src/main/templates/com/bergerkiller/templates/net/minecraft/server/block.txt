@@ -110,23 +110,6 @@ class Block {
     }
 
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
-        if (iblockdata.a(TagsBlock.LEAVES)) {
-            return false;
-        }
-
-  #if version >= 1.16
-        #require net.minecraft.server.Block private static final VoxelShape checkShape:b;
-  #else
-        #require net.minecraft.server.Block private static final VoxelShape checkShape:c;
-  #endif
-        VoxelShape checkShape = Block#checkShape;
-
-        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
-        BlockPosition blockposition = block.getPosition();
-        VoxelShape shape = iblockdata.getCollisionShape(iblockaccess, blockposition);
-        return !VoxelShapes.c(shape.a(EnumDirection.UP), checkShape, OperatorBoolean.ONLY_SECOND);
-    }
 #elseif version >= 1.13
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -148,9 +131,6 @@ class Block {
     }
 
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
-        return instance.r(iblockdata);
-    }
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
@@ -167,10 +147,8 @@ class Block {
     }
 
     public boolean isPowerSource:isPowerSource((IBlockDataHandle) IBlockData iblockdata);
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
-        return instance.k(iblockdata);
-    }
-#elseif version >= 1.8.3
+#else
+  #if version >= 1.8.3
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.p();
@@ -178,38 +156,7 @@ class Block {
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
         return instance.r();
     }
-
-    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        return instance.isOccluding();
-    }
-
-    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
-        return instance.isOccluding();
-    }
-
-    public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
-        return instance.isPowerSource();
-    }
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
-        Block block = iblockdata.getBlock();
-        if (block.getMaterial().k() && block.d()) {
-            return true;
-        }
-        if (block instanceof BlockStairs) {
-            return iblockdata.get(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP;
-        }
-        if (block instanceof BlockStepAbstract) {
-            return iblockdata.get(BlockStepAbstract.HALF) == BlockStepAbstract.EnumSlabHalf.TOP;
-        }
-        if (block instanceof BlockHopper) {
-            return true;
-        }
-        if (block instanceof BlockSnow) {
-            return ((Integer) iblockdata.get(BlockSnow.LAYERS)).intValue() == 7;
-        }
-        return false;
-    }
-#else
+  #else
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.n();
@@ -217,6 +164,7 @@ class Block {
     public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
         return instance.p();
     }
+  #endif
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.isOccluding();
@@ -229,17 +177,89 @@ class Block {
     public boolean isPowerSource((IBlockDataHandle) IBlockData iblockdata) {
         return instance.isPowerSource();
     }
-    public boolean canSupportTop((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block) {
-        Block block = iblockdata.getBlock();
-        if (block.getMaterial().k() && block.d()) {
+#endif
+
+#if version >= 1.14
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        if (iblockdata.a(TagsBlock.LEAVES)) {
+            return false;
+        }
+
+  #if version >= 1.16
+        #require net.minecraft.server.Block private static final VoxelShape checkShape:b;
+  #else
+        #require net.minecraft.server.Block private static final VoxelShape checkShape:c;
+  #endif
+        VoxelShape checkShape = Block#checkShape;
+
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        VoxelShape shape = iblockdata.getCollisionShape(iblockaccess, blockposition);
+        return !VoxelShapes.c(shape.a(direction), checkShape, OperatorBoolean.ONLY_SECOND);
+    }
+
+#elseif version >= 1.12
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        if (direction == EnumDirection.UP) {
+  #if version >= 1.13
+            return instance.r(iblockdata);
+  #else
+            return instance.k(iblockdata);
+  #endif
+        } else {
+  #if version >= 1.13
+            IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+  #else
+            IBlockAccess iblockaccess = ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
+  #endif
+  #if version >= 1.13.1
+            BlockPosition blockposition = block.getPosition();
+  #else
+            BlockPosition blockposition = new BlockPosition(block.getX(), block.getY(), block.getZ());
+  #endif
+            EnumBlockFaceShape shape = instance.a(iblockaccess, iblockdata, blockposition, direction);
+            return shape ==  EnumBlockFaceShape.SOLID;
+        }
+    }
+
+#elseif version >= 1.9
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        // See also BlockButtonAbstract for why this is
+        if (direction == EnumDirection.UP) {
+            return instance.k(iblockdata);
+        } else {
+            return instance.isOccluding(iblockdata);
+        }
+    }
+
+#else
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, org.bukkit.block.Block block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        if (direction != EnumDirection.UP) {
+            // See also BlockButtonAbstract for why this is
+            return instance.isOccluding();
+        }
+
+        Block nms_block = iblockdata.getBlock();
+        if (nms_block.getMaterial().k() && nms_block.d()) {
             return true;
         }
+
+        // Enums changed location as of 1.8.3
+  #if version >= 1.8.3
+        if (nms_block instanceof BlockStairs) {
+            return iblockdata.get(BlockStairs.HALF) == BlockStairs.EnumHalf.TOP;
+        }
+        if (nms_block instanceof BlockStepAbstract) {
+            return iblockdata.get(BlockStepAbstract.HALF) == BlockStepAbstract.EnumSlabHalf.TOP;
+        }
+  #else
         if (block instanceof BlockStairs) {
             return iblockdata.get(BlockStairs.HALF) == EnumHalf.TOP;
         }
         if (block instanceof BlockStepAbstract) {
             return iblockdata.get(BlockStepAbstract.HALF) == EnumSlabHalf.TOP;
         }
+  #endif
         if (block instanceof BlockHopper) {
             return true;
         }

@@ -451,11 +451,21 @@ public abstract class BlockData extends BlockDataRegistry {
 
     /**
      * Gets whether this Block is capable of supporting other blocks on top, like torches and minecart track.
+     * Equivalent to {@link #canSupportOnFace(Block, BlockFace)} with UP as face.
      * 
      * @param block position where this BlockData exists
      * @return True if supporting blocks on top
      */
     public abstract boolean canSupportTop(Block block);
+
+    /**
+     * Gets whether the given block face of a Block is capable of supporting other blocks, like torches and minecart track.
+     * 
+     * @param block position where this BlockData exists
+     * @param face BlockFace to check
+     * @return True if supporting blocks on this face
+     */
+    public abstract boolean canSupportOnFace(Block block, BlockFace face);
 
     /**
      * Gets the bounding box of a block of this Block Data type/
