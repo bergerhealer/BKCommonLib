@@ -614,7 +614,9 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
     private int suckingCooldown:b;
 #endif
 
-#if version >= 1.14
+#if version >= 1.16
+    public boolean suckItems:B();
+#elseif version >= 1.14
     public boolean suckItems:C();
 #elseif version >= 1.13
     public boolean suckItems:J();
