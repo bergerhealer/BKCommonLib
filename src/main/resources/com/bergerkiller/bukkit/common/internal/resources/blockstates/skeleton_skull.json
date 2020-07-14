@@ -10,7 +10,7 @@
         "rotation=6":  { "model": "block/skeleton_skull", "y": 135 },
         "rotation=7":  { "model": "block/skeleton_skull", "y": 157.5 },
         
-        "rotation=8":  { "model": "block/skeleton_skull", y: 180.0 },
+        "rotation=8":  { "model": "block/skeleton_skull", "y": 180.0 },
         "rotation=9":  { "model": "block/skeleton_skull", "y": 202.5 },
         "rotation=10":  { "model": "block/skeleton_skull", "y": 225 },
         "rotation=11":  { "model": "block/skeleton_skull", "y": 247.5 },
