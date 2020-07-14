@@ -241,7 +241,7 @@ class VoxelShape {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.EMPTY;
     }
 
-    public static (Object) net.minecraft.server.VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+    public static (Object) net.minecraft.server.VoxelShape createRawFromAABB((Object) List<net.minecraft.server.AxisAlignedBB> handles) {
         return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromNMSAABB(handles);
     }
 
