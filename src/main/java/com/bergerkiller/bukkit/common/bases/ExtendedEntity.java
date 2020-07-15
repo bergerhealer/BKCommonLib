@@ -758,7 +758,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         if (handle != null) {
             WorldHandle world = handle.getWorld();
             if (world != null) {
-                return world.getEntityById(handle.getId()) == this.getEntity();
+                return world.getEntityById(handle.getIdField()) == this.getEntity();
             }
         }
         return false;
