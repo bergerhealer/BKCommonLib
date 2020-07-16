@@ -45,6 +45,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
+    private final FastMethod<Object> tuinitySwapEntityInWorldEntityIterationSetMethod = new FastMethod<Object>();
     private final FastMethod<Object> paperspigotSwapEntityInChunkEntityListMethod = new FastMethod<Object>();
 
     //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
@@ -70,6 +71,24 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    if (instance.loadedEntities.remove(oldEntity)) {\n" +
                         "        instance.loadedEntities.add(newEntity);\n" +
+                        "    }\n" +
+                        "}"
+                ));
+            }
+        } catch (ClassNotFoundException ignore) {}
+
+        // Tuinity support: 'entitiesForIteration' field of WorldServer
+        try {
+            Class<?> entitySetType = Class.forName("com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet");
+            if (SafeField.contains(WorldServerHandle.T.getType(), "entitiesForIteration", entitySetType)) {
+                ClassResolver resolver = new ClassResolver();
+                resolver.setDeclaredClass(WorldServerHandle.T.getType());
+                tuinitySwapEntityInWorldEntityIterationSetMethod.init(new MethodDeclaration(resolver,
+                        "public void swap(Entity oldEntity, Entity newEntity) {\n" +
+                        "    #require net.minecraft.server.WorldServer final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entitiesForIteration;\n" +
+                        "    com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = instance#entitiesForIteration;\n" +
+                        "    if (set.remove(oldEntity)) {\n" +
+                        "        set.add(newEntity);\n" +
                         "    }\n" +
                         "}"
                 ));
@@ -274,9 +293,14 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             }
         }
 
-        // *** Tuinity World EntityList field ***
+        // *** Tuinity WorldServer EntityList field ***
         if (tuinitySwapEntityInWorldEntityListMethod.isAvailable()) {
             tuinitySwapEntityInWorldEntityListMethod.invoke(worldHandle, oldEntity.getRaw(), newEntity.getRaw());
+        }
+
+        // *** Tuinity WorldServer entitiesForIteration field ***
+        if (tuinitySwapEntityInWorldEntityIterationSetMethod.isAvailable()) {
+            tuinitySwapEntityInWorldEntityIterationSetMethod.invoke(worldHandle, oldEntity.getRaw(), newEntity.getRaw());
         }
 
         // *** EntityTrackerEntry ***
