@@ -315,10 +315,12 @@ public class DebugUtil {
     private static class StackElement {
         public final Object info;
         public boolean logged;
+        public int index; // -1 = no index, -2 = recurse
 
         public StackElement(Object info) {
             this.info = info;
             this.logged = false;
+            this.index = -1;
         }
     }
 
@@ -340,14 +342,19 @@ public class DebugUtil {
                         continue;
                     }
 
-                    String infoStr = "";
+                    String infoStr;
                     if (el.info instanceof Field) {
                         Field f = (Field) el.info;
-                        infoStr += Modifier.toString(f.getModifiers());
-                        infoStr += " " + f.getType().getSimpleName();
-                        infoStr += " " + f.getName();
+                        infoStr = Modifier.toString(f.getModifiers()) +
+                                " " + f.getType().getSimpleName() +
+                                " " + f.getName();
                     } else {
-                        infoStr += el.info.toString();
+                        infoStr = el.info.toString();
+                    }
+                    if (el.index == -2) {
+                        infoStr += " [Recursive]";
+                    } else if (el.index != -1) {
+                        infoStr += " [" + el.index + "]";
                     }
                     if (last == el) {
                         System.out.println(indent + "- " + infoStr + " <<< HERE");
@@ -367,7 +374,7 @@ public class DebugUtil {
         }
 
         // Discover the current class
-        Class<?> type = current.getClass();
+        final Class<?> type = current.getClass();
         ArrayList<Field> localFields = classFieldMapping.get(type);
         if (localFields == null) {
             localFields = logInstancesInClass(type, value, crossedValues, classFieldMapping);
@@ -392,14 +399,16 @@ public class DebugUtil {
         // Handle lists so we don't have to go all the way into the private members
         try {
             if (List.class.isAssignableFrom(type)) {
+                StackElement last = fieldStack.getLast();
                 List<?> list = (List<?>) current;
                 ListIterator<?> iter = list.listIterator();
                 int idx = 0;
                 while (iter.hasNext()) {
                     Object currItem = iter.next();
-                    fieldStack.addLast(new StackElement("L[" + idx + "]"));
+                    int old_index = last.index;
+                    last.index = (old_index == -1) ? idx : -2;
                     logInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
-                    fieldStack.removeLast();
+                    last.index = old_index;
                     idx++;
                 }
                 return;
@@ -421,12 +430,19 @@ public class DebugUtil {
 
         // If this is an array, go by all its elements
         // Unknown collection types will also end up deep inside here
-        if (type.isArray() && !type.getComponentType().isPrimitive()) {
+        if (type.isArray()) {
+            // Skip primitive arrays entirely
+            if (type.getComponentType().isPrimitive()) {
+                return;
+            }
+
+            StackElement last = fieldStack.getLast();
             Object[] arr = (Object[]) current;
             for (int i = 0; i < arr.length; i++) {
-                fieldStack.addLast(new StackElement("A[" + i + "]"));
+                int old_index = last.index;
+                last.index = (old_index == -1) ? i : -2;
                 logInstances(arr[i], value, crossedValues, classFieldMapping, fieldStack);
-                fieldStack.removeLast();
+                last.index = old_index;
             }
             return;
         }
@@ -438,9 +454,33 @@ public class DebugUtil {
                 fieldValue = localField.get(current);
             } catch (Throwable tt) {}
 
-            fieldStack.addLast(new StackElement(localField));
-            logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
-            fieldStack.removeLast();
+            // If null, just skip it's not going to store anything interesting
+            if (fieldValue == null) {
+                continue;
+            }
+
+            // If top element, always go into it
+            if (fieldStack.isEmpty()) {
+                fieldStack.addLast(new StackElement(localField));
+                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                fieldStack.removeLast();
+                continue;
+            }
+
+            // If last in the stack is also this field, add a (Recurse) stack element and nothing more
+            StackElement last = fieldStack.getLast();
+            if (last.info == localField) {
+                // Same field, set recurse flag and move on without growing the stack
+                int old_index = last.index;
+                last.index = -2;
+                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                last.index = old_index;
+            } else {
+                // Not the same field
+                fieldStack.addLast(new StackElement(localField));
+                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                fieldStack.removeLast();
+            }
         }
     }
 
