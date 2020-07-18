@@ -637,50 +637,60 @@ public class Matrix4x4 implements Cloneable {
     /**
      * Multiplies this matrix with another, storing the result in this matrix
      * 
-     * @param m1 the other matrix to multiply with
+     * @param mRight the right-hand side matrix to multiply with
      */
-    public final void multiply(Matrix4x4 m1)
-    {
+    public final void multiply(Matrix4x4 mRight) {
+        multiply(this, mRight, this);
+    }
+
+    /**
+     * Stores the result of a matrix multiplication in this matrix.
+     * One of the input matrices is allowed to be the same instance as this matrix.
+     * 
+     * @param mLeft Left side of the matrix multiplication
+     * @param mRight Right side of the matrix multiplication
+     */
+    public final void storeMultiply(Matrix4x4 mLeft, Matrix4x4 mRight) {
         double m00, m01, m02, m03;
         double m10, m11, m12, m13;
         double m20, m21, m22, m23;
         double m30, m31, m32, m33;
 
-        m00 = this.m00*m1.m00 + this.m01*m1.m10 +
-                this.m02*m1.m20 + this.m03*m1.m30;
-        m01 = this.m00*m1.m01 + this.m01*m1.m11 +
-                this.m02*m1.m21 + this.m03*m1.m31;
-        m02 = this.m00*m1.m02 + this.m01*m1.m12 +
-                this.m02*m1.m22 + this.m03*m1.m32;
-        m03 = this.m00*m1.m03 + this.m01*m1.m13 +
-                this.m02*m1.m23 + this.m03*m1.m33;
+        m00 = mLeft.m00*mRight.m00 + mLeft.m01*mRight.m10 +
+                mLeft.m02*mRight.m20 + mLeft.m03*mRight.m30;
+        m01 = mLeft.m00*mRight.m01 + mLeft.m01*mRight.m11 +
+                mLeft.m02*mRight.m21 + mLeft.m03*mRight.m31;
+        m02 = mLeft.m00*mRight.m02 + mLeft.m01*mRight.m12 +
+                mLeft.m02*mRight.m22 + mLeft.m03*mRight.m32;
+        m03 = mLeft.m00*mRight.m03 + mLeft.m01*mRight.m13 +
+                mLeft.m02*mRight.m23 + mLeft.m03*mRight.m33;
 
-        m10 = this.m10*m1.m00 + this.m11*m1.m10 +
-                this.m12*m1.m20 + this.m13*m1.m30;
-        m11 = this.m10*m1.m01 + this.m11*m1.m11 +
-                this.m12*m1.m21 + this.m13*m1.m31;
-        m12 = this.m10*m1.m02 + this.m11*m1.m12 +
-                this.m12*m1.m22 + this.m13*m1.m32;
-        m13 = this.m10*m1.m03 + this.m11*m1.m13 +
-                this.m12*m1.m23 + this.m13*m1.m33;
+        m10 = mLeft.m10*mRight.m00 + mLeft.m11*mRight.m10 +
+                mLeft.m12*mRight.m20 + mLeft.m13*mRight.m30;
+        m11 = mLeft.m10*mRight.m01 + mLeft.m11*mRight.m11 +
+                mLeft.m12*mRight.m21 + mLeft.m13*mRight.m31;
+        m12 = mLeft.m10*mRight.m02 + mLeft.m11*mRight.m12 +
+                mLeft.m12*mRight.m22 + mLeft.m13*mRight.m32;
+        m13 = mLeft.m10*mRight.m03 + mLeft.m11*mRight.m13 +
+                mLeft.m12*mRight.m23 + mLeft.m13*mRight.m33;
 
-        m20 = this.m20*m1.m00 + this.m21*m1.m10 +
-                this.m22*m1.m20 + this.m23*m1.m30;
-        m21 = this.m20*m1.m01 + this.m21*m1.m11 +
-                this.m22*m1.m21 + this.m23*m1.m31;
-        m22 = this.m20*m1.m02 + this.m21*m1.m12 +
-                this.m22*m1.m22 + this.m23*m1.m32;
-        m23 = this.m20*m1.m03 + this.m21*m1.m13 +
-                this.m22*m1.m23 + this.m23*m1.m33;
+        m20 = mLeft.m20*mRight.m00 + mLeft.m21*mRight.m10 +
+                mLeft.m22*mRight.m20 + mLeft.m23*mRight.m30;
+        m21 = mLeft.m20*mRight.m01 + mLeft.m21*mRight.m11 +
+                mLeft.m22*mRight.m21 + mLeft.m23*mRight.m31;
+        m22 = mLeft.m20*mRight.m02 + mLeft.m21*mRight.m12 +
+                mLeft.m22*mRight.m22 + mLeft.m23*mRight.m32;
+        m23 = mLeft.m20*mRight.m03 + mLeft.m21*mRight.m13 +
+                mLeft.m22*mRight.m23 + mLeft.m23*mRight.m33;
 
-        m30 = this.m30*m1.m00 + this.m31*m1.m10 +
-                this.m32*m1.m20 + this.m33*m1.m30;
-        m31 = this.m30*m1.m01 + this.m31*m1.m11 +
-                this.m32*m1.m21 + this.m33*m1.m31;
-        m32 = this.m30*m1.m02 + this.m31*m1.m12 +
-                this.m32*m1.m22 + this.m33*m1.m32;
-        m33 = this.m30*m1.m03 + this.m31*m1.m13 +
-                this.m32*m1.m23 + this.m33*m1.m33;
+        m30 = mLeft.m30*mRight.m00 + mLeft.m31*mRight.m10 +
+                mLeft.m32*mRight.m20 + mLeft.m33*mRight.m30;
+        m31 = mLeft.m30*mRight.m01 + mLeft.m31*mRight.m11 +
+                mLeft.m32*mRight.m21 + mLeft.m33*mRight.m31;
+        m32 = mLeft.m30*mRight.m02 + mLeft.m31*mRight.m12 +
+                mLeft.m32*mRight.m22 + mLeft.m33*mRight.m32;
+        m33 = mLeft.m30*mRight.m03 + mLeft.m31*mRight.m13 +
+                mLeft.m32*mRight.m23 + mLeft.m33*mRight.m33;
 
         this.m00 = m00; this.m01 = m01; this.m02 = m02; this.m03 = m03;
         this.m10 = m10; this.m11 = m11; this.m12 = m12; this.m13 = m13;
@@ -835,6 +845,31 @@ public class Matrix4x4 implements Cloneable {
      */
     public static Quaternion diffRotation(Matrix4x4 m1, Matrix4x4 m2) {
         return diff(m1, m2).getRotation();
+    }
+
+    /**
+     * Multiplies two matrices together, returning a new matrix with the result.
+     * 
+     * @param mLeft Left matrix of the matrix multiplication
+     * @param mRight Right matrix of the matrix multiplication
+     * @return Result of the multiplication
+     */
+    public static Matrix4x4 multiply(Matrix4x4 mLeft, Matrix4x4 mRight) {
+        Matrix4x4 result = new Matrix4x4();
+        result.storeMultiply(mLeft, mRight);
+        return result;
+    }
+
+    /**
+     * Multiplies two matrices together, storing the result in another matrix.
+     * The result matrix is allowed to be the same instance as one of the input matrices.
+     * 
+     * @param mLeft Left matrix of the matrix multiplication
+     * @param mRight Right matrix of the matrix multiplication
+     * @param mResult Result of the multiplication is written to this matrix
+     */
+    public static void multiply(Matrix4x4 mLeft, Matrix4x4 mRight, Matrix4x4 mResult) {
+        mResult.storeMultiply(mLeft, mRight);
     }
 
     // From https://math.stackexchange.com/questions/296794
