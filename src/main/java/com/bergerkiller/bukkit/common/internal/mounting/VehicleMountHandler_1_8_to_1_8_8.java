@@ -55,13 +55,13 @@ public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseIm
 
     @Override
     protected void onSpawned(SpawnedEntity entity) {
-        if (entity.vehicleMount != null && entity.vehicleMount.vehicle.spawned) {
+        if (entity.vehicleMount != null && entity.vehicleMount.vehicle.state.isSpawned()) {
             entity.vehicleMount.sent = true;
             sendAttach(entity.vehicleMount.vehicle, entity);
         }
         if (!entity.passengerMounts.isEmpty()) {
             Mount m = entity.passengerMounts.get(0);
-            if (m.passenger.spawned) {
+            if (m.passenger.state.isSpawned()) {
                 m.sent = true;
                 sendAttach(entity, m.passenger);
             }

@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 
 /**
@@ -38,7 +39,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         this._player = player;
         this._playerDimension = PlayerUtil.getPlayerDimension(player).getKey();
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
-        this._playerSpawnedEntity.spawned = true;
+        this._playerSpawnedEntity.state = SpawnedEntity.State.SPAWNED;
         this._spawnedEntities = new IntHashMap<>();
         this._spawnedEntities.put(this._playerSpawnedEntity.id, this._playerSpawnedEntity);
         this._queuedPackets = new ConcurrentLinkedQueue<PacketHandle>();
@@ -91,7 +92,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             }
 
             // Send the mount if we can
-            if (vehicle.spawned && passenger.spawned) {
+            if (vehicle.state.isSpawned() && passenger.state.isSpawned()) {
                 // Both entities are spawned, so we can synchronize right now
                 // Collect all the passenger id's for entities that have spawned and send a mount packet right away
                 mount.sent = true;
@@ -175,6 +176,62 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
         // Remove from tracking
         tryRemoveFromTracking(entity);
+    }
+
+    @Override
+    public void despawn(int entityId) {
+        synchronizeAndQueuePackets(() -> {
+            SpawnedEntity entity = getSpawnedEntity(entityId, true);
+            if (entity.state == SpawnedEntity.State.SPAWNED) {
+                // Currently spawned, despawn it, track while it is spawned
+                entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
+                queuePacket(PacketPlayOutEntityDestroyHandle.createNew(new int[] {entityId}));
+            } else if (entity.state == SpawnedEntity.State.DESPAWNED) {
+                // Was despawned, let's keep it that way
+                entity.state = SpawnedEntity.State.DESPAWNED_BLOCKED;
+            }
+        });
+    }
+
+    @Override
+    public void respawn(int entityId, RespawnFunctionWithEntityId respawnFunction) {
+        respawn(entityId, () -> respawnFunction.respawn(this._player, entityId));
+    }
+
+    @Override
+    public <T extends org.bukkit.entity.Entity> void respawn(T entity, RespawnFunctionWithEntity<T> respawnFunction) {
+        respawn(entity.getEntityId(), () -> respawnFunction.respawn(this._player, entity));
+    }
+
+    @Override
+    public void respawn(int entityId, Runnable respawnAction) {
+        synchronizeAndQueuePackets(() -> {
+            SpawnedEntity entity = getSpawnedEntity(entityId, true);
+            switch (entity.state) {
+            case DESPAWNED_BLOCKED:
+                // Not currently spawned, there is nothing for us to do
+                entity.state = SpawnedEntity.State.DESPAWNED;
+                tryRemoveFromTracking(entity);
+                break;
+            case SUPPRESSED_INFLIGHT_BLOCKED:
+                // Destroy packet will be sent in a short time, destroying it all
+                // Make sure to switch state to 'SPAWNED' to handle this gracefully
+                // The destroy packets will be received, switching it back to DESPAWNED.
+                // Right after, the packets sent using the respawnFunction are received,
+                // switching it back to SPAWNED
+                entity.state = SpawnedEntity.State.SPAWNED;
+                respawnAction.run();
+                break;
+            case SUPPRESSED_BLOCKED:
+                // Entity is currently not spawned, but we want it to be
+                entity.state = SpawnedEntity.State.DESPAWNED;
+                respawnAction.run();
+                break;
+            default:
+                // No despawn() is active, do nothing
+                break;
+            }
+        });
     }
 
     /**
@@ -266,20 +323,44 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         if (entity == null || entity == this._playerSpawnedEntity) {
             return;
         }
-        if (entity.spawned) {
-            entity.spawned = false;
+        if (entity.state == SpawnedEntity.State.SPAWNED) {
+            entity.state = SpawnedEntity.State.DESPAWNED;
             onDespawned(entity);
         }
-        entity.spawned = true;
-        onSpawned(entity);
+        if (entity.state.isBlocked()) {
+            // Cancel the spawn
+            // We could perhaps cancel the original spawn packet, but because we
+            // use a packet monitor we cannot do that. For a split second the Entity
+            // might be visible.
+            entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
+            queuePacket(PacketPlayOutEntityDestroyHandle.createNew(new int[] {entityId}));
+        } else {
+            // Allow the spawn
+            entity.state = SpawnedEntity.State.SPAWNED;
+            onSpawned(entity);
+        }
     }
 
     private final void handleDespawn(int entityId) {
         SpawnedEntity entity = getSpawnedEntity(entityId, false);
-        if (entity != null && entity.spawned && entity != this._playerSpawnedEntity) {
-            entity.spawned = false;
+        if (entity == null || entity == this._playerSpawnedEntity) {
+            return;
+        }
+
+        switch (entity.state) {
+        case SPAWNED:
+            entity.state = SpawnedEntity.State.DESPAWNED;
             onDespawned(entity);
             tryRemoveFromTracking(entity);
+            break;
+        case SUPPRESSED_INFLIGHT_BLOCKED:
+            entity.state = SpawnedEntity.State.SUPPRESSED_BLOCKED;
+            break;
+        case SUPPRESSED_BLOCKED:
+            entity.state = SpawnedEntity.State.DESPAWNED_BLOCKED;
+            break;
+        default:
+            break;
         }
     }
 
@@ -290,7 +371,11 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 entity.vehicleMount.sent = false;
             }
             if (entity != this._playerSpawnedEntity) {
-                entity.spawned = false;
+                if (entity.state.isBlocked()) {
+                    entity.state = SpawnedEntity.State.DESPAWNED_BLOCKED;
+                } else {
+                    entity.state = SpawnedEntity.State.DESPAWNED;
+                }
                 tryRemoveFromTracking(entity);
             }
         }
@@ -314,7 +399,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     private final void tryRemoveFromTracking(SpawnedEntity entity) {
-        if (!entity.spawned && entity.vehicleMount == null && entity.passengerMounts.isEmpty()) {
+        if (entity.state == SpawnedEntity.State.DESPAWNED && entity.vehicleMount == null && entity.passengerMounts.isEmpty()) {
             this._spawnedEntities.remove(entity.id);
         }
     }
@@ -344,7 +429,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      */
     protected final boolean isSpawned(int entityId) {
         SpawnedEntity spawnedEntity = this._spawnedEntities.get(entityId);
-        return spawnedEntity != null && spawnedEntity.spawned;
+        return spawnedEntity != null && spawnedEntity.state.isSpawned();
     }
 
     /**
@@ -404,7 +489,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      */
     protected static final class SpawnedEntity {
         public final int id;
-        public boolean spawned;
+        public State state;
         /**
          * Active mounted passengers, where this entity is a vehicle of.
          */
@@ -417,7 +502,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
         public SpawnedEntity(int entityId) {
             this.id = entityId;
-            this.spawned = false;
+            this.state = State.DESPAWNED;
             this.passengerMounts = Collections.emptyList();
             this.vehicleMount = null;
         }
@@ -454,6 +539,51 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         @Override
         public String toString() {
             return "{id: " + this.id + "}";
+        }
+
+        public static enum State {
+            /** Entity is not spawned (yet) */
+            DESPAWNED(false, false),
+            /** Entity has been spawned */
+            SPAWNED(true, false),
+            /** Entity is not spawned (yet) and it is also not allowed to */
+            DESPAWNED_BLOCKED(false, true),
+            /**
+             * Entity is supposed to be spawned, but we do not allow it to be.
+             * A packet is in-flight to destroy the Entity.
+             */
+            SUPPRESSED_INFLIGHT_BLOCKED(false, true),
+            /**
+             * Entity is supposed to be spawned, but we do not allow it to be.
+             * The packet to destroy it has already been sent.
+             */
+            SUPPRESSED_BLOCKED(false, true);
+
+            private final boolean spawned;
+            private final boolean blocked;
+
+            private State(boolean spawned, boolean blocked) {
+                this.spawned = spawned;
+                this.blocked = blocked;
+            }
+
+            /**
+             * Whether the Entity is currently spawned or not
+             * 
+             * @return True if spawned
+             */
+            public boolean isSpawned() {
+                return this.spawned;
+            }
+
+            /**
+             * Whether spawning of the Entity is blocked by the controller
+             * 
+             * @return True if blocked
+             */
+            public boolean isBlocked() {
+                return this.blocked;
+            }
         }
     }
 

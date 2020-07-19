@@ -91,12 +91,12 @@ public class VehicleMountHandler_1_9_to_1_15_2 extends VehicleMountHandler_BaseI
 
     @Override
     protected void onSpawned(SpawnedEntity entity) {
-        if (entity.vehicleMount != null && entity.vehicleMount.vehicle.spawned) {
+        if (entity.vehicleMount != null && entity.vehicleMount.vehicle.state.isSpawned()) {
             entity.vehicleMount.sent = true;
             sendVehicleMounts(entity.vehicleMount.vehicle, true);
         }
         for (Mount m : entity.passengerMounts) {
-            if (m.passenger.spawned) {
+            if (m.passenger.state.isSpawned()) {
                 m.sent = true;
             }
         }

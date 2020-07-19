@@ -54,4 +54,71 @@ public interface VehicleMountController {
      * @param entityId
      */
     void clear(int entityId);
+
+    /**
+     * Despawns an Entity and prevents the Entity from being spawned by the server until
+     * {@link #respawn(int, RespawnFunction)} is called. If the Entity was already spawned,
+     * the entity is despawned right away.
+     * 
+     * @param entityId
+     */
+    void despawn(int entityId);
+
+    /**
+     * Respawns an Entity previous hidden using despawn. Only calls the respawn function
+     * if without ever calling despawn the entity would have existed otherwise. If the server
+     * already despawned the entity while in the despawned state, nothing happens.
+     * 
+     * @param entityId The id of the entity to respawn
+     * @param respawnFunction Executes the logic for spawning the entity if needed
+     */
+    void respawn(int entityId, RespawnFunctionWithEntityId respawnFunction);
+
+    /**
+     * Respawns an Entity previous hidden using despawn. Only calls the respawn function
+     * if without ever calling despawn the entity would have existed otherwise. If the server
+     * already despawned the entity while in the despawned state, nothing happens.
+     * 
+     * @param entity The entity to respawn
+     * @param respawnFunction Executes the logic for spawning the entity if needed
+     */
+    <T extends org.bukkit.entity.Entity> void respawn(T entity, RespawnFunctionWithEntity<T> respawnFunction);
+
+    /**
+     * Respawns an Entity previous hidden using despawn. Only calls the respawn function
+     * if without ever calling despawn the entity would have existed otherwise. If the server
+     * already despawned the entity while in the despawned state, nothing happens.
+     * 
+     * @param entityId The id of the entity to respawn
+     * @param respawnAction Executes the logic for spawning the entity if needed
+     */
+    void respawn(int entityId, Runnable respawnAction);
+
+    /**
+     * Function parameters for respawning an Entity previously hidden.
+     * The input Entity ID is sent as parameter to the respawn function.
+     */
+    public static interface RespawnFunctionWithEntityId {
+        /**
+         * Spawns the Entity again
+         * 
+         * @param viewer Player to which to send the spawn packets
+         * @param entityId The ID of the Entity to respawn
+         */
+        public void respawn(Player viewer, int entityId);
+    }
+
+    /**
+     * Function parameters for respawning an Entity previously hidden.
+     * The input Entity is sent as parameter to the respawn function.
+     */
+    public static interface RespawnFunctionWithEntity<T extends org.bukkit.entity.Entity> {
+        /**
+         * Spawns the Entity again
+         * 
+         * @param viewer Player to which to send the spawn packets
+         * @param entityId The ID of the Entity to respawn
+         */
+        public void respawn(Player viewer, T entity);
+    }
 }
