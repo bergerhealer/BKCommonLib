@@ -690,6 +690,20 @@ public class MathUtil {
     }
 
     /**
+     * Takes the most and least significant words of both keys, sums them together,
+     * and produces a new key with the two words summed.
+     * 
+     * @param keyA
+     * @param keyB
+     * @return words of keyA and keyB summed, and turned back into a long
+     */
+    public static long longHashSumW(long keyA, long keyB) {
+        long sum_msw = (keyA & 0xFFFFFFFF00000000L) + (keyB & 0xFFFFFFFF00000000L);
+        long sum_lsw = (keyA & 0xFFFFFFFF) + (keyB & 0xFFFFFFFF);
+        return sum_msw + (int) sum_lsw - Integer.MIN_VALUE;
+    }
+
+    /**
      * Shorthand equivalent of:<br>
      * longHashToLong(longHashMsw(a)+longHashMsw(b), longHashLsw(a)+longHashLsw(b))
      * 
