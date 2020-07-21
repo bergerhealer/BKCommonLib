@@ -13,10 +13,8 @@ import java.util.List;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.collections.CharacterIterable;
-import com.bergerkiller.bukkit.common.map.util.Matrix4f;
 import com.bergerkiller.bukkit.common.map.util.Model;
 import com.bergerkiller.bukkit.common.map.util.Quad;
-import com.bergerkiller.bukkit.common.map.util.Vector3f;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 
@@ -604,11 +602,6 @@ public abstract class MapCanvas {
      */
     public final MapCanvas fill(byte color) {
         return this.fillRectangle(0, 0, getWidth(), getHeight(), color);
-    }
-
-    @Deprecated
-    public final MapCanvas setLightOptions(float ambientLightFactor, float directionalLightFactor, Vector3f directionVector) {
-        return this.setLightOptions(ambientLightFactor, directionalLightFactor, (Vector3) directionVector);
     }
 
     /**
@@ -1250,11 +1243,6 @@ public abstract class MapCanvas {
      */
     public final MapCanvas fillItem(MapResourcePack resourcePack, ItemStack item) {
         return this.drawItem(resourcePack, item, 0, 0, this.getWidth(), this.getHeight());
-    }
-
-    @Deprecated
-    public final MapCanvas drawModel(Model model, Matrix4f transform) {
-        return this.drawModel(model, (Matrix4x4) transform);
     }
 
     /**
