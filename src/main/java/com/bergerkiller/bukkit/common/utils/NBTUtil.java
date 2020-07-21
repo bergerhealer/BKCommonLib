@@ -16,7 +16,6 @@ import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.LivingEntity;
-import org.bukkit.inventory.Inventory;
 
 /**
  * Contains utility functions for dealing with NBT data such as saving and loading
@@ -69,29 +68,6 @@ public class NBTUtil {
         if (stack != null) {
             stack.saveToNBT(compound);
         }
-    }
-
-    /**
-     * Creates an inventory from a tag list
-     *
-     * @param tags Tag list
-     * @return Inventory
-     */
-    public static Inventory createInventory(CommonTagList tags) {
-    	//TODO: BROKEN!!!
-    	return null;
-    	/*
-        Inventory inv = new CraftInventoryCustom(null, tags.size());
-
-        for (int i = 0; i < tags.size(); i++) {
-            CommonTagCompound tag = (CommonTagCompound) tags.get(i);
-            if (!tag.isEmpty()) {
-                inv.setItem(i, CraftItemStack.asCraftMirror(ItemStack.createStack(
-                        (NBTTagCompound) tag.getHandle())));
-            }
-        }
-        return inv;
-        */
     }
 
     /**
