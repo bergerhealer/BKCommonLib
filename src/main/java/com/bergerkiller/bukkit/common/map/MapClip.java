@@ -54,6 +54,26 @@ public class MapClip {
     }
 
     /**
+     * Gets whether this entire clip area can fit inside a rectangular area. If this
+     * clip is not dirty, true is returned. If this clip is set to everything, false
+     * will be returned.
+     * 
+     * @param x - coordinate of the top-left corner of the rectangle
+     * @param y - coordinate of the top-left corner of the rectangle
+     * @param w - width of the rectangle
+     * @param h - height of the rectangle
+     * @return True if this dirty clip can fix inside the rectangular area
+     */
+    public final boolean isFullyEnclosedBy(int x, int y, int w, int h) {
+        return !this.dirty ||
+                (!this.everything &&
+                 x <= this.dirty_x1 &&
+                 y <= this.dirty_y1 &&
+                 (x+w) >= this.dirty_x2 &&
+                 (y+h) >= this.dirty_y2);
+    }
+
+    /**
      * Marks a single pixel as dirty
      * 
      * @param x - coordinate of the pixel

@@ -989,9 +989,15 @@ public class MapDisplay implements MapDisplayEvents {
                 }
                 if (color == 0) {
                     // Marking only a portion of the area cleared
-                    // We will have to update the clip area accordingly
-                    // This requires a re-calculation (but is not required)
-                    //TODO!
+                    // If we are filling an area larger or equal to the current clip
+                    // dirty area, we can reset the entire clip (it is all transparent)
+                    // It might happen that this is done portion-by-portion, but there
+                    // is no clean way to detect that without performance loss.
+                    // This could be done by reading the buffer and checking if all pixels
+                    // are set to 0, for example.
+                    if (this.clip.isFullyEnclosedBy(x, y, w, h)) {
+                        this.clip.clearDirty();
+                    }
                 } else {
                     // mark layer area dirty
                     this.clip.markDirty(x, y, w, h);
@@ -1047,20 +1053,27 @@ public class MapDisplay implements MapDisplayEvents {
             } else {
                 // Update z-index to be greater or equal to this layer's z
                 if (is_entire_canvas) {
-                    for (int i = 0; i < this.map.zbuffer.length; i++) {
-                        if (this.map.zbuffer[i] < this.z_index) {
-                            this.map.zbuffer[i] = this.z_index;
+                    for (int idx = 0; idx < this.map.zbuffer.length; idx++) {
+                        byte curr_z = this.map.zbuffer[idx];
+                        if (curr_z == this.z_index) {
+                            this.map.livebuffer[idx] = color;
+                        } else if (curr_z < this.z_index) {
+                            this.map.zbuffer[idx] = this.z_index;
+                            this.map.livebuffer[idx] = color;
                         }
                     }
                 } else {
                     for (int dy = 0; dy < h; dy++) {
                         int idx = (x + ((y + dy) * this.getWidth()));
                         int idx_end = (idx + w);
-                        while (idx < idx_end) {
-                            if (this.map.zbuffer[idx] < this.z_index) {
-                                this.map.livebuffer[idx] = this.z_index;
+                        for (; idx < idx_end; idx++) {
+                            byte curr_z = this.map.zbuffer[idx];
+                            if (curr_z == this.z_index) {
+                                this.map.livebuffer[idx] = color;
+                            } else if (curr_z < this.z_index) {
+                                this.map.zbuffer[idx] = this.z_index;
+                                this.map.livebuffer[idx] = color;
                             }
-                            ++idx;
                         }
                     }
                 }

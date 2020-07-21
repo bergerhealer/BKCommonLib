@@ -21,6 +21,11 @@ public enum MapBlendMode {
         public void process(byte[] input, byte[] output) {
             System.arraycopy(input, 0, output, 0, output.length);
         }
+
+        @Override
+        public boolean inputColorUsesOutput(byte input) {
+            return false;
+        }
     },
     OVERLAY {
         @Override
@@ -42,6 +47,11 @@ public enum MapBlendMode {
                     output[i] = input[i];
                 }
             }
+        }
+
+        @Override
+        public boolean inputColorUsesOutput(byte input) {
+            return input == 0;
         }
     },
     AVERAGE {
@@ -112,4 +122,17 @@ public enum MapBlendMode {
     public abstract byte process(byte inputA, byte inputB);
     public abstract void process(byte input, byte[] output);
     public abstract void process(byte[] input, byte[] output);
+
+    /**
+     * Gets whether the given input color value requires the original output color value
+     * to compute the resulting color blend. Blend modes that merge the old and new color values,
+     * or that keep the original color when the drawn color is transparent, return true here.
+     * Colors that always result in a predictable blend color return false.
+     * 
+     * @param input The input color code
+     * @return True if for this input color code, the output color is predictable
+     */
+    public boolean inputColorUsesOutput(byte input) {
+        return true;
+    }
 }

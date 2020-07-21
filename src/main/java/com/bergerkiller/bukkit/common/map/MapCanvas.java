@@ -245,7 +245,7 @@ public abstract class MapCanvas {
      */
     public final MapCanvas drawRawData(int x, int y, int w, int h, byte[] colorData, byte colorFactor) {
         // Shortcut when no special functions are used to fill an area quickly
-        if (colorData == null && this.depthBuffer == null && this.blendMode == MapBlendMode.NONE && this.depthBuffer == null && this.maskBuffer == null) {
+        if (colorData == null && this.depthBuffer == null && this.depthBuffer == null && this.maskBuffer == null && !this.blendMode.inputColorUsesOutput(colorFactor)) {
             return this.writePixelsFill(x, y, w, h, colorFactor);
         }
 
