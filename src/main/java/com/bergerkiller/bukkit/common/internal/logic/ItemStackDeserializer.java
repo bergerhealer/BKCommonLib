@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -83,48 +86,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             } else if ("OAK_WALL_SIGN".equals(type)) {
                 map.put("type", "WALL_SIGN");
             }
-            if (LogicUtil.contains(type,
-                    "ACACIA_SIGN", "ACACIA_WALL_SIGN",
-                    "ANDESITE_SLAB", "ANDESITE_STAIRS", "ANDESITE_WALL",
-                    "BAMBOO", "BAMBOO_SAPLING", "BARREL", "BELL",
-                    "BIRCH_SIGN", "BIRCH_WALL_SIGN", "BLACK_DYE", "BLAST_FURNACE",
-                    "BLUE_DYE", "BRICK_WALL", "BROWN_DYE", "CAMPFIRE",
-                    "CARTOGRAPHY_TABLE", "CAT_SPAWN_EGG", "COMPOSTER",
-                    "CORNFLOWER", "CREEPER_BANNER_PATTERN", "CROSSBOW",
-                    "CUT_RED_SANDSTONE_SLAB", "CUT_SANDSTONE_SLAB",
-                    "DARK_OAK_SIGN", "DARK_OAK_WALL_SIGN", "DIORITE_SLAB",
-                    "DIORITE_STAIRS", "DIORITE_WALL", "END_STONE_BRICK_SLAB",
-                    "END_STONE_BRICK_STAIRS", "END_STONE_BRICK_WALL",
-                    "FLETCHING_TABLE", "FLOWER_BANNER_PATTERN", "FOX_SPAWN_EGG",
-                    "GLOBE_BANNER_PATTERN", "GRANITE_SLAB", "GRANITE_STAIRS",
-                    "GRANITE_WALL", "GRINDSTONE", "JIGSAW", "JUNGLE_SIGN",
-                    "JUNGLE_WALL_SIGN", "LANTERN", "LEATHER_HORSE_ARMOR",
-                    "LECTERN", "LILY_OF_THE_VALLEY", "LOOM",
-                    "MOJANG_BANNER_PATTERN", "MOSSY_COBBLESTONE_SLAB",
-                    "MOSSY_COBBLESTONE_STAIRS", "MOSSY_STONE_BRICK_SLAB",
-                    "MOSSY_STONE_BRICK_STAIRS", "MOSSY_STONE_BRICK_WALL",
-                    "NETHER_BRICK_WALL", "PANDA_SPAWN_EGG", "PILLAGER_SPAWN_EGG",
-                    "POLISHED_ANDESITE_SLAB", "POLISHED_ANDESITE_STAIRS",
-                    "POLISHED_DIORITE_SLAB", "POLISHED_DIORITE_STAIRS",
-                    "POLISHED_GRANITE_SLAB", "POLISHED_GRANITE_STAIRS",
-                    "POTTED_BAMBOO", "POTTED_CORNFLOWER",
-                    "POTTED_LILY_OF_THE_VALLEY", "POTTED_WITHER_ROSE",
-                    "PRISMARINE_WALL", "RAVAGER_SPAWN_EGG",
-                    "RED_NETHER_BRICK_SLAB", "RED_NETHER_BRICK_STAIRS",
-                    "RED_NETHER_BRICK_WALL", "RED_SANDSTONE_WALL",
-                    "SANDSTONE_WALL", "SCAFFOLDING", "SKULL_BANNER_PATTERN",
-                    "SMITHING_TABLE", "SMOKER", "SMOOTH_QUARTZ_SLAB",
-                    "SMOOTH_QUARTZ_STAIRS", "SMOOTH_RED_SANDSTONE_SLAB",
-                    "SMOOTH_RED_SANDSTONE_STAIRS", "SMOOTH_SANDSTONE_SLAB",
-                    "SMOOTH_SANDSTONE_STAIRS", "SMOOTH_STONE_SLAB",
-                    "SPRUCE_SIGN", "SPRUCE_WALL_SIGN", "STONECUTTER",
-                    "STONE_BRICK_WALL", "STONE_STAIRS", "SUSPICIOUS_STEW",
-                    "SWEET_BERRIES", "SWEET_BERRY_BUSH", "TRADER_LLAMA_SPAWN_EGG",
-                    "WANDERING_TRADER_SPAWN_EGG", "WHITE_DYE", "WITHER_ROSE"
-            )) {
-                return false;
-            }
-            return true;
+            return !Helper.ADDED_MC_1_14.contains(type);
         });
 
         // From MC 1.14.1 to 1.14 (no changes)
@@ -142,14 +104,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.15 to 1.14.4 (bees and honey materials no longer valid)
         this.register(1976, map -> {
             Object type = map.get("type");
-            if (LogicUtil.contains(type,
-                    "BEEHIVE", "BEE_NEST", "BEE_SPAWN_EGG",
-                    "HONEYCOMB", "HONEYCOMB_BLOCK",
-                    "HONEY_BLOCK", "HONEY_BOTTLE"
-            )) {
-                return false;
-            }
-            return true;
+            return !Helper.ADDED_MC_1_15.contains(type);
         });
 
         // From MC 1.15.1 to 1.15 (no changes)
@@ -158,8 +113,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.15.2+ to 1.15.1 (no changes)
         this.register(2227, NO_CONVERSION);
 
+        // From MC 1.16 to 1.15.2 (loads of 1.16 introduced materials no longer valid)
+        this.register(2230, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_16.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 2230; // MC 1.15.2
+        this.max_version = 2567; // MC 1.16.1
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -202,6 +163,15 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         }
 
         return ItemStack.deserialize(args);
+    }
+
+    /**
+     * Gets the maximum supported Minecraft data version
+     * 
+     * @return max version
+     */
+    public int getMaxSupportedDataVersion() {
+        return this.max_version;
     }
 
     /**
@@ -315,5 +285,99 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
     private static interface ConverterFunction {
         boolean convert(Map<String, Object> values);
+    }
+
+    private static class Helper {
+        // All material names (Material enum) added Minecraft 1.13.2 -> 1.14
+        public static final Set<String> ADDED_MC_1_14 = new HashSet<String>(Arrays.asList(
+                "ACACIA_SIGN", "ACACIA_WALL_SIGN",
+                "ANDESITE_SLAB", "ANDESITE_STAIRS", "ANDESITE_WALL",
+                "BAMBOO", "BAMBOO_SAPLING", "BARREL", "BELL",
+                "BIRCH_SIGN", "BIRCH_WALL_SIGN", "BLACK_DYE", "BLAST_FURNACE",
+                "BLUE_DYE", "BRICK_WALL", "BROWN_DYE", "CAMPFIRE",
+                "CARTOGRAPHY_TABLE", "CAT_SPAWN_EGG", "COMPOSTER",
+                "CORNFLOWER", "CREEPER_BANNER_PATTERN", "CROSSBOW",
+                "CUT_RED_SANDSTONE_SLAB", "CUT_SANDSTONE_SLAB",
+                "DARK_OAK_SIGN", "DARK_OAK_WALL_SIGN", "DIORITE_SLAB",
+                "DIORITE_STAIRS", "DIORITE_WALL", "END_STONE_BRICK_SLAB",
+                "END_STONE_BRICK_STAIRS", "END_STONE_BRICK_WALL",
+                "FLETCHING_TABLE", "FLOWER_BANNER_PATTERN", "FOX_SPAWN_EGG",
+                "GLOBE_BANNER_PATTERN", "GRANITE_SLAB", "GRANITE_STAIRS",
+                "GRANITE_WALL", "GRINDSTONE", "JIGSAW", "JUNGLE_SIGN",
+                "JUNGLE_WALL_SIGN", "LANTERN", "LEATHER_HORSE_ARMOR",
+                "LECTERN", "LILY_OF_THE_VALLEY", "LOOM",
+                "MOJANG_BANNER_PATTERN", "MOSSY_COBBLESTONE_SLAB",
+                "MOSSY_COBBLESTONE_STAIRS", "MOSSY_STONE_BRICK_SLAB",
+                "MOSSY_STONE_BRICK_STAIRS", "MOSSY_STONE_BRICK_WALL",
+                "NETHER_BRICK_WALL", "PANDA_SPAWN_EGG", "PILLAGER_SPAWN_EGG",
+                "POLISHED_ANDESITE_SLAB", "POLISHED_ANDESITE_STAIRS",
+                "POLISHED_DIORITE_SLAB", "POLISHED_DIORITE_STAIRS",
+                "POLISHED_GRANITE_SLAB", "POLISHED_GRANITE_STAIRS",
+                "POTTED_BAMBOO", "POTTED_CORNFLOWER",
+                "POTTED_LILY_OF_THE_VALLEY", "POTTED_WITHER_ROSE",
+                "PRISMARINE_WALL", "RAVAGER_SPAWN_EGG",
+                "RED_NETHER_BRICK_SLAB", "RED_NETHER_BRICK_STAIRS",
+                "RED_NETHER_BRICK_WALL", "RED_SANDSTONE_WALL",
+                "SANDSTONE_WALL", "SCAFFOLDING", "SKULL_BANNER_PATTERN",
+                "SMITHING_TABLE", "SMOKER", "SMOOTH_QUARTZ_SLAB",
+                "SMOOTH_QUARTZ_STAIRS", "SMOOTH_RED_SANDSTONE_SLAB",
+                "SMOOTH_RED_SANDSTONE_STAIRS", "SMOOTH_SANDSTONE_SLAB",
+                "SMOOTH_SANDSTONE_STAIRS", "SMOOTH_STONE_SLAB",
+                "SPRUCE_SIGN", "SPRUCE_WALL_SIGN", "STONECUTTER",
+                "STONE_BRICK_WALL", "STONE_STAIRS", "SUSPICIOUS_STEW",
+                "SWEET_BERRIES", "SWEET_BERRY_BUSH", "TRADER_LLAMA_SPAWN_EGG",
+                "WANDERING_TRADER_SPAWN_EGG", "WHITE_DYE", "WITHER_ROSE"));
+
+        // All material names (Material enum) added Minecraft 1.14.4 -> 1.15
+        public static final Set<String> ADDED_MC_1_15 = new HashSet<String>(Arrays.asList(
+                "BEEHIVE", "BEE_NEST", "BEE_SPAWN_EGG",
+                "HONEYCOMB", "HONEYCOMB_BLOCK",
+                "HONEY_BLOCK", "HONEY_BOTTLE"));
+
+        // All material names (Material enum) added Minecraft 1.15.2 -> 1.16
+        public static final Set<String> ADDED_MC_1_16 = new HashSet<String>(Arrays.asList(
+                "ANCIENT_DEBRIS", "BASALT", "CHAIN", "CRYING_OBSIDIAN",
+                "BLACKSTONE", "BLACKSTONE_SLAB", "BLACKSTONE_STAIRS", "BLACKSTONE_WALL",
+                "GILDED_BLACKSTONE",
+                "CHISELED_NETHER_BRICKS", "CHISELED_POLISHED_BLACKSTONE",
+                "CRACKED_NETHER_BRICKS", "CRACKED_POLISHED_BLACKSTONE_BRICKS",
+                "CRIMSON_BUTTON", "CRIMSON_DOOR", "CRIMSON_FENCE",
+                "CRIMSON_FENCE_GATE", "CRIMSON_FUNGUS", "CRIMSON_HYPHAE",
+                "CRIMSON_NYLIUM", "CRIMSON_PLANKS", "CRIMSON_PRESSURE_PLATE",
+                "CRIMSON_ROOTS", "CRIMSON_SIGN", "CRIMSON_SLAB", "CRIMSON_STAIRS",
+                "CRIMSON_STEM", "CRIMSON_TRAPDOOR", "CRIMSON_WALL_SIGN",
+                "HOGLIN_SPAWN_EGG", "LODESTONE", "MUSIC_DISC_PIGSTEP",
+                "NETHERITE_AXE", "NETHERITE_BLOCK", "THERITE_BOOTS",
+                "NETHERITE_CHESTPLATE", "NETHERITE_HELMET",
+                "NETHERITE_HOE", "NETHERITE_INGOT", "NETHERITE_LEGGINGS",
+                "NETHERITE_PICKAXE", "NETHERITE_SCRAP", "NETHERITE_SHOVEL",
+                "NETHERITE_SWORD",
+                "NETHER_GOLD_ORE", "NETHER_SPROUTS",
+                "PIGLIN_BANNER_PATTERN", "PIGLIN_SPAWN_EGG",
+                "POLISHED_BASALT", "POLISHED_BLACKSTONE",
+                "POLISHED_BLACKSTONE_BRICKS", "POLISHED_BLACKSTONE_BRICK_SLAB",
+                "POLISHED_BLACKSTONE_BRICK_STAIRS", "POLISHED_BLACKSTONE_BRICK_WALL",
+                "POLISHED_BLACKSTONE_BUTTON", "POLISHED_BLACKSTONE_PRESSURE_PLATE",
+                "POLISHED_BLACKSTONE_SLAB", "POLISHED_BLACKSTONE_STAIRS",
+                "POLISHED_BLACKSTONE_WALL",
+                "POTTED_CRIMSON_FUNGUS", "POTTED_CRIMSON_ROOTS",
+                "POTTED_WARPED_FUNGUS", "POTTED_WARPED_ROOTS", "QUARTZ_BRICKS",
+                "RESPAWN_ANCHOR", "SHROOMLIGHT",
+                "SOUL_CAMPFIRE", "SOUL_FIRE", "SOUL_LANTERN",
+                "SOUL_SOIL", "SOUL_TORCH", "SOUL_WALL_TORCH",
+                "STRIDER_SPAWN_EGG",
+                "STRIPPED_CRIMSON_HYPHAE", "STRIPPED_CRIMSON_STEM",
+                "STRIPPED_WARPED_HYPHAE", "STRIPPED_WARPED_STEM",
+                "TARGET", "TWISTING_VINES", "TWISTING_VINES_PLANT",
+                "WARPED_BUTTON", "WARPED_DOOR", "WARPED_FENCE",
+                "WARPED_FENCE_GATE", "WARPED_FUNGUS",
+                "WARPED_FUNGUS_ON_A_STICK", "WARPED_HYPHAE",
+                "WARPED_NYLIUM", "WARPED_PLANKS",
+                "WARPED_PRESSURE_PLATE", "WARPED_ROOTS",
+                "WARPED_SIGN", "WARPED_SLAB", "WARPED_STAIRS",
+                "WARPED_STEM", "WARPED_TRAPDOOR", "WARPED_WALL_SIGN",
+                "WARPED_WART_BLOCK",
+                "WEEPING_VINES", "WEEPING_VINES_PLANT",
+                "ZOGLIN_SPAWN_EGG", "ZOMBIFIED_PIGLIN_SPAWN_EGG"));
     }
 }

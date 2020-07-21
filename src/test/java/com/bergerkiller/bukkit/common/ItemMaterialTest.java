@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
+import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -32,6 +33,7 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 /*
  * Tests whether the material properties and ItemStack-related utilities are functional
@@ -459,6 +461,14 @@ public class ItemMaterialTest {
                 Object block = HandleConversion.toBlockHandle(m);
                 assertNotNull("Material " + m + " resulted in null block", block);
             }
+        }
+    }
+
+    @Test
+    public void testItemStackDeserializationVersion() {
+        int curr = CraftMagicNumbersHandle.getDataVersion();
+        if (curr > ItemStackDeserializer.INSTANCE.getMaxSupportedDataVersion()) {
+            fail("ItemStacKDeserializer needs to support the new Data Version (" + curr + ")");
         }
     }
 
