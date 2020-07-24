@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -18,9 +19,11 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
+import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 
 /**
@@ -148,7 +151,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         // Load/unload the chunk
         if (forced) {
             // Request the chunk to be loaded asynchronously
-            WorldUtil.getChunkAsync(chunk.world, chunk.chunkX, chunk.chunkZ).thenAccept(entry);
+            entry.startLoadingAsync();
         } else {
             // Trigger the server to unload the chunk. It will fire a single
             // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
@@ -157,7 +160,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
     }
 
-    private final class Entry implements ForcedChunkEntry, Consumer<Chunk> {
+    private final class Entry implements ForcedChunkEntry, Consumer<Object> {
         private final ChunkKey key;
         private final AtomicInteger counter;
         private CompletableFuture<Chunk> chunkFuture;
@@ -221,8 +224,51 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         @Override
-        public void accept(Chunk chunk) {
-            this.chunkFuture.complete(chunk);
+        public void accept(Object chunk) {
+            // Either -> Left
+            chunk = RunnableConsumer.unpack(chunk);
+
+            // If successful, complete the async chunk loading future
+            if (chunk != null) {
+                this.chunkFuture.complete(WrapperConversion.toChunk(chunk));
+                return;
+            }
+
+            // If not successful, and this entry is still forced loaded, try again
+            if (this.isForced()) {
+                startLoadingAsync();
+            }
+        }
+
+        /**
+         * Asks the chunk loading scheduler to start loading this chunk asynchronously.
+         * Once done, the accept callback method is called with the loaded chunk.
+         */
+        public void startLoadingAsync() {
+            // If future already resolved, ignore
+            if (this.chunkFuture.isDone()) {
+                return;
+            }
+
+            // If already loaded, complete it right away!
+            WorldServerHandle worldHandle = WorldServerHandle.fromBukkit(this.key.world);
+            {
+                org.bukkit.Chunk loadedChunk = worldHandle.getChunkIfLoaded(this.key.chunkX, this.key.chunkZ);
+                if (loadedChunk != null) {
+                    this.chunkFuture.complete(loadedChunk);
+                    return;
+                }
+            }
+
+            // This consumer is called from internal when the chunk is ready
+            // Null is returned when loading fails
+            final ChunkProviderServerHandle cps_handle = worldHandle.getChunkProviderServer();
+            final Executor executor = cps_handle.getAsyncExecutor();
+            if (executor == null) {
+                cps_handle.getChunkAtAsync(this.key.chunkX, this.key.chunkZ, this);
+            } else {
+                CompletableFuture.runAsync(() -> cps_handle.getChunkAtAsync(this.key.chunkX, this.key.chunkZ, Entry.this), executor);
+            }
         }
     }
 

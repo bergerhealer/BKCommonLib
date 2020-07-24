@@ -4,8 +4,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunk;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
-import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
@@ -16,7 +14,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
@@ -34,8 +31,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 
 /**
  * Contains utilities to get and set chunks of a world
@@ -311,45 +306,18 @@ public class ChunkUtil {
      */
     public static CompletableFuture<org.bukkit.Chunk> getChunkAsync(World world, final int x, final int z) {
         final CompletableFuture<org.bukkit.Chunk> result = new CompletableFuture<org.bukkit.Chunk>();
-
-        org.bukkit.Chunk loadedChunk = getChunk(world, x, z);
-        if (loadedChunk != null) {
-            result.complete(loadedChunk);
-        } else {
-            final ChunkProviderServerHandle cps_handle = CommonNMS.getHandle(world).getChunkProviderServer();
-            final Executor executor = cps_handle.getAsyncExecutor();
-
-            // This consumer is called from internal when the chunk is ready
-            // Null is returned when loading fails
-            // It is also a Runnable, when run() is called, the async operation is started.
-            final class AsyncConsumer implements Consumer<Object>, Runnable {
-                @Override
-                public void accept(Object value) {
-                    value = RunnableConsumer.unpack(value);
-                    if (value != null) {
-                        // Complete the request
-                        result.complete(Conversion.toChunk.convert(value));
-                    } else {
-                        // Try again
-                        // TODO: Maximum number of tries?
-                        this.run();
-                    }
+        final ForcedChunk forced = WorldUtil.forceChunkLoaded(world, x, z);
+        forced.getChunkAsync().whenComplete((chunk, exception) -> {
+            try {
+                if (exception != null) {
+                    result.completeExceptionally(exception);
+                } else {
+                    result.complete(chunk);
                 }
-
-                @Override
-                public void run() {
-                    if (executor == null) {
-                        cps_handle.getChunkAtAsync(x, z, this);
-                    } else {
-                        CompletableFuture.runAsync(() -> cps_handle.getChunkAtAsync(x, z, AsyncConsumer.this), executor);
-                    }
-                }
-            };
-
-            // Initiate the process
-            new AsyncConsumer().run();
-        }
-
+            } finally {
+                forced.close();
+            }
+        });
         return result;
     }
 
