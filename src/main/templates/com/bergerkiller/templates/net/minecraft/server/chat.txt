@@ -15,6 +15,53 @@ class IChatBaseComponent {
     public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling);
 #endif
 
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableURL(String url) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
+
+#if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+#else
+        return instance.setChatModifier(modifier);
+#endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableContent(String content) {
+#if version >= 1.15
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+#endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
+
+#if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+#else
+        return instance.setChatModifier(modifier);
+#endif
+    }
+
     class IChatBaseComponent.ChatSerializer {
         public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
 

@@ -24,12 +24,18 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract IChatBaseComponentHandle addSibling(IChatBaseComponentHandle sibling);
+    public abstract IChatBaseComponentHandle setClickableURL(String url);
+    public abstract IChatBaseComponentHandle setClickableContent(String content);
+    public abstract IChatBaseComponentHandle setHoverText(IChatBaseComponentHandle hoverText);
     /**
      * Stores class members for <b>net.minecraft.server.IChatBaseComponent</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IChatBaseComponentClass extends Template.Class<IChatBaseComponentHandle> {
         public final Template.Method.Converted<IChatBaseComponentHandle> addSibling = new Template.Method.Converted<IChatBaseComponentHandle>();
+        public final Template.Method.Converted<IChatBaseComponentHandle> setClickableURL = new Template.Method.Converted<IChatBaseComponentHandle>();
+        public final Template.Method.Converted<IChatBaseComponentHandle> setClickableContent = new Template.Method.Converted<IChatBaseComponentHandle>();
+        public final Template.Method.Converted<IChatBaseComponentHandle> setHoverText = new Template.Method.Converted<IChatBaseComponentHandle>();
 
     }
 

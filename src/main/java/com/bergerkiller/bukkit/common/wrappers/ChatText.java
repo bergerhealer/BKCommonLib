@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.bukkit.ChatColor;
+import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle;
@@ -16,6 +18,16 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHa
 public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
 
     private ChatText() {
+    }
+
+    /**
+     * Sends this chat text as a message to a player.
+     * 
+     * @param player The player to send to
+     * @see PlayerUtil#sendMessage(player, message)
+     */
+    public final void sendTo(Player player) {
+        PlayerUtil.sendMessage(player, this);
     }
 
     /**
@@ -89,15 +101,152 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
      * Appends text to this Chat Text
      * 
      * @param text to append
+     * @return this
      */
-    public final void append(ChatText text) {
+    public final ChatText append(ChatText text) {
         handle.addSibling(text.handle);
+        return this;
     }
 
+    /**
+     * Appends text to this Chat Text
+     * 
+     * @param text to append
+     * @return this
+     */
+    public final ChatText append(String text) {
+        return append(fromMessage(text));
+    }
+
+    /**
+     * Appends a  text component that represents a clickable link.
+     * When clicked, the player is asked to navigate to the URL specified.
+     * 
+     * @param text The text visible to the player
+     * @param url The url navigated to when clicked
+     * @return this
+     */
+    public final ChatText appendClickableURL(String text, String url) {
+        return append(fromClickableURL(text, url));
+    }
+
+    /**
+     * Appends a  text component that represents a clickable link.
+     * When clicked, the player is asked to navigate to the URL specified.
+     * 
+     * @param text The text visible to the player
+     * @param url The url navigated to when clicked
+     * @param altText The text displayed to the player when hovering with the cursor on the link
+     * @return this
+     */
+    public final ChatText appendClickableURL(String text, String url, String altText) {
+        return append(fromClickableURL(text, url).setHoverText(altText));
+    }
+
+    /**
+     * Appends a  text component that represents a clickable link.
+     * When clicked, the player is asked to copy the content specified
+     * to their clipboard.
+     * 
+     * @param text The text visible to the player
+     * @param content The content copied
+     * @return this
+     */
+    public final ChatText appendClickableContent(String text, String content) {
+        return append(fromClickableContent(text, content));
+    }
+
+    /**
+     * Makes this current chat text message clickable. When a player clicks on the text,
+     * it will prompt the player to navigate their Webbrowser to the URL given.
+     * 
+     * @param url The url to navigate to when clicked
+     * @return this
+     */
+    public final ChatText setClickableURL(String url) {
+        handle.setClickableURL(url);
+        return this;
+    }
+
+    /**
+     * Makes this current chat text message clickable. When a player clicks on the text,
+     * it will prompt to copy the content specified here to their clipboard. Avoid using
+     * too large contents, as they may lag out the client.
+     * 
+     * @param content The content the player can copy to their clipboard
+     * @return this
+     */
+    public final ChatText setClickableContent(String content) {
+        handle.setClickableContent(content);
+        return this;
+    }
+
+    /**
+     * Sets the text displayed to the player when he hovers his cursor on top of it
+     * 
+     * @param hoverText The text displayed
+     * @return this
+     */
+    public final ChatText setHoverText(ChatText hoverText) {
+        if (hoverText != null) {
+            handle.setHoverText(hoverText.getBackingHandle());
+        }
+        return this;
+    }
+
+    /**
+     * Sets the text displayed to the player when he hovers his cursor on top of it
+     * 
+     * @param hoverText The text displayed
+     * @return this
+     */
+    public final ChatText setHoverText(String hoverText) {
+        if (hoverText != null) {
+            handle.setHoverText(ChatText.fromMessage(hoverText).getBackingHandle());
+        }
+        return this;
+    }
+
+    /**
+     * Creates a chat text component of an empty String
+     * 
+     * @return empty ChatText
+     */
     public static ChatText empty() {
         return fromMessage("");
     }
 
+    /**
+     * Creates the text component for representing a clickable link.
+     * When clicked, the player is asked to navigate to the URL specified.
+     * 
+     * @param text The text visible to the player
+     * @param url The url navigated to when clicked
+     * @return url ChatText
+     */
+    public static ChatText fromClickableURL(String text, String url) {
+        return fromMessage(text).setClickableURL(url);
+    }
+
+    /**
+     * Creates the text component for representing a clickable link.
+     * When clicked, the player is asked to copy the content specified
+     * to their clipboard.
+     * 
+     * @param text The text visible to the player
+     * @param content The content to copy when clicked
+     * @return content ChatText
+     */
+    public static ChatText fromClickableContent(String text, String content) {
+        return fromMessage(text).setClickableContent(content);
+    }
+
+    /**
+     * Decodes JSON-encoded chat messages into a Chat Text component
+     * 
+     * @param jsonText Input json (Mojangson) message data
+     * @return ChatText
+     */
     public static ChatText fromJson(String jsonText) {
         if (jsonText == null) {
             return null;
@@ -107,6 +256,13 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
         return text;
     }
 
+    /**
+     * Converts a Bukkit-style chat message with Bukkit-style chat formatting characters
+     * into a ChatText message.
+     * 
+     * @param message
+     * @return message ChatText
+     */
     public static ChatText fromMessage(String message) {
         if (message == null) {
             return null;
@@ -116,6 +272,12 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
         return text;
     }
 
+    /**
+     * Wraps the internal representation of chat text data
+     * 
+     * @param iChatBaseComponentHandle
+     * @return ChatText
+     */
     public static ChatText fromComponent(Object iChatBaseComponentHandle) {
         if (iChatBaseComponentHandle == null) {
             return null;
@@ -125,6 +287,12 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
         return text;
     }
 
+    /**
+     * Wraps the chat color code as chat text data
+     * 
+     * @param color
+     * @return ChatText
+     */
     public static ChatText fromChatColor(ChatColor color) {
         if (color == null) {
             return null;
@@ -141,7 +309,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
      * Saves creating an IChatBaseComponent in between.
      * TODO: Test this! And test performance!
      */
-    public static String convertTextToJson_old(String text) {
+    protected static String convertTextToJson_old(String text) {
         if (text == null || text.length() == 0) {
             return "\"\"";
         }

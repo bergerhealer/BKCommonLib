@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.World;
 import org.bukkit.inventory.InventoryView;
 import java.util.Collection;
@@ -31,6 +32,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract void setSpawnForced(boolean forced);
     public abstract World getSpawnWorld();
     public abstract void setSpawnWorld(World world);
+    public abstract void sendMessage(ChatText ichatbasecomponent);
     public abstract InventoryView openAnvilWindow();
 
     public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
@@ -54,6 +56,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         public final Template.Method<Void> setSpawnForced = new Template.Method<Void>();
         public final Template.Method<World> getSpawnWorld = new Template.Method<World>();
         public final Template.Method<Void> setSpawnWorld = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> sendMessage = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Collection<Integer>> getRemoveQueue = new Template.Method<Collection<Integer>>();
         public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();

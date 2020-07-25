@@ -3,6 +3,7 @@ package net.minecraft.server;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
@@ -421,6 +422,14 @@ class EntityPlayer extends EntityHuman {
     public void setSpawnWorld(org.bukkit.World world) {
         instance.spawnWorld = (world == null) ? "" : world.getName();
     }
+#endif
+
+#if version >= 1.16
+    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
+        instance.sendMessage(ichatbasecomponent, SystemUtils.b);
+    }
+#else
+    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent);
 #endif
 
 #if exists net.minecraft.server.EntityPlayer public final java.util.List<Integer> removeQueue;

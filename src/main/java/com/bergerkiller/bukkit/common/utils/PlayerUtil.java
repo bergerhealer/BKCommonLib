@@ -9,9 +9,11 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -424,5 +426,15 @@ public class PlayerUtil extends EntityUtil {
         } else {
             return null;
         }
+    }
+
+    /**
+     * Sends a {@link ChatText} chat message to a player
+     * 
+     * @param player The player to send a message to
+     * @param text The text to send, formatted using ChatText
+     */
+    public static void sendMessage(Player player, ChatText text) {
+        EntityPlayerHandle.fromBukkit(player).sendMessage(text);
     }
 }
