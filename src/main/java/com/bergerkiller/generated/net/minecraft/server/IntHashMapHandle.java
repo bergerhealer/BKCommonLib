@@ -32,9 +32,11 @@ public abstract class IntHashMapHandle extends Template.Handle {
     public abstract void put(int key, Object paramV);
     public abstract boolean containsKey(int key);
     public abstract void clear();
+    public abstract int size();
     public abstract Object getEntry(int key);
     public abstract List<Entry> getEntries();
     public abstract List<Object> getValues();
+    public abstract IntHashMapHandle cloneMap();
     /**
      * Stores class members for <b>net.minecraft.server.IntHashMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -47,9 +49,11 @@ public abstract class IntHashMapHandle extends Template.Handle {
         public final Template.Method.Converted<Void> put = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> containsKey = new Template.Method<Boolean>();
         public final Template.Method<Void> clear = new Template.Method<Void>();
+        public final Template.Method<Integer> size = new Template.Method<Integer>();
         public final Template.Method<Object> getEntry = new Template.Method<Object>();
         public final Template.Method<List<Entry>> getEntries = new Template.Method<List<Entry>>();
         public final Template.Method<List<Object>> getValues = new Template.Method<List<Object>>();
+        public final Template.Method.Converted<IntHashMapHandle> cloneMap = new Template.Method.Converted<IntHashMapHandle>();
 
     }
 

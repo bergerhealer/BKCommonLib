@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
  *
  * @param <T> - value type
  */
-public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
+public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> implements Cloneable {
 
     public IntHashMap() {
         this.setHandle(IntHashMapHandle.createNew());
@@ -18,6 +18,10 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
 
     public IntHashMap(Object handle) {
         this.setHandle(IntHashMapHandle.createHandle(handle));
+    }
+
+    private IntHashMap(IntHashMapHandle wrappedHandle) {
+        this.setHandle(wrappedHandle);
     }
 
     /**
@@ -104,6 +108,20 @@ public class IntHashMap<T> extends BasicWrapper<IntHashMapHandle> {
     @SuppressWarnings("unchecked")
     public List<T> values() {
         return (List<T>) this.handle.getValues();
+    }
+
+    /**
+     * Gets the number of entries stored inside this hashmap
+     * 
+     * @return hashmap size
+     */
+    public int size() {
+        return this.handle.size();
+    }
+
+    @Override
+    public IntHashMap<T> clone() {
+        return new IntHashMap<T>(this.handle.cloneMap());
     }
 
     /**

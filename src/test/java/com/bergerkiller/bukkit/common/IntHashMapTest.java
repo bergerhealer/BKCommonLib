@@ -14,12 +14,14 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 public class IntHashMapTest {
 
     @Test
-    public void testHashMap() {
+    public void testIntHashMap() {
         IntHashMap<String> test = new IntHashMap<String>();
+        assertEquals(0, test.size());
         test.put(154, "test_string");
         assertEquals("test_string", test.get(154));
         assertTrue(test.contains(154));
         assertFalse(test.contains(155));
+        assertEquals(1, test.size());
 
         IntHashMap.Entry<String> entry = test.getEntry(154);
         assertNotNull(entry);
@@ -47,5 +49,23 @@ public class IntHashMapTest {
         entry.setValue("new_string");
         assertEquals("new_string", entry.getValue());
         assertEquals("new_string", test.get(154));
+    }
+
+    @Test
+    public void testIntHashMapClone() {
+        IntHashMap<String> test = new IntHashMap<String>();
+        test.put(-100000, "test_string_a");
+        test.put(0, "test_string_b");
+        test.put(100000, "test_string_c");
+        assertEquals(3, test.size());
+
+        IntHashMap<String> clone = test.clone();
+        assertTrue(clone.contains(-100000));
+        assertTrue(clone.contains(0));
+        assertTrue(clone.contains(100000));
+        assertEquals(3, clone.size());
+        assertEquals("test_string_a", clone.get(-100000));
+        assertEquals("test_string_b", clone.get(0));
+        assertEquals("test_string_c", clone.get(100000));
     }
 }

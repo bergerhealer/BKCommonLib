@@ -29,9 +29,50 @@ class LongObjectHashMap {
 #if version >= 1.14
     public volatile Collection<V> values();
     public volatile Set<Long> keySet();
+
+    public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
+        return (org.bukkit.craftbukkit.util.LongObjectHashMap) com.bergerkiller.bukkit.common.utils.LogicUtil.clone(instance);
+    }
 #else
     public Collection<V> values();
     public Set<Long> keySet();
+
+    // Note: the builtin clone() has a runtime error, we can't use it at all :(
+    public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
+        // Retrieve the data in the original hashmap
+        // We can omit modCount
+        #require org.bukkit.craftbukkit.util.LongObjectHashMap private transient long[][] keys;
+        #require org.bukkit.craftbukkit.util.LongObjectHashMap private transient V[][] values;
+        #require org.bukkit.craftbukkit.util.LongObjectHashMap private transient int size;
+        long[][] keys = instance#keys;
+        Object[][] values = instance#values;
+        int size = instance#size;
+
+        // Deep-clone the keys
+        keys = (long[][]) keys.clone();
+        for (int i = 0; i < keys.length; i++) {
+            long[] arr = keys[i];
+            if (arr != null) {
+                keys[i] = (long[]) arr.clone();
+            }
+        }
+
+        // Deep-clone the values
+        values = (Object[][]) values.clone();
+        for (int i = 0; i < values.length; i++) {
+            Object[] arr = values[i];
+            if (arr != null) {
+                values[i] = (Object[]) arr.clone();
+            }
+        }
+
+        // Create a new instance and apply the values
+        LongObjectHashMap clone = new LongObjectHashMap();
+        clone#keys = keys;
+        clone#values = values;
+        clone#size = size;
+        return clone;
+    }
 #endif
 }
 

@@ -144,6 +144,23 @@ public class LongHashSetTest {
         assertEquals(test.size(), 0);
     }
 
+    @Test
+    public void testHashSetClone() {
+        LongHashSet test = new LongHashSet();
+        assertTrue(test.add(20));
+        assertTrue(test.add(Long.MIN_VALUE));
+        assertTrue(test.add(0));
+        assertTrue(test.add(Long.MAX_VALUE));
+        assertEquals(4, test.size());
+
+        LongHashSet clone = test.clone();
+        assertTrue(clone.contains(20));
+        assertTrue(clone.contains(Long.MIN_VALUE));
+        assertTrue(clone.contains(0));
+        assertTrue(clone.contains(Long.MAX_VALUE));
+        assertEquals(4, clone.size());
+    }
+
     private static void verifySpecialTest(HashSet<Long> set) {
         assertEquals(4, set.size());
         assertTrue(set.contains(Long.valueOf(20)));

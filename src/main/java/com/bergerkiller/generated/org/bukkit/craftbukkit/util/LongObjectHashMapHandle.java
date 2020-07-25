@@ -35,6 +35,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
     public abstract Object put(long key, Object value);
     public abstract Collection<Object> values();
     public abstract Set<Long> keySet();
+    public abstract LongObjectHashMapHandle cloneMap();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -50,6 +51,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method<Object> put = new Template.Method<Object>();
         public final Template.Method<Collection<Object>> values = new Template.Method<Collection<Object>>();
         public final Template.Method<Set<Long>> keySet = new Template.Method<Set<Long>>();
+        public final Template.Method.Converted<LongObjectHashMapHandle> cloneMap = new Template.Method.Converted<LongObjectHashMapHandle>();
 
     }
 

@@ -1,8 +1,9 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_14;
-import com.bergerkiller.bukkit.common.internal.logic.LongHashSet_Iterator_1_8_to_1_13_2;
+import com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_Iterator_1_14;
+import com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_Iterator_1_8_to_1_13_2;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.LongHashSetHandle;
 
@@ -13,7 +14,7 @@ import java.util.Iterator;
  * HashSet allows storing long keys. Ideally, two int values are merged into one
  * long to store 2D-coordinates.
  */
-public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iterable<Long> {
+public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iterable<Long>, Cloneable {
 
     public LongHashSet() {
         this.setHandle(LongHashSetHandle.createNew());
@@ -100,6 +101,11 @@ public class LongHashSet extends BasicWrapper<LongHashSetHandle> implements Iter
         } else {
             return new LongHashSet_Iterator_1_8_to_1_13_2(this.getRawHandle());
         }
+    }
+
+    @Override
+    public LongHashSet clone() {
+        return new LongHashSet(LogicUtil.clone(this.getRawHandle()));
     }
 
     /**

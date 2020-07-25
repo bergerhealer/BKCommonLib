@@ -245,8 +245,8 @@ public class CommonBootstrap {
 
         // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
         // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
-        remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2");
-        remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2$LongIterator");
+        remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2");
+        remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (evaluateMCVersion("<=", "1.8.8")) {

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
@@ -15,7 +16,7 @@ import java.util.Set;
  * @param <V> - Value type
  */
 @SuppressWarnings("unchecked")
-public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
+public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> implements Cloneable {
 
     /**
      * Constructs a new LongHashMap
@@ -35,6 +36,10 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
 
     public LongHashMap(Object handle) {
         this.setHandle(LongObjectHashMapHandle.createHandle(handle));
+    }
+
+    private LongHashMap(LongObjectHashMapHandle handle) {
+        this.setHandle(handle);
     }
 
     /**
@@ -123,6 +128,10 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
     }
 
     public Collection<V> getValues() {
+        return values();
+    }
+
+    public Collection<V> values() {
         return (Collection<V>) handle.values();
     }
 
@@ -135,5 +144,14 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> {
         }
         return result;
         //return ((TLongObjectHashMap<V>) getRawHandle()).keySet().toArray(new long[0]);
+    }
+
+    /**
+     * Clones this LongHashMap to create a new instance of the same backing map with the same
+     * keys and values as this map. Changes to the returned map do not affect this one.
+     */
+    @Override
+    public LongHashMap<V> clone() {
+        return new LongHashMap<V>(handle.cloneMap());
     }
 }

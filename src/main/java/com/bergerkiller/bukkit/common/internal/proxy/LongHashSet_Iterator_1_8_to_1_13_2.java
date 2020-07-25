@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal.logic;
+package com.bergerkiller.bukkit.common.internal.proxy;
 
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 

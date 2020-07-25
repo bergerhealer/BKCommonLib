@@ -38,4 +38,21 @@ public class LongHashMapTest {
         assertFalse(test.contains(1546464643643436634L));
     }
 
+    @Test
+    public void testHashMapClone() {
+        LongHashMap<String> test = new LongHashMap<String>();
+        test.put(1546464643643436634L, "test_string_a");
+        test.put(0L, "test_string_b");
+        test.put(-1546464643643436634L, "test_string_c");
+        assertEquals(3, test.size());
+
+        LongHashMap<String> clone = test.clone();
+        assertTrue(clone.contains(1546464643643436634L));
+        assertTrue(clone.contains(0L));
+        assertTrue(clone.contains(-1546464643643436634L));
+        assertEquals("test_string_a", clone.get(1546464643643436634L));
+        assertEquals("test_string_b", clone.get(0L));
+        assertEquals("test_string_c", clone.get(-1546464643643436634L));
+        assertEquals(3, clone.size());
+    }
 }

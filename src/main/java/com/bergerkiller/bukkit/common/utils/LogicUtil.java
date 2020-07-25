@@ -26,7 +26,7 @@ import com.google.common.collect.BiMap;
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
-    private static final Map<Class<?>, Method> _cloneMethodCache = new HashMap<>();
+    private static Map<Class<?>, Method> _cloneMethodCache = Collections.emptyMap();
     private static final Consumer<Object> _noopConsumer = obj -> {};
 
     /**
@@ -233,7 +233,9 @@ public class LogicUtil {
     }
 
     /**
-     * Clones a single value
+     * Clones a single value. Finds the clone() method of the value type,
+     * and calls it on the value to clone it. If the value can not be cloned,
+     * then an exception is thrown.
      *
      * @param value to clone
      * @return cloned value
@@ -255,8 +257,12 @@ public class LogicUtil {
                     } catch (NoSuchMethodException | SecurityException e) {
                         throw new IllegalArgumentException("Object of type " + value.getClass().getName() + " can not be cloned");
                     }
+
+                    // Thread-safety: because we get() outside of synchronized() a copy must be made
+                    HashMap<Class<?>, Method> newCache = new HashMap<Class<?>, Method>(_cloneMethodCache);
+                    newCache.put(value.getClass(), cloneMethod);
+                    _cloneMethodCache = newCache;
                 }
-                _cloneMethodCache.put(value.getClass(), cloneMethod);
             }
         }
 

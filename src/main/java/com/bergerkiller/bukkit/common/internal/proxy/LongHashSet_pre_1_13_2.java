@@ -14,19 +14,21 @@
   limitations under the License.
 */
 
-package com.bergerkiller.bukkit.common.internal.logic;
+package com.bergerkiller.bukkit.common.internal.proxy;
 
 import java.util.Arrays;
 import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import com.bergerkiller.mountiplex.MountiplexUtil;
+
 /**
  * LongHashSet class implementation from CraftBukkit, with some fixes and API
  * improvements. Most important fix is that it can also store the value 0 and Long.MIN_VALUE,
  * which is otherwise not possible to be used.
  */
-public class LongHashSet_pre_1_13_2 {
+public class LongHashSet_pre_1_13_2 implements Cloneable {
     private final static int INITIAL_SIZE = 3;
     private final static double LOAD_FACTOR = 0.75;
 
@@ -285,6 +287,20 @@ public class LongHashSet_pre_1_13_2 {
 
         values = newValues;
         freeEntries = values.length - elements;
+    }
+
+    @Override
+    public LongHashSet_pre_1_13_2 clone() {
+        LongHashSet_pre_1_13_2 clone;
+        try {
+            clone = (LongHashSet_pre_1_13_2) super.clone();
+        } catch (CloneNotSupportedException e) {
+            throw MountiplexUtil.uncheckedRethrow(e);
+        }
+
+        clone.values = clone.values.clone();
+        clone.modCount = 0;
+        return clone;
     }
 
     public final class LongIterator implements Iterator<Long> {
