@@ -543,6 +543,20 @@ class EntityHanging extends Entity {
     public (IntVector3) BlockPosition blockPosition;
 }
 
+class EntityBoat extends Entity {
+#if version >= 1.14
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:e;
+#elseif version >= 1.9
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:d;
+#else
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:###;
+#endif
+
+    <code>
+    public static final Key<com.bergerkiller.bukkit.common.wrappers.BoatWoodType> DATA_WOOD_TYPE = Key.Type.BOAT_WOOD_TYPE.createKey(T.DATA_WOOD_TYPE, -1);
+    </code>
+}
+
 class EntityMinecartAbstract extends Entity {
 #if version >= 1.14
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:b;

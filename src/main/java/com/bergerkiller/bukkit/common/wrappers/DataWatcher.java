@@ -624,6 +624,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
             public static final Type<BlockFace> DIRECTION = getForType(BlockFace.class);
             public static final Type<java.util.OptionalInt> ENTITY_ID = new Type<java.util.OptionalInt>(INTEGER._token, new EntityIdTypeConverter());
+            public static final Type<BoatWoodType> BOAT_WOOD_TYPE = new Type<BoatWoodType>(INTEGER._token, new BoatWoodTypeIdConverter());
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
                 if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
@@ -895,6 +896,37 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public boolean acceptsNullOutput() {
                 return true;
             }
+        }
+    }
+
+    private static final class BoatWoodTypeIdConverter extends DuplexConverter<Object, BoatWoodType> {
+
+        public BoatWoodTypeIdConverter() {
+            super(Integer.class, BoatWoodType.class);
+        }
+
+        @Override
+        public BoatWoodType convertInput(Object value) {
+            if (value instanceof Integer) {
+                return BoatWoodType.byId(((Integer) value).intValue());
+            } else {
+                return BoatWoodType.OAK;
+            }
+        }
+
+        @Override
+        public Object convertOutput(BoatWoodType value) {
+            return Integer.valueOf((value == null) ? 0 : value.getId());
+        }
+
+        @Override
+        public boolean acceptsNullInput() {
+            return true;
+        }
+
+        @Override
+        public boolean acceptsNullOutput() {
+            return true;
         }
     }
 
