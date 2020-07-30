@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -16,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
@@ -36,12 +38,18 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
+    private SyncChunkLoader syncChunkLoader = null;
+
+    // After this number of ticks, force-load the chunk and don't wait for asynchronous loading to finish
+    private static final int SYNC_LOAD_AFTER_TICKS = 100;
 
     public CommonForcedChunkManager(CommonPlugin plugin) {
         this.plugin = plugin;
     }
 
     public synchronized void enable() {
+        this.syncChunkLoader = new SyncChunkLoader(this.plugin);
+        this.syncChunkLoader.start(1, 1);
         this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
@@ -68,6 +76,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     public synchronized void disable(CommonPlugin plugin) {
+        this.syncChunkLoader.stop();
+        this.syncChunkLoader = null;
         this.pendingHandler.stop();
         this.pendingHandler = null;
         this.pending.clear();
@@ -151,6 +161,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         // Load/unload the chunk
         if (forced) {
             // Request the chunk to be loaded asynchronously
+            // The syncChunkLoader will sync-load the chunk after a tick delay
+            syncChunkLoader.add(entry);
             entry.startLoadingAsync();
         } else {
             // Trigger the server to unload the chunk. It will fire a single
@@ -219,6 +231,18 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         @Override
+        public Chunk getChunk() {
+            if (this.chunkFuture.isDone()) {
+                try {
+                    return this.chunkFuture.get();
+                } catch (Throwable t) {}
+            }
+            Chunk chunk = this.key.getChunk();
+            this.chunkFuture.complete(chunk);
+            return chunk;
+        }
+
+        @Override
         public CompletableFuture<Chunk> getChunkAsync() {
             return this.chunkFuture;
         }
@@ -283,6 +307,10 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             this.chunkZ = chunkZ;
         }
 
+        public Chunk getChunk() {
+            return world.getChunkAt(chunkX, chunkZ);
+        }
+
         @Override
         public boolean equals(Object o) {
             ChunkKey other = (ChunkKey) o;
@@ -309,6 +337,56 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         public void onChunkUnload(ChunkUnloadEvent event) {
             if (isForced(event.getChunk())) {
                 ((Cancellable) event).setCancelled(true);
+            }
+        }
+    }
+
+    // Force-loads every chunk kept loading after a 30-ish tick timeout
+    // Each entry stores the chunks to load for that tick
+    private static class SyncChunkLoadTask {
+        public final int tick;
+        private final LinkedList<Entry> entries = new LinkedList<Entry>();
+
+        public SyncChunkLoadTask(int ticks) {
+            this.tick = ticks;
+        }
+
+        public void add(Entry entry) {
+            this.entries.add(entry);
+        }
+
+        public void load() {
+            for (Entry e : entries) {
+                if (e.isForced()) {
+                    e.getChunk();
+                }
+            }
+        }
+    }
+
+    // Main task responsible for loading chunks after a tick delay
+    private static class SyncChunkLoader extends Task {
+        private final LinkedList<SyncChunkLoadTask> tasks = new LinkedList<SyncChunkLoadTask>();
+        private int currentTick = 0;
+
+        public SyncChunkLoader(JavaPlugin plugin) {
+            super(plugin);
+        }
+
+        public void add(Entry entry) {
+            SyncChunkLoadTask task;
+            if (tasks.isEmpty() || (task = tasks.peekLast()).tick != currentTick) {
+                task = new SyncChunkLoadTask(currentTick);
+                tasks.addLast(task);
+            }
+            task.add(entry);
+        }
+
+        @Override
+        public void run() {
+            currentTick++;
+            if (!tasks.isEmpty() && (currentTick-SYNC_LOAD_AFTER_TICKS) >= tasks.peek().tick) {
+                tasks.poll().load();
             }
         }
     }

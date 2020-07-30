@@ -29,6 +29,7 @@ public abstract class ForcedChunkManager {
         World getWorld();
         int getX();
         int getZ();
+        org.bukkit.Chunk getChunk();
         CompletableFuture<org.bukkit.Chunk> getChunkAsync();
     }
 }

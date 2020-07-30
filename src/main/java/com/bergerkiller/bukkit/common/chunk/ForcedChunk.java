@@ -85,8 +85,7 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * @return chunk
      */
     public org.bukkit.Chunk getChunk() {
-        ForcedChunkManager.ForcedChunkEntry entry = this.access();
-        return entry.getWorld().getChunkAt(entry.getX(), entry.getZ());
+        return this.access().getChunk();
     }
 
     /**
