@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.World;
-import java.util.function.IntSupplier;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.LightEngineThreaded</b>.
@@ -28,7 +27,7 @@ public abstract class LightEngineThreadedHandle extends Template.Handle {
         return T.forWorld.invoke(world);
     }
 
-    public abstract void schedule(int cx, int cz, IntSupplier ticketLevelSupplier, Object lightenginethreaded_update, Runnable runnable);
+    public abstract void schedule(Runnable runnable);
     /**
      * Stores class members for <b>net.minecraft.server.LightEngineThreaded</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,7 +35,7 @@ public abstract class LightEngineThreadedHandle extends Template.Handle {
     public static final class LightEngineThreadedClass extends Template.Class<LightEngineThreadedHandle> {
         public final Template.StaticMethod.Converted<LightEngineThreadedHandle> forWorld = new Template.StaticMethod.Converted<LightEngineThreadedHandle>();
 
-        public final Template.Method.Converted<Void> schedule = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> schedule = new Template.Method<Void>();
 
     }
 

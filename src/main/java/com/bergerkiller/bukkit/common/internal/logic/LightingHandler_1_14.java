@@ -1,8 +1,12 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.IntSupplier;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 import org.bukkit.World;
@@ -10,7 +14,6 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -20,31 +23,18 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * which means changes to light requires scheduling tasks on a worker thread.
  */
 public class LightingHandler_1_14 extends LightingHandler {
-    private final IntSupplier updateTicket;
-    private final Object lightUpdateStage;
     private final Field light_layer_block;
     private final Field light_layer_sky;
     private final Field light_storage;
     private final Field light_storage_live;
     private final Field light_storage_volatile;
     private final Field light_storage_paper_lock;
-    private final FastMethod<Object> setStorageDataAndCopyMethod = new FastMethod<Object>();
+    private final FastMethod<Void> setStorageDataMethod = new FastMethod<Void>();
+    private final FastMethod<Object> createCopyMethod = new FastMethod<Object>();
     private final FastMethod<byte[]> getLayerDataMethod = new FastMethod<byte[]>();
+    private final Map<World, EngineUpdateTaskLists> task_lists = new HashMap<>();
 
     public LightingHandler_1_14() throws Throwable {
-        { // Update ticket intsupplier
-            //final int golden_ticket = PlayerChunkMapHandle.T.getType().getDeclaredField("GOLDEN_TICKET").getInt(null);
-            this.updateTicket = () -> 0;
-        }
-
-        { // PRE_UPDATE constant to pass to schedule()
-            Class<?> updateEnumType = CommonUtil.getNMSClass("LightEngineThreaded.Update");
-            Field preUpdateConstant = updateEnumType.getDeclaredField("PRE_UPDATE");
-            preUpdateConstant.setAccessible(true);
-            this.lightUpdateStage = preUpdateConstant.get(null);
-            preUpdateConstant.setAccessible(false);
-        }
-
         Class<?> lightEngineType = CommonUtil.getNMSClass("LightEngine");
         if (lightEngineType == null) {
             throw new IllegalStateException("LightEngine class not found");
@@ -121,17 +111,24 @@ public class LightingHandler_1_14 extends LightingHandler {
             this.light_storage_paper_lock.setAccessible(true);
         }
 
-        // This generated method updates the contents in a live layer, creates a copy of the data and returns it
         ClassResolver storage_resolver = new ClassResolver();
         storage_resolver.setDeclaredClass(lightEngineStorageArrayType);
-        this.setStorageDataAndCopyMethod.init(new MethodDeclaration(storage_resolver,
-                "public LightEngineStorageArray setDataAndCopy(int cx, int cy, int cz, byte[] data) {\n" +
+
+        // This generated method updates the contents in a live layer
+        this.setStorageDataMethod.init(new MethodDeclaration(storage_resolver,
+                "public void setData(int cx, int cy, int cz, byte[] data) {\n" +
                 "    instance.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));\n" +
+                "}"));
+        this.setStorageDataMethod.forceInitialization();
+
+        // This generated method creates a copy of the live layer
+        this.createCopyMethod.init(new MethodDeclaration(storage_resolver,
+                "public LightEngineStorageArray createCopy() {\n" +
                 "    LightEngineStorageArray copy = instance.b();\n" +
                 "    copy.d();\n" +
                 "    return copy;\n" +
                 "}"));
-        this.setStorageDataAndCopyMethod.forceInitialization();
+        this.createCopyMethod.forceInitialization();
 
         // This generated method simply reads the nibblearray data and returns a byte[] copy
         ClassResolver layer_resolver = new ClassResolver();
@@ -186,66 +183,152 @@ public class LightingHandler_1_14 extends LightingHandler {
 
     @Override
     public CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
-        try {
-            Object layer = this.light_layer_block.get(engine.getRaw());
-            if (layer == null) {
-                throw new UnsupportedOperationException("This world has no block light data");
-            }
-            return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
-        } catch (Throwable ex) {
-            return completedExceptionally(ex);
-        }
+        return scheduleUpdate(world, list -> list.block, cx, cy, cz, data);
     }
 
     @Override
     public CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
-        try {
-            Object layer = this.light_layer_sky.get(engine.getRaw());
-            if (layer == null) {
-                throw new UnsupportedOperationException("This world has no sky light data");
+        return scheduleUpdate(world, list -> list.sky, cx, cy, cz, data);
+    }
+
+    // Queues up and schedules the update for a 16x16x16 area of sky/light data
+    private CompletableFuture<Void> scheduleUpdate(World world, Function<EngineUpdateTaskLists, LayerUpdateTaskList> function,
+            int cx, int cy, int cz, byte[] data)
+    {
+        UpdateTask task = new UpdateTask(cx, cy, cz, data);
+        synchronized (task_lists) {
+            EngineUpdateTaskLists lists = task_lists.computeIfAbsent(world, EngineUpdateTaskLists::new);
+            function.apply(lists).tasks.add(task);
+        }
+        return task.future;
+    }
+
+    // All the updates to perform for a single (world) light engine
+    private final class EngineUpdateTaskLists implements Runnable {
+        public final World world;
+        public final LayerUpdateTaskList block;
+        public final LayerUpdateTaskList sky;
+        private boolean hasRun;
+
+        public EngineUpdateTaskLists(World world) {
+            LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
+            Object layer_block, layer_sky;
+            try {
+                layer_block = light_layer_block.get(engine.getRaw());
+                layer_sky = light_layer_sky.get(engine.getRaw());
+            } catch (Throwable t) {
+                layer_block = null;
+                layer_sky = null;
             }
-            return scheduleSetLayerStorageData(engine, layer, cx, cy, cz, data);
-        } catch (Throwable ex) {
-            return completedExceptionally(ex);
+            this.world = world;
+            this.block = new LayerUpdateTaskList(layer_block);
+            this.sky = new LayerUpdateTaskList(layer_sky);
+            this.hasRun = false;
+            engine.schedule(this);
+        }
+
+        @Override
+        public void run() {
+            // Remove from task lists, if different (should never happen!) run separately
+            EngineUpdateTaskLists removed;
+            synchronized (task_lists) {
+                removed = task_lists.remove(this.world);
+            }
+            if (removed != null && removed != this) {
+                removed.run();
+            }
+
+            // Protection
+            if (this.hasRun) {
+                return;
+            } else {
+                this.hasRun = true;
+            }
+
+            // Process all updates
+            block.run();
+            sky.run();
+
+            // Complete all callbacks
+            CommonUtil.nextTick(() -> {
+                fireCallbacks(block);
+                fireCallbacks(sky);
+            });
+        }
+
+        private void fireCallbacks(LayerUpdateTaskList list) {
+            for (UpdateTask task : list.tasks) {
+                if (task.error != null) {
+                    task.future.completeExceptionally(task.error);
+                } else {
+                    task.future.complete(null);
+                }
+            }
         }
     }
 
-    private CompletableFuture<Void> scheduleSetLayerStorageData(LightEngineThreadedHandle engine, Object layer, int cx, int cy, int cz, byte[] data) {
-        final CompletableFuture<Void> future = new CompletableFuture<Void>();
-        engine.schedule(cx, cz, this.updateTicket, this.lightUpdateStage, () -> {
+    // All the tasks for a single layer (block/sky)
+    private final class LayerUpdateTaskList {
+        public final Object layer;
+        public final List<UpdateTask> tasks;
+
+        public LayerUpdateTaskList(Object layer) {
+            this.layer = layer;
+            this.tasks  = new ArrayList<UpdateTask>();
+        }
+
+        public void run() {
             try {
-                Object storage = this.light_storage.get(layer);
-                if (light_storage_paper_lock != null) {
-                    synchronized (light_storage_paper_lock.get(storage)) {
-                        Object storage_live = this.light_storage_live.get(storage);
-                        Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
-                        this.light_storage_volatile.set(storage, layer_data);
-                    }
-                } else {
-                    Object storage_live = this.light_storage_live.get(storage);
-                    Object layer_data = setStorageDataAndCopyMethod.invoke(storage_live, cx, cy, cz, data);
-                    this.light_storage_volatile.set(storage, layer_data);
+                if (this.layer == null) {
+                    throw new IllegalStateException("Light layer field could not be retrieved");
                 }
 
-                //TODO: Can scheduling it onto the main thread be done differently?
-                CommonUtil.nextTick(() -> {
-                    future.complete(null);
-                });
+                // Paperspigot also has a lock we must use while accessing the data
+                Object storage = light_storage.get(this.layer);
+                if (light_storage_paper_lock != null) {
+                    synchronized (light_storage_paper_lock.get(storage)) {
+                        run_impl(storage);
+                    }
+                } else {
+                    run_impl(storage);
+                }
             } catch (Throwable t) {
-                //TODO: Can scheduling it onto the main thread be done differently?
-                CommonUtil.nextTick(() -> {
-                    future.completeExceptionally(t);
-                });
+                for (UpdateTask task : this.tasks) {
+                    task.error = t;
+                }
             }
-        });
-        return future;
+        }
+
+        // Changes the storage data of the live layer for all pending tasks
+        // Then creates a copy of the entire live layer, making it available
+        private void run_impl(Object storage) throws Throwable {
+            Object storage_live = light_storage_live.get(storage);
+            for (UpdateTask task : this.tasks) {
+                try {
+                    setStorageDataMethod.invoke(storage_live, task.cx, task.cy, task.cz, task.data);
+                } catch (Throwable t) {
+                    task.error = t;
+                }
+            }
+            Object layer_data = createCopyMethod.invoke(storage_live);
+            light_storage_volatile.set(storage, layer_data);
+        }
     }
 
-    private static CompletableFuture<Void> completedExceptionally(Throwable ex) {
-        CompletableFuture<Void> future = new CompletableFuture<Void>();
-        future.completeExceptionally(ex);
-        return future;
+    // A single task to change a single 16x16x16 slice
+    private static final class UpdateTask {
+        public final CompletableFuture<Void> future = new CompletableFuture<Void>();
+        public final int cx;
+        public final int cy;
+        public final int cz;
+        public final byte[] data;
+        public Throwable error = null;
+
+        public UpdateTask(int cx, int cy, int cz, byte[] data) {
+            this.cx = cx;
+            this.cy = cy;
+            this.cz = cz;
+            this.data = data;
+        }
     }
 }

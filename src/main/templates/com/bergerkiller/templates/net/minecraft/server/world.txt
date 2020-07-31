@@ -621,7 +621,11 @@ class WorldServer extends World {
 // Since MC 1.14
 optional class LightEngineThreaded {
 
-    private void schedule:a(int cx, int cz, java.util.function.IntSupplier ticketLevelSupplier, (Object) LightEngineThreaded.Update lightenginethreaded_update, Runnable runnable);
+    public void schedule(Runnable runnable) {
+        #require net.minecraft.server.LightEngineThreaded private final ThreadedMailbox<Runnable> mailbox:b;
+        ThreadedMailbox mailbox = instance#mailbox;
+        mailbox.a(runnable);
+    }
 
     public static LightEngineThreadedHandle forWorld((org.bukkit.World) World world) {
         return com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle.createHandle(((ChunkProviderServer) world.getChunkProvider()).getLightEngine());
