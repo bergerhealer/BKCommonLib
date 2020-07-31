@@ -41,7 +41,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private SyncChunkLoader syncChunkLoader = null;
 
     // After this number of ticks, force-load the chunk and don't wait for asynchronous loading to finish
-    private static final int SYNC_LOAD_AFTER_TICKS = 100;
+    private static final int SYNC_LOAD_AFTER_SECONDS = 120;
+    private static final int SYNC_LOAD_AFTER_TICKS = (20*SYNC_LOAD_AFTER_SECONDS);
 
     public CommonForcedChunkManager(CommonPlugin plugin) {
         this.plugin = plugin;
@@ -247,6 +248,16 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             return this.chunkFuture;
         }
 
+        public boolean forceLoadSync() {
+            if (this.isForced() && !this.chunkFuture.isDone()) {
+                Chunk chunk = this.key.getChunk();
+                this.chunkFuture.complete(chunk);
+                return true;
+            } else {
+                return false;
+            }
+        }
+
         @Override
         public void accept(Object chunk) {
             // Either -> Left
@@ -355,12 +366,13 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             this.entries.add(entry);
         }
 
-        public void load() {
-            for (Entry e : entries) {
-                if (e.isForced()) {
-                    e.getChunk();
+        public boolean loadOne() {
+            while (!entries.isEmpty()) {
+                if (entries.poll().forceLoadSync()) {
+                    return true;
                 }
             }
+            return false;
         }
     }
 
@@ -385,8 +397,12 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         @Override
         public void run() {
             currentTick++;
-            if (!tasks.isEmpty() && (currentTick-SYNC_LOAD_AFTER_TICKS) >= tasks.peek().tick) {
-                tasks.poll().load();
+
+            // Load a single chunk (that started loading 10s ago) per tick
+            // This makes sure all chunks are eventually force-loaded
+            SyncChunkLoadTask oldest;
+            while (!tasks.isEmpty() && (currentTick-SYNC_LOAD_AFTER_TICKS) >= (oldest = tasks.peek()).tick && !oldest.loadOne()) {
+                tasks.poll();
             }
         }
     }
