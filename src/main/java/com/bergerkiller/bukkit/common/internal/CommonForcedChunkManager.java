@@ -59,11 +59,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                         for (ChunkKey key : pending) {
                             Entry entry = chunks.get(key);
                             if (entry != null) {
-                                boolean forced = entry.isForced();
-                                refreshChunk(entry, forced);
-                                if (!forced) {
-                                    chunks.remove(key);
-                                }
+                                entry.sync();
                             }
                         }
                         pending.clear();
@@ -99,28 +95,24 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     protected void setForced(Entry entry, boolean forced) {
-        if (CommonUtil.isMainThread()) {
-            // Verify forced while synchronized around this.
-            // Remove the entry when indeed, the chunk is no longer forced
-            if (!forced) {
-                synchronized (this) {
-                    if (entry.isForced()) {
-                        return;
-                    }
-                    chunks.remove(entry.getKey());
-                }
+        // Verify forced while synchronized around this.
+        // Remove the entry when indeed, the chunk is no longer forced
+        if (!forced) {
+            synchronized (this) {
+                chunks.remove(entry.getKey());
             }
+        }
 
-            // Refresh
-            refreshChunk(entry, forced);
-        } else {
-            // Refresh 'forced' state later in the future
-            synchronized (pending) {
-                if (pending.isEmpty()) {
-                    pendingHandler.start();
-                }
-                pending.add(entry.getKey());
+        // Refresh
+        refreshChunk(entry, forced);
+    }
+
+    private void scheduleUpdate(Entry entry) {
+        synchronized (pending) {
+            if (pending.isEmpty()) {
+                pendingHandler.start();
             }
+            pending.add(entry.getKey());
         }
     }
 
@@ -175,40 +167,67 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
     private final class Entry implements ForcedChunkEntry, Consumer<Object> {
         private final ChunkKey key;
-        private final AtomicInteger counter;
+        private final AtomicInteger asyncCounter; // tracks state on other threads
+        private int counter; // updated on main thread only
         private CompletableFuture<Chunk> chunkFuture;
 
         public Entry(ChunkKey key) {
             this.key = key;
-            this.counter = new AtomicInteger();
+            this.asyncCounter = new AtomicInteger();
+            this.counter = 0;
             this.resetAsyncLoad();
         }
 
         public void resetAsyncLoad() {
             this.chunkFuture = new CompletableFuture<Chunk>();
         }
-        
+
         public boolean isForced() {
-            return this.counter.get() > 0;
+            return this.counter > 0;
         }
 
+        // Only called from main thread during disabling
         public void disable() {
-            if (this.counter.getAndSet(0) > 0) {
+            this.asyncCounter.set(0);
+            if (this.counter > 0) {
+                this.counter = 0;
                 setForced(this, false);
+            }
+        }
+
+        public void sync() {
+            if (this.counter <= 0) {
+                this.counter += this.asyncCounter.getAndSet(0);
+                if (this.counter > 0) {
+                    setForced(this, true);
+                }
+            } else {
+                this.counter += this.asyncCounter.getAndSet(0);
+                if (this.counter <= 0) {
+                    setForced(this, false);
+                }
             }
         }
 
         @Override
         public void add() {
-            if (this.counter.incrementAndGet() == 1) {
-                setForced(this, true);
+            int new_async = this.asyncCounter.incrementAndGet();
+            if (CommonUtil.isMainThread()) {
+                this.sync();
+            } else if (new_async == 1) {
+                // Schedule a sync very soon on the main thread
+                scheduleUpdate(this);
             }
         }
 
         @Override
         public void remove() {
-            if (this.counter.decrementAndGet() == 0) {
-                setForced(this, false);
+            int new_async = this.asyncCounter.decrementAndGet();
+            if (CommonUtil.isMainThread()) {
+                this.sync();
+            } else if (new_async == -1) {
+                // Schedule a sync very soon on the main thread
+                scheduleUpdate(this);
             }
         }
 
