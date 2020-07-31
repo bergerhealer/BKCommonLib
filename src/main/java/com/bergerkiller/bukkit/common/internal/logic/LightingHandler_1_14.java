@@ -33,8 +33,8 @@ public class LightingHandler_1_14 extends LightingHandler {
 
     public LightingHandler_1_14() throws Throwable {
         { // Update ticket intsupplier
-            final int golden_ticket = PlayerChunkMapHandle.T.getType().getDeclaredField("GOLDEN_TICKET").getInt(null);
-            this.updateTicket = () -> golden_ticket;
+            //final int golden_ticket = PlayerChunkMapHandle.T.getType().getDeclaredField("GOLDEN_TICKET").getInt(null);
+            this.updateTicket = () -> 0;
         }
 
         { // PRE_UPDATE constant to pass to schedule()
