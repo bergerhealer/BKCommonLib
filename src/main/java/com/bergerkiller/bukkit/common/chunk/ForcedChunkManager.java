@@ -22,7 +22,7 @@ public abstract class ForcedChunkManager {
      */
     public abstract ForcedChunkEntry add(World world, int chunkX, int chunkZ);
 
-    public static abstract interface ForcedChunkEntry {
+    public static interface ForcedChunkEntry {
         void add();
         void remove();
 

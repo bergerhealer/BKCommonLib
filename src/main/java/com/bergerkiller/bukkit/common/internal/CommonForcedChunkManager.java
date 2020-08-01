@@ -20,6 +20,7 @@ import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.chunk.ForcedChunkLoadTimeoutException;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
 import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -33,27 +34,24 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
  * with a reference counter.
  */
 public class CommonForcedChunkManager extends ForcedChunkManager {
-    private static final boolean USE_SYNC_LOADER = Boolean.FALSE.booleanValue();
     private final Map<ChunkKey, Entry> chunks = new HashMap<ChunkKey, Entry>();
     private final Set<ChunkKey> pending = new HashSet<ChunkKey>();
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
-    private SyncChunkLoader syncChunkLoader = null;
+    private ChunkLoadTimeoutTracker loadTimeoutTracker = null;
 
-    // After this number of ticks, force-load the chunk and don't wait for asynchronous loading to finish
-    private static final int SYNC_LOAD_AFTER_SECONDS = 120;
-    private static final int SYNC_LOAD_AFTER_TICKS = (20*SYNC_LOAD_AFTER_SECONDS);
+    // After this number of ticks, consider the loading of a chunk to have failed
+    private static final int FAIL_LOAD_AFTER_SECONDS = 300;
+    private static final int FAIL_LOAD_AFTER_TICKS = (20*FAIL_LOAD_AFTER_SECONDS);
 
     public CommonForcedChunkManager(CommonPlugin plugin) {
         this.plugin = plugin;
     }
 
     public synchronized void enable() {
-        this.syncChunkLoader = new SyncChunkLoader(this.plugin);
-        if (USE_SYNC_LOADER) {
-            this.syncChunkLoader.start(1, 1);
-        }
+        this.loadTimeoutTracker = new ChunkLoadTimeoutTracker(this.plugin);
+        this.loadTimeoutTracker.start(1, 1);
         this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
@@ -76,8 +74,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     public synchronized void disable(CommonPlugin plugin) {
-        this.syncChunkLoader.stop();
-        this.syncChunkLoader = null;
+        this.loadTimeoutTracker.stop();
+        this.loadTimeoutTracker = null;
         this.pendingHandler.stop();
         this.pendingHandler = null;
         this.pending.clear();
@@ -97,6 +95,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         return chunks.containsKey(new ChunkKey(chunk.getWorld(), chunk.getX(), chunk.getZ()));
     }
 
+    // This method is only called on the main thread!
     protected void setForced(Entry entry, boolean forced) {
         // Verify forced while synchronized around this.
         // Remove the entry when indeed, the chunk is no longer forced
@@ -106,8 +105,33 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             }
         }
 
-        // Refresh
-        refreshChunk(entry, forced);
+        ChunkKey chunk = entry.getKey();
+
+        // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
+        // This method is available on 1.13.1+
+        // The ChunkUnloadEvent is not used for this, then
+        if (WorldServerHandle.T.setForceLoadedAsync.isAvailable()) {
+            WorldServerHandle.T.setForceLoadedAsync.invoke(
+                    HandleConversion.toWorldHandle(chunk.world),
+                    Integer.valueOf(chunk.chunkX),
+                    Integer.valueOf(chunk.chunkZ),
+                    this.plugin,
+                    Boolean.valueOf(forced)
+            );
+        }
+
+        // Load/unload the chunk
+        if (forced) {
+            // Request the chunk to be loaded asynchronously
+            // The loadTimeoutTracker will error the chunk load if timed out
+            loadTimeoutTracker.add(entry);
+            entry.startLoadingAsync();
+        } else {
+            // Trigger the server to unload the chunk. It will fire a single
+            // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
+            chunk.world.unloadChunkRequest(chunk.chunkX, chunk.chunkZ);
+            entry.resetAsyncLoad();
+        }
     }
 
     private void scheduleUpdate(Entry entry) {
@@ -129,45 +153,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
         entry.add();
         return entry;
-    }
-
-    /**
-     * Main method that interfaces with Bukkit. Can only be run
-     * on the main thread.
-     * 
-     * @param entry
-     * @param forced
-     */
-    private void refreshChunk(Entry entry, boolean forced) {
-        ChunkKey chunk = entry.getKey();
-
-        // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
-        // This method is available on 1.13.1+
-        // The ChunkUnloadEvent is not used for this, then
-        if (WorldServerHandle.T.setForceLoadedAsync.isAvailable()) {
-            WorldServerHandle.T.setForceLoadedAsync.invoke(
-                    HandleConversion.toWorldHandle(chunk.world),
-                    Integer.valueOf(chunk.chunkX),
-                    Integer.valueOf(chunk.chunkZ),
-                    this.plugin,
-                    Boolean.valueOf(forced)
-            );
-        }
-
-        // Load/unload the chunk
-        if (forced) {
-            // Request the chunk to be loaded asynchronously
-            // The syncChunkLoader will sync-load the chunk after a tick delay
-            if (USE_SYNC_LOADER) {
-                syncChunkLoader.add(entry);
-            }
-            entry.startLoadingAsync();
-        } else {
-            // Trigger the server to unload the chunk. It will fire a single
-            // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
-            chunk.world.unloadChunkRequest(chunk.chunkX, chunk.chunkZ);
-            entry.resetAsyncLoad();
-        }
     }
 
     private final class Entry implements ForcedChunkEntry, Consumer<Object> {
@@ -272,13 +257,13 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             return this.chunkFuture;
         }
 
-        public boolean forceLoadSync() {
+        /**
+         * Aborts a pending chunk load with a ForcedChunkLoadTimeoutException if the chunk isn't loaded yet,
+         * but is kept force-loaded.
+         */
+        public void abortIfNotLoaded() {
             if (this.isForced() && !this.chunkFuture.isDone()) {
-                Chunk chunk = this.key.getChunk();
-                this.chunkFuture.complete(chunk);
-                return true;
-            } else {
-                return false;
+                this.chunkFuture.completeExceptionally(new ForcedChunkLoadTimeoutException(key.world, key.chunkX, key.chunkZ));
             }
         }
 
@@ -376,13 +361,12 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
     }
 
-    // Force-loads every chunk kept loading after a 30-ish tick timeout
-    // Each entry stores the chunks to load for that tick
-    private static class SyncChunkLoadTask {
+    // Tracks the ongoing load of a Chunk for a single timeout period
+    private static class PendingChunkLoadTask {
         public final int tick;
         private final LinkedList<Entry> entries = new LinkedList<Entry>();
 
-        public SyncChunkLoadTask(int ticks) {
+        public PendingChunkLoadTask(int ticks) {
             this.tick = ticks;
         }
 
@@ -390,29 +374,26 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             this.entries.add(entry);
         }
 
-        public boolean loadOne() {
+        public void abortAllIfNotLoaded() {
             while (!entries.isEmpty()) {
-                if (entries.poll().forceLoadSync()) {
-                    return true;
-                }
+                entries.poll().abortIfNotLoaded();
             }
-            return false;
         }
     }
 
-    // Main task responsible for loading chunks after a tick delay
-    private static class SyncChunkLoader extends Task {
-        private final LinkedList<SyncChunkLoadTask> tasks = new LinkedList<SyncChunkLoadTask>();
+    // Main task responsible for timing out chunk loads
+    private static class ChunkLoadTimeoutTracker extends Task {
+        private final LinkedList<PendingChunkLoadTask> tasks = new LinkedList<PendingChunkLoadTask>();
         private int currentTick = 0;
 
-        public SyncChunkLoader(JavaPlugin plugin) {
+        public ChunkLoadTimeoutTracker(JavaPlugin plugin) {
             super(plugin);
         }
 
         public void add(Entry entry) {
-            SyncChunkLoadTask task;
+            PendingChunkLoadTask task;
             if (tasks.isEmpty() || (task = tasks.peekLast()).tick != currentTick) {
-                task = new SyncChunkLoadTask(currentTick);
+                task = new PendingChunkLoadTask(currentTick);
                 tasks.addLast(task);
             }
             task.add(entry);
@@ -424,9 +405,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
             // Load a single chunk (that started loading 10s ago) per tick
             // This makes sure all chunks are eventually force-loaded
-            SyncChunkLoadTask oldest;
-            while (!tasks.isEmpty() && (currentTick-SYNC_LOAD_AFTER_TICKS) >= (oldest = tasks.peek()).tick && !oldest.loadOne()) {
-                tasks.poll();
+            while (!tasks.isEmpty() && (currentTick-FAIL_LOAD_AFTER_TICKS) >= tasks.peek().tick) {
+                tasks.poll().abortAllIfNotLoaded();
             }
         }
     }
