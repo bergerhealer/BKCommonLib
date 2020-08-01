@@ -33,6 +33,7 @@ import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
  * with a reference counter.
  */
 public class CommonForcedChunkManager extends ForcedChunkManager {
+    private static final boolean USE_SYNC_LOADER = Boolean.FALSE.booleanValue();
     private final Map<ChunkKey, Entry> chunks = new HashMap<ChunkKey, Entry>();
     private final Set<ChunkKey> pending = new HashSet<ChunkKey>();
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
@@ -50,7 +51,9 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
     public synchronized void enable() {
         this.syncChunkLoader = new SyncChunkLoader(this.plugin);
-        this.syncChunkLoader.start(1, 1);
+        if (USE_SYNC_LOADER) {
+            this.syncChunkLoader.start(1, 1);
+        }
         this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
@@ -155,7 +158,9 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         if (forced) {
             // Request the chunk to be loaded asynchronously
             // The syncChunkLoader will sync-load the chunk after a tick delay
-            syncChunkLoader.add(entry);
+            if (USE_SYNC_LOADER) {
+                syncChunkLoader.add(entry);
+            }
             entry.startLoadingAsync();
         } else {
             // Trigger the server to unload the chunk. It will fire a single
