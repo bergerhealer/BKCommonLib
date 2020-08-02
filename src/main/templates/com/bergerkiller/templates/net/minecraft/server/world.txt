@@ -622,9 +622,11 @@ class WorldServer extends World {
 optional class LightEngineThreaded {
 
     public void schedule(Runnable runnable) {
+#if exists net.minecraft.server.LightEngineThreaded
         #require net.minecraft.server.LightEngineThreaded private final ThreadedMailbox<Runnable> mailbox:b;
         ThreadedMailbox mailbox = instance#mailbox;
         mailbox.a(runnable);
+#endif
     }
 
     public static LightEngineThreadedHandle forWorld((org.bukkit.World) World world) {
