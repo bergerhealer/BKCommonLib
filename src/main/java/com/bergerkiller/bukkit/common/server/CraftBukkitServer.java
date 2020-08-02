@@ -3,13 +3,15 @@ package com.bergerkiller.bukkit.common.server;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeMethod;
+import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
+
+import java.util.Collections;
+import java.util.Map;
 
 import org.bukkit.Bukkit;
 
-public class CraftBukkitServer extends CommonServerBase {
+public class CraftBukkitServer extends CommonServerBase implements ClassPathResolver {
     private static final String CB_ROOT = "org.bukkit.craftbukkit";
     private static final String NMS_ROOT = "net.minecraft.server";
 
@@ -33,6 +35,10 @@ public class CraftBukkitServer extends CommonServerBase {
      * Defines the org.bukkit.craftbukkit.libs root path
      */
     public String CB_ROOT_LIBS;
+    /**
+     * Defines class name remappings to perform right after the version info is included in the class path
+     */
+    private Map<String, String> remappings = Collections.emptyMap();
 
     @Override
     public boolean init() {
@@ -74,12 +80,17 @@ public class CraftBukkitServer extends CommonServerBase {
             if (Bukkit.getServer() != null) {
                 // Obtain MinecraftServer instance from server
                 Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
-                MethodAccessor<Object> getServer = new SafeMethod<Object>(server, "getServer");
-                Object minecraftServerInstance = getServer.invoke(Bukkit.getServer());
 
-                // Use getVersion() on this instance
-                MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
-                return;
+                // Standard CraftServer::getServer()
+                Object minecraftServerInstance;
+                try {
+                    java.lang.reflect.Method getServerMethod = server.getDeclaredMethod("getServer");
+                    minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
+                    MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
+                    return;
+                } catch (NoSuchMethodException ex) {}
+
+                throw new RuntimeException("Server version could not be identified");
             }
 
             // If MinecraftVersion class exists, we can use the static a() method to retrieve it
@@ -117,24 +128,19 @@ public class CraftBukkitServer extends CommonServerBase {
     }
 
     @Override
-    public String getClassName(String path) {
+    public String resolveClassPath(String path) {
         if (path.startsWith(NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
-            return NMS_ROOT_VERSIONED + path.substring(NMS_ROOT.length());
+            path = NMS_ROOT_VERSIONED + path.substring(NMS_ROOT.length());
+        } else if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
+            path = CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
         }
-        if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
-            return CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
+
+        String remapped = this.remappings.get(path);
+        if (remapped != null) {
+            path = remapped;
         }
+
         return path;
-    }
-
-    @Override
-    public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
-        return methodName;
-    }
-
-    @Override
-    public String getFieldName(Class<?> type, String fieldName) {
-        return fieldName;
     }
 
     @Override
@@ -159,4 +165,22 @@ public class CraftBukkitServer extends CommonServerBase {
         return "CraftBukkit";
     }
 
+    @Override
+    public String getNMSRoot() {
+        return NMS_ROOT_VERSIONED;
+    }
+
+    @Override
+    public String getCBRoot() {
+        return CB_ROOT_VERSIONED;
+    }
+
+    /**
+     * Sets the remappings to perform right after the version info is included in the Class name package path.
+     * 
+     * @param remappings
+     */
+    public void setEarlyRemappings(Map<String, String> remappings) {
+        this.remappings = remappings;
+    }
 }

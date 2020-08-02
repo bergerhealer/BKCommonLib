@@ -66,36 +66,6 @@ public interface CommonServer {
     public String getServerDescription();
 
     /**
-     * Gets the real Class name for the given Path, allowing Class path
-     * translations to occur
-     *
-     * @param path to the Class to fix
-     * @return the real Class path
-     */
-    public String getClassName(String path);
-
-    /**
-     * Obtains the real method name for a given method, allowing name
-     * translations to occur
-     *
-     * @param type of Class the method is in
-     * @param methodName of the method to fix
-     * @param params of the method
-     * @return the (translated) method name
-     */
-    public String getMethodName(Class<?> type, String methodName, Class<?>... params);
-
-    /**
-     * Obtains the real field name for a given field, allowing name translations
-     * to occur
-     *
-     * @param type of Class the field is in
-     * @param fieldName of the field to fix
-     * @return the (translated) field name
-     */
-    public String getFieldName(Class<?> type, String fieldName);
-
-    /**
      * Checks whether BKCommonLib is compatible with this server
      *
      * @return True if compatible, False if not
@@ -163,4 +133,18 @@ public interface CommonServer {
      * @return True if the world can be loaded, False if not
      */
     public boolean isLoadableWorld(String worldName);
+
+    /**
+     * Gets the root package path for net.minecraft.server
+     * 
+     * @return minecraft server root
+     */
+    public String getNMSRoot();
+
+    /**
+     * Gets the root package path for org.bukkit.craftbukkit
+     * 
+     * @return craftbukkit root
+     */
+    public String getCBRoot();
 }

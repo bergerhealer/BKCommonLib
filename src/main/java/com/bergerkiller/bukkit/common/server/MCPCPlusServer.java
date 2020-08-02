@@ -1,10 +1,11 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 
 import org.bukkit.Bukkit;
 
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
-public class MCPCPlusServer extends SpigotServer {
+public class MCPCPlusServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
 
     private Object classRemapper;
     private MethodAccessor<String> mapType;
@@ -55,11 +56,11 @@ public class MCPCPlusServer extends SpigotServer {
     }
 
     @Override
-    public String getClassName(String path) {
+    public String resolveClassPath(String path) {
         if (!isRelocatedSpigotUtils && path.equals("org.spigotmc.FlatMap")) {
             return CB_ROOT_VERSIONED + ".util.FlatMap";
         }
-        return mapType.invoke(classRemapper, super.getClassName(path).replace('.', '/')).replace('/', '.');
+        return mapType.invoke(classRemapper, super.resolveClassPath(path).replace('.', '/')).replace('/', '.');
     }
 
     private String getOriginalOwner(Class<?> type) {
@@ -80,12 +81,12 @@ public class MCPCPlusServer extends SpigotServer {
     }
 
     @Override
-    public String getFieldName(Class<?> type, String fieldName) {
+    public String resolveFieldName(Class<?> type, String fieldName) {
         return mapField.invoke(classRemapper, getOriginalOwner(type), fieldName, "");
     }
 
     @Override
-    public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
+    public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
         final String methodPath = getOriginalOwner(type) + "/" + methodName + " ";
         for (Map.Entry<String, String> entry : methodsMap.entrySet()) {
             // Try to find the (obfuscated) method, if it exists with the parameters, we found our method
@@ -104,7 +105,7 @@ public class MCPCPlusServer extends SpigotServer {
         Class<?> superClass = type.getSuperclass();
         // Try to find the method in the super class
         if (superClass != null) {
-            return getMethodName(superClass, methodName, params);
+            return resolveMethodName(superClass, methodName, params);
         }
         // Failure to replace anything, perhaps it is correct?
         return methodName;

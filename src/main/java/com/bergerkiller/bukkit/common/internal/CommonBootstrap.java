@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
+import com.bergerkiller.bukkit.common.server.MohistServer;
 import com.bergerkiller.bukkit.common.server.PaperSpigotServer;
 import com.bergerkiller.bukkit.common.server.PurpurServer;
 import com.bergerkiller.bukkit.common.server.SpigotServer;
@@ -32,6 +33,10 @@ import com.bergerkiller.bukkit.common.server.UnknownServer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
+import com.bergerkiller.mountiplex.reflection.resolver.ClassNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.templates.TemplateResolver;
 
@@ -92,6 +97,7 @@ public class CommonBootstrap {
                 // Autodetect most likely server type
                 List<CommonServer> servers = new ArrayList<>();
                 servers.add(new MCPCPlusServer());
+                servers.add(new MohistServer());
                 servers.add(new PurpurServer());
                 servers.add(new PaperSpigotServer());
                 servers.add(new SpigotServer());
@@ -219,10 +225,18 @@ public class CommonBootstrap {
      */
     private static void initResolvers(CommonServer server) {
         // Register server to handle field, method and class resolving
-        //TODO! Implement these functions in SERVER directly
-        Resolver.registerClassResolver(server::getClassName);
-        Resolver.registerFieldResolver(server::getFieldName);
-        Resolver.registerMethodResolver(server::getMethodName);
+        if (server instanceof ClassPathResolver) {
+            Resolver.registerClassResolver((ClassPathResolver) server);
+        }
+        if (server instanceof ClassNameResolver) {
+            Resolver.registerClassNameResolver((ClassNameResolver) server);
+        }
+        if (server instanceof FieldNameResolver) {
+            Resolver.registerFieldResolver((FieldNameResolver) server);
+        }
+        if (server instanceof MethodNameResolver) {
+            Resolver.registerMethodResolver((MethodNameResolver) server);
+        }
 
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
         if (Resolver.loadClass("net.minecraft.server.EnumGamemode", false) == null) {
@@ -236,8 +250,8 @@ public class CommonBootstrap {
             });
         }
 
-        final String nms_root = server.getClassName("net.minecraft.server.Entity").replace(".Entity", "");
-        final String cb_root = server.getClassName("org.bukkit.craftbukkit.CraftServer").replaceAll(".CraftServer", "");
+        final String nms_root = server.getNMSRoot();
+        final String cb_root = server.getCBRoot();
         final Map<String, String> remappings = new HashMap<String, String>();
 
         // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
@@ -384,10 +398,16 @@ public class CommonBootstrap {
 
         // If remappings exist, add a resolver for them
         if (!remappings.isEmpty()) {
-            Resolver.registerClassResolver(classPath -> {
-                String remapped = remappings.get(classPath);
-                return (remapped != null) ? remapped : classPath;
-            });
+            if (server instanceof CraftBukkitServer) {
+                // Perform early remappings so that servers such as Mohist don't get super confused
+                ((CraftBukkitServer) server).setEarlyRemappings(remappings);
+            } else {
+                // Add an extra class resolver to do it in
+                Resolver.registerClassResolver(classPath -> {
+                    String remapped = remappings.get(classPath);
+                    return (remapped != null) ? remapped : classPath;
+                });
+            }
         }
 
         // Register converters

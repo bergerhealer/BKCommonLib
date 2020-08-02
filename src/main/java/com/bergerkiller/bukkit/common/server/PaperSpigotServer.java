@@ -15,9 +15,16 @@ public class PaperSpigotServer extends SpigotServer {
         // Attempt to load the Paperspigot's 'PaperConfig' class, which only exists on paperspigot servers
         try {
             Class.forName("com.destroystokyo.paper.PaperConfig");
-            return true;
-        } catch (Throwable t) {}
-        return false;
+        } catch (Throwable t1) {
+            // On Mohist it's called "PaperMCConfig" for some reason
+            try {
+                Class.forName("com.destroystokyo.paper.PaperMCConfig");
+            } catch (Throwable t2) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     @Override

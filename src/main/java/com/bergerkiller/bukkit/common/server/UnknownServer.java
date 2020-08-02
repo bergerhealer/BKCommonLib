@@ -54,27 +54,6 @@ public class UnknownServer extends CommonServerBase {
     }
 
     @Override
-    public String getClassName(String path) {
-        if (path.startsWith(Common.NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
-            return NMS_ROOT_VERSIONED + path.substring(Common.NMS_ROOT.length());
-        }
-        if (path.startsWith(Common.CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED)) {
-            return CB_ROOT_VERSIONED + path.substring(Common.CB_ROOT.length());
-        }
-        return path;
-    }
-
-    @Override
-    public String getMethodName(Class<?> type, String methodName, Class<?>... params) {
-        return methodName;
-    }
-
-    @Override
-    public String getFieldName(Class<?> type, String fieldName) {
-        return fieldName;
-    }
-
-    @Override
     public boolean init() {
         return true;
     }
@@ -98,6 +77,18 @@ public class UnknownServer extends CommonServerBase {
             CB_ROOT_VERSIONED = Common.CB_ROOT;
             NMS_ROOT_VERSIONED = Common.NMS_ROOT;
         }
+    }
+
+    @Override
+    public String getNMSRoot() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getCBRoot() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }
