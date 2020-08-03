@@ -14,6 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
+import java.util.Map;
 
 public abstract class CommonServerBase implements CommonServer {
     public static final Class<?> SERVER_CLASS = findServerClass();
@@ -129,6 +130,10 @@ public abstract class CommonServerBase implements CommonServer {
     @Override
     public boolean evaluateMCVersion(String operand, String version) {
         return MountiplexUtil.evaluateText(this.getMinecraftVersion(), operand, version);
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
     }
 
     @Override

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Map;
+
 /**
  * Created by Develop on 27-2-2016.
  */
@@ -30,5 +32,11 @@ public class PaperSpigotServer extends SpigotServer {
     @Override
     public String getServerName() {
         return "Paper(Spigot)";
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
+        super.addVariables(variables);
+        variables.put("paperspigot", "true");
     }
 }

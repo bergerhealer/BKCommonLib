@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Map;
+
 public class PurpurServer extends PaperSpigotServer {
 
     @Override
@@ -20,5 +22,11 @@ public class PurpurServer extends PaperSpigotServer {
     @Override
     public String getServerName() {
         return "Purpur (Paper) (Spigot)";
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
+        super.addVariables(variables);
+        variables.put("purpur", "true");
     }
 }

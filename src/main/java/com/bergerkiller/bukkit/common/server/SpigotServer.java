@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Map;
+
 public class SpigotServer extends CraftBukkitServer {
 
     @Override
@@ -26,5 +28,11 @@ public class SpigotServer extends CraftBukkitServer {
     @Override
     public String getServerName() {
         return "Spigot";
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
+        super.addVariables(variables);
+        variables.put("spigot", "true");
     }
 }

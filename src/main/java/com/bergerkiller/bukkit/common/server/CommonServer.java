@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.Map;
 
 public interface CommonServer {
 
@@ -147,4 +148,11 @@ public interface CommonServer {
      * @return craftbukkit root
      */
     public String getCBRoot();
+
+    /**
+     * Adds the environment variables relevant for this server type
+     * 
+     * @param variables Map of variables to fill
+     */
+    public void addVariables(Map<String, String> variables);
 }

@@ -86,19 +86,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
 
             String templatePath = "com/bergerkiller/templates/init.txt";
             Map<String, String> variables = new HashMap<String, String>();
+
+            //TODO: Should we move these to the SERVER addVariables too?
             variables.put("version", this.version);
             if (this.pre_version != null) {
                 variables.put("pre", this.pre_version);
             }
-            if (Common.IS_SPIGOT_SERVER) {
-                variables.put("spigot", "true");
-            }
-            if (Common.IS_PAPERSPIGOT_SERVER) {
-                variables.put("paperspigot", "true");
-            }
-            if (Common.IS_PURPUR_SERVER) {
-                variables.put("purpur", "true");
-            }
+
+            Common.SERVER.addVariables(variables);
 
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
             SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);

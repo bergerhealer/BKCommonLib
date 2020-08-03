@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.util.Map;
+
 import com.bergerkiller.generated.red.mohist.bukkit.nms.utils.RemapUtilsHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -80,6 +82,12 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
     @Override
     public String resolveClassName(Class<?> clazz) {
         return RemapUtilsHandle.inverseMapClassName(clazz);
+    }
+
+    @Override
+    public void addVariables(Map<String, String> variables) {
+        super.addVariables(variables);
+        variables.put("forge", "mohist");
     }
 
     // Used by the RemapUtilsHandle because it is used before the actual template engine is initialized
