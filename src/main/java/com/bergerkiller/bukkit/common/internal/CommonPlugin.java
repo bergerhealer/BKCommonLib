@@ -543,7 +543,9 @@ public class CommonPlugin extends PluginBase {
                 "Soon generating lambda expressions from thin air!",
                 "We have a Discord!",
                 "Years of Minecraft history carefully catalogued",
-                "50% generated, 50% crafted by an artificial intelligence");
+                "50% generated, 50% crafted by an artificial intelligence",
+                "Supplier supplying suppliers for your lazy needs!",
+                "Please wait while we get our code ready...");
 
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
