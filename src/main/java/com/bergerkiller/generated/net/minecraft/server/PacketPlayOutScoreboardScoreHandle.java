@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutScoreboardScore")
 public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardScoreClass} */
-    public static final PacketPlayOutScoreboardScoreClass T = new PacketPlayOutScoreboardScoreClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardScoreHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutScoreboardScoreClass T = Template.Class.create(PacketPlayOutScoreboardScoreClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutScoreboardScoreHandle createHandle(Object handleInstance) {
@@ -34,11 +32,10 @@ public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction")
     public abstract static class EnumScoreboardActionHandle extends Template.Handle {
         /** @See {@link EnumScoreboardActionClass} */
-        public static final EnumScoreboardActionClass T = new EnumScoreboardActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumScoreboardActionHandle.class, "net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumScoreboardActionClass T = Template.Class.create(EnumScoreboardActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumScoreboardActionHandle CHANGE = T.CHANGE.getSafe();
         public static final EnumScoreboardActionHandle REMOVE = T.REMOVE.getSafe();
         /* ============================================================================== */

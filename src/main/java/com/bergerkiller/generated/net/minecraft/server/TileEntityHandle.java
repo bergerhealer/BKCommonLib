@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -14,11 +13,10 @@ import org.bukkit.World;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.TileEntity")
 public abstract class TileEntityHandle extends Template.Handle {
     /** @See {@link TileEntityClass} */
-    public static final TileEntityClass T = new TileEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(TileEntityHandle.class, "net.minecraft.server.TileEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final TileEntityClass T = Template.Class.create(TileEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static TileEntityHandle createHandle(Object handleInstance) {

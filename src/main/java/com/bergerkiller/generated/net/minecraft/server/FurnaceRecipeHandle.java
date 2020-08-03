@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.FurnaceRecipe")
 public abstract class FurnaceRecipeHandle extends IRecipeHandle {
     /** @See {@link FurnaceRecipeClass} */
-    public static final FurnaceRecipeClass T = new FurnaceRecipeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(FurnaceRecipeHandle.class, "net.minecraft.server.FurnaceRecipe", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final FurnaceRecipeClass T = Template.Class.create(FurnaceRecipeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static FurnaceRecipeHandle createHandle(Object handleInstance) {

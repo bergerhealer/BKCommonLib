@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.FoodMetaData")
 public abstract class FoodMetaDataHandle extends Template.Handle {
     /** @See {@link FoodMetaDataClass} */
-    public static final FoodMetaDataClass T = new FoodMetaDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(FoodMetaDataHandle.class, "net.minecraft.server.FoodMetaData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final FoodMetaDataClass T = Template.Class.create(FoodMetaDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static FoodMetaDataHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.SoundCategory")
 public abstract class SoundCategoryHandle extends Template.Handle {
     /** @See {@link SoundCategoryClass} */
-    public static final SoundCategoryClass T = new SoundCategoryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundCategoryHandle.class, "net.minecraft.server.SoundCategory", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final SoundCategoryClass T = Template.Class.create(SoundCategoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static SoundCategoryHandle createHandle(Object handleInstance) {

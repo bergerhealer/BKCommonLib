@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayOutMount")
 public abstract class PacketPlayOutMountHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMountClass} */
-    public static final PacketPlayOutMountClass T = new PacketPlayOutMountClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMountHandle.class, "net.minecraft.server.PacketPlayOutMount", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutMountClass T = Template.Class.create(PacketPlayOutMountClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutMountHandle createHandle(Object handleInstance) {

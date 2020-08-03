@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.block;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -10,11 +9,10 @@ import org.bukkit.block.BlockState;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.block.CraftBlockState")
 public abstract class CraftBlockStateHandle extends Template.Handle {
     /** @See {@link CraftBlockStateClass} */
-    public static final CraftBlockStateClass T = new CraftBlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockStateHandle.class, "org.bukkit.craftbukkit.block.CraftBlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftBlockStateClass T = Template.Class.create(CraftBlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftBlockStateHandle createHandle(Object handleInstance) {

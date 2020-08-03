@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumDifficulty")
 public abstract class EnumDifficultyHandle extends Template.Handle {
     /** @See {@link EnumDifficultyClass} */
-    public static final EnumDifficultyClass T = new EnumDifficultyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDifficultyHandle.class, "net.minecraft.server.EnumDifficulty", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumDifficultyClass T = Template.Class.create(EnumDifficultyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EnumDifficultyHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.World;
@@ -13,11 +12,10 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.Block")
 public abstract class BlockHandle extends Template.Handle {
     /** @See {@link BlockClass} */
-    public static final BlockClass T = new BlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockHandle.class, "net.minecraft.server.Block", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BlockClass T = Template.Class.create(BlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();
     /* ============================================================================== */

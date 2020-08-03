@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -13,11 +12,10 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityPlayer")
 public abstract class EntityPlayerHandle extends EntityHumanHandle {
     /** @See {@link EntityPlayerClass} */
-    public static final EntityPlayerClass T = new EntityPlayerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityPlayerHandle.class, "net.minecraft.server.EntityPlayer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityPlayerClass T = Template.Class.create(EntityPlayerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityPlayerHandle createHandle(Object handleInstance) {

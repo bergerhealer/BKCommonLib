@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.entity;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.entity.HumanEntity")
 public abstract class HumanEntityHandle extends EntityHandle {
     /** @See {@link HumanEntityClass} */
-    public static final HumanEntityClass T = new HumanEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(HumanEntityHandle.class, "org.bukkit.entity.HumanEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final HumanEntityClass T = Template.Class.create(HumanEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static HumanEntityHandle createHandle(Object handleInstance) {

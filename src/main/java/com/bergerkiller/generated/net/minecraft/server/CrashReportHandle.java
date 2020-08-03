@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.CrashReport")
 public abstract class CrashReportHandle extends Template.Handle {
     /** @See {@link CrashReportClass} */
-    public static final CrashReportClass T = new CrashReportClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CrashReportHandle.class, "net.minecraft.server.CrashReport", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CrashReportClass T = Template.Class.create(CrashReportClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CrashReportHandle createHandle(Object handleInstance) {

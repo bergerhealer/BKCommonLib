@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutWorldParticles")
 public abstract class PacketPlayOutWorldParticlesHandle extends Template.Handle {
     /** @See {@link PacketPlayOutWorldParticlesClass} */
-    public static final PacketPlayOutWorldParticlesClass T = new PacketPlayOutWorldParticlesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutWorldParticlesHandle.class, "net.minecraft.server.PacketPlayOutWorldParticles", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutWorldParticlesClass T = Template.Class.create(PacketPlayOutWorldParticlesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutWorldParticlesHandle createHandle(Object handleInstance) {

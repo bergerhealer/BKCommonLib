@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.List;
 import java.util.Map;
@@ -10,11 +9,10 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityTypes")
 public abstract class EntityTypesHandle extends Template.Handle {
     /** @See {@link EntityTypesClass} */
-    public static final EntityTypesClass T = new EntityTypesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTypesHandle.class, "net.minecraft.server.EntityTypes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityTypesClass T = Template.Class.create(EntityTypesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityTypesHandle createHandle(Object handleInstance) {

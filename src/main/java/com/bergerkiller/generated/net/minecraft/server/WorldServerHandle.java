@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -16,11 +15,10 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.WorldServer")
 public abstract class WorldServerHandle extends WorldHandle {
     /** @See {@link WorldServerClass} */
-    public static final WorldServerClass T = new WorldServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldServerHandle.class, "net.minecraft.server.WorldServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final WorldServerClass T = Template.Class.create(WorldServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static WorldServerHandle createHandle(Object handleInstance) {

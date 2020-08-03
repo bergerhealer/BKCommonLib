@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumItemSlot")
 public abstract class EnumItemSlotHandle extends Template.Handle {
     /** @See {@link EnumItemSlotClass} */
-    public static final EnumItemSlotClass T = new EnumItemSlotClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumItemSlotHandle.class, "net.minecraft.server.EnumItemSlot", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumItemSlotClass T = Template.Class.create(EnumItemSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EnumItemSlotHandle createHandle(Object handleInstance) {

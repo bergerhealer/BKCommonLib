@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.GenericAttributes")
 public abstract class GenericAttributesHandle extends Template.Handle {
     /** @See {@link GenericAttributesClass} */
-    public static final GenericAttributesClass T = new GenericAttributesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(GenericAttributesHandle.class, "net.minecraft.server.GenericAttributes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final GenericAttributesClass T = Template.Class.create(GenericAttributesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final Object FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
     public static final Object MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();
     /* ============================================================================== */

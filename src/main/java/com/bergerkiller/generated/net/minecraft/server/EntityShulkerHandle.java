@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
@@ -12,11 +11,10 @@ import org.bukkit.block.BlockFace;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.EntityShulker")
 public abstract class EntityShulkerHandle extends EntityInsentientHandle {
     /** @See {@link EntityShulkerClass} */
-    public static final EntityShulkerClass T = new EntityShulkerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityShulkerHandle.class, "net.minecraft.server.EntityShulker", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityShulkerClass T = Template.Class.create(EntityShulkerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityShulkerHandle createHandle(Object handleInstance) {

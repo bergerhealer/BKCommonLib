@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.World;
 
@@ -10,11 +9,10 @@ import org.bukkit.World;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.LightEngineThreaded")
 public abstract class LightEngineThreadedHandle extends Template.Handle {
     /** @See {@link LightEngineThreadedClass} */
-    public static final LightEngineThreadedClass T = new LightEngineThreadedClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LightEngineThreadedHandle.class, "net.minecraft.server.LightEngineThreaded", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final LightEngineThreadedClass T = Template.Class.create(LightEngineThreadedClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static LightEngineThreadedHandle createHandle(Object handleInstance) {

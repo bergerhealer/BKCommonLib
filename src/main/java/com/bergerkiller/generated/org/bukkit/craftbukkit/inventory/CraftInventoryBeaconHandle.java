@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.BeaconInventory;
 
@@ -9,11 +8,10 @@ import org.bukkit.inventory.BeaconInventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryBeacon")
 public abstract class CraftInventoryBeaconHandle extends Template.Handle {
     /** @See {@link CraftInventoryBeaconClass} */
-    public static final CraftInventoryBeaconClass T = new CraftInventoryBeaconClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryBeaconHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryBeacon", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftInventoryBeaconClass T = Template.Class.create(CraftInventoryBeaconClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftInventoryBeaconHandle createHandle(Object handleInstance) {

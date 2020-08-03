@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.block;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.block.BlockState")
 public abstract class BlockStateHandle extends Template.Handle {
     /** @See {@link BlockStateClass} */
-    public static final BlockStateClass T = new BlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockStateHandle.class, "org.bukkit.block.BlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BlockStateClass T = Template.Class.create(BlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static BlockStateHandle createHandle(Object handleInstance) {

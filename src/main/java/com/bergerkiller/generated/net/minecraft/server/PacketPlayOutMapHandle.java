@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.map.MapCursor;
 
@@ -9,11 +8,10 @@ import org.bukkit.map.MapCursor;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutMap")
 public abstract class PacketPlayOutMapHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapClass} */
-    public static final PacketPlayOutMapClass T = new PacketPlayOutMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapHandle.class, "net.minecraft.server.PacketPlayOutMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutMapClass T = Template.Class.create(PacketPlayOutMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutMapHandle createHandle(Object handleInstance) {

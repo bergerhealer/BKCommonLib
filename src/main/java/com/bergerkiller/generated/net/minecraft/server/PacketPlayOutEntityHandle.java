@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutEntity")
 public abstract class PacketPlayOutEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityClass} */
-    public static final PacketPlayOutEntityClass T = new PacketPlayOutEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityHandle.class, "net.minecraft.server.PacketPlayOutEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutEntityClass T = Template.Class.create(PacketPlayOutEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutEntityHandle createHandle(Object handleInstance) {
@@ -86,11 +84,10 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutEntity.PacketPlayOutEntityLook")
     public abstract static class PacketPlayOutEntityLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutEntityLookClass} */
-        public static final PacketPlayOutEntityLookClass T = new PacketPlayOutEntityLookClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutEntityLook", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final PacketPlayOutEntityLookClass T = Template.Class.create(PacketPlayOutEntityLookClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static PacketPlayOutEntityLookHandle createHandle(Object handleInstance) {
@@ -134,11 +131,10 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMove")
     public abstract static class PacketPlayOutRelEntityMoveHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveClass} */
-        public static final PacketPlayOutRelEntityMoveClass T = new PacketPlayOutRelEntityMoveClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMove", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final PacketPlayOutRelEntityMoveClass T = Template.Class.create(PacketPlayOutRelEntityMoveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static PacketPlayOutRelEntityMoveHandle createHandle(Object handleInstance) {
@@ -183,11 +179,10 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook")
     public abstract static class PacketPlayOutRelEntityMoveLookHandle extends PacketPlayOutEntityHandle {
         /** @See {@link PacketPlayOutRelEntityMoveLookClass} */
-        public static final PacketPlayOutRelEntityMoveLookClass T = new PacketPlayOutRelEntityMoveLookClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRelEntityMoveLookHandle.class, "net.minecraft.server.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final PacketPlayOutRelEntityMoveLookClass T = Template.Class.create(PacketPlayOutRelEntityMoveLookClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static PacketPlayOutRelEntityMoveLookHandle createHandle(Object handleInstance) {

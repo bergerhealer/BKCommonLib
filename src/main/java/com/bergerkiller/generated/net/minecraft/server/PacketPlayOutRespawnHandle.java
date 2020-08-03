@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -13,11 +12,10 @@ import org.bukkit.World;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutRespawn")
 public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
     /** @See {@link PacketPlayOutRespawnClass} */
-    public static final PacketPlayOutRespawnClass T = new PacketPlayOutRespawnClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutRespawnHandle.class, "net.minecraft.server.PacketPlayOutRespawn", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutRespawnClass T = Template.Class.create(PacketPlayOutRespawnClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutRespawnHandle createHandle(Object handleInstance) {

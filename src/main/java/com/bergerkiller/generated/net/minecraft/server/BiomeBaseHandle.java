@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.Weig
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.BiomeBase")
 public abstract class BiomeBaseHandle extends Template.Handle {
     /** @See {@link BiomeBaseClass} */
-    public static final BiomeBaseClass T = new BiomeBaseClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeBaseHandle.class, "net.minecraft.server.BiomeBase", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BiomeBaseClass T = Template.Class.create(BiomeBaseClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static BiomeBaseHandle createHandle(Object handleInstance) {
@@ -35,11 +33,10 @@ public abstract class BiomeBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.BiomeBase.BiomeMeta")
     public abstract static class BiomeMetaHandle extends WeightedRandomChoiceHandle {
         /** @See {@link BiomeMetaClass} */
-        public static final BiomeMetaClass T = new BiomeMetaClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(BiomeMetaHandle.class, "net.minecraft.server.BiomeBase.BiomeMeta", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final BiomeMetaClass T = Template.Class.create(BiomeMetaClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static BiomeMetaHandle createHandle(Object handleInstance) {

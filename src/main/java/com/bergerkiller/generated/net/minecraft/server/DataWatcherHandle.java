@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
@@ -11,11 +10,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.DataWatcher")
 public abstract class DataWatcherHandle extends Template.Handle {
     /** @See {@link DataWatcherClass} */
-    public static final DataWatcherClass T = new DataWatcherClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DataWatcherHandle.class, "net.minecraft.server.DataWatcher", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final DataWatcherClass T = Template.Class.create(DataWatcherClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static DataWatcherHandle createHandle(Object handleInstance) {
@@ -96,11 +94,10 @@ public abstract class DataWatcherHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.DataWatcher.Item")
     public abstract static class ItemHandle extends Template.Handle {
         /** @See {@link ItemClass} */
-        public static final ItemClass T = new ItemClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.DataWatcher.Item", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static ItemHandle createHandle(Object handleInstance) {

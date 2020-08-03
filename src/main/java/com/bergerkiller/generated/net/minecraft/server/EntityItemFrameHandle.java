@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
@@ -13,11 +12,10 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityItemFrame")
 public abstract class EntityItemFrameHandle extends EntityHandle {
     /** @See {@link EntityItemFrameClass} */
-    public static final EntityItemFrameClass T = new EntityItemFrameClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityItemFrameHandle.class, "net.minecraft.server.EntityItemFrame", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityItemFrameClass T = Template.Class.create(EntityItemFrameClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityItemFrameHandle createHandle(Object handleInstance) {

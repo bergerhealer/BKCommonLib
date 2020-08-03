@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayOutSpawnEntityWeather")
 public abstract class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityWeatherClass} */
-    public static final PacketPlayOutSpawnEntityWeatherClass T = new PacketPlayOutSpawnEntityWeatherClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityWeatherHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityWeather", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutSpawnEntityWeatherClass T = Template.Class.create(PacketPlayOutSpawnEntityWeatherClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityWeatherHandle createHandle(Object handleInstance) {

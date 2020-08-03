@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.EnumHand")
 public abstract class EnumHandHandle extends Template.Handle {
     /** @See {@link EnumHandClass} */
-    public static final EnumHandClass T = new EnumHandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumHandHandle.class, "net.minecraft.server.EnumHand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumHandClass T = Template.Class.create(EnumHandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumHandHandle MAIN_HAND = T.MAIN_HAND.getSafe();
     public static final EnumHandHandle OFF_HAND = T.OFF_HAND.getSafe();
     /* ============================================================================== */

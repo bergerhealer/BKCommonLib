@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Entity;
 
@@ -9,11 +8,10 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutEntityTeleport")
 public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityTeleportClass} */
-    public static final PacketPlayOutEntityTeleportClass T = new PacketPlayOutEntityTeleportClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityTeleportHandle.class, "net.minecraft.server.PacketPlayOutEntityTeleport", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutEntityTeleportClass T = Template.Class.create(PacketPlayOutEntityTeleportClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutEntityTeleportHandle createHandle(Object handleInstance) {

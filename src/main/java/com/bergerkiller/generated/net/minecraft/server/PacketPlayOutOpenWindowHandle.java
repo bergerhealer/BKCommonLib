@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.wrappers.WindowType;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutOpenWindow")
 public abstract class PacketPlayOutOpenWindowHandle extends PacketHandle {
     /** @See {@link PacketPlayOutOpenWindowClass} */
-    public static final PacketPlayOutOpenWindowClass T = new PacketPlayOutOpenWindowClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutOpenWindowHandle.class, "net.minecraft.server.PacketPlayOutOpenWindow", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutOpenWindowClass T = Template.Class.create(PacketPlayOutOpenWindowClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutOpenWindowHandle createHandle(Object handleInstance) {

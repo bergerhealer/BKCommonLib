@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.ForcedChunk")
 public abstract class ForcedChunkHandle extends Template.Handle {
     /** @See {@link ForcedChunkClass} */
-    public static final ForcedChunkClass T = new ForcedChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ForcedChunkHandle.class, "net.minecraft.server.ForcedChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ForcedChunkClass T = Template.Class.create(ForcedChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ForcedChunkHandle createHandle(Object handleInstance) {

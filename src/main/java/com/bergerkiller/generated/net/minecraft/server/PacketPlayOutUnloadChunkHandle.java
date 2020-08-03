@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayOutUnloadChunk")
 public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutUnloadChunkClass} */
-    public static final PacketPlayOutUnloadChunkClass T = new PacketPlayOutUnloadChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUnloadChunkHandle.class, "net.minecraft.server.PacketPlayOutUnloadChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutUnloadChunkClass T = Template.Class.create(PacketPlayOutUnloadChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutUnloadChunkHandle createHandle(Object handleInstance) {

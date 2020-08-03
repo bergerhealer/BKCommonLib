@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.plugin;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Map;
 
@@ -9,11 +8,10 @@ import java.util.Map;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.plugin.PluginDescriptionFile")
 public abstract class PluginDescriptionFileHandle extends Template.Handle {
     /** @See {@link PluginDescriptionFileClass} */
-    public static final PluginDescriptionFileClass T = new PluginDescriptionFileClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PluginDescriptionFileHandle.class, "org.bukkit.plugin.PluginDescriptionFile", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PluginDescriptionFileClass T = Template.Class.create(PluginDescriptionFileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PluginDescriptionFileHandle createHandle(Object handleInstance) {

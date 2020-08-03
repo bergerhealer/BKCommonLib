@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayInVehicleMove")
 public abstract class PacketPlayInVehicleMoveHandle extends PacketHandle {
     /** @See {@link PacketPlayInVehicleMoveClass} */
-    public static final PacketPlayInVehicleMoveClass T = new PacketPlayInVehicleMoveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInVehicleMoveHandle.class, "net.minecraft.server.PacketPlayInVehicleMove", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInVehicleMoveClass T = Template.Class.create(PacketPlayInVehicleMoveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInVehicleMoveHandle createHandle(Object handleInstance) {

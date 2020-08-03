@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.BlockCobbleWall")
 public abstract class BlockCobbleWallHandle extends Template.Handle {
     /** @See {@link BlockCobbleWallClass} */
-    public static final BlockCobbleWallClass T = new BlockCobbleWallClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCobbleWallHandle.class, "net.minecraft.server.BlockCobbleWall", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BlockCobbleWallClass T = Template.Class.create(BlockCobbleWallClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static BlockCobbleWallHandle createHandle(Object handleInstance) {

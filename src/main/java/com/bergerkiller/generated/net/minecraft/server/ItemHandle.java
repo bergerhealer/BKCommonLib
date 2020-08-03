@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.Item")
 public abstract class ItemHandle extends Template.Handle {
     /** @See {@link ItemClass} */
-    public static final ItemClass T = new ItemClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ItemHandle.class, "net.minecraft.server.Item", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ItemHandle createHandle(Object handleInstance) {

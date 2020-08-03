@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import org.bukkit.entity.Entity;
@@ -13,11 +12,10 @@ import java.util.function.Consumer;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityTrackerEntryState")
 public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     /** @See {@link EntityTrackerEntryStateClass} */
-    public static final EntityTrackerEntryStateClass T = new EntityTrackerEntryStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityTrackerEntryStateHandle.class, "net.minecraft.server.EntityTrackerEntryState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityTrackerEntryStateClass T = Template.Class.create(EntityTrackerEntryStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityTrackerEntryStateHandle createHandle(Object handleInstance) {

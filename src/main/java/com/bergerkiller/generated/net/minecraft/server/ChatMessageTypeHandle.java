@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.ChatMessageType")
 public abstract class ChatMessageTypeHandle extends Template.Handle {
     /** @See {@link ChatMessageTypeClass} */
-    public static final ChatMessageTypeClass T = new ChatMessageTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChatMessageTypeHandle.class, "net.minecraft.server.ChatMessageType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ChatMessageTypeClass T = Template.Class.create(ChatMessageTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ChatMessageTypeHandle createHandle(Object handleInstance) {

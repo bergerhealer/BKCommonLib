@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import org.bukkit.util.Vector;
@@ -10,11 +9,10 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityArmorStand")
 public abstract class EntityArmorStandHandle extends EntityLivingHandle {
     /** @See {@link EntityArmorStandClass} */
-    public static final EntityArmorStandClass T = new EntityArmorStandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityArmorStandHandle.class, "net.minecraft.server.EntityArmorStand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityArmorStandClass T = Template.Class.create(EntityArmorStandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityArmorStandHandle createHandle(Object handleInstance) {

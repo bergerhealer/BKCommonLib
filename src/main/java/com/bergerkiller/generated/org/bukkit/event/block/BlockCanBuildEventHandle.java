@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.event.block;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import org.bukkit.block.Block;
@@ -11,11 +10,10 @@ import org.bukkit.event.block.BlockCanBuildEvent;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.event.block.BlockCanBuildEvent")
 public abstract class BlockCanBuildEventHandle extends Template.Handle {
     /** @See {@link BlockCanBuildEventClass} */
-    public static final BlockCanBuildEventClass T = new BlockCanBuildEventClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BlockCanBuildEventHandle.class, "org.bukkit.event.block.BlockCanBuildEvent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BlockCanBuildEventClass T = Template.Class.create(BlockCanBuildEventClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static BlockCanBuildEventHandle createHandle(Object handleInstance) {

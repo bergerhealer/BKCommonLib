@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.com.mojang.authlib;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import java.util.Collection;
@@ -12,11 +11,10 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("com.mojang.authlib.GameProfile")
 public abstract class GameProfileHandle extends Template.Handle {
     /** @See {@link GameProfileClass} */
-    public static final GameProfileClass T = new GameProfileClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(GameProfileHandle.class, "com.mojang.authlib.GameProfile", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final GameProfileClass T = Template.Class.create(GameProfileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static GameProfileHandle createHandle(Object handleInstance) {

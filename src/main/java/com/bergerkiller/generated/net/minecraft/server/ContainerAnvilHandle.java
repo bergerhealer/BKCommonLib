@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.InventoryView;
 
@@ -9,11 +8,10 @@ import org.bukkit.inventory.InventoryView;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.ContainerAnvil")
 public abstract class ContainerAnvilHandle extends ContainerHandle {
     /** @See {@link ContainerAnvilClass} */
-    public static final ContainerAnvilClass T = new ContainerAnvilClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ContainerAnvilHandle.class, "net.minecraft.server.ContainerAnvil", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ContainerAnvilClass T = Template.Class.create(ContainerAnvilClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ContainerAnvilHandle createHandle(Object handleInstance) {

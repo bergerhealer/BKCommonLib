@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 import java.util.Set;
@@ -10,11 +9,10 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.util.LongObjectHashMap")
 public abstract class LongObjectHashMapHandle extends Template.Handle {
     /** @See {@link LongObjectHashMapClass} */
-    public static final LongObjectHashMapClass T = new LongObjectHashMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LongObjectHashMapHandle.class, "org.bukkit.craftbukkit.util.LongObjectHashMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final LongObjectHashMapClass T = Template.Class.create(LongObjectHashMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static LongObjectHashMapHandle createHandle(Object handleInstance) {

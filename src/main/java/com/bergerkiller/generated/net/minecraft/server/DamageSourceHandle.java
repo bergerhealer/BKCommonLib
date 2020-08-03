@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
@@ -12,11 +11,10 @@ import org.bukkit.entity.LivingEntity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.DamageSource")
 public abstract class DamageSourceHandle extends Template.Handle {
     /** @See {@link DamageSourceClass} */
-    public static final DamageSourceClass T = new DamageSourceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DamageSourceHandle.class, "net.minecraft.server.DamageSource", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final DamageSourceClass T = Template.Class.create(DamageSourceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static DamageSourceHandle createHandle(Object handleInstance) {

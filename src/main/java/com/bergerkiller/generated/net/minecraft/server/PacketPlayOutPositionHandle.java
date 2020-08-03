@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Set;
 
@@ -9,11 +8,10 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutPosition")
 public abstract class PacketPlayOutPositionHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPositionClass} */
-    public static final PacketPlayOutPositionClass T = new PacketPlayOutPositionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPositionHandle.class, "net.minecraft.server.PacketPlayOutPosition", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutPositionClass T = Template.Class.create(PacketPlayOutPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutPositionHandle createHandle(Object handleInstance) {
@@ -110,11 +108,10 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutPosition.EnumPlayerTeleportFlags")
     public abstract static class EnumPlayerTeleportFlagsHandle extends Template.Handle {
         /** @See {@link EnumPlayerTeleportFlagsClass} */
-        public static final EnumPlayerTeleportFlagsClass T = new EnumPlayerTeleportFlagsClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerTeleportFlagsHandle.class, "net.minecraft.server.PacketPlayOutPosition.EnumPlayerTeleportFlags", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumPlayerTeleportFlagsClass T = Template.Class.create(EnumPlayerTeleportFlagsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerTeleportFlagsHandle X = T.X.getSafe();
         public static final EnumPlayerTeleportFlagsHandle Y = T.Y.getSafe();
         public static final EnumPlayerTeleportFlagsHandle Z = T.Z.getSafe();

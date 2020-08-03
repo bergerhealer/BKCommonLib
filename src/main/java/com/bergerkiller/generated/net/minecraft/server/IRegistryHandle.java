@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.IRegistry")
 public abstract class IRegistryHandle extends Template.Handle {
     /** @See {@link IRegistryClass} */
-    public static final IRegistryClass T = new IRegistryClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IRegistryHandle.class, "net.minecraft.server.IRegistry", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final IRegistryClass T = Template.Class.create(IRegistryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static IRegistryHandle createHandle(Object handleInstance) {

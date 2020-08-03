@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import org.bukkit.block.BlockFace;
@@ -10,11 +9,10 @@ import org.bukkit.block.BlockFace;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayInBlockDig")
 public abstract class PacketPlayInBlockDigHandle extends PacketHandle {
     /** @See {@link PacketPlayInBlockDigClass} */
-    public static final PacketPlayInBlockDigClass T = new PacketPlayInBlockDigClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInBlockDigHandle.class, "net.minecraft.server.PacketPlayInBlockDig", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInBlockDigClass T = Template.Class.create(PacketPlayInBlockDigClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInBlockDigHandle createHandle(Object handleInstance) {
@@ -46,11 +44,10 @@ public abstract class PacketPlayInBlockDigHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayInBlockDig.EnumPlayerDigType")
     public abstract static class EnumPlayerDigTypeHandle extends Template.Handle {
         /** @See {@link EnumPlayerDigTypeClass} */
-        public static final EnumPlayerDigTypeClass T = new EnumPlayerDigTypeClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerDigTypeHandle.class, "net.minecraft.server.PacketPlayInBlockDig.EnumPlayerDigType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumPlayerDigTypeClass T = Template.Class.create(EnumPlayerDigTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerDigTypeHandle START_DESTROY_BLOCK = T.START_DESTROY_BLOCK.getSafe();
         public static final EnumPlayerDigTypeHandle ABORT_DESTROY_BLOCK = T.ABORT_DESTROY_BLOCK.getSafe();
         public static final EnumPlayerDigTypeHandle STOP_DESTROY_BLOCK = T.STOP_DESTROY_BLOCK.getSafe();

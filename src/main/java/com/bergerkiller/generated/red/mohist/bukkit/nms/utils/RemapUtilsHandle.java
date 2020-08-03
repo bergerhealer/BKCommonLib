@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.red.mohist.bukkit.nms.utils;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("red.mohist.bukkit.nms.utils.RemapUtils")
 public abstract class RemapUtilsHandle extends Template.Handle {
     /** @See {@link RemapUtilsClass} */
-    public static final RemapUtilsClass T = new RemapUtilsClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RemapUtilsHandle.class, "red.mohist.bukkit.nms.utils.RemapUtils", com.bergerkiller.bukkit.common.server.MohistServer.TEMPLATE_RESOLVER);
-
+    public static final RemapUtilsClass T = Template.Class.create(RemapUtilsClass.class, com.bergerkiller.bukkit.common.server.MohistServer.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static RemapUtilsHandle createHandle(Object handleInstance) {

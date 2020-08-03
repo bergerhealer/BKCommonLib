@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayInTeleportAccept")
 public abstract class PacketPlayInTeleportAcceptHandle extends PacketHandle {
     /** @See {@link PacketPlayInTeleportAcceptClass} */
-    public static final PacketPlayInTeleportAcceptClass T = new PacketPlayInTeleportAcceptClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInTeleportAcceptHandle.class, "net.minecraft.server.PacketPlayInTeleportAccept", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInTeleportAcceptClass T = Template.Class.create(PacketPlayInTeleportAcceptClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInTeleportAcceptHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Iterator;
 
@@ -9,11 +8,10 @@ import java.util.Iterator;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("com.bergerkiller.bukkit.common.internal.LongHashSet")
 public abstract class LongHashSetHandle extends Template.Handle {
     /** @See {@link LongHashSetClass} */
-    public static final LongHashSetClass T = new LongHashSetClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LongHashSetHandle.class, "com.bergerkiller.bukkit.common.internal.LongHashSet", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final LongHashSetClass T = Template.Class.create(LongHashSetClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static LongHashSetHandle createHandle(Object handleInstance) {

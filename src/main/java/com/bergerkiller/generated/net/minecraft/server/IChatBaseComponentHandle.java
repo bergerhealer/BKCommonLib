@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.ChatColor;
 import java.util.Collection;
@@ -10,11 +9,10 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.IChatBaseComponent")
 public abstract class IChatBaseComponentHandle extends Template.Handle {
     /** @See {@link IChatBaseComponentClass} */
-    public static final IChatBaseComponentClass T = new IChatBaseComponentClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IChatBaseComponentHandle.class, "net.minecraft.server.IChatBaseComponent", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final IChatBaseComponentClass T = Template.Class.create(IChatBaseComponentClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static IChatBaseComponentHandle createHandle(Object handleInstance) {
@@ -45,11 +43,10 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.IChatBaseComponent.ChatSerializer")
     public abstract static class ChatSerializerHandle extends Template.Handle {
         /** @See {@link ChatSerializerClass} */
-        public static final ChatSerializerClass T = new ChatSerializerClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ChatSerializerHandle.class, "net.minecraft.server.IChatBaseComponent.ChatSerializer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final ChatSerializerClass T = Template.Class.create(ChatSerializerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static ChatSerializerHandle createHandle(Object handleInstance) {

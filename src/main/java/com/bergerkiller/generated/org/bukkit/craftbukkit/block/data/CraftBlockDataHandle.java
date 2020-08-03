@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.block.data;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("org.bukkit.craftbukkit.block.data.CraftBlockData")
 public abstract class CraftBlockDataHandle extends Template.Handle {
     /** @See {@link CraftBlockDataClass} */
-    public static final CraftBlockDataClass T = new CraftBlockDataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftBlockDataHandle.class, "org.bukkit.craftbukkit.block.data.CraftBlockData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftBlockDataClass T = Template.Class.create(CraftBlockDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftBlockDataHandle createHandle(Object handleInstance) {

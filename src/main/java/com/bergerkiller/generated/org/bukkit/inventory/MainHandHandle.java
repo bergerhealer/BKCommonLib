@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.inventory;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("org.bukkit.inventory.MainHand")
 public abstract class MainHandHandle extends Template.Handle {
     /** @See {@link MainHandClass} */
-    public static final MainHandClass T = new MainHandClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MainHandHandle.class, "org.bukkit.inventory.MainHand", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final MainHandClass T = Template.Class.create(MainHandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final MainHandHandle LEFT = T.LEFT.getSafe();
     public static final MainHandHandle RIGHT = T.RIGHT.getSafe();
     /* ============================================================================== */

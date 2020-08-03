@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.potion;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.potion.PotionEffect;
 
@@ -9,11 +8,10 @@ import org.bukkit.potion.PotionEffect;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.potion.CraftPotionUtil")
 public abstract class CraftPotionUtilHandle extends Template.Handle {
     /** @See {@link CraftPotionUtilClass} */
-    public static final CraftPotionUtilClass T = new CraftPotionUtilClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftPotionUtilHandle.class, "org.bukkit.craftbukkit.potion.CraftPotionUtil", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftPotionUtilClass T = Template.Class.create(CraftPotionUtilClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftPotionUtilHandle createHandle(Object handleInstance) {

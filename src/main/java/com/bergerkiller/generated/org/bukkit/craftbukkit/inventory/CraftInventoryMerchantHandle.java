@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.MerchantInventory;
 
@@ -9,11 +8,10 @@ import org.bukkit.inventory.MerchantInventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryMerchant")
 public abstract class CraftInventoryMerchantHandle extends Template.Handle {
     /** @See {@link CraftInventoryMerchantClass} */
-    public static final CraftInventoryMerchantClass T = new CraftInventoryMerchantClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryMerchantHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryMerchant", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftInventoryMerchantClass T = Template.Class.create(CraftInventoryMerchantClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftInventoryMerchantHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityHanging")
 public abstract class EntityHangingHandle extends EntityHandle {
     /** @See {@link EntityHangingClass} */
-    public static final EntityHangingClass T = new EntityHangingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHangingHandle.class, "net.minecraft.server.EntityHanging", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityHangingClass T = Template.Class.create(EntityHangingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityHangingHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -15,11 +14,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.Chunk")
 public abstract class ChunkHandle extends Template.Handle {
     /** @See {@link ChunkClass} */
-    public static final ChunkClass T = new ChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkHandle.class, "net.minecraft.server.Chunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ChunkClass T = Template.Class.create(ChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ChunkHandle createHandle(Object handleInstance) {

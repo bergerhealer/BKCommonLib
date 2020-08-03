@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityMinecartFurnace")
 public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartFurnaceClass} */
-    public static final EntityMinecartFurnaceClass T = new EntityMinecartFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityMinecartFurnaceHandle.class, "net.minecraft.server.EntityMinecartFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityMinecartFurnaceClass T = Template.Class.create(EntityMinecartFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityMinecartFurnaceHandle createHandle(Object handleInstance) {

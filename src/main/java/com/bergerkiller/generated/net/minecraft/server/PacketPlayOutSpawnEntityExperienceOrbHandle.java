@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb")
 public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityExperienceOrbClass} */
-    public static final PacketPlayOutSpawnEntityExperienceOrbClass T = new PacketPlayOutSpawnEntityExperienceOrbClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityExperienceOrbHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrb", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutSpawnEntityExperienceOrbClass T = Template.Class.create(PacketPlayOutSpawnEntityExperienceOrbClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityExperienceOrbHandle createHandle(Object handleInstance) {

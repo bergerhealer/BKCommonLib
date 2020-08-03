@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutMapChunk")
 public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     /** @See {@link PacketPlayOutMapChunkClass} */
-    public static final PacketPlayOutMapChunkClass T = new PacketPlayOutMapChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutMapChunkHandle.class, "net.minecraft.server.PacketPlayOutMapChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutMapChunkClass T = Template.Class.create(PacketPlayOutMapChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutMapChunkHandle createHandle(Object handleInstance) {
@@ -133,11 +131,10 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutMapChunk.ChunkMap")
     public abstract static class ChunkMapHandle extends Template.Handle {
         /** @See {@link ChunkMapClass} */
-        public static final ChunkMapClass T = new ChunkMapClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkMapHandle.class, "net.minecraft.server.PacketPlayOutMapChunk.ChunkMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final ChunkMapClass T = Template.Class.create(ChunkMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static ChunkMapHandle createHandle(Object handleInstance) {

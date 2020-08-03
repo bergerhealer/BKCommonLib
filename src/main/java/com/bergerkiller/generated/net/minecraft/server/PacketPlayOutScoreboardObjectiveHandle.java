@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutScoreboardObjective")
 public abstract class PacketPlayOutScoreboardObjectiveHandle extends Template.Handle {
     /** @See {@link PacketPlayOutScoreboardObjectiveClass} */
-    public static final PacketPlayOutScoreboardObjectiveClass T = new PacketPlayOutScoreboardObjectiveClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutScoreboardObjectiveHandle.class, "net.minecraft.server.PacketPlayOutScoreboardObjective", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutScoreboardObjectiveClass T = Template.Class.create(PacketPlayOutScoreboardObjectiveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutScoreboardObjectiveHandle createHandle(Object handleInstance) {

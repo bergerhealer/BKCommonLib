@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.SoundEffect")
 public abstract class SoundEffectHandle extends Template.Handle {
     /** @See {@link SoundEffectClass} */
-    public static final SoundEffectClass T = new SoundEffectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(SoundEffectHandle.class, "net.minecraft.server.SoundEffect", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final SoundEffectClass T = Template.Class.create(SoundEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static SoundEffectHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.List;
 
@@ -10,11 +9,10 @@ import java.util.List;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.NonNullList")
 public abstract class NonNullListHandle extends Template.Handle {
     /** @See {@link NonNullListClass} */
-    public static final NonNullListClass T = new NonNullListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NonNullListHandle.class, "net.minecraft.server.NonNullList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final NonNullListClass T = Template.Class.create(NonNullListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static NonNullListHandle createHandle(Object handleInstance) {

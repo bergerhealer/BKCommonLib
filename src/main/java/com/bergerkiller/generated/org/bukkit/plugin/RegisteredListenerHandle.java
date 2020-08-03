@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.plugin;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.plugin.EventExecutor;
 
@@ -9,11 +8,10 @@ import org.bukkit.plugin.EventExecutor;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.plugin.RegisteredListener")
 public abstract class RegisteredListenerHandle extends Template.Handle {
     /** @See {@link RegisteredListenerClass} */
-    public static final RegisteredListenerClass T = new RegisteredListenerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RegisteredListenerHandle.class, "org.bukkit.plugin.RegisteredListener", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final RegisteredListenerClass T = Template.Class.create(RegisteredListenerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static RegisteredListenerHandle createHandle(Object handleInstance) {

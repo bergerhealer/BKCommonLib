@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import org.bukkit.inventory.ItemStack;
@@ -10,11 +9,10 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayInWindowClick")
 public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
     /** @See {@link PacketPlayInWindowClickClass} */
-    public static final PacketPlayInWindowClickClass T = new PacketPlayInWindowClickClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInWindowClickHandle.class, "net.minecraft.server.PacketPlayInWindowClick", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInWindowClickClass T = Template.Class.create(PacketPlayInWindowClickClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInWindowClickHandle createHandle(Object handleInstance) {

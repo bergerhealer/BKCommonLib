@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import java.util.stream.Stream;
@@ -10,11 +9,10 @@ import java.util.stream.Stream;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.VoxelShape")
 public abstract class VoxelShapeHandle extends Template.Handle {
     /** @See {@link VoxelShapeClass} */
-    public static final VoxelShapeClass T = new VoxelShapeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(VoxelShapeHandle.class, "net.minecraft.server.VoxelShape", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final VoxelShapeClass T = Template.Class.create(VoxelShapeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static VoxelShapeHandle createHandle(Object handleInstance) {

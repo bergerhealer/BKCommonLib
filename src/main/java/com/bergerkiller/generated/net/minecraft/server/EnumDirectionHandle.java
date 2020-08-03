@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumDirection")
 public abstract class EnumDirectionHandle extends Template.Handle {
     /** @See {@link EnumDirectionClass} */
-    public static final EnumDirectionClass T = new EnumDirectionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumDirectionHandle.class, "net.minecraft.server.EnumDirection", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumDirectionClass T = Template.Class.create(EnumDirectionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumDirectionHandle DOWN = T.DOWN.getSafe();
     public static final EnumDirectionHandle UP = T.UP.getSafe();
     public static final EnumDirectionHandle NORTH = T.NORTH.getSafe();
@@ -47,11 +45,10 @@ public abstract class EnumDirectionHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.EnumDirection.EnumAxis")
     public abstract static class EnumAxisHandle extends Template.Handle {
         /** @See {@link EnumAxisClass} */
-        public static final EnumAxisClass T = new EnumAxisClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumAxisHandle.class, "net.minecraft.server.EnumDirection.EnumAxis", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumAxisClass T = Template.Class.create(EnumAxisClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumAxisHandle X = T.X.getSafe();
         public static final EnumAxisHandle Y = T.Y.getSafe();
         public static final EnumAxisHandle Z = T.Z.getSafe();

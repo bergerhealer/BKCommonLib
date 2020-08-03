@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 
@@ -9,11 +8,10 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.IBlockState")
 public abstract class IBlockStateHandle extends Template.Handle {
     /** @See {@link IBlockStateClass} */
-    public static final IBlockStateClass T = new IBlockStateClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IBlockStateHandle.class, "net.minecraft.server.IBlockState", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final IBlockStateClass T = Template.Class.create(IBlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static IBlockStateHandle createHandle(Object handleInstance) {

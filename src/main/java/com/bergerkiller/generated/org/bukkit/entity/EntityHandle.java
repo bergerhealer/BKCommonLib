@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.entity;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Entity;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.entity.Entity")
 public abstract class EntityHandle extends Template.Handle {
     /** @See {@link EntityClass} */
-    public static final EntityClass T = new EntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHandle.class, "org.bukkit.entity.Entity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityClass T = Template.Class.create(EntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.com.mojang.authlib.properties;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("com.mojang.authlib.properties.Property")
 public abstract class PropertyHandle extends Template.Handle {
     /** @See {@link PropertyClass} */
-    public static final PropertyClass T = new PropertyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PropertyHandle.class, "com.mojang.authlib.properties.Property", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PropertyClass T = Template.Class.create(PropertyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PropertyHandle createHandle(Object handleInstance) {

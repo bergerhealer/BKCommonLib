@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Sound;
 
@@ -9,11 +8,10 @@ import org.bukkit.Sound;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.CraftSound")
 public abstract class CraftSoundHandle extends Template.Handle {
     /** @See {@link CraftSoundClass} */
-    public static final CraftSoundClass T = new CraftSoundClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftSoundHandle.class, "org.bukkit.craftbukkit.CraftSound", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftSoundClass T = Template.Class.create(CraftSoundClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftSoundHandle createHandle(Object handleInstance) {

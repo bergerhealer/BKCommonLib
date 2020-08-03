@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 
@@ -9,11 +8,10 @@ import java.util.Collection;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutUpdateAttributes")
 public abstract class PacketPlayOutUpdateAttributesHandle extends PacketHandle {
     /** @See {@link PacketPlayOutUpdateAttributesClass} */
-    public static final PacketPlayOutUpdateAttributesClass T = new PacketPlayOutUpdateAttributesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUpdateAttributesHandle.class, "net.minecraft.server.PacketPlayOutUpdateAttributes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutUpdateAttributesClass T = Template.Class.create(PacketPlayOutUpdateAttributesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutUpdateAttributesHandle createHandle(Object handleInstance) {

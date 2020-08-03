@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 import java.util.Map;
@@ -11,11 +10,10 @@ import java.util.Map;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.RecipesFurnace")
 public abstract class RecipesFurnaceHandle extends Template.Handle {
     /** @See {@link RecipesFurnaceClass} */
-    public static final RecipesFurnaceClass T = new RecipesFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(RecipesFurnaceHandle.class, "net.minecraft.server.RecipesFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final RecipesFurnaceClass T = Template.Class.create(RecipesFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static RecipesFurnaceHandle createHandle(Object handleInstance) {

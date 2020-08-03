@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Material;
 
@@ -10,11 +9,10 @@ import org.bukkit.Material;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayOutSetCooldown")
 public abstract class PacketPlayOutSetCooldownHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSetCooldownClass} */
-    public static final PacketPlayOutSetCooldownClass T = new PacketPlayOutSetCooldownClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSetCooldownHandle.class, "net.minecraft.server.PacketPlayOutSetCooldown", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutSetCooldownClass T = Template.Class.create(PacketPlayOutSetCooldownClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutSetCooldownHandle createHandle(Object handleInstance) {

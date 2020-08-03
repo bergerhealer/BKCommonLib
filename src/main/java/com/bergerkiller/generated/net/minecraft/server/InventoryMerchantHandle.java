@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.InventoryMerchant")
 public abstract class InventoryMerchantHandle extends IInventoryHandle {
     /** @See {@link InventoryMerchantClass} */
-    public static final InventoryMerchantClass T = new InventoryMerchantClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryMerchantHandle.class, "net.minecraft.server.InventoryMerchant", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final InventoryMerchantClass T = Template.Class.create(InventoryMerchantClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static InventoryMerchantHandle createHandle(Object handleInstance) {

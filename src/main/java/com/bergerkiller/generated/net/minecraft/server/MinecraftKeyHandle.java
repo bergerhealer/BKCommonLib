@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.MinecraftKey")
 public abstract class MinecraftKeyHandle extends Template.Handle {
     /** @See {@link MinecraftKeyClass} */
-    public static final MinecraftKeyClass T = new MinecraftKeyClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MinecraftKeyHandle.class, "net.minecraft.server.MinecraftKey", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final MinecraftKeyClass T = Template.Class.create(MinecraftKeyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static MinecraftKeyHandle createHandle(Object handleInstance) {

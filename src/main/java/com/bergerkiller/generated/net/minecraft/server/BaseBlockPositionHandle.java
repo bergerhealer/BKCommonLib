@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.BaseBlockPosition")
 public abstract class BaseBlockPositionHandle extends Template.Handle {
     /** @See {@link BaseBlockPositionClass} */
-    public static final BaseBlockPositionClass T = new BaseBlockPositionClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(BaseBlockPositionHandle.class, "net.minecraft.server.BaseBlockPosition", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final BaseBlockPositionClass T = Template.Class.create(BaseBlockPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static BaseBlockPositionHandle createHandle(Object handleInstance) {

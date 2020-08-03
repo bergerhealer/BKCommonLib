@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagList;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.InventoryEnderChest")
 public abstract class InventoryEnderChestHandle extends IInventoryHandle {
     /** @See {@link InventoryEnderChestClass} */
-    public static final InventoryEnderChestClass T = new InventoryEnderChestClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(InventoryEnderChestHandle.class, "net.minecraft.server.InventoryEnderChest", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final InventoryEnderChestClass T = Template.Class.create(InventoryEnderChestClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static InventoryEnderChestHandle createHandle(Object handleInstance) {

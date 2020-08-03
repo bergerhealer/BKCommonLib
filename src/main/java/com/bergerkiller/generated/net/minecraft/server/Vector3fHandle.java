@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.util.Vector;
 
@@ -9,11 +8,10 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.Vector3f")
 public abstract class Vector3fHandle extends Template.Handle {
     /** @See {@link Vector3fClass} */
-    public static final Vector3fClass T = new Vector3fClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(Vector3fHandle.class, "net.minecraft.server.Vector3f", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final Vector3fClass T = Template.Class.create(Vector3fClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static Vector3fHandle createHandle(Object handleInstance) {

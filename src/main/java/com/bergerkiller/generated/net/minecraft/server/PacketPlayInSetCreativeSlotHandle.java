@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 
@@ -9,11 +8,10 @@ import org.bukkit.inventory.ItemStack;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayInSetCreativeSlot")
 public abstract class PacketPlayInSetCreativeSlotHandle extends PacketHandle {
     /** @See {@link PacketPlayInSetCreativeSlotClass} */
-    public static final PacketPlayInSetCreativeSlotClass T = new PacketPlayInSetCreativeSlotClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInSetCreativeSlotHandle.class, "net.minecraft.server.PacketPlayInSetCreativeSlot", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInSetCreativeSlotClass T = Template.Class.create(PacketPlayInSetCreativeSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInSetCreativeSlotHandle createHandle(Object handleInstance) {

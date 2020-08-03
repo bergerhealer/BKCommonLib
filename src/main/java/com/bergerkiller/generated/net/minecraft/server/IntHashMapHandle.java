@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap.Entry;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.IntHashMap")
 public abstract class IntHashMapHandle extends Template.Handle {
     /** @See {@link IntHashMapClass} */
-    public static final IntHashMapClass T = new IntHashMapClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapHandle.class, "net.minecraft.server.IntHashMap", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final IntHashMapClass T = Template.Class.create(IntHashMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static IntHashMapHandle createHandle(Object handleInstance) {
@@ -63,11 +61,10 @@ public abstract class IntHashMapHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.IntHashMap.IntHashMapEntry")
     public abstract static class IntHashMapEntryHandle extends Template.Handle {
         /** @See {@link IntHashMapEntryClass} */
-        public static final IntHashMapEntryClass T = new IntHashMapEntryClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(IntHashMapEntryHandle.class, "net.minecraft.server.IntHashMap.IntHashMapEntry", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final IntHashMapEntryClass T = Template.Class.create(IntHashMapEntryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static IntHashMapEntryHandle createHandle(Object handleInstance) {

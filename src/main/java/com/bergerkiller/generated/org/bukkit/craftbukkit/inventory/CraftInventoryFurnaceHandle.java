@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.FurnaceInventory;
 
@@ -9,11 +8,10 @@ import org.bukkit.inventory.FurnaceInventory;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryFurnace")
 public abstract class CraftInventoryFurnaceHandle extends Template.Handle {
     /** @See {@link CraftInventoryFurnaceClass} */
-    public static final CraftInventoryFurnaceClass T = new CraftInventoryFurnaceClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftInventoryFurnaceHandle.class, "org.bukkit.craftbukkit.inventory.CraftInventoryFurnace", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftInventoryFurnaceClass T = Template.Class.create(CraftInventoryFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftInventoryFurnaceHandle createHandle(Object handleInstance) {

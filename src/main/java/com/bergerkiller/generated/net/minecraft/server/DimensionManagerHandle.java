@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.DimensionManager")
 public abstract class DimensionManagerHandle extends Template.Handle {
     /** @See {@link DimensionManagerClass} */
-    public static final DimensionManagerClass T = new DimensionManagerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(DimensionManagerHandle.class, "net.minecraft.server.DimensionManager", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final DimensionManagerClass T = Template.Class.create(DimensionManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static DimensionManagerHandle createHandle(Object handleInstance) {

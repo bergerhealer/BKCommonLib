@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
@@ -11,11 +10,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutEntityMetadata")
 public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityMetadataClass} */
-    public static final PacketPlayOutEntityMetadataClass T = new PacketPlayOutEntityMetadataClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityMetadataHandle.class, "net.minecraft.server.PacketPlayOutEntityMetadata", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutEntityMetadataClass T = Template.Class.create(PacketPlayOutEntityMetadataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutEntityMetadataHandle createHandle(Object handleInstance) {

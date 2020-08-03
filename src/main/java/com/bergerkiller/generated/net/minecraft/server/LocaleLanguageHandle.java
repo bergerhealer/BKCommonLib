@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.LocaleLanguage")
 public abstract class LocaleLanguageHandle extends Template.Handle {
     /** @See {@link LocaleLanguageClass} */
-    public static final LocaleLanguageClass T = new LocaleLanguageClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(LocaleLanguageHandle.class, "net.minecraft.server.LocaleLanguage", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final LocaleLanguageClass T = Template.Class.create(LocaleLanguageClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static LocaleLanguageHandle createHandle(Object handleInstance) {

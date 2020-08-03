@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumGamemode")
 public abstract class EnumGamemodeHandle extends Template.Handle {
     /** @See {@link EnumGamemodeClass} */
-    public static final EnumGamemodeClass T = new EnumGamemodeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumGamemodeHandle.class, "net.minecraft.server.EnumGamemode", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumGamemodeClass T = Template.Class.create(EnumGamemodeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EnumGamemodeHandle createHandle(Object handleInstance) {

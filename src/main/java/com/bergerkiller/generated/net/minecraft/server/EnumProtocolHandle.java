@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumProtocol")
 public abstract class EnumProtocolHandle extends Template.Handle {
     /** @See {@link EnumProtocolClass} */
-    public static final EnumProtocolClass T = new EnumProtocolClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumProtocolHandle.class, "net.minecraft.server.EnumProtocol", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumProtocolClass T = Template.Class.create(EnumProtocolClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumProtocolHandle PLAY = T.PLAY.getSafe();
     /* ============================================================================== */
 

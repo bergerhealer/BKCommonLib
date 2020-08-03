@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
@@ -18,11 +17,10 @@ import java.util.Random;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.World")
 public abstract class WorldHandle extends IBlockAccessHandle {
     /** @See {@link WorldClass} */
-    public static final WorldClass T = new WorldClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(WorldHandle.class, "net.minecraft.server.World", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final WorldClass T = Template.Class.create(WorldClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static WorldHandle createHandle(Object handleInstance) {

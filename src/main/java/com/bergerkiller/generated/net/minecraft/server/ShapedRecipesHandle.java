@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.ShapedRecipes")
 public abstract class ShapedRecipesHandle extends IRecipeHandle {
     /** @See {@link ShapedRecipesClass} */
-    public static final ShapedRecipesClass T = new ShapedRecipesClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ShapedRecipesHandle.class, "net.minecraft.server.ShapedRecipes", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ShapedRecipesClass T = Template.Class.create(ShapedRecipesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ShapedRecipesHandle createHandle(Object handleInstance) {

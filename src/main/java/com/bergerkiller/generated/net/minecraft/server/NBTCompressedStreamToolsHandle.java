@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -12,11 +11,10 @@ import java.io.OutputStream;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.NBTCompressedStreamTools")
 public abstract class NBTCompressedStreamToolsHandle extends Template.Handle {
     /** @See {@link NBTCompressedStreamToolsClass} */
-    public static final NBTCompressedStreamToolsClass T = new NBTCompressedStreamToolsClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTCompressedStreamToolsHandle.class, "net.minecraft.server.NBTCompressedStreamTools", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final NBTCompressedStreamToolsClass T = Template.Class.create(NBTCompressedStreamToolsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static NBTCompressedStreamToolsHandle createHandle(Object handleInstance) {

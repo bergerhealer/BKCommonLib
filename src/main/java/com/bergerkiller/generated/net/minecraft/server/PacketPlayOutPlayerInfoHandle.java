@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -12,11 +11,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutPlayerInfo")
 public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
     /** @See {@link PacketPlayOutPlayerInfoClass} */
-    public static final PacketPlayOutPlayerInfoClass T = new PacketPlayOutPlayerInfoClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutPlayerInfoHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutPlayerInfoClass T = Template.Class.create(PacketPlayOutPlayerInfoClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutPlayerInfoHandle createHandle(Object handleInstance) {
@@ -51,11 +49,10 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData")
     public abstract static class PlayerInfoDataHandle extends Template.Handle {
         /** @See {@link PlayerInfoDataClass} */
-        public static final PlayerInfoDataClass T = new PlayerInfoDataClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(PlayerInfoDataHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.PlayerInfoData", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final PlayerInfoDataClass T = Template.Class.create(PlayerInfoDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static PlayerInfoDataHandle createHandle(Object handleInstance) {
@@ -94,11 +91,10 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutPlayerInfo.EnumPlayerInfoAction")
     public abstract static class EnumPlayerInfoActionHandle extends Template.Handle {
         /** @See {@link EnumPlayerInfoActionClass} */
-        public static final EnumPlayerInfoActionClass T = new EnumPlayerInfoActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumPlayerInfoActionHandle.class, "net.minecraft.server.PacketPlayOutPlayerInfo.EnumPlayerInfoAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumPlayerInfoActionClass T = Template.Class.create(EnumPlayerInfoActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerInfoActionHandle ADD_PLAYER = T.ADD_PLAYER.getSafe();
         public static final EnumPlayerInfoActionHandle UPDATE_GAME_MODE = T.UPDATE_GAME_MODE.getSafe();
         public static final EnumPlayerInfoActionHandle UPDATE_LATENCY = T.UPDATE_LATENCY.getSafe();

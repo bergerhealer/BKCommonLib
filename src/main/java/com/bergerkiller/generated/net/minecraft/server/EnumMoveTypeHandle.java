@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -9,11 +8,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.EnumMoveType")
 public abstract class EnumMoveTypeHandle extends Template.Handle {
     /** @See {@link EnumMoveTypeClass} */
-    public static final EnumMoveTypeClass T = new EnumMoveTypeClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumMoveTypeHandle.class, "net.minecraft.server.EnumMoveType", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumMoveTypeClass T = Template.Class.create(EnumMoveTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumMoveTypeHandle SELF = T.SELF.getSafe();
     public static final EnumMoveTypeHandle PLAYER = T.PLAYER.getSafe();
     public static final EnumMoveTypeHandle PISTON = T.PISTON.getSafe();

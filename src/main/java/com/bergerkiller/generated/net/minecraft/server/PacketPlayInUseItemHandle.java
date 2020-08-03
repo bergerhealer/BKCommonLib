@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -12,11 +11,10 @@ import org.bukkit.entity.HumanEntity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayInUseItem")
 public abstract class PacketPlayInUseItemHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseItemClass} */
-    public static final PacketPlayInUseItemClass T = new PacketPlayInUseItemClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseItemHandle.class, "net.minecraft.server.PacketPlayInUseItem", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInUseItemClass T = Template.Class.create(PacketPlayInUseItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInUseItemHandle createHandle(Object handleInstance) {

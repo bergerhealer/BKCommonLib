@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Entity;
 
@@ -9,11 +8,10 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutEntityHeadRotation")
 public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle {
     /** @See {@link PacketPlayOutEntityHeadRotationClass} */
-    public static final PacketPlayOutEntityHeadRotationClass T = new PacketPlayOutEntityHeadRotationClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutEntityHeadRotationHandle.class, "net.minecraft.server.PacketPlayOutEntityHeadRotation", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutEntityHeadRotationClass T = Template.Class.create(PacketPlayOutEntityHeadRotationClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutEntityHeadRotationHandle createHandle(Object handleInstance) {

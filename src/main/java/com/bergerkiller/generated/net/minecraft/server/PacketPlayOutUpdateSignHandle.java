@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -12,11 +11,10 @@ import org.bukkit.World;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
+@Template.InstanceType("net.minecraft.server.PacketPlayOutUpdateSign")
 public abstract class PacketPlayOutUpdateSignHandle extends Template.Handle {
     /** @See {@link PacketPlayOutUpdateSignClass} */
-    public static final PacketPlayOutUpdateSignClass T = new PacketPlayOutUpdateSignClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutUpdateSignHandle.class, "net.minecraft.server.PacketPlayOutUpdateSign", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutUpdateSignClass T = Template.Class.create(PacketPlayOutUpdateSignClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutUpdateSignHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import org.bukkit.entity.LivingEntity;
@@ -11,11 +10,10 @@ import java.util.UUID;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutSpawnEntityLiving")
 public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
     /** @See {@link PacketPlayOutSpawnEntityLivingClass} */
-    public static final PacketPlayOutSpawnEntityLivingClass T = new PacketPlayOutSpawnEntityLivingClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutSpawnEntityLivingHandle.class, "net.minecraft.server.PacketPlayOutSpawnEntityLiving", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutSpawnEntityLivingClass T = Template.Class.create(PacketPlayOutSpawnEntityLivingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutSpawnEntityLivingHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import org.bukkit.map.MapCursor;
@@ -10,11 +9,10 @@ import org.bukkit.map.MapCursor;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.MapIcon")
 public abstract class MapIconHandle extends Template.Handle {
     /** @See {@link MapIconClass} */
-    public static final MapIconClass T = new MapIconClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MapIconHandle.class, "net.minecraft.server.MapIcon", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final MapIconClass T = Template.Class.create(MapIconClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static MapIconHandle createHandle(Object handleInstance) {
@@ -63,11 +61,10 @@ public abstract class MapIconHandle extends Template.Handle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
+    @Template.InstanceType("net.minecraft.server.MapIcon.Type")
     public abstract static class TypeHandle extends Template.Handle {
         /** @See {@link TypeClass} */
-        public static final TypeClass T = new TypeClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(TypeHandle.class, "net.minecraft.server.MapIcon.Type", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final TypeClass T = Template.Class.create(TypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static TypeHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.ChunkCoordIntPair")
 public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     /** @See {@link ChunkCoordIntPairClass} */
-    public static final ChunkCoordIntPairClass T = new ChunkCoordIntPairClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(ChunkCoordIntPairHandle.class, "net.minecraft.server.ChunkCoordIntPair", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final ChunkCoordIntPairClass T = Template.Class.create(ChunkCoordIntPairClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static ChunkCoordIntPairHandle createHandle(Object handleInstance) {

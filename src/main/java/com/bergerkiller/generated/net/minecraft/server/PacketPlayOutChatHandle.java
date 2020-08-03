@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutChat")
 public abstract class PacketPlayOutChatHandle extends PacketHandle {
     /** @See {@link PacketPlayOutChatClass} */
-    public static final PacketPlayOutChatClass T = new PacketPlayOutChatClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutChatHandle.class, "net.minecraft.server.PacketPlayOutChat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutChatClass T = Template.Class.create(PacketPlayOutChatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutChatHandle createHandle(Object handleInstance) {

@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.MobEffectList")
 public abstract class MobEffectListHandle extends Template.Handle {
     /** @See {@link MobEffectListClass} */
-    public static final MobEffectListClass T = new MobEffectListClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobEffectListHandle.class, "net.minecraft.server.MobEffectList", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final MobEffectListClass T = Template.Class.create(MobEffectListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static MobEffectListHandle createHandle(Object handleInstance) {

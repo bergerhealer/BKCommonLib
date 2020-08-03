@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
@@ -12,11 +11,10 @@ import java.io.File;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.CraftServer")
 public abstract class CraftServerHandle extends Template.Handle {
     /** @See {@link CraftServerClass} */
-    public static final CraftServerClass T = new CraftServerClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftServerHandle.class, "org.bukkit.craftbukkit.CraftServer", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftServerClass T = Template.Class.create(CraftServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftServerHandle createHandle(Object handleInstance) {

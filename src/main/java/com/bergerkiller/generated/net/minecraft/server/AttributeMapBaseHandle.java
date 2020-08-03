@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import java.util.Collection;
@@ -11,11 +10,10 @@ import java.util.Set;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.AttributeMapBase")
 public abstract class AttributeMapBaseHandle extends Template.Handle {
     /** @See {@link AttributeMapBaseClass} */
-    public static final AttributeMapBaseClass T = new AttributeMapBaseClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(AttributeMapBaseHandle.class, "net.minecraft.server.AttributeMapBase", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final AttributeMapBaseClass T = Template.Class.create(AttributeMapBaseClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static AttributeMapBaseHandle createHandle(Object handleInstance) {

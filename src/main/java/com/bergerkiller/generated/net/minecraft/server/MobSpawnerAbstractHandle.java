@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.entity.Entity;
 import java.util.List;
@@ -10,11 +9,10 @@ import java.util.List;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.MobSpawnerAbstract")
 public abstract class MobSpawnerAbstractHandle extends Template.Handle {
     /** @See {@link MobSpawnerAbstractClass} */
-    public static final MobSpawnerAbstractClass T = new MobSpawnerAbstractClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(MobSpawnerAbstractHandle.class, "net.minecraft.server.MobSpawnerAbstract", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final MobSpawnerAbstractClass T = Template.Class.create(MobSpawnerAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static MobSpawnerAbstractHandle createHandle(Object handleInstance) {

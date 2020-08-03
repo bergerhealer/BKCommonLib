@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import org.bukkit.util.Vector;
@@ -10,11 +9,10 @@ import org.bukkit.util.Vector;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayInUseEntity")
 public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
     /** @See {@link PacketPlayInUseEntityClass} */
-    public static final PacketPlayInUseEntityClass T = new PacketPlayInUseEntityClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayInUseEntityHandle.class, "net.minecraft.server.PacketPlayInUseEntity", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayInUseEntityClass T = Template.Class.create(PacketPlayInUseEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayInUseEntityHandle createHandle(Object handleInstance) {
@@ -68,11 +66,10 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction")
     public abstract static class EnumEntityUseActionHandle extends Template.Handle {
         /** @See {@link EnumEntityUseActionClass} */
-        public static final EnumEntityUseActionClass T = new EnumEntityUseActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumEntityUseActionHandle.class, "net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumEntityUseActionClass T = Template.Class.create(EnumEntityUseActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumEntityUseActionHandle INTERACT = T.INTERACT.getSafe();
         public static final EnumEntityUseActionHandle ATTACK = T.ATTACK.getSafe();
         public static final EnumEntityUseActionHandle INTERACT_AT = T.INTERACT_AT.getSafe();

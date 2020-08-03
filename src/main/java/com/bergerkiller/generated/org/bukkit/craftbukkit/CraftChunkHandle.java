@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.CraftChunk")
 public abstract class CraftChunkHandle extends Template.Handle {
     /** @See {@link CraftChunkClass} */
-    public static final CraftChunkClass T = new CraftChunkClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftChunkHandle.class, "org.bukkit.craftbukkit.CraftChunk", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftChunkClass T = Template.Class.create(CraftChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftChunkHandle createHandle(Object handleInstance) {

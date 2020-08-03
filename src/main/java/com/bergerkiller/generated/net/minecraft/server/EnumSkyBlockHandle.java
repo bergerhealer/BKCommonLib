@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EnumSkyBlock")
 public abstract class EnumSkyBlockHandle extends Template.Handle {
     /** @See {@link EnumSkyBlockClass} */
-    public static final EnumSkyBlockClass T = new EnumSkyBlockClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EnumSkyBlockHandle.class, "net.minecraft.server.EnumSkyBlock", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EnumSkyBlockClass T = Template.Class.create(EnumSkyBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumSkyBlockHandle SKY = T.SKY.getSafe();
     public static final EnumSkyBlockHandle BLOCK = T.BLOCK.getSafe();
     /* ============================================================================== */

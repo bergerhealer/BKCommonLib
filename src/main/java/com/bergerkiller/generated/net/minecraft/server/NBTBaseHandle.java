@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.NBTBase")
 public abstract class NBTBaseHandle extends Template.Handle {
     /** @See {@link NBTBaseClass} */
-    public static final NBTBaseClass T = new NBTBaseClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(NBTBaseHandle.class, "net.minecraft.server.NBTBase", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final NBTBaseClass T = Template.Class.create(NBTBaseClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static NBTBaseHandle createHandle(Object handleInstance) {
@@ -174,11 +172,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagString")
     public abstract static class NBTTagStringHandle extends NBTBaseHandle {
         /** @See {@link NBTTagStringClass} */
-        public static final NBTTagStringClass T = new NBTTagStringClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagStringHandle.class, "net.minecraft.server.NBTTagString", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagStringClass T = Template.Class.create(NBTTagStringClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagStringHandle createHandle(Object handleInstance) {
@@ -219,11 +216,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagByte")
     public abstract static class NBTTagByteHandle extends NBTBaseHandle {
         /** @See {@link NBTTagByteClass} */
-        public static final NBTTagByteClass T = new NBTTagByteClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagByteHandle.class, "net.minecraft.server.NBTTagByte", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagByteClass T = Template.Class.create(NBTTagByteClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagByteHandle createHandle(Object handleInstance) {
@@ -265,11 +261,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagShort")
     public abstract static class NBTTagShortHandle extends NBTBaseHandle {
         /** @See {@link NBTTagShortClass} */
-        public static final NBTTagShortClass T = new NBTTagShortClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagShortHandle.class, "net.minecraft.server.NBTTagShort", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagShortClass T = Template.Class.create(NBTTagShortClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagShortHandle createHandle(Object handleInstance) {
@@ -312,11 +307,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagInt")
     public abstract static class NBTTagIntHandle extends NBTBaseHandle {
         /** @See {@link NBTTagIntClass} */
-        public static final NBTTagIntClass T = new NBTTagIntClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagIntHandle.class, "net.minecraft.server.NBTTagInt", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagIntClass T = Template.Class.create(NBTTagIntClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagIntHandle createHandle(Object handleInstance) {
@@ -358,11 +352,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagLong")
     public abstract static class NBTTagLongHandle extends NBTBaseHandle {
         /** @See {@link NBTTagLongClass} */
-        public static final NBTTagLongClass T = new NBTTagLongClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagLongHandle.class, "net.minecraft.server.NBTTagLong", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagLongClass T = Template.Class.create(NBTTagLongClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagLongHandle createHandle(Object handleInstance) {
@@ -404,11 +397,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagFloat")
     public abstract static class NBTTagFloatHandle extends NBTBaseHandle {
         /** @See {@link NBTTagFloatClass} */
-        public static final NBTTagFloatClass T = new NBTTagFloatClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagFloatHandle.class, "net.minecraft.server.NBTTagFloat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagFloatClass T = Template.Class.create(NBTTagFloatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagFloatHandle createHandle(Object handleInstance) {
@@ -450,11 +442,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagDouble")
     public abstract static class NBTTagDoubleHandle extends NBTBaseHandle {
         /** @See {@link NBTTagDoubleClass} */
-        public static final NBTTagDoubleClass T = new NBTTagDoubleClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagDoubleHandle.class, "net.minecraft.server.NBTTagDouble", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagDoubleClass T = Template.Class.create(NBTTagDoubleClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagDoubleHandle createHandle(Object handleInstance) {
@@ -496,11 +487,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagByteArray")
     public abstract static class NBTTagByteArrayHandle extends NBTBaseHandle {
         /** @See {@link NBTTagByteArrayClass} */
-        public static final NBTTagByteArrayClass T = new NBTTagByteArrayClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagByteArrayHandle.class, "net.minecraft.server.NBTTagByteArray", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagByteArrayClass T = Template.Class.create(NBTTagByteArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagByteArrayHandle createHandle(Object handleInstance) {
@@ -537,11 +527,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.NBTTagIntArray")
     public abstract static class NBTTagIntArrayHandle extends NBTBaseHandle {
         /** @See {@link NBTTagIntArrayClass} */
-        public static final NBTTagIntArrayClass T = new NBTTagIntArrayClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagIntArrayHandle.class, "net.minecraft.server.NBTTagIntArray", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagIntArrayClass T = Template.Class.create(NBTTagIntArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagIntArrayHandle createHandle(Object handleInstance) {
@@ -579,11 +568,10 @@ public abstract class NBTBaseHandle extends Template.Handle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.Optional
+    @Template.InstanceType("net.minecraft.server.NBTTagLongArray")
     public abstract static class NBTTagLongArrayHandle extends NBTBaseHandle {
         /** @See {@link NBTTagLongArrayClass} */
-        public static final NBTTagLongArrayClass T = new NBTTagLongArrayClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(NBTTagLongArrayHandle.class, "net.minecraft.server.NBTTagLongArray", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final NBTTagLongArrayClass T = Template.Class.create(NBTTagLongArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
         public static NBTTagLongArrayHandle createHandle(Object handleInstance) {

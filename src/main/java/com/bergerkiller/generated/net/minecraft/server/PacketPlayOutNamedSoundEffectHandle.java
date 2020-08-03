@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
@@ -10,11 +9,10 @@ import com.bergerkiller.bukkit.common.resources.SoundEffect;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutNamedSoundEffect")
 public abstract class PacketPlayOutNamedSoundEffectHandle extends PacketHandle {
     /** @See {@link PacketPlayOutNamedSoundEffectClass} */
-    public static final PacketPlayOutNamedSoundEffectClass T = new PacketPlayOutNamedSoundEffectClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutNamedSoundEffectHandle.class, "net.minecraft.server.PacketPlayOutNamedSoundEffect", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutNamedSoundEffectClass T = Template.Class.create(PacketPlayOutNamedSoundEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutNamedSoundEffectHandle createHandle(Object handleInstance) {

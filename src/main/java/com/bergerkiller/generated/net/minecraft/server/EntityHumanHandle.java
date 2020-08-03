@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -11,11 +10,10 @@ import org.bukkit.entity.Entity;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityHuman")
 public abstract class EntityHumanHandle extends EntityLivingHandle {
     /** @See {@link EntityHumanClass} */
-    public static final EntityHumanClass T = new EntityHumanClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityHumanHandle.class, "net.minecraft.server.EntityHuman", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityHumanClass T = Template.Class.create(EntityHumanClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityHumanHandle createHandle(Object handleInstance) {

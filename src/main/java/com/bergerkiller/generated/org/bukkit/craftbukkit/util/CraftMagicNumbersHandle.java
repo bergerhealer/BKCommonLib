@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.Material;
 
@@ -9,11 +8,10 @@ import org.bukkit.Material;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("org.bukkit.craftbukkit.util.CraftMagicNumbers")
 public abstract class CraftMagicNumbersHandle extends Template.Handle {
     /** @See {@link CraftMagicNumbersClass} */
-    public static final CraftMagicNumbersClass T = new CraftMagicNumbersClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(CraftMagicNumbersHandle.class, "org.bukkit.craftbukkit.util.CraftMagicNumbers", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final CraftMagicNumbersClass T = Template.Class.create(CraftMagicNumbersClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static CraftMagicNumbersHandle createHandle(Object handleInstance) {

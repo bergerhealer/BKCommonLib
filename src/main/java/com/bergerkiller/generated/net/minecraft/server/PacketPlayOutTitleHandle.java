@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -8,11 +7,10 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.PacketPlayOutTitle")
 public abstract class PacketPlayOutTitleHandle extends PacketHandle {
     /** @See {@link PacketPlayOutTitleClass} */
-    public static final PacketPlayOutTitleClass T = new PacketPlayOutTitleClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(PacketPlayOutTitleHandle.class, "net.minecraft.server.PacketPlayOutTitle", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final PacketPlayOutTitleClass T = Template.Class.create(PacketPlayOutTitleClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static PacketPlayOutTitleHandle createHandle(Object handleInstance) {
@@ -34,11 +32,10 @@ public abstract class PacketPlayOutTitleHandle extends PacketHandle {
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
+    @Template.InstanceType("net.minecraft.server.PacketPlayOutTitle.EnumTitleAction")
     public abstract static class EnumTitleActionHandle extends Template.Handle {
         /** @See {@link EnumTitleActionClass} */
-        public static final EnumTitleActionClass T = new EnumTitleActionClass();
-        static final StaticInitHelper _init_helper = new StaticInitHelper(EnumTitleActionHandle.class, "net.minecraft.server.PacketPlayOutTitle.EnumTitleAction", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+        public static final EnumTitleActionClass T = Template.Class.create(EnumTitleActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumTitleActionHandle TITLE = T.TITLE.getSafe();
         public static final EnumTitleActionHandle SUBTITLE = T.SUBTITLE.getSafe();
         public static final EnumTitleActionHandle TIMES = T.TIMES.getSafe();

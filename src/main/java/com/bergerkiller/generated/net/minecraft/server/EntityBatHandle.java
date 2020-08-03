@@ -1,6 +1,5 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
-import com.bergerkiller.mountiplex.reflection.util.StaticInitHelper;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
@@ -9,11 +8,10 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
+@Template.InstanceType("net.minecraft.server.EntityBat")
 public abstract class EntityBatHandle extends EntityInsentientHandle {
     /** @See {@link EntityBatClass} */
-    public static final EntityBatClass T = new EntityBatClass();
-    static final StaticInitHelper _init_helper = new StaticInitHelper(EntityBatHandle.class, "net.minecraft.server.EntityBat", com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-
+    public static final EntityBatClass T = Template.Class.create(EntityBatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
     public static EntityBatHandle createHandle(Object handleInstance) {
