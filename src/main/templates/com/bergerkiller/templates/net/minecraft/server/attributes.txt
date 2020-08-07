@@ -6,9 +6,13 @@ import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 
 class AttributeModifiable {
+#if forge
+    public abstract void setValue:a(double value);
+    public abstract double getValue:e();
+#else
     public abstract void setValue(double value);
-
     public abstract double getValue();
+#endif
 }
 
 class AttributeMapBase {

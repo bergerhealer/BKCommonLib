@@ -330,7 +330,10 @@ class NBTBase {
 #else
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
 #endif
-#if version >= 1.11
+
+#if forge
+        public double getDoubleData:h();
+#elseif version >= 1.11
         public double getDoubleData:asDouble();
 #elseif version >= 1.10.2
         public double getDoubleData:h();
@@ -442,7 +445,12 @@ class NBTTagList extends NBTBase {
     </code>
 
     public int size();
+
+#if forge
+    public boolean isEmpty:b_();
+#else
     public boolean isEmpty();
+#endif
 
 #if version >= 1.16
     public (byte) byte getElementTypeId:d_();
@@ -614,7 +622,11 @@ class NBTTagCompound extends NBTBase {
     }
     </code>
 
+#if forge
+    public boolean isEmpty:b_();
+#else
     public boolean isEmpty();
+#endif
 
 #if version >= 1.15
     public int size:e();

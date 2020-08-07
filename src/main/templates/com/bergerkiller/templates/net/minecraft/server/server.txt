@@ -50,7 +50,13 @@ class MinecraftServer {
     public int getTicks:ar();
 #endif
 
+#if forge
+    public boolean isMainThread() {
+        return Thread.currentThread() == instance.func_175583_aK();
+    }
+#else
     public boolean isMainThread();
+#endif
 
     <code>
     private static MinecraftServerHandle _cached_instance = null;
