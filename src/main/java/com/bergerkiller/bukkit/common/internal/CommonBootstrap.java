@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
+import com.bergerkiller.bukkit.common.server.MagmaServer;
 import com.bergerkiller.bukkit.common.server.MohistServer;
 import com.bergerkiller.bukkit.common.server.PaperSpigotServer;
 import com.bergerkiller.bukkit.common.server.PurpurServer;
@@ -98,6 +99,7 @@ public class CommonBootstrap {
                 List<CommonServer> servers = new ArrayList<>();
                 servers.add(new MCPCPlusServer());
                 servers.add(new MohistServer());
+                servers.add(new MagmaServer());
                 servers.add(new PurpurServer());
                 servers.add(new PaperSpigotServer());
                 servers.add(new SpigotServer());
