@@ -590,10 +590,10 @@ class WorldServer extends World {
 
 #if forge
     public boolean addEntity:a((EntityHandle) Entity entity);
-    public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer:u();
 #else
     public boolean addEntity((EntityHandle) Entity entity);
-    public (MinecraftServerHandle) MinecraftServer getMinecraftServer:u();
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
 #endif
 
 #if version >= 1.14
