@@ -23,6 +23,7 @@ import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
@@ -222,6 +223,13 @@ public class TemplateTest {
                 Logging.LOGGER_REFLECTION.severe("Failed to initialize " + templateClass.getType());
                 throw MountiplexUtil.uncheckedRethrow(t);
             }
+        }
+
+        // These are optional, but they must work at runtime depending on version
+        if (Common.evaluateMCVersion(">=", "1.14")) {
+            PacketPlayOutSpawnEntityHandle.T.opt_entityType.forceInitialization();
+        } else {
+            PacketPlayOutSpawnEntityHandle.T.opt_entityTypeId.forceInitialization();
         }
     }
 

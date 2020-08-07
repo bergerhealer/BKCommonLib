@@ -54,6 +54,10 @@ public class TemplateResolver implements ClassDeclarationResolver {
         }
     }
 
+    @Override
+    public void resolveClassVariables(String classPath, Class<?> classType, Map<String, String> variables) {
+    }
+
     /**
      * Gets all Class Declarations that are available at runtime
      * 
