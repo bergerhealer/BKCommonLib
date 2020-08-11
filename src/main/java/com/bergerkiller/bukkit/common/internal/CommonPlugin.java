@@ -36,7 +36,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
-import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
+import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;

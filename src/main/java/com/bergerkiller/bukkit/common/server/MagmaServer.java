@@ -4,14 +4,13 @@ import java.lang.reflect.Method;
 import java.util.Map;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.resolver.ClassNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 
 /**
  * Mohist is a PaperSpigot + Forge implementation
  */
-public class MagmaServer extends SpigotServer implements FieldNameResolver, MethodNameResolver, ClassNameResolver {
+public class MagmaServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
     private RemappingUtilsClass remappingUtils = null;
 
     @Override
@@ -47,7 +46,7 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
             System.out.println(resolveClassPath("net.minecraft.server.EnumDifficulty"));
             Class<?> c = Class.forName(resolveClassPath("net.minecraft.server.EnumDifficulty"));
             System.out.println("mapMethodName: " + remappingUtils.mapMethodName(c, "c", new Class[] {}));
-            System.out.println("inverseMapMethodName: " + remappingUtils.inverseMapMethodName(c, "c", new Class[] {}));
+            System.out.println("inverseMapMethodName: " + remappingUtils.mapMethodName(c, "c", new Class[] {}));
             System.out.println("Methods of " + c.getName());
             for (Method m : c.getDeclaredMethods()) {
                 System.out.println("  - " + m.toGenericString());
@@ -76,17 +75,12 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
 
     @Override
     public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
-        return remappingUtils.inverseMapMethodName(type, methodName, params);
+        return remappingUtils.mapMethodName(type, methodName, params);
     }
 
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
-        return remappingUtils.inverseMapFieldName(type, fieldName);
-    }
-
-    @Override
-    public String resolveClassName(Class<?> clazz) {
-        return remappingUtils.inverseMapClassName(clazz);
+        return remappingUtils.mapFieldName(type, fieldName);
     }
 
     @Override
@@ -114,21 +108,11 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
                             "}")
         public abstract String mapClassName(String className);
 
-        @Template.Generated("public static String inverseMapClassName(Class<?> type) {\n" +
-                            "    // Because we generate this, the remapper of Mohist is unable to wrap it\n" +
-                            "    // As a result, getName() is now correct! Yay!\n" +
-                            "    return type.getName();\n" +
-                            "}")
-        public abstract String inverseMapClassName(Class<?> type);
-
         @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
         public abstract String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes);
 
-        @Template.Generated("public static transient String inverseMapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
-        public abstract String inverseMapMethodName(Class<?> type, String name, Class<?>[] parameterTypes);
-
-        @Template.Generated("public static String inverseMapFieldName(Class<?> type, String fieldName)")
-        public abstract String inverseMapFieldName(Class<?> type, String fieldName);
+        @Template.Generated("public static String mapFieldName(Class<?> type, String fieldName)")
+        public abstract String mapFieldName(Class<?> type, String fieldName);
     }
 
 }

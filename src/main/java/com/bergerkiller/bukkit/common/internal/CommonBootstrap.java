@@ -34,7 +34,6 @@ import com.bergerkiller.bukkit.common.server.UnknownServer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
-import com.bergerkiller.mountiplex.reflection.resolver.ClassNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
@@ -229,9 +228,6 @@ public class CommonBootstrap {
         // Register server to handle field, method and class resolving
         if (server instanceof ClassPathResolver) {
             Resolver.registerClassResolver((ClassPathResolver) server);
-        }
-        if (server instanceof ClassNameResolver) {
-            Resolver.registerClassNameResolver((ClassNameResolver) server);
         }
         if (server instanceof FieldNameResolver) {
             Resolver.registerFieldResolver((FieldNameResolver) server);

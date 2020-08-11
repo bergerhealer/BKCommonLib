@@ -29,7 +29,7 @@ public abstract class IBlockStateHandle extends Template.Handle {
      */
     public static final class IBlockStateClass extends Template.Class<IBlockStateHandle> {
         public final Template.Method<String> getKeyToken = new Template.Method<String>();
-        public final Template.Method.Converted<String> getValueToken = new Template.Method.Converted<String>();
+        public final Template.Method<String> getValueToken = new Template.Method<String>();
         public final Template.Method<Collection> getValues = new Template.Method<Collection>();
 
     }

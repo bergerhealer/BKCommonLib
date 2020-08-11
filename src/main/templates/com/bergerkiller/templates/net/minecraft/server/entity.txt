@@ -935,7 +935,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.16
+#if forge
+    public void burn(float dmg) {
+        #require net.minecraft.server.Entity protected void burn(int dmg);
+        instance#burn((int)dmg);
+    }
+#elseif version >= 1.16
     public void burn(float dmg) {
         if (!instance.isFireProof()) {
             instance.damageEntity(DamageSource.FIRE, dmg);

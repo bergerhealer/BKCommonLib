@@ -19,11 +19,14 @@ class Block {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     public static final Iterable<?> getRegistry() {
-#if version >= 1.13.1
-        return IRegistry.BLOCK;
+#if version >= 1.14
+        #require net.minecraft.server.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
+#elseif version >= 1.13.1
+        #require net.minecraft.server.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
 #else
-        return Block.REGISTRY;
+        #require net.minecraft.server.Block public static final RegistryBlocks REGISTRY;
 #endif
+        return #REGISTRY;
     }
 
 #if version >= 1.9
@@ -479,11 +482,7 @@ interface IBlockState {
     public abstract String getKeyToken:a();
 #endif
 
-#if version >= 1.8.3
-    public abstract String getValueToken:a((Comparable) T value);
-#else
-    public abstract String getValueToken:a((Comparable) Comparable value);
-#endif
+    public abstract String getValueToken:a(Comparable value);
 
 #if version >= 1.14.4
     public abstract java.util.Collection getValues();

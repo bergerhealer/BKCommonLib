@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
-import com.bergerkiller.mountiplex.reflection.util.ASMUtil;
+import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
 import java.util.Collections;
 import java.util.Map;
