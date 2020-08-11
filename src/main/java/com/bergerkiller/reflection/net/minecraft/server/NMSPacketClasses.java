@@ -98,6 +98,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRespawnHandl
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardObjectiveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetCooldownHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityExperienceOrbHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
@@ -1574,9 +1575,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutSetSlot extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<Integer> slot = nextField("private int b");
-        public final FieldAccessor<ItemStack> item = nextFieldSignature("private ItemStack c").translate(DuplexConversion.itemStack);
+        public final FieldAccessor<Integer> windowId = PacketPlayOutSetSlotHandle.T.windowId.toFieldAccessor();
+        public final FieldAccessor<Integer> slot = PacketPlayOutSetSlotHandle.T.slot.toFieldAccessor();
+        public final FieldAccessor<ItemStack> item = PacketPlayOutSetSlotHandle.T.item.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutSpawnEntity extends NMSPacket {

@@ -33,17 +33,18 @@ class EntityTypes {
     private static optional final (Map<Class<?>, Integer>) Map opt_typeIdMap_1_8:f;
 #endif
 
-#if version >= 1.13.1
+#if version >= 1.11
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-        return (RegistryMaterials) IRegistry.ENTITY_TYPE;
-    }
-#elseif version >= 1.13
-    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-        return (RegistryMaterials) EntityTypes.REGISTRY;
-    }
-#elseif version >= 1.11
-    public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-        return EntityTypes.b;
+  #if version >= 1.14
+        #require net.minecraft.server.IRegistry public static final RegistryBlocks<EntityTypes<?>> REGISTRY:ENTITY_TYPE;
+  #elseif version >= 1.13.1
+        #require net.minecraft.server.IRegistry public static final IRegistry<EntityTypes<?>> REGISTRY:ENTITY_TYPE;
+  #elseif version >= 1.13
+        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, EntityTypes<?>> REGISTRY;
+  #else
+        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
+  #endif
+        return (RegistryMaterials) #REGISTRY;
     }
 #else
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry:###();
@@ -86,7 +87,7 @@ class EntityTypes {
 
 #if version >= 1.13
 
-#if version >= 1.14
+  #if version >= 1.14
     public static Class<?> getEntityClass(String internalEntityName) {
         java.util.Optional opt = EntityTypes.a(internalEntityName);
         if (opt.isPresent()) {
@@ -95,7 +96,7 @@ class EntityTypes {
             return null;
         }
     }
-#else
+  #else
     public static Class<?> getEntityClass(String internalEntityName) {
         EntityTypes type = EntityTypes.a(internalEntityName);
         if (type == null) {
@@ -104,14 +105,14 @@ class EntityTypes {
             return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type);
         }
     }
-#endif
+  #endif
 
     public static String getEntityInternalName(Class<?> entityType) {
-#if version >= 1.13.1
+  #if version >= 1.13.1
         java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
-#else
+  #else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
-#endif
+  #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
@@ -125,30 +126,37 @@ class EntityTypes {
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-#if version >= 1.13.1
+  #if version >= 1.13.1
         java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
-#else
+  #else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
-#endif
+  #endif
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
-#if version >= 1.13.1
+  #if version >= 1.13.1
                 return IRegistry.ENTITY_TYPE.a((Object) type);
-#else
+  #else
                 return EntityTypes.REGISTRY.a((Object) type);
-#endif
+  #endif
             }
         }
         return -1;
     }
+
 #elseif version >= 1.11
+
     public static Class<?> getEntityClass(String internalEntityName) {
-        return (Class) EntityTypes.b.get(new MinecraftKey(internalEntityName));
+        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
+        #require net.minecraft.server.RegistryMaterials public V get(K key);
+        RegistryMaterials registry = #REGISTRY;
+        MinecraftKey key = new MinecraftKey(internalEntityName);
+        return (Class) registry#get(key);
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        MinecraftKey key = EntityTypes.getName(entityType);
+        #require net.minecraft.server.EntityTypes public static MinecraftKey getName(Class<? extends Entity> oclass);
+        MinecraftKey key = EntityTypes#getName(entityType);
         if (key == null) {
             return null;
         } else {
@@ -157,9 +165,14 @@ class EntityTypes {
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-        return EntityTypes.b.a((Object) entityType);
+        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
+        #require net.minecraft.server.RegistryMaterials public int getId:a(V value);
+        RegistryMaterials registry = #REGISTRY;
+        return registry#getId(entityType);
     }
+
 #elseif version >= 1.9
+
     public static Class<?> getEntityClass(String internalEntityName) {
         java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
         return (Class) map.get(internalEntityName);
@@ -178,7 +191,9 @@ class EntityTypes {
             return -1;
         }
     }
+
 #else
+
     public static Class<?> getEntityClass(String internalEntityName) {
         java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
         return (Class) map.get(internalEntityName);

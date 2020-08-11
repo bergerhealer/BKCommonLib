@@ -134,7 +134,10 @@ class World extends IBlockAccess {
         // However, WorldProvider does not return the DimensionManager of the world, but
         // rather the enum constants, so the result of WorldProvider:getDimensionManager()
         // is safe to use!
-        return instance.worldProvider.getDimensionManager();
+        #require net.minecraft.server.World public WorldProvider worldProvider;
+        #require net.minecraft.server.WorldProvider public abstract DimensionManager getDimensionManager();
+        WorldProvider provider = instance#worldProvider;
+        return provider#getDimensionManager();
   #else
         // Uses a dimension ID, instead of a DimensionManager instance.
         // WorldProvider:getDimension() only returns -1, 0 or 1, as set in the constructor
@@ -578,11 +581,13 @@ class WorldServer extends World {
     }
 #elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
-        return instance.entityList;
+        #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList;
+        return instance#entityList;
     }
 #else
     public (Collection<EntityHandle>) Collection<Entity> getEntities() {
-        return instance.entityList;
+        #require net.minecraft.server.World public final List<Entity> entityList;
+        return instance#entityList;
     }
 #endif
 

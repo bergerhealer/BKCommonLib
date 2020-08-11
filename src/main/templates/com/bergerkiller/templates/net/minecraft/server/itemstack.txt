@@ -42,20 +42,26 @@ class ItemStack {
 
     // Create a default ItemStack with type STONE amount 1
     public static (ItemStackHandle) ItemStack newInstance() {
+        #require net.minecraft.server.Blocks public static final net.minecraft.server.Block STONE;
 #if version >= 1.13
-        return new ItemStack(Blocks.STONE, 1);
+        return new ItemStack(#STONE, 1);
 #elseif version >= 1.11.2
-        return new ItemStack(Item.getItemOf(Blocks.STONE), 1, 0, false);
+        #require net.minecraft.server.Item public static net.minecraft.server.Item getItemOf(net.minecraft.server.Block block);
+        net.minecraft.server.Block block = #STONE;
+        return new ItemStack(#getItemOf(block), 1, 0, false);
 #else
-        return new ItemStack(Blocks.STONE, 1, 0);
+        return new ItemStack(#STONE, 1, 0);
 #endif
     }
 
     public static (ItemStackHandle) ItemStack fromBlockData((IBlockDataHandle) IBlockData data, int amount) {
+        #require net.minecraft.server.IBlockData public abstract Block getBlock();
 #if version >= 1.13
-        return new ItemStack(data.getBlock(), amount);
+        return new ItemStack(data#getBlock(), amount);
 #else
-        return new ItemStack(data.getBlock(), amount, data.getBlock().getDropData(data));
+        #require net.minecraft.server.Block public int getDropData(IBlockData iblockdata);
+        Block block = data#getBlock();
+        return new ItemStack(block, amount, block#getDropData(data));
 #endif
     }
 

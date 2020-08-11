@@ -4,11 +4,14 @@ import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 
 class Item {
     public static Iterable<?> getRegistry() {
-#if version >= 1.13.1
-        return IRegistry.ITEM;
+#if version >= 1.14
+        #require net.minecraft.server.IRegistry public static final RegistryBlocks<Item> REGISTRY:ITEM;
+#elseif version >= 1.13.1
+        #require net.minecraft.server.IRegistry public static final IRegistry<Item> REGISTRY:ITEM;
 #else
-        return Item.REGISTRY;
+        #require net.minecraft.server.Item public static final RegistryMaterials<MinecraftKey, Item> REGISTRY;
 #endif
+        return #REGISTRY;
     }
 
     public int getMaxStackSize();

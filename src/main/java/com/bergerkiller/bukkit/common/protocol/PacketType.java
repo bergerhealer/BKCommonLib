@@ -215,6 +215,7 @@ public class PacketType extends ClassTemplate<Object> {
 
         // Apply the packet class
         this.setClass((Class<Object>) packetClass);
+        this.addImport("net.minecraft.server.*");
 
         // Obtain ID and determine in/outgoing
         int tmpId;

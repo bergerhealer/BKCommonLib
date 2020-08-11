@@ -534,6 +534,12 @@ class PacketPlayOutCollect extends Packet {
     private optional int unknown:c;
 }
 
+class PacketPlayOutSetSlot extends Packet {
+    private int windowId:a;
+    private int slot:b;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:c;
+}
+
 class PacketPlayOutWindowItems extends Packet {
     private int windowId:a;
 
