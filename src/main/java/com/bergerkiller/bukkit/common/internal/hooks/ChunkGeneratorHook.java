@@ -76,7 +76,7 @@ public class ChunkGeneratorHook {
         return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
-    private static class ChunkGeneratorHook_1_16 extends ClassHook<ChunkGeneratorHook_1_16> {
+    public static class ChunkGeneratorHook_1_16 extends ClassHook<ChunkGeneratorHook_1_16> {
         private final World world;
 
         public ChunkGeneratorHook_1_16(World world) {
@@ -109,7 +109,7 @@ public class ChunkGeneratorHook {
         }
     }
 
-    private static class ChunkGeneratorHook_1_8_to_1_15_2 extends ClassHook<ChunkGeneratorHook_1_8_to_1_15_2> {
+    public static class ChunkGeneratorHook_1_8_to_1_15_2 extends ClassHook<ChunkGeneratorHook_1_8_to_1_15_2> {
         private final World world;
 
         public ChunkGeneratorHook_1_8_to_1_15_2(World world) {

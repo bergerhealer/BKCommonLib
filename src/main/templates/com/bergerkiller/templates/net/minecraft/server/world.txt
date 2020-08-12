@@ -370,12 +370,14 @@ class WorldServer extends World {
         return instance.getChunkProvider().playerChunkMap;
     }
 #else
+    #require net.minecraft.server.WorldServer public EntityTracker tracker;
+
     public Object getEntityTrackerHandle() {
-        return instance.tracker;
+        return instance#tracker;
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-        instance.tracker = entityTrackerHandle;
+        instance#tracker = entityTrackerHandle;
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
@@ -449,7 +451,8 @@ class WorldServer extends World {
 
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
 #if version >= 1.9
-        return (ChunkProviderServer) instance.getChunkProvider();
+        #require net.minecraft.server.WorldServer public IChunkProvider getChunkProvider();
+        return (ChunkProviderServer) instance#getChunkProvider();
 #else
         return instance.chunkProviderServer;
 #endif

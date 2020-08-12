@@ -1443,7 +1443,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public org.bukkit.entity.Entity getBukkitEntity() {
-        if (instance.world == null) {
+        #require net.minecraft.server.Entity public World world;
+        World world = instance#world;
+        if (world == null) {
             // We need this to avoid NPE's for non-spawned entities!
             #require net.minecraft.server.Entity protected org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity;
             org.bukkit.entity.Entity entity = instance#bukkitEntity;
