@@ -647,7 +647,9 @@ class EntityTrackerEntryState {
     public (CommonPacket) Packet<?> getSpawnPacket() {
         #require net.minecraft.server.EntityTrackerEntryState private final Entity entity:tracker;
         Entity entity = instance#entity;
-  #if version >= 1.16
+  #if version >= 1.16.2
+        return entity.P();
+  #elseif version >= 1.16
         return entity.O();
   #elseif version >= 1.15
         return entity.L();

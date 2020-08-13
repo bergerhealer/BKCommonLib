@@ -541,7 +541,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public float fallDistance;
 
-#if version >= 1.16
+#if version >= 1.16.2
+    #require net.minecraft.server.Entity private float stepCounter:am;
+#elseif version >= 1.16
     #require net.minecraft.server.Entity private float stepCounter:at;
 #elseif version >= 1.14
     #require net.minecraft.server.Entity private float stepCounter:av;
@@ -626,7 +628,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
 
-#if version >= 1.16
+#if version >= 1.16.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aq;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ar;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:as;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:at;
+
+#elseif version >= 1.16
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
     private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:ax;
@@ -866,7 +876,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     protected unknown int al;
 #endif
 
-#if version >= 1.16
+#if version >= 1.16.2
+    optional private final double[] move_SomeArray:aA;
+    optional private long move_SomeState:aB;
+#elseif version >= 1.16
     optional private final double[] move_SomeArray:aF;
     optional private long move_SomeState:aG;
 #elseif version >= 1.14
@@ -904,7 +917,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.13
+#if version >= 1.16.2
+    protected void playStepSound:b((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+#elseif version >= 1.13
     protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
 #else
     protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) Block blockData);
@@ -999,7 +1014,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
     // Note: counts rain too as being wet!
-#if version >= 1.16
+#if version >= 1.16.2
+    public boolean isWet:aF();
+#elseif version >= 1.16
     public boolean isWet:aC();
 #elseif version >= 1.15
     public boolean isWet:ay();
@@ -1031,7 +1048,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      * }
      */
     // Note: checks just standing in water! Rain does not count.
-#if version >= 1.16
+#if version >= 1.16.2
+    public boolean isInWaterUpdate:aG();
+#elseif version >= 1.16
     public boolean isInWaterUpdate:aD();
 #elseif version >= 1.15
     public boolean isInWaterUpdate:az();
@@ -1158,7 +1177,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
      * }
      */
-#if version >= 1.15
+#if version >= 1.16.2
+    public double calculateDistance:h(double x, double y, double z);
+#elseif version >= 1.15
     public double calculateDistance:g(double x, double y, double z);
 #else
     public double calculateDistance:e(double x, double y, double z);
@@ -1213,7 +1234,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.16
+#if version >= 1.16.2
+    // Since 1.16.2 there's a flag, aY(), which gets whether the 'other' bounding box exists
+    // Only the Shulker and Boat entity appear to use this flag
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
+        return instance.aY() ? instance.getBoundingBox() : null;
+    }
+#elseif version >= 1.16
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
 #elseif version >= 1.15
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
@@ -1231,7 +1258,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
 #endif
 
+#if version >= 1.16.2
+    // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
+    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox((EntityHandle) Entity entity) {
+        return instance.isCollidable() ? entity.getBoundingBox() : null;
+    }
+#else
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
+#endif
 
 #if version >= 1.9
     public optional boolean isVehicle();
@@ -1379,7 +1413,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
 
-#if version >= 1.15
+#if version >= 1.16.2
+    public void onPush:i(double d0, double d1, double d2);
+#elseif version >= 1.15
     public void onPush:h(double d0, double d1, double d2);
 #elseif version >= 1.11
     public void onPush:f(double d0, double d1, double d2);

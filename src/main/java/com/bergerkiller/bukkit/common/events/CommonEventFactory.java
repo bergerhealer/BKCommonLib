@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.google.common.collect.Iterables;
@@ -27,10 +27,10 @@ public class CommonEventFactory {
     private final List<EntityHandle> entityMoveEntities = new LinkedList<EntityHandle>();
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
 
-    private final InstanceBuffer<BiomeMetaHandle> creaturePreSpawnMobs = new InstanceBuffer<BiomeMetaHandle>() {
+    private final InstanceBuffer<SpawnRateHandle> creaturePreSpawnMobs = new InstanceBuffer<SpawnRateHandle>() {
         @Override
-        public BiomeMetaHandle createElement() {
-            return BiomeMetaHandle.T.newHandleNull();
+        public SpawnRateHandle createElement() {
+            return SpawnRateHandle.T.newHandleNull();
         }
     };
 
@@ -94,7 +94,7 @@ public class CommonEventFactory {
      * @param inputTypes to process and fire events for
      * @return a list of mobs to spawn
      */
-    public List<BiomeMetaHandle> handleCreaturePreSpawn(World world, int x, int y, int z, List<BiomeMetaHandle> inputTypes) {
+    public List<SpawnRateHandle> handleCreaturePreSpawn(World world, int x, int y, int z, List<SpawnRateHandle> inputTypes) {
         // Shortcuts
         if (LogicUtil.nullOrEmpty(inputTypes) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
             return inputTypes;
@@ -102,7 +102,7 @@ public class CommonEventFactory {
 
         // Start processing the elements
         creaturePreSpawnMobs.clear();
-        for (BiomeMetaHandle inputMeta : inputTypes) {
+        for (SpawnRateHandle inputMeta : inputTypes) {
             final EntityType oldEntityType = CommonEntityType.byNMSEntityClass(inputMeta.getEntityClass()).entityType;
 
             // Set up the event
@@ -136,7 +136,7 @@ public class CommonEventFactory {
             }
 
             // Add element to buffer
-            final BiomeMetaHandle outputMeta = creaturePreSpawnMobs.add();
+            final SpawnRateHandle outputMeta = creaturePreSpawnMobs.add();
             outputMeta.setEntityClass(entityClass);
             outputMeta.setMinSpawnCount(creaturePreSpawnEvent.minSpawnCount);
             outputMeta.setMaxSpawnCount(creaturePreSpawnEvent.maxSpawnCount);

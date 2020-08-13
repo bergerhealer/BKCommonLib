@@ -670,7 +670,9 @@ class PacketPlayOutLogin extends Packet {
     }
 #endif
 
-#if version >= 1.16
+#if version >= 1.16.2
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:h;
+#elseif version >= 1.16
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:h;
 #elseif version >= 1.15
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:e;
@@ -735,7 +737,9 @@ class PacketPlayOutLogin extends Packet {
 }
 
 class PacketPlayOutRespawn extends Packet {
-#if version >= 1.16
+#if version >= 1.16.2
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:a;
+#elseif version >= 1.16
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:a;
 #elseif version >= 1.13.1
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:a;
@@ -893,7 +897,11 @@ class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.15
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:d;
+  #if version >= 1.16.2
+    private unknown int[] biomeStorage:e;
+  #else
     private unknown BiomeStorage biomeStorage:e;
+  #endif
     private optional byte[] data:f;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:g;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;

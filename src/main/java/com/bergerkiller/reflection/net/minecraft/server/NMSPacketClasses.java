@@ -1301,6 +1301,9 @@ public class NMSPacketClasses {
         }
     }
 
+    // Too complicated to maintain
+    // TODO: Restore this for post-1.16.2 or in general I guess
+    /*
     public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
 
         public final FieldAccessor<IntVector2> chunk = nextField("private ChunkCoordIntPair a").translate(DuplexConversion.chunkIntPair);
@@ -1320,6 +1323,7 @@ public class NMSPacketClasses {
             }
         }
     }
+    */
 
     public static class NMSPacketPlayOutNamedEntitySpawn extends NMSPacket {
 

@@ -78,7 +78,11 @@ class IChatBaseComponent {
 #if version >= 1.16
         // ChatModifier is immutable since 1.16
         public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+  #if version >= 1.16.2
+            ChatModifier initial_modifier = ChatModifier.a;
+  #else
             ChatModifier initial_modifier = ChatModifier.b;
+  #endif
 
             ChatModifier modifier = initial_modifier;
             java.util.Iterator iter = colors.iterator();

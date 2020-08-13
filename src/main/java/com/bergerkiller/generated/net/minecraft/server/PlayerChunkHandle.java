@@ -29,10 +29,6 @@ public abstract class PlayerChunkHandle extends Template.Handle {
     public abstract Chunk getChunkIfLoaded();
     public abstract IntVector2 getLocation();
     public abstract void setLocation(IntVector2 value);
-    public abstract int getDirtyCount();
-    public abstract void setDirtyCount(int value);
-    public abstract int getDirtySectionMask();
-    public abstract void setDirtySectionMask(int value);
     public abstract boolean isDone();
     public abstract void setDone(boolean value);
     /**
@@ -41,8 +37,6 @@ public abstract class PlayerChunkHandle extends Template.Handle {
      */
     public static final class PlayerChunkClass extends Template.Class<PlayerChunkHandle> {
         public final Template.Field.Converted<IntVector2> location = new Template.Field.Converted<IntVector2>();
-        public final Template.Field.Integer dirtyCount = new Template.Field.Integer();
-        public final Template.Field.Integer dirtySectionMask = new Template.Field.Integer();
         public final Template.Field.Boolean done = new Template.Field.Boolean();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();

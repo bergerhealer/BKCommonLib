@@ -34,8 +34,13 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         }
 
         // Reset dirty mask so it does not send twice
+  #if version >= 1.16.2
+        #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:r;
+        #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:s;
+  #else
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtySkyLightMask:t;
+  #endif
         instance#pc_dirtyBlockLightMask = 0;
         instance#pc_dirtySkyLightMask = 0;
 
@@ -108,28 +113,12 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
     private final (IntVector2) ChunkCoordIntPair location;
 
 #if version >= 1.14.1
-    private int dirtyCount;
-    private int dirtySectionMask:r;
-    public unknown final PlayerChunk.d players;
     private boolean done:hasBeenLoaded;
 #elseif version >= 1.14
-    private int dirtyCount;
-    private int dirtySectionMask:q;
-    public unknown final PlayerChunk.d players;
     private boolean done:x;
 #elseif version >= 1.9
-    private int dirtyCount;
-    private int dirtySectionMask:h;
     private boolean done;
-#elseif version >= 1.8.3
-    private unknown short[] dirtyBlocks;
-    private int dirtyCount;
-    private int dirtySectionMask:f;
-    private boolean done:loaded;
 #else
-    private unknown short[] dirtyBlocks;
-    private int dirtyCount;
-    private int dirtySectionMask:f;
     private boolean done:loaded;
 #endif
 

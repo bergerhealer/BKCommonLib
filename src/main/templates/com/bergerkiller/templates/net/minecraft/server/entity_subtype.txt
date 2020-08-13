@@ -22,7 +22,14 @@ import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 class EntityLiving extends Entity {
 
-#if version >= 1.16
+#if version >= 1.16.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ag;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bh;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bj;
+#elseif version >= 1.16
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:an;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
@@ -158,7 +165,12 @@ class EntityLiving extends Entity {
 
     public float lastDamage;
 
-#if version >= 1.16
+#if version >= 1.16.2
+    protected unknown boolean jumping;
+    public float sideMovement:aR;
+    public unknown float aS;
+    public float forwardMovement:aT;
+#elseif version >= 1.16
     protected unknown boolean jumping;
     public float sideMovement:aY;
     public unknown float aZ;
@@ -266,7 +278,12 @@ class EntityHuman extends EntityLiving {
     public int expTotal;
     public float exp;
 
-#if version >= 1.16
+#if version >= 1.16.2
+    protected unknown int bG;
+    protected unknown final float bH;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bJ;
+#elseif version >= 1.16
     protected unknown int bN;
     protected unknown final float bO;
     private unknown int g;
@@ -783,7 +800,9 @@ class EntityArmorStand extends EntityLiving {
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:e;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:f;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:g;
-  #if version >= 1.16
+  #if version >= 1.16.2
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bh;
+  #elseif version >= 1.16
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bo;
   #elseif version >= 1.15
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bp;

@@ -260,6 +260,10 @@ public class CommonBootstrap {
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2");
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
 
+        // Since Minecraft 1.16.2 it has an entirely new Class, this makes the API look clean
+        remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeBase$BiomeMeta");
+        remappings.put(nms_root + ".BiomeSettingsMobs", nms_root + ".BiomeBase");
+
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (evaluateMCVersion("<=", "1.8.8")) {
             remappings.put(nms_root + ".MobSpawnerData", nms_root + ".MobSpawnerAbstract$a");
@@ -304,7 +308,7 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
             remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
             remappings.put(nms_root + ".WeightedRandom$WeightedRandomChoice", nms_root + ".WeightedRandomChoice");
-            remappings.put(nms_root + ".BiomeBase$BiomeMeta", nms_root + ".BiomeMeta");
+            remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeMeta");
             remappings.put(nms_root + ".IScoreboardCriteria$EnumScoreboardHealthDisplay", nms_root + ".EnumScoreboardHealthDisplay");
             remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", nms_root + ".IntHashMapEntry");
             remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
@@ -392,6 +396,13 @@ public class CommonBootstrap {
         // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
         if (evaluateMCVersion("<", "1.16")) {
             remappings.put(nms_root + ".WorldDataServer", nms_root + ".WorldData");
+        }
+
+        // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
+        // Assume a more human-readable name and remap the name prior to the right place
+        if (evaluateMCVersion(">=", "1.16.2")) {
+            remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeSettingsMobs$c");
+            remappings.put(nms_root + ".BiomeSettingsMobs", nms_root + ".BiomeSettingsMobs");
         }
 
         // If remappings exist, add a resolver for them

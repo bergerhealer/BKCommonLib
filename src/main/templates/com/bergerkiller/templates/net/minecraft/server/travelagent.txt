@@ -59,8 +59,31 @@ class PortalTravelAgent {
             return location;
         }
 
-        // public ShapeDetector.c a(BlockPosition blockposition, Vec3D entityMotion, EnumDirection entityFacing, double portalOffsetX, double portalOffsetZ, boolean isHuman) {
         BlockPosition blockPosition = new BlockPosition(x, y, z);
+
+  #if version >= 1.16.2
+        // Call findPortal with the block position to start looking from
+        // Flag=false sets radius to 128 (default)
+        java.util.Optional opt_result = instance.findPortal(blockPosition, false);
+        if (!opt_result.isPresent()) {
+            return null;
+        }
+        BlockUtil$Rectangle result = (BlockUtil$Rectangle) opt_result.get();
+
+        // Turn the Rectangle into a Location
+        org.bukkit.Location location = startLocation.clone();
+        location.setX((double) result.origin.getX());
+        location.setY((double) result.origin.getY());
+        location.setZ((double) result.origin.getZ());
+        if (result.side1 > result.side2) {
+            location.setYaw(90.0f);
+        } else {
+            location.setYaw(0.0f);
+        }
+        return location;
+  #else
+        // This portion is the contents of findAndTeleport() which omits the Entity portion
+        // public ShapeDetector.c a(BlockPosition blockposition, Vec3D entityMotion, EnumDirection entityFacing, double portalOffsetX, double portalOffsetZ, boolean isHuman) {
         Vec3D entityMotion = Vec3D.a; // 0, 0, 0
         EnumDirection entityFacing = EnumDirection.NORTH;
         double portalOffsetX = 0.0;
@@ -74,18 +97,19 @@ class PortalTravelAgent {
         // result stores position (Vec3D a), motion (Vec3D b) and rotation (int c)
         // turn rotation into yaw. Assign x/y/z of a to location
         org.bukkit.Location location = startLocation.clone();
-  #if version >= 1.14.2
+    #if version >= 1.14.2
         location.setX(result.position.x);
         location.setY(result.position.y);
         location.setZ(result.position.z);
         location.setYaw((float) result.yaw);
-  #else
+    #else
         location.setX(result.a.x);
         location.setY(result.a.y);
         location.setZ(result.a.z);
         location.setYaw((float) result.c);
-  #endif
+    #endif
         return location;
+  #endif
 #else
         BlockPosition portalPosition = instance.findPortal(x, y, z, 128);
         if (portalPosition == null) {
@@ -141,21 +165,28 @@ class PortalTravelAgent {
             return true;
         }
 
+  #if version >= 1.16.2
+        // public Optional<BlockUtil.Rectangle> createPortal(BlockPosition blockposition, EnumDirection.EnumAxis enumdirection_enumaxis, Entity entity, int createRadius);
+        BlockPosition blockposition = new BlockPosition(x, y, z);
+        EnumDirection$EnumAxis enumaxis = EnumDirection$EnumAxis.X; //TODO: input parameter?
+        return instance.createPortal(blockposition, enumaxis, null, 128).isPresent();
+  #else
         // It now only accepts an Entity as parameter.
         // The method, however, only uses the locX/locY/locZ
         // Simply null-construct a temporary entity and set these fields
         Entity entity = (Entity) com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.newInstanceNull();
-  #if version >= 1.15
+    #if version >= 1.15
         entity.setPositionRaw(x, y, z);
-  #else
+    #else
         entity.locX = x;
         entity.locY = y;
         entity.locZ = z;
-  #endif
-  #if version >= 1.15.2
+    #endif
+    #if version >= 1.15.2
         return instance.createPortal(entity);
-  #else
+    #else
         return instance.a(entity);
+    #endif
   #endif
 #else
         return instance.createPortal(x, y, z, 16);

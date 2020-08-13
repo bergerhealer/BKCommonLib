@@ -16,7 +16,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
-import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
@@ -157,7 +157,11 @@ class World extends IBlockAccess {
     }
 #endif
 
-#if version >= 1.13
+#if version >= 1.14
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.getWorldBorder().a(entity.getBoundingBox());
+    }
+#elseif version >= 1.13
     public boolean isWithinWorldBorder:i((EntityHandle) Entity entity);
 #elseif version >= 1.11.2
     public boolean isWithinWorldBorder:g((EntityHandle) Entity entity);
@@ -753,9 +757,9 @@ class WeightedRandom {
     }
 }
 
-class BiomeBase {
+class BiomeSettingsMobs {
 
-    class BiomeBase.BiomeMeta extends WeightedRandom.WeightedRandomChoice {
+    class BiomeSettingsMobs.SpawnRate extends WeightedRandom.WeightedRandomChoice {
 #if version >= 1.16
         public (java.lang.Class<?>) EntityTypes entityClass:c;
 #elseif version >= 1.13
@@ -773,9 +777,9 @@ class BiomeBase {
 #endif
 
 #if version >= 1.13
-        public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) EntityTypes entityClass, int x, int y, int z);
+        public (SpawnRateHandle) BiomeSettingsMobs.SpawnRate((java.lang.Class<?>) EntityTypes entityClass, int x, int y, int z);
 #else
-        public (BiomeMetaHandle) BiomeBase.BiomeMeta((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
+        public (SpawnRateHandle) BiomeSettingsMobs.SpawnRate((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
 #endif
 
     }

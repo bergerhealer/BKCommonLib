@@ -182,7 +182,13 @@ class Block {
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.16.2
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        return iblockaccess.getType(blockposition).a(iblockaccess, blockposition, direction, EnumBlockSupport.RIGID);
+    }
+#elseif version >= 1.14
     public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
         if (iblockdata.a(TagsBlock.LEAVES)) {
             return false;
@@ -301,7 +307,11 @@ class Block {
         TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(world.random);
+  #if version >= 1.16.2
+        loottableinfo_builder.set(LootContextParameters.ORIGIN, Vec3D.a(blockposition));
+  #else
         loottableinfo_builder.set(LootContextParameters.POSITION, blockposition);
+  #endif
         loottableinfo_builder.set(LootContextParameters.TOOL, EMPTY_ITEM);
         loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
         loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));

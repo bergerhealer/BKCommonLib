@@ -447,6 +447,12 @@ public class TestServerFactory {
             setField(server, "console", mc_server);
             setField(mc_server, "serverThread", Thread.currentThread());
 
+            // Initialize the dimension root registry for the server
+            // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
+            // this.f = iregistrycustom_dimension; (MinecraftServer.java)
+            Object customRegistry = createFromCode(minecraftServerType, "return IRegistryCustom.b();");
+            setField(mc_server, "f", customRegistry);
+
             // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
             Field bkServerField = Bukkit.class.getDeclaredField("server");
             bkServerField.setAccessible(true);
@@ -455,8 +461,14 @@ public class TestServerFactory {
             // Initialize propertyManager field, which is responsible for server-wide settings like view distance
             Object propertyManager = ClassTemplate.create(nms_root + "DedicatedServerSettings").newInstanceNull();
             setField(mc_server, "propertyManager", propertyManager);
-            setField(propertyManager, "properties", createFromCode(Class.forName(nms_root + "DedicatedServerProperties"),
-                    "return new DedicatedServerProperties(new java.util.Properties(), new joptsimple.OptionParser().parse(new String[0]));\n"));
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.16.2")) {
+                setField(propertyManager, "properties", createFromCode(Class.forName(nms_root + "DedicatedServerProperties"),
+                        "return new DedicatedServerProperties(new java.util.Properties(), arg0, new joptsimple.OptionParser().parse(new String[0]));\n",
+                        customRegistry));
+            } else {
+                setField(propertyManager, "properties", createFromCode(Class.forName(nms_root + "DedicatedServerProperties"),
+                        "return new DedicatedServerProperties(new java.util.Properties(), new joptsimple.OptionParser().parse(new String[0]));\n"));
+            }
 
             // Create data converter registry manager object - used for serialization/deserialization
             // Only used >= MC 1.10.2
@@ -477,7 +489,6 @@ public class TestServerFactory {
                         "return SystemUtils.e();"));
             }
 
-            
             // this.dataPackResources = DataPackResources (passed through constructor)
             // The place where this is created can be found in Main.java and looks similar to this
             // Difference is that no configuration is read in, and we assume a default environment
@@ -584,13 +595,9 @@ public class TestServerFactory {
                 setField(mc_server, "dataPackResources", datapackresources);
             }
 
-            // Initialize the dimension root registry for the server
-            // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
-            // this.f = iregistrycustom_dimension; (MinecraftServer.java)
-            setField(mc_server, "f", createFromCode(minecraftServerType, "return IRegistryCustom.b();"));
-
             // Initialize WorldDataServer instance
             // public WorldDataServer(WorldSettings worldsettings, GeneratorSettings generatorsettings, Lifecycle lifecycle)
+            /*
             Object worldData;
             {
                 Object worldSettings = createFromCode(minecraftServerType, "return MinecraftServer.c;");
@@ -599,6 +606,7 @@ public class TestServerFactory {
                 Class<?> worldDataType = Class.forName(nms_root + "WorldDataServer");
                 worldData = construct(worldDataType, worldSettings, generatorSettings, lifeCycle);
             }
+            */
 
             /*
             // Initialize the server further, loading the resource packs, by calling MinecraftServer.a(File, WorldData)
@@ -669,6 +677,20 @@ public class TestServerFactory {
 
     protected static Object createFromCode(Class<?> type, String code) {
         return compileCode(type, "public static Object create() {" + code + "}").invoke(null);
+    }
+
+    protected static Object createFromCode(Class<?> type, String code, Object... args) {
+        StringBuilder body = new StringBuilder();
+        body.append("public static Object create(");
+        for (int i = 0; i < args.length; i++) {
+            if (i > 0) {
+                body.append(", ");
+            }
+            Class<?> argType = (args[i] == null) ? Object.class : args[i].getClass();
+            body.append(argType.getName()).append(" arg").append(i);
+        }
+        body.append(") {").append(code).append("}");
+        return compileCode(type, body.toString()).invokeVA(null, args);
     }
 
     protected static FastMethod<Object> compileCode(Class<?> type, String code) {

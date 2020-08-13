@@ -80,7 +80,6 @@ public class ReflectionTest {
             loadClass(NMSEntityMinecart.class);
             loadClass(NMSEnumGamemode.class);
             loadClass(NMSWeightedRandomChoice.class);
-            loadClass(NMSBiomeMeta.class);
             loadClass(NMSPlayerList.class);
             loadClass(PacketType.class);
             loadClass(NMSEntityItem.class);

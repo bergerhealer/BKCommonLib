@@ -50,7 +50,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutMap OUT_MAP = new NMSPacketPlayOutMap();
     public static final NMSPacketPlayOutMapChunk OUT_MAP_CHUNK = new NMSPacketPlayOutMapChunk();
     public static final NMSPacketPlayOutPlayerListHeaderFooter OUT_PLAYER_LIST_HEADER_FOOTER = new NMSPacketPlayOutPlayerListHeaderFooter();
-    public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
+    //public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
     public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();
     public static final NMSPacketPlayOutOpenSignEditor OUT_OPEN_SIGN_EDITOR = new NMSPacketPlayOutOpenSignEditor();
     public static final NMSPacketPlayOutPlayerInfo OUT_PLAYER_INFO = new NMSPacketPlayOutPlayerInfo();

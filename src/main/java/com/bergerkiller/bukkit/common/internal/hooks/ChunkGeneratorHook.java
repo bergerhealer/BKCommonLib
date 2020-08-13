@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle;
+import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -96,11 +96,11 @@ public class ChunkGeneratorHook {
 
                 // Wrap the parameters and send the event along
                 BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
-                List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+                List<SpawnRateHandle> mobsHandles = new ConvertingList<SpawnRateHandle>(mobs, SpawnRateHandle.T.getHandleConverter());
                 mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
                         pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
 
-                return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
+                return new ConvertingList<Object>(mobsHandles, SpawnRateHandle.T.getHandleConverter().reverse());
             } catch (Throwable t) {
                 Logging.LOGGER.log(Level.SEVERE, "Failed to handle mob pre-spawn event", t);
             }
@@ -129,11 +129,11 @@ public class ChunkGeneratorHook {
                     }
                     // Wrap the parameters and send the event along
                     BlockPositionHandle pos = BlockPositionHandle.createHandle(blockposition);
-                    List<BiomeMetaHandle> mobsHandles = new ConvertingList<BiomeMetaHandle>(mobs, BiomeMetaHandle.T.getHandleConverter());
+                    List<SpawnRateHandle> mobsHandles = new ConvertingList<SpawnRateHandle>(mobs, SpawnRateHandle.T.getHandleConverter());
                     mobsHandles = CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(this.world, 
                             pos.getX(), pos.getY(), pos.getZ(), mobsHandles);
 
-                    return new ConvertingList<Object>(mobsHandles, BiomeMetaHandle.T.getHandleConverter().reverse());
+                    return new ConvertingList<Object>(mobsHandles, SpawnRateHandle.T.getHandleConverter().reverse());
                 }
             } catch (Throwable t) {
                 Logging.LOGGER.log(Level.SEVERE, "Failed to handle mob pre-spawn event", t);
