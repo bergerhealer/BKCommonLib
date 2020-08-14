@@ -35,16 +35,13 @@ class EntityTypes {
 
 #if version >= 1.11
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
-  #if version >= 1.14
-        #require net.minecraft.server.IRegistry public static final RegistryBlocks<EntityTypes<?>> REGISTRY:ENTITY_TYPE;
-  #elseif version >= 1.13.1
-        #require net.minecraft.server.IRegistry public static final IRegistry<EntityTypes<?>> REGISTRY:ENTITY_TYPE;
+  #if version >= 1.13.1
+        return (RegistryMaterials) IRegistry.ENTITY_TYPE;
   #elseif version >= 1.13
-        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, EntityTypes<?>> REGISTRY;
+        return (RegistryMaterials) EntityTypes.REGISTRY;
   #else
-        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
+        return EntityTypes.b;
   #endif
-        return (RegistryMaterials) #REGISTRY;
     }
 #else
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry:###();
@@ -147,16 +144,11 @@ class EntityTypes {
 #elseif version >= 1.11
 
     public static Class<?> getEntityClass(String internalEntityName) {
-        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
-        #require net.minecraft.server.RegistryMaterials public V get(K key);
-        RegistryMaterials registry = #REGISTRY;
-        MinecraftKey key = new MinecraftKey(internalEntityName);
-        return (Class) registry#get(key);
+        return (Class) EntityTypes.b.get((Object) new MinecraftKey(internalEntityName));
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        #require net.minecraft.server.EntityTypes public static MinecraftKey getName(Class<? extends Entity> oclass);
-        MinecraftKey key = EntityTypes#getName(entityType);
+        MinecraftKey key = EntityTypes.getName(entityType);
         if (key == null) {
             return null;
         } else {
@@ -165,10 +157,7 @@ class EntityTypes {
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-        #require net.minecraft.server.EntityTypes public static final RegistryMaterials<MinecraftKey, Class<? extends Entity>> REGISTRY:b;
-        #require net.minecraft.server.RegistryMaterials public int getId:a(V value);
-        RegistryMaterials registry = #REGISTRY;
-        return registry#getId(entityType);
+        return EntityTypes.b.a((Object) entityType);
     }
 
 #elseif version >= 1.9

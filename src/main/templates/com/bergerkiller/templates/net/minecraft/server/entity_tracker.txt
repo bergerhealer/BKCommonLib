@@ -49,10 +49,6 @@ class EntityTracker {
 
 #else
     #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
-    #require net.minecraft.server.EntityTracker public final IntHashMap<EntityTrackerEntry> trackedEntities;
-    #require net.minecraft.server.IntHashMap public V mapRemove:d(int i);
-    #require net.minecraft.server.IntHashMap public void mapPut:a(int i, V value);
-    #require net.minecraft.server.IntHashMap public V mapGet:get(int i);
 
     private final (org.bukkit.World) WorldServer world;
 
@@ -61,21 +57,19 @@ class EntityTracker {
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
-        IntHashMap trackedEntities = instance#trackedEntities;
-        return (EntityTrackerEntry) trackedEntities#mapGet(entityId);
+        return (EntityTrackerEntry) instance.trackedEntities.get(entityId);
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
         java.util.Set set = instance#trackedEntitiesSet;
-        IntHashMap trackedEntities = instance#trackedEntities;
 
         // Remove any previous entry
-        EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities#mapRemove(entityId);
+        EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities.d(entityId);
         set.remove(previous);
 
         // Add the new entry
         if (entry != null) {
-            instance.trackedEntities#mapPut(entityId, entry);
+            instance.trackedEntities.a(entityId, (Object) entry);
             set.add(entry);
         }
 

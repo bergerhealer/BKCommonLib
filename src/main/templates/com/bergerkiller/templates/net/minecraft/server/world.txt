@@ -134,10 +134,7 @@ class World extends IBlockAccess {
         // However, WorldProvider does not return the DimensionManager of the world, but
         // rather the enum constants, so the result of WorldProvider:getDimensionManager()
         // is safe to use!
-        #require net.minecraft.server.World public WorldProvider worldProvider;
-        #require net.minecraft.server.WorldProvider public abstract DimensionManager getDimensionManager();
-        WorldProvider provider = instance#worldProvider;
-        return provider#getDimensionManager();
+        return instance.worldProvider.getDimensionManager();
   #else
         // Uses a dimension ID, instead of a DimensionManager instance.
         // WorldProvider:getDimension() only returns -1, 0 or 1, as set in the constructor
@@ -374,14 +371,12 @@ class WorldServer extends World {
         return instance.getChunkProvider().playerChunkMap;
     }
 #else
-    #require net.minecraft.server.WorldServer public EntityTracker tracker;
-
     public Object getEntityTrackerHandle() {
-        return instance#tracker;
+        return instance.tracker;
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-        instance#tracker = entityTrackerHandle;
+        instance.tracker = entityTrackerHandle;
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
@@ -455,8 +450,7 @@ class WorldServer extends World {
 
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
 #if version >= 1.9
-        #require net.minecraft.server.WorldServer public IChunkProvider getChunkProvider();
-        return (ChunkProviderServer) instance#getChunkProvider();
+        return (ChunkProviderServer) instance.getChunkProvider();
 #else
         return instance.chunkProviderServer;
 #endif
@@ -588,13 +582,11 @@ class WorldServer extends World {
     }
 #elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
-        #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList;
-        return instance#entityList;
+        return instance.entityList;
     }
 #else
     public (Collection<EntityHandle>) Collection<Entity> getEntities() {
-        #require net.minecraft.server.World public final List<Entity> entityList;
-        return instance#entityList;
+        return instance.entityList;
     }
 #endif
 

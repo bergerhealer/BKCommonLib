@@ -184,8 +184,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
     public (WorldHandle) World getWorld() {
-        #require net.minecraft.server.Entity public readonly World world;
-        return instance#world;
+        return instance.world;
     }
 
     <code>
@@ -1480,16 +1479,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public org.bukkit.entity.Entity getBukkitEntity() {
-        #require net.minecraft.server.Entity public World world;
-        World world = instance#world;
-        if (world == null) {
+        if (instance.world == null) {
             // We need this to avoid NPE's for non-spawned entities!
             #require net.minecraft.server.Entity protected org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity;
             org.bukkit.entity.Entity entity = instance#bukkitEntity;
             if (entity == null) {
                 org.bukkit.craftbukkit.CraftServer server = (org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer();
-                #require org.bukkit.craftbukkit.entity.CraftEntity public static org.bukkit.craftbukkit.entity.CraftEntity getEntity(org.bukkit.craftbukkit.CraftServer server, net.minecraft.server.Entity entity);
-                entity = #getEntity(server, instance);
+                entity = org.bukkit.craftbukkit.entity.CraftEntity.getEntity(server, instance);
                 instance#bukkitEntity = entity;
             }
             return entity;
