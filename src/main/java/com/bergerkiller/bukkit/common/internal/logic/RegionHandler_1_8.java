@@ -40,8 +40,8 @@ public class RegionHandler_1_8 extends RegionHandler {
 
     public RegionHandler_1_8() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("ChunkProviderServer"));
-        resolver.setVariable("version", Common.MC_VERSION);
+        resolver.setDeclaredClassName("net.minecraft.server.ChunkProviderServer");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         // chunkExists generated method
         {

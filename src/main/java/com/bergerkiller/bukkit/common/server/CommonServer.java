@@ -155,4 +155,35 @@ public interface CommonServer {
      * @param variables Map of variables to fill
      */
     public void addVariables(Map<String, String> variables);
+
+    /**
+     * Removes any pre-postfixes from a verion String
+     * 
+     * @param mc_version
+     * @return clean Minecraft version
+     */
+    public static String cleanVersion(String mc_version) {
+        String clean_version = mc_version;
+        int pre_idx = clean_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            clean_version = clean_version.substring(0, pre_idx);
+        }
+        return clean_version;
+    }
+
+    /**
+     * Checks for the existance of a -pre in the version String,
+     * and returns the pre-version if found. If none found,
+     * null is returned.
+     * 
+     * @param mc_version
+     * @return pre-version, null if no pre-version is active
+     */
+    public static String preVersion(String mc_version) {
+        int pre_idx = mc_version.indexOf("-pre");
+        if (pre_idx != -1) {
+            return mc_version.substring(pre_idx + 4);
+        }
+        return null;
+    }
 }

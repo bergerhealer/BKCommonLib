@@ -24,12 +24,12 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
 
     public LightingHandler_1_8_to_1_13_2() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
-        resolver.setVariable("version", Common.MC_VERSION);
+        resolver.setDeclaredClassName("net.minecraft.server.Chunk");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         getSectionBlockLightMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static byte[] getSectionBlockLight(Chunk chunk, int sectionIndex) {\n" +
-                "    ChunkSection[] sections = chunk.getSections();\n" +
+                "public byte[] getSectionBlockLight(int sectionIndex) {\n" +
+                "    ChunkSection[] sections = instance.getSections();\n" +
                 "    if (sectionIndex >= 0 && sectionIndex < sections.length) {\n" +
                 "        ChunkSection section = sections[sectionIndex];\n" +
                 "        if (section != null) {\n" +
@@ -48,8 +48,8 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
         getSectionBlockLightMethod.forceInitialization();
 
         getSectionSkyLightMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                "public static byte[] getSectionSkyLight(Chunk chunk, int sectionIndex) {\n" +
-                "    ChunkSection[] sections = chunk.getSections();\n" +
+                "public byte[] getSectionSkyLight(int sectionIndex) {\n" +
+                "    ChunkSection[] sections = instance.getSections();\n" +
                 "    if (sectionIndex >= 0 && sectionIndex < sections.length) {\n" +
                 "        ChunkSection section = sections[sectionIndex];\n" +
                 "        if (section != null) {\n" +
@@ -68,8 +68,8 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
         getSectionSkyLightMethod.forceInitialization();
 
         setSectionBlockLightMethod.init(new MethodDeclaration(resolver,
-                "public static void setSectionBlockLight(Chunk chunk, int sectionIndex, byte[] data) {\n" +
-                "    ChunkSection[] sections = chunk.getSections();\n" +
+                "public void setSectionBlockLight(int sectionIndex, byte[] data) {\n" +
+                "    ChunkSection[] sections = instance.getSections();\n" +
                 "    if (sectionIndex >= 0 && sectionIndex < sections.length) {\n" +
                 "        ChunkSection section = sections[sectionIndex];\n" +
                 "        if (section != null) {\n" +
@@ -80,8 +80,8 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
         setSectionBlockLightMethod.forceInitialization();
 
         setSectionSkyLightMethod.init(new MethodDeclaration(resolver,
-                "public static void setSectionSkyLight(Chunk chunk, int sectionIndex, byte[] data) {\n" +
-                "    ChunkSection[] sections = chunk.getSections();\n" +
+                "public void setSectionSkyLight(int sectionIndex, byte[] data) {\n" +
+                "    ChunkSection[] sections = instance.getSections();\n" +
                 "    if (sectionIndex >= 0 && sectionIndex < sections.length) {\n" +
                 "        ChunkSection section = sections[sectionIndex];\n" +
                 "        if (section != null) {\n" +
@@ -95,20 +95,20 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
     @Override
     public byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
         Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-        return getSectionBlockLightMethod.invoke(null, nms_chunk, cy);
+        return getSectionBlockLightMethod.invoke(nms_chunk, cy);
     }
 
     @Override
     public byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
         Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-        return getSectionSkyLightMethod.invoke(null, nms_chunk, cy);
+        return getSectionSkyLightMethod.invoke(nms_chunk, cy);
     }
 
     @Override
     public CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
         return CommonUtil.runAsyncMainThread(() -> {
             Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-            setSectionBlockLightMethod.invoke(null, nms_chunk, cy, data);
+            setSectionBlockLightMethod.invoke(nms_chunk, cy, data);
         });
     }
 
@@ -116,7 +116,7 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
     public CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
         return CommonUtil.runAsyncMainThread(() -> {
             Object nms_chunk = HandleConversion.toChunkHandle(world.getChunkAt(cx, cz));
-            setSectionSkyLightMethod.invoke(null, nms_chunk, cy, data);
+            setSectionSkyLightMethod.invoke(nms_chunk, cy, data);
         });
     }
 }

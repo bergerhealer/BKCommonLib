@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -17,7 +18,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
     private HashMap<Class<?>, List<ClassDeclaration>> classes = new HashMap<Class<?>, List<ClassDeclaration>>();
     private boolean classes_loaded = false;
     private String version = "UNKNOWN";
-    private String pre_version = null;
+    private final Map<String, String> variables = new HashMap<>();
 
     private final String[] supported_mc_versions = new String[] {
             "1.8", "1.8.3", "1.8.4", "1.8.5", "1.8.6", "1.8.7", "1.8.8",
@@ -56,6 +57,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
 
     @Override
     public void resolveClassVariables(String classPath, Class<?> classType, Map<String, String> variables) {
+        variables.putAll(this.variables);
     }
 
     /**
@@ -85,22 +87,14 @@ public class TemplateResolver implements ClassDeclarationResolver {
     public void load() {
         if (!classes_loaded) {
             classes_loaded = true;
-            this.version = cleanVersion(Common.MC_VERSION);
-            this.pre_version = preVersion(Common.MC_VERSION);
+            this.version = Common.SERVER.getMinecraftVersionMajor();
 
             String templatePath = "com/bergerkiller/templates/init.txt";
-            Map<String, String> variables = new HashMap<String, String>();
-
-            //TODO: Should we move these to the SERVER addVariables too?
-            variables.put("version", this.version);
-            if (this.pre_version != null) {
-                variables.put("pre", this.pre_version);
-            }
-
-            Common.SERVER.addVariables(variables);
+            this.variables.clear();
+            Common.SERVER.addVariables(this.variables);
 
             ClassLoader classLoader = TemplateResolver.class.getClassLoader();
-            SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, variables);
+            SourceDeclaration sourceDec = SourceDeclaration.parseFromResources(classLoader, templatePath, this.variables);
             for (ClassDeclaration cdec : sourceDec.classes) {
                 register(cdec);
             }
@@ -129,7 +123,7 @@ public class TemplateResolver implements ClassDeclarationResolver {
      * @return True if supported, False if not
      */
     public boolean isSupported(String mc_version) {
-        return LogicUtil.contains(cleanVersion(mc_version), supported_mc_versions);
+        return LogicUtil.contains(CommonServer.cleanVersion(mc_version), supported_mc_versions);
     }
 
     /**
@@ -148,22 +142,5 @@ public class TemplateResolver implements ClassDeclarationResolver {
      */
     public String getVersion() {
         return this.version;
-    }
-
-    private static String cleanVersion(String mc_version) {
-        String clean_version = mc_version;
-        int pre_idx = clean_version.indexOf("-pre");
-        if (pre_idx != -1) {
-            clean_version = clean_version.substring(0, pre_idx);
-        }
-        return clean_version;
-    }
-
-    private static String preVersion(String mc_version) {
-        int pre_idx = mc_version.indexOf("-pre");
-        if (pre_idx != -1) {
-            return mc_version.substring(pre_idx + 4);
-        }
-        return null;
     }
 }

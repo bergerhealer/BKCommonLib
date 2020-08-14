@@ -109,22 +109,12 @@ public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public String getMinecraftVersionMajor() {
-        String clean_version = this.getMinecraftVersion();
-        int pre_idx = clean_version.indexOf("-pre");
-        if (pre_idx != -1) {
-            clean_version = clean_version.substring(0, pre_idx);
-        }
-        return clean_version;
+        return CommonServer.cleanVersion(getMinecraftVersion());
     }
 
     @Override
     public String getMinecraftVersionPre() {
-        String mc_version = this.getMinecraftVersion();
-        int pre_idx = mc_version.indexOf("-pre");
-        if (pre_idx != -1) {
-            return mc_version.substring(pre_idx + 4);
-        }
-        return null;
+        return CommonServer.preVersion(getMinecraftVersion());
     }
 
     @Override
@@ -134,6 +124,12 @@ public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public void addVariables(Map<String, String> variables) {
+        variables.put("version", getMinecraftVersionMajor());
+
+        String pre_version = getMinecraftVersionPre();
+        if (pre_version != null) {
+            variables.put("pre", pre_version);
+        }
     }
 
     @Override
