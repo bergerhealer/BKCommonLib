@@ -16,8 +16,10 @@ class ItemStack {
 #endif
 
     private int amountField:count;
-    private (org.bukkit.Material) Item typeField:item;
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
+
+    public (org.bukkit.Material) Item getTypeField:getItem();
+    public void setTypeField:setItem((org.bukkit.Material) Item type);
 
 #if version >= 1.13
     private optional int durabilityField:###;

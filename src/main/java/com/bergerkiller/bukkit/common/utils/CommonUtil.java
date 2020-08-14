@@ -102,7 +102,7 @@ public class CommonUtil {
      * @return True if the server is shutting down
      */
     public static boolean isShuttingDown() {
-        return CommonNMS.getMCServer().isHasStopped();
+        return MinecraftServerHandle.instance().isHasStopped();
     }
 
     /**

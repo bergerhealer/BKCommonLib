@@ -55,7 +55,7 @@ public abstract class PlayerFileDataHandler {
             }
         }
 
-        @HookMethod("public abstract NBTTagCompound load(EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract net.minecraft.server.NBTTagCompound load(net.minecraft.server.EntityHuman paramEntityHuman)")
         public Object load(Object entityHuman) {
             if (this.controller != null) {
                 Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);
@@ -72,7 +72,7 @@ public abstract class PlayerFileDataHandler {
             return this.base.load(entityHuman);
         }
 
-        @HookMethod("public abstract void save(EntityHuman paramEntityHuman)")
+        @HookMethod("public abstract void save(net.minecraft.server.EntityHuman paramEntityHuman)")
         public void save(Object entityHuman) {
             if (this.controller != null) {
                 Player player = CommonUtil.tryCast(WrapperConversion.toEntity(entityHuman), Player.class);

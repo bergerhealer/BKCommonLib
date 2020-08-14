@@ -1,7 +1,13 @@
 package com.bergerkiller.bukkit.common.server;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Map;
 
+import org.bukkit.Bukkit;
+
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
@@ -40,6 +46,40 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
     @Override
     public String getServerName() {
         return "Mohist";
+    }
+
+    public String getMainWorldName() {
+        return "world";
+    }
+
+    @Override
+    public Collection<String> getLoadableWorlds() {
+        String[] subDirs = Bukkit.getWorldContainer().list();
+        Collection<String> rval = new ArrayList<String>(subDirs.length + 1);
+        rval.add(getMainWorldName());
+        for (String worldName : subDirs) {
+            if (isLoadableWorld(worldName)) {
+                rval.add(worldName);
+            }
+        }
+        return rval;
+    }
+
+    @Override
+    public File getWorldRegionFolder(String worldName) {
+        // Is always the region subdirectory on Forge
+        File regionFolder = new File(getWorldFolder(worldName), "region");
+        return regionFolder.exists() ? regionFolder : null;
+    }
+
+    @Override
+    public File getWorldFolder(String worldName) {
+        // If main world, then it is the container itself
+        if (worldName.equals(getMainWorldName())) {
+            return Bukkit.getWorldContainer();
+        } else {
+            return StreamUtil.getFileIgnoreCase(Bukkit.getWorldContainer(), worldName);
+        }
     }
 
     @Override

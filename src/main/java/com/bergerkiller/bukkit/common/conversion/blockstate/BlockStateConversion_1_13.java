@@ -15,11 +15,11 @@ import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -30,8 +30,8 @@ import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
-import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
 /**
  * BlockState conversion used on MC 1.13 and after
@@ -100,22 +100,22 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
                 // setTypeAndData is used by TileEntityStructure
                 if (methodName.equals("setTypeAndData")) {
-                    return (instance, args) -> Boolean.TRUE;
+                    return ConstantReturningInvoker.of(Boolean.TRUE);
                 }
 
                 // Gets the Minecraft Server (safe)
                 if (methodName.equals("getMinecraftServer")) {
-                    return (instance, args) -> CommonNMS.getMCServer().getRaw();
+                    return ConstantReturningInvoker.of(MinecraftServerHandle.instance().getRaw());
                 }
 
                 // TileEntityMobSpawner uses this to perform physics logic, disable that and do nothing
                 if (methodName.equals("notify") || methodName.equals("b") || methodName.equals("updateAdjacentComparators")) {
-                    return (instance, args) -> null;
+                    return ConstantReturningInvoker.of(null);
                 }
 
                 // Fluid and Block Tick list
                 if (params.length == 0 && CommonUtil.getNMSClass("TickList").isAssignableFrom(method.getReturnType())) {
-                    return (instance, args) -> proxy_nms_world_ticklist;
+                    return ConstantReturningInvoker.of(proxy_nms_world_ticklist);
                 }
 
                 // All other method calls fail
@@ -136,7 +136,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
                 // Get the NMS World proxy
                 if (method.getName().equals("getHandle")) {
-                    return (instance, args) -> proxy_nms_world;
+                    return ConstantReturningInvoker.of(proxy_nms_world);
                 }
 
                 // All other method calls fail
@@ -153,7 +153,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             protected Invoker<?> getCallback(Method method) {
                 String name = method.getName();
                 if (name.equals("getWorld")) {
-                    return new NullInvoker<World>(proxy_world);
+                    return ConstantReturningInvoker.of(proxy_world);
                 } else if (name.equals("getChunk")) {
                     return (instance, args) -> input_state.chunk;
                 } else if (name.equals("getType")) {

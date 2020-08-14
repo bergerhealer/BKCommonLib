@@ -32,6 +32,8 @@ public abstract class ItemStackHandle extends Template.Handle {
         return T.fromBlockData.invoke(data, amount);
     }
 
+    public abstract Material getTypeField();
+    public abstract void setTypeField(Material type);
     public abstract Object getItem();
     public abstract ChatText getName();
     public abstract void setName(ChatText name);
@@ -78,8 +80,6 @@ public abstract class ItemStackHandle extends Template.Handle {
     }
     public abstract int getAmountField();
     public abstract void setAmountField(int value);
-    public abstract Material getTypeField();
-    public abstract void setTypeField(Material value);
     public abstract CommonTagCompound getTagField();
     public abstract void setTagField(CommonTagCompound value);
     /**
@@ -91,7 +91,6 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.StaticField.Converted<ItemStackHandle> OPT_EMPTY_ITEM = new Template.StaticField.Converted<ItemStackHandle>();
 
         public final Template.Field.Integer amountField = new Template.Field.Integer();
-        public final Template.Field.Converted<Material> typeField = new Template.Field.Converted<Material>();
         public final Template.Field.Converted<CommonTagCompound> tagField = new Template.Field.Converted<CommonTagCompound>();
         @Template.Optional
         public final Template.Field.Integer durabilityField = new Template.Field.Integer();
@@ -99,6 +98,8 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ItemStackHandle> newInstance = new Template.StaticMethod.Converted<ItemStackHandle>();
         public final Template.StaticMethod.Converted<ItemStackHandle> fromBlockData = new Template.StaticMethod.Converted<ItemStackHandle>();
 
+        public final Template.Method.Converted<Material> getTypeField = new Template.Method.Converted<Material>();
+        public final Template.Method.Converted<Void> setTypeField = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Object> getItem = new Template.Method<Object>();

@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.logging.Level;
 
 import org.bukkit.Chunk;
-import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -17,15 +16,20 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
@@ -34,10 +38,11 @@ import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
  */
 public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     private TileState input_state;
+    private final Object proxy_nms_world;
     private final World proxy_world;
     private final Chunk proxy_chunk;
     private final Block proxy_block;
-    private final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
+    private static final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
         String name = instance.getClass().getSuperclass().getSimpleName();
         throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
     };
@@ -63,6 +68,9 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
             }
         }.createInstance(CraftChunkHandle.T.getType());
 
+        // Only appears to be used on forge servers, standard Spigot never calls getHandle() in CraftWorld
+        proxy_nms_world = new NMSWorldHook().createInstance(WorldServerHandle.T.getType());
+
         // Create a CraftWorld proxy that only supports the following calls:
         // - getTileEntityAt(x, y, z) to return our requested entity
         // All other methods will fail.
@@ -72,6 +80,11 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 // Gets our requested tile entity
                 if (method.getName().equals("getTileEntityAt")) {
                     return (instance, args) -> input_state.tileEntity;
+                }
+
+                // Gets the Handle (World/WorldServer)
+                if (method.getName().equals("getHandle")) {
+                    return ConstantReturningInvoker.of(proxy_nms_world);
                 }
 
                 // All other method calls fail
@@ -93,11 +106,11 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
                 } else if (name.equals("getChunk")) {
                     return (instance, args) -> input_state.block.getChunk();
                 } else if (name.equals("getType")) {
-                    return (instance, args) -> input_state.type;
+                    return (instance, args) -> input_state.blockData.getType();
                 } else if (name.equals("getTypeId")) {
-                    return (instance, args) -> CommonLegacyMaterials.getIdFromMaterial(input_state.type);
+                    return (instance, args) -> CommonLegacyMaterials.getIdFromMaterial(input_state.blockData.getType());
                 } else if (name.equals("getData")) {
-                    return (instance, args) -> input_state.rawData;
+                    return (instance, args) -> (byte) input_state.blockData.getRawData();
                 } else if (name.equals("getLightLevel")) {
                     return (instance, args) -> input_state.block.getLightLevel();
                 } else if (name.equals("getX")) {
@@ -211,15 +224,41 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
 
     private static final class TileState {
         public final Object tileEntity;
-        public final byte rawData;
-        public final Material type;
+        public final BlockData blockData;
         public final Block block;
 
         public TileState(Block block, Object nmsTileEntity) {
             this.block = block;
             this.tileEntity = nmsTileEntity;
-            this.type = TileEntityHandle.T.getType.invoke(nmsTileEntity);
-            this.rawData = (byte) (TileEntityHandle.T.getLegacyData.invoke(nmsTileEntity) & 0xF);
+            this.blockData = TileEntityHandle.T.getBlockData.invoke(nmsTileEntity);
+        }
+    }
+
+    public class NMSWorldHook extends ClassHook<NMSWorldHook> {
+        @Override
+        protected Invoker<?> getCallback(Method method) {
+            Invoker<?> callback = super.getCallback(method);
+            return (callback != null) ? callback : non_instrumented_invokable;
+        }
+
+        @HookMethod("public net.minecraft.server.TileEntity getTileEntity(net.minecraft.server.BlockPosition blockposition)")
+        public Object getTileEntity(Object blockPosition) {
+            return input_state.tileEntity;
+        }
+
+        @HookMethod("public net.minecraft.server.MinecraftServer getMinecraftServer()")
+        public Object getMinecraftServer() {
+            return MinecraftServerHandle.instance().getRaw();
+        }
+
+        @HookMethod("public net.minecraft.server.IBlockData getType(net.minecraft.server.BlockPosition blockposition)")
+        public Object getType(Object blockPosition) {
+            return input_state.blockData.getData();
+        }
+
+        @HookMethod("public boolean setTypeAndData(net.minecraft.server.BlockPosition blockposition, net.minecraft.server.IBlockData iblockdata, int i)")
+        public boolean setTypeAndData(Object blockPosition, Object iblockdata, int i) {
+            return true;
         }
     }
 

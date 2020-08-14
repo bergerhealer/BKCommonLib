@@ -199,7 +199,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.server.ItemStack", acceptsNull = true)
     public static org.bukkit.inventory.ItemStack toItemStack(Object nmsItemStackHandle) {
-        if (nmsItemStackHandle == null || ItemStackHandle.T.typeField.raw.get(nmsItemStackHandle) == null) {
+        if (nmsItemStackHandle == null || ItemStackHandle.T.getTypeField.raw.invoke(nmsItemStackHandle) == null) {
             return null;
         } else {
             return CraftItemStackHandle.asCraftMirror(nmsItemStackHandle);

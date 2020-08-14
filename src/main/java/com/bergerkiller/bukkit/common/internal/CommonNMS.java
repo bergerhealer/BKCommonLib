@@ -132,15 +132,6 @@ public class CommonNMS {
     }
 
     /**
-     * Gets the native Minecraft Server which contains the main logic
-     *
-     * @return Minecraft Server
-     */
-    public static MinecraftServerHandle getMCServer() {
-        return MinecraftServerHandle.instance();
-    }
-
-    /**
      * Gets the native Minecraft Server Player List, which keeps track of
      * player-related information
      *

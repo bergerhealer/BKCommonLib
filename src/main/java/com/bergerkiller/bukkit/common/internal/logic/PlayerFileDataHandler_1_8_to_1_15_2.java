@@ -31,7 +31,7 @@ public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public java.io.File getPlayerDir() {\n" +
-                    "    return ((WorldNBTStorage) instance.getDataManager()).getPlayerDir();\n" +
+                    "    return ((net.minecraft.server.WorldNBTStorage) instance.getDataManager()).getPlayerDir();\n" +
                     "}"));
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }

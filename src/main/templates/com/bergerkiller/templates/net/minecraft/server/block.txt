@@ -345,9 +345,9 @@ class Block {
 
     public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition) {
 #if version >= 1.13
-        return Block.b(iblockdata, world, blockposition);
+        return Block.b(iblockdata, (GeneratorAccess) world, blockposition);
 #else
-        return instance.updateState(iblockdata, world, blockposition);
+        return instance.updateState(iblockdata, (IBlockAccess) world, blockposition);
 #endif
     }
 
