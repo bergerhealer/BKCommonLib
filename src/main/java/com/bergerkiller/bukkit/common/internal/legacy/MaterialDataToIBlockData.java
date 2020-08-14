@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
@@ -37,6 +38,7 @@ public class MaterialDataToIBlockData {
         {
             ClassResolver resolver = new ClassResolver();
             resolver.setDeclaredClass(CommonUtil.getCBClass("util.CraftMagicNumbers"));
+            resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                         "public static net.minecraft.server.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
@@ -64,10 +66,12 @@ public class MaterialDataToIBlockData {
             } else {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, 
                         "public static net.minecraft.server.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
+                        "    #require net.minecraft.server.Block public IBlockData fromLegacyData(int legacyData);\n" +
+                        "    #require net.minecraft.server.Block public IBlockData getBlockData();\n" +
                         "    net.minecraft.server.Block block = CraftMagicNumbers.getBlock(materialdata.getItemType());\n" +
                         "    net.minecraft.server.IBlockData result;\n" +
                         "    try {\n" +
-                        "        result = block.fromLegacyData((int) materialdata.getData());\n" +
+                        "        result = block#fromLegacyData((int) materialdata.getData());\n" +
                         "        // Returns null on TacoSpigot when last set() fails\n" +
                         "        if (result != null) {\n" +
                         "            return result;\n" +
@@ -79,7 +83,7 @@ public class MaterialDataToIBlockData {
                         "        System.err.println(\"[BKCommonLib] An error occurred inside fromLegacyData(\"+Byte.toString(materialdata.getData())+\"):\");\n" +
                         "        t.printStackTrace();\n" +
                         "    }\n" +
-                        "    result = block.getBlockData();\n" +
+                        "    result = block#getBlockData();\n" +
                         "    if (result == null) {\n" +
                         "        System.err.println(\"[BKCommonLib] Block \"+block.toString()+\" getBlockData() returned null!\");\n" +
                         "    }\n" +

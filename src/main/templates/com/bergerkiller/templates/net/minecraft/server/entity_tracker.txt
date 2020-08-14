@@ -9,29 +9,16 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 class EntityTracker {
 #if version >= 1.14
     public final (org.bukkit.World) WorldServer world;
-#else
-    private final (org.bukkit.World) WorldServer world;
-#endif
 
     public (Collection<com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
-#if version >= 1.14
         return instance.trackedEntities.values();
-#else
-        #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
-        return instance#trackedEntitiesSet;
-#endif
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
-#if version >= 1.14
         return (PlayerChunkMap$EntityTracker) instance.trackedEntities.get(entityId);
-#else
-        return (EntityTrackerEntry) instance.trackedEntities.get(entityId);
-#endif
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
-#if version >= 1.14
         if (entry == null) {
             return (PlayerChunkMap$EntityTracker) instance.trackedEntities.remove(entityId);
         } else if (instance.trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
@@ -41,26 +28,8 @@ class EntityTracker {
             instance.trackedEntities.remove(entityId);
             return (PlayerChunkMap$EntityTracker) instance.trackedEntities.putIfAbsent(entityId, entry);
         }
-#else
-        #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
-
-        java.util.Set set = instance#trackedEntitiesSet;
-
-        // Remove any previous entry
-        EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities.d(entityId);
-        set.remove(previous);
-
-        // Add the new entry
-        if (entry != null) {
-            instance.trackedEntities.a(entityId, entry);
-            set.add(entry);
-        }
-
-        return previous;
-#endif
     }
 
-#if version >= 1.14
   #if exists net.minecraft.server.PlayerChunkMap.ProtectedVisibleChunksMap
     public optional void setVisibleChunksToUpdatingChunks:###();
   #elseif exists net.minecraft.server.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.PlayerChunk> visibleChunksClone;
@@ -77,8 +46,44 @@ class EntityTracker {
   #else
     public optional void setVisibleChunksToUpdatingChunks:###();
   #endif
+
 #else
+    #require net.minecraft.server.EntityTracker private final Set<EntityTrackerEntry> trackedEntitiesSet:c;
+    #require net.minecraft.server.EntityTracker public final IntHashMap<EntityTrackerEntry> trackedEntities;
+    #require net.minecraft.server.IntHashMap public V mapRemove:d(int i);
+    #require net.minecraft.server.IntHashMap public void mapPut:a(int i, V value);
+    #require net.minecraft.server.IntHashMap public V mapGet:get(int i);
+
+    private final (org.bukkit.World) WorldServer world;
+
+    public (Collection<com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
+        return instance#trackedEntitiesSet;
+    }
+
+    public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
+        IntHashMap trackedEntities = instance#trackedEntities;
+        return (EntityTrackerEntry) trackedEntities#mapGet(entityId);
+    }
+
+    public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
+        java.util.Set set = instance#trackedEntitiesSet;
+        IntHashMap trackedEntities = instance#trackedEntities;
+
+        // Remove any previous entry
+        EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities#mapRemove(entityId);
+        set.remove(previous);
+
+        // Add the new entry
+        if (entry != null) {
+            instance.trackedEntities#mapPut(entityId, entry);
+            set.add(entry);
+        }
+
+        return previous;
+    }
+
     public optional void setVisibleChunksToUpdatingChunks:###();
+
 #endif
 
 #if version >= 1.14.1

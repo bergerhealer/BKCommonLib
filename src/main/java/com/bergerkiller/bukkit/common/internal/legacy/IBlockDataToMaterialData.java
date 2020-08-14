@@ -63,6 +63,7 @@ public class IBlockDataToMaterialData {
         {
             ClassResolver resolver = new ClassResolver();
             resolver.setDeclaredClass(CommonUtil.getCBClass("util.CraftMagicNumbers"));
+            resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftbukkitGetMaterialdata.init(new MethodDeclaration(resolver, 
                         "public static org.bukkit.material.MaterialData getMaterialData(net.minecraft.server.IBlockData iblockdata) {\n" +
@@ -84,8 +85,12 @@ public class IBlockDataToMaterialData {
             } else {
                 craftbukkitGetMaterialdata.init(new MethodDeclaration(resolver, 
                         "public static org.bukkit.material.MaterialData getMaterialData(net.minecraft.server.IBlockData iblockdata) {\n" +
-                        "    org.bukkit.Material data_type = CraftMagicNumbers.getMaterial(iblockdata.getBlock());\n" +
-                        "    byte data_value = (byte) iblockdata.getBlock().toLegacyData(iblockdata);\n" +
+                        "    #require net.minecraft.server.IBlockData public abstract Block getBlock();\n" +
+                        "    #require net.minecraft.server.Block public int toLegacyData(IBlockData iblockdata);\n" +
+                        "    #require org.bukkit.craftbukkit.util.CraftMagicNumbers public static org.bukkit.Material getMaterial(net.minecraft.server.Block block);\n" +
+                        "    net.minecraft.server.Block block = iblockdata#getBlock();\n" +
+                        "    org.bukkit.Material data_type = #getMaterial(block);\n" +
+                        "    byte data_value = (byte) block#toLegacyData(iblockdata);\n" +
                         "    return com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData.createMaterialData(data_type, data_type, data_value);\n" +
                         "}"
                 ));

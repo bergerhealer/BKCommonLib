@@ -184,7 +184,8 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
     public (WorldHandle) World getWorld() {
-        return instance.world;
+        #require net.minecraft.server.Entity public readonly World world;
+        return instance#world;
     }
 
     <code>
@@ -1487,7 +1488,8 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
             org.bukkit.entity.Entity entity = instance#bukkitEntity;
             if (entity == null) {
                 org.bukkit.craftbukkit.CraftServer server = (org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer();
-                entity = org.bukkit.craftbukkit.entity.CraftEntity.getEntity(server, instance);
+                #require org.bukkit.craftbukkit.entity.CraftEntity public static org.bukkit.craftbukkit.entity.CraftEntity getEntity(org.bukkit.craftbukkit.CraftServer server, net.minecraft.server.Entity entity);
+                entity = #getEntity(server, instance);
                 instance#bukkitEntity = entity;
             }
             return entity;
