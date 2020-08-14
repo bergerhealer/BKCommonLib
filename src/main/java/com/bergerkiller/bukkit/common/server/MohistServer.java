@@ -54,6 +54,19 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
     }
 
     @Override
+    public boolean canLoadClassPath(String classPath) {
+        // The .class data at this path contains obfuscated type information
+        // These obfuscated names are deobufscated at runtime
+        // This difference causes compiler errors at runtime, so instead of
+        // loading the .class files, inspect the signatures using reflection.
+        if (classPath.startsWith("org.bukkit.craftbukkit")) {
+            return false;
+        }
+
+        return true;
+    }
+
+    @Override
     public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
         return remapUtils.mapMethodName(type, methodName, params);
     }

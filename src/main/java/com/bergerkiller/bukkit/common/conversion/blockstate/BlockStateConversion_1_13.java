@@ -292,7 +292,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             }
 
             // Cache type instantiator for next time
-            this.blockStateInstantiators.put(blockData.getType(), new NullInstantiator<BlockState>(result.getClass()));
+            this.blockStateInstantiators.put(blockData.getType(), NullInstantiator.of(result.getClass()));
 
             // All done!
             return result;
