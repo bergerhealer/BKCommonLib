@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonClassManipulation;
+import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.io.ClassRewriter;
 import com.bergerkiller.bukkit.common.localization.ILocalizationDefault;
@@ -110,40 +111,7 @@ public abstract class PluginBase extends JavaPlugin {
      * @return version parsed to an Integer
      */
     public int getVersionNumber() {
-        // Split by dots
-        int versionNumber = 0;
-        int numDigits = 0;
-        for (String part : this.getVersion().split("\\.")) {
-            // Trim non-digits from the start of the version part
-            int part_start = 0;
-            while (part_start < part.length() && !Character.isDigit(part.charAt(part_start))) {
-                part_start++;
-            }
-            if (part_start >= part.length()) {
-                continue;
-            }
-
-            // Trim everything after the first non-digit
-            int part_end = part_start;
-            while (part_end < part.length() && Character.isDigit(part.charAt(part_end))) {
-                part_end++;
-            }
-
-            // Try and parse it; append to global version value and shift multiplier
-            try {
-                versionNumber *= 100;
-                versionNumber += Integer.parseInt(part.substring(part_start, part_end));
-                numDigits++;
-            } catch (NumberFormatException ex) {}
-        }
-
-        // Guarantee three-digit version format
-        while (numDigits < 3) {
-            numDigits++;
-            versionNumber *= 100;
-        }
-
-        return versionNumber;
+        return CommonMethods.parseVersionNumber(this.getVersion());
     }
 
     /**

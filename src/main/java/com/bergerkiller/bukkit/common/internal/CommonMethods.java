@@ -72,4 +72,41 @@ public class CommonMethods {
         }
     }
 
+    // Used by PluginBase.getVersionNumber()
+    public static int parseVersionNumber(String version) {
+        // Split by dots
+        int versionNumber = 0;
+        int numDigits = 0;
+        for (String part : version.split("\\.")) {
+            // Trim non-digits from the start of the version part
+            int part_start = 0;
+            while (part_start < part.length() && !Character.isDigit(part.charAt(part_start))) {
+                part_start++;
+            }
+            if (part_start >= part.length()) {
+                continue;
+            }
+
+            // Trim everything after the first non-digit
+            int part_end = part_start;
+            while (part_end < part.length() && Character.isDigit(part.charAt(part_end))) {
+                part_end++;
+            }
+
+            // Try and parse it; append to global version value and shift multiplier
+            try {
+                versionNumber *= 100;
+                versionNumber += Integer.parseInt(part.substring(part_start, part_end));
+                numDigits++;
+            } catch (NumberFormatException ex) {}
+        }
+
+        // Guarantee three-digit version format
+        while (numDigits < 3) {
+            numDigits++;
+            versionNumber *= 100;
+        }
+
+        return versionNumber;
+    }
 }
