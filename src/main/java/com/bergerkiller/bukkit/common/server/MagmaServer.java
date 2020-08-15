@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.server;
 
-import java.lang.reflect.Method;
+import java.io.File;
+import java.util.Collection;
 import java.util.Map;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -8,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 
 /**
- * Mohist is a PaperSpigot + Forge implementation
+ * Magma is a Spigot + Forge implementation
  */
 public class MagmaServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
     private RemappingUtilsClass remappingUtils = null;
@@ -19,7 +20,7 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
             return false;
         }
 
-        // Check this is actually a Mohist server, we expect this Class to exist
+        // Check this is actually a Magma server, we expect this Class to exist
         try {
             Class.forName("org.magmafoundation.magma.Magma");
         } catch (Throwable t) {
@@ -39,27 +40,28 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
     }
 
     @Override
-    public void postInit() {
-        super.postInit();
-
-        try {
-            System.out.println(resolveClassPath("net.minecraft.server.EnumDifficulty"));
-            Class<?> c = Class.forName(resolveClassPath("net.minecraft.server.EnumDifficulty"));
-            System.out.println("mapMethodName: " + remappingUtils.mapMethodName(c, "c", new Class[] {}));
-            System.out.println("inverseMapMethodName: " + remappingUtils.mapMethodName(c, "c", new Class[] {}));
-            System.out.println("Methods of " + c.getName());
-            for (Method m : c.getDeclaredMethods()) {
-                System.out.println("  - " + m.toGenericString());
-            }
-        } catch (ClassNotFoundException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+    public String getServerName() {
+        return "Magma";
     }
 
     @Override
-    public String getServerName() {
-        return "Magma";
+    public Collection<String> getLoadableWorlds() {
+        return ForgeSupport.getLoadableWorlds();
+    }
+
+    @Override
+    public boolean isLoadableWorld(String worldName) {
+        return ForgeSupport.isLoadableWorld(worldName);
+    }
+
+    @Override
+    public File getWorldRegionFolder(String worldName) {
+        return ForgeSupport.getWorldRegionFolder(worldName);
+    }
+
+    @Override
+    public File getWorldFolder(String worldName) {
+        return ForgeSupport.getWorldFolder(worldName);
     }
 
     @Override
@@ -67,10 +69,23 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
         // Replaces path with proper net.minecraft.server.v1_1_1 path
         path = super.resolveClassPath(path);
 
-        // Ask Mohist what the actual class name is on Forge
+        // Ask Magma what the actual class name is on Forge
         path = remappingUtils.mapClassName(path);
 
         return path;
+    }
+
+    @Override
+    public boolean canLoadClassPath(String classPath) {
+        // The .class data at this path contains obfuscated type information
+        // These obfuscated names are deobufscated at runtime
+        // This difference causes compiler errors at runtime, so instead of
+        // loading the .class files, inspect the signatures using reflection.
+        if (classPath.startsWith("org.bukkit.craftbukkit.")) {
+            return false;
+        }
+
+        return true;
     }
 
     @Override
@@ -99,7 +114,7 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
                             "        if (mapping != null) {\r\n" + 
                             "            return mapping.getMcpName();\r\n" + 
                             "        } else {\r\n" + 
-                            "            // Mohist BUGFIX!!!\r\n" + 
+                            "            // Magma BUGFIX!!!\r\n" + 
                             "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\r\n" + 
                             "            return \"missing.type.\" + className;\r\n" + 
                             "        }\r\n" + 

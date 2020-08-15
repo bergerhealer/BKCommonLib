@@ -52,10 +52,10 @@ class Chunk {
         return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
     }
 
-#if spigot
-    public final (List<Object>[]) List<Entity>[] entitySlices;
-#else
+#if exists net.minecraft.server.Chunk public final EntitySlice<Entity>[] entitySlices;
     public final (List<Object>[]) EntitySlice<Entity>[] entitySlices;
+#else
+    public final (List<Object>[]) List<Entity>[] entitySlices;
 #endif
     public org.bukkit.Chunk bukkitChunk;
 

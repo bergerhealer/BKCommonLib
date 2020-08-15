@@ -339,7 +339,7 @@ class WorldServer extends World {
 #else
     // Note: is List<EntityHuman> on 1.13.2 and before, but only stores players, so this is safe.
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers() {
-        return instance.players;
+        return ((World)instance).players;
     }
 #endif
 
@@ -582,11 +582,11 @@ class WorldServer extends World {
     }
 #elseif fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
-        return instance.entityList;
+        return ((World)instance).entityList;
     }
 #else
     public (Collection<EntityHandle>) Collection<Entity> getEntities() {
-        return instance.entityList;
+        return ((World)instance).entityList;
     }
 #endif
 

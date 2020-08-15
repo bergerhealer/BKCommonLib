@@ -24,7 +24,6 @@ import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -91,6 +90,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutOpenWindowHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerListHeaderFooterHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
@@ -112,7 +112,6 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
@@ -191,7 +190,7 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
         public final FieldAccessor<Object> face = nextFieldSignature("private EnumDirection b");
-        public final FieldAccessor<Object> status = nextFieldSignature("private EnumPlayerDigType c");
+        public final FieldAccessor<Object> status = nextFieldSignature("private PacketPlayInBlockDig.EnumPlayerDigType c");
     }
 
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
@@ -347,22 +346,22 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> leftPaddle = PacketPlayInBoatMoveHandle.T.leftPaddle.toFieldAccessor();
         public final FieldAccessor<Boolean> rightPaddle = PacketPlayInBoatMoveHandle.T.rightPaddle.toFieldAccessor();
     }
-    
+
     public static class NMSPacketPlayInChat extends NMSPacket {
 
         public final FieldAccessor<String> message = nextField("private String a");
     }
-    
+
     public static class NMSPacketPlayInClientCommand extends NMSPacket {
 
-        public final FieldAccessor<Object> command = nextField("private EnumClientCommand a");
+        public final FieldAccessor<Object> command = nextField("private PacketPlayInClientCommand.EnumClientCommand a");
     }
-    
+
     public static class NMSPacketPlayInCloseWindow extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = nextField("private int id");
     }
-    
+
     public static class NMSPacketPlayInCustomPayload extends NMSPacket {
 
         // public final FieldAccessor<String> tag = nextField("private String a");
@@ -378,7 +377,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayInEntityAction extends NMSPacket {
 
         public final FieldAccessor<Integer> playerId = nextField("private int a");
-        public final FieldAccessor<Object> actionId = nextFieldSignature("private EnumPlayerAction animation");
+        public final FieldAccessor<Object> actionId = nextFieldSignature("private PacketPlayInEntityAction.EnumPlayerAction animation");
         public final FieldAccessor<Integer> jumpBoost = nextFieldSignature("private int c");
     }
 
@@ -1452,8 +1451,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
 
-        public final FieldAccessor<Object> action = nextField("private EnumPlayerInfoAction a");
-        public final FieldAccessor<List<?>> playerInfoData = nextFieldSignature("private final List<PlayerInfoData> b");
+        public final FieldAccessor<Object> action = PacketPlayOutPlayerInfoHandle.T.action.raw.toFieldAccessor();
+        public final FieldAccessor<List<?>> playerInfoData = CommonUtil.unsafeCast(PacketPlayOutPlayerInfoHandle.T.players.raw.toFieldAccessor());
     }
 
     public static class NMSPacketPlayOutPlayerListHeaderFooter extends NMSPacket {
@@ -1548,7 +1547,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<String> name = nextField("private String a");
         public final FieldAccessor<String> objName = nextFieldSignature("private String b");
         public final FieldAccessor<Integer> value = nextFieldSignature("private int c");
-        public final FieldAccessor<ScoreboardAction> action = nextFieldSignature("private EnumScoreboardAction d").translate(DuplexConversion.scoreboardAction);
+        public final FieldAccessor<ScoreboardAction> action = nextFieldSignature("private PacketPlayOutScoreboardScore.EnumScoreboardAction d").translate(DuplexConversion.scoreboardAction);
     }
     
     public static class NMSPacketPlayOutScoreboardTeam extends NMSPacket {
@@ -1963,7 +1962,7 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutTitle extends NMSPacket {
-        public final FieldAccessor<Object> action = nextField("private EnumTitleAction a");
+        public final FieldAccessor<Object> action = nextField("private PacketPlayOutTitle.EnumTitleAction a");
         public final FieldAccessor<Object> chatComponent = nextFieldSignature("private IChatBaseComponent b");
         public final FieldAccessor<Integer> a = nextFieldSignature("private int c");
         public final FieldAccessor<Integer> b = nextFieldSignature("private int d");
@@ -2047,7 +2046,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutWorldBorder extends NMSPacket {
 
-        public final FieldAccessor<Object> action = nextField("private EnumWorldBorderAction a");
+        public final FieldAccessor<Object> action = nextField("private PacketPlayOutWorldBorder.EnumWorldBorderAction a");
         public final FieldAccessor<Integer> b = nextFieldSignature("private int b");
         public final FieldAccessor<Double> cx = nextFieldSignature("private double c");
         public final FieldAccessor<Double> cz = nextFieldSignature("private double d");
