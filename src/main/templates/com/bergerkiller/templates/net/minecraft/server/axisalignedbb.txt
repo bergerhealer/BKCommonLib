@@ -307,11 +307,11 @@ class VoxelShape {
         java.util.Iterator iter = voxels.iterator();
         while (iter.hasNext()) {
             net.minecraft.server.VoxelShape voxel = (net.minecraft.server.VoxelShape) iter.next();
-            if (axis == net.minecraft.server.EnumDirection.EnumAxis.X) {
+            if (axis == net.minecraft.server.EnumDirection$EnumAxis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Y) {
+            } else if (axis == net.minecraft.server.EnumDirection$EnumAxis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == net.minecraft.server.EnumDirection.EnumAxis.Z) {
+            } else if (axis == net.minecraft.server.EnumDirection$EnumAxis.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
 

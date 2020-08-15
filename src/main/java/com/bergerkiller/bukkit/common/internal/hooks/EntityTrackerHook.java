@@ -8,6 +8,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
  * This hook is used to spawn entities without creating an entity tracker entry.
  * It is only temporarily hooked for the duration of a single Entity spawn.
  */
+@ClassHook.HookPackage("net.minecraft.server")
 public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
     public final HashSet<Object> ignoredEntities = new HashSet<Object>();
     public final Object original;

@@ -24,6 +24,7 @@ import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
+@ClassHook.HookPackage("net.minecraft.server")
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
     private Throwable stack = null;

@@ -76,6 +76,7 @@ public class ChunkGeneratorHook {
         return WorldServerHandle.fromBukkit(world).getChunkProviderServer().getRaw();
     }
 
+    @ClassHook.HookPackage("net.minecraft.server")
     public static class ChunkGeneratorHook_1_16 extends ClassHook<ChunkGeneratorHook_1_16> {
         private final World world;
 
@@ -83,7 +84,7 @@ public class ChunkGeneratorHook {
             this.world = world;
         }
 
-        @HookMethod("public List getMobsFor(net.minecraft.server.BiomeBase, net.minecraft.server.StructureManager, net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
+        @HookMethod("public List getMobsFor(BiomeSettingsMobs biome, StructureManager structManager, EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
         public List<?> getMobsFor(Object biomeBase, Object structureManager, Object enumcreaturetype, Object blockposition) {
             List<?> mobs = base.getMobsFor(biomeBase, structureManager, enumcreaturetype, blockposition);
 
@@ -109,6 +110,7 @@ public class ChunkGeneratorHook {
         }
     }
 
+    @ClassHook.HookPackage("net.minecraft.server")
     public static class ChunkGeneratorHook_1_8_to_1_15_2 extends ClassHook<ChunkGeneratorHook_1_8_to_1_15_2> {
         private final World world;
 
@@ -116,7 +118,7 @@ public class ChunkGeneratorHook {
             this.world = world;
         }
 
-        @HookMethod("public List getMobsFor(net.minecraft.server.EnumCreatureType enumcreaturetype, net.minecraft.server.BlockPosition blockposition)")
+        @HookMethod("public List getMobsFor(EnumCreatureType enumcreaturetype, BlockPosition blockposition)")
         public List<?> getMobsFor(Object enumcreaturetype, Object blockposition) {
             List<?> mobs = base.getMobsFor(enumcreaturetype, blockposition);
 

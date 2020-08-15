@@ -21,6 +21,8 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
  * Redirects all IInventory function calls to the appropriate method in a 
  * org.bukkit.inventory.Inventory object.
  */
+@ClassHook.HookPackage("net.minecraft.server")
+@ClassHook.HookImport("org.bukkit.craftbukkit.entity.CraftHumanEntity")
 public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     private final Inventory inventory;
 
@@ -125,11 +127,11 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void update() {
     }
 
-    @HookMethod("public abstract void onOpen(org.bukkit.craftbukkit.entity.CraftHumanEntity paramCraftHumanEntity)")
+    @HookMethod("public abstract void onOpen(CraftHumanEntity paramCraftHumanEntity)")
     public void onOpen(Object entity) {
     }
 
-    @HookMethod("public abstract void onClose(org.bukkit.craftbukkit.entity.CraftHumanEntity paramCraftHumanEntity)")
+    @HookMethod("public abstract void onClose(CraftHumanEntity paramCraftHumanEntity)")
     public void onClose(Object entity) {
     }
 

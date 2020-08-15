@@ -90,6 +90,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         return object;
     }
 
+    @ClassHook.HookPackage("net.minecraft.server")
     public class StateHook extends ClassHook<StateHook> {
 
         @HookMethod("public void onTick:???()")

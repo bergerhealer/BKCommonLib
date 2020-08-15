@@ -74,8 +74,8 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.StepSoundHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.BiomeMetaHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.BiomeBaseHandle.BiomeMetaHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.SpawnRateHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WeightedRandomChoiceHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle";

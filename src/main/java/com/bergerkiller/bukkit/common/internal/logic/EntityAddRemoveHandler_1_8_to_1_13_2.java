@@ -118,6 +118,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
      * Handles all the method calls coming from a WorldListener instance that is hooked.
      * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
      */
+    @ClassHook.HookPackage("net.minecraft.server")
     public static class WorldListenerHook extends ClassHook<WorldListenerHook> {
         private final EntityAddRemoveHandler_1_8_to_1_13_2 handler;
         private final World world;
@@ -144,14 +145,14 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             return new NullInvoker<Object>(method.getReturnType());
         }
 
-        @HookMethod("public void onEntityAdded:a(net.minecraft.server.Entity entity)")
+        @HookMethod("public void onEntityAdded:a(Entity entity)")
         public void onEntityAdded(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
             CommonPlugin.getInstance().notifyAddedEarly(world, bEntity);
             CommonPlugin.getInstance().notifyAdded(world, bEntity);
         }
 
-        @HookMethod("public void onEntityRemoved:b(net.minecraft.server.Entity entity)")
+        @HookMethod("public void onEntityRemoved:b(Entity entity)")
         public void onEntityRemoved(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
             CommonPlugin.getInstance().notifyRemoved(world, bEntity);
