@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
@@ -23,11 +22,11 @@ public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
 
     public BlockDataSerializer_1_8_to_1_12_2() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("CommandAbstract"));
-        resolver.setVariable("version", Common.MC_VERSION);
+        resolver.setDeclaredClassName("net.minecraft.server.Block");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         findBlockByNameMethod.init(new MethodDeclaration(resolver,
                 "public static Object findBlockByName(MinecraftKey minecraftKey) {\n" +
-                "    return Block.REGISTRY.get(minecraftKey);\n" +
+                "    return Block.REGISTRY.get((Object)minecraftKey);\n" +
                 "}"));
         createLegacyBlockDataMethod.init(new MethodDeclaration(resolver,
                 "public static IBlockData createLegacyBlockData(Block block, int legacyData) {\n" +

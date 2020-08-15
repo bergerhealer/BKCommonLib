@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -18,8 +17,8 @@ public class BlockDataSerializer_1_13 extends BlockDataSerializer {
 
     public BlockDataSerializer_1_13() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("ArgumentBlock"));
-        resolver.setVariable("version", Common.MC_VERSION);
+        resolver.setDeclaredClassName("net.minecraft.server.ArgumentBlock");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static String serialize(IBlockData iblockdata) {\n" +
                 "#if version >= 1.14\n" +
