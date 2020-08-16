@@ -102,11 +102,21 @@ public final class BlockFaceSet {
     /**
      * Checks whether the given face is set in this BlockFaceSet
      * 
-     * @param face
+     * @param face BlockFace to check
      * @return True if set
      */
     public boolean get(BlockFace face) {
-        return (this._mask & getMask(face)) != 0;
+        return get(getMask(face));
+    }
+
+    /**
+     * Checks whether the given face is set in this BlockFaceSet
+     * 
+     * @param faceMask Mask of the face to check
+     * @return True if set
+     */
+    public boolean get(int faceMask) {
+        return (this._mask & faceMask) != 0;
     }
 
     /**
