@@ -235,4 +235,8 @@ public class InventoryProxy extends ProxyBase<Inventory> implements Inventory {
         base.setMaxStackSize(size);
     }
 
+    @Override
+    public boolean isEmpty() {
+        return base.isEmpty();
+    }
 }

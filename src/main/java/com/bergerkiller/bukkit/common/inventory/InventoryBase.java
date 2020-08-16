@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
@@ -302,5 +303,16 @@ public abstract class InventoryBase implements Inventory {
     //@Override // Only on paperspigot
     public InventoryHolder getHolder(boolean b) {
         return getHolder();
+    }
+
+    //@Override // Recently added
+    public boolean isEmpty() {
+        int size = this.getSize();
+        for (int i = 0; i < size; i++) {
+            if (!ItemUtil.isEmpty(this.getItem(i))) {
+                return false;
+            }
+        }
+        return true;
     }
 }
