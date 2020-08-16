@@ -283,8 +283,8 @@ class HeightMap {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
 #if version >= 1.14
+    #require net.minecraft.server.HeightMap private final IChunkAccess chunk:e;
     public (ChunkHandle) Chunk getChunk() {
-        #require net.minecraft.server.HeightMap private final IChunkAccess chunk:e;
         return (Chunk) instance#chunk;
     }
 #elseif version >= 1.13
@@ -306,7 +306,68 @@ class HeightMap {
     public void setHeight(int x, int z, int height);
 #endif
 
-#if version == 1.13
+#if version >= 1.14
+    // Since version 1.14 the heightmap is no longer used for light calculations
+    // We have to recalculate one ourselves, with our own rules
+    public void initialize() {
+        #require net.minecraft.server.HeightMap private final DataBits databits:c;
+
+        IChunkAccess ichunkaccess = instance#chunk;
+        DataBits databits = instance#databits;
+        int databits_index = 0;
+        int startY = ichunkaccess.b() + 15;
+        BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
+        for (int z = 0; z < 16; ++z) {
+            for (int x = 0; x < 16; ++x) {
+                int y = startY;
+                while (y > 0) {
+                    blockposition.d(x, y, z);
+                    IBlockData iblockdata = ichunkaccess.getType(blockposition);
+
+                    // Optimization for air blocks
+                    Block block = iblockdata.getBlock();
+                    if (block == Blocks.AIR) {
+                        --y;
+                        continue;
+                    }
+
+                    // If opacity is nonzero, stop
+                    if (iblockdata.b(ichunkaccess, blockposition) > 0) {
+                        break;
+                    }
+
+                    // If top blockface is opaque, don't progress y and stop
+  #if version >= 1.14.4
+                    if (iblockdata.d(ichunkaccess, blockposition, EnumDirection.UP)) {
+                        break;
+                    }
+  #else
+                    if (Block.d(iblockdata, ichunkaccess, blockposition, EnumDirection.UP)) {
+                        break;
+                    }
+  #endif
+
+                    // Next block
+                    --y;
+
+                    // If bottom blockface was opaque, stop (but allow block itself to be lit)
+  #if version >= 1.14.4
+                    if (iblockdata.d(ichunkaccess, blockposition, EnumDirection.DOWN)) {
+                        break;
+                    }
+  #else
+                    if (Block.d(iblockdata, ichunkaccess, blockposition, EnumDirection.DOWN)) {
+                        break;
+                    }
+  #endif
+                }
+
+                // Store the value
+                databits.a(databits_index++, y+1);
+            }
+        }
+    }
+#elseif version == 1.13
     public void initialize:a();
 #elseif version == 1.13.1
     public void initialize:a();

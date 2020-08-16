@@ -21,6 +21,7 @@ public class BlockDataOpacityTest {
     public void testOpacity() {
         assertOpacity(0, BlockData.fromMaterial(Material.AIR));
         assertOpacity(0, BlockData.fromMaterial(Material.GLASS));
+        assertOpacity(0, BlockData.fromMaterial(Material.OAK_STAIRS));
         assertOpacity(15, BlockData.fromMaterial(Material.OAK_WOOD));
         assertOpacity(15, BlockData.fromMaterial(Material.OBSIDIAN));
         assertOpacity(1, BlockData.fromMaterial(Material.OAK_LEAVES));
