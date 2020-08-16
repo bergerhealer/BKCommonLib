@@ -5,14 +5,17 @@ import java.util.Collection;
 import java.util.Map;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.resolver.CompiledFieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
-import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * CatServer is a Spigot + Forge implementation
  */
-public class CatServerServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
+public class CatServerServer extends SpigotServer implements FieldNameResolver, MethodNameResolver,
+        CompiledFieldNameResolver, CompiledMethodNameResolver
+{
     private RemapUtils remapUtils = null;
 
     @Override
@@ -36,8 +39,6 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
 
         // Force initialization to avoid late catastrophic failing
         remapUtils.forceInitialization();
-
-        System.out.println("CatServer Initialized!");
 
         return true;
     }
@@ -92,19 +93,23 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     }
 
     @Override
-    public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
-        //TODO: The actual bytecode uses MCP names, but reflection gives the CraftBukkit names
-        //      This currently causes a NoSuchMethodError at runtime when generated code is executed
-        //return remapUtils.mapMethod(type, methodName, params);
-        return methodName;
+    public String resolveCompiledFieldName(Class<?> declaringClass, String fieldName) {
+        return remapUtils.mapFieldName(declaringClass, fieldName);
     }
 
     @Override
-    public String resolveFieldName(Class<?> type, String fieldName) {
-        //TODO: The actual bytecode uses MCP names, but reflection gives the CraftBukkit names
-        //      This currently causes a NoSuchFieldError at runtime when generated code is executed
-        //return remapUtils.mapFieldName(type, fieldName);
-        return fieldName;
+    public String resolveCompiledMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
+        return remapUtils.mapMethod(declaringClass, methodName, parameterTypes);
+    }
+
+    @Override
+    public String resolveFieldName(Class<?> declaringClass, String fieldName) {
+        return remapUtils.mapFieldName(declaringClass, fieldName);
+    }
+
+    @Override
+    public String resolveMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
+        return remapUtils.mapMethod(declaringClass, methodName, parameterTypes);
     }
 
     @Override
@@ -138,5 +143,4 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
         @Template.Generated("public static String mapFieldName(Class<?> inst, String name)")
         public abstract String mapFieldName(Class<?> type, String fieldName);
     }
-
 }

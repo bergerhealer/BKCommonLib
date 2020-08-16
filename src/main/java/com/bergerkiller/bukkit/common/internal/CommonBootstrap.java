@@ -36,6 +36,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.CompiledFieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -236,6 +238,12 @@ public class CommonBootstrap {
         }
         if (server instanceof MethodNameResolver) {
             Resolver.registerMethodResolver((MethodNameResolver) server);
+        }
+        if (server instanceof CompiledFieldNameResolver) {
+            Resolver.registerCompiledFieldResolver((CompiledFieldNameResolver) server);
+        }
+        if (server instanceof CompiledMethodNameResolver) {
+            Resolver.registerCompiledMethodResolver((CompiledMethodNameResolver) server);
         }
 
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
