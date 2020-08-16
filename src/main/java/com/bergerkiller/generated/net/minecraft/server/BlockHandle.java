@@ -41,6 +41,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract SoundEffectTypeHandle getSoundType(IBlockDataHandle iblockdata);
     public abstract void entityHitVertical(WorldHandle world, EntityHandle entity);
     public abstract String getTitle();
+    public abstract boolean isFaceOpaque(IBlockDataHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
     public abstract int getOpacity(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract int getEmission(IBlockDataHandle iblockdata);
     public abstract boolean isOccluding_at(IBlockDataHandle iblockdata, World world, int x, int y, int z);
@@ -68,6 +69,7 @@ public abstract class BlockHandle extends Template.Handle {
         public final Template.Method.Converted<SoundEffectTypeHandle> getSoundType = new Template.Method.Converted<SoundEffectTypeHandle>();
         public final Template.Method.Converted<Void> entityHitVertical = new Template.Method.Converted<Void>();
         public final Template.Method<String> getTitle = new Template.Method<String>();
+        public final Template.Method.Converted<Boolean> isFaceOpaque = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Integer> getOpacity = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Integer> getEmission = new Template.Method.Converted<Integer>();
         public final Template.Method.Converted<Boolean> isOccluding_at = new Template.Method.Converted<Boolean>();

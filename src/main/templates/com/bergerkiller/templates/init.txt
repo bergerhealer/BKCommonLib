@@ -56,6 +56,7 @@
 #include /net/minecraft/server/item.txt
 #include /net/minecraft/server/foodmeta.txt
 #include /net/minecraft/server/block.txt
+#include /net/minecraft/server/blockdata.txt
 #include /net/minecraft/server/block_subtype.txt
 #include /net/minecraft/server/datawatcher.txt
 #include /net/minecraft/server/inventories.txt

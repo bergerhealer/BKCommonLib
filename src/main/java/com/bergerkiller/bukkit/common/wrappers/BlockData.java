@@ -12,6 +12,7 @@ import org.bukkit.material.Directional;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -355,7 +356,7 @@ public abstract class BlockData extends BlockDataRegistry {
      * 
      * @return step sound
      */
-    public abstract ResourceKey getStepSound();
+    public abstract ResourceKey<SoundEffect> getStepSound();
 
     /**
      * Gets the name of the sound effect played when placing down this Block
@@ -389,10 +390,31 @@ public abstract class BlockData extends BlockDataRegistry {
      *
      * @param block
      * @return the opacity
+     * @see {@link #getOpaqueFaces()}
      */
-    public int getOpacity(Block block) {
-        return getOpacity(block.getWorld(), block.getX(), block.getY(), block.getZ());
-    }
+    public abstract int getOpacity(Block block);
+
+    /**
+     * Gets a BlockFaceSet of all the faces of this block that are opaque.
+     * Opaque faces do not let light through.
+     * 
+     * @param world the Block is in
+     * @param x world coordinate of the Block
+     * @param y world coordinate of the Block
+     * @param z world coordinate of the Block
+     * @return BlockFaceSet of opaque faces
+     */
+    public abstract BlockFaceSet getOpaqueFaces(World world, int x, int y, int z);
+
+    /**
+     * Gets a BlockFaceSet of all the faces of this block that are opaque.
+     * Opaque faces do not let light through.
+     *
+     * @param block
+     * @return the opacity
+     * @see {@link #getOpaqueFaces()}
+     */
+    public abstract BlockFaceSet getOpaqueFaces(Block block);
 
     /**
      * Gets the amount of light the Block radiates, value between 0 and 15.

@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import java.util.Map;
 
 /**
@@ -21,6 +22,8 @@ public abstract class IBlockDataHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract BlockHandle getBlock();
+    public abstract BlockFaceSet getCachedOpaqueFaces();
+    public abstract int getCachedOpacity();
     public abstract boolean isBuildable();
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
@@ -58,6 +61,8 @@ public abstract class IBlockDataHandle extends Template.Handle {
      */
     public static final class IBlockDataClass extends Template.Class<IBlockDataHandle> {
         public final Template.Method.Converted<BlockHandle> getBlock = new Template.Method.Converted<BlockHandle>();
+        public final Template.Method<BlockFaceSet> getCachedOpaqueFaces = new Template.Method<BlockFaceSet>();
+        public final Template.Method<Integer> getCachedOpacity = new Template.Method<Integer>();
         public final Template.Method<Boolean> isBuildable = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();

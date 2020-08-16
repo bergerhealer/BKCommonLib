@@ -1,0 +1,210 @@
+package net.minecraft.server;
+
+import com.google.common.collect.ImmutableMap;
+
+import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
+
+import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
+
+interface IBlockData {
+    public abstract (BlockHandle) Block getBlock();
+
+    <code>
+    public void logStates() {
+        for (java.util.Map.Entry<IBlockStateHandle, Comparable<?>> entry : getStates().entrySet()) {
+            System.out.println(entry.getKey() + " = " + entry.getValue());
+        }
+    }
+
+    public IBlockStateHandle findState(String key) {
+        for (IBlockStateHandle blockState : getStates().keySet()) {
+            if (blockState.getKeyToken().equals(key)) {
+                return blockState;
+            }
+        }
+        return null;
+    }
+
+    public IBlockDataHandle set(String key, Object value) {
+        return set(findState(key), value);
+    }
+
+    public <T> T get(String key, Class<T> type) {
+        return get(findState(key), type);
+    }
+
+    public <T> T get(IBlockStateHandle state, Class<T> type) {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.convert(get(state), type, null);
+    }
+    </code>
+
+    // World access require check
+#if version >= 1.16
+    #require net.minecraft.server.Block public boolean isWorldAccessRequired:o();
+#elseif version >= 1.15
+    #require net.minecraft.server.Block public boolean isWorldAccessRequired:q();
+#elseif version >= 1.14
+    #require net.minecraft.server.Block public boolean isWorldAccessRequired:p();
+#endif
+
+    // Returns null when the opaque faces aren't cached
+    public BlockFaceSet getCachedOpaqueFaces() {
+#if version >= 1.14
+        // Check world access isn't required (see: Block)
+        Block block = instance.getBlock();
+        boolean worldAccessRequired = block#isWorldAccessRequired();
+        if (worldAccessRequired) {
+            return null;
+        }
+
+        // Query all 6 faces and produce a mask
+        int mask = 0;
+  #if version >= 1.14.4
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
+        }
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
+        }
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
+        }
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
+        }
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
+        }
+        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
+        }
+  #else
+        // Awkward! It's not cached yet. Hopefully this works, though.
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
+        }
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
+        }
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
+        }
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
+        }
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
+        }
+        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
+        }
+  #endif
+        return com.bergerkiller.bukkit.common.collections.BlockFaceSet.byMask(mask);
+
+#elseif version >= 1.9
+        return instance.getBlock().isOccluding(instance) ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
+                                                         : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+#else
+        return instance.getBlock().isOccluding() ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
+                                                 : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+#endif
+    }
+
+    // Returns -1 if world access is required to figure it out
+#if version >= 1.14
+    public int getCachedOpacity() {
+        // Check world access isn't required (see: Block)
+        Block block = instance.getBlock();
+        boolean worldAccessRequired = block#isWorldAccessRequired();
+        if (worldAccessRequired) {
+            return -1;
+        } else {
+            return instance.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+        }
+    }
+#elseif version >= 1.13
+    public int getCachedOpacity() {
+        return -1;
+    }
+#elseif version >= 1.9
+    public int getCachedOpacity:c();
+#else
+    // IBlockData has no properties, delegate to Block
+    public int getCachedOpacity() {
+  #if version >= 1.8.3
+        return instance.getBlock().p();
+  #else
+        return instance.getBlock().n();
+  #endif
+    }
+#endif
+
+    public boolean isBuildable() {
+#if version >= 1.9
+        return instance.getMaterial().isBuildable();
+#else
+        return instance.getBlock().getMaterial().isBuildable();
+#endif
+    }
+
+    public Object get((IBlockStateHandle) IBlockState state) {
+        if (state != null) {
+            return instance.get(state);
+        } else {
+            return null;
+        }
+    }
+
+    public (IBlockDataHandle) IBlockData set((IBlockStateHandle) IBlockState state, Object value) {
+        if (state != null) {
+#if version >= 1.16
+            Class type = state.getType();
+#else
+            Class type = state.b();
+#endif
+            Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, type, null);
+            if (converted != null) {
+                return (IBlockData) instance.set(state, (Comparable) converted);
+            }
+        }
+        return instance;
+    }
+
+#if version >= 1.13.2
+  #if methodexists net.minecraft.server.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();
+      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
+  #else
+      public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+  #endif
+#elseif version >= 1.13
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
+#elseif version >= 1.12
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:t();
+#elseif version >= 1.11
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:u();
+#elseif version >= 1.9
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:s();
+#else
+    public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState, Comparable> getStates:b();
+#endif
+}
+
+interface IBlockState {
+#if version >= 1.16
+    public abstract String getKeyToken:getName();
+#else
+    public abstract String getKeyToken:a();
+#endif
+
+    public abstract String getValueToken:a(Comparable value);
+
+#if version >= 1.14.4
+    public abstract java.util.Collection getValues();
+#elseif version >= 1.13
+    public abstract java.util.Collection getValues:d();
+#else
+    public abstract java.util.Collection getValues:c();
+#endif
+}

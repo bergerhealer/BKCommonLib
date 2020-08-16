@@ -16,6 +16,7 @@ import org.bukkit.material.MaterialData;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
@@ -53,6 +54,10 @@ public class BlockDataImpl extends BlockData {
     private Material type;
     private boolean hasRenderOptions;
     private int combinedId;
+
+    // Cached properties
+    private BlockFaceSet cachedOpaqueFaces; // null if unavailable
+    private int cachedOpacity; // -1 if unavailable
 
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
@@ -270,6 +275,8 @@ public class BlockDataImpl extends BlockData {
         this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
         this.materialData = IBlockDataToMaterialData.getMaterialData(this.data);
         this.combinedId = BlockHandle.getCombinedId(this.data);
+        this.cachedOpaqueFaces = this.data.getCachedOpaqueFaces();
+        this.cachedOpacity = this.data.getCachedOpacity();
     }
 
     @Override
@@ -416,7 +423,77 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public final int getOpacity(World world, int x, int y, int z) {
-        return this.block.getOpacity(this.data, world, x, y, z);
+        if (this.cachedOpacity == -1) {
+            try {
+                return this.block.getOpacity(this.data, world, x, y, z);
+            } catch (RuntimeException ex) {
+                if (world == null) {
+                    throw new IllegalArgumentException("For BlockData " + this + " World Access is required to read opacity");
+                } else {
+                    throw ex; // weird?
+                }
+            }
+        } else {
+            return this.cachedOpacity;
+        }
+    }
+
+    @Override
+    public final int getOpacity(Block block) {
+        if (this.cachedOpacity == -1) {
+            try {
+                return this.block.getOpacity(this.data, block.getWorld(), block.getX(), block.getY(), block.getZ());
+            } catch (NullPointerException ex) {
+                if (block == null) {
+                    throw new IllegalArgumentException("For BlockData " + this + " World Access is required to read opacity");
+                } else {
+                    throw ex; // weird?
+                }
+            }
+        } else {
+            return this.cachedOpacity;
+        }
+    }
+
+    @Override
+    public final BlockFaceSet getOpaqueFaces(World world, int x, int y, int z) {
+        if (this.cachedOpaqueFaces != null) {
+            return this.cachedOpaqueFaces;
+        } else if (world == null) {
+            throw new IllegalArgumentException("For BlockData " + this + " World Access is required to read opaque faces");
+        } else {
+            int mask = 0;
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.NORTH)) {
+                mask |= BlockFaceSet.MASK_NORTH;
+            }
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.EAST)) {
+                mask |= BlockFaceSet.MASK_EAST;
+            }
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.SOUTH)) {
+                mask |= BlockFaceSet.MASK_SOUTH;
+            }
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.WEST)) {
+                mask |= BlockFaceSet.MASK_WEST;
+            }
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.UP)) {
+                mask |= BlockFaceSet.MASK_UP;
+            }
+            if (this.block.isFaceOpaque(this.data, world, x, y, z, BlockFace.DOWN)) {
+                mask |= BlockFaceSet.MASK_DOWN;
+            }
+            return BlockFaceSet.byMask(mask);
+        }
+    }
+
+    @Override
+    public final BlockFaceSet getOpaqueFaces(Block block) {
+        if (this.cachedOpaqueFaces != null) {
+            return this.cachedOpaqueFaces;
+        } else if (block == null) {
+            throw new IllegalArgumentException("For BlockData " + this + " World Access is required to read opaque faces");
+        } else {
+            return getOpaqueFaces(block.getWorld(), block.getX(), block.getY(), block.getZ());
+        }
     }
 
     @Override
