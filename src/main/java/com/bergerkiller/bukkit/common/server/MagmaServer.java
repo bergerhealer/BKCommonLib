@@ -27,7 +27,7 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
             return false;
         }
 
-        // Make sure RemapUtils exists, this initializes the RemapUtilsHandle using the above initialized declaration
+        // Make sure RemappingUtils exists, this initializes the RemappingUtilsHandle using the above initialized declaration
         remappingUtils = Template.Class.create(RemappingUtilsClass.class);
         if (!remappingUtils.isAvailable()) {
             return false;
@@ -107,19 +107,19 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
     @Template.Optional
     @Template.InstanceType("org.magmafoundation.magma.remapper.utils.RemappingUtils")
     public static abstract class RemappingUtilsClass extends Template.Class<Template.Handle> {
-        @Template.Generated("public static String mapClassName(String className) {\r\n" + 
-                            "    if (className.startsWith(\"net.minecraft.server.\")) {\r\n" + 
-                            "        org.magmafoundation.magma.remapper.mappingsModel.ClassMappings mapping;\r\n" + 
-                            "        mapping = (org.magmafoundation.magma.remapper.mappingsModel.ClassMappings) RemappingUtils.jarMapping.byNMSName.get(className);\r\n" + 
-                            "        if (mapping != null) {\r\n" + 
-                            "            return mapping.getMcpName();\r\n" + 
-                            "        } else {\r\n" + 
-                            "            // Magma BUGFIX!!!\r\n" + 
-                            "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\r\n" + 
-                            "            return \"missing.type.\" + className;\r\n" + 
-                            "        }\r\n" + 
-                            "    }\r\n" + 
-                            "    return className;\r\n" + 
+        @Template.Generated("public static String mapClassName(String className) {\n" +
+                            "    if (className.startsWith(\"net.minecraft.server.\")) {\n" +
+                            "        org.magmafoundation.magma.remapper.mappingsModel.ClassMappings mapping;\n" +
+                            "        mapping = (org.magmafoundation.magma.remapper.mappingsModel.ClassMappings) RemappingUtils.jarMapping.byNMSName.get(className);\n" +
+                            "        if (mapping != null) {\n" +
+                            "            return mapping.getMcpName();\n" +
+                            "        } else {\n" +
+                            "            // Magma BUGFIX!!!\n" +
+                            "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\n" +
+                            "            return \"missing.type.\" + className;\n" +
+                            "        }\n" +
+                            "    }\n" +
+                            "    return className;\n" +
                             "}")
         public abstract String mapClassName(String className);
 

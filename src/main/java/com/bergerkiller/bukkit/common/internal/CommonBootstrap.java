@@ -20,6 +20,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.server.CatServerServer;
 import com.bergerkiller.bukkit.common.server.CommonServer;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
@@ -99,6 +100,7 @@ public class CommonBootstrap {
                 servers.add(new MCPCPlusServer());
                 servers.add(new MohistServer());
                 servers.add(new MagmaServer());
+                servers.add(new CatServerServer());
                 servers.add(new PurpurServer());
                 servers.add(new PaperSpigotServer());
                 servers.add(new SpigotServer());

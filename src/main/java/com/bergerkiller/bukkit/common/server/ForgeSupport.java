@@ -13,8 +13,9 @@ import com.bergerkiller.bukkit.common.utils.StreamUtil;
  * Special helper methods specifically for Forge servers
  */
 public class ForgeSupport {
+
     public static String getMainWorldName() {
-        return "world";
+        return Bukkit.getWorldContainer().getName();
     }
 
     public static Collection<String> getLoadableWorlds() {

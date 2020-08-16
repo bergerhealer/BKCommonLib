@@ -7,12 +7,13 @@ import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
- * Mohist is a PaperSpigot + Forge implementation
+ * CatServer is a Spigot + Forge implementation
  */
-public class MohistServer extends PaperSpigotServer implements FieldNameResolver, MethodNameResolver {
-    private RemapUtilsClass remapUtils = null;
+public class CatServerServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
+    private RemapUtils remapUtils = null;
 
     @Override
     public boolean init() {
@@ -20,15 +21,15 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
             return false;
         }
 
-        // Check this is actually a Mohist server, we expect this Class to exist
+        // Check this is actually a CatServer server, we expect this Class to exist
         try {
-            Class.forName("red.mohist.Mohist");
+            Class.forName("catserver.server.CatServer");
         } catch (Throwable t) {
             return false;
         }
 
         // Make sure RemapUtils exists, this initializes the RemapUtilsHandle using the above initialized declaration
-        remapUtils = Template.Class.create(RemapUtilsClass.class);
+        remapUtils = Template.Class.create(RemapUtils.class);
         if (!remapUtils.isAvailable()) {
             return false;
         }
@@ -36,12 +37,14 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
         // Force initialization to avoid late catastrophic failing
         remapUtils.forceInitialization();
 
+        System.out.println("CatServer Initialized!");
+
         return true;
     }
 
     @Override
     public String getServerName() {
-        return "Mohist";
+        return "CatServer";
     }
 
     @Override
@@ -69,7 +72,7 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
         // Replaces path with proper net.minecraft.server.v1_1_1 path
         path = super.resolveClassPath(path);
 
-        // Ask Mohist what the actual class name is on Forge
+        // Ask CatServer what the actual class name is on Forge
         path = remapUtils.mapClassName(path);
 
         return path;
@@ -90,31 +93,37 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
 
     @Override
     public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
-        return remapUtils.mapMethodName(type, methodName, params);
+        //TODO: The actual bytecode uses MCP names, but reflection gives the CraftBukkit names
+        //      This currently causes a NoSuchMethodError at runtime when generated code is executed
+        //return remapUtils.mapMethod(type, methodName, params);
+        return methodName;
     }
 
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
-        return remapUtils.mapFieldName(type, fieldName);
+        //TODO: The actual bytecode uses MCP names, but reflection gives the CraftBukkit names
+        //      This currently causes a NoSuchFieldError at runtime when generated code is executed
+        //return remapUtils.mapFieldName(type, fieldName);
+        return fieldName;
     }
 
     @Override
     public void addVariables(Map<String, String> variables) {
         super.addVariables(variables);
-        variables.put("forge", "mohist");
+        variables.put("forge", "catserver");
     }
 
     @Template.Optional
-    @Template.InstanceType("red.mohist.bukkit.nms.utils.RemapUtils")
-    public static abstract class RemapUtilsClass extends Template.Class<Template.Handle> {
+    @Template.InstanceType("catserver.server.remapper.RemapUtils")
+    public static abstract class RemapUtils  extends Template.Class<Template.Handle> {
         @Template.Generated("public static String mapClassName(String className) {\n" +
                             "    if (className.startsWith(\"net.minecraft.server.\")) {\n" +
-                            "        red.mohist.bukkit.nms.model.ClassMapping mapping;\n" +
-                            "        mapping = (red.mohist.bukkit.nms.model.ClassMapping) RemapUtils.jarMapping.byNMSName.get(className);\n" +
-                            "        if (mapping != null) {\n" +
-                            "            return mapping.getMcpName();\n" +
+                            "        String internalClassName = className.replace('.', '/');\n" +
+                            "        String mapping_name = (String) ReflectionTransformer.jarMapping.classes.get(internalClassName);\n" +
+                            "        if (mapping_name != null) {\n" +
+                            "            return mapping_name.replace('/', '.');\n" +
                             "        } else {\n" +
-                            "            // Mohist BUGFIX!!!\n" +
+                            "            // Magma BUGFIX!!!\n" +
                             "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\n" +
                             "            return \"missing.type.\" + className;\n" +
                             "        }\n" +
@@ -123,10 +132,10 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
                             "}")
         public abstract String mapClassName(String className);
 
-        @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
-        public abstract String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes);
+        @Template.Generated("public static String mapMethod(Class<?> inst, String name, Class<?>[] parameterTypes)")
+        public abstract String mapMethod(Class<?> type, String name, Class<?>[] parameterTypes);
 
-        @Template.Generated("public static String mapFieldName(Class<?> type, String fieldName)")
+        @Template.Generated("public static String mapFieldName(Class<?> inst, String name)")
         public abstract String mapFieldName(Class<?> type, String fieldName);
     }
 
