@@ -7,9 +7,10 @@ import java.awt.image.IndexColorModel;
 import java.io.InputStream;
 import java.util.Arrays;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.color.MCSDBubbleFormat;
+import com.bergerkiller.bukkit.common.map.color.MCSDFlat;
 import com.bergerkiller.bukkit.common.map.color.MCSDGenBukkit;
 import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
 
@@ -42,27 +43,49 @@ public class MapColorPalette {
     static {
         // Load color map data from the Bubble format file bundled with the library
         {
-            MCSDBubbleFormat bubbleData = new MCSDBubbleFormat();
             boolean success = false;
-            try {
-                String bub_path = "/com/bergerkiller/bukkit/common/internal/resources/map/";
-                if (Common.evaluateMCVersion(">=", "1.12")) {
-                    bub_path += "map_1_12.bub";
-                } else {
-                    bub_path += "map_1_8_8.bub";
+            MapColorSpaceData result;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+                MCSDFlat flat = new MCSDFlat();
+                result = flat;
+                try {
+                    String flat_path = "/com/bergerkiller/bukkit/common/internal/resources/map/map_1_16_flat.dat";
+                    InputStream input = MapColorPalette.class.getResourceAsStream(flat_path);
+                    if (input == null) {
+                        Logging.LOGGER_MAPDISPLAY.severe("Flat data at " + flat_path + " not found!");
+                    } else {
+                        flat.readFrom(input);
+                        success = true;
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
-                InputStream input = MapColorPalette.class.getResourceAsStream(bub_path);
-                if (input == null) {
-                    Logging.LOGGER_MAPDISPLAY.severe("Bubble data at " + bub_path + " not found!");
-                } else {
-                    bubbleData.readFrom(input);
-                    success = true;
+                result = flat;
+            } else {
+                MCSDBubbleFormat bubbleData = new MCSDBubbleFormat();
+                result = bubbleData;
+                try {
+                    String bub_path = "/com/bergerkiller/bukkit/common/internal/resources/map/";
+                    if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+                        bub_path += "map_1_16.bub";
+                    } else if (CommonBootstrap.evaluateMCVersion(">=", "1.12")) {
+                        bub_path += "map_1_12.bub";
+                    } else {
+                        bub_path += "map_1_8_8.bub";
+                    }
+                    InputStream input = MapColorPalette.class.getResourceAsStream(bub_path);
+                    if (input == null) {
+                        Logging.LOGGER_MAPDISPLAY.severe("Bubble data at " + bub_path + " not found!");
+                    } else {
+                        bubbleData.readFrom(input);
+                        success = true;
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
-            } catch (Throwable t) {
-                t.printStackTrace();
             }
             if (success) {
-                COLOR_MAP_DATA.readFrom(bubbleData);
+                COLOR_MAP_DATA.readFrom(result);
             } else {
                 Logging.LOGGER_MAPDISPLAY.warning("Bubble colormap data could not be loaded, it will be generated instead");
                 MCSDGenBukkit bukkitGen = new MCSDGenBukkit();

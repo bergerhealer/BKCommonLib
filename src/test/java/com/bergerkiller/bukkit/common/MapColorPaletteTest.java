@@ -19,11 +19,11 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
-import com.bergerkiller.bukkit.common.map.MCSDFlat;
 import com.bergerkiller.bukkit.common.map.MCSDGenCiede2000;
 import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
 import com.bergerkiller.bukkit.common.map.color.MCSDBubbleFormat;
+import com.bergerkiller.bukkit.common.map.color.MCSDFlat;
 import com.bergerkiller.bukkit.common.map.util.MapDebugWindow;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -33,8 +33,8 @@ public class MapColorPaletteTest {
     @Ignore
     @Test
     public void generateColorMap() {
-        String version = "1.12"; // Minecraft version to generate the data for
-        boolean regenerate_bubble_format = true; // Whether to regenerate the highly compressed bubble format file
+        String version = "1.16"; // Minecraft version to generate the data for
+        boolean regenerate_bubble_format = false; // Whether to regenerate the highly compressed bubble format file
         boolean debug_display = true; // Whether to display the final results in a debugging window
         int max_iterations = 100000; // Sets compression versus compression time
 
@@ -58,11 +58,11 @@ public class MapColorPaletteTest {
             flat.readFrom(new FileInputStream(flat_filename));
 
             // Generate a highly compressed 'bubble format' file that will be compiled with the application
-            String bubble_filename = "src/main/java/com/bergerkiller/bukkit/common/map/data/" +
+            String bubble_filename = "src/main/resources/com/bergerkiller/bukkit/common/internal/resources/map/" +
                                      "map_" + version.replace('.', '_') + ".bub";
             if (regenerate_bubble_format || !new File(bubble_filename).exists()) {
                 MCSDBubbleFormat originalGrid = new MCSDBubbleFormat();
-                originalGrid.setMaxIterations(max_iterations);;
+                originalGrid.setMaxIterations(max_iterations);
                 originalGrid.readFrom(flat);
                 originalGrid.writeTo(new FileOutputStream(bubble_filename));
             }

@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.map;
+package com.bergerkiller.bukkit.common.map.color;
 
 import java.awt.Color;
 import java.io.IOException;
@@ -8,7 +8,6 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
 
 /**
  * Map color space data that is read from and written to in a flat GZIP compressed format.

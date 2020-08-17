@@ -204,6 +204,9 @@ public class MCSDWebbingCodec {
             } else if (op == 0b10) {
                 last_x += last_dx;
                 last_y += last_dy;
+            } else if (op == -1) {
+                // End of stream
+                return false;
             }
             strands[last_x | (last_y << 8)] = true;
         }

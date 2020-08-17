@@ -81,7 +81,21 @@ public class MCSDGenCiede2000 extends MapColorSpaceData {
                    .addBaseColor(142, 60, 46)
                    .addBaseColor(37, 22, 16);
         }
+
+        if (MountiplexUtil.evaluateText(minecraftVersion, ">=", "1.16")) {
+            builder.addBaseColor(189, 48, 49)
+                   .addBaseColor(148, 63, 97)
+                   .addBaseColor(92, 25, 29)
+                   .addBaseColor(22, 126, 134)
+                   .addBaseColor(58, 142, 140)
+                   .addBaseColor(86, 44, 62)
+                   .addBaseColor(20, 180, 133);
+        }
+
         this.entries = builder.build();
+        if (this.entries.length > 256) {
+            throw new IllegalArgumentException("More than 256 colors: " + this.entries.length);
+        }
     }
 
     /**
