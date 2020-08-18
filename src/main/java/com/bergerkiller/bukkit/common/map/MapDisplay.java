@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInf
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -701,7 +702,7 @@ public class MapDisplay implements MapDisplayEvents {
      * 
      * @param soundKey of the sound to play
      */
-    public void playSound(ResourceKey soundKey) {
+    public void playSound(ResourceKey<SoundEffect> soundKey) {
         playSound(soundKey, 1.0f, 1.0f);
     }
 
@@ -712,7 +713,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @param volume of the sound
      * @param pitch of the sound
      */
-    public void playSound(ResourceKey soundKey, float volume, float pitch) {
+    public void playSound(ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         for (Player viewer : this.getViewers()) {
             PlayerUtil.playSound(viewer, soundKey, this._masterVolume * volume, pitch);
         }
