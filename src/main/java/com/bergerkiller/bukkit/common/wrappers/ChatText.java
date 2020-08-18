@@ -15,7 +15,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHa
  * Minecraft formatted text represented as chat components, which can be converted between legacy chat messages
  * and JSON formatted text.
  */
-public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
+public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> implements Cloneable {
 
     private ChatText() {
     }
@@ -205,6 +205,24 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> {
             handle.setHoverText(ChatText.fromMessage(hoverText).getBackingHandle());
         }
         return this;
+    }
+
+    /**
+     * Copies the contents of another ChatText and sets it in this object
+     * 
+     * @param from ChatText to copy from
+     * @return this
+     */
+    public ChatText copy(ChatText from) {
+        this.setHandle(from.handle.isMutable() ? from.handle.createCopy() : from.handle);
+        return this;
+    }
+
+    @Override
+    public final ChatText clone() {
+        ChatText clone = new ChatText();
+        clone.setHandle(this.handle.isMutable() ? this.handle.createCopy() : this.handle);
+        return clone;
     }
 
     /**
