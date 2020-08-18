@@ -3,6 +3,10 @@ package com.bergerkiller.bukkit.common.utils;
 import java.io.*;
 import java.nio.channels.FileChannel;
 import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import com.bergerkiller.bukkit.common.collections.UnmodifiableListCollector;
 
 /**
  * Stream and File-related utility methods
@@ -250,5 +254,16 @@ public class StreamUtil {
             }
         }
         return childFile;
+    }
+
+    /**
+     * Version of {@link Collectors#toList()} which wraps the result up in an unmodifiable List.
+     * 
+     * @param <T>
+     * @return unmodifiable list
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Collector<T, ?, List<T>> toUnmodifiableList() {
+        return UnmodifiableListCollector.INSTANCE;
     }
 }
