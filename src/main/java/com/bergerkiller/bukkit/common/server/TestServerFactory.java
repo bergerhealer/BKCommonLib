@@ -42,6 +42,7 @@ public class TestServerFactory {
             initTestServer_pre_1_13_2();
         }
         init_spigotConfig();
+        System.gc();
     }
 
     private static void initTestServer_pre_1_13_2() {
