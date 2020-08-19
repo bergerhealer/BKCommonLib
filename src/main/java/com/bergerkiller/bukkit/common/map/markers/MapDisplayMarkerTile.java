@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.map.MapMarker;
  */
 public class MapDisplayMarkerTile {
     private final double offsetX, offsetY;
-    private final List<MapMarker> markers = new ArrayList<>();
+    private final List<MapMarker> visibleMarkers = new ArrayList<>();
     private final Set<Player> sentToPlayers = new HashSet<Player>();
     private boolean changed = false;
 
@@ -25,15 +25,15 @@ public class MapDisplayMarkerTile {
     }
 
     public boolean isEmpty() {
-        return markers.isEmpty();
+        return visibleMarkers.isEmpty();
     }
 
     public int getMarkerCount() {
-        return markers.size();
+        return visibleMarkers.size();
     }
 
     public MapMarker getMarker(int index) {
-        return markers.get(index);
+        return visibleMarkers.get(index);
     }
 
     public void setChanged(boolean new_changed) {
@@ -46,19 +46,19 @@ public class MapDisplayMarkerTile {
     }
 
     public void clear() {
-        if (!markers.isEmpty()) {
-            markers.clear();
+        if (!visibleMarkers.isEmpty()) {
+            visibleMarkers.clear();
             changed = true;
         }
     }
 
     public void add(MapMarker marker) {
-        markers.add(marker);
+        visibleMarkers.add(marker);
         changed = true;
     }
 
     public void remove(MapMarker marker) {
-        markers.remove(marker);
+        visibleMarkers.remove(marker);
         changed = true;
     }
 

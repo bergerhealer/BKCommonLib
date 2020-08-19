@@ -183,10 +183,8 @@ public final class MapMarker {
      * @return this
      */
     public MapMarker setVisible(boolean visible) {
-        if (this.visible != visible) {
-            this.visible = visible;
-            this.owner.update(this);
-        }
+        this.owner.updateVisible(this, visible);
+        this.visible = visible;
         return this;
     }
 

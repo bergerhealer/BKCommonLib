@@ -50,15 +50,24 @@ public class MapDisplayMarkers {
 
         // Replacing an existing marker, requires cleanup
         if (previousEntry != null) {
-            previousEntry.tile.remove(previousEntry.value);
+            previousEntry.setTile(null);
         }
 
         return marker;
     }
 
+    public void updateVisible(MapMarker marker, boolean new_visible) {
+        if (marker.isVisible() != new_visible) {
+            Entry entry = markersById.get(marker.getId());
+            if (entry != null) {
+                entry.setTile(new_visible ? computeTileAtPosition(marker.getPositionX(), marker.getPositionY()) : null);
+            }
+        }
+    }
+
     public void update(MapMarker marker) {
         Entry entry = markersById.get(marker.getId());
-        if (entry != null) {
+        if (entry != null && entry.tile != null) {
             entry.tile.setChanged(true);
         }
     }
@@ -66,7 +75,7 @@ public class MapDisplayMarkers {
     public MapMarker remove(String id) {
         Entry removedEntry = markersById.remove(id);
         if (removedEntry != null) {
-            removedEntry.tile.remove(removedEntry.value);
+            removedEntry.setTile(null);
             return removedEntry.value;
         } else {
             return null;
@@ -82,12 +91,15 @@ public class MapDisplayMarkers {
             markersById.put(removedEntry.value.getId(), removedEntry);
             return false;
         } else {
-            removedEntry.tile.remove(marker);
+            removedEntry.setTile(null);
             return true;
         }
     }
 
     public void move(MapMarker marker, double new_x, double new_y) {
+        if (!marker.isVisible()) {
+            return; // not stored in tiles
+        }
         Entry oldEntry = markersById.get(marker.getId());
         if (oldEntry == null) {
             return; // not stored
@@ -103,13 +115,15 @@ public class MapDisplayMarkers {
                 oldEntry.tile.setChanged(true);
             }
         } else {
-            oldEntry.tile.remove(marker);
-            oldEntry.tile = new_tile;
-            new_tile.add(marker);
+            oldEntry.setTile(new_tile);
         }
     }
 
     public void synchronize(MapSession session) {
+        if (markersByTile.isEmpty()) {
+            return; // skip
+        }
+
         for (MapDisplayTile displayedTile : session.tiles) {
             MapDisplayMarkerTile tile = markersByTile.get(displayedTile.tile);
             if (tile == null || !tile.isChanged()) {
@@ -184,6 +198,17 @@ public class MapDisplayMarkers {
         public Entry(MapMarker value, MapDisplayMarkerTile tile) {
             this.value = value;
             this.tile = tile;
+        }
+
+        public void setTile(MapDisplayMarkerTile new_tile) {
+            if (tile != null) {
+                tile.remove(value);
+                tile = null;
+            }
+            if (new_tile != null) {
+                tile = new_tile;
+                new_tile.add(value);
+            }
         }
     }
 }
