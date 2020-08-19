@@ -32,6 +32,7 @@ public class BlockDataOpacityTest {
 
     @Test
     public void testOpaqueFaces() {
+        assertOpaqueFaces(BlockFaceSet.NONE, BlockData.fromMaterial(Material.GLASS));
         assertOpaqueFaces(BlockFaceSet.NONE, BlockData.fromMaterial(Material.AIR));
         assertOpaqueFaces(BlockFaceSet.NONE, BlockData.fromMaterial(Material.ACACIA_FENCE));
         assertOpaqueFaces(BlockFaceSet.ALL, BlockData.fromMaterial(Material.OAK_WOOD));

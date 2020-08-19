@@ -101,6 +101,17 @@ interface IBlockData {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #endif
+
+        // Bugfix: sometimes faces is 'all' while opacity < 15
+        // When this happens, it would make transparent blocks block all light
+        // We obviously don't want that!
+        if (mask == com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL.mask()) {
+            int opacity = instance.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            if (opacity < 15) {
+                mask = 0;
+            }
+        }
+
         return com.bergerkiller.bukkit.common.collections.BlockFaceSet.byMask(mask);
 
 #elseif version >= 1.9
