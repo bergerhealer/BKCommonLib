@@ -27,6 +27,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHa
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRemoveEntityEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle.ChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutAttachEntityHandle;
@@ -887,6 +888,46 @@ class PacketPlayOutMap extends Packet {
     private int width:f;
     private int height:g;
     private byte[] pixels:h;
+#endif
+
+    public (PacketPlayOutMapHandle) PacketPlayOutMap();
+
+#if version >= 1.14
+    #require net.minecraft.server.PacketPlayOutMap private boolean locked:d;
+
+    public boolean isLocked() {
+        return instance#locked;
+    }
+
+    public void setLocked(boolean locked) {
+        instance#locked = locked;
+    }
+#else
+    public boolean isLocked() {
+        return false;
+    }
+
+    public void setLocked(boolean locked) {
+    }
+#endif
+
+#if version >= 1.9
+    #require net.minecraft.server.PacketPlayOutMap private boolean track:c;
+
+    public boolean isTrack() {
+        return instance#track;
+    }
+
+    public void setTrack(boolean track) {
+        instance#track = track;
+    }
+#else
+    public boolean isTrack() {
+        return false;
+    }
+
+    public void setTrack(boolean track) {
+    }
 #endif
 }
 

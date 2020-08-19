@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -16,14 +17,16 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
  * A marker icon displayed on the {@link MapDisplay}
  */
 public final class MapMarker {
+    private final MapDisplayMarkers owner;
     private final String id;
     private Type type;
-    private int x, y;
+    private double x, y;
     private double rotation;
     private boolean visible;
     private ChatText caption;
 
-    MapMarker(String id) {
+    MapMarker(MapDisplayMarkers owner, String id) {
+        this.owner = owner;
         this.id = id;
         this.type = Type.RED_MARKER;
         this.x = 0;
@@ -42,6 +45,16 @@ public final class MapMarker {
      */
     public String getId() {
         return this.id;
+    }
+
+    /**
+     * Removes this marker from the display
+     * 
+     * @return True if this marker was found and removed, False
+     *         if the marker was already removed
+     */
+    public boolean remove() {
+        return this.owner.remove(this);
     }
 
     /**
@@ -64,7 +77,7 @@ public final class MapMarker {
             throw new IllegalArgumentException("Type can not be null");
         } else if (this.type != type) {
             this.type = type;
-            this.markChanged();
+            this.owner.update(this);
         }
         return this;
     }
@@ -75,7 +88,7 @@ public final class MapMarker {
      * 
      * @return Position X-coordinate
      */
-    public int getPositionX() {
+    public double getPositionX() {
         return this.x;
     }
 
@@ -85,7 +98,7 @@ public final class MapMarker {
      * 
      * @return Position Y-coordinate
      */
-    public int getPositionY() {
+    public double getPositionY() {
         return this.y;
     }
 
@@ -96,12 +109,8 @@ public final class MapMarker {
      * @param x X-Coordinate to set to
      * @return this
      */
-    public MapMarker setPositionX(int x) {
-        if (this.x != x) {
-            this.x = x;
-            this.markChanged();
-        }
-        return this;
+    public MapMarker setPositionX(double x) {
+        return setPosition(x, this.y);
     }
 
     /**
@@ -111,12 +120,8 @@ public final class MapMarker {
      * @param y Y-Coordinate to set to
      * @return this
      */
-    public MapMarker setPositionY(int y) {
-        if (this.y != y) {
-            this.y = y;
-            this.markChanged();
-        }
-        return this;
+    public MapMarker setPositionY(double y) {
+        return setPosition(this.x, y);
     }
 
     /**
@@ -127,11 +132,11 @@ public final class MapMarker {
      * @param y Y-Coordinate
      * @return this
      */
-    public MapMarker setPosition(int x, int y) {
+    public MapMarker setPosition(double x, double y) {
         if (this.x != x || this.y != y) {
+            this.owner.move(this, x, y);
             this.x = x;
             this.y = y;
-            this.markChanged();
         }
         return this;
     }
@@ -155,7 +160,7 @@ public final class MapMarker {
         boolean changed = isRotationChanged(this.rotation, rotation);
         this.rotation = rotation;
         if (changed) {
-            this.markChanged();
+            this.owner.update(this);
         }
         return this;
     }
@@ -180,7 +185,7 @@ public final class MapMarker {
     public MapMarker setVisible(boolean visible) {
         if (this.visible != visible) {
             this.visible = visible;
-            this.markChanged();
+            this.owner.update(this);
         }
         return this;
     }
@@ -207,14 +212,14 @@ public final class MapMarker {
         if (this.caption == null) {
             if (caption != null) {
                 this.caption = ChatText.fromMessage(caption);
-                this.markChanged();
+                this.owner.update(this);
             }
         } else if (caption == null) {
             this.caption = null;
-            this.markChanged();
+            this.owner.update(this);
         } else if (!this.caption.getMessage().equals(caption)) {
             this.caption.setMessage(caption);
-            this.markChanged();
+            this.owner.update(this);
         }
         return this;
     }
@@ -245,21 +250,16 @@ public final class MapMarker {
         if (this.caption == null) {
             if (caption != null) {
                 this.caption = caption.clone();
-                this.markChanged();
+                this.owner.update(this);
             }
         } else if (caption == null) {
             this.caption = null;
-            this.markChanged();
+            this.owner.update(this);
         } else if (!this.caption.equals(caption)) {
             this.caption.copy(caption);
-            this.markChanged();
+            this.owner.update(this);
         }
         return this;
-    }
-
-    private void markChanged() {
-        //TODO: Notify MapDisplay that map icons need to be checked
-        //      Could also just set a flag inside this object
     }
 
     private static boolean isRotationChanged(double oldAngle, double newAngle) {

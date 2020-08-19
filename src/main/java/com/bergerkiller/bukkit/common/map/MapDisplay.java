@@ -18,13 +18,13 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -72,6 +72,7 @@ public class MapDisplay implements MapDisplayEvents {
     protected MapDisplayInfo info = null;
     protected JavaPlugin plugin = null;
     private final MapWidgetRoot widgets = new MapWidgetRoot(this);
+    private final MapDisplayMarkers markers = new MapDisplayMarkers();
     protected final MapDisplayProperties properties = new MapDisplayProperties(this);
 
     /**
@@ -109,6 +110,7 @@ public class MapDisplay implements MapDisplayEvents {
     // called when setRunning(true) is called, right before onAttached
     private void preRunInitialize() {
         this.info.loadTiles(this.session, true);
+        this.markers.clear();
         this.width = this.info.getDesiredWidth();
         this.height = this.info.getDesiredHeight();
         this.zbuffer = new byte[this.width * this.height];
@@ -328,7 +330,7 @@ public class MapDisplay implements MapDisplayEvents {
         if (this.clip.dirty) {
             // For all viewers watching, send map texture updates
             // For players that are in-sync, we can re-use the same packet
-            List<CommonPacket> syncPackets = null;
+            List<MapDisplayTile.Update> syncUpdates = null;
             for (MapSession.Owner owner : this.session.onlineOwners) {
                 if (!owner.viewing) {
                     // Update dirty clip only
@@ -339,20 +341,21 @@ public class MapDisplay implements MapDisplayEvents {
                 // When viewers have individual dirty areas, they need their own update packets
                 if (owner.clip.dirty) {
                     owner.clip.markDirty(this.clip);
-                    owner.updateMap(this.getUpdatePackets(owner.clip));
+                    owner.updateMap(this.getUpdates(owner.clip, owner.player));
                     continue;
                 }
 
                 // Viewers viewing for a while only need to have our own clip updated
-                // We can re-use the same update packet for all viewers
-                if (syncPackets == null) {
-                    syncPackets = this.getUpdatePackets(this.clip);
+                if (syncUpdates == null) {
+                    syncUpdates = this.getUpdates(this.clip, owner.player);
                 } else {
-                    for (int i = 0; i < syncPackets.size(); i++) {
-                        syncPackets.set(i, syncPackets.get(i).clone());
+                    // We can re-use the same update packets for all viewers
+                    // We do need to make sure to clear map marker tiles represented
+                    for (int i = 0; i < syncUpdates.size(); i++) {
+                        syncUpdates.set(i, syncUpdates.get(i).clone());
                     }
                 }
-                owner.updateMap(syncPackets);
+                owner.updateMap(syncUpdates);
             }
 
             // Done updating, reset the dirty state
@@ -363,7 +366,7 @@ public class MapDisplay implements MapDisplayEvents {
             if (session.hasNewViewers) {
                 for (MapSession.Owner owner : session.onlineOwners) {
                     if (owner.isNewViewer()) {
-                        owner.updateMap(getUpdatePackets(owner.clip));
+                        owner.updateMap(getUpdates(owner.clip, owner.player));
                     }
                 }
             }
@@ -372,10 +375,16 @@ public class MapDisplay implements MapDisplayEvents {
             // When players rejoin or change worlds, they may not know the map
             for (MapSession.Owner owner : this.session.onlineOwners) {
                 if (owner.viewing && owner.clip.dirty) {
-                    owner.updateMap(this.getUpdatePackets(owner.clip));
+                    owner.updateMap(this.getUpdates(owner.clip, owner.player));
                 }
             }
         }
+
+        // Check all tiles with markers on them and synchronize the changes to the players
+        // Previous map content changes may have already synchronized them, in which case
+        // the player was marked as synchronized for the tile affected.
+        // After this, all the 'is marker changed' logic is reset.
+        markers.synchronize(this.session);
     }
 
     private final void refreshMapItem() {
@@ -384,12 +393,12 @@ public class MapDisplay implements MapDisplayEvents {
         }
     }
 
-    private final List<CommonPacket> getUpdatePackets(MapClip clip) {
-        List<CommonPacket> packets = new ArrayList<CommonPacket>(this.session.tiles.size());
+    private final List<MapDisplayTile.Update> getUpdates(MapClip clip, Player viewer) {
+        List<MapDisplayTile.Update> updates = new ArrayList<MapDisplayTile.Update>(this.session.tiles.size());
         for (MapDisplayTile tile : this.session.tiles) {
-            tile.addUpdatePackets(this, packets, clip);
+            tile.addTileUpdate(this, viewer, updates, clip);
         }
-        return packets;
+        return updates;
     }
 
     /**
@@ -677,6 +686,86 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public MapWidget getFocusedWidget() {
         return this.widgets.getFocusedWidget();
+    }
+
+    /**
+     * Internal use only
+     * 
+     * @return markers manager
+     */
+    MapDisplayMarkers getMarkerManager() {
+        return markers;
+    }
+
+    /**
+     * Gets all the map markers added to this display
+     * 
+     * @return unmodifiable collection of map markers
+     */
+    public Collection<MapMarker> getMarkers() {
+        return markers.values();
+    }
+
+    /**
+     * Creates a new marker and adds it to to the display.
+     * It is assigned a randomly generated unique id.
+     * 
+     * @return marker
+     */
+    public MapMarker createMarker() {
+        while (true) {
+            String name = MapDisplayMarkers.RANDOM_NAME_SOURCE.nextHex();
+            if (markers.get(name) == null) {
+                return markers.add(new MapMarker(markers, name));
+            }
+        }
+    }
+
+    /**
+     * Creates a new marker and adds it to the display.
+     * The id specified will be assigned to the marker,
+     * allowing it to be later retrieved again by the same id
+     * using {@link #getMarker(id)}.<br>
+     * <br>
+     * If a marker with this id already exists, then that marker
+     * is replaced with a new one that has the initial settings
+     * of a newly created marker.
+     * 
+     * @param id The unique ID to assign to the marker
+     * @return marker
+     */
+    public MapMarker createMarker(String id) {
+        return markers.add(new MapMarker(markers, id));
+    }
+
+    /**
+     * Retrieves the marker previously created by id. If
+     * the marker by this id could not be found, null is returned.
+     * 
+     * @param id The unique ID of the marker to find
+     * @return marker, null if no marker with this id exists
+     */
+    public MapMarker getMarker(String id) {
+        return markers.get(id);
+    }
+
+    /**
+     * Removes a marker from this display, returning the marker
+     * that was removed if found.
+     * 
+     * @param id The unique ID of the marker to remove
+     * @return marker that was removed, or null if no marker with
+     *         this ID was found.
+     */
+    public MapMarker removeMarker(String id) {
+        return markers.remove(id);
+    }
+
+    /**
+     * Removes all map markers previously added to this display
+     */
+    public void clearMarkers() {
+        markers.clear();
     }
 
     /**

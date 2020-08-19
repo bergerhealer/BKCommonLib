@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
+import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -308,6 +309,11 @@ public class TemplateTest {
         } else if (Common.evaluateMCVersion(">=", "1.13")) {
             assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_13.isBlockCollisionsMethodInitialized());
         }
+    }
+
+    @Test
+    public void testMapDisplayMarkerApplier() {
+        MapDisplayMarkers.APPLIER.forceInitialization();
     }
 
     private void assertAvailable(Template.TemplateElement<?>... elements) {

@@ -18,8 +18,16 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
+    public static final PacketPlayOutMapHandle createNew() {
+        return T.constr.newInstance();
+    }
+
     /* ============================================================================== */
 
+    public abstract boolean isLocked();
+    public abstract void setLocked(boolean locked);
+    public abstract boolean isTrack();
+    public abstract void setTrack(boolean track);
     public abstract int getItemId();
     public abstract void setItemId(int value);
     public abstract byte getScale();
@@ -41,6 +49,8 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutMapClass extends Template.Class<PacketPlayOutMapHandle> {
+        public final Template.Constructor.Converted<PacketPlayOutMapHandle> constr = new Template.Constructor.Converted<PacketPlayOutMapHandle>();
+
         public final Template.Field.Integer itemId = new Template.Field.Integer();
         public final Template.Field.Byte scale = new Template.Field.Byte();
         @Template.Optional
@@ -53,6 +63,11 @@ public abstract class PacketPlayOutMapHandle extends PacketHandle {
         public final Template.Field.Integer width = new Template.Field.Integer();
         public final Template.Field.Integer height = new Template.Field.Integer();
         public final Template.Field<byte[]> pixels = new Template.Field<byte[]>();
+
+        public final Template.Method<Boolean> isLocked = new Template.Method<Boolean>();
+        public final Template.Method<Void> setLocked = new Template.Method<Void>();
+        public final Template.Method<Boolean> isTrack = new Template.Method<Boolean>();
+        public final Template.Method<Void> setTrack = new Template.Method<Void>();
 
     }
 

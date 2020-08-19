@@ -11,7 +11,6 @@ import org.bukkit.entity.Player;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.ViewStack;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -231,10 +230,10 @@ public class MapSession {
             return this.viewing && !this.wasViewing;
         }
 
-        public void updateMap(List<CommonPacket> packets) {
+        public void updateMap(List<MapDisplayTile.Update> updates) {
             this.clip.clearDirty();
-            for (CommonPacket packet : packets) {
-                PacketUtil.sendPacket(this.player, packet, false);
+            for (MapDisplayTile.Update mapUpdate : updates) {
+                sendUpdate(mapUpdate);
             }
         }
 
@@ -255,10 +254,9 @@ public class MapSession {
             if (!clip.dirty) {
                 // Clip was not dirty, so we can send packets right away
                 // Do so without affecting the clip of this owner, so do not use updateMap!
-                ArrayList<CommonPacket> packets = new ArrayList<CommonPacket>(1);
-                tile.addUpdatePackets(this.display, packets, null);
-                for (CommonPacket packet : packets) {
-                    PacketUtil.sendPacket(this.player, packet, false);
+                MapDisplayTile.Update update = tile.getTileUpdate(this.display, this.player, null);
+                if (update != null) {
+                    sendUpdate(update);
                 }
             } else if (!clip.everything) {
                 // Clip is dirty, so the display will send changes anyway
@@ -266,6 +264,11 @@ public class MapSession {
                 // No need to do this if the entire clip is already dirty
                 this.clip.markDirty(x, y, w, h);
             }
+        }
+
+        private void sendUpdate(MapDisplayTile.Update mapUpdate) {
+            PacketUtil.sendPacket(this.player, mapUpdate.packet, false);
+            display.getMarkerManager().setMarkersSynchronized(this.player, mapUpdate);
         }
     }
 }
