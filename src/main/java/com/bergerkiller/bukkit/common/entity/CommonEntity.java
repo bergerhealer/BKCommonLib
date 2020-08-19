@@ -503,9 +503,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                     if (updatedPassengers != null) {
                         updatedPassengers.add(passenger);
                     }
-                    CommonEntity<?> commonPassenger = get(passenger);
-                    commonPassenger.getController().onTick();
-                    commonPassenger.doPostTick();
+                    EntityHandle.fromBukkit(passenger).onTick();
+                    get(passenger).doPostTick();
                 } else {
                     if (updatedPassengers == null) {
                         updatedPassengers = new ArrayList<org.bukkit.entity.Entity>();
