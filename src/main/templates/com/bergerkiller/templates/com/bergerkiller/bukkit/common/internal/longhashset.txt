@@ -20,7 +20,7 @@ class LongHashSet {
     </code>
 
 #if version >= 1.14
-    public volatile (java.util.Iterator<Long>) java.util.Iterator iterator();
+    public abstract (java.util.Iterator<Long>) it.unimi.dsi.fastutil.longs.LongIterator iterator();
 #else
     public (java.util.Iterator<Long>) com.bergerkiller.bukkit.common.internal.LongHashSet.LongIterator iterator();
 #endif

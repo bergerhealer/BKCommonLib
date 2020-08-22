@@ -368,14 +368,19 @@ public class CommonBootstrap {
                 Class.forName(unimi_fastutil_path + "longs.LongSet");
 
                 // Fixes hardcoded fastutil paths used in templates
-                remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectLinkedOpenHashMap");
-                remappings.put("it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap", unimi_fastutil_path + "ints.Int2ObjectOpenHashMap");
-                remappings.put("it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap", unimi_fastutil_path + "longs.Long2ObjectOpenHashMap");
-                remappings.put("it.unimi.dsi.fastutil.longs.LongIterator", unimi_fastutil_path + "longs.LongIterator");
-                remappings.put("it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet", unimi_fastutil_path + "longs.LongLinkedOpenHashSet");
-                remappings.put("it.unimi.dsi.fastutil.longs.LongOpenHashSet", unimi_fastutil_path + "longs.LongOpenHashSet");
-                remappings.put("it.unimi.dsi.fastutil.longs.LongSet", unimi_fastutil_path + "longs.LongSet");
-                remappings.put("it.unimi.dsi.fastutil.objects.Object2IntMap", unimi_fastutil_path + "objects.Object2IntMap");
+                for (String fastutilClass : new String[] {
+                        "longs.Long2ObjectLinkedOpenHashMap",
+                        "ints.Int2ObjectOpenHashMap",
+                        "longs.Long2ObjectOpenHashMap",
+                        "longs.LongIterator",
+                        "longs.LongLinkedOpenHashSet",
+                        "longs.LongOpenHashSet",
+                        "longs.LongSet",
+                        "objects.Object2IntMap",
+                        "objects.ObjectCollection"
+                }) {
+                    remappings.put("it.unimi.dsi.fastutil." + fastutilClass, unimi_fastutil_path + fastutilClass);
+                }
             } catch (ClassNotFoundException ex) {
                 unimi_fastutil_path = "it.unimi.dsi.fastutil.";
             }

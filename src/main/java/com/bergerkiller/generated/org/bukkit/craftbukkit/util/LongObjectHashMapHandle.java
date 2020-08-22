@@ -47,8 +47,8 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method<Object> get = new Template.Method<Object>();
         public final Template.Method<Object> remove = new Template.Method<Object>();
         public final Template.Method<Object> put = new Template.Method<Object>();
-        public final Template.Method<Collection<Object>> values = new Template.Method<Collection<Object>>();
-        public final Template.Method<Set<Long>> keySet = new Template.Method<Set<Long>>();
+        public final Template.Method.Converted<Collection<Object>> values = new Template.Method.Converted<Collection<Object>>();
+        public final Template.Method.Converted<Set<Long>> keySet = new Template.Method.Converted<Set<Long>>();
         public final Template.Method.Converted<LongObjectHashMapHandle> cloneMap = new Template.Method.Converted<LongObjectHashMapHandle>();
 
     }

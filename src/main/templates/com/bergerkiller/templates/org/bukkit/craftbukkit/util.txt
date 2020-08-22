@@ -27,8 +27,8 @@ class LongObjectHashMap {
     public V put(long key, V value);
 
 #if version >= 1.14
-    public volatile Collection<V> values();
-    public volatile Set<Long> keySet();
+    public abstract (Collection<V>) it.unimi.dsi.fastutil.objects.ObjectCollection<V> values();
+    public abstract (Set<Long>) it.unimi.dsi.fastutil.longs.LongSet keySet();
 
     public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
         return (org.bukkit.craftbukkit.util.LongObjectHashMap) com.bergerkiller.bukkit.common.utils.LogicUtil.clone(instance);
