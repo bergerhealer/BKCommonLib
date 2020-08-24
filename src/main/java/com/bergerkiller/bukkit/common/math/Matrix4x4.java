@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.math;
 
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.map.util.MatrixMath;
@@ -777,6 +778,17 @@ public class Matrix4x4 implements Cloneable {
         return new Vector(m03, m13, m23);
     }
 
+    /**
+     * Obtains the absolute position vector and rotation yaw/pitch information of this matrix
+     * 
+     * @param world The world to use for the Location
+     * @return location
+     */
+    public Location toLocation(World world) {
+        Vector ypr = this.getYawPitchRoll();
+        return new Location(world, m03, m13, m23, (float) ypr.getY(), (float) ypr.getX());
+    }
+
     @Override
     public Matrix4x4 clone() {
         return new Matrix4x4(this);
@@ -805,6 +817,20 @@ public class Matrix4x4 implements Cloneable {
                 v0.getY(), v1.getY(), v2.getY(), 0.0,
                 v0.getZ(), v1.getZ(), v2.getZ(), 0.0,
                 0.0, 0.0, 0.0, 1.0);
+    }
+
+    /**
+     * Creates a 4x4 matrix by using the Location information of an Entity.
+     * This is equivalent to calling {@link #translateRotate(Location)} on an
+     * identity matrix.
+     * 
+     * @param location
+     * @return transformation matrix for location
+     */
+    public static Matrix4x4 fromLocation(Location location) {
+        Matrix4x4 result = new Matrix4x4();
+        result.translateRotate(location);
+        return result;
     }
 
     /**
