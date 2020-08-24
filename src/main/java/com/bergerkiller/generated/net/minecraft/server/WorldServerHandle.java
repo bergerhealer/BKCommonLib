@@ -3,7 +3,9 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 import org.bukkit.Chunk;
+import org.bukkit.Location;
 import org.bukkit.World;
 import java.util.Collection;
 import java.util.List;
@@ -45,6 +47,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
+    public abstract Location findSafeSpawn(PlayerRespawnPoint respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn);
 
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
@@ -89,6 +92,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
+        public final Template.Method<Location> findSafeSpawn = new Template.Method<Location>();
 
     }
 

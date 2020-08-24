@@ -1,16 +1,13 @@
 package com.bergerkiller.bukkit.common.entity.type;
 
-import com.bergerkiller.bukkit.common.BlockLocation;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
@@ -130,35 +127,27 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
 
     /**
      * Gets the block location of the respawn point for the player.
-     * If none is available, null is returned instead.
+     * If none is available, null is returned instead.<br>
+     * <br>
+     * <b>Deprecated: please use {@link PlayerRespawnPoint} instead</b>
      * 
      * @return spawn point coordinates, or null if none are available
      */
+    @Deprecated
     public Block getSpawnPoint() {
-        EntityPlayerHandle handle = EntityPlayerHandle.createHandle(this.getHandle());
-        World world = handle.getSpawnWorld();
-        IntVector3 coords = handle.getSpawnCoord();
-        if (world != null && coords != null) {
-            return coords.toBlock(world);
-        } else {
-            return null;
-        }
+        return PlayerRespawnPoint.forPlayer(this.getEntity()).getBlock();
     }
 
     /**
      * Sets the block location of the respawn point for the human entity.
-     * To clear the respawn point and set it to 'none', set it to null.
+     * To clear the respawn point and set it to 'none', set it to null.<br>
+     * <br>
+     * <b>Deprecated: please use {@link PlayerRespawnPoint} instead</b>
      * 
      * @param spawnPoint to set to
      */
+    @Deprecated
     public void setSpawnPoint(Block spawnPoint) {
-        EntityPlayerHandle handle = EntityPlayerHandle.createHandle(this.getHandle());
-        if (spawnPoint == null) {
-            handle.setSpawnWorld(null);
-            handle.setSpawnCoord(null);
-        } else {
-            handle.setSpawnWorld(spawnPoint.getWorld());
-            handle.setSpawnCoord(new IntVector3(spawnPoint));
-        }
+        PlayerRespawnPoint.create(spawnPoint).applyToPlayer(this.getEntity());
     }
 }

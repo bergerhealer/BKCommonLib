@@ -194,4 +194,14 @@ public class CommonCapabilities {
      * desynchronizing from the server if attempted.
      */
     public static final boolean VEHICLE_EXIT_CANCELLABLE = CommonBootstrap.evaluateMCVersion("<", "1.16");
+
+    /**
+     * Since Minecraft 1.16 the spawn world is saved as a dimension key in the NBT
+     */
+    public static final boolean PLAYER_SPAWN_WORLD_IS_DIMENSION_KEY = CommonBootstrap.evaluateMCVersion(">=", "1.16");
+
+    /**
+     * Since Minecraft 1.16.2 the spawn point has an angle component
+     */
+    public static final boolean PLAYER_SPAWN_HAS_ANGLE = CommonBootstrap.evaluateMCVersion(">=", "1.16.2");
 }

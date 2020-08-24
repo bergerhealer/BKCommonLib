@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
@@ -612,6 +613,45 @@ class WorldServer extends World {
 #else
     public void saveLevel();
 #endif
+
+    public org.bukkit.Location findSafeSpawn(PlayerRespawnPoint respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+        if (respawnPoint.isNone()) {
+            return null;
+        }
+
+        BlockPosition blockposition = new BlockPosition(respawnPoint.getX(), respawnPoint.getY(), respawnPoint.getZ());
+
+        // If isDeathRespawn is true, removes one use tick from a bed respawn anchor, if used
+        boolean ignoreRespawnAnchorUses = !isDeathRespawn;
+
+#if version >= 1.14
+        // Optional<Vec3D>
+  #if version >= 1.16.2
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+  #elseif version >= 1.16
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, alsoWhenDestroyed, ignoreRespawnAnchorUses);
+  #else
+        java.util.Optional result = EntityHuman.getBed((IWorldReader) instance, blockposition, alsoWhenDestroyed);
+  #endif
+        Vec3D vec3d = (Vec3D) result.orElse(null);
+        if (vec3d == null) {
+            return null;
+        } else {
+            return new org.bukkit.Location(respawnPoint.getWorld(), vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        }
+#else
+  #if version >= 1.13
+        BlockPosition result = EntityHuman.getBed((IBlockAccess) instance, blockposition, alsoWhenDestroyed);
+  #else
+        BlockPosition result = EntityHuman.getBed((World) instance, blockposition, alsoWhenDestroyed);
+  #endif
+        if (result == null) {
+            return null;
+        } else {
+            return new org.bukkit.Location(respawnPoint.getWorld(), (double) result.getX() + 0.5, (double) result.getY(), (double) result.getZ() + 0.5);
+        }
+#endif
+    }
 
     <code>
     public static WorldServerHandle fromBukkit(org.bukkit.World world) {

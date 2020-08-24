@@ -364,6 +364,28 @@ class EntityPlayer extends EntityHuman {
     // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
 
 #if version >= 1.16
+    // World dimension on 1.16 and later
+    public org.bukkit.World getSpawnWorld() {
+        ResourceKey spawn = instance.getSpawnDimension();
+        World world = MinecraftServer.getServer().getWorldServer(spawn);
+        return (world == null) ? null : world.getWorld();
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        #require net.minecraft.server.EntityPlayer private ResourceKey<World> spawnDimension;
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
+        instance#spawnDimension = key;
+    }
+#else
+    // World name on 1.15.2 and earlier
+    public org.bukkit.World getSpawnWorld() {
+        return org.bukkit.Bukkit.getWorld(instance.spawnWorld);
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        instance.spawnWorld = (world == null) ? "" : world.getName();
+    }
+#endif
+
+#if version >= 1.16
     #require net.minecraft.server.EntityPlayer private BlockPosition spawnCoord:spawn;
     #require net.minecraft.server.EntityPlayer private boolean spawnForced;
 #elseif version >= 1.15
@@ -417,27 +439,63 @@ class EntityPlayer extends EntityHuman {
         instance#spawnForced = forced;
     }
 
-    public int ping;
+#if version >= 1.16.2
+    #require net.minecraft.server.EntityPlayer private float spawnAngle;
+#endif
 
-#if version >= 1.16
-    // World dimension on 1.16 and later
-    public org.bukkit.World getSpawnWorld() {
-        ResourceKey spawn = instance.getSpawnDimension();
-        World world = MinecraftServer.getServer().getWorldServer(spawn);
-        return (world == null) ? null : world.getWorld();
+#if version >= 1.16.2
+    public float getSpawnAngle() {
+        return instance#spawnAngle;
     }
-    public void setSpawnWorld(org.bukkit.World world) {
-        #require net.minecraft.server.EntityPlayer private ResourceKey<World> spawnDimension;
-        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
-        instance#spawnDimension = key;
+
+    public void setSpawnAngle(float angle) {
+        instance#spawnAngle = angle;
     }
 #else
-    // World name on 1.15.2 and earlier
-    public org.bukkit.World getSpawnWorld() {
-        return org.bukkit.Bukkit.getWorld(instance.spawnWorld);
+    public float getSpawnAngle() {
+        return 0.0f;
     }
-    public void setSpawnWorld(org.bukkit.World world) {
-        instance.spawnWorld = (world == null) ? "" : world.getName();
+
+    public void setSpawnAngle(float angle) {
+    }
+#endif
+
+    public int ping;
+
+    // Seen credits getter/setter
+#if version >= 1.12
+    // Since Minecraft 1.12 this is just a boolean property of the player
+  #if version >= 1.16.2
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cd;
+  #elseif version >= 1.16.1
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:ck;
+  #elseif version >= 1.15
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cm;
+  #elseif version >= 1.14
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cp;
+  #elseif version >= 1.13.1
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cx;
+  #elseif version >= 1.13
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cy;
+  #else
+    #require net.minecraft.server.EntityPlayer private boolean seenCredits:cq;
+  #endif
+
+    public boolean hasSeenCredits() {
+        return instance#seenCredits;
+    }
+
+    public void setHasSeenCredits(boolean hasSeen) {
+        instance#seenCredits = hasSeen;
+    }
+#else
+    // Older versions of Minecraft used the achievement list for this
+    public boolean hasSeenCredits() {
+        return instance.a(AchievementList.D);
+    }
+
+    public void setHasSeenCredits(boolean hasSeen) {
+        instance.getStatisticManager().setStatistic(instance, (Statistic) AchievementList.D, hasSeen ? 1 : 0);
     }
 #endif
 
