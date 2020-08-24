@@ -307,6 +307,16 @@ public class MaterialUtil {
     public static final MaterialTypeProperty ISARMOR = new MaterialTypeProperty(ISBOOTS, ISLEGGINGS, ISCHESTPLATE, ISHELMET);
 
     /**
+     * The material is the nether portal frame
+     */
+    public static final MaterialTypeProperty ISNETHERPORTAL = TYPE_PROPERTIES.get("ISNETHERPORTAL");
+
+    /**
+     * The material is the end portal frame
+     */
+    public static final MaterialTypeProperty ISENDPORTAL = TYPE_PROPERTIES.get("ISENDPORTAL");
+
+    /**
      * The material is a type of armor made of leather, such as leather boots or leather helmet.
      * Distinctive of this property is that the armor material can be painted because of it.
      */

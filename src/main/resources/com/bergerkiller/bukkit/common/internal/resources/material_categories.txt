@@ -352,6 +352,14 @@ ISPOTION:
   LEGACY_LINGERING_POTION
   LEGACY_SPLASH_POTION
 
+ISNETHERPORTAL:
+  LEGACY_PORTAL
+  NETHER_PORTAL
+
+ISENDPORTAL:
+  LEGACY_ENDER_PORTAL
+  END_PORTAL
+
 // ============================================================
 #else
 // ===================== Legacy <= 1.12.2 =====================
@@ -499,6 +507,12 @@ ISPOTION:
   LEGACY_LINGERING_POTION
   LEGACY_SPLASH_POTION
 #endif
+
+ISNETHERPORTAL:
+  LEGACY_PORTAL
+
+ISENDPORTAL:
+  LEGACY_ENDER_PORTAL
 
 // ============================================================
 #endif
