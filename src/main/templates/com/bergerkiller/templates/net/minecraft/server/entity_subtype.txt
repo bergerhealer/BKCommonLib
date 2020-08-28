@@ -461,6 +461,7 @@ class EntityPlayer extends EntityHuman {
 #endif
 
     public int ping;
+    public readonly boolean viewingCredits;
 
     // Seen credits getter/setter
 #if version >= 1.12
@@ -491,7 +492,11 @@ class EntityPlayer extends EntityHuman {
 #else
     // Older versions of Minecraft used the achievement list for this
     public boolean hasSeenCredits() {
+  #if version >= 1.9
         return instance.a(AchievementList.D);
+  #else
+        return instance.getStatisticManager().hasAchievement(AchievementList.D);
+  #endif
     }
 
     public void setHasSeenCredits(boolean hasSeen) {

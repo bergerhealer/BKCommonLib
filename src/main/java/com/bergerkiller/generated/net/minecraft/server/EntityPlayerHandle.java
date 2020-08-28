@@ -44,6 +44,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract void setPlayerConnection(PlayerConnectionHandle value);
     public abstract int getPing();
     public abstract void setPing(int value);
+    @Template.Readonly
+    public abstract boolean isViewingCredits();
     /**
      * Stores class members for <b>net.minecraft.server.EntityPlayer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -51,6 +53,8 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {
         public final Template.Field.Converted<PlayerConnectionHandle> playerConnection = new Template.Field.Converted<PlayerConnectionHandle>();
         public final Template.Field.Integer ping = new Template.Field.Integer();
+        @Template.Readonly
+        public final Template.Field.Boolean viewingCredits = new Template.Field.Boolean();
 
         public final Template.Method<World> getSpawnWorld = new Template.Method<World>();
         public final Template.Method<Void> setSpawnWorld = new Template.Method<Void>();
