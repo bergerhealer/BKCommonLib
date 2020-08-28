@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -22,7 +21,6 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.*;
-import java.util.logging.Level;
 
 public class RecipeUtil {
 
@@ -31,20 +29,17 @@ public class RecipeUtil {
     static {
         // Store initial values
         for (Material material : MaterialsByName.getAllMaterials()) {
-            if (!material.isItem()) {
-                continue;
-            }
-
             ItemStackHandle item = ItemStackHandle.newInstance();
             try {
                 item.setTypeField(material);
-                item.setAmountField(1);
-                int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
-                if (fuel > 0) {
-                    fuelTimes.put(material, fuel);
-                }
             } catch (Throwable t) {
-                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to register fuel type " + material, t);
+                // Ignore forge errors
+                continue;
+            }
+            item.setAmountField(1);
+            int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
+            if (fuel > 0) {
+                fuelTimes.put(material, fuel);
             }
         }
 
