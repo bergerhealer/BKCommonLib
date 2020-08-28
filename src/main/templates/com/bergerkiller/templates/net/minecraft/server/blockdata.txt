@@ -82,22 +82,22 @@ interface IBlockData {
         }
   #else
         // Awkward! It's not cached yet. Hopefully this works, though.
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (Block.d(iblockdata, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #endif
