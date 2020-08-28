@@ -32,7 +32,6 @@
 #include /net/minecraft/server/packets_spawn.txt
 #include /net/minecraft/server/mobspawner.txt
 #include /net/minecraft/server/inthashmap.txt
-#include /net/minecraft/server/travelagent.txt
 #include /net/minecraft/server/vectors.txt
 #include /net/minecraft/server/recipes.txt
 #include /net/minecraft/server/map.txt

@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
@@ -409,6 +410,9 @@ public class CommonPlugin extends PluginBase {
             entities.clear();
         }
 
+        // Shut down any ongoing tasks for the portal handler
+        PortalHandler.INSTANCE.disable(this);
+
         // Shut down map display controller
         this.mapController.onDisable();
 
@@ -585,6 +589,9 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize event factory
         eventFactory = new CommonEventFactory();
+
+        // Initialize portal handling logic
+        PortalHandler.INSTANCE.enable(this);
 
         // Initialize entity map (needs to be here because of CommonPlugin instance needed)
         playerMetadata = new EntityMap<Player, CommonPlayerMeta>();

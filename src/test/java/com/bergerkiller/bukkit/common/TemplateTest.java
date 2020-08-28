@@ -13,6 +13,7 @@ import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
+import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -258,6 +259,11 @@ public class TemplateTest {
     @Test
     public void testRegionHandler() {
         RegionHandler.INSTANCE.forceInitialization();
+    }
+
+    @Test
+    public void testPortalHandler() {
+        PortalHandler.INSTANCE.forceInitialization();
     }
 
     @Test

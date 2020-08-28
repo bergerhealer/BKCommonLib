@@ -7,13 +7,13 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
@@ -37,6 +37,17 @@ import java.util.List;
  * Player - specific operations and tools
  */
 public class PlayerUtil extends EntityUtil {
+
+    /**
+     * Displays the game end credits for the player. If the player has already seen
+     * these credits, then the screen is automatically closed by the player.
+     * In all cases, the player is respawned onto the world.
+     * 
+     * @param player
+     */
+    public static void showEndCredits(Player player) {
+        PortalHandler.INSTANCE.showEndCredits(player);
+    }
 
     /**
      * Gets the vehicle mount controller for a player. This controller can be used

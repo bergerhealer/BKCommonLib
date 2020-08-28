@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
+import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -27,7 +28,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.PortalTravelAgentHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
@@ -41,6 +41,7 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -351,38 +352,81 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Attempts to find a suitable spawn location, searching from the
-     * startLocation specified. Note that portals are created if no position can
-     * be found.
-     *
-     * @param startLocation to find a spawn from
-     * @return suitable spawn location, or the input startLocation if this
-     * failed
+     * Since Minecraft 1.15 it is important that all nether portal
+     * blocks are registered, so that it can be found again when creating
+     * nether portal links. With this method you can register nether
+     * portal blocks in the world.
+     * 
+     * @param netherPortalBlock
      */
-    public static Location findSpawnLocation(Location startLocation) {
-        return findSpawnLocation(startLocation, true);
+    public static void markNetherPortal(Block netherPortalBlock) {
+        PortalHandler.INSTANCE.markNetherPortal(netherPortalBlock);
     }
 
     /**
-     * Attempts to find a suitable spawn location, searching from the
-     * startLocation specified. If specified, portals will be created if none
-     * are found.
-     *
-     * @param startLocation to find a spawn from
-     * @param createPortals - True to create a portal if not found, False not to
-     * @return suitable spawn location, or the input startLocation if this
-     * failed
+     * Searches for a lit nether portal frame from a start block area. The nearest
+     * lit portal is returned, or null if no portal could be found. No portal
+     * is ever created.<br>
+     * <br>
+     * This uses the server-configured search radius of 128, which might be altered
+     * by some server implementations.
+     * 
+     * @param searchStart The block from which to start searching for the portal
+     * @return nether portal Block found, null if not found
      */
-    public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
-        // Patch up the Start Location to find portals nearby to spawn at
-        PortalTravelAgentHandle travelAgent = PortalTravelAgentHandle.createNew(startLocation.getWorld());
-        Location portal = travelAgent.findPortal(startLocation);
-        if (portal == null) {
-            if (createPortals && travelAgent.createPortal(startLocation.getX(), startLocation.getY(), startLocation.getZ())) {
-                portal = travelAgent.findPortal(startLocation);
-            }
+    public static Block findNetherPortal(Block searchStart) {
+        return PortalHandler.INSTANCE.findNetherPortal(searchStart);
+    }
+
+    /**
+     * Creates a new lit nether portal frame on a suitable area at a target block.
+     * Returns null if the portal could not be created.
+     * 
+     * @param searchStart The block from which to start looking for suitable space
+     * @param orientation The orientation of the portal to create. This is the direction
+     *        the player looks into standing inside the portal looking out.
+     * @param initiator The entity that initiated creation of the portal, can be null
+     * @return nether portal Block created, null if failed
+     */
+    public static Block createNetherPortal(Block searchStart, BlockFace orientation, Entity initiator) {
+        if (searchStart == null) {
+            throw new IllegalArgumentException("Start block can not be null");
         }
-        return (portal == null) ? startLocation.clone() : portal;
+        return PortalHandler.INSTANCE.createNetherPortal(searchStart, orientation, initiator);
+    }
+
+    /**
+     * Searches for an intact end platform in its default position for the world.
+     * If no such platform is found, or blocks are incorrect, null is returned.
+     * 
+     * @param world
+     * @return end platform Block, null if not found
+     */
+    public static Block findEndPlatform(World world) {
+        return PortalHandler.INSTANCE.findEndPlatform(world);
+    }
+
+    /**
+     * Creates the end platform on a world in its default position for the world
+     * 
+     * @param world World on which to create the end platform
+     * @param initiator Entity that initiated creation, used for event handling, can be null
+     * @return end platform Block, null if creation failed
+     */
+    public static Block createEndPlatform(World world, Entity initiator) {
+        return PortalHandler.INSTANCE.createEndPlatform(world, initiator);
+    }
+
+    /**
+     * Gets whether a given world is the main end world dimension on the server.
+     * If this is the case, players that enter end portals here are automatically
+     * respawned on the main world.
+     * 
+     * @param world
+     * @return True if the world is the main end world
+     */
+    public static boolean isMainEndWorld(World world) {
+        return PortalHandler.INSTANCE.isMainEndWorld(world);
     }
 
     /**
