@@ -107,20 +107,24 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
     @Template.Optional
     @Template.InstanceType("org.magmafoundation.magma.remapper.utils.RemappingUtils")
     public static abstract class RemappingUtilsClass extends Template.Class<Template.Handle> {
-        @Template.Generated("public static String mapClassName(String className) {\n" +
-                            "    if (className.startsWith(\"net.minecraft.server.\")) {\n" +
-                            "        org.magmafoundation.magma.remapper.mappingsModel.ClassMappings mapping;\n" +
-                            "        mapping = (org.magmafoundation.magma.remapper.mappingsModel.ClassMappings) RemappingUtils.jarMapping.byNMSName.get(className);\n" +
-                            "        if (mapping != null) {\n" +
-                            "            return mapping.getMcpName();\n" +
-                            "        } else {\n" +
-                            "            // Magma BUGFIX!!!\n" +
-                            "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\n" +
-                            "            return \"missing.type.\" + className;\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "    return className;\n" +
-                            "}")
+        /*
+         * <MAP_CLASS_NAME>
+         * public static String mapClassName(String className) {
+         *     if (className.startsWith("net.minecraft.server.")) {
+         *         org.magmafoundation.magma.remapper.mappingsModel.ClassMappings mapping;
+         *         mapping = (org.magmafoundation.magma.remapper.mappingsModel.ClassMappings) RemappingUtils.jarMapping.byNMSName.get(className);
+         *         if (mapping != null) {
+         *             return mapping.getMcpName();
+         *         } else {
+         *             // Magma BUGFIX!!!
+         *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
+         *             return "missing.type." + className;
+         *         }
+         *     }
+         *     return className;
+         * }
+         */
+        @Template.Generated("%MAP_CLASS_NAME%")
         public abstract String mapClassName(String className);
 
         @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")

@@ -21,7 +21,7 @@
         <!-- Library versions -->
         <minecraft.version>1.16.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.10</mountiplex.version>
+        <mountiplex.version>2.11</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -288,19 +288,6 @@
                 <groupId>com.bergerkiller.mountiplex</groupId>
                 <artifactId>Mountiplex</artifactId>
                 <version>${mountiplex.version}</version>
-                <configuration>
-                    <source_root>src/main/templates</source_root>
-                    <target_root>src/main/java</target_root>
-                    <generatorActions>
-                        <generatorAction>
-                            <source>com/bergerkiller/templates/init.txt</source>
-                            <target>com/bergerkiller/generated</target>
-                            <variables>
-                                <version>${minecraft.version}</version>
-                            </variables>
-                        </generatorAction>
-                    </generatorActions>
-                </configuration>
                 <executions>
                     <execution>
                         <id>Generate reflection templates</id>
@@ -308,6 +295,26 @@
                             <goal>create-reflection</goal>
                         </goals>
                         <phase>generate-sources</phase>
+                        <configuration>
+                            <source_root>src/main/templates</source_root>
+                            <target_root>src/main/java</target_root>
+                            <generatorActions>
+                                <generatorAction>
+                                    <source>com/bergerkiller/templates/init.txt</source>
+                                    <target>com/bergerkiller/generated</target>
+                                    <variables>
+                                        <version>${minecraft.version}</version>
+                                    </variables>
+                                </generatorAction>
+                            </generatorActions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>Preprocess annotations in comments</id>
+                        <goals>
+                            <goal>preprocess-annotations</goal>
+                        </goals>
+                        <phase>process-classes</phase>
                     </execution>
                 </executions>
             </plugin>
@@ -474,6 +481,7 @@
                                         <versionRange>[1.0,)</versionRange>
                                         <goals>
                                             <goal>create-reflection</goal>
+                                            <goal>preprocess-annotations</goal>
                                         </goals>
                                     </pluginExecutionFilter>
                                     <action>

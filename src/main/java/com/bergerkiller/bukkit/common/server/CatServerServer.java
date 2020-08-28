@@ -121,20 +121,24 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     @Template.Optional
     @Template.InstanceType("catserver.server.remapper.RemapUtils")
     public static abstract class RemapUtils  extends Template.Class<Template.Handle> {
-        @Template.Generated("public static String mapClassName(String className) {\n" +
-                            "    if (className.startsWith(\"net.minecraft.server.\")) {\n" +
-                            "        String internalClassName = className.replace('.', '/');\n" +
-                            "        String mapping_name = (String) ReflectionTransformer.jarMapping.classes.get(internalClassName);\n" +
-                            "        if (mapping_name != null) {\n" +
-                            "            return mapping_name.replace('/', '.');\n" +
-                            "        } else {\n" +
-                            "            // Magma BUGFIX!!!\n" +
-                            "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\n" +
-                            "            return \"missing.type.\" + className;\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "    return className;\n" +
-                            "}")
+        /*
+         * <MAP_CLASS_NAME>
+         * public static String mapClassName(String className) {
+         *     if (className.startsWith("net.minecraft.server.")) {
+         *         String internalClassName = className.replace('.', '/');
+         *         String mapping_name = (String) ReflectionTransformer.jarMapping.classes.get(internalClassName);
+         *         if (mapping_name != null) {
+         *             return mapping_name.replace('/', '.');
+         *         } else {
+         *             // CatServer BUGFIX!!!
+         *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
+         *             return "missing.type." + className;
+         *         }
+         *     }
+         *     return className;
+         * }
+         */
+        @Template.Generated("%MAP_CLASS_NAME%")
         public abstract String mapClassName(String className);
 
         @Template.Generated("public static String mapMethod(Class<?> inst, String name, Class<?>[] parameterTypes)")

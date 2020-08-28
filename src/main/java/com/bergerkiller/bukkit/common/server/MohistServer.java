@@ -107,20 +107,24 @@ public class MohistServer extends PaperSpigotServer implements FieldNameResolver
     @Template.Optional
     @Template.InstanceType("red.mohist.bukkit.nms.utils.RemapUtils")
     public static abstract class RemapUtilsClass extends Template.Class<Template.Handle> {
-        @Template.Generated("public static String mapClassName(String className) {\n" +
-                            "    if (className.startsWith(\"net.minecraft.server.\")) {\n" +
-                            "        red.mohist.bukkit.nms.model.ClassMapping mapping;\n" +
-                            "        mapping = (red.mohist.bukkit.nms.model.ClassMapping) RemapUtils.jarMapping.byNMSName.get(className);\n" +
-                            "        if (mapping != null) {\n" +
-                            "            return mapping.getMcpName();\n" +
-                            "        } else {\n" +
-                            "            // Mohist BUGFIX!!!\n" +
-                            "            // If we do not do this, it will suffer a NPE in the PluginClassLoader\n" +
-                            "            return \"missing.type.\" + className;\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "    return className;\n" +
-                            "}")
+        /*
+         * <MAP_CLASS_NAME>
+         * public static String mapClassName(String className) {
+         *     if (className.startsWith("net.minecraft.server.")) {
+         *         red.mohist.bukkit.nms.model.ClassMapping mapping;
+         *         mapping = (red.mohist.bukkit.nms.model.ClassMapping) RemapUtils.jarMapping.byNMSName.get(className);
+         *         if (mapping != null) {
+         *             return mapping.getMcpName();
+         *         } else {
+         *             // Mohist BUGFIX!!!
+         *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
+         *             return "missing.type." + className;
+         *         }
+         *     }
+         *     return className;
+         * }
+         */
+        @Template.Generated("%MAP_CLASS_NAME%")
         public abstract String mapClassName(String className);
 
         @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
