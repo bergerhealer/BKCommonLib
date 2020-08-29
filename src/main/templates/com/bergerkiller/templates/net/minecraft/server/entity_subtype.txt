@@ -120,6 +120,19 @@ class EntityLiving extends Entity {
         org.bukkit.craftbukkit.attribute.CraftAttributeMap new_craftAttributes = new org.bukkit.craftbukkit.attribute.CraftAttributeMap(new_attributes);
         instance#attributeMapField = new_attributes;
         instance#craftAttributes = new_craftAttributes;
+
+        // Item attributes need to be re-applied later, they are lost as part of this reset
+  #if version >= 1.16.2
+        #require net.minecraft.server.EntityLiving private final NonNullList<ItemStack> handItems:bn;
+        #require net.minecraft.server.EntityLiving private final NonNullList<ItemStack> armorItems:bo;
+  #else
+        #require net.minecraft.server.EntityLiving private final NonNullList<ItemStack> handItems:bu;
+        #require net.minecraft.server.EntityLiving private final NonNullList<ItemStack> armorItems:bv;
+  #endif
+        NonNullList handItems = instance#handItems;
+        NonNullList armorItems = instance#armorItems;
+        handItems.clear();
+        armorItems.clear();
 #else
         // Set attributeMapField to null and call getAttributeMap()
         // This will initialize the field (and possibly related CraftAttributeMap >= 1.11)
