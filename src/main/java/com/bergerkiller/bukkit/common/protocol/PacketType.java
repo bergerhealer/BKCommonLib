@@ -35,6 +35,7 @@ public class PacketType extends ClassTemplate<Object> {
     /* Misc. packets */
     public static final NMSPacket DEFAULT = new NMSPacket();
     public static final NMSPacketPlayOutAbilities OUT_ABILITIES = new NMSPacketPlayOutAbilities();
+    public static final NMSPacketPlayOutAdvancements OUT_ADVANCEMENTS = new NMSPacketPlayOutAdvancements();
     public static final NMSPacketPlayOutBed OUT_BED = Common.evaluateMCVersion(">=", "1.14") ? null : new NMSPacketPlayOutBed();
     public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
     public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();

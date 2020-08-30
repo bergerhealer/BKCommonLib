@@ -584,6 +584,12 @@ public class NMSPacketClasses {
         }
     }
 
+    public static class NMSPacketPlayOutAdvancements extends NMSPacket {
+
+        public final FieldAccessor<Boolean> initial = nextField("private boolean a");
+        //TODO: Fields
+    }
+
     public static class NMSPacketPlayOutAnimation extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = nextField("private int a");
