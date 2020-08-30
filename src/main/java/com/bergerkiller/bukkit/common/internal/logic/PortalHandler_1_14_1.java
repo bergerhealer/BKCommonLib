@@ -73,8 +73,8 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     }
 
     @Override
-    public Block findNetherPortal(Block startBlock) {
-        return _pta.findNetherPortal(startBlock);
+    public Block findNetherPortal(Block startBlock, int radius) {
+        return _pta.findNetherPortal(startBlock, radius);
     }
 
     @Override
@@ -190,12 +190,12 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
 
         /*
          * <FIND_NETHER_PORTAL>
-         * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock) {
+         * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock, int radius) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          * #if version >= 1.16.2
-         *     java.util.Optional opt_result = agent.findPortal(blockposition, 128);
+         *     java.util.Optional opt_result = agent.findPortal(blockposition, radius);
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
@@ -204,7 +204,11 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                                             result.origin.getY(),
          *                                             result.origin.getZ());
          * #else
+         *   #if version >= 1.15.2
+         *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
+         *   #else
          *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
+         *   #endif
          *     if (result == null) {
          *         return null;
          *     }
@@ -215,7 +219,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * }
          */
         @Template.Generated("%FIND_NETHER_PORTAL%")
-        public abstract Block findNetherPortal(Block startBlock);
+        public abstract Block findNetherPortal(Block startBlock, int radius);
 
         /*
          * <CREATE_NETHER_PORTAL>

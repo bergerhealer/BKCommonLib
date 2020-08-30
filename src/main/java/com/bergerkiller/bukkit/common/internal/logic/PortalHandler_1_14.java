@@ -55,7 +55,7 @@ public class PortalHandler_1_14 extends PortalHandler {
     }
 
     @Override
-    public Block findNetherPortal(Block startBlock) {
+    public Block findNetherPortal(Block startBlock, int radius) {
         return _pta.findNetherPortal(startBlock);
     }
 

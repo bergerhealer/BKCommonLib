@@ -372,10 +372,11 @@ public class WorldUtil extends ChunkUtil {
      * by some server implementations.
      * 
      * @param searchStart The block from which to start searching for the portal
+     * @param searchRadius The radius to look for the portal, 128 is a default
      * @return nether portal Block found, null if not found
      */
-    public static Block findNetherPortal(Block searchStart) {
-        return PortalHandler.INSTANCE.findNetherPortal(searchStart);
+    public static Block findNetherPortal(Block searchStart, int searchRadius) {
+        return PortalHandler.INSTANCE.findNetherPortal(searchStart, searchRadius);
     }
 
     /**

@@ -93,9 +93,10 @@ public abstract class PortalHandler implements LazyInitializedObject {
      * Searches for an existing Portal from startBlock.
      * 
      * @param startBlock Block from which to start searching for portals
+     * @param radius The radius to look in the world for portals
      * @return found portal frame Block, null if not found
      */
-    public abstract Block findNetherPortal(Block startBlock);
+    public abstract Block findNetherPortal(Block startBlock, int radius);
 
     /**
      * Creates a new nether portal near startBlock. The entity argument
