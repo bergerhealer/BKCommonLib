@@ -106,7 +106,7 @@ public class ChunkGeneratorHook {
     }
 
     @ClassHook.HookPackage("net.minecraft.server")
-    public static class ChunkGeneratorHook_1_16_paper extends ClassHook<ChunkGeneratorHook_1_16> {
+    public static class ChunkGeneratorHook_1_16_paper extends ClassHook<ChunkGeneratorHook_1_16_paper> {
         private final World world;
 
         public ChunkGeneratorHook_1_16_paper(World world) {
