@@ -26,7 +26,6 @@ import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.server.MCPCPlusServer;
 import com.bergerkiller.bukkit.common.server.MagmaServer;
 import com.bergerkiller.bukkit.common.server.MohistServer;
-import com.bergerkiller.bukkit.common.server.PaperSpigotServer;
 import com.bergerkiller.bukkit.common.server.PurpurServer;
 import com.bergerkiller.bukkit.common.server.SpigotServer;
 import com.bergerkiller.bukkit.common.server.SportBukkitServer;
@@ -104,7 +103,6 @@ public class CommonBootstrap {
                 servers.add(new MagmaServer());
                 servers.add(new CatServerServer());
                 servers.add(new PurpurServer());
-                servers.add(new PaperSpigotServer());
                 servers.add(new SpigotServer());
                 servers.add(new SportBukkitServer());
                 servers.add(new CraftBukkitServer());

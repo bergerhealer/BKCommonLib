@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.server;
 
 import java.util.Map;
 
-public class PurpurServer extends PaperSpigotServer {
+public class PurpurServer extends SpigotServer {
 
     @Override
     public boolean init() {

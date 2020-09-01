@@ -110,7 +110,7 @@ public class Common {
         SERVER = CommonBootstrap.initCommonServer();
         MC_VERSION = SERVER.getMinecraftVersion();
         IS_SPIGOT_SERVER = CommonBootstrap.isSpigotServer();
-        IS_PAPERSPIGOT_SERVER = SERVER instanceof PaperSpigotServer;
+        IS_PAPERSPIGOT_SERVER = SERVER instanceof SpigotServer && ((SpigotServer) SERVER).isPaperSpigot();
         IS_PURPUR_SERVER = SERVER instanceof PurpurServer;
         IS_COMPATIBLE = SERVER.isCompatible();
         TEMPLATE_RESOLVER = CommonBootstrap.initTemplates();

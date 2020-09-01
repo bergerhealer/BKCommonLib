@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 /**
  * Mohist is a PaperSpigot + Forge implementation
  */
-public class MohistServer extends PaperSpigotServer implements FieldNameResolver, MethodNameResolver {
+public class MohistServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
     private RemapUtilsClass remapUtils = null;
 
     @Override
