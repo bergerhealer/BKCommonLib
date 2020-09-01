@@ -331,7 +331,7 @@ class NBTBase {
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
 #endif
 
-#if forge
+#if forge_nms_obfuscated
         public double getDoubleData:h();
 #elseif version >= 1.11
         public double getDoubleData:asDouble();
@@ -446,7 +446,7 @@ class NBTTagList extends NBTBase {
 
     public int size();
 
-#if forge
+#if forge_nms_obfuscated
     public boolean isEmpty:b_();
 #else
     public boolean isEmpty();
@@ -622,7 +622,7 @@ class NBTTagCompound extends NBTBase {
     }
     </code>
 
-#if forge
+#if forge_nms_obfuscated
     public boolean isEmpty:b_();
 #else
     public boolean isEmpty();

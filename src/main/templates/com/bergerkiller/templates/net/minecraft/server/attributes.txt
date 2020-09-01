@@ -6,7 +6,7 @@ import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 
 class AttributeModifiable {
-#if forge
+#if forge_nms_obfuscated
     public abstract void setValue:a(double value);
     public abstract double getValue:e();
 #else

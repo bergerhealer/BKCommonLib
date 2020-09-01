@@ -66,7 +66,7 @@ class World extends IBlockAccess {
 
     public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer();
 
-#if forge
+#if forge_nms_obfuscated
     public (BlockData) IBlockData getBlockData:o((IntVector3) BlockPosition blockposition);
 #else
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
@@ -592,7 +592,7 @@ class WorldServer extends World {
 
     public void removeEntity((EntityHandle) Entity entity);
 
-#if forge
+#if forge_nms_obfuscated
     public boolean addEntity:a((EntityHandle) Entity entity);
     public (MinecraftServerHandle) MinecraftServer getMinecraftServer:u();
 #else

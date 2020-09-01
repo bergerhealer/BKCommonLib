@@ -116,6 +116,7 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     public void addVariables(Map<String, String> variables) {
         super.addVariables(variables);
         variables.put("forge", "catserver");
+        variables.put("forge_nms_obfuscated", "true");
     }
 
     @Template.Optional

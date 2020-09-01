@@ -102,6 +102,7 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
     public void addVariables(Map<String, String> variables) {
         super.addVariables(variables);
         variables.put("forge", "magma");
+        variables.put("forge_nms_obfuscated", "true");
     }
 
     @Template.Optional

@@ -517,7 +517,7 @@ class EntityPlayer extends EntityHuman {
     }
 #endif
 
-#if forge
+#if forge_nms_obfuscated
     public void sendMessage:a((ChatText) IChatBaseComponent ichatbasecomponent);
 #elseif version >= 1.16
     public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
@@ -855,7 +855,7 @@ class EntityItemFrame extends Entity {
     public (IntVector3) BlockPosition getBlockPosition();
     public int getRotationOrdinal:getRotation();
 
-#if forge
+#if forge_nms_obfuscated
     public (org.bukkit.block.BlockFace) EnumDirection getFacing:bt();
 #else
     public (org.bukkit.block.BlockFace) EnumDirection getFacing:getDirection();
