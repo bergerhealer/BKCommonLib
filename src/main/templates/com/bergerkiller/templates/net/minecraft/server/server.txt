@@ -54,7 +54,7 @@ class MinecraftServer {
 
 #if forge
     public boolean isMainThread() {
-        return Thread.currentThread() == instance.func_175583_aK();
+        return Thread.currentThread() == com.bergerkiller.bukkit.common.utils.CommonUtil.MAIN_THREAD;
     }
 #else
     public boolean isMainThread();
