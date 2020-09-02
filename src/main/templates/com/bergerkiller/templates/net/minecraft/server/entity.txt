@@ -941,7 +941,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     ...
      * }
      */
+#if forge
+    public void setRotation:setYawPitch(float yaw, float pitch);
+#else
     protected void setRotation:setYawPitch(float yaw, float pitch);
+#endif
 
     /*
      # protected void ##METHODNAME##(float i) { // CraftBukkit - int -> float
@@ -1219,7 +1223,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.a(new_BoundingBox);
     }
 #elseif version >= 1.8.3
+  #if forge
+    protected void setSize(float width, float height);
+  #else
     public void setSize(float width, float height);
+  #endif
 #else
     public void setSize:a(float width, float height);
 #endif
