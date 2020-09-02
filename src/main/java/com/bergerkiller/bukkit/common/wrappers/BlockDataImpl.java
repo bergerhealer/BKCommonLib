@@ -144,6 +144,16 @@ public class BlockDataImpl extends BlockData {
             }
 
             MaterialData materialdata = new MaterialData(mat);
+            if (materialdata.getItemType() == null) {
+                // On forge these materials don't have valid registration in the server
+                // Just fill with the base IBlockData
+                int index = CommonLegacyMaterials.getOrdinal(mat);
+                for (int data = 0; data < 16; data++) {
+                    BY_LEGACY_MAT_DATA[index | (data << BY_LEGACY_MAT_DATA_SHIFT)] = blockConst;
+                }
+                continue;
+            }
+
             for (int data = 0; data < 16; data++) {
                 // Find IBlockData from Material + Data and cache it if needed
                 materialdata.setData((byte) data);
