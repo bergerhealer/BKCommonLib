@@ -329,7 +329,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         final Object handle = getHandle();
         final CommonEntityType type = CommonEntityType.byNMSEntity(handle);
         // Check whether the handle is not of an external-plugin type
-        if (handle == null || !type.nmsType.isType(handle)) {
+        if (handle == null || !type.nmsType.isValid() || !type.nmsType.isType(handle)) {
             return false;
         }
         return true;
