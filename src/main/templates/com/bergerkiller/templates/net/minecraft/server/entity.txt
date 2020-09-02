@@ -941,7 +941,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     ...
      * }
      */
-#if forge
+#if forge_nms_obfuscated
     public void setRotation:setYawPitch(float yaw, float pitch);
 #else
     protected void setRotation:setYawPitch(float yaw, float pitch);

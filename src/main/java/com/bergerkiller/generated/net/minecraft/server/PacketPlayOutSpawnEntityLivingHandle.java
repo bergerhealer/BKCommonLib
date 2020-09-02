@@ -62,6 +62,14 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         }
     }
 
+    public static boolean isEntityTypeSupported(org.bukkit.entity.EntityType type) {
+        if (type == null) {
+            return false;
+        }
+        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
+        return typeId != -1;
+    }
+
     public void setEntityType(org.bukkit.entity.EntityType type) {
         if (type == null) {
             throw new IllegalArgumentException("Input EntityType is null");

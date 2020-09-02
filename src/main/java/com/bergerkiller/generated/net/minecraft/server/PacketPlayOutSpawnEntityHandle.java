@@ -36,6 +36,20 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         }
     }
 
+    public static boolean isEntityTypeSupported(org.bukkit.entity.EntityType type) {
+        return isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
+    }
+
+    public static boolean isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            return false;
+        } else if (T.opt_entityTypeId.isAvailable()) {
+            return (commonEntityType.objectTypeId != -1);
+        } else {
+            return (commonEntityType.nmsEntityType != null);
+        }
+    }
+
     public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
         if (commonEntityType == null) {
             throw new IllegalArgumentException("Input CommonEntityType is null");
