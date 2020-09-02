@@ -137,11 +137,17 @@ public class CommonEntityType {
                 nmsName = "EntityPotion";
             }
 
-            if (nmsName == null) {
-                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");
-            } else {
+            // Try retrieving NMS class again
+            if (nmsName != null) {
                 nmsType = CommonUtil.getNMSClass(nmsName);
-                if (nmsType == null) {
+            }
+
+            // Check this Entity Type isn't a custom Forge Entity type
+            // In that case, don't log this warning
+            if (nmsType == null && !Common.SERVER.isCustomEntityType(entityType)) {
+                if (nmsName == null) {
+                    Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: unknown type (" + entityType.toString() + ")");
+                } else {
                     Logging.LOGGER_REGISTRY.log(Level.WARNING, "Entity type could not be registered: class not found (" + entityType.toString() + ") class=" + nmsName);
                 }
             }

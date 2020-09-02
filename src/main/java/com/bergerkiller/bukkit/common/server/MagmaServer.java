@@ -13,6 +13,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
  */
 public class MagmaServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
     private RemappingUtilsClass remappingUtils = null;
+    private Class<?> customEntityBaseClass = null;
 
     @Override
     public boolean init() {
@@ -35,6 +36,11 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
 
         // Force initialization to avoid late catastrophic failing
         remappingUtils.forceInitialization();
+
+        // Custom entity class is used for forge entities and such
+        try {
+            customEntityBaseClass = Class.forName("org.magmafoundation.magma.entity.CraftCustomEntity");
+        } catch (Throwable t) {}
 
         return true;
     }
@@ -96,6 +102,12 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
         return remappingUtils.mapFieldName(type, fieldName);
+    }
+
+    @Override
+    public boolean isCustomEntityType(org.bukkit.entity.EntityType entityType) {
+        Class<?> entityClass = entityType.getEntityClass();
+        return customEntityBaseClass != null && entityClass != null && customEntityBaseClass.isAssignableFrom(entityClass);
     }
 
     @Override

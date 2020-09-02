@@ -1,8 +1,11 @@
 package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
@@ -13,6 +16,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
  */
 public class MohistServer extends SpigotServer implements FieldNameResolver, MethodNameResolver {
     private RemapUtilsClass remapUtils = null;
+    private List<Class<?>> customEntityBaseClasses = new ArrayList<Class<?>>();
 
     @Override
     public boolean init() {
@@ -35,6 +39,14 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
 
         // Force initialization to avoid late catastrophic failing
         remapUtils.forceInitialization();
+
+        // Custom entity class used for forge entities
+        Stream.of("CraftCustomEntity", "CraftCustomChestHorse", "CraftCustomAbstractHorse").forEach(n -> {
+            try {
+                Class<?> type = Class.forName("red.mohist.entity." + n);
+                customEntityBaseClasses.add(type);
+            } catch (Throwable t) {}
+        });
 
         return true;
     }
@@ -96,6 +108,19 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
         return remapUtils.mapFieldName(type, fieldName);
+    }
+
+    @Override
+    public boolean isCustomEntityType(org.bukkit.entity.EntityType entityType) {
+        Class<?> entityClass = entityType.getEntityClass();
+        if (entityClass != null) {
+            for (Class<?> customType : customEntityBaseClasses) {
+                if (customType.isAssignableFrom(entityClass)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

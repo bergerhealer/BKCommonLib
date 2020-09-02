@@ -1,22 +1,23 @@
 package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.mountiplex.reflection.resolver.CompiledFieldNameResolver;
-import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 
 /**
  * CatServer is a Spigot + Forge implementation
  */
-public class CatServerServer extends SpigotServer implements FieldNameResolver, MethodNameResolver,
-        CompiledFieldNameResolver, CompiledMethodNameResolver
+public class CatServerServer extends SpigotServer implements FieldNameResolver, MethodNameResolver
 {
     private RemapUtils remapUtils = null;
+    private List<Class<?>> customEntityBaseClasses = new ArrayList<Class<?>>();
 
     @Override
     public boolean init() {
@@ -39,6 +40,14 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
 
         // Force initialization to avoid late catastrophic failing
         remapUtils.forceInitialization();
+
+        // Custom entity base classes on CatServer
+        Stream.of("CraftCustomEntity", "CraftCustomChestHorse", "CraftCustomHorse").forEach(n -> {
+            try {
+                Class<?> type = Class.forName("catserver.server.entity." + n);
+                customEntityBaseClasses.add(type);
+            } catch (Throwable t) {}
+        });
 
         return true;
     }
@@ -93,16 +102,6 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     }
 
     @Override
-    public String resolveCompiledFieldName(Class<?> declaringClass, String fieldName) {
-        return remapUtils.mapFieldName(declaringClass, fieldName);
-    }
-
-    @Override
-    public String resolveCompiledMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
-        return remapUtils.mapMethod(declaringClass, methodName, parameterTypes);
-    }
-
-    @Override
     public String resolveFieldName(Class<?> declaringClass, String fieldName) {
         return remapUtils.mapFieldName(declaringClass, fieldName);
     }
@@ -110,6 +109,19 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     @Override
     public String resolveMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
         return remapUtils.mapMethod(declaringClass, methodName, parameterTypes);
+    }
+
+    @Override
+    public boolean isCustomEntityType(org.bukkit.entity.EntityType entityType) {
+        Class<?> entityClass = entityType.getEntityClass();
+        if (entityClass != null) {
+            for (Class<?> customType : customEntityBaseClasses) {
+                if (customType.isAssignableFrom(entityClass)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     @Override

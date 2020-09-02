@@ -150,6 +150,16 @@ public interface CommonServer {
     public String getCBRoot();
 
     /**
+     * Gets whether a given EntityType enum value represents a special 'custom' entity type
+     * on this server. This is a type of entity normally not present in vanilla Minecraft.
+     * An example case of this happening is on Forge.
+     * 
+     * @param entityType
+     * @return True if the entity type is a custom entity type, not part of vanilla Minecraft
+     */
+    public boolean isCustomEntityType(org.bukkit.entity.EntityType entityType);
+
+    /**
      * Adds the environment variables relevant for this server type
      * 
      * @param variables Map of variables to fill

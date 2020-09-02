@@ -143,6 +143,11 @@ public abstract class CommonServerBase implements CommonServer {
     }
 
     @Override
+    public boolean isCustomEntityType(org.bukkit.entity.EntityType entityType) {
+        return false;
+    }
+
+    @Override
     public void enable(CommonPlugin plugin) {
     }
 
