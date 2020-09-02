@@ -73,7 +73,7 @@ public class BlockDataImpl extends BlockData {
 
     // Legacy: array of all possible Material values with all possible legacy data values
     // Index into it by taking data x 1024 | mat.ordinal()
-    public static final int BY_LEGACY_MAT_DATA_SHIFT = 11; // (1<<11 == 2048)
+    public static final int BY_LEGACY_MAT_DATA_SHIFT = 14; // (1<<14 == 16384)
     public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
 
     // These Material types do not support Block.updateState, as they cause issues with block physics events being fired
