@@ -19,10 +19,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
  * Since Minecraft 1.14 it has become much harder to know what NMS Entity
@@ -31,26 +28,13 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  */
 public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     private final IdentityHashMap<Object, Class<?>> _cache = new IdentityHashMap<Object, Class<?>>();
-    private final FastMethod<Class<?>> findEntityTypesClass = new FastMethod<Class<?>>();
-    private final FastMethod<Object> createEntry = new FastMethod<Object>();
+    private final Handler _handler;
     private final Object nmsWorldHandle;
 
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
     public EntityTypingHandler_1_14() {
-        {
-            ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClassName("net.minecraft.server.EntityTypes");
-            MethodDeclaration m = new MethodDeclaration(resolver, 
-                    "public Class<?> findClassFromEntityTypes(net.minecraft.server.World world) {\n" +
-                    "    Object entity = instance.a(world);\n" +
-                    "    if (entity == null) {\n" +
-                    "        return null;\n" +
-                    "    } else {\n" +
-                    "        return entity.getClass();\n" +
-                    "    }\n" +
-                    "}");
-            findEntityTypesClass.init(m);
-        }
+        this._handler = Template.Class.create(Handler.class, Common.TEMPLATE_RESOLVER);
+        this._handler.forceInitialization();
 
         // Initialize a dummy field with the sole purpose of constructing an entity without errors
         this.nmsWorldHandle = WorldServerHandle.T.newInstanceNull();
@@ -63,60 +47,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                 nmsWorldData = ClassTemplate.createNMS("WorldDataServer").getConstructor().newInstance();
             }
 
-            ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
-            resolver.setVariable("version", Common.MC_VERSION);
-            MethodDeclaration m = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public void initWorldServer(WorldDataServer worldData) {\n" +
-
-                    // Spigot World configuration
-                    "#if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
-                    "    #require net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;\n" +
-                    "    org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig(\"DUMMY\");\n" +
-                    "    instance#spigotConfig = spigotConfig;\n" +
-                    "#endif\n" +
-
-                    // PaperSpigot World configuration
-                    "#if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
-                    "    #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;\n" +
-                    "    com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(\"DUMMY\", spigotConfig);\n" +
-                    "    instance#paperConfig = paperConfig;\n" +
-                    "#endif\n" +
-
-                    // Purpur World configuration
-                    "#if fieldexists net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;\n" +
-                    "    #require net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;\n" +
-                    "    net.pl3x.purpur.PurpurWorldConfig purpurConfig;\n" +
-                    "  #if exists net.pl3x.purpur.PurpurWorldConfig public net.pl3x.purpur.PurpurWorldConfig(String worldName);\n" +
-                    "    purpurConfig = new net.pl3x.purpur.PurpurWorldConfig(\"DUMMY\");\n" +
-                    "  #else\n" +
-                    "    purpurConfig = new net.pl3x.purpur.PurpurWorldConfig(\"DUMMY\", paperConfig, spigotConfig);\n" +
-                    "  #endif\n" +
-                    "    instance#purpurConfig = purpurConfig;\n" +
-                    "#endif\n" +
-
-                    "#if version >= 1.16\n" +
-                    // WorldDataMutable and WorldDataServer fields
-                    "    #require net.minecraft.server.World public final WorldDataMutable worldData;\n" +
-                    "    #require net.minecraft.server.WorldServer public final WorldDataServer worldDataServer;\n" +
-                    "    instance#worldData = worldData;\n" +
-                    "    instance#worldDataServer = worldData;\n" +
-
-                    "#else\n" +
-
-                    // worldProvider field
-                    "    int envId = org.bukkit.World.Environment.NORMAL.getId();\n" +
-                    "    instance.worldProvider = DimensionManager.a(envId).getWorldProvider((World) instance);\n" +
-
-                    // worldData field
-                    "    #require net.minecraft.server.World public final WorldData worldData;\n" +
-                    "    instance#worldData = worldData;\n" +
-                    "#endif\n" +
-                    "}", resolver));
-            FastMethod<Void> fm = new FastMethod<Void>();
-            fm.init(m);
-            fm.invoke(this.nmsWorldHandle, nmsWorldData);
-
+            this._handler.initWorldServer(this.nmsWorldHandle, nmsWorldData);
             WorldHandle.T.random.set(this.nmsWorldHandle, new Random());
         }
 
@@ -128,21 +59,6 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         registerEntityTypes("LIGHTNING_BOLT", "EntityLightning");
         registerEntityTypes("PLAYER", "EntityPlayer");
         registerEntityTypes("WITHER", "EntityWither"); // scoreboard things
-
-        // Initialize method that creates new EntityTrackerEntry instances (which are actually PlayerChunkMap$EntityTracker)
-        {
-            ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClassName("net.minecraft.server.PlayerChunkMap");
-            MethodDeclaration createEntryMethod = new MethodDeclaration(resolver, 
-                    "public Object createEntry(Entity entity) {\n" +
-                    "    EntityTypes entitytypes = entity.getEntityType();\n" +
-                    "    int i = entitytypes.getChunkRange() * 16;\n" +
-                    (Common.IS_SPIGOT_SERVER ? "i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);\n" : "") +
-                    "    int j = entitytypes.getUpdateInterval();\n" +
-                    "    return new PlayerChunkMap$EntityTracker(instance, entity, i, j, entitytypes.isDeltaTracking());\n" +
-                    "}");
-            createEntry.init(createEntryMethod);
-        }
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
@@ -176,7 +92,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     public Class<?> getClassFromEntityTypes(Object nmsEntityTypesInstance) {
         Class<?> result = this._cache.get(nmsEntityTypesInstance);
         if (result == null) {
-            result = this.findEntityTypesClass.invoke(nmsEntityTypesInstance, this.nmsWorldHandle);
+            result = _handler.findClassFromEntityTypes(nmsEntityTypesInstance, this.nmsWorldHandle);
             this._cache.put(nmsEntityTypesInstance, result);
         }
         return result;
@@ -184,7 +100,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
     @Override
     public EntityTrackerEntryHandle createEntityTrackerEntry(EntityTracker entityTracker, Entity entity) {
-        Object handle = createEntry.invoke(entityTracker.getRawHandle(), HandleConversion.toEntityHandle(entity));
+        Object handle = _handler.createEntry(entityTracker.getRawHandle(), HandleConversion.toEntityHandle(entity));
         EntityTrackerEntryHandle entry = EntityTrackerEntryHandle.createHandle(handle);
 
         // Set the passengers field to the current passengers
@@ -201,5 +117,88 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Override
     public Object hookEntityTrackerEntry(Object entityTrackerEntryHandle) {
         return new EntityTrackerEntryHook_1_14().hook(entityTrackerEntryHandle);
+    }
+
+    @Template.Package("net.minecraft.server")
+    public static abstract class Handler extends Template.Class<Template.Handle> {
+
+        /*
+         * <CLASS_FROM_ENTITYTYPES>
+         * public static Class<?> findClassFromEntityTypes((Object) EntityTypes entityTypes, (Object) World world) {
+         *     Object entity = entityTypes.a(world);
+         *     if (entity == null) {
+         *         return null;
+         *     } else {
+         *         return entity.getClass();
+         *     }
+         * }
+         */
+        @Template.Generated("%CLASS_FROM_ENTITYTYPES%")
+        public abstract Class<?> findClassFromEntityTypes(Object entityTypes, Object world);
+
+        /*
+         * <INIT_WORLD>
+         * public static void initWorldServer((Object) WorldServer worldserver, (Object) WorldDataServer worldData) {
+         * 
+         * // Spigot World configuration
+         * #if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         *     #require net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         *     org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig("DUMMY");
+         *     worldserver#spigotConfig = spigotConfig;
+         * #endif
+         * 
+         * // PaperSpigot World configuration
+         * #if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         *     #require net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig("DUMMY", spigotConfig);
+         *     worldserver#paperConfig = paperConfig;
+         * #endif
+         * 
+         * // Purpur World configuration
+         * #if fieldexists net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
+         *     #require net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
+         *     net.pl3x.purpur.PurpurWorldConfig purpurConfig;
+         *   #if exists net.pl3x.purpur.PurpurWorldConfig public net.pl3x.purpur.PurpurWorldConfig(String worldName);
+         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY");
+         *   #else
+         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY", paperConfig, spigotConfig);
+         *   #endif
+         *     worldserver#purpurConfig = purpurConfig;
+         * #endif
+         * 
+         * #if version >= 1.16
+         *     // WorldDataMutable and WorldDataServer fields
+         *     #require net.minecraft.server.World public final WorldDataMutable worldData;
+         *     #require net.minecraft.server.WorldServer public final WorldDataServer worldDataServer;
+         *     worldserver#worldData = worldData;
+         *     worldserver#worldDataServer = worldData;
+         * #else
+         *     // worldProvider field
+         *     int envId = org.bukkit.World.Environment.NORMAL.getId();
+         *     worldserver.worldProvider = DimensionManager.a(envId).getWorldProvider((World) worldserver);
+         * 
+         *     // worldData field
+         *     #require net.minecraft.server.World public final WorldData worldData;
+         *     worldserver#worldData = worldData;
+         * #endif    
+         * }
+         */
+        @Template.Generated("%INIT_WORLD%")
+        public abstract void initWorldServer(Object world, Object worldData);
+
+        /*
+         * <CREATE_ENTRY>
+         * public static Object createEntry((Object) PlayerChunkMap playerChunkMap, (Object) Entity entity) {
+         *     EntityTypes entitytypes = entity.getEntityType();
+         *     int i = entitytypes.getChunkRange() * 16;
+         * #if spigot
+         *     i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);
+         * #endif
+         *     int j = entitytypes.getUpdateInterval();
+         *     return new PlayerChunkMap$EntityTracker(playerChunkMap, entity, i, j, entitytypes.isDeltaTracking());
+         * }
+         */
+        @Template.Generated("%CREATE_ENTRY%")
+        public abstract Object createEntry(Object playerChunkMap, Object entity);
     }
 }
