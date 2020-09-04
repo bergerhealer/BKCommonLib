@@ -30,6 +30,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolve
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 import com.bergerkiller.templates.TemplateResolver;
 
 /**
@@ -353,7 +354,7 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.14")) {
             String unimi_fastutil_path = "org.bukkit.craftbukkit.libs.it.unimi.dsi.fastutil.";
             try {
-                Class.forName(unimi_fastutil_path + "longs.LongSet");
+                MPLType.getClassByName(unimi_fastutil_path + "longs.LongSet");
 
                 // Fixes hardcoded fastutil paths used in templates
                 for (String fastutilClass : new String[] {
