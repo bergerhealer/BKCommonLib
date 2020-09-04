@@ -39,7 +39,7 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         boolean success = true;
         ClassResolver resolver = new ClassResolver();
         resolver.setVariable("version", Common.MC_VERSION);
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
+        resolver.setDeclaredClassName("net.minecraft.server.World");
         try {
             String method_path;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {

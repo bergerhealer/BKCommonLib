@@ -53,7 +53,7 @@ class EntityTypes {
     }
 
     public optional int getTypeId() {
-        return IRegistry.ENTITY_TYPE.a(instance);
+        return IRegistry.ENTITY_TYPE.a((Object) instance);
     }
 #elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();

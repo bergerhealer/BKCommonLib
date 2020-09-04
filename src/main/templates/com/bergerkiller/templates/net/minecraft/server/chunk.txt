@@ -73,7 +73,7 @@ class Chunk {
     public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
         BlockPosition$PooledBlockPosition blockPos = BlockPosition$PooledBlockPosition.f(x, y, z);
         try {
-            return instance.getType(blockPos);
+            return instance.getType((BlockPosition) blockPos);
         } finally {
             blockPos.close();
         }
@@ -313,6 +313,7 @@ class HeightMap {
         #require net.minecraft.server.HeightMap private final DataBits databits:c;
 
         IChunkAccess ichunkaccess = instance#chunk;
+        IBlockAccess iblockaccess = (IBlockAccess) ichunkaccess;
         DataBits databits = instance#databits;
         int databits_index = 0;
         int startY = ichunkaccess.b() + 15;
@@ -322,7 +323,7 @@ class HeightMap {
                 int y = startY;
                 while (y > 0) {
                     blockposition.d(x, y, z);
-                    IBlockData iblockdata = ichunkaccess.getType(blockposition);
+                    IBlockData iblockdata = ichunkaccess.getType((BlockPosition) blockposition);
 
                     // Optimization for air blocks
                     Block block = iblockdata.getBlock();
@@ -332,17 +333,17 @@ class HeightMap {
                     }
 
                     // If opacity is nonzero, stop
-                    if (iblockdata.b(ichunkaccess, blockposition) > 0) {
+                    if (iblockdata.b(iblockaccess, (BlockPosition) blockposition) > 0) {
                         break;
                     }
 
                     // If top blockface is opaque, don't progress y and stop
   #if version >= 1.14.4
-                    if (iblockdata.d(ichunkaccess, blockposition, EnumDirection.UP)) {
+                    if (iblockdata.d(iblockaccess, (BlockPosition) blockposition, EnumDirection.UP)) {
                         break;
                     }
   #else
-                    if (Block.d(iblockdata, ichunkaccess, blockposition, EnumDirection.UP)) {
+                    if (Block.d(iblockdata, iblockaccess, (BlockPosition) blockposition, EnumDirection.UP)) {
                         break;
                     }
   #endif
@@ -352,11 +353,11 @@ class HeightMap {
 
                     // If bottom blockface was opaque, stop (but allow block itself to be lit)
   #if version >= 1.14.4
-                    if (iblockdata.d(ichunkaccess, blockposition, EnumDirection.DOWN)) {
+                    if (iblockdata.d(iblockaccess, (BlockPosition) blockposition, EnumDirection.DOWN)) {
                         break;
                     }
   #else
-                    if (Block.d(iblockdata, ichunkaccess, blockposition, EnumDirection.DOWN)) {
+                    if (Block.d(iblockdata, iblockaccess, (BlockPosition) blockposition, EnumDirection.DOWN)) {
                         break;
                     }
   #endif

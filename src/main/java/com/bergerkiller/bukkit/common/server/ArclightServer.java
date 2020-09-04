@@ -103,7 +103,12 @@ public class ArclightServer extends SpigotServer implements FieldNameResolver, M
             return false;
         }
 
-        return true;
+        // NMS World class 'entitiesById' has different field modifiers in bytecode than loaded class
+        if (classPath.startsWith("net.minecraft.server.")) {
+            return false;
+        }
+
+        return false;
     }
 
     /*

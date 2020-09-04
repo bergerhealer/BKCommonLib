@@ -15,7 +15,6 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -32,7 +31,7 @@ public class RegionHandler_1_14 extends RegionHandler {
 
     public RegionHandler_1_14() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("RegionFileCache"));
+        resolver.setDeclaredClassName("net.minecraft.server.RegionFileCache");
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         {

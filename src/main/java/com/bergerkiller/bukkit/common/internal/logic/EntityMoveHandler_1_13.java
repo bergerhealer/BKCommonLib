@@ -40,7 +40,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
 
         boolean success = true;
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("World"));
+        resolver.setDeclaredClassName("net.minecraft.server.World");
         try {
             String method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_13_getBlockCollisions.txt";
             try (InputStream input = EntityMoveHandler_1_13.class.getResourceAsStream(method_path)) {

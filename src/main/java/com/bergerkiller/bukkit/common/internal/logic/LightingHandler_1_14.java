@@ -112,7 +112,7 @@ public class LightingHandler_1_14 extends LightingHandler {
         }
 
         ClassResolver storage_resolver = new ClassResolver();
-        storage_resolver.setDeclaredClass(lightEngineStorageArrayType);
+        storage_resolver.setDeclaredClassName("net.minecraft.server.LightEngineStorageArray");
 
         // This generated method updates the contents in a live layer
         this.setStorageDataMethod.init(new MethodDeclaration(storage_resolver,
@@ -132,7 +132,7 @@ public class LightingHandler_1_14 extends LightingHandler {
 
         // This generated method simply reads the nibblearray data and returns a byte[] copy
         ClassResolver layer_resolver = new ClassResolver();
-        layer_resolver.setDeclaredClass(lightEngineLayerType);
+        layer_resolver.setDeclaredClassName("net.minecraft.server.LightEngineLayer");
         this.getLayerDataMethod.init(new MethodDeclaration(layer_resolver,
                 "public byte[] getData(int cx, int cy, int cz) {\n" +
                 "    NibbleArray array = instance.a(SectionPosition.a(cx, cy, cz));\n" +

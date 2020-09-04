@@ -74,6 +74,7 @@ class World extends IBlockAccess {
 
     /* This is runtime generated to improve performance, avoiding the cost of creating BlockPosition objects */
     public BlockData getBlockDataAtCoord(int x, int y, int z) {
+#if exists net.minecraft.server.World public boolean captureTreeGeneration;
         // CraftBukkit does some special stuff, sometimes, when captureTreeGeneration is set
         if (instance.captureTreeGeneration) {
             IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
@@ -95,6 +96,11 @@ class World extends IBlockAccess {
 
         // Fallback is AIR
         return com.bergerkiller.bukkit.common.wrappers.BlockData.AIR;
+#else
+        // Weird stuff on forge
+        IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
+        return com.bergerkiller.bukkit.common.wrappers.BlockData.fromBlockData(blockData);
+#endif
     }
 
     <code>

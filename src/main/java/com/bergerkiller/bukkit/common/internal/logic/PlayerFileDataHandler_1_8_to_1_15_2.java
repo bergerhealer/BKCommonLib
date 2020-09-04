@@ -26,6 +26,7 @@ public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_8_to_1_15_2() {
         ClassResolver resolver = new ClassResolver();
+        resolver.setPackage("net.minecraft.server");
         resolver.setDeclaredClass(WorldServerHandle.T.getType());
 
         {

@@ -53,6 +53,7 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
         this.fallbackConstructor = new FastMethod<Object>();
         {
             ClassResolver resolver = new ClassResolver();
+            resolver.setPackage("net.minecraft.server");
             resolver.setDeclaredClass(EntityTrackerEntryStateHandle.T.getType());
             MethodDeclaration fallbackConstructorMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static EntityTrackerEntry createNew(Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {\n" +

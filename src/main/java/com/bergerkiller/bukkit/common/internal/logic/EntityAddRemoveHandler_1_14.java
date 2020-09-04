@@ -66,7 +66,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entityListType = Class.forName("com.tuinity.tuinity.util.EntityList");
             if (SafeField.contains(WorldServerHandle.T.getType(), "loadedEntities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClass(WorldServerHandle.T.getType());
+                resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
                 tuinitySwapEntityInWorldEntityListMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    if (instance.loadedEntities.remove(oldEntity)) {\n" +
@@ -82,7 +82,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entitySetType = Class.forName("com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet");
             if (SafeField.contains(WorldServerHandle.T.getType(), "entitiesForIteration", entitySetType)) {
                 ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClass(WorldServerHandle.T.getType());
+                resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
                 tuinitySwapEntityInWorldEntityIterationSetMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    #require net.minecraft.server.WorldServer final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entitiesForIteration;\n" +
@@ -100,7 +100,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entityListType = Class.forName("com.destroystokyo.paper.util.maplist.EntityList");
             if (SafeField.contains(ChunkHandle.T.getType(), "entities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClass(ChunkHandle.T.getType());
+                resolver.setDeclaredClassName("net.minecraft.server.Chunk");
                 paperspigotSwapEntityInChunkEntityListMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    if (instance.entities.remove(oldEntity)) {\n" +

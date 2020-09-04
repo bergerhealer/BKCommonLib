@@ -9,7 +9,6 @@ import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.PlayerListHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -26,7 +25,7 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_16() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(WorldServerHandle.T.getType());
+        resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
 
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(

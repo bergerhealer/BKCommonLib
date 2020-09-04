@@ -836,8 +836,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         }
   #if version >= 1.16
         return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
-  #else
+  #elseif exists net.minecraft.server.World public Chunk getChunkIfLoaded(int x, int z);
         return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+  #else
+        return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
   #endif
     }
 #else

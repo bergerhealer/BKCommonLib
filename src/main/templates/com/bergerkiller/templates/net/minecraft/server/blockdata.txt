@@ -61,43 +61,44 @@ interface IBlockData {
 
         // Query all 6 faces and produce a mask
         int mask = 0;
+        IBlockAccess emptyBlockAccess = BlockAccessAir.INSTANCE;
   #if version >= 1.14.4
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (instance.d(BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #else
         // Awkward! It's not cached yet. Hopefully this works, though.
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.NORTH)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.EAST)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
         }
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
         }
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.WEST)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
         }
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.UP)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
         }
-        if (Block.d(instance, BlockAccessAir.INSTANCE, BlockPosition.ZERO, EnumDirection.DOWN)) {
+        if (Block.d(instance, emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
         }
   #endif
@@ -106,7 +107,7 @@ interface IBlockData {
         // When this happens, it would make transparent blocks block all light
         // We obviously don't want that!
         if (mask == com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL.mask()) {
-            int opacity = instance.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            int opacity = instance.b(emptyBlockAccess, BlockPosition.ZERO);
             if (opacity < 15) {
                 mask = 0;
             }
@@ -132,7 +133,7 @@ interface IBlockData {
         if (worldAccessRequired) {
             return -1;
         } else {
-            return instance.b(BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            return instance.b((IBlockAccess) BlockAccessAir.INSTANCE, BlockPosition.ZERO);
         }
     }
 #elseif version >= 1.13

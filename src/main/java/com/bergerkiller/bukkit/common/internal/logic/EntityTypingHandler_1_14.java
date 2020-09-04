@@ -15,7 +15,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -40,7 +39,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     public EntityTypingHandler_1_14() {
         {
             ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(EntityTypesHandle.T.getType());
+            resolver.setDeclaredClassName("net.minecraft.server.EntityTypes");
             MethodDeclaration m = new MethodDeclaration(resolver, 
                     "public Class<?> findClassFromEntityTypes(net.minecraft.server.World world) {\n" +
                     "    Object entity = instance.a(world);\n" +
@@ -65,7 +64,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
             }
 
             ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(WorldServerHandle.T.getType());
+            resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
             resolver.setVariable("version", Common.MC_VERSION);
             MethodDeclaration m = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public void initWorldServer(WorldDataServer worldData) {\n" +
@@ -107,7 +106,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
                     // worldProvider field
                     "    int envId = org.bukkit.World.Environment.NORMAL.getId();\n" +
-                    "    instance.worldProvider = DimensionManager.a(envId).getWorldProvider(instance);\n" +
+                    "    instance.worldProvider = DimensionManager.a(envId).getWorldProvider((World) instance);\n" +
 
                     // worldData field
                     "    #require net.minecraft.server.World public final WorldData worldData;\n" +
@@ -133,7 +132,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         // Initialize method that creates new EntityTrackerEntry instances (which are actually PlayerChunkMap$EntityTracker)
         {
             ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(EntityTrackerHandle.T.getType());
+            resolver.setDeclaredClassName("net.minecraft.server.PlayerChunkMap");
             MethodDeclaration createEntryMethod = new MethodDeclaration(resolver, 
                     "public Object createEntry(Entity entity) {\n" +
                     "    EntityTypes entitytypes = entity.getEntityType();\n" +

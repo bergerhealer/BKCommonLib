@@ -577,7 +577,7 @@ public abstract class PluginBase extends JavaPlugin {
                         }
                         // Log the message
                         if (plugin == null) {
-                            log(Level.SEVERE, type + " a dependency of this plugin");
+                            getLogger().log(Level.SEVERE, type + " a dependency of this plugin", reason);
                             // Add all dependencies of this plugin to the cause
                             LinkedHashSet<String> dep = new LinkedHashSet<String>();
                             dep.add(this.getName());

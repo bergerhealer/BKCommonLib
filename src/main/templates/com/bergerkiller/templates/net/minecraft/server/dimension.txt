@@ -70,7 +70,7 @@ class DimensionManager {
         net.minecraft.server.MinecraftKey name;
 
   #if version >= 1.13.1
-        name = IRegistry.DIMENSION_TYPE.getKey(instance);
+        name = IRegistry.DIMENSION_TYPE.getKey((Object) instance);
         if (name == null) {
             throw new IllegalArgumentException("This dimension is not registered");
         }

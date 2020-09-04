@@ -33,7 +33,7 @@ public class RegionHandler_1_15 extends RegionHandler {
 
     public RegionHandler_1_15() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClass(CommonUtil.getNMSClass("RegionFileCache"));
+        resolver.setDeclaredClassName("net.minecraft.server.RegionFileCache");
         resolver.setVariable("version", Common.MC_VERSION);
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
