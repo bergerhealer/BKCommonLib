@@ -14,13 +14,11 @@ class Block {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     public static final Iterable<?> getRegistry() {
-#if version >= 1.14
-        #require net.minecraft.server.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
-#elseif version >= 1.13.1
-        #require net.minecraft.server.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
-#else
-        #require net.minecraft.server.Block public static final RegistryBlocks REGISTRY;
-#endif
+#select version >=
+#case 1.14:   #require net.minecraft.server.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
+#case 1.13.1: #require net.minecraft.server.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
+#case else:   #require net.minecraft.server.Block public static final RegistryBlocks REGISTRY;
+#endselect
         return #REGISTRY;
     }
 
@@ -52,22 +50,19 @@ class Block {
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 #endif
 
-#if version >= 1.16
-    public String getTitle:i();
-#elseif version >= 1.15
-    public String getTitle:k();
-#elseif version >= 1.14
-    public String getTitle:l();
-#elseif version >= 1.13
-    public String getTitle:m();
-#else
+#select version >=
+#case 1.16: public String getTitle:i();
+#case 1.15: public String getTitle:k();
+#case 1.14: public String getTitle:l();
+#case 1.13: public String getTitle:m();
+#case else
     public String getTitle() {
         StringBuilder str = new StringBuilder();
         str.append(instance.a());
         str.append(".name");
         return str.toString();
     }
-#endif
+#endselect
 
     public boolean isFaceOpaque((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z, (org.bukkit.block.BlockFace) EnumDirection direction) {
   #if version >= 1.16

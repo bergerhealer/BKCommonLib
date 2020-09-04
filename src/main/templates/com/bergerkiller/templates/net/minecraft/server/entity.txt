@@ -63,19 +63,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public optional (EntityHandle) Entity opt_passenger:passenger;
 #endif
 
-#if version >= 1.13.1
-    private (EntityHandle) Entity vehicle:vehicle;
-#elseif version >= 1.13
-    private (EntityHandle) Entity vehicle:ax;
-#elseif version >= 1.10.2
-    private (EntityHandle) Entity vehicle:au;
-#elseif version >= 1.9.4
-    private (EntityHandle) Entity vehicle:at;
-#elseif version >= 1.9
-    private (EntityHandle) Entity vehicle:as;
-#else
-    private (EntityHandle) Entity vehicle;
-#endif
+#select version >=
+#case 1.13.1: private (EntityHandle) Entity vehicle:vehicle;
+#case 1.13:   private (EntityHandle) Entity vehicle:ax;
+#case 1.10.2: private (EntityHandle) Entity vehicle:au;
+#case 1.9.4:  private (EntityHandle) Entity vehicle:at;
+#case 1.9:    private (EntityHandle) Entity vehicle:as;
+#case else:   private (EntityHandle) Entity vehicle;
+#endselect
 
     <code>
     public List<EntityHandle> getPassengers() {
@@ -513,51 +508,45 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
-#if version >= 1.16
+#select version >=
+#case 1.16
     public unknown float z;
     public float walkedDistanceXZ:A;
     public float walkedDistanceXYZ:B;
-#elseif version >= 1.15
+#case 1.15
     public unknown float A;
     public float walkedDistanceXZ:B;
     public float walkedDistanceXYZ:C;
-#elseif version >= 1.14
+#case 1.14
     public unknown float D;
     public float walkedDistanceXZ:E;
     public float walkedDistanceXYZ:F;
-#elseif version >= 1.13
+#case 1.13
     public unknown float J;
     public float walkedDistanceXZ:K;
     public float walkedDistanceXYZ:L;
-#elseif version >= 1.9
+#case 1.9
     public unknown float I;
     public float walkedDistanceXZ:J;
     public float walkedDistanceXYZ:K;
-#else
+#case else
     public unknown float L;
     public float walkedDistanceXZ:M;
     public float walkedDistanceXYZ:N;
-#endif
+#endselect
 
     public float fallDistance;
 
-#if version >= 1.16.2
-    #require net.minecraft.server.Entity private float stepCounter:am;
-#elseif version >= 1.16
-    #require net.minecraft.server.Entity private float stepCounter:at;
-#elseif version >= 1.14
-    #require net.minecraft.server.Entity private float stepCounter:av;
-#elseif version >= 1.13
-    #require net.minecraft.server.Entity private float stepCounter:aA;
-#elseif version >= 1.10.2
-    #require net.minecraft.server.Entity private int stepCounter:ax;
-#elseif version >= 1.9.4
-    #require net.minecraft.server.Entity private int stepCounter:aw;
-#elseif version >= 1.9
-    #require net.minecraft.server.Entity private int stepCounter:av;
-#else
-    #require net.minecraft.server.Entity private int stepCounter:h;
-#endif
+#select version >=
+#case 1.16.2: #require net.minecraft.server.Entity private float stepCounter:am;
+#case 1.16:   #require net.minecraft.server.Entity private float stepCounter:at;
+#case 1.14:   #require net.minecraft.server.Entity private float stepCounter:av;
+#case 1.13:   #require net.minecraft.server.Entity private float stepCounter:aA;
+#case 1.10.2: #require net.minecraft.server.Entity private int stepCounter:ax;
+#case 1.9.4:  #require net.minecraft.server.Entity private int stepCounter:aw;
+#case 1.9:    #require net.minecraft.server.Entity private int stepCounter:av;
+#case else:   #require net.minecraft.server.Entity private int stepCounter:h;
+#endselect
 
     public void setStepCounter(float value) {
 #if version >= 1.13
@@ -571,55 +560,19 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return (float) instance#stepCounter;
     }
 
-#if version >= 1.16
-    public unknown double D;
-    public unknown double E;
-    public unknown double F;
-    public float heightOffset:G;
+#select version >=
+#case 1.16:  public float heightOffset:G;
+#case 1.15:  public float heightOffset:H;
+#case 1.14:  public float heightOffset:K;
+#case 1.13:  public float heightOffset:Q;
+#case 1.9:   public float heightOffset:P;
+#case else:  public float heightOffset:S;
+#endselect
+
+#if version >= 1.8.3
     public boolean noclip;
-    public unknown float I;
-#elseif version >= 1.15
-    public unknown double E;
-    public unknown double F;
-    public unknown double G;
-    public float heightOffset:H;
-    public boolean noclip;
-    public unknown float J;
-#elseif version >= 1.14
-    public unknown double H;
-    public unknown double I;
-    public unknown double J;
-    public float heightOffset:K;
-    public boolean noclip;
-    public unknown float M;
-#elseif version >= 1.13
-    public unknown double N;
-    public unknown double O;
-    public unknown double P;
-    public float heightOffset:Q;
-    public boolean noclip;
-    public unknown float S;
-#elseif version >= 1.9
-    public unknown double M;
-    public unknown double N;
-    public unknown double O;
-    public float heightOffset:P;
-    public boolean noclip;
-    public unknown float R;
-#elseif version >= 1.8.3
-    public unknown double P;
-    public unknown double Q;
-    public unknown double R;
-    public float heightOffset:S;
-    public boolean noclip;
-    public unknown float U;
 #else
-    public unknown double P;
-    public unknown double Q;
-    public unknown double R;
-    public float heightOffset:S;
     public boolean noclip:T;
-    public unknown float U;
 #endif
 
     protected Random random;
@@ -661,17 +614,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #elseif version >= 1.9
     /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
-    #if version >= 1.13
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;
-    #elseif version >= 1.11
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
-    #elseif version >= 1.10.2
-        protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
-    #elseif version >= 1.9.4
-        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ay;
-    #else
-        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
-    #endif
+    #select version >=
+    #case 1.13:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;
+    #case 1.11:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
+    #case 1.10.2: protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    #case 1.9.4:  private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ay;
+    #case else:   private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
+    #endselect
     #if version >= 1.13
         private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aD;
         private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aE;
@@ -855,28 +804,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public int portalCooldown;
 
-#if version >= 1.16
-    protected boolean allowTeleportation:inPortal;
-    protected unknown int portalTicks;
-#elseif version >= 1.15
-    protected boolean allowTeleportation:af;
-    protected unknown int ag;
-#elseif version >= 1.14
-    protected boolean allowTeleportation:ai;
-    protected unknown int aj;
-#elseif version >= 1.13
-    protected boolean allowTeleportation:an;
-    protected unknown int ao;
-#elseif version >= 1.11
-    protected boolean allowTeleportation:ak;
-    protected unknown int al;
-#elseif version >= 1.10.2
-    protected boolean allowTeleportation:al;
-    protected unknown int am;
-#else
-    protected boolean allowTeleportation:ak;
-    protected unknown int al;
-#endif
+#select version >=
+#case 1.16:   protected boolean allowTeleportation:inPortal;
+#case 1.15:   protected boolean allowTeleportation:af;
+#case 1.14:   protected boolean allowTeleportation:ai;
+#case 1.13:   protected boolean allowTeleportation:an;
+#case 1.11:   protected boolean allowTeleportation:ak;
+#case 1.10.2: protected boolean allowTeleportation:al;
+#case else:   protected boolean allowTeleportation:ak;
+#endselect
 
 #if version >= 1.16.2
     optional private final double[] move_SomeArray:aA;
@@ -1020,29 +956,19 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
     // Note: counts rain too as being wet!
-#if version >= 1.16.2
-    public boolean isWet:aF();
-#elseif version >= 1.16
-    public boolean isWet:aC();
-#elseif version >= 1.15
-    public boolean isWet:ay();
-#elseif version >= 1.14.3
-    public boolean isWet:au();
-#elseif version >= 1.14
-    public boolean isWet:at();
-#elseif version >= 1.13
-    public boolean isWet:ap();
-#elseif version >= 1.12
-    public boolean isWet:an();
-#elseif version >= 1.10.2
-    public boolean isWet:ai();
-#elseif version >= 1.9.4
-    public boolean isWet:ah();
-#elseif version >= 1.9
-    public boolean isWet:ah();
-#else
-    public boolean isWet:U();
-#endif
+#select version >=
+#case 1.16.2: public boolean isWet:aF();
+#case 1.16:   public boolean isWet:aC();
+#case 1.15:   public boolean isWet:ay();
+#case 1.14.3: public boolean isWet:au();
+#case 1.14:   public boolean isWet:at();
+#case 1.13:   public boolean isWet:ap();
+#case 1.12:   public boolean isWet:an();
+#case 1.10.2: public boolean isWet:ai();
+#case 1.9.4:  public boolean isWet:ah();
+#case 1.9:    public boolean isWet:ah();
+#case else:   public boolean isWet:U();
+#endselect
 
     /*
      # public boolean ###METHODNAME###() {
@@ -1054,23 +980,16 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      * }
      */
     // Note: checks just standing in water! Rain does not count.
-#if version >= 1.16.2
-    public boolean isInWaterUpdate:aG();
-#elseif version >= 1.16
-    public boolean isInWaterUpdate:aD();
-#elseif version >= 1.15
-    public boolean isInWaterUpdate:az();
-#elseif version >= 1.14
-    public boolean isInWaterUpdate:au();
-#elseif version >= 1.12
-    public boolean isInWaterUpdate:aq();
-#elseif version >= 1.10.2
-    public boolean isInWaterUpdate:ak();
-#elseif version >= 1.9
-    public boolean isInWaterUpdate:aj();
-#else
-    public boolean isInWaterUpdate:W();
-#endif
+#select version >=
+#case 1.16.2: public boolean isInWaterUpdate:aG();
+#case 1.16:   public boolean isInWaterUpdate:aD();
+#case 1.15:   public boolean isInWaterUpdate:az();
+#case 1.14:   public boolean isInWaterUpdate:au();
+#case 1.12:   public boolean isInWaterUpdate:aq();
+#case 1.10.2: public boolean isInWaterUpdate:ak();
+#case 1.9:    public boolean isInWaterUpdate:aj();
+#case else:   public boolean isInWaterUpdate:W();
+#endselect
 
     /*
      # public boolean ###METHODNAME###() {
@@ -1244,29 +1163,22 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
 
-#if version >= 1.16.2
+#select version >=
+#case 1.16.2
     // Since 1.16.2 there's a flag, aY(), which gets whether the 'other' bounding box exists
     // Only the Shulker and Boat entity appear to use this flag
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
         return instance.aY() ? instance.getBoundingBox() : null;
     }
-#elseif version >= 1.16
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
-#elseif version >= 1.15
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
-#elseif version >= 1.14.3
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
-#elseif version >= 1.14
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
-#elseif version >= 1.12
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
-#elseif version >= 1.10.2
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
-#elseif version >= 1.9
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:af();
-#else
-    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
-#endif
+#case 1.16:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
+#case 1.15:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
+#case 1.14.3: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
+#case 1.14:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
+#case 1.12:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
+#case 1.10.2: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
+#case 1.9:    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:af();
+#case else:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
+#endselect
 
 #if version >= 1.16.2
     // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
@@ -1440,27 +1352,18 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return 300;
      * }
      */
-#if version >= 1.16
-    public int getPortalCooldownMaximum:getDefaultPortalCooldown();
-#elseif version >= 1.15
-    public int getPortalCooldownMaximum:ba();
-#elseif version >= 1.14.3
-    public int getPortalCooldownMaximum:aX();
-#elseif version >= 1.14
-    public int getPortalCooldownMaximum:aW();
-#elseif version >= 1.13
-    public int getPortalCooldownMaximum:aQ();
-#elseif version >= 1.12
-    public int getPortalCooldownMaximum:aM();
-#elseif version >= 1.10.2
-    public int getPortalCooldownMaximum:aE();
-#elseif version >= 1.9
-    public int getPortalCooldownMaximum:aC();
-#elseif version >= 1.8.3
-    public int getPortalCooldownMaximum:aq();
-#else
-    public int getPortalCooldownMaximum:ar();
-#endif
+#select version >=
+#case 1.16:   public int getPortalCooldownMaximum:getDefaultPortalCooldown();
+#case 1.15:   public int getPortalCooldownMaximum:ba();
+#case 1.14.3: public int getPortalCooldownMaximum:aX();
+#case 1.14:   public int getPortalCooldownMaximum:aW();
+#case 1.13:   public int getPortalCooldownMaximum:aQ();
+#case 1.12:   public int getPortalCooldownMaximum:aM();
+#case 1.10.2: public int getPortalCooldownMaximum:aE();
+#case 1.9:    public int getPortalCooldownMaximum:aC();
+#case 1.8.3:  public int getPortalCooldownMaximum:aq();
+#case else:   public int getPortalCooldownMaximum:ar();
+#endselect
 
     // Since MC 1.8.8
     public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
