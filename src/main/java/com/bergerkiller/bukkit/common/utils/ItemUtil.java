@@ -390,8 +390,7 @@ public class ItemUtil {
      * @return ItemStack
      */
     public static org.bukkit.inventory.ItemStack createItem(Material type, int amount) {
-        ItemStackHandle stack = ItemStackHandle.newInstance();
-        stack.setTypeField(type);
+        ItemStackHandle stack = ItemStackHandle.newInstance(type);
         stack.setAmountField(amount);
         return stack.toBukkit();
     }
@@ -411,8 +410,7 @@ public class ItemUtil {
             return BlockData.fromMaterialData(type, data).createItem(amount);
         }
 
-        ItemStackHandle stack = ItemStackHandle.newInstance();
-        stack.setTypeField(type);
+        ItemStackHandle stack = ItemStackHandle.newInstance(type);
         stack.setAmountField(amount);
         stack.setDurability(data);
         return stack.toBukkit();

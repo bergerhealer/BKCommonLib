@@ -24,8 +24,8 @@ public abstract class ItemStackHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static ItemStackHandle newInstance() {
-        return T.newInstance.invoke();
+    public static ItemStackHandle newInstance(Material type) {
+        return T.newInstance.invoke(type);
     }
 
     public static ItemStackHandle fromBlockData(IBlockDataHandle data, int amount) {
@@ -33,7 +33,6 @@ public abstract class ItemStackHandle extends Template.Handle {
     }
 
     public abstract Material getTypeField();
-    public abstract void setTypeField(Material type);
     public abstract Object getItem();
     public abstract ChatText getName();
     public abstract void setName(ChatText name);
@@ -99,7 +98,6 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.StaticMethod.Converted<ItemStackHandle> fromBlockData = new Template.StaticMethod.Converted<ItemStackHandle>();
 
         public final Template.Method.Converted<Material> getTypeField = new Template.Method.Converted<Material>();
-        public final Template.Method.Converted<Void> setTypeField = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
         public final Template.Method<Object> getItem = new Template.Method<Object>();

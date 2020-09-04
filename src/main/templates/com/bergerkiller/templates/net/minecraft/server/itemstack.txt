@@ -19,7 +19,6 @@ class ItemStack {
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
 
     public (org.bukkit.Material) Item getTypeField:getItem();
-    public void setTypeField:setItem((org.bukkit.Material) Item type);
 
 #if version >= 1.13
     private optional int durabilityField:###;
@@ -42,17 +41,30 @@ class ItemStack {
     // available since MC 1.11
     public optional boolean isEmpty();
 
-    // Create a default ItemStack with type STONE amount 1
-    public static (ItemStackHandle) ItemStack newInstance() {
+    // Create an ItemStack with the given material type, and initial amount 1
+    public static (ItemStackHandle) ItemStack newInstance(org.bukkit.Material type) {
+        if (type.isBlock()) {
+            Block block = org.bukkit.craftbukkit.util.CraftMagicNumbers.getBlock(type);
 #if forge
-        return new ItemStack(Blocks.STONE, 1);
+            return new ItemStack(block, 1);
 #elseif version >= 1.13
-        return new ItemStack(Blocks.STONE, 1);
+            return new ItemStack(block, 1);
 #elseif version >= 1.11.2
-        return new ItemStack(Item.getItemOf(Blocks.STONE), 1, 0, false);
+            return new ItemStack(Item.getItemOf(block), 1, 0, false);
 #else
-        return new ItemStack(Blocks.STONE, 1, 0);
+            return new ItemStack(block, 1, 0);
 #endif
+        } else {
+            Item item = org.bukkit.craftbukkit.util.CraftMagicNumbers.getItem(type);
+            if (item == null) {
+                throw new IllegalArgumentException("Invalid item material type: " + type.name());
+            }
+#if version >= 1.13
+            return new ItemStack((IMaterial) item, 1);
+#else
+            return new ItemStack(item, 1);
+#endif
+        }
     }
 
     public static (ItemStackHandle) ItemStack fromBlockData((IBlockDataHandle) IBlockData data, int amount) {

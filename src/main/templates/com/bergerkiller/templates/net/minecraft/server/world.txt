@@ -276,9 +276,9 @@ class World extends IBlockAccess {
 #if version >= 1.14
     // Fallback...
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
-        RayTrace rayTrace = new RayTrace(point1, point2, RayTrace.BlockCollisionOption.OUTLINE, RayTrace.FluidCollisionOption.NONE, null);
+        RayTrace rayTrace = new RayTrace(point1, point2, RayTrace$BlockCollisionOption.OUTLINE, RayTrace$FluidCollisionOption.NONE, null);
         MovingObjectPosition result = instance.rayTrace(rayTrace);
-        if (result != null && result.getType() == MovingObjectPosition.EnumMovingObjectType.MISS) {
+        if (result != null && result.getType() == MovingObjectPosition$EnumMovingObjectType.MISS) {
             result = null;
         }
         return result;

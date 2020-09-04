@@ -127,8 +127,7 @@ public class HandleConversion {
             } else {
                 if (Common.IS_TEST_MODE) {
                     // Fallback under test - does not go into production!
-                    ItemStackHandle handle = ItemStackHandle.newInstance();
-                    handle.setTypeField(itemStack.getType());
+                    ItemStackHandle handle = ItemStackHandle.newInstance(itemStack.getType());
                     handle.setAmountField(itemStack.getAmount());
                     handle.setDurability(itemStack.getDurability());
                     return handle.getRaw();

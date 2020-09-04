@@ -29,14 +29,13 @@ public class RecipeUtil {
     static {
         // Store initial values
         for (Material material : MaterialsByName.getAllMaterials()) {
-            ItemStackHandle item = ItemStackHandle.newInstance();
+            ItemStackHandle item;
             try {
-                item.setTypeField(material);
+                item = ItemStackHandle.newInstance(material);
             } catch (Throwable t) {
                 // Ignore forge errors
                 continue;
             }
-            item.setAmountField(1);
             int fuel = ((Integer) TileEntityFurnaceHandle.T.fuelTime.raw.invoke(item.getRaw())).intValue();
             if (fuel > 0) {
                 fuelTimes.put(material, fuel);

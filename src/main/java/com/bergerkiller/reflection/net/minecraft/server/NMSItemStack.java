@@ -15,8 +15,7 @@ public class NMSItemStack {
     public static final FieldAccessor<CommonTagCompound> tag = ItemStackHandle.T.tagField.toFieldAccessor();
 
     public static Object newInstance(Material type, int data, int amount) {
-        ItemStackHandle instance = ItemStackHandle.newInstance();
-        instance.setTypeField(type);
+        ItemStackHandle instance = ItemStackHandle.newInstance(type);
         instance.setDurability(data);
         instance.setAmountField(amount);
         return instance.getRaw();
