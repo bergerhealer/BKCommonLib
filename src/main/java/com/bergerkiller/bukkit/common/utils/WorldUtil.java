@@ -40,6 +40,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
+import org.bukkit.World.Environment;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -349,6 +350,62 @@ public class WorldUtil extends ChunkUtil {
      */
     public static Collection<String> getLoadableWorlds() {
         return Common.SERVER.getLoadableWorlds();
+    }
+
+    /**
+     * Attempts to find a suitable spawn location, searching from the
+     * startLocation specified. Note that portals are created if no position can
+     * be found.<br>
+     * <br>
+     * <b>Deprecated: please use the end and nether portal specific functions instead</b>
+     *
+     * @param startLocation to find a spawn from
+     * @return suitable spawn location, or the input startLocation if this
+     * failed
+     */
+    @Deprecated
+    public static Location findSpawnLocation(Location startLocation) {
+        return findSpawnLocation(startLocation, true);
+    }
+
+    /**
+     * Attempts to find a suitable spawn location, searching from the
+     * startLocation specified. If specified, portals will be created if none
+     * are found.<br>
+     * <br>
+     * <b>Deprecated: please use the end and nether portal specific functions instead</b>
+     *
+     * @param startLocation to find a spawn from
+     * @param createPortals - True to create a portal if not found, False not to
+     * @return suitable spawn location, or the input startLocation if this
+     * failed
+     */
+    @Deprecated
+    public static Location findSpawnLocation(Location startLocation, boolean createPortals) {
+        // Patch up the Start Location to find portals nearby to spawn at
+        Block startBlock = startLocation.getBlock();
+        Block portal;
+        if (startBlock.getWorld().getEnvironment() == Environment.THE_END) {
+            portal = findEndPlatform(startBlock.getWorld());
+            if (portal == null && createPortals) {
+                portal = createEndPlatform(startBlock.getWorld(), null);
+            }
+        } else if (startBlock.getWorld().getEnvironment() == Environment.NETHER) {
+            portal = findNetherPortal(startBlock, 16);
+            if (portal == null && createPortals) {
+                portal = createNetherPortal(startBlock, BlockFace.SELF, null);
+            }
+        } else {
+            portal = findNetherPortal(startBlock, 128);
+            if (portal == null && createPortals) {
+                portal = createNetherPortal(startBlock, BlockFace.SELF, null);
+            }
+        }
+        if (portal == null) {
+            return startLocation.clone();
+        } else {
+            return portal.getLocation().add(0.5, 0.0, 0.5);
+        }
     }
 
     /**
