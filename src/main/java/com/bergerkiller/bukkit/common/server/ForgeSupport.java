@@ -53,6 +53,9 @@ public class ForgeSupport {
         if (!worldFolder.isDirectory()) {
             return false;
         }
+        if (worldName.equals("DIM1") || worldName.equals("DIM-1")) {
+            return true; // default nether/end worlds, always allow
+        }
         if (new File(worldFolder, "level.dat").exists()) {
             return true;
         }
