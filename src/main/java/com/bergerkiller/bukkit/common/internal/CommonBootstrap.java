@@ -88,7 +88,6 @@ public class CommonBootstrap {
             } else {
                 // Autodetect most likely server type
                 List<CommonServer> servers = new ArrayList<>();
-                servers.add(new MCPCPlusServer());
                 servers.add(new MohistServer());
                 servers.add(new MagmaServer());
                 servers.add(new ArclightServer());
