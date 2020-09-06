@@ -35,9 +35,11 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     private final Queue<PacketHandle> _queuedPackets;
 
     public VehicleMountHandler_BaseImpl(CommonPlugin plugin, Player player) {
+        DimensionType playerDimension = PlayerUtil.getPlayerDimension(player);
+
         this._plugin = plugin;
         this._player = player;
-        this._playerDimension = PlayerUtil.getPlayerDimension(player).getKey();
+        this._playerDimension = (playerDimension == null) ? null : playerDimension.getKey();
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
         this._playerSpawnedEntity.state = SpawnedEntity.State.SPAWNED;
         this._spawnedEntities = new IntHashMap<>();
@@ -243,7 +245,10 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         synchronizeAndQueuePackets(() -> {
             // Refresh player dimension if none could be set (temporary player, pre-join)
             if (this._playerDimension == null) {
-                this._playerDimension = PlayerUtil.getPlayerDimension(this._player).getKey();
+                DimensionType playerDimension = PlayerUtil.getPlayerDimension(this._player);
+                if (playerDimension != null) {
+                    this._playerDimension = playerDimension.getKey();
+                }
             }
 
             // Event handler for further implementations
