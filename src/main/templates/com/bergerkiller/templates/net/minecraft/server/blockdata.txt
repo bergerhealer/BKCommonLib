@@ -51,9 +51,15 @@ interface IBlockData {
 
     // Returns null when the opaque faces aren't cached
     public BlockFaceSet getCachedOpaqueFaces() {
+        Block block = instance.getBlock();
+
+        // Carpet must be overrided to allow light to pass through
+        if (block instanceof BlockCarpet) {
+            return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+        }
+
 #if version >= 1.14
         // Check world access isn't required (see: Block)
-        Block block = instance.getBlock();
         boolean worldAccessRequired = block#isWorldAccessRequired();
         if (worldAccessRequired) {
             return null;
@@ -116,11 +122,11 @@ interface IBlockData {
         return com.bergerkiller.bukkit.common.collections.BlockFaceSet.byMask(mask);
 
 #elseif version >= 1.9
-        return instance.getBlock().isOccluding(instance) ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
-                                                         : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+        return block.isOccluding(instance) ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
+                                           : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
 #else
-        return instance.getBlock().isOccluding() ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
-                                                 : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+        return block.isOccluding() ? com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL
+                                   : com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
 #endif
     }
 
