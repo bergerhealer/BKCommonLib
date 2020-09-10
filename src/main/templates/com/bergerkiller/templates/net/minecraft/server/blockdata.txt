@@ -53,7 +53,19 @@ interface IBlockData {
     public BlockFaceSet getCachedOpaqueFaces() {
         Block block = instance.getBlock();
 
-        // Carpet must be overrided to allow light to pass through
+        // This flag is set to true by default for all blocks
+        // Blocks that pass light through at all times, have it set to false
+        // Examples are: doors, trapdoors
+#if version >= 1.16
+        if (!instance.l()) {
+#else
+        if (!instance.o()) {
+#endif
+            return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
+        }
+
+        // Some blocks must be overrided to allow light to pass through
+        // There doesn't appear to be a property we can use to query this :(
         if (block instanceof BlockCarpet) {
             return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
         }
