@@ -429,7 +429,13 @@ class PacketPlayInUseItem extends Packet {
 
         #require net.minecraft.server.PacketPlayInUseItem private MovingObjectPositionBlock movingObject:a;
 
-        MovingObjectPositionBlock moving = MovingObjectPositionBlock.a(Vec3D.a, EnumDirection.DOWN, BlockPosition.ZERO);
+  #if version >= 1.16.3
+        Vec3D origin = Vec3D.ORIGIN;
+  #else
+        Vec3D origin = Vec3D.a;
+  #endif
+
+        MovingObjectPositionBlock moving = MovingObjectPositionBlock.a(origin, EnumDirection.DOWN, BlockPosition.ZERO);
         instance#movingObject = moving; 
     }
 #else

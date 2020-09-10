@@ -14,9 +14,15 @@ class DimensionManager {
 #endif
 
 #if version >= 1.16
+  #if version >= 1.16.3
+    #require net.minecraft.server.MinecraftServer public final IRegistryCustom.Dimension customRegistry;
+  #else
+    #require net.minecraft.server.MinecraftServer public final IRegistryCustom.Dimension customRegistry:f;
+  #endif
+
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server.f;
+        IRegistryCustom$Dimension registry = server#customRegistry;
         java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
             return (ResourceKey) key_opt.get();
@@ -27,14 +33,14 @@ class DimensionManager {
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
         MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server.f;
+        IRegistryCustom$Dimension registry = server#customRegistry;
         return (DimensionManager) registry.a().a(key);
     }
 
     // deprecated fallback
     public int getId() {
         MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server.f;
+        IRegistryCustom$Dimension registry = server#customRegistry;
         java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
@@ -61,7 +67,7 @@ class DimensionManager {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }
         MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server.f;
+        IRegistryCustom$Dimension registry = server#customRegistry;
         return (DimensionManager) registry.a().a(res_key);
     }
 #else

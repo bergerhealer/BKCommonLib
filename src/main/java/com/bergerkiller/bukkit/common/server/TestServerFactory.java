@@ -452,7 +452,11 @@ public class TestServerFactory {
             // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
             // this.f = iregistrycustom_dimension; (MinecraftServer.java)
             Object customRegistry = createFromCode(minecraftServerType, "return IRegistryCustom.b();");
-            setField(mc_server, "f", customRegistry);
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.16.3")) {
+                setField(mc_server, "customRegistry", customRegistry);
+            } else {
+                setField(mc_server, "f", customRegistry);
+            }
 
             // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
             Field bkServerField = Bukkit.class.getDeclaredField("server");
