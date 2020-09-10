@@ -313,10 +313,12 @@ class HeightMap {
         #require net.minecraft.server.HeightMap private final DataBits databits:c;
 
         IChunkAccess ichunkaccess = instance#chunk;
-        IBlockAccess iblockaccess = (IBlockAccess) ichunkaccess;
+        org.bukkit.World world = ((Chunk) ichunkaccess).getWorld().getWorld();
         DataBits databits = instance#databits;
         int databits_index = 0;
+        int startX = ((Chunk) ichunkaccess).getPos().x << 4;
         int startY = ichunkaccess.b() + 15;
+        int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
         BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
@@ -332,35 +334,29 @@ class HeightMap {
                         continue;
                     }
 
+                    // Turn into BKCommonLib BlockData to read material properties we need
+                    com.bergerkiller.bukkit.common.wrappers.BlockData bkc_blockdata;
+                    bkc_blockdata = com.bergerkiller.bukkit.common.wrappers.BlockDataRegistry.fromBlockData((Object) iblockdata);
+
                     // If opacity is nonzero, stop
-                    if (iblockdata.b(iblockaccess, (BlockPosition) blockposition) > 0) {
+                    if (bkc_blockdata.getOpacity(world, startX + x, y, startZ + z) > 0) {
                         break;
                     }
 
                     // If top blockface is opaque, don't progress y and stop
-  #if version >= 1.14.4
-                    if (iblockdata.d(iblockaccess, (BlockPosition) blockposition, EnumDirection.UP)) {
+                    com.bergerkiller.bukkit.common.collections.BlockFaceSet bkc_opaquefaces;
+                    bkc_opaquefaces = bkc_blockdata.getOpaqueFaces(world, startX + x, y, startZ + z);
+                    if (bkc_opaquefaces.up()) {
                         break;
                     }
-  #else
-                    if (Block.d(iblockdata, iblockaccess, (BlockPosition) blockposition, EnumDirection.UP)) {
-                        break;
-                    }
-  #endif
 
                     // Next block
                     --y;
 
                     // If bottom blockface was opaque, stop (but allow block itself to be lit)
-  #if version >= 1.14.4
-                    if (iblockdata.d(iblockaccess, (BlockPosition) blockposition, EnumDirection.DOWN)) {
+                    if (bkc_opaquefaces.down()) {
                         break;
                     }
-  #else
-                    if (Block.d(iblockdata, iblockaccess, (BlockPosition) blockposition, EnumDirection.DOWN)) {
-                        break;
-                    }
-  #endif
                 }
 
                 // Store the value
