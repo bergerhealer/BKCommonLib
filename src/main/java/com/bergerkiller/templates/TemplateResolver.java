@@ -136,6 +136,50 @@ public class TemplateResolver implements ClassDeclarationResolver {
     }
 
     /**
+     * Gets the 'is built for' versions displayed when the current version is incompatible
+     * 
+     * @return versions string
+     */
+    public String getDebugSupportedVersionsString() {
+        // Get major version (1.16.1 -> 1.16)
+        String lastMayorVersion = supported_mc_versions[supported_mc_versions.length - 1];
+        int firstDot = lastMayorVersion.indexOf('.');
+        if (firstDot != -1) {
+            int secondDot = lastMayorVersion.indexOf('.', firstDot + 1);
+            if (secondDot != -1) {
+                lastMayorVersion = lastMayorVersion.substring(0, secondDot);
+            }
+        }
+
+        // Figure out from what point onwards the last major version is listed
+        String lastMayorVersionWithDot = lastMayorVersion + ".";
+        int lastMajorVersionsStart = supported_mc_versions.length - 1;
+        while (lastMajorVersionsStart >= 1) {
+            String ver = supported_mc_versions[lastMajorVersionsStart-1];
+            if (ver.equals(lastMayorVersion) || ver.startsWith(lastMayorVersionWithDot)) {
+                lastMajorVersionsStart--;
+            } else {
+                break;
+            }
+        }
+
+        // Combine into a single message
+        StringBuilder str = new StringBuilder();
+        str.append(supported_mc_versions[0]);
+        str.append(" to ");
+        str.append(supported_mc_versions[lastMajorVersionsStart-1]);
+        for (int i = lastMajorVersionsStart; i < supported_mc_versions.length; i++) {
+            if (i == (supported_mc_versions.length - 1)) {
+                str.append(" and ");
+            } else {
+                str.append(", ");
+            }
+            str.append(supported_mc_versions[i]);
+        }
+        return str.toString();
+    }
+
+    /**
      * Gets the current server version, excluding -pre information
      * 
      * @return version number

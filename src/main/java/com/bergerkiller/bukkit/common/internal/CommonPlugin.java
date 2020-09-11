@@ -31,7 +31,6 @@ import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
@@ -481,7 +480,7 @@ public class CommonPlugin extends PluginBase {
         if (Common.IS_COMPATIBLE) {
             log(Level.INFO, "BKCommonLib is running on " + Common.SERVER.getServerDetails());
         } else {
-            String verText = StringUtil.combineNames(Common.TEMPLATE_RESOLVER.getSupportedVersions());
+            String verText = Common.TEMPLATE_RESOLVER.getDebugSupportedVersionsString();
             log(Level.SEVERE, "This version of BKCommonLib is not compatible with: " + Common.SERVER.getServerDetails());
             log(Level.SEVERE, "It could be that BKCommonLib has to be updated, as the current version is built for MC " + verText);
             log(Level.SEVERE, "Please look for a new updated BKCommonLib version that is compatible:");
