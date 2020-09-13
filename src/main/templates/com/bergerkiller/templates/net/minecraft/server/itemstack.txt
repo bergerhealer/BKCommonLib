@@ -43,8 +43,13 @@ class ItemStack {
 
     // Create an ItemStack with the given material type, and initial amount 1
     public static (ItemStackHandle) ItemStack newInstance(org.bukkit.Material type) {
-        if (type.isBlock()) {
+        Item item = org.bukkit.craftbukkit.util.CraftMagicNumbers.getItem(type);
+        if (item == null) {
+            // This shouldn't be needed, but just in case, do a by-block lookup if not found
             Block block = org.bukkit.craftbukkit.util.CraftMagicNumbers.getBlock(type);
+            if (block == null) {
+                throw new IllegalArgumentException("Invalid item material type: " + type.name());
+            }
 #if forge
             return new ItemStack(block, 1);
 #elseif version >= 1.13
@@ -55,10 +60,6 @@ class ItemStack {
             return new ItemStack(block, 1, 0);
 #endif
         } else {
-            Item item = org.bukkit.craftbukkit.util.CraftMagicNumbers.getItem(type);
-            if (item == null) {
-                throw new IllegalArgumentException("Invalid item material type: " + type.name());
-            }
 #if version >= 1.13
             return new ItemStack((IMaterial) item, 1);
 #else
