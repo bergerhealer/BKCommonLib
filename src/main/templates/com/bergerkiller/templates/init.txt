@@ -52,6 +52,7 @@
 #include /net/minecraft/server/dimension.txt
 #include /net/minecraft/server/world.txt
 #include /net/minecraft/server/chunk.txt
+#include /net/minecraft/server/heightmap.txt
 #include /net/minecraft/server/item.txt
 #include /net/minecraft/server/foodmeta.txt
 #include /net/minecraft/server/block.txt
