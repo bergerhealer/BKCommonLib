@@ -27,7 +27,11 @@ class EntityLiving extends Entity {
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
     private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+  #if version >= 1.16.3
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:ARROWS_IN_BODY;
+  #else
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bh;
+  #endif
     private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bj;
 #elseif version >= 1.16
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:an;
