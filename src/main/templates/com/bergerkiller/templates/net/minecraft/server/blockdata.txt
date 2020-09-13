@@ -53,14 +53,15 @@ interface IBlockData {
     public BlockFaceSet getCachedOpaqueFaces() {
         Block block = instance.getBlock();
 
+#if version >= 1.14
         // This flag is set to true by default for all blocks
         // Blocks that pass light through at all times, have it set to false
         // Examples are: doors, trapdoors
-#if version >= 1.16
+  #if version >= 1.16
         if (!instance.l()) {
-#else
+  #else
         if (!instance.o()) {
-#endif
+  #endif
             return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
         }
 
@@ -70,7 +71,6 @@ interface IBlockData {
             return com.bergerkiller.bukkit.common.collections.BlockFaceSet.NONE;
         }
 
-#if version >= 1.14
         // Check world access isn't required (see: Block)
         boolean worldAccessRequired = block#isWorldAccessRequired();
         if (worldAccessRequired) {
