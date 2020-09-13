@@ -11,30 +11,28 @@ import java.util.logging.Level;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
  * Lighting handler for Minecraft 1.14 and later. A new asynchronous lighting engine was introduced,
  * which means changes to light requires scheduling tasks on a worker thread.
  */
 public class LightingHandler_1_14 extends LightingHandler {
+    private final LightEngineHandle handle;
     private final Field light_layer_block;
     private final Field light_layer_sky;
     private final Field light_storage;
-    private final Field light_storage_live;
-    private final Field light_storage_volatile;
-    private final Field light_storage_paper_lock;
-    private final FastMethod<Void> setStorageDataMethod = new FastMethod<Void>();
-    private final FastMethod<Object> createCopyMethod = new FastMethod<Object>();
-    private final FastMethod<byte[]> getLayerDataMethod = new FastMethod<byte[]>();
+    private final Field light_storage_array_live;
     private final Map<World, EngineUpdateTaskLists> task_lists = new HashMap<>();
 
     public LightingHandler_1_14() throws Throwable {
+        this.handle = Template.Class.create(LightEngineHandle.class, Common.TEMPLATE_RESOLVER);
+        this.handle.forceInitialization();
+
         Class<?> lightEngineType = CommonUtil.getNMSClass("LightEngine");
         if (lightEngineType == null) {
             throw new IllegalStateException("LightEngine class not found");
@@ -70,78 +68,16 @@ public class LightingHandler_1_14 extends LightingHandler {
             throw new IllegalStateException("LightEngineLayer light_storage field is not of type LightEngineStorage");
         }
 
-        this.light_storage_live = lightEngineStorageType.getDeclaredField("f");
-        if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_live.getType())) {
+        this.light_storage_array_live = lightEngineStorageType.getDeclaredField("f");
+        if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_array_live.getType())) {
             throw new IllegalStateException("LightEngineStorage light_storage_live field is not of type LightEngineStorageArray");
-        }
-
-        // Renamed (de-obfuscated) by Paper devs
-        {
-            Field f;
-            try {
-                f = lightEngineStorageType.getDeclaredField("e_visible");
-            } catch (NoSuchFieldException ex) {
-                f = lightEngineStorageType.getDeclaredField("e");
-            }
-            this.light_storage_volatile = f;
-        }
-
-        // On paperspigot there is a lock object when the e_visible is updated
-        {
-            Field f;
-            try {
-                f = lightEngineStorageType.getDeclaredField("visibleUpdateLock");
-            } catch (NoSuchFieldException ex) {
-                f = null;
-            }
-            this.light_storage_paper_lock = f;
-        }
-
-        if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_volatile.getType())) {
-            throw new IllegalStateException("LightEngineStorage light_storage_volatile field is not of type LightEngineStorageArray");
         }
 
         // Make all accessible
         this.light_layer_block.setAccessible(true);
         this.light_layer_sky.setAccessible(true);
         this.light_storage.setAccessible(true);
-        this.light_storage_live.setAccessible(true);
-        this.light_storage_volatile.setAccessible(true);
-        if (this.light_storage_paper_lock != null) {
-            this.light_storage_paper_lock.setAccessible(true);
-        }
-
-        ClassResolver storage_resolver = new ClassResolver();
-        storage_resolver.setDeclaredClassName("net.minecraft.server.LightEngineStorageArray");
-
-        // This generated method updates the contents in a live layer
-        this.setStorageDataMethod.init(new MethodDeclaration(storage_resolver,
-                "public void setData(int cx, int cy, int cz, byte[] data) {\n" +
-                "    instance.a(SectionPosition.b(cx, cy, cz), new NibbleArray(data));\n" +
-                "}"));
-        this.setStorageDataMethod.forceInitialization();
-
-        // This generated method creates a copy of the live layer
-        this.createCopyMethod.init(new MethodDeclaration(storage_resolver,
-                "public LightEngineStorageArray createCopy() {\n" +
-                "    LightEngineStorageArray copy = instance.b();\n" +
-                "    copy.d();\n" +
-                "    return copy;\n" +
-                "}"));
-        this.createCopyMethod.forceInitialization();
-
-        // This generated method simply reads the nibblearray data and returns a byte[] copy
-        ClassResolver layer_resolver = new ClassResolver();
-        layer_resolver.setDeclaredClassName("net.minecraft.server.LightEngineLayer");
-        this.getLayerDataMethod.init(new MethodDeclaration(layer_resolver,
-                "public byte[] getData(int cx, int cy, int cz) {\n" +
-                "    NibbleArray array = instance.a(SectionPosition.a(cx, cy, cz));\n" +
-                "    if (array == null) {\n" +
-                "        return null;\n" +
-                "    }\n" +
-                "    return array.asBytes();\n" +
-                "}"));
-        this.getLayerDataMethod.forceInitialization();
+        this.light_storage_array_live.setAccessible(true);
     }
 
     @Override
@@ -171,13 +107,8 @@ public class LightingHandler_1_14 extends LightingHandler {
     private byte[] readLayerData(LightEngineThreadedHandle engine, Object layer, int cx, int cy, int cz) throws Throwable {
         if (layer == null) {
             return null;
-        } else if (light_storage_paper_lock != null) {
-            Object storage = this.light_storage.get(layer);
-            synchronized (light_storage_paper_lock.get(storage)) {
-                return getLayerDataMethod.invoke(layer, cx, cy, cz);
-            }
         } else {
-            return getLayerDataMethod.invoke(layer, cx, cy, cz);
+            return this.handle.getData(layer, cx, cy, cz);
         }
     }
 
@@ -283,35 +214,30 @@ public class LightingHandler_1_14 extends LightingHandler {
                     throw new IllegalStateException("Light layer field could not be retrieved");
                 }
 
-                // Paperspigot also has a lock we must use while accessing the data
+                // Apply all the changes we have queued up in one go
                 Object storage = light_storage.get(this.layer);
-                if (light_storage_paper_lock != null) {
-                    synchronized (light_storage_paper_lock.get(storage)) {
-                        run_impl(storage);
+                Object storage_array_live = light_storage_array_live.get(storage);
+                for (UpdateTask task : this.tasks) {
+                    try {
+                        handle.setData(storage_array_live, task.cx, task.cy, task.cz, task.data);
+                    } catch (Throwable t) {
+                        task.error = t;
                     }
-                } else {
-                    run_impl(storage);
                 }
+
+                // There's a small cache of the last two 16x16x16 slices queried
+                // We clear this cache to make sure data is updated
+                handle.clearCache(storage_array_live);
+
+                // This refreshes the thread-safe 'visible' layer
+                // All data updated earlier is copied and the immutable copy is
+                // assigned to a separate 'visible' representation.
+                handle.assignUpdatingToVisible(storage);
             } catch (Throwable t) {
                 for (UpdateTask task : this.tasks) {
                     task.error = t;
                 }
             }
-        }
-
-        // Changes the storage data of the live layer for all pending tasks
-        // Then creates a copy of the entire live layer, making it available
-        private void run_impl(Object storage) throws Throwable {
-            Object storage_live = light_storage_live.get(storage);
-            for (UpdateTask task : this.tasks) {
-                try {
-                    setStorageDataMethod.invoke(storage_live, task.cx, task.cy, task.cz, task.data);
-                } catch (Throwable t) {
-                    task.error = t;
-                }
-            }
-            Object layer_data = createCopyMethod.invoke(storage_live);
-            light_storage_volatile.set(storage, layer_data);
         }
     }
 
@@ -330,5 +256,90 @@ public class LightingHandler_1_14 extends LightingHandler {
             this.cz = cz;
             this.data = data;
         }
+    }
+
+    @Template.Optional
+    @Template.Import("com.destroystokyo.paper.util.map.QueuedChangesMapLong2Object")
+    @Template.Import("net.minecraft.server.MCUtil")
+    @Template.InstanceType("net.minecraft.server.LightEngineStorage")
+    public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
+
+        /*
+         * <GET_LAYER_DATA>
+         * public static byte[] getLayerData(net.minecraft.server.LightEngineLayer layer, int cx, int cy, int cz) {
+         *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
+         *    if (array == null) {
+         *        return null;
+         *    }
+         *    return array.asBytes();
+         * }
+         */
+        @Template.Generated("%GET_LAYER_DATA%")
+        public abstract byte[] getData(Object lightEngineLayer, int cx, int cy, int cz);
+
+        /*
+         * <SET_LIVE_DATA>
+         * public static void setLiveData(net.minecraft.server.LightEngineStorageArray lightEngineStorageArray, int cx, int cy, int cz, byte[] data_bytes) {
+         *     long key = SectionPosition.b(cx, cy, cz);
+         * 
+         * #if exists net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
+         *     // Retrieve previously stored data for releasing, if needed
+         *     #require net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
+         *     QueuedChangesMapLong2Object data = lightEngineStorageArray#data;
+         *     final NibbleArray updating = data.getUpdating(key);
+         * 
+         *     // Queue update of the new data
+         *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
+         * 
+         *     // If previous data was pooled, release that data to prevent a memory leak
+         *     if (updating != null && updating.cleaner != null) {
+         *   #if exists net.minecraft.server.MCUtil public static org.bukkit.scheduler.BukkitTask scheduleTask(int ticks, Runnable runnable, String taskName);
+         *         MCUtil.scheduleTask(2, updating.cleaner, "Light Engine Release");
+         *   #else
+         *         MCUtil.scheduleTask(2, updating.cleaner);
+         *   #endif
+         *     }
+         * #else
+         *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
+         * #endif
+         * }
+         */
+        @Template.Generated("%SET_LIVE_DATA%")
+        public abstract void setData(Object lightEngineStorageArray, int cx, int cy, int cz, byte[] data);
+
+        /*
+         * <CLEAR_CACHE>
+         * public static void setLiveData(net.minecraft.server.LightEngineStorageArray lightEngineStorageArray) {
+         *     lightEngineStorageArray.c();
+         * }
+         */
+        @Template.Generated("%CLEAR_CACHE%")
+        public abstract void clearCache(Object lightEngineStorageArray);
+
+        /*
+         * <ASSIGN_UPDATING_TO_VISIBLE>
+         * public static void assignUpdatingToVisible(net.minecraft.server.LightEngineStorage lightEngineStorage) {
+         * #if exists net.minecraft.server.LightEngineStorage protected final Object visibleUpdateLock;
+         *     #require net.minecraft.server.LightEngineStorage protected final Object visibleUpdateLock;
+         *     Object lock = lightEngineStorage#visibleUpdateLock;
+         *     synchronized (lock)
+         * #endif
+         *     {
+         *         #require net.minecraft.server.LightEngineStorage protected final net.minecraft.server.LightEngineStorageArray liveArray:f;
+         * #if exists net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray e_visible;
+         *         #require net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray visible:e_visible;
+         * #else
+         *         #require net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray visible:e;
+         * #endif
+         * 
+         *         net.minecraft.server.LightEngineStorageArray m0 = lightEngineStorage#liveArray;
+         *         m0 = m0.b();
+         *         m0.d();
+         *         lightEngineStorage#visible = m0;
+         *     }
+         * }
+         */
+        @Template.Generated("%ASSIGN_UPDATING_TO_VISIBLE%")
+        public abstract void assignUpdatingToVisible(Object lightEngineStorage);
     }
 }
