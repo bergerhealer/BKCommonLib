@@ -158,7 +158,9 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #if fieldexists net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
          *     #require net.minecraft.server.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
          *     net.pl3x.purpur.PurpurWorldConfig purpurConfig;
-         *   #if exists net.pl3x.purpur.PurpurWorldConfig public net.pl3x.purpur.PurpurWorldConfig(String worldName);
+         *   #if exists net.pl3x.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
+         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY", org.bukkit.World$Environment.NORMAL);
+         *   #elseif exists net.pl3x.purpur.PurpurWorldConfig public net.pl3x.purpur.PurpurWorldConfig(String worldName);
          *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY");
          *   #else
          *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY", paperConfig, spigotConfig);
