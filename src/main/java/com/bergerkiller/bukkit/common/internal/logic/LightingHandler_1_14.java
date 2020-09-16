@@ -286,7 +286,7 @@ public class LightingHandler_1_14 extends LightingHandler {
          *     // Retrieve previously stored data for releasing, if needed
          *     #require net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
          *     QueuedChangesMapLong2Object data = lightEngineStorageArray#data;
-         *     final NibbleArray updating = data.getUpdating(key);
+         *     final NibbleArray updating = (NibbleArray) data.getUpdating(key);
          * 
          *     // Queue update of the new data
          *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
