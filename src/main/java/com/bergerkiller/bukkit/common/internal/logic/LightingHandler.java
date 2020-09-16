@@ -17,8 +17,7 @@ public abstract class LightingHandler {
                 return new LightingHandler_1_8_to_1_13_2();
             }
         } catch (Throwable t) {
-            t.printStackTrace();
-            return new LightingHandler_Broken();
+            return new LightingHandler_Broken(t);
         }
     }
 

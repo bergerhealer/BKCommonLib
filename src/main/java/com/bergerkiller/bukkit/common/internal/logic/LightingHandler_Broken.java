@@ -5,9 +5,14 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.World;
 
 public class LightingHandler_Broken extends LightingHandler {
+    private final Throwable cause;
+
+    public LightingHandler_Broken(Throwable cause) {
+        this.cause = cause;
+    }
 
     private UnsupportedOperationException fail() {
-        return new UnsupportedOperationException("Failed to initialize lighting handler, BKCommonLib does not support this server");
+        return new UnsupportedOperationException("Failed to initialize lighting handler, BKCommonLib does not support this server", cause);
     }
 
     @Override
