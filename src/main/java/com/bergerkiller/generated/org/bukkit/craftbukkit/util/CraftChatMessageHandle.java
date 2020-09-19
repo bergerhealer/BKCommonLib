@@ -24,8 +24,8 @@ public abstract class CraftChatMessageHandle extends Template.Handle {
         return T.fromComponent.invoke(component);
     }
 
-    public static IChatBaseComponentHandle[] fromString(String message) {
-        return T.fromString.invoke(message);
+    public static IChatBaseComponentHandle[] fromString(String message, boolean keepNewlines) {
+        return T.fromString.invoke(message, keepNewlines);
     }
 
     /**

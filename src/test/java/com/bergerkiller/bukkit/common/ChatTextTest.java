@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.ChatColor;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -92,5 +93,23 @@ public class ChatTextTest {
         ChatText text = ChatText.empty();
         assertEquals("", text.getMessage());
         assertEquals("{\"text\":\"\"}", text.getJson());
+    }
+
+    @Test
+    public void testNewlines() {
+        String message = "hello\nworld";
+        ChatText text = ChatText.fromMessage(message);
+        assertEquals(message, text.getMessage());
+    }
+
+    @Test
+    @Ignore
+    public void testStyleBeforeColor() {
+        //TODO: This appears to be a bug in Bukkit itself
+        //      Not fixing this for now. Just put color before the styling.
+        String message = ChatColor.BOLD.toString() + ChatColor.RED + "test";
+        ChatText text = ChatText.fromMessage(message);
+        System.out.println(text.getJson());
+        assertEquals(message, text.getMessage());
     }
 }

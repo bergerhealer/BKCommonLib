@@ -78,7 +78,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         }
 
         // Use CraftBukkit util's method of parsing
-        handle = CraftChatMessageHandle.fromString(messageText)[0];
+        handle = CraftChatMessageHandle.fromString(messageText, true)[0];
 
         // Find trailing color formatting characters in the message that would otherwise be dropped
         ArrayList<ChatColor> trailing_formatting_chars = new ArrayList<ChatColor>(0);

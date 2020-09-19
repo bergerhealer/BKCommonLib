@@ -183,5 +183,5 @@ class CraftChatMessage {
         return out.toString();
     }
 
-    public static (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] fromString(String message);
+    public static (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] fromString(String message, boolean keepNewlines);
 }
