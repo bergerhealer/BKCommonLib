@@ -828,8 +828,8 @@ public class MapWidget implements MapDisplayEvents {
         absoluteX += this._x;
         absoluteY += this._y;
 
-        // Only do this when the widget has been drawn before
-        if (this.layer != null && this._lastWidth > 0 && this._lastHeight > 0) {
+        // Only do this when the widget has been drawn before (and is not root)
+        if (this != this.root && this.layer != null && this._lastWidth > 0 && this._lastHeight > 0) {
 
             // Detect changes in bounds and invalidate when it happens
             if (this._lastWidth != this._width ||
@@ -951,7 +951,7 @@ public class MapWidget implements MapDisplayEvents {
         // If invalidated, redraw
         if (this._invalidated) {
             this.refreshView(absoluteX, absoluteY);
-            if (this.isVisible()) {
+            if (this != this.root && this.isVisible()) {
                 this.onDraw();
             }
             this._lastX = absoluteX;
@@ -976,7 +976,7 @@ public class MapWidget implements MapDisplayEvents {
                         (otherChild.getY() + otherChild.getHeight()) >= child.getY() &&
                         otherChild.getY() <= (child.getY() + child.getHeight())
                     ) {
-                        otherChild._invalidated = true;
+                        otherChild.invalidate();
                     }
                 }
             }
