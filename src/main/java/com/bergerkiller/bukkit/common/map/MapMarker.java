@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -332,6 +333,7 @@ public final class MapMarker {
      */
     public static final class Type {
         private final boolean available;
+        private final boolean visibleOnItemFrames;
         private final String name;
         private final String displayName;
         private final Color color;
@@ -448,6 +450,7 @@ public final class MapMarker {
             this.displayName = displayName;
             this.color = color;
             this.id = this.available ? (byte) id : fallback.id;
+            this.visibleOnItemFrames = this.id != 0 && this.id != 2 && this.id != 3 && this.id != 6 && this.id != 7;
         }
 
         /**
@@ -498,6 +501,15 @@ public final class MapMarker {
          */
         public boolean isAvailable() {
             return this.available;
+        }
+
+        /**
+         * Gets whether this type of marker is displayed on maps in item frames, or not.
+         * 
+         * @return True if this type of marker is displayed on item frames
+         */
+        public boolean isVisibleOnItemFrames() {
+            return this.visibleOnItemFrames;
         }
 
         /**
