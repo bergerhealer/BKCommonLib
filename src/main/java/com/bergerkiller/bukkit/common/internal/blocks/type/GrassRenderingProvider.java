@@ -25,6 +25,11 @@ public class GrassRenderingProvider extends BlockRenderProvider {
         this.materials.add(CommonLegacyMaterials.getLegacyMaterial("LEAVES"));
         this.materials.add(CommonLegacyMaterials.getLegacyMaterial("LEAVES_2"));
         this.materials.add(CommonLegacyMaterials.getLegacyMaterial("LONG_GRASS"));
+
+        // Vines
+        this.materials.add(CommonLegacyMaterials.getLegacyMaterial("VINE"));
+
+        // All the 1.13+ variants
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {            
             for (Material m : CommonLegacyMaterials.getAllMaterials()) {
                 if (CommonLegacyMaterials.getMaterialName(m).endsWith("_LEAVES")) {
@@ -35,6 +40,7 @@ public class GrassRenderingProvider extends BlockRenderProvider {
             }
             this.materials.add(CommonLegacyMaterials.getMaterial("TALL_GRASS"));
             this.materials.add(CommonLegacyMaterials.getMaterial("GRASS"));
+            this.materials.add(CommonLegacyMaterials.getMaterial("VINE"));
         }
 
         // Remove null materials (Materials not found?)
