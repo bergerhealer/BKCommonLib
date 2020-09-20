@@ -87,7 +87,7 @@ public class MapDisplayMarkerTile {
     }
 
     public byte encodeRotation(double rotation) {
-        return (byte) ((int) (rotation / (360.0 / 16.0)) & 15);
+        return (byte) ((int) ((rotation + 180.0) / (360.0 / 16.0)) & 15);
     }
 
     private static byte encodeToByte(double value) {
