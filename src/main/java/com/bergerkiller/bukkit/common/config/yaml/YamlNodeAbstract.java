@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -682,7 +683,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @throws YAMLException When the YAML-encoded text is malformed or an IO Exception occurs
      */
     public void loadFromStream(InputStream stream) throws YAMLException {
-        loadFromReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        loadFromReader(new InputStreamReader(new BufferedInputStream(stream), StandardCharsets.UTF_8));
     }
 
     /**
