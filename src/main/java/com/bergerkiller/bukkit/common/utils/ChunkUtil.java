@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.collections.FilteredCollection;
 import com.bergerkiller.bukkit.common.collections.List2D;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
@@ -64,20 +63,30 @@ public class ChunkUtil {
     }
 
     /**
-     * Gets an array of vertical Chunk Sections that make up the data of a chunk
+     * Gets an array of vertical Chunk Sections that make up the data of a chunk.
+     * Some array elements may be null, if that slice stores all-air.<br>
+     * <br>
+     * <b>Deprecated: Does not take into account infinite-y size worlds when a modded
+     * server is used that adds that functionality. Only returns the first 16 slices.</b>
      * 
      * @param chunk to get the sections of
-     * @return chunk sections
+     * @return the first 16 chunk sections of the chunk
      */
+    @Deprecated
     public static ChunkSection[] getSections(org.bukkit.Chunk chunk) {
-        Object[] nmsSections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
-        ChunkSection[] sections = new ChunkSection[nmsSections.length];
-        for (int i = 0; i < sections.length; i++) {
-            if (nmsSections[i] != null) {
-                sections[i] = new ChunkSection(ChunkSectionHandle.createHandle(nmsSections[i]));
-            }
-        }
-        return sections;
+        return ChunkHandle.T.getSections.invoke(HandleConversion.toChunkHandle(chunk));
+    }
+
+    /**
+     * Gets a vertical 16-high cube slice of the chunk
+     * 
+     * @param chunk The chunk to get the section of
+     * @param cy The 16x16x16 block section coordinate (same coordinate space as chunk x/z)
+     * @return chunk section at this coordinate, or null if at this coordinate all blocks are air
+     *         and no data is stored here.
+     */
+    public static ChunkSection getSection(org.bukkit.Chunk chunk, int cy) {
+        return ChunkHandle.T.getSection.invoke(HandleConversion.toChunkHandle(chunk), cy);
     }
 
     /**
@@ -186,17 +195,14 @@ public class ChunkUtil {
      * @param data to set to
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, Block block, BlockData data) {
-        if (block.getY() < 0 || block.getY() >= chunk.getWorld().getMaxHeight()) {
-            return;
-        }
-
-        Object[] sections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
         final int secIndex = block.getY() >> 4;
-        Object section = sections[secIndex];
-        if (section == null) {
-            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), block.getY()).getRaw();
+        Object section = (Object[]) ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        if (section != null) {
+            ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
+        } else {
+            // Slow method, to initialize the empty chunk
+            WorldUtil.setBlockData(block, data);
         }
-        ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
     }
 
     /**
@@ -209,17 +215,18 @@ public class ChunkUtil {
      * @param data to set to
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, int x, int y, int z, BlockData data) {
-        if (y < 0 || y >= chunk.getWorld().getMaxHeight()) {
-            return;
-        }
-
-        Object[] sections = (Object[]) ChunkHandle.T.sections.raw.get(HandleConversion.toChunkHandle(chunk));
         final int secIndex = y >> 4;
-        Object section = sections[secIndex];
-        if (section == null) {
-            section = sections[secIndex] = CommonMethods.ChunkSection_new(chunk.getWorld(), y).getRaw();
+        Object section = (Object[]) ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        if (section != null) {
+            ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
+        } else {
+            // Slow method, to initialize the empty chunk
+            WorldUtil.setBlockData(chunk.getWorld(),
+                    (chunk.getX() << 4) | (x & 0xf),
+                    y,
+                    (chunk.getZ() << 4) | (z & 0xf),
+                    data);
         }
-        ChunkSectionHandle.T.setBlockData.invoke(section, x & 0xf, y & 0xf, z & 0xf, data);
     }
 
     /**

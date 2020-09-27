@@ -7,7 +7,6 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
 
-import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 
@@ -15,10 +14,6 @@ public class CommonMethods {
 
     public static BlockState CraftBlockState_new(Block block) {
         return CraftBlockStateHandle.createNew(block);
-    }
-
-    public static ChunkSectionHandle ChunkSection_new(org.bukkit.World world, int y) {
-        return ChunkSectionHandle.createNew(world, y >> 4 << 4);
     }
 
     public static void damageBy(org.bukkit.entity.Entity entity, org.bukkit.entity.Entity damager, double damage) {

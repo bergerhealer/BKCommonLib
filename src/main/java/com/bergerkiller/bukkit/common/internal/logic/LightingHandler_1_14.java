@@ -81,6 +81,11 @@ public class LightingHandler_1_14 extends LightingHandler {
     }
 
     @Override
+    public boolean isSupported(World world) {
+        return true;
+    }
+
+    @Override
     public byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
         LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {

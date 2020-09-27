@@ -13,12 +13,12 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Lighting handler for Minecraft 1.8 to 1.13.2. This is before the introduction
  * of a new asynchronous light engine, which means everything happens on the main thread.
  */
-public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
+public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
     private final LightingLogicHandle handle = Template.Class.create(LightingLogicHandle.class, Common.TEMPLATE_RESOLVER);
 
     @Override
     public boolean isSupported(World world) {
-        return true;
+        return handle.isSupported(HandleConversion.toWorldHandle(world));
     }
 
     @Override
@@ -50,82 +50,86 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
     }
 
     @Template.Optional
+    @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICube")
     @Template.InstanceType("net.minecraft.server.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
+
+        /*
+         * <IS_SUPPORTED>
+         * public static boolean isSupported(net.minecraft.server.WorldServer world) {
+         *     return world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld();
+         * }
+         */
+        @Template.Generated("%IS_SUPPORTED%")
+        public abstract boolean isSupported(Object worldHandle);
+
         /*
          * <GET_SECTION_BLOCK_LIGHT>
-         * public static byte[] getSectionBlockLight(Chunk chunk, int sectionIndex) {
-         *     ChunkSection[] sections = chunk.getSections();
-         *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
-         *         if (section != null) {
-         *             NibbleArray array = section.getEmittedLightArray();
-         *             if (array != null) {
+         * public static byte[] getSectionBlockLight(Chunk chunk, int cy) {
+         *     ICube cube = chunk.getCube(cy);
+         *     ChunkSection section = cube.getStorage();
+         *     if (section != null) {
+         *         NibbleArray array = section.getEmittedLightArray();
+         *         if (array != null) {
          * #if version >= 1.9
-         *                 return array.asBytes();
+         *             return array.asBytes();
          * #else
-         *                 return array.a();
+         *             return array.a();
          * #endif
-         *             }
          *         }
          *     }
          *     return null;
          * }
          */
         @Template.Generated("%GET_SECTION_BLOCK_LIGHT%")
-        public abstract byte[] getSectionBlockLight(Object chunkHandle, int sectionIndex);
+        public abstract byte[] getSectionBlockLight(Object chunkHandle, int cy);
 
         /*
          * <GET_SECTION_SKY_LIGHT>
-         * public static byte[] getSectionSkyLight(Chunk chunk, int sectionIndex) {
-         *     ChunkSection[] sections = chunk.getSections();
-         *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
-         *         if (section != null) {
-         *             NibbleArray array = section.getSkyLightArray();
-         *             if (array != null) {
+         * public static byte[] getSectionSkyLight(Chunk chunk, int cy) {
+         *     ICube cube = chunk.getCube(cy);
+         *     ChunkSection section = cube.getStorage();
+         *     if (section != null) {
+         *         NibbleArray array = section.getSkyLightArray();
+         *         if (array != null) {
          * #if version >= 1.9
-         *                 return array.asBytes();
+         *             return array.asBytes();
          * #else
-         *                 return array.a();
+         *             return array.a();
          * #endif
-         *             }
          *         }
          *     }
          *     return null;
          * }
          */
         @Template.Generated("%GET_SECTION_SKY_LIGHT%")
-        public abstract byte[] getSectionSkyLight(Object chunkHandle, int sectionIndex);
+        public abstract byte[] getSectionSkyLight(Object chunkHandle, int cy);
 
         /*
          * <SET_SECTION_BLOCK_LIGHT>
-         * public static void setSectionBlockLight(Chunk chunk, int sectionIndex, byte[] data) {
-         *     ChunkSection[] sections = chunk.getSections();
-         *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
-         *         if (section != null) {
-         *             section.a(new NibbleArray(data));
-         *         }
+         * public static void setSectionBlockLight(Chunk chunk, int cy, byte[] data) {
+         *     ICube cube = chunk.getCube(cy);
+         *     ChunkSection section = cube.getStorage();
+         *     if (section != null) {
+         *         section.a(new NibbleArray(data));
          *     }
          * }
          */
         @Template.Generated("%SET_SECTION_BLOCK_LIGHT%")
-        public abstract void setSectionBlockLight(Object chunkHandle, int sectionIndex, byte[] data);
+        public abstract void setSectionBlockLight(Object chunkHandle, int cy, byte[] data);
 
         /*
          * <SET_SECTION_SKY_LIGHT>
-         * public static void setSectionSkyLight(Chunk chunk, int sectionIndex, byte[] data) {
-         *     ChunkSection[] sections = chunk.getSections();
-         *     if (sectionIndex >= 0 && sectionIndex < sections.length) {
-         *         ChunkSection section = sections[sectionIndex];
-         *         if (section != null) {
-         *             section.b(new NibbleArray(data));
-         *         }
+         * public static void setSectionSkyLight(Chunk chunk, int cy, byte[] data) {
+         *     ICube cube = chunk.getCube(cy);
+         *     ChunkSection section = cube.getStorage();
+         *     if (section != null) {
+         *         section.b(new NibbleArray(data));
          *     }
          * }
          */
         @Template.Generated("%SET_SECTION_SKY_LIGHT%")
-        public abstract void setSectionSkyLight(Object chunkHandle, int sectionIndex, byte[] data);
+        public abstract void setSectionSkyLight(Object chunkHandle, int cy, byte[] data);
     }
 }

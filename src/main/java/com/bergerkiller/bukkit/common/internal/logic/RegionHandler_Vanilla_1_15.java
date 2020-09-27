@@ -13,28 +13,33 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Handles region-based operations from MC 1.14 onwards
  */
-public class RegionHandler_1_14 extends RegionHandler {
+public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
     private final FastMethod<Object> findRegionFileCache = new FastMethod<Object>();
     private final FastMethod<Collection<Object>> findCacheRegionFileInstances = new FastMethod<Collection<Object>>();
-    private final FastMethod<Collection<IntVector2>> findCacheRegionFileCoordinates = new FastMethod<Collection<IntVector2>>();
+    private final FastMethod<Collection<IntVector3>> findCacheRegionFileCoordinates = new FastMethod<Collection<IntVector3>>();
     private final FastMethod<Object> findRegionFileAt = new FastMethod<Object>();
 
-    public RegionHandler_1_14() {
+    public RegionHandler_Vanilla_1_15() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.RegionFileCache");
+        resolver.setVariable("version", Common.MC_VERSION);
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
-        {
+        // This is slightly different on PaperSpigot, where they changed the IChunkLoader to extend RegionFileCache, rather than adding a field
+        if (CommonUtil.getNMSClass("RegionFileCache").isAssignableFrom(CommonUtil.getNMSClass("PlayerChunkMap"))) {
+            // PaperMC
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
@@ -42,6 +47,31 @@ public class RegionHandler_1_14 extends RegionHandler {
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
                     "    return rfc.cache;\n" +
                     "}");
+            findRegionFileCache.init(findRegionFileCacheMethod);
+        } else {
+            // Spigot/CraftBukkit/vanilla NMS
+            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
+                    "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
+                    "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
+                    "#if exists net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    /*   Paperspigot compatible code  */
+                    "    #require net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    "    RegionFileCache rfc = icl#regionFileCache;\n" +
+                    "#else\n" +
+                    /*   Normal Spigot code */
+                    "    #require net.minecraft.server.IChunkLoader private final IOWorker ioworker:a;\n" +
+                    "    IOWorker ioworker = icl#ioworker;\n" +
+                    "  #if version >= 1.16\n" +
+                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:d;\n" +
+                    "  #else\n" +
+                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:e;\n" +
+                    "  #endif\n" +
+                    "    RegionFileCache rfc = ioworker#cache;\n" +
+                    "#endif\n" +
+                    "    return rfc.cache;\n" +
+                    "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
         }
 
@@ -57,7 +87,7 @@ public class RegionHandler_1_14 extends RegionHandler {
         // Initialize method to obtain all the region coordinates of regions loaded
         {
             MethodDeclaration findCacheRegionFileCoordinatesMethod = new MethodDeclaration(resolver,
-                    "public static Collection<com.bergerkiller.bukkit.common.bases.IntVector2> " +
+                    "public static Collection<com.bergerkiller.bukkit.common.bases.IntVector3> " +
                     "findWorldRegionFileInstances(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache) {\n" +
                     "    it.unimi.dsi.fastutil.longs.LongSet coordSet;\n" +
                     "    it.unimi.dsi.fastutil.longs.LongIterator iter;\n" +
@@ -69,7 +99,7 @@ public class RegionHandler_1_14 extends RegionHandler {
                     "        long coord = iter.nextLong();\n" +
                     "        int coord_x = ChunkCoordIntPair.getX(coord);\n" +
                     "        int coord_z = ChunkCoordIntPair.getZ(coord);\n" +
-                    "        result.add(new com.bergerkiller.bukkit.common.bases.IntVector2(coord_x, coord_z));\n" +
+                    "        result.add(new com.bergerkiller.bukkit.common.bases.IntVector3(coord_x, 0, coord_z));\n" +
                     "    }\n" +
                     "    return result;\n" +
                     "}");
@@ -96,8 +126,8 @@ public class RegionHandler_1_14 extends RegionHandler {
     }
 
     @Override
-    public Set<IntVector2> getRegions(World world) {
-        HashSet<IntVector2> regionIndices = new HashSet<IntVector2>();
+    public Set<IntVector3> getRegions3(World world) {
+        HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
 
         // Add all RegionFile instances in the cache
         Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
@@ -110,7 +140,7 @@ public class RegionHandler_1_14 extends RegionHandler {
             for (String regionFileName : regionFileNames) {
                 File file = new File(regionFolder, regionFileName);
                 if (file.isFile() && file.exists() && file.length() >= 4096) {
-                    IntVector2 coords = getRegionFileCoordinates(file);
+                    IntVector3 coords = getRegionFileCoordinates(file);
                     if (coords != null && !regionIndices.contains(coords)) {
                         regionIndices.add(coords);
                     }
@@ -120,17 +150,15 @@ public class RegionHandler_1_14 extends RegionHandler {
 
         // Look at all loaded chunks of the world and add the regions they are inside of
         for (Chunk chunk : world.getLoadedChunks()) {
-            IntVector2 coords = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
-            if (!regionIndices.contains(coords)) {
-                regionIndices.add(coords);
-            }
+            IntVector3 coords = new IntVector3(chunk.getX() >> 5, 0, chunk.getZ() >> 5);
+            regionIndices.add(coords);
         }
 
         return regionIndices;
     }
 
     @Override
-    public BitSet getRegionChunks(World world, int rx, int rz) {
+    public BitSet getRegionChunks3(World world, int rx, int ry, int rz) {
         BitSet chunks = new BitSet(1024);
 
         Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
@@ -189,7 +217,7 @@ public class RegionHandler_1_14 extends RegionHandler {
         }
 
         //TODO: Optimize!
-        return getRegionChunks(world, rx, rz).get((cz << 5) | cx);
+        return getRegionChunks3(world, rx, 0, rz).get((cz << 5) | cx);
     }
 
     @Override

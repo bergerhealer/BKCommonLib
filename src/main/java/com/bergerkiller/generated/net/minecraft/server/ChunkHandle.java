@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
@@ -28,6 +29,8 @@ public abstract class ChunkHandle extends Template.Handle {
 
     public abstract int getLocX();
     public abstract int getLocZ();
+    public abstract ChunkSection[] getSections();
+    public abstract ChunkSection getSection(int cy);
     public abstract Collection<?> getRawTileEntities();
     public abstract Collection<BlockState> getTileEntities();
     public abstract BlockData getBlockData(IntVector3 blockposition);
@@ -49,8 +52,6 @@ public abstract class ChunkHandle extends Template.Handle {
             return null;
         }
     }
-    public abstract ChunkSectionHandle[] getSections();
-    public abstract void setSections(ChunkSectionHandle[] value);
     public abstract WorldHandle getWorld();
     public abstract void setWorld(WorldHandle value);
     public abstract List<Object>[] getEntitySlices();
@@ -62,13 +63,14 @@ public abstract class ChunkHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
-        public final Template.Field.Converted<ChunkSectionHandle[]> sections = new Template.Field.Converted<ChunkSectionHandle[]>();
         public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
         public final Template.Field.Converted<List<Object>[]> entitySlices = new Template.Field.Converted<List<Object>[]>();
         public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
         public final Template.Method<Integer> getLocX = new Template.Method<Integer>();
         public final Template.Method<Integer> getLocZ = new Template.Method<Integer>();
+        public final Template.Method.Converted<ChunkSection[]> getSections = new Template.Method.Converted<ChunkSection[]>();
+        public final Template.Method.Converted<ChunkSection> getSection = new Template.Method.Converted<ChunkSection>();
         public final Template.Method<Collection<?>> getRawTileEntities = new Template.Method<Collection<?>>();
         public final Template.Method<Collection<BlockState>> getTileEntities = new Template.Method<Collection<BlockState>>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();

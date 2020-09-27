@@ -7,16 +7,16 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
-class Chunk {
-    private final (ChunkSectionHandle[]) ChunkSection[] sections;
+import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
+import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 
+class Chunk {
 #if version >= 1.16
     public final (WorldHandle) WorldServer world;
 #else
@@ -40,6 +40,37 @@ class Chunk {
         return instance.locZ;
     }
 #endif
+
+    public (com.bergerkiller.bukkit.common.wrappers.ChunkSection[]) ChunkSection[] getSections() {
+#if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        World world = instance.getWorld();
+        if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
+            ChunkSection[] sections = new ChunkSection[16];
+            for (int cy = 0; cy < 16; cy++) {
+                sections[cy] = instance.getCube(cy).getStorage();
+            }
+            return sections;
+        }
+#endif
+
+        return instance.getSections();
+    }
+
+    public (com.bergerkiller.bukkit.common.wrappers.ChunkSection) ChunkSection getSection(int cy) {
+#if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        World world = instance.getWorld();
+        if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
+            return instance.getCube(cy).getStorage();
+        }
+#endif
+
+        ChunkSection[] sections = instance.getSections();
+        if (cy >= 0 && cy < sections.length) {
+            return sections[cy];
+        } else {
+            return null;
+        }
+    }
 
     public java.util.Collection<?> getRawTileEntities() {
         return instance.tileEntities.values();
@@ -193,15 +224,6 @@ class ChunkSection {
 #endif
 
     public int getYPosition();
-
-    public static (ChunkSectionHandle) ChunkSection createNew((org.bukkit.World) World world, int y) {
-#if version >= 1.14
-        return new ChunkSection(y);
-#else
-        Boolean hasSkyLight = (Boolean) com.bergerkiller.generated.net.minecraft.server.WorldProviderHandle.T.hasSkyLight.invoke(world.worldProvider);
-        return new ChunkSection(y, hasSkyLight.booleanValue());
-#endif
-    }
 
 #if version >= 1.13
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();

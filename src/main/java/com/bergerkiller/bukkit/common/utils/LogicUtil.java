@@ -12,10 +12,13 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
+import com.bergerkiller.bukkit.common.bases.CheckedSupplier;
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -190,6 +193,42 @@ public class LogicUtil {
      */
     public static <T> T fixNull(T value, T def) {
         return value == null ? def : value;
+    }
+
+    /**
+     * Tries to create an object using a supplier that can possibly throw an exception.
+     * If this happens, the error handler is used to construct a value, instead.
+     * Checked exceptions are handled too, this method primarily exists to support
+     * the java Supplier type directly.
+     * 
+     * @param <T>
+     * @param constructor Main supplier of the result, that can throw an exception
+     * @param errorHandler Function that produces an alternative value, with the error as input
+     * @return supplied value, or the error handler output if an exception occurs
+     */
+    public static <T> T tryCreateUsingSupplier(Supplier<T> supplier, Function<Throwable, T> errorHandler) {
+        try {
+            return supplier.get();
+        } catch (Throwable t) {
+            return errorHandler.apply(t);
+        }
+    }
+
+    /**
+     * Tries to create an object using a supplier that can possibly throw an exception.
+     * If this happens, the error handler is used to construct a value, instead.
+     * 
+     * @param <T>
+     * @param constructor Main supplier of the result, that can throw a checked exception
+     * @param errorHandler Function that produces an alternative value, with the error as input
+     * @return supplied value, or the error handler output if an exception occurs
+     */
+    public static <T> T tryCreate(CheckedSupplier<T> constructor, Function<Throwable, T> errorHandler) {
+        try {
+            return constructor.get();
+        } catch (Throwable t) {
+            return errorHandler.apply(t);
+        }
     }
 
     /**

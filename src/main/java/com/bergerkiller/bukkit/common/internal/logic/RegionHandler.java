@@ -1,59 +1,25 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import java.io.File;
 import java.util.BitSet;
+import java.util.HashSet;
 import java.util.Set;
 
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
 public abstract class RegionHandler implements LazyInitializedObject {
-    public static final RegionHandler INSTANCE;
+    public static final RegionHandler INSTANCE = new RegionHandlerSelector();
 
-    static {
-        if (Common.evaluateMCVersion(">=", "1.15")) {
-            INSTANCE = new RegionHandler_1_15();
-        } else if (Common.evaluateMCVersion(">=", "1.14")) {
-            INSTANCE = new RegionHandler_1_14();
-        } else {
-            INSTANCE = new RegionHandler_1_8();
-        }
-    }
-
-    protected IntVector2 getRegionFileCoordinates(File regionFile) {
-        String regionFileName = regionFile.getName();
-
-        // Parse r.0.0.mca
-        // Step one: verify starts with r. and ends with .mca
-        if (!regionFileName.startsWith("r.") || !regionFileName.endsWith(".mca")) {
-            return null;
-        }
-
-        // Find dot between coordinates
-        int coord_sep_idx = regionFileName.indexOf('.', 2);
-        if (coord_sep_idx == -1 || coord_sep_idx >= regionFileName.length() - 4) {
-            return null;
-        }
-
-        // Parse the two numbers as integers - should succeed
-        try {
-            int rx = Integer.parseInt(regionFileName.substring(2, coord_sep_idx));
-            int rz = Integer.parseInt(regionFileName.substring(coord_sep_idx + 1, regionFileName.length() - 4));
-            return new IntVector2(rx, rz);
-        } catch (Exception ex) {
-        }
-        return null;
-    }
-
-    protected File getRegionFile(World world, int rx, int rz) {
-        File regionsFolder = Common.SERVER.getWorldRegionFolder(world.getName());
-        StringBuilder fileName = new StringBuilder();
-        fileName.append("r.").append(rx).append('.').append(rz).append(".mca");
-        return new File(regionsFolder, fileName.toString());
-    }
+    /**
+     * Gets whether the world specified is supported by this region handler
+     * 
+     * @param world
+     * @return True if this world is supported
+     */
+    public abstract boolean isSupported(World world);
 
     /**
      * Closes all the open files for a world, so that the files can be
@@ -64,12 +30,35 @@ public abstract class RegionHandler implements LazyInitializedObject {
     public abstract void closeStreams(World world);
 
     /**
-     * Gets all region indices for loadable regions of a world
+     * Gets all region indices for loadable regions of a world.
+     * Regions are 32x32x32 areas of chunks. On vanilla Minecraft,
+     * the Y component will always be 0, because it is limited to y=256.
+     * On forge with cubic chunks installed, the y component can also
+     * increase.
+     * 
+     * @param world
+     * @return region coordinates of the world
+     */
+    public abstract Set<IntVector3> getRegions3(World world);
+
+    /**
+     * Gets all region indices for loadable regions of a world.<br>
+     * <br>
+     * <b>Deprecated: use {@link #getRegions3(World)} instead
+     * to support servers with infinite Y-coordinate generation</b>
      * 
      * @param world
      * @return region indices
      */
-    public abstract Set<IntVector2> getRegions(World world);
+    @Deprecated
+    public final Set<IntVector2> getRegions(World world) {
+        Set<IntVector3> coords_3d = getRegions3(world);
+        Set<IntVector2> coords_2d = new HashSet<IntVector2>(coords_3d.size());
+        for (IntVector3 coord : coords_3d) {
+            coords_2d.add(coord.toIntVector2());
+        }
+        return coords_2d;
+    }
 
     /**
      * Gets a bitset of length 1024 containing a True/False of which chunks
@@ -77,10 +66,28 @@ public abstract class RegionHandler implements LazyInitializedObject {
      * 
      * @param world
      * @param rx - region X-coordinate
+     * @param ry - region Y-coordinate
      * @param rz - region Z-coordinate
      * @return bitset of all chunks in a region that exist
      */
-    public abstract BitSet getRegionChunks(World world, int rx, int rz);
+    public abstract BitSet getRegionChunks3(World world, int rx, int ry, int rz);
+
+    /**
+     * Gets a bitset of length 1024 containing a True/False of which chunks
+     * in a region exists.<br>
+     * <br>
+     * <b>Deprecated: use {@link #getRegionChunks3(World, int, int, int)} instead
+     * to support servers with infinite Y-coordinate generation</b>
+     * 
+     * @param world
+     * @param rx - region X-coordinate
+     * @param rz - region Z-coordinate
+     * @return bitset of all chunks in a region that exist
+     */
+    @Deprecated
+    public final BitSet getRegionChunks(World world, int rx, int rz) {
+        return getRegionChunks3(world, rx, 0, rz);
+    }
 
     /**
      * Gets whether a particular chunk exists on disk and can be loaded,

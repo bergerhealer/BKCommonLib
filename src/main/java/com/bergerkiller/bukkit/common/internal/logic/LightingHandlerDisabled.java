@@ -1,18 +1,29 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
-public class LightingHandler_Broken extends LightingHandler {
+import com.bergerkiller.bukkit.common.Logging;
+
+public class LightingHandlerDisabled extends LightingHandler {
     private final Throwable cause;
 
-    public LightingHandler_Broken(Throwable cause) {
+    public LightingHandlerDisabled(Throwable cause) {
         this.cause = cause;
+        if (cause != null) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize lighting handler", cause);
+        }
     }
 
     private UnsupportedOperationException fail() {
         return new UnsupportedOperationException("Failed to initialize lighting handler, BKCommonLib does not support this server", cause);
+    }
+
+    @Override
+    public boolean isSupported(World world) {
+        return false;
     }
 
     @Override

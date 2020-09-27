@@ -4,22 +4,16 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.Common;
-
 public abstract class LightingHandler {
-    public static final LightingHandler INSTANCE = createInstance();
+    public static final LightingHandler INSTANCE = new LightingHandlerSelector();
 
-    private static LightingHandler createInstance() {
-        try {
-            if (Common.evaluateMCVersion(">=", "1.14")) {
-                return new LightingHandler_1_14();
-            } else {
-                return new LightingHandler_1_8_to_1_13_2();
-            }
-        } catch (Throwable t) {
-            return new LightingHandler_Broken(t);
-        }
-    }
+    /**
+     * Gets whether this lighting handler can support operations on the world specified.
+     * 
+     * @param world
+     * @return True if the world is supported
+     */
+    public abstract boolean isSupported(World world);
 
     /**
      * Gets the sky light values for a single 16x16x16 section of blocks

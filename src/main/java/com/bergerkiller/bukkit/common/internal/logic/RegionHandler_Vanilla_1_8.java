@@ -18,7 +18,7 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.bases.IntVector2;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
@@ -33,12 +33,12 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 /**
  * Handles region-based operations from MC 1.8 to MC 1.13.2
  */
-public class RegionHandler_1_8 extends RegionHandler {
+public class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
     private final Class<?> regionFileCacheType = CommonUtil.getNMSClass("RegionFileCache");
     private final FastMethod<Boolean> chunkExists = new FastMethod<Boolean>();
     private final FastField<Map<File, Object>> cacheField = new FastField<Map<File, Object>>();
 
-    public RegionHandler_1_8() {
+    public RegionHandler_Vanilla_1_8() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.ChunkProviderServer");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
@@ -117,7 +117,7 @@ public class RegionHandler_1_8 extends RegionHandler {
     }
 
     @Override
-    public Set<IntVector2> getRegions(World world) {
+    public Set<IntVector3> getRegions3(World world) {
         // Obtain the region file names
         Set<File> regionFiles = new HashSet<File>();
         File regionFolder = Common.SERVER.getWorldRegionFolder(world.getName());
@@ -142,9 +142,9 @@ public class RegionHandler_1_8 extends RegionHandler {
         }
 
         // Parse all found files into the region x and z coordinates
-        HashSet<IntVector2> regionIndices = new HashSet<IntVector2>();
+        HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
         for (File file : regionFiles) {
-            IntVector2 coords = getRegionFileCoordinates(file);
+            IntVector3 coords = getRegionFileCoordinates(file);
             if (coords != null) {
                 regionIndices.add(coords);
             }
@@ -152,17 +152,15 @@ public class RegionHandler_1_8 extends RegionHandler {
 
         // Look at all loaded chunks of the world and add the regions they are inside of
         for (Chunk chunk : world.getLoadedChunks()) {
-            IntVector2 coords = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
-            if (!regionIndices.contains(coords)) {
-                regionIndices.add(coords);
-            }
+            IntVector3 coords = new IntVector3(chunk.getX() >> 5, 0, chunk.getZ() >> 5);
+            regionIndices.add(coords);
         }
 
         return regionIndices;
     }
 
     @Override
-    public BitSet getRegionChunks(World world, int rx, int rz) {
+    public BitSet getRegionChunks3(World world, int rx, int ry, int rz) {
         BitSet chunks = new BitSet(1024);
         File regionFile = getRegionFile(world, rx, rz);
         synchronized (regionFileCacheType) {
