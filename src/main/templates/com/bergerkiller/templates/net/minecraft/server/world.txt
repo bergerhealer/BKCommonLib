@@ -749,7 +749,11 @@ class ChunkProviderServer {
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy proxy;
         proxy = new com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy(consumer, instance, cx, cz);
+  #if forge
+        instance.loadChunk(cx, cz, proxy);
+  #else
         instance.getChunkAt(cx, cz, proxy);
+  #endif
     }
 #endif
 
