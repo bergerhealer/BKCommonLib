@@ -24,7 +24,8 @@ public abstract class PlayerChunkHandle extends Template.Handle {
     /* ============================================================================== */
 
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
-    public abstract void resendAllLighting();
+    public abstract boolean resendChunk();
+    public abstract boolean resendAllLighting();
     public abstract List<Player> getPlayers();
     public abstract Chunk getChunkIfLoaded();
     public abstract IntVector2 getLocation();
@@ -40,7 +41,8 @@ public abstract class PlayerChunkHandle extends Template.Handle {
         public final Template.Field.Boolean done = new Template.Field.Boolean();
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
-        public final Template.Method<Void> resendAllLighting = new Template.Method<Void>();
+        public final Template.Method<Boolean> resendChunk = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> resendAllLighting = new Template.Method<Boolean>();
         public final Template.Method.Converted<List<Player>> getPlayers = new Template.Method.Converted<List<Player>>();
         @Template.Optional
         public final Template.Method.Converted<Chunk> opt_getChunkTryHard_1_14 = new Template.Method.Converted<Chunk>();

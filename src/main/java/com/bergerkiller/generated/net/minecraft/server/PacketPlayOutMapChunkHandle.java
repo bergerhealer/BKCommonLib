@@ -82,16 +82,6 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
         } else {
         }
     }
-
-
-    public static PacketPlayOutMapChunkHandle createNew(org.bukkit.Chunk chunk, int sectionsMask) {
-        if (T.constr_chunk_sectionsMask.isAvailable()) {
-            return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
-        } else {
-            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimensionType().hasSkyLight();
-            return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
-        }
-    }
     public abstract int getX();
     public abstract void setX(int value);
     public abstract int getZ();
@@ -103,11 +93,6 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutMapChunkClass extends Template.Class<PacketPlayOutMapChunkHandle> {
-        @Template.Optional
-        public final Template.Constructor.Converted<PacketPlayOutMapChunkHandle> constr_chunk_flag_sectionsMask = new Template.Constructor.Converted<PacketPlayOutMapChunkHandle>();
-        @Template.Optional
-        public final Template.Constructor.Converted<PacketPlayOutMapChunkHandle> constr_chunk_sectionsMask = new Template.Constructor.Converted<PacketPlayOutMapChunkHandle>();
-
         public final Template.Field.Integer x = new Template.Field.Integer();
         public final Template.Field.Integer z = new Template.Field.Integer();
         @Template.Optional

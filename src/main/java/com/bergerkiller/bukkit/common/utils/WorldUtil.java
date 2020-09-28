@@ -13,8 +13,6 @@ import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
@@ -36,7 +34,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
@@ -49,7 +46,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.List;
@@ -751,21 +747,9 @@ public class WorldUtil extends ChunkUtil {
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSendLight(org.bukkit.World world, int chunkX, int chunkZ) {
-        if (CommonCapabilities.NEW_LIGHT_ENGINE) {
-            // Send light update packet
-            PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
-            PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
-            if (playerChunk == null || playerChunk.getPlayers().isEmpty() || playerChunk.getChunkIfLoaded() == null) {
-                return false;
-            }
-
-            // Force a refresh of all chunk lighting information
-            playerChunk.resendAllLighting();
-            return true;
-        } else {
-            // Light data is sent with chunk data below MC 1.14
-            return queueChunkSend(world, chunkX, chunkZ);
-        }
+        PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
+        PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
+        return playerChunk != null && playerChunk.resendAllLighting();
     }
 
     /**
@@ -792,33 +776,7 @@ public class WorldUtil extends ChunkUtil {
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
         PlayerChunkMapHandle playerChunkMap = CommonNMS.getHandle(world).getPlayerChunkMap();
         PlayerChunkHandle playerChunk = playerChunkMap.getVisibleChunk(chunkX, chunkZ);
-        if (playerChunk == null) {
-            return false;
-        }
-
-        List<Player> players = new ArrayList<Player>(playerChunk.getPlayers());
-        if (players.isEmpty()) {
-            return false;
-        }
-
-        // Retrieve chunk. May be null if not loaded (yet).
-        Chunk chunk = playerChunk.getChunkIfLoaded();
-        if (chunk == null) {
-            return false;
-        }
-
-        // Send light packets first on MC 1.14 and later
-        if (CommonCapabilities.NEW_LIGHT_ENGINE) {
-            playerChunk.resendAllLighting();
-        }
-
-        // Send chunk data itself to all the players
-        CommonPacket packet = PacketType.OUT_MAP_CHUNK.newInstance(chunk, 0x1FFFF);
-        for (Player player : players) {
-            PacketUtil.sendPacket(player, packet);
-        }
-
-        return true;
+        return playerChunk != null && playerChunk.resendChunk();
     }
 
     /**
@@ -1135,29 +1093,69 @@ public class WorldUtil extends ChunkUtil {
     /**
      * Gets all the region indices that can be loaded or are loaded for a world.
      * Regions that have not yet generated chunks are excluded.
-     * Each region has 1024 (32x32) chunks in it.
+     * Each region has 1024 (32x32) chunks in it.<br>
+     * <br>
+     * <b>Deprecated: use {@link #getWorldRegions3(World)} instead
+     * to support servers with infinite Y-coordinate generation</b>
      * 
      * @param world
      * @return
      */
+    @Deprecated
     public static Set<IntVector2> getWorldRegions(World world) {
         return RegionHandler.INSTANCE.getRegions(world);
     }
 
     /**
+     * Gets all the region indices that can be loaded or are loaded for a world.
+     * Regions that have not yet generated chunks are excluded.
+     * Each region has 1024 (32x32) chunks in it. On servers that support infinite
+     * world heights, the Y-value is the Y-region coordinate. There can be 32 chunk
+     * slices in each vertical region.
+     * 
+     * @param world
+     * @return
+     */
+    public static Set<IntVector3> getWorldRegions3(World world) {
+        return RegionHandler.INSTANCE.getRegions3(world);
+    }
+
+    /**
      * Gets all the chunks in a region that have been saved to disk.
      * These chunks are returned as a 1024-length (32x32) bitset.
-     * Chunks that are loaded but have not yet been saved are excluded from the results.
+     * Chunks that are loaded but have not yet been saved are excluded from the results.<br>
+     * <br>
+     * <b>Deprecated: use {@link #getWorldSavedRegionChunks3(World, int, int, int)} instead
+     * to support servers with infinite Y-coordinate generation</b>
      * 
      * @param world
      * @param rx - region X-coordinate
      * @param rz - region Z-coordinate
      * @return bitset of saved chunks in the region
      */
+    @Deprecated
     public static BitSet getWorldSavedRegionChunks(World world, int rx, int rz) {
         return RegionHandler.INSTANCE.getRegionChunks(world, rx, rz);
     }
 
+    /**
+     * Gets all the chunks in a region that have been saved to disk.
+     * These chunks are returned as a 1024-length (32x32) bitset.
+     * Chunks that are loaded but have not yet been saved are excluded from the results.
+     * On servers that support infinite
+     * world heights, the Y-value is the Y-region coordinate. There can be 32 chunk
+     * slices in each vertical region.
+     * 
+     * @param world
+     * @param rx - region X-coordinate
+     * @param rz - region Z-coordinate
+     * @return bitset of saved chunks in the region
+     */
+    public static BitSet getWorldSavedRegionChunks3(World world, int rx, int ry, int rz) {
+        return RegionHandler.INSTANCE.getRegionChunks3(world, rx, ry, rz);
+    }
+
+    
     /**
      * Gets the raw nibble data storing the sky light for a 16x16x16 section of the world
      * 

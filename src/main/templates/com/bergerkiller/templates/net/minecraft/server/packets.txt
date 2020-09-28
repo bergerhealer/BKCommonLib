@@ -1047,23 +1047,6 @@ class PacketPlayOutMapChunk extends Packet {
     }
     </code>
 
-    // MC 1.8.8
-    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, boolean flag, int sectionsMask);
-
-    // MC >= 1.9
-    public optional (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk((org.bukkit.Chunk) Chunk chunk, int sectionsMask);
-
-    <code>
-    public static PacketPlayOutMapChunkHandle createNew(org.bukkit.Chunk chunk, int sectionsMask) {
-        if (T.constr_chunk_sectionsMask.isAvailable()) {
-            return T.constr_chunk_sectionsMask.newInstance(chunk, sectionsMask);
-        } else {
-            boolean flag = !WorldHandle.fromBukkit(chunk.getWorld()).getDimensionType().hasSkyLight();
-            return T.constr_chunk_flag_sectionsMask.newInstance(chunk, flag, sectionsMask);
-        }
-    }
-    </code>
-
     // MC 1.8.8 only
     optional class PacketPlayOutMapChunk.ChunkMap {
         public byte[] data:a;

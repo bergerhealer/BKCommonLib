@@ -8,7 +8,6 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Chunk;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -1274,14 +1273,6 @@ public class NMSPacketClasses {
         };
 
         public final FieldAccessor<Boolean> hasBiomeData = PacketPlayOutMapChunkHandle.T.hasBiomeData.toFieldAccessor();
-
-        public CommonPacket newInstance(Chunk chunk) {
-            return newInstance(chunk, 0xFFFF);
-        }
-
-        public CommonPacket newInstance(Chunk chunk, int sectionsMask) {
-            return new CommonPacket(PacketPlayOutMapChunkHandle.createNew(chunk, sectionsMask).getRaw());
-        }
     }
     
     public static class NMSPacketPlayOutMount extends NMSPacket {

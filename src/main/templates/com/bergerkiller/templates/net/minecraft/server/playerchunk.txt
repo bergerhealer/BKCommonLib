@@ -6,31 +6,118 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+
+import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
+import io.github.opencubicchunks.cubicchunks.api.world.IColumn;
+import io.github.opencubicchunks.cubicchunks.api.world.ICube;
+import io.github.opencubicchunks.cubicchunks.api.world.ICubeWatcher;
 
 class PlayerChunk {
 
-public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
 #if version >= 1.14
-    return (PlayerChunkMap) instance.players;
+        return (PlayerChunkMap) instance.players;
 #elseif version >= 1.9
-    #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap;
-    return instance#playerChunkMap;
+        #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap;
+        return instance#playerChunkMap;
 #elseif version >= 1.8.3
-    #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
-    return instance#playerChunkMap;
+        #require net.minecraft.server.PlayerChunk private final PlayerChunkMap playerChunkMap:this$0;
+        return instance#playerChunkMap;
 #else
-    #require net.minecraft.server.PlayerChunk final PlayerChunkMap playerChunkMap;
-    return instance#playerChunkMap;
+        #require net.minecraft.server.PlayerChunk final PlayerChunkMap playerChunkMap;
+        return instance#playerChunkMap;
 #endif
-}
+    }
+
+    public boolean resendChunk() {
+        Chunk chunk = (Chunk) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getChunkIfLoaded.raw).invoke(instance);
+        if (chunk == null) {
+            return false;
+        }
+
+        // Cubic chunks support
+#if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        if (chunk.getWorld() instanceof ICubicWorld && ((ICubicWorld) chunk.getWorld()).isCubicWorld()) {
+            // Retrieve cube map
+            PlayerChunkMap playerChunkMap = (PlayerChunkMap) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayerChunkMap.raw).invoke(instance);
+            io.github.opencubicchunks.cubicchunks.core.server.PlayerCubeMap playerCubeMap;
+            playerCubeMap = (io.github.opencubicchunks.cubicchunks.core.server.PlayerCubeMap) playerChunkMap;
+
+            // Query cubes in chunk column
+            java.util.Iterator cubes_iter = ((IColumn) chunk).getLoadedCubes().iterator();
+
+            // For all loaded cubes, find the CubeWatcher
+            // If it exists, resend lighting to the players that see it
+            boolean sentChanges = false;
+            while (cubes_iter.hasNext()) {
+                ICube cube = (ICube) cubes_iter.next();
+                ICubeWatcher cubeWatcher = playerCubeMap.getCubeWatcher(cube.getCoords());
+                if (cubeWatcher == null || !cubeWatcher.isSentToPlayers()) {
+                    continue;
+                }
+
+                // Gather list of players to send this cube to using reflection (there's no getter)
+                #require io.github.opencubicchunks.cubicchunks.core.server.CubeWatcher private final readonly it.unimi.dsi.fastutil.objects.ObjectArrayList<net.minecraft.server.EntityPlayer> players;
+                it.unimi.dsi.fastutil.objects.ObjectArrayList obj_players = cubeWatcher#players;
+                Object[] arr_players = obj_players.elements();
+
+                // Send cube to all players that see it according to the watcher
+                int num_players = arr_players.length;
+                for (int i = 0; i < num_players; i++) {
+                    sentChanges = true;
+                    playerCubeMap.scheduleSendCubeToPlayer((io.github.opencubicchunks.cubicchunks.core.world.cube.Cube) cube, (EntityPlayer) arr_players[i]);
+                }
+            }
+
+            // Don't do any of the vanilla code!
+            return sentChanges;
+        }
+#endif
+
+        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        if (players.isEmpty()) {
+            return false;
+        }
+
+        // Resend lighting information first on 1.14 and later
+#if version >= 1.14
+        PlayerChunkHandle.T.resendAllLighting.invoke(instance);
+#endif
+
+        // Create a map chunk packet (version-specific code required)
+#if exists net.minecraft.server.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.server.Chunk chunk, int sectionsMask);
+        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF);
+#else
+        boolean flag = !WorldHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
+        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, flag, 0x1FFFF);
+#endif
+
+        // Send to all players that see this chunk
+        java.util.Iterator iter = players.iterator();
+        while (iter.hasNext()) {
+            EntityPlayer player = (EntityPlayer) iter.next();
+            if (player.playerConnection != null) {
+                player.playerConnection.sendPacket((net.minecraft.server.Packet) packet);
+            }
+        }
+
+        return true;
+    }
 
 #if version >= 1.16
     // Since Minecraft 1.16 the sending of lighting is broken and nothing gets updated
     // We must send the light update packet ourselves
-    public void resendAllLighting() {
+    public boolean resendAllLighting() {
         Chunk chunk = instance.getChunk();
         if (chunk == null) {
-            return;
+            return false;
+        }
+
+        // Check there are players to receive data at all
+        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        if (players.isEmpty()) {
+            return false;
         }
 
         // Reset dirty mask so it does not send twice
@@ -51,15 +138,30 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         // Create a lighting update packet, similar to how it is done in PlayerChunk
         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);
 
-        // Send the packet, with flag=false (!) to make sure it actually works
-        // There appears to be a bug that the server only sends the packet with flag=true,
-        // which looking at the code, causes the packet to only be sent to players exactly [viewdistance]
-        // away from the chunk. This makes no sense whatsoever.
-        #require net.minecraft.server.PlayerChunk private void a(Packet<?> packet, boolean flag);
-        instance#a(packet,false);
+        // Send the packet to all players that can see this player chunk
+        java.util.Iterator players_iter = players.iterator();
+        while (players_iter.hasNext()) {
+            EntityPlayer player = (EntityPlayer) players_iter.next();
+            if (player.playerConnection != null) {
+                player.playerConnection.sendPacket((net.minecraft.server.Packet) packet);
+            }
+        }
+
+        return true;
     }
 #elseif version >= 1.14
-    public void resendAllLighting() {
+    public boolean resendAllLighting() {
+        Chunk chunk = instance.getChunk();
+        if (chunk == null) {
+            return false;
+        }
+
+        // Check there are players to receive data at all
+        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        if (players.isEmpty()) {
+            return false;
+        }
+
   #if version >= 1.14.1
         #require net.minecraft.server.PlayerChunk private int pc_layerLightMask:s;
         #require net.minecraft.server.PlayerChunk private int pc_dirtyBlockLightMask:t;
@@ -75,14 +177,13 @@ public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
         instance#pc_dirtySkyLightMask = 0x3FFFF;
 
         // Update now
-        Chunk chunk = instance.getChunk();
-        if (chunk != null) {
-            instance.a(chunk);
-        }
+        instance.a(chunk);
+        return true;
     }
 #else
-    public void resendAllLighting() {
-        // Unavailable < 1.14
+    public boolean resendAllLighting() {
+        // Send entire chunk instead, lighting isn't separate
+        return ((Boolean) PlayerChunkHandle.T.resendChunk.invoke(instance)).booleanValue();
     }
 #endif
 
