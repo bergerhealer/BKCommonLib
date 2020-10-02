@@ -63,13 +63,15 @@ class IntHashMap {
 
     public List<com.bergerkiller.bukkit.common.wrappers.IntHashMap.Entry> getEntries() {
         #require net.minecraft.server.IntHashMap private transient (Object[]) IntHashMap.IntHashMapEntry<V>[] entries_field:a;
+        #require net.minecraft.server.IntHashMap.IntHashMapEntry (Object) IntHashMap.IntHashMapEntry<V> nextEntry:c;
 
         Object[] entries = instance#entries_field;
         java.util.ArrayList result = new java.util.ArrayList(entries.length);
         for (int i = 0; i < entries.length; i++) {
             Object entry = entries[i];
-            if (entry != null) {
+            while (entry != null) {
                 result.add(new com.bergerkiller.bukkit.common.wrappers.IntHashMap.Entry(entry));
+                entry = entry#nextEntry;
             }
         }
         return java.util.Collections.unmodifiableList(result);
@@ -78,13 +80,15 @@ class IntHashMap {
     public List<Object> getValues() {
         #require net.minecraft.server.IntHashMap private transient (Object[]) IntHashMap.IntHashMapEntry<V>[] entries_field:a;
         #require net.minecraft.server.IntHashMap.IntHashMapEntry public final V getEntryValue:b();
+        #require net.minecraft.server.IntHashMap.IntHashMapEntry (Object) IntHashMap.IntHashMapEntry<V> nextEntry:c;
 
         Object[] entries = instance#entries_field;
         java.util.ArrayList result = new java.util.ArrayList(entries.length);
         for (int i = 0; i < entries.length; i++) {
             Object entry = entries[i];
-            if (entry != null) {
+            while (entry != null) {
                 result.add(entry#getEntryValue());
+                entry = entry#nextEntry;
             }
         }
         return java.util.Collections.unmodifiableList(result);
@@ -94,6 +98,7 @@ class IntHashMap {
         #require net.minecraft.server.IntHashMap private transient (Object[]) IntHashMap.IntHashMapEntry<V>[] entries_field:a;
         #require net.minecraft.server.IntHashMap.IntHashMapEntry public final int getEntryKey:a();
         #require net.minecraft.server.IntHashMap.IntHashMapEntry public final V getEntryValue:b();
+        #require net.minecraft.server.IntHashMap.IntHashMapEntry (Object) IntHashMap.IntHashMapEntry<V> nextEntry:c;
 
         // Because the entry class isn't public it is very difficult to efficiently clone it
         // Instead, we just create a new instance and put all the entries into it
@@ -102,10 +107,11 @@ class IntHashMap {
         Object[] entries = instance#entries_field;
         for (int i = 0; i < entries.length; i++) {
             Object entry = entries[i];
-            if (entry != null) {
+            while (entry != null) {
                 int key = entry#getEntryKey();
                 Object value = entry#getEntryValue();
                 clone.a(key, value);
+                entry = entry#nextEntry;
             }
         }
 
