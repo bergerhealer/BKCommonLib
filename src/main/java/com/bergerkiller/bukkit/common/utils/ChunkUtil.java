@@ -78,6 +78,17 @@ public class ChunkUtil {
     }
 
     /**
+     * Gets the Y-coordinates of the chunk sections (slices of height 16) that are loaded
+     * of a chunk.
+     * 
+     * @param chunk
+     * @return loaded chunk section coordinates
+     */
+    public static List<Integer> getLoadedSectionCoordinates(org.bukkit.Chunk chunk) {
+        return ChunkHandle.T.getLoadedSectionCoordinates.invoke(HandleConversion.toChunkHandle(chunk));
+    }
+
+    /**
      * Gets a vertical 16-high cube slice of the chunk
      * 
      * @param chunk The chunk to get the section of

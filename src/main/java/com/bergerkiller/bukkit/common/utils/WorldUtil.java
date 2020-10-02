@@ -56,6 +56,9 @@ import java.util.concurrent.CompletableFuture;
 public class WorldUtil extends ChunkUtil {
     private static final Template.Method<Object> getBlockData_raw = CraftBlockHandle.T.getBlockData.raw;
 
+    /** The number of chunks on each axis of a single region (32) */
+    public static final int CHUNKS_PER_REGION_AXIS = 32;
+
     /**
      * Gets BlockData for a particular Block
      * 
@@ -1107,6 +1110,22 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets all the region indices that can be loaded or are loaded for a world
+     * that match one of the given 2D flat region coordinates.
+     * Regions that have not yet generated chunks are excluded.
+     * Each region has 1024 (32x32) chunks in it. On servers that support infinite
+     * world heights, the Y-value is the Y-region coordinate. There can be 32 chunk
+     * slices in each vertical region.
+     * 
+     * @param world
+     * @param regionXZCoordinates
+     * @return set of 3D region coordinates
+     */
+    public static Set<IntVector3> getWorldRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        return RegionHandler.INSTANCE.getRegions3ForXZ(world, regionXZCoordinates);
+    }
+
+    /**
      * Gets all the region indices that can be loaded or are loaded for a world.
      * Regions that have not yet generated chunks are excluded.
      * Each region has 1024 (32x32) chunks in it. On servers that support infinite
@@ -1114,7 +1133,7 @@ public class WorldUtil extends ChunkUtil {
      * slices in each vertical region.
      * 
      * @param world
-     * @return
+     * @return set of 3D region coordinates
      */
     public static Set<IntVector3> getWorldRegions3(World world) {
         return RegionHandler.INSTANCE.getRegions3(world);
@@ -1148,6 +1167,7 @@ public class WorldUtil extends ChunkUtil {
      * 
      * @param world
      * @param rx - region X-coordinate
+     * @param ry - region Y-coordinate
      * @param rz - region Z-coordinate
      * @return bitset of saved chunks in the region
      */

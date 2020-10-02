@@ -6,6 +6,7 @@ import java.util.Set;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -61,6 +62,11 @@ public final class RegionHandlerSelector extends RegionHandler {
     @Override
     public void closeStreams(World world) {
         getHandler(world).closeStreams(world);
+    }
+
+    @Override
+    public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        return getHandler(world).getRegions3ForXZ(world, regionXZCoordinates);
     }
 
     @Override

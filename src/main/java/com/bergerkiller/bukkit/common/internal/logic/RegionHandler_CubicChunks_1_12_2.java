@@ -1,16 +1,25 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
@@ -65,46 +74,40 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     }
 
     @Override
-    public Set<IntVector3> getRegions3(World world) {
-        // Obtain the region file names
-        Set<File> regionFiles = new HashSet<File>();
-        File regionFolder = getRegionFolder(world);
-        if (regionFolder.exists()) {
-            File[] regionFilesArr = regionFolder.listFiles();
-            for (File regionFile : regionFilesArr) {
-                if (regionFile.isFile() && regionFile.length() >= 4096) {
-                    regionFiles.add(regionFile);
-                }
-            }
-        }
-
-        // Detect any addition Region Files in the cache that are not yet saved
-        // Synchronized, since we are going to iterate the files here...unsafe not to do so!
-        /*
-        synchronized (regionFileCacheType) {
-            for (File regionFile : getCache().keySet()) {
-                if (regionFile != null && regionFile.getParentFile().equals(regionFolder)) {
-                    regionFiles.add(regionFile);
-                }
-            }
-        }
-        */
-
-        // Parse all found files into the region x and z coordinates
-        HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
-        for (File file : regionFiles) {
-            IntVector3 coords = getRegionFileCoordinates(file);
-            if (coords != null) {
-                regionIndices.add(coords);
-            }
-        }
+    public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        // Obtain the coordinates using the files stored on disk
+        Set<IntVector3> regionIndices = getWorldRegionFileCoordinates(world, c -> {
+            return regionXZCoordinates.contains(c.toIntVector2());
+        });
 
         // Look at all loaded chunks and their cubes of the world and add the regions they are inside of
         for (Chunk chunk : world.getLoadedChunks()) {
+            // Check region is filtered
+            IntVector2 region = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
+            if (!regionXZCoordinates.contains(region)) {
+                continue;
+            }
+
             List<Integer> cubes_y = handle.getLoadedCubesY(HandleConversion.toChunkHandle(chunk));
             for (Integer y : cubes_y) {
-                IntVector3 coords = new IntVector3(chunk.getX() >> 5, y.intValue() >> 6, chunk.getZ() >> 5);
-                regionIndices.add(coords);
+                regionIndices.add(region.toIntVector3(y.intValue() >> 5));
+            }
+        }
+
+        return regionIndices;
+    }
+
+    @Override
+    public Set<IntVector3> getRegions3(World world) {
+        // Obtain the coordinates using the files stored on disk
+        Set<IntVector3> regionIndices = getWorldRegionFileCoordinates(world, c -> true);
+
+        // Look at all loaded chunks and their cubes of the world and add the regions they are inside of
+        for (Chunk chunk : world.getLoadedChunks()) {
+            IntVector2 region = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
+            List<Integer> cubes_y = handle.getLoadedCubesY(HandleConversion.toChunkHandle(chunk));
+            for (Integer y : cubes_y) {
+                regionIndices.add(region.toIntVector3(y.intValue() >> 5));
             }
         }
 
@@ -173,13 +176,30 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         return false;
     }
 
+    // Gets all region file coordinates stored on disk
+    protected HashSet<IntVector3> getWorldRegionFileCoordinates(World world, Predicate<IntVector3> filter) {
+        Path regionPath = getRegionFolder(world).toPath();
+        try {
+            try (Stream<IntVector3> stream = Files.list(regionPath)
+                    .parallel()
+                    .map(path -> getRegionFileCoordinates(path.getFileName().toString()))
+                    .filter(coord -> coord != null)
+                    .filter(filter)
+                    .sequential())
+            {
+                return stream.collect(Collectors.toCollection(HashSet::new));
+            }
+        } catch (IOException e) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to list region files of world " + world.getName(), e);
+            return new HashSet<IntVector3>();
+        }
+    }
+
     protected File getRegionFolder(World world) {
         return new File(Common.SERVER.getWorldFolder(world.getName()), "region3d");
     }
 
-    protected IntVector3 getRegionFileCoordinates(File regionFile) {
-        String regionFileName = regionFile.getName();
-
+    protected IntVector3 getRegionFileCoordinates(String regionFileName) {
         // Parse 0.0.0.3dr
         // Step one: verify starts with r. and ends with .mca
         if (!regionFileName.endsWith(".3dr")) {

@@ -30,6 +30,17 @@ public abstract class RegionHandler implements LazyInitializedObject {
     public abstract void closeStreams(World world);
 
     /**
+     * Gets all the loadable region coordinates that have one of the given flat X/Z coordinates.
+     * This can be used to quickly determine the available Y-coordinates of a large number
+     * of chunks.
+     * 
+     * @param world
+     * @param regionXZCoordinates
+     * @return region coodinates of the world with one of the given x/z coordinates
+     */
+    public abstract Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates);
+
+    /**
      * Gets all region indices for loadable regions of a world.
      * Regions are 32x32x32 areas of chunks. On vanilla Minecraft,
      * the Y component will always be 0, because it is limited to y=256.

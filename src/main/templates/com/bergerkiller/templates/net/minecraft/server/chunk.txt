@@ -41,6 +41,29 @@ class Chunk {
     }
 #endif
 
+    public java.util.List<Integer> getLoadedSectionCoordinates() {
+#if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        World world = instance.getWorld();
+        if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
+            java.util.ArrayList result = new java.util.ArrayList();
+            java.util.Iterator cubes_iter = instance.getLoadedCubes().iterator();
+            while (cubes_iter.hasNext()) {
+                result.add(Integer.valueOf(((ICube) cubes_iter.next()).getY()));
+            }
+            return result;
+        }
+#endif
+
+        java.util.ArrayList result = new java.util.ArrayList();
+        ChunkSection[] sections = instance.getSections();
+        for (int y = 0; y < sections.length; y++) {
+            if (sections[y] != null) {
+                result.add(Integer.valueOf(y));
+            }
+        }
+        return result;
+    }
+
     public (com.bergerkiller.bukkit.common.wrappers.ChunkSection[]) ChunkSection[] getSections() {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         World world = instance.getWorld();

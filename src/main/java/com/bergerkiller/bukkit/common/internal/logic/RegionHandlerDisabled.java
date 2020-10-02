@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 public class RegionHandlerDisabled extends RegionHandler {
@@ -30,6 +31,11 @@ public class RegionHandlerDisabled extends RegionHandler {
 
     @Override
     public void closeStreams(World world) {
+        throw fail();
+    }
+
+    @Override
+    public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
         throw fail();
     }
 

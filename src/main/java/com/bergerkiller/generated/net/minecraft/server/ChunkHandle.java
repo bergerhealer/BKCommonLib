@@ -29,6 +29,7 @@ public abstract class ChunkHandle extends Template.Handle {
 
     public abstract int getLocX();
     public abstract int getLocZ();
+    public abstract List<Integer> getLoadedSectionCoordinates();
     public abstract ChunkSection[] getSections();
     public abstract ChunkSection getSection(int cy);
     public abstract Collection<?> getRawTileEntities();
@@ -69,6 +70,7 @@ public abstract class ChunkHandle extends Template.Handle {
 
         public final Template.Method<Integer> getLocX = new Template.Method<Integer>();
         public final Template.Method<Integer> getLocZ = new Template.Method<Integer>();
+        public final Template.Method<List<Integer>> getLoadedSectionCoordinates = new Template.Method<List<Integer>>();
         public final Template.Method.Converted<ChunkSection[]> getSections = new Template.Method.Converted<ChunkSection[]>();
         public final Template.Method.Converted<ChunkSection> getSection = new Template.Method.Converted<ChunkSection>();
         public final Template.Method<Collection<?>> getRawTileEntities = new Template.Method<Collection<?>>();

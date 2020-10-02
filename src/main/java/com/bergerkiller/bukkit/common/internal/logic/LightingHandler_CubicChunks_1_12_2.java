@@ -52,6 +52,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
     @Template.Optional
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICube")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.cube.Cube")
     @Template.InstanceType("net.minecraft.server.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
 
@@ -73,9 +74,9 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *         NibbleArray array = section.getEmittedLightArray();
          *         if (array != null) {
          * #if version >= 1.9
-         *             return array.asBytes();
+         *             return array.asBytes().clone();
          * #else
-         *             return array.a();
+         *             return array.a().clone();
          * #endif
          *         }
          *     }
@@ -94,9 +95,9 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *         NibbleArray array = section.getSkyLightArray();
          *         if (array != null) {
          * #if version >= 1.9
-         *             return array.asBytes();
+         *             return array.asBytes().clone();
          * #else
-         *             return array.a();
+         *             return array.a().clone();
          * #endif
          *         }
          *     }
@@ -113,6 +114,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
          *         section.a(new NibbleArray(data));
+         *         ((Cube) cube).markDirty();
          *     }
          * }
          */
@@ -126,6 +128,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
          *         section.b(new NibbleArray(data));
+         *         ((Cube) cube).markDirty();
          *     }
          * }
          */

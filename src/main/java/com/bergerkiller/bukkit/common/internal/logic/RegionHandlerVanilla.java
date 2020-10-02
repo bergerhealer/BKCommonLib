@@ -1,20 +1,31 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 /**
  * Vanilla Minecraft region file behavior
  */
 public abstract class RegionHandlerVanilla extends RegionHandler {
-
     @Override
     public boolean isSupported(World world) {
         return true;
+    }
+
+    @Override
+    public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        Set<IntVector3> result = new HashSet<IntVector3>(regionXZCoordinates.size());
+        for (IntVector2 coord : regionXZCoordinates) {
+            result.add(coord.toIntVector3(0));
+        }
+        return result;
     }
 
     protected IntVector3 getRegionFileCoordinates(File regionFile) {
