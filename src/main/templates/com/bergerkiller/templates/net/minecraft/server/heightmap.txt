@@ -110,6 +110,16 @@ class HeightMap {
     // On versions before 1.12.2 and after 1.14, use our own implementation
     // The server offers no method on these versions to do so.
     public void initialize() {
+        // Do not do this when this is a CubicChunks world (!!!)
+  #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        {
+            World world = ((Chunk) instance.chunk).getWorld();
+            if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
+                return;
+            }
+        }
+  #endif
+
         com.bergerkiller.generated.net.minecraft.server.HeightMapHandle handle;
         handle = com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.createHandle(instance);
 
