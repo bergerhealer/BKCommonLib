@@ -62,9 +62,9 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
          *             NibbleArray array = section.getEmittedLightArray();
          *             if (array != null) {
          * #if version >= 1.9
-         *                 return array.asBytes();
+         *                 return array.asBytes().clone();
          * #else
-         *                 return array.a();
+         *                 return array.a().clone();
          * #endif
          *             }
          *         }
@@ -85,9 +85,9 @@ public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
          *             NibbleArray array = section.getSkyLightArray();
          *             if (array != null) {
          * #if version >= 1.9
-         *                 return array.asBytes();
+         *                 return array.asBytes().clone();
          * #else
-         *                 return array.a();
+         *                 return array.a().clone();
          * #endif
          *             }
          *         }
