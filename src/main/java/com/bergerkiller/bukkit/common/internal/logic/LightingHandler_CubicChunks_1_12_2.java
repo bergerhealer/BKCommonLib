@@ -52,6 +52,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
     @Template.Optional
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICube")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.IColumn")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.cube.Cube")
     @Template.InstanceType("net.minecraft.server.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
@@ -67,7 +68,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
 
         /*
          * <GET_SECTION_BLOCK_LIGHT>
-         * public static byte[] getSectionBlockLight(Chunk chunk, int cy) {
+         * public static byte[] getSectionBlockLight(IColumn chunk, int cy) {
          *     ICube cube = chunk.getCube(cy);
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
@@ -88,7 +89,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
 
         /*
          * <GET_SECTION_SKY_LIGHT>
-         * public static byte[] getSectionSkyLight(Chunk chunk, int cy) {
+         * public static byte[] getSectionSkyLight(IColumn chunk, int cy) {
          *     ICube cube = chunk.getCube(cy);
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
@@ -109,7 +110,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
 
         /*
          * <SET_SECTION_BLOCK_LIGHT>
-         * public static void setSectionBlockLight(Chunk chunk, int cy, byte[] data) {
+         * public static void setSectionBlockLight(IColumn chunk, int cy, byte[] data) {
          *     ICube cube = chunk.getCube(cy);
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
@@ -123,7 +124,7 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
 
         /*
          * <SET_SECTION_SKY_LIGHT>
-         * public static void setSectionSkyLight(Chunk chunk, int cy, byte[] data) {
+         * public static void setSectionSkyLight(IColumn chunk, int cy, byte[] data) {
          *     ICube cube = chunk.getCube(cy);
          *     ChunkSection section = cube.getStorage();
          *     if (section != null) {
