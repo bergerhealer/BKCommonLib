@@ -75,9 +75,9 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *         NibbleArray array = section.getEmittedLightArray();
          *         if (array != null) {
          * #if version >= 1.9
-         *             return array.asBytes().clone();
+         *             return (byte[]) array.asBytes().clone();
          * #else
-         *             return array.a().clone();
+         *             return (byte[]) array.a().clone();
          * #endif
          *         }
          *     }
@@ -96,9 +96,9 @@ public class LightingHandler_CubicChunks_1_12_2 extends LightingHandler {
          *         NibbleArray array = section.getSkyLightArray();
          *         if (array != null) {
          * #if version >= 1.9
-         *             return array.asBytes().clone();
+         *             return (byte[]) array.asBytes().clone();
          * #else
-         *             return array.a().clone();
+         *             return (byte[]) array.a().clone();
          * #endif
          *         }
          *     }
