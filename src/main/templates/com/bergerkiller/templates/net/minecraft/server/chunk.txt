@@ -15,6 +15,7 @@ import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
+import io.github.opencubicchunks.cubicchunks.api.world.ICubeProviderServer;
 
 class Chunk {
 #if version >= 1.16
@@ -83,7 +84,13 @@ class Chunk {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         World world = instance.getWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
-            return instance.getCube(cy).getStorage();
+            ICubeProviderServer provider = (ICubeProviderServer) ((ICubicWorld) world).getCubeCache();
+            ICube cube = provider.getCube(instance.locX, cy, instance.locZ, ICubeProviderServer.Requirement.LOAD);
+            if (cube != null) {
+                return cube.getStorage();
+            } else {
+                return null;
+            }
         }
 #endif
 

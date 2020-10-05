@@ -36,7 +36,7 @@ public abstract class RegionHandler implements LazyInitializedObject {
      * 
      * @param world
      * @param regionXZCoordinates
-     * @return region coodinates of the world with one of the given x/z coordinates
+     * @return region coordinates of the world with one of the given x/z coordinates
      */
     public abstract Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates);
 
