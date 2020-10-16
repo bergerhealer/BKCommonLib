@@ -84,6 +84,7 @@ public class CommonBootstrap {
                 // Always Spigot server
                 CommonServer server = new SpigotServer();
                 server.init();
+                initServerResolvers(server);
                 server.postInit();
                 _commonServer = server;
             } else {
@@ -93,6 +94,7 @@ public class CommonBootstrap {
                 servers.add(new MagmaServer());
                 servers.add(new ArclightServer());
                 servers.add(new CatServerServer());
+                servers.add(new Bukkit4FabricServer());
                 servers.add(new PurpurServer());
                 servers.add(new SpigotServer());
                 servers.add(new SportBukkitServer());
@@ -103,6 +105,7 @@ public class CommonBootstrap {
                 for (CommonServer server : servers) {
                     try {
                         if (server.init()) {
+                            initServerResolvers(server);
                             server.postInit();
                             _commonServer = server;
                             break;
@@ -212,12 +215,11 @@ public class CommonBootstrap {
     }
 
     /**
-     * Initializes the type, field and method resolvers for a server, so that such information
-     * can be obtained at runtime.
+     * Registers any resolvers used by the current server handler
      * 
      * @param server
      */
-    private static void initResolvers(CommonServer server) {
+    private static void initServerResolvers(CommonServer server) {
         // Register server to handle field, method and class resolving
         if (server instanceof ClassPathResolver) {
             Resolver.registerClassResolver((ClassPathResolver) server);
@@ -234,7 +236,15 @@ public class CommonBootstrap {
         if (server instanceof CompiledMethodNameResolver) {
             Resolver.registerCompiledMethodResolver((CompiledMethodNameResolver) server);
         }
+    }
 
+    /**
+     * Initializes the type, field and method resolvers for a server, so that such information
+     * can be obtained at runtime.
+     * 
+     * @param server
+     */
+    private static void initResolvers(CommonServer server) {
         // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
         if (Resolver.loadClass("net.minecraft.server.EnumGamemode", false) == null) {
             final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");

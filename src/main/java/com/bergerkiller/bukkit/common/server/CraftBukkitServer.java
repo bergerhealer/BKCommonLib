@@ -4,8 +4,11 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
@@ -73,18 +76,18 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
     public void postInit() {
         try {
             // Find getVersion() method using reflection
-            Class<?> minecraftServerType = Class.forName(NMS_ROOT_VERSIONED + ".MinecraftServer", false, this.getClass().getClassLoader());
-            java.lang.reflect.Method getVersionMethod = minecraftServerType.getMethod("getVersion");
+            Class<?> minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
+            java.lang.reflect.Method getVersionMethod = getDeclaredMethod(minecraftServerType, "getVersion");
 
             // This is easy when the server is already initialized
             if (Bukkit.getServer() != null) {
                 // Obtain MinecraftServer instance from server
-                Class<?> server = Class.forName(CB_ROOT_VERSIONED + ".CraftServer");
+                Class<?> server = loadClass(CB_ROOT_VERSIONED + ".CraftServer");
 
                 // Standard CraftServer::getServer()
                 Object minecraftServerInstance;
                 try {
-                    java.lang.reflect.Method getServerMethod = server.getDeclaredMethod("getServer");
+                    java.lang.reflect.Method getServerMethod = getDeclaredMethod(server, "getServer");
                     minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
                     MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
                     return;
@@ -99,10 +102,10 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
             try {
                 Object gameVersion;
                 try {
-                    Class<?> minecraftVersionClass = Class.forName(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                    Class<?> minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
                     gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
                 } catch (ClassNotFoundException | NoSuchMethodException ex) {
-                    Class<?> sharedConstantsClass = Class.forName(NMS_ROOT_VERSIONED + ".SharedConstants");
+                    Class<?> sharedConstantsClass = loadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
                     gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
                     Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
                 }
@@ -141,6 +144,19 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
         }
 
         return path;
+    }
+
+    private Method getDeclaredMethod(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
+        methodName = Resolver.resolveMethodName(declaringClass, methodName, parameterTypes);
+        return MPLType.getDeclaredMethod(declaringClass, methodName, parameterTypes);
+    }
+
+    private Class<?> loadClass(String name) throws ClassNotFoundException {
+        Class<?> type = Resolver.loadClass(name, false);
+        if (type == null) {
+            throw new ClassNotFoundException("Failed to load class " + name);
+        }
+        return type;
     }
 
     @Override
