@@ -230,6 +230,13 @@
         <!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
         <resources>
             <resource>
+                <directory>.</directory>
+                <filtering>false</filtering>
+                <includes>
+                    <include>LICENSE</include>
+                </includes>
+            </resource>
+            <resource>
                 <directory>src/main/resources</directory>
                 <filtering>true</filtering>
                 <includes>
