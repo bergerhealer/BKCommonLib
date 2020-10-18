@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.math;
 
+import java.util.Iterator;
+
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.internal.CommonTrigMath;
@@ -508,6 +510,15 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Creates a new identity quaternion
+     * 
+     * @return identity quaternion (x=0, y=0, z=0, w=1)
+     */
+    public static Quaternion identity() {
+        return new Quaternion();
+    }
+
+    /**
      * Performs a multiplication between two quaternions.
      * A new quaternion instance is returned.
      * 
@@ -804,6 +815,58 @@ public class Quaternion implements Cloneable {
         double q0f = qd * Math.sin(angle*(1.0-theta));
         double qsf = qd * Math.sin(angle*theta);
         return lerp(q0, qs, q0f, qsf);
+    }
+
+    /**
+     * Produces an average rotation from several different rotation values.
+     * If only one rotation value is specified, then that one value is returned.
+     * If no rotation values are specified, identity is returned.
+     * The returned Quaternion is always a copy.
+     * 
+     * @param values Iterable of Quaternion rotation values
+     * @return average rotation Quaternion
+     */
+    public static Quaternion average(Iterable<Quaternion> values) {
+        Iterator<Quaternion> iter = values.iterator();
+
+        // No values, return identity
+        if (!iter.hasNext()) {
+            return identity();
+        }
+
+        // Only one value, return the one value (make sure to clone!)
+        Quaternion first = iter.next();
+        if (!iter.hasNext()) {
+            return first.clone();
+        }
+
+        // Build up an average
+        int num_values = 1;
+        Quaternion result = first.clone();
+        do {
+            Quaternion next = iter.next();
+            if (first.dot(next) >= 0.0) {
+                result.x += next.x;
+                result.y += next.y;
+                result.z += next.z;
+                result.w += next.w;
+            } else {
+                result.x -= next.x;
+                result.y -= next.y;
+                result.z -= next.z;
+                result.w -= next.w;
+            }
+            num_values++;
+        } while (iter.hasNext());
+
+        // Divide by the number of values, then normalize the result
+        double fact = 1.0 / (double) num_values;
+        result.x *= fact;
+        result.y *= fact;
+        result.z *= fact;
+        result.w *= fact;
+        result.normalize();
+        return result;
     }
 
     // This method is used often for the two-arg rotateX/Y/Z functions

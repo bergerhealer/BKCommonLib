@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -368,6 +370,35 @@ public class MathUtilTest {
             double angle_expected = (1.0-t) * a0 + t * a1;
             double angle_actual = Math.toDegrees(Math.atan2(f.getX(), f.getZ()));
             assertEquals(angle_expected, angle_actual, 0.0000000000001);
+        }
+    }
+
+    @Test
+    public void testQuaternionAverage() {
+        testQuaternionsEqual(Quaternion.identity(), Quaternion.average(Collections.emptyList()));
+        testQuaternionsEqual(new Quaternion(0.4, 0.7, 0.2, 0.5),
+                Quaternion.average(Arrays.asList(new Quaternion(0.4, 0.7, 0.2, 0.5))));
+
+        // Mixed -quaternion and quaternion values, should produce same value
+        {
+            Quaternion value = new Quaternion(0.6, 0.3, 0.2, 0.7);
+            testQuaternionsEqual(value, Quaternion.average(Arrays.asList(
+                    value,
+                    value,
+                    new Quaternion(-value.getX(), -value.getY(), -value.getZ(), -value.getW()),
+                    value
+            )));
+        }
+
+        // Exact angles test
+        {
+            List<Quaternion> values = Arrays.asList(
+                    Quaternion.fromYawPitchRoll(90.0, 20.0, 30.0),
+                    Quaternion.fromYawPitchRoll(90.0, 25.0, 30.0),
+                    Quaternion.fromYawPitchRoll(90.0, 30.0, 30.0)
+            );
+            testQuaternionsEqual(Quaternion.fromYawPitchRoll(90.0, 25.0, 30.0),
+                    Quaternion.average(values));
         }
     }
 
