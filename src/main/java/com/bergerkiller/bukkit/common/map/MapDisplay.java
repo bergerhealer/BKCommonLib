@@ -65,6 +65,7 @@ public class MapDisplay implements MapDisplayEvents {
     private boolean _updateWhenNotViewing = true;
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
+    private boolean _playSoundToAllViewers = false;
     private float _masterVolume = 1.0f;
     private int updateTaskId = -1;
     private ItemStack _oldItem = null;
@@ -787,6 +788,16 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Sets whether sounds played by this display are played to everyone viewing the map (true), or
+     * only to players holding the map in their hands (false)
+     * 
+     * @param everyone
+     */
+    public void setPlaySoundToEveryone(boolean everyone) {
+        this._playSoundToAllViewers = everyone;
+    }
+
+    /**
      * Convenience function for playing sounds to the viewers of this map display
      * 
      * @param soundKey of the sound to play
@@ -804,7 +815,9 @@ public class MapDisplay implements MapDisplayEvents {
      */
     public void playSound(ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         for (Player viewer : this.getViewers()) {
-            PlayerUtil.playSound(viewer, soundKey, this._masterVolume * volume, pitch);
+            if (this._playSoundToAllViewers || this.isHolding(viewer)) {
+                PlayerUtil.playSound(viewer, soundKey, this._masterVolume * volume, pitch);
+            }
         }
     }
 
