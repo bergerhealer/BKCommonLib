@@ -40,6 +40,22 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
         // Force initialization to avoid late catastrophic failing
         reflectionRemapper.forceInitialization();
 
+        // A basic test.
+        /*
+        try {
+            System.out.println(this.resolveClassPath("net.minecraft.server.MinecraftKey"));
+            System.out.println(this.resolveClassPath("net.minecraft.server.ResourceKey"));
+            Class<?> mckey = Class.forName(this.resolveClassPath("net.minecraft.server.MinecraftKey"));
+            Class<?> reskey = Class.forName(this.resolveClassPath("net.minecraft.server.ResourceKey"));
+            System.out.println(this.resolveMethodName(mckey, "a", new Class<?>[0]));
+            for (Method m : reskey.getDeclaredMethods()) {
+                System.out.println("- " + m);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        */
+
         return true;
     }
 
@@ -95,12 +111,13 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
     @Override
     public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
         try {
-            //TODO: Params???
-            Method method = reflectionRemapper.getDeclaredMethodByName(type, methodName);
+            Method method = reflectionRemapper.getDeclaredMethodByName(type, methodName, params);
             if (method != null) {
                 return method.getName();
             }
-        } catch (Throwable t) {}
+        } catch (Throwable t) {
+            t.printStackTrace(); // They really need to fix this.
+        }
 
         return methodName;
     }
@@ -108,12 +125,13 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
         try {
-            //TODO: Params???
             Field field = reflectionRemapper.getDeclaredFieldByName(type, fieldName);
             if (field != null) {
                 return field.getName();
             }
-        } catch (Throwable t) {}
+        } catch (Throwable t) {
+            t.printStackTrace(); // They really need to fix this.
+        }
 
         return fieldName;
     }
@@ -132,8 +150,8 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
         @Template.Generated("public static String mapClassName(String className)")
         public abstract String mapClassName(String className);
 
-        @Template.Generated("public static java.lang.reflect.Method getDeclaredMethodByName(Class<?> calling, String f)")
-        public abstract Method getDeclaredMethodByName(Class<?> type, String name);
+        @Template.Generated("public static java.lang.reflect.Method getDeclaredMethodByName(Class<?> calling, String f, Class<?>[] parms)")
+        public abstract Method getDeclaredMethodByName(Class<?> type, String name, Class<?>[] params);
 
         @Template.Generated("public static java.lang.reflect.Field getDeclaredFieldByName(Class<?> calling, String f)")
         public abstract Field getDeclaredFieldByName(Class<?> type, String fieldName);
