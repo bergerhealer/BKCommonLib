@@ -167,7 +167,6 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         forRegion_base_cx = base_cx;
         forRegion_base_cy = base_cy;
         forRegion_base_cz = base_cz;
-        System.out.println("From existing region(" + regionProvider.getClass() + "   " + callback.getClass());
         return (T) handle.fromExistingRegion(regionProvider, base_cx, base_cy, base_cz, callback);
     }
 
