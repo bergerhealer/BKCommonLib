@@ -11,6 +11,12 @@ class CommonClasses {
      */
 
     public static void init() {
+        // Make sure bootstrap is finished before loading
+        // If not compatible, skip further initialization
+        if (!Common.IS_COMPATIBLE) {
+            return;
+        }
+
         // Conversion
         CommonUtil.loadClass(Common.class);
 
