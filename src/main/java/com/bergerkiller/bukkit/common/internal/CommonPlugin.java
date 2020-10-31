@@ -28,7 +28,6 @@ import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
-import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -80,7 +79,6 @@ public class CommonPlugin extends PluginBase {
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;
     private PermissionHandler permissionHandler = null;
-    private CommonTabController tabController = null;
     private CommonMapController mapController = null;
     private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
@@ -219,16 +217,6 @@ public class CommonPlugin extends PluginBase {
             }
             return meta;
         }
-    }
-
-    /**
-     * Obtains the Tab Controller that is responsible for the creation and
-     * updating of tabs
-     *
-     * @return tab controller
-     */
-    public CommonTabController getTabController() {
-        return tabController;
     }
 
     /**
@@ -421,7 +409,6 @@ public class CommonPlugin extends PluginBase {
         }
         HandlerList.unregisterAll(listener);
         PacketUtil.removePacketListener(this.mapController);
-        PacketUtil.removePacketListener(this.tabController);
 
         // Disable Vehicle mount manager
         this.vehicleMountManager.disable();
@@ -601,10 +588,6 @@ public class CommonPlugin extends PluginBase {
         // NO LONGER USED!!!
         // register(new CommonPacketMonitor(), CommonPacketMonitor.TYPES);
 
-        tabController = new CommonTabController();
-        register(tabController);
-        PacketUtil.addPacketListener(this, tabController, PacketType.OUT_PLAYER_INFO);
-
         mapController = new CommonMapController();
         if (this.isMapDisplaysEnabled) {
             register(mapController);
@@ -614,7 +597,6 @@ public class CommonPlugin extends PluginBase {
 
         startedTasks.add(new MoveEventHandler(this).start(1, 1));
         startedTasks.add(new EntityRemovalHandler(this).start(1, 1));
-        startedTasks.add(new TabUpdater(this).start(1, 1));
         startedTasks.add(new CreaturePreSpawnEventHandlerDetectorTask(this).start(0, 20));
         startedTasks.add(new ObjectCacheCleanupTask(this).start(10, 20*60*30));
 
@@ -628,8 +610,6 @@ public class CommonPlugin extends PluginBase {
         CommonUtil.nextTick(() -> {
             // Set server started state
             isServerStarted = true;
-            // Tell the tabs to initialize the initial dimensions
-            getTabController().setDefaultSize();
         });
 
         // Register listeners and hooks
@@ -750,18 +730,6 @@ public class CommonPlugin extends PluginBase {
             return pluginsParentPath.relativize(filePath).toString();
         } catch (Throwable t) {
             return file.getAbsolutePath();
-        }
-    }
-
-    private static class TabUpdater extends Task {
-
-        public TabUpdater(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            getInstance().getTabController().refreshAllTabs();
         }
     }
 
