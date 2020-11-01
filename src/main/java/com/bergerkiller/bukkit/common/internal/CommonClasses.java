@@ -28,8 +28,6 @@ class CommonClasses {
         loadRef("Recipe", "NBT", "RegionFile", "TileEntity", "ChunkSection", "Block", "Chunk", "World", "WorldServer");
         loadRef("EnumGamemode", "EnumProtocol");
         */
-        // Internal
-        loadCommon("internal.CommonTabController");
         // Logic
         loadLogic("EntityAddRemoveHandler", "EntityMoveHandler", "EntityTypingHandler", "RegionHandler");
         // Utility classes (only those that interact with nms)
