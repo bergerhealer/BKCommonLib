@@ -62,6 +62,7 @@ import com.bergerkiller.bukkit.common.events.map.MapAction;
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
+import com.bergerkiller.bukkit.common.map.MapDisplayProperties;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
@@ -1007,7 +1008,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Clean up from 'dirty' set (probably never needed)
-            dirtyMapUUIDSet.remove(toRemove);
+            dirtyMapUUIDSet.remove(toRemove.getUUID());
         }
     }
 
@@ -1027,26 +1028,15 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // When defined in the NBT of the item, construct the Map Display automatically
-        CommonTagCompound tag = ItemUtil.getMetaTag(event.getMapItem(), false);
-        if (tag != null && !hasDisplay) {
-            String pluginName = tag.getValue("mapDisplayPlugin", String.class);
-            String displayClassName = tag.getValue("mapDisplayClass", String.class);
-            if (pluginName != null && displayClassName != null) {
-                Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
-                Class<?> displayClass = null;
-                if (plugin != null && plugin.isEnabled()) {
+        // Do not do this when one was already assigned (global, or during event handling)
+        MapDisplayProperties properties = MapDisplayProperties.of(event.getMapItem());
+        if (!hasDisplay && !event.hasDisplay() && properties != null) {
+            Class<? extends MapDisplay> displayClass = properties.getMapDisplayClass();
+            if (displayClass != null) {
+                Plugin plugin = properties.getPlugin();
+                if (plugin != null) {
                     try {
-                        displayClass = plugin.getClass().getClassLoader().loadClass(displayClassName);
-                        if (!MapDisplay.class.isAssignableFrom(displayClass)) {
-                            displayClass = null;
-                        }
-                    } catch (ClassNotFoundException e) {
-                        
-                    }
-                }
-                if (displayClass != null && !event.hasDisplay()) {
-                    try {
-                        MapDisplay display = (MapDisplay) displayClass.newInstance();
+                        MapDisplay display = displayClass.newInstance();
                         event.setDisplay((JavaPlugin) plugin, display);;
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();

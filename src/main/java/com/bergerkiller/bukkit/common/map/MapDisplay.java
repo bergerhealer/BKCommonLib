@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.ItemFrame;
@@ -21,13 +22,10 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -74,7 +72,45 @@ public class MapDisplay implements MapDisplayEvents {
     protected JavaPlugin plugin = null;
     private final MapWidgetRoot widgets = new MapWidgetRoot(this);
     private final MapDisplayMarkers markers = new MapDisplayMarkers();
-    protected final MapDisplayProperties properties = new MapDisplayProperties(this);
+
+    /**
+     * Properties of this Map Display. Can be used to store information about
+     * this map display persistently in the map item itself.
+     */
+    protected final MapDisplayProperties properties = new MapDisplayProperties() {
+        @Override
+        public ItemStack getMapItem() {
+            return MapDisplay.this.getMapItem();
+        }
+
+        @Override
+        public String getPluginName() {
+            Plugin plugin = MapDisplay.this.getPlugin();
+            return (plugin != null) ? plugin.getName() : super.getPluginName();
+        }
+
+        @Override
+        public Plugin getPlugin() {
+            Plugin plugin = MapDisplay.this.getPlugin();
+            return (plugin != null) ? plugin : super.getPlugin();
+        }
+
+        @Override
+        public String getMapDisplayClassName() {
+            return MapDisplay.this.getClass().getName();
+        }
+
+        @Override
+        public Class<? extends MapDisplay> getMapDisplayClass() {
+            return MapDisplay.this.getClass();
+        }
+
+        @Override
+        public UUID getUniqueId() {
+            MapDisplayInfo info = MapDisplay.this.getMapInfo();
+            return (info != null) ? info.uuid : super.getUniqueId();
+        }
+    };
 
     /**
      * Initializes this Map Display, setting the owner plugin and what map it represents.
@@ -1364,38 +1400,35 @@ public class MapDisplay implements MapDisplayEvents {
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
-     * when viewed
+     * when viewed<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Class)} instead.
      * 
      * @param mapDisplayClass from a Java Plugin (jar)
      * @return map item
+     * @throws IllegalArgumentException If the map display class is not from a plugin, or lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
      */
     public static ItemStack createMapItem(Class<? extends MapDisplay> mapDisplayClass) {
-        Plugin plugin = CommonUtil.getPluginByClass(mapDisplayClass);
-        if (plugin == null) {
-            throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not belong to a Java Plugin");
-        }
-        return createMapItem(plugin, mapDisplayClass);
+        return MapDisplayProperties.createNew(mapDisplayClass).getMapItem();
     }
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class
-     * when viewed
+     * when viewed.<br>
+     * <br>
+     * To store additional properties for the display, use
+     * {@link MapDisplayProperties#createNew(Plugin, Class)} instead.
      * 
      * @param plugin owner of the display
      * @param mapDisplayClass
      * @return map item
+     * @throws IllegalArgumentException If the map display class lacks a no-args constructor
+     * @throws UnsupportedOperationException If map displays are disabled in BKCommonLib's configuration
      */
     public static ItemStack createMapItem(Plugin plugin, Class<? extends MapDisplay> mapDisplayClass) {
-        if (!CommonPlugin.getInstance().isMapDisplaysEnabled()) {
-            throw new UnsupportedOperationException("Map displays are disabled in BKCommonLib's config.yml!");
-        }
-        ItemStack mapItem = ItemUtil.createItem(CommonMapUUIDStore.FILLED_MAP_TYPE, 1);
-        CommonMapUUIDStore.setItemMapId(mapItem, 0);
-        CommonTagCompound tag = ItemUtil.getMetaTag(mapItem, true);
-        tag.putValue("mapDisplayPlugin", plugin.getName());
-        tag.putValue("mapDisplayClass", mapDisplayClass.getName());
-        tag.putUUID("mapDisplay", CommonMapUUIDStore.generateDynamicMapUUID());
-        return mapItem;
+        return MapDisplayProperties.createNew(plugin, mapDisplayClass).getMapItem();
     }
 
     /**
