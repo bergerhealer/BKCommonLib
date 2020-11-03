@@ -26,31 +26,21 @@ class MinecraftServer {
 #endif
     }
 
-#if version >= 1.16.2
-    public int getTicks:ah();
-#elseif version >= 1.16
-    public int getTicks:ag();
-#elseif version >= 1.15.2
-    public int getTicks:ak();
-#elseif version >= 1.14.4
-    public int getTicks:aj();
-#elseif version >= 1.14
-    public int getTicks:ai();
-#elseif version >= 1.13.1
-    public int getTicks:ah();
-#elseif version >= 1.13
-    public int getTicks:aj();
-#elseif version >= 1.11
-    public int getTicks:aq();
-#elseif version >= 1.9
-    public int getTicks:ap();
-#elseif version >= 1.8.4
-    public int getTicks:at();
-#elseif version >= 1.8.3
-    public int getTicks:as();
-#else
-    public int getTicks:ar();
-#endif
+#select version >=
+#case 1.16.4: public int getTicks:ai();
+#case 1.16.2: public int getTicks:ah();
+#case 1.16:   public int getTicks:ag();
+#case 1.15.2: public int getTicks:ak();
+#case 1.14.4: public int getTicks:aj();
+#case 1.14:   public int getTicks:ai();
+#case 1.13.1: public int getTicks:ah();
+#case 1.13:   public int getTicks:aj();
+#case 1.11:   public int getTicks:aq();
+#case 1.9:    public int getTicks:ap();
+#case 1.8.4:  public int getTicks:at();
+#case 1.8.3:  public int getTicks:as();
+#case else:   public int getTicks:ar();
+#endselect
 
 #if forge
     public boolean isMainThread() {

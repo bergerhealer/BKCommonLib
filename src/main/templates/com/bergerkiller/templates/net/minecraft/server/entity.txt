@@ -961,6 +961,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     // Note: counts rain too as being wet!
 #select version >=
+#case 1.16.4: public boolean isWet:aG();
 #case 1.16.2: public boolean isWet:aF();
 #case 1.16:   public boolean isWet:aC();
 #case 1.15:   public boolean isWet:ay();
@@ -985,6 +986,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      */
     // Note: checks just standing in water! Rain does not count.
 #select version >=
+#case 1.16.4: public boolean isInWaterUpdate:aH();
 #case 1.16.2: public boolean isInWaterUpdate:aG();
 #case 1.16:   public boolean isInWaterUpdate:aD();
 #case 1.15:   public boolean isInWaterUpdate:az();
@@ -1169,10 +1171,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #select version >=
 #case 1.16.2
-    // Since 1.16.2 there's a flag, aY(), which gets whether the 'other' bounding box exists
+    // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
     // Only the Shulker and Boat entity appear to use this flag
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
+  #if version >= 1.16.4
+        return instance.aZ() ? instance.getBoundingBox() : null;
+  #else
         return instance.aY() ? instance.getBoundingBox() : null;
+  #endif
     }
 #case 1.16:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
 #case 1.15:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();

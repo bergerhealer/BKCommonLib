@@ -712,7 +712,9 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
     public static final Key<Boolean> DATA_SMOKING = Key.Type.BOOLEAN.createKey(T.DATA_SMOKING, 16);
     </code>
 
-#if version >= 1.14
+#if version >= 1.16.4
+    public int fuel;
+#elseif version >= 1.14
     private int fuel:e;
 #elseif version >= 1.9
     private int fuel:d;
