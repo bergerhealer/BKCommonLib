@@ -207,7 +207,7 @@ public class ChunkUtil {
      */
     public static void setBlockFast(org.bukkit.Chunk chunk, Block block, BlockData data) {
         final int secIndex = block.getY() >> 4;
-        Object section = (Object[]) ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
+        Object section = ChunkHandle.T.getSection.raw.invoke(HandleConversion.toChunkHandle(chunk), secIndex);
         if (section != null) {
             ChunkSectionHandle.T.setBlockDataAtBlock.invoke(section, block, data);
         } else {
