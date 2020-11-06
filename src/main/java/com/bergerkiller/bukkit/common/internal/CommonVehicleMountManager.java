@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 
@@ -29,6 +31,7 @@ public class CommonVehicleMountManager {
     private final PacketListener listener;
     private final CommonPlugin plugin;
     private final Task cleanupTask;
+    private final Task updateTask;
     private final BiFunction<CommonPlugin, Player, VehicleMountHandler_BaseImpl> _handlerMaker;
     private final PacketType[] _listenedPackets;
 
@@ -40,6 +43,22 @@ public class CommonVehicleMountManager {
             @Override
             public void run() {
                 cleanup();
+            }
+        };
+
+        // Runs every tick to perform routine updates in
+        this.updateTask = new Task(plugin) {
+            private final List<VehicleMountHandler_BaseImpl> tmp = new ArrayList<>();
+
+            @Override
+            public void run() {
+                synchronized (CommonVehicleMountManager.this) {
+                    tmp.clear();
+                    tmp.addAll(_players.values());
+                }
+                for (VehicleMountHandler_BaseImpl handler : tmp) {
+                    handler.update();
+                }
             }
         };
 
@@ -83,6 +102,7 @@ public class CommonVehicleMountManager {
 
     public void enable() {
         this.cleanupTask.start(100, 100);
+        this.updateTask.start(1, 1);
 
         PacketUtil.addPacketMonitor(this.plugin, this.monitor,
                 PacketType.OUT_ENTITY_SPAWN,
@@ -96,6 +116,7 @@ public class CommonVehicleMountManager {
 
     public void disable() {
         this.cleanupTask.stop();
+        this.updateTask.stop();
         PacketUtil.removePacketMonitor(this.monitor);
         PacketUtil.removePacketListener(this.listener);
     }

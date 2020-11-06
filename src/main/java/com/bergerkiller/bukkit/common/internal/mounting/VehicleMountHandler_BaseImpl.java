@@ -5,22 +5,31 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 import org.bukkit.entity.Player;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.server.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityDestroyHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMountHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutNamedEntitySpawnHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 
 /**
  * Base implementation for vehicle mount handlers
@@ -33,6 +42,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     private ResourceKey<DimensionType> _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
     private final Queue<PacketHandle> _queuedPackets;
+    protected int _currentTick = 0;
 
     public VehicleMountHandler_BaseImpl(CommonPlugin plugin, Player player) {
         DimensionType playerDimension = PlayerUtil.getPlayerDimension(player);
@@ -40,7 +50,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         this._plugin = plugin;
         this._player = player;
         this._playerDimension = (playerDimension == null) ? null : playerDimension.getKey();
-        this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId());
+        this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId(), CommonEntityType.PLAYER);
         this._playerSpawnedEntity.state = SpawnedEntity.State.SPAWNED;
         this._spawnedEntities = new IntHashMap<>();
         this._spawnedEntities.put(this._playerSpawnedEntity.id, this._playerSpawnedEntity);
@@ -237,6 +247,13 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     /**
+     * Called every tick to perform routine updates
+     */
+    public void update() {
+        _currentTick++;
+    }
+
+    /**
      * Call this to handle a relevant packet that was sent from the server to the client
      * 
      * @param packet The packet sent
@@ -256,13 +273,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
             // Handle packets
             PacketType type = packet.getType();
-            if (type == PacketType.OUT_ENTITY_SPAWN) {
-                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN.entityId));
-            } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
-                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_LIVING.entityId));
-            } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
-                handleSpawn(packet.read(PacketType.OUT_ENTITY_SPAWN_NAMED.entityId));
-            } else if (type == PacketType.OUT_ENTITY_DESTROY) {
+            if (type == PacketType.OUT_ENTITY_DESTROY) {
                 for (int entityId : packet.read(PacketType.OUT_ENTITY_DESTROY.entityIds)) {
                     handleDespawn(entityId);
                 }
@@ -271,6 +282,46 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 if (dimension != null && !dimension.equals(this._playerDimension)) {
                     this._playerDimension = dimension;
                     handleReset();
+                }
+            } else {
+                if (this.isPositionTracked()) {
+                    // Also decode position
+                    if (type == PacketType.OUT_ENTITY_SPAWN) {
+                        PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
+                    } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
+                        PacketPlayOutSpawnEntityLivingHandle handle = PacketPlayOutSpawnEntityLivingHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
+                    } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
+                        PacketPlayOutNamedEntitySpawnHandle handle = PacketPlayOutNamedEntitySpawnHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), CommonEntityType.PLAYER, new Vector(handle.getPosX(), handle.getPosY(), handle.getPosZ()));
+                    } else if (type == PacketType.OUT_ENTITY_TELEPORT) {
+                        PacketPlayOutEntityTeleportHandle handle = PacketPlayOutEntityTeleportHandle.createHandle(packet.getHandle());
+                        handleMove(handle.getEntityId(), (position) -> {
+                            position.setX(handle.getPosX());
+                            position.setY(handle.getPosY());
+                            position.setZ(handle.getPosZ());
+                        });
+                    } else if (type == PacketType.OUT_ENTITY_MOVE || type == PacketType.OUT_ENTITY_MOVE_LOOK) {
+                        PacketPlayOutEntityHandle handle = PacketPlayOutEntityHandle.createHandle(packet.getHandle());
+                        handleMove(handle.getEntityId(), (position) -> {
+                            position.setX(position.getX() + handle.getDeltaX());
+                            position.setY(position.getY() + handle.getDeltaY());
+                            position.setZ(position.getZ() + handle.getDeltaZ());
+                        });
+                    }
+                } else {
+                    // No decoding/tracking of position
+                    if (type == PacketType.OUT_ENTITY_SPAWN) {
+                        PacketPlayOutSpawnEntityHandle handle = PacketPlayOutSpawnEntityHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), null);
+                    } else if (type == PacketType.OUT_ENTITY_SPAWN_LIVING) {
+                        PacketPlayOutSpawnEntityLivingHandle handle = PacketPlayOutSpawnEntityLivingHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), handle.getCommonEntityType(), null);
+                    } else if (type == PacketType.OUT_ENTITY_SPAWN_NAMED) {
+                        PacketPlayOutNamedEntitySpawnHandle handle = PacketPlayOutNamedEntitySpawnHandle.createHandle(packet.getHandle());
+                        handleSpawn(handle.getEntityId(), CommonEntityType.PLAYER, null);
+                    }
                 }
             }
         });
@@ -323,7 +374,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         return result;
     }
 
-    private final void handleSpawn(int entityId) {
+    private final void handleSpawn(int entityId, CommonEntityType type, Vector position) {
         SpawnedEntity entity = getSpawnedEntity(entityId, true);
         if (entity == null || entity == this._playerSpawnedEntity) {
             return;
@@ -342,6 +393,9 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         } else {
             // Allow the spawn
             entity.state = SpawnedEntity.State.SPAWNED;
+            entity.type = type;
+            entity.position = position;
+            entity.position_sync = _currentTick;
             onSpawned(entity);
         }
     }
@@ -366,6 +420,18 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             break;
         default:
             break;
+        }
+    }
+
+    private final void handleMove(int entityId, Consumer<Vector> modify) {
+        SpawnedEntity entity = getSpawnedEntity(entityId, false);
+        if (entity != null && (entity.vehicleMount == null || !entity.vehicleMount.sent)) {
+            if (entity.position == null) {
+                entity.position = new Vector();
+            }
+            modify.accept(entity.position);
+            entity.position_sync = _currentTick;
+            entity.propagatePosition();
         }
     }
 
@@ -415,7 +481,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      * 
      * @param entityId The entity id to query
      * @param create Whether to create an entry when the entity isn't spawned and no mounts are active
-     * @return mounts
+     * @return spawned entity
      */
     protected final SpawnedEntity getSpawnedEntity(int entityId, boolean create) {
         SpawnedEntity spawnedEntity = this._spawnedEntities.get(entityId);
@@ -490,10 +556,21 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     protected abstract void onPacketReceive(CommonPacket packet);
 
     /**
+     * Gets whether the position of spawned entities are tracked for use in
+     * this vehicle mount handler.
+     * 
+     * @return True if tracked, false otherwise
+     */
+    protected boolean isPositionTracked() {
+        return false;
+    }
+
+    /**
      * Metadata of a single spawned entity
      */
     protected static final class SpawnedEntity {
         public final int id;
+        public CommonEntityType type;
         public State state;
         /**
          * Active mounted passengers, where this entity is a vehicle of.
@@ -504,12 +581,47 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
          * Null if this entity is not mounted inside a vehicle.
          */
         public Mount vehicleMount; // Vehicle of this entity
+        /**
+         * Last synchronized position of the entity.
+         * Null if not tracked by the vehicle mount handler.
+         */
+        public Vector position;
+        /**
+         * Last (server) tick time the position was updated
+         */
+        public int position_sync;
 
         public SpawnedEntity(int entityId) {
+            this(entityId, CommonEntityType.UNKNOWN);
+        }
+
+        public SpawnedEntity(int entityId, CommonEntityType type) {
             this.id = entityId;
             this.state = State.DESPAWNED;
             this.passengerMounts = Collections.emptyList();
             this.vehicleMount = null;
+            this.position = null;
+            this.position_sync = -1;
+            this.type = type;
+        }
+
+        /**
+         * Applies the new position information of this entity to
+         * the passengers of this entity (recursively).
+         */
+        public void propagatePosition() {
+            for (Mount mount : this.passengerMounts) {
+                if (mount.sent) {
+                    //TODO: Relative position offsets?
+                    if (mount.passenger.position == null) {
+                        mount.passenger.position = this.position.clone();
+                    } else {
+                        MathUtil.setVector(mount.passenger.position, this.position);
+                    }
+                    mount.passenger.position_sync = this.position_sync;
+                    mount.passenger.propagatePosition();
+                }
+            }
         }
 
         /**

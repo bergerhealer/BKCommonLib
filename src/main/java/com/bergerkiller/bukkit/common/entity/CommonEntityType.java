@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -44,6 +45,7 @@ public class CommonEntityType {
     private static final CommonPair[] commonPairs;
     private static final EnumMap<EntityType, CommonEntityType> byEntityType = new EnumMap<EntityType, CommonEntityType>(EntityType.class);
     public static final CommonEntityType UNKNOWN = new CommonEntityType(EntityType.UNKNOWN, true);
+    public static final CommonEntityType PLAYER;
 
     public final ClassTemplate<?> nmsType;
     public final ClassTemplate<?> commonType;
@@ -54,6 +56,7 @@ public class CommonEntityType {
     public final int entityTypeId;
     public final int objectTypeId;
     public final int objectExtraData;
+    public final int moveTicks;
     public final EntityTypesHandle nmsEntityType;
 
     private CommonEntityType(EntityType entityType, boolean nullInitialize) {
@@ -71,6 +74,7 @@ public class CommonEntityType {
             this.nmsEntityType = null;
             this.objectTypeId = -1;
             this.objectExtraData = -1;
+            this.moveTicks = 3;
             return;
         }
 
@@ -243,6 +247,13 @@ public class CommonEntityType {
         }
         if (this.objectTypeId != -1) {
             byObjectTypeId.put(this.objectTypeId, this);
+        }
+
+        //TODO: Can this be read from somewhere?
+        if (this.nmsType.getType() != null && EntityMinecartAbstractHandle.T.isAssignableFrom(this.nmsType.getType())) {
+            this.moveTicks = 5;
+        } else {
+            this.moveTicks = 3;
         }
     }
 
@@ -487,5 +498,8 @@ public class CommonEntityType {
             byNMS.put(commonEntityType.nmsType, commonEntityType);
             byEntityType.put(entityType, commonEntityType);
         }
+
+        // Some constant types that are always available
+        PLAYER = byEntityType.get(EntityType.PLAYER);
     }
 }

@@ -86,6 +86,7 @@ public class CommonPlugin extends PluginBase {
     private CommonVehicleMountManager vehicleMountManager = null;
     private boolean isFrameTilingSupported = true;
     private boolean isMapDisplaysEnabled = true;
+    private boolean teleportPlayersToSeat = true;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -112,6 +113,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isMapDisplaysEnabled() {
         return isMapDisplaysEnabled;
+    }
+
+    public boolean teleportPlayersToSeat() {
+        return teleportPlayersToSeat;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -499,6 +504,10 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("enableMapDisplays", "When enabled, the map item tracking may impose a slight overhead");
         config.addHeader("enableMapDisplays", "If no plugin is using map displays, then this can be safely disabled to improve performance");
         this.isMapDisplaysEnabled = config.get("enableMapDisplays", true);
+        config.setHeader("teleportPlayersToSeat", "\nWhether to teleport players to their supposed seat while they hold the sneak button");
+        config.addHeader("teleportPlayersToSeat", "This is used on Minecraft 1.16 and later to make sure players stay near their seat,");
+        config.addHeader("teleportPlayersToSeat", "when exiting the seat was cancelled.");
+        this.teleportPlayersToSeat = config.get("teleportPlayersToSeat", true);
         config.save();
 
         // Welcome message
