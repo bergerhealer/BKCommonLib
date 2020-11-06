@@ -396,10 +396,23 @@ public class CommonBootstrap {
         }
 
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
-        if (evaluateMCVersion("<", "1.15.2") ||
-            (evaluateMCVersion("==", "1.15.2") && CommonUtil.getCBClass("util.CraftLegacy") != null))
         {
-            remappings.put(cb_root + ".legacy.CraftLegacy", cb_root + ".util.CraftLegacy");
+            boolean craftLegacyIsInUtil;
+            if (evaluateMCVersion("<", "1.15.2")) {
+                craftLegacyIsInUtil = true;
+            } else if (evaluateMCVersion("==", "1.15.2")) {
+                try {
+                    Class.forName(cb_root + ".legacy.CraftLegacy");
+                    craftLegacyIsInUtil = false;
+                } catch (Throwable t) {
+                    craftLegacyIsInUtil = true;
+                }
+            } else {
+                craftLegacyIsInUtil = false;
+            }
+            if (craftLegacyIsInUtil) {
+                remappings.put(cb_root + ".legacy.CraftLegacy", cb_root + ".util.CraftLegacy");
+            }
         }
 
         // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
