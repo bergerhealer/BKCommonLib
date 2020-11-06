@@ -4,11 +4,9 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInFlyingHandle;
@@ -31,7 +29,6 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
             PacketType.IN_POSITION, PacketType.IN_POSITION_LOOK, PacketType.OUT_MOUNT,
             PacketType.OUT_ENTITY_TELEPORT, PacketType.OUT_ENTITY_MOVE, PacketType.OUT_ENTITY_MOVE_LOOK};
     private boolean _is_sneaking;
-    private final Task _remountTask;
     private Vector in_pos = null;
     private Vector last_pos = null;
     private final Vector curr_pos = new Vector();
@@ -41,24 +38,11 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
     public VehicleMountHandler_1_16(CommonPlugin plugin, Player player) {
         super(plugin, player);
         this._is_sneaking = false;
-        this._remountTask = new Task(plugin) {
-            @Override
-            public void run() {
-                synchronizeAndQueuePackets(() -> {
-                    remount();
-                });
-            }
-        };
     }
 
     @Override
     protected boolean isPositionTracked() {
         return _plugin.teleportPlayersToSeat();
-    }
-
-    @Override
-    protected void onRemoved() {
-        this._remountTask.stop();
     }
 
     @Override
