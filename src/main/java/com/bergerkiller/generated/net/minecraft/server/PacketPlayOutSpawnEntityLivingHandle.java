@@ -62,12 +62,26 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         }
     }
 
+    public static boolean isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType type) {
+        return type != null && type.entityTypeId != -1;
+    }
+
     public static boolean isEntityTypeSupported(org.bukkit.entity.EntityType type) {
-        if (type == null) {
-            return false;
+        return type != null && isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
+    }
+
+    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            throw new IllegalArgumentException("Input CommonEntityType is null");
         }
-        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
-        return typeId != -1;
+        if (commonEntityType.entityTypeId == -1) {
+            throw new IllegalArgumentException("Input CommonEntityType " + commonEntityType.toString() + " cannot be spawned using this packet");
+        }
+        setEntityTypeId(commonEntityType.entityTypeId);
+    }
+
+    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
+        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId());
     }
 
     public void setEntityType(org.bukkit.entity.EntityType type) {
@@ -82,7 +96,7 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     }
 
     public org.bukkit.entity.EntityType getEntityType() {
-        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId()).entityType;
+        return getCommonEntityType().entityType;
     }
 
     public double getPosX() {
