@@ -87,6 +87,7 @@ public class CommonPlugin extends PluginBase {
     private boolean isFrameTilingSupported = true;
     private boolean isMapDisplaysEnabled = true;
     private boolean teleportPlayersToSeat = true;
+    private boolean forceSynchronousSaving = false;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -117,6 +118,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean teleportPlayersToSeat() {
         return teleportPlayersToSeat;
+    }
+
+    public boolean forceSynchronousSaving() {
+        return forceSynchronousSaving;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -508,6 +513,12 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("teleportPlayersToSeat", "This is used on Minecraft 1.16 and later to make sure players stay near their seat,");
         config.addHeader("teleportPlayersToSeat", "when exiting the seat was cancelled.");
         this.teleportPlayersToSeat = config.get("teleportPlayersToSeat", true);
+        config.setHeader("forceSynchronousSaving", "\nWhether to force saving to be done synchronously, rather than asynchronously");
+        config.addHeader("forceSynchronousSaving", "If the Asynchronous File I/O in the JVM has a glitch in it, it might cause very large");
+        config.addHeader("forceSynchronousSaving", "corrupt (.yml) files to be generated. On server restart this can cause a loss of data.");
+        config.addHeader("forceSynchronousSaving", "Synchronous saving (such as YAML) may hurt server performance for large files,");
+        config.addHeader("forceSynchronousSaving", "but will prevent these issues from happening.");
+        this.forceSynchronousSaving = config.get("forceSynchronousSaving", false);
         config.save();
 
         // Welcome message

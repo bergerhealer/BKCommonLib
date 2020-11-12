@@ -1,15 +1,19 @@
 package com.bergerkiller.bukkit.common.config;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.CharArrayReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -61,7 +65,37 @@ public class FileConfiguration extends BasicConfiguration {
             return;
         }
         try {
-            this.loadFromStream(new FileInputStream(this.file));
+            if (CommonPlugin.hasInstance() && CommonPlugin.getInstance().forceSynchronousSaving()) {
+                char[] data;
+                {
+                    // Read bytes
+                    byte[] data_bytes = Files.readAllBytes(this.file.toPath());
+
+                    // Decode as char[] using UTF-8
+                    String s = new String(data_bytes, StandardCharsets.UTF_8);
+                    data = s.toCharArray();
+                }
+
+                // Safety: erase any use of 0-char values in the original data
+                for (int i = 0; i < data.length; i++) {
+                    if (data[i] == 0) {
+                        int num_nul_chars = 1;
+                        for (int j = i+1; j < data.length && data[j] == 0; j++) {
+                            num_nul_chars++;
+                        }
+                        char[] new_data = new char[data.length - num_nul_chars];
+                        System.arraycopy(data, 0, new_data, 0, i);
+                        System.arraycopy(data, i + num_nul_chars, new_data, i, new_data.length - i);
+                        data = new_data;
+                        i--;
+                    }
+                }
+
+                // Load it in
+                this.loadFromReader(new CharArrayReader(data));
+            } else {
+                this.loadFromStream(new FileInputStream(this.file));
+            }
         } catch (Throwable t) {
         	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "'");
             try {

@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.io;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.channels.AsynchronousFileChannel;
@@ -18,6 +20,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
@@ -214,22 +217,38 @@ public class AsyncTextWriter {
             // Create directories of where the file is located
             file.getParentFile().mkdirs();
 
-            // Open the file. May throw an error.
-            AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(file.toPath(),
-                    StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+            if (!CommonPlugin.hasInstance() || CommonPlugin.getInstance().forceSynchronousSaving()) {
+                // Perform all the writing right here, rather than asynchronously on another thread
+                // Do it in chunks
+                try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {
+                    char[] tmp = new char[4096];
+                    int remaining;
+                    while ((remaining = Math.min(tmp.length, inputData.remaining())) > 0) {
+                        inputData.get(tmp, 0, remaining);
+                        writer.write(tmp, 0, remaining);
+                    }
+                }
 
-            // Pick an appropriate buffer size. We don't need a large buffer for small amounts of text.
-            // Use size that is a power of 2 because it might be more performant
-            int bufferSize = 512;
-            int len = inputData.length();
-            while (len > bufferSize && bufferSize < 16384) {
-                bufferSize <<= 1;
+                // Done!
+                return CompletableFuture.completedFuture(null);
+            } else {
+                // Open the file. May throw an error.
+                AsynchronousFileChannel fileChannel = AsynchronousFileChannel.open(file.toPath(),
+                        StandardOpenOption.CREATE, StandardOpenOption.WRITE, StandardOpenOption.TRUNCATE_EXISTING);
+
+                // Pick an appropriate buffer size. We don't need a large buffer for small amounts of text.
+                // Use size that is a power of 2 because it might be more performant
+                int bufferSize = 512;
+                int len = inputData.length();
+                while (len > bufferSize && bufferSize < 16384) {
+                    bufferSize <<= 1;
+                }
+
+                // Create the writer and initiate it
+                AsyncTextWriter writer = new AsyncTextWriter(fileChannel, inputData, bufferSize);
+                writer.start(LOCK_FILE);
+                return writer._future;
             }
-
-            // Create the writer and initiate it
-            AsyncTextWriter writer = new AsyncTextWriter(fileChannel, inputData, bufferSize);
-            writer.start(LOCK_FILE);
-            return writer._future;
         } catch (Throwable t) {
             CompletableFuture<Void> future = new CompletableFuture<Void>();
             future.completeExceptionally(t);
