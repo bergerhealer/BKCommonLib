@@ -217,7 +217,7 @@ public class AsyncTextWriter {
             // Create directories of where the file is located
             file.getParentFile().mkdirs();
 
-            if (!CommonPlugin.hasInstance() || CommonPlugin.getInstance().forceSynchronousSaving()) {
+            if (CommonPlugin.hasInstance() && CommonPlugin.getInstance().forceSynchronousSaving()) {
                 // Perform all the writing right here, rather than asynchronously on another thread
                 // Do it in chunks
                 try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file), StandardCharsets.UTF_8)) {

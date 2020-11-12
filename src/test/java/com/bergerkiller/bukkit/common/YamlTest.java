@@ -16,6 +16,7 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.util.Vector;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlDeserializer;
 import com.bergerkiller.bukkit.common.config.yaml.YamlNode;
@@ -858,6 +859,54 @@ public class YamlTest {
                 "      - value2\n" +
                 "      -  - value3\n" +
                 "         - value4\n");
+
+        // Verification
+        verifyDeserializeResults(output);
+    }
+
+    @Test
+    public void testYamlDeserializeFailure() {
+        // Checks that when the YAML deserializer fails to deserialize something it does not fail
+        // all future deserialization attempts. This is forced by inputting a very large null-padded
+        // string, which should fill any temporary buffers with invalid data.
+
+        // Deserialize some invalid YAML
+        try {
+            StringBuilder ss = new StringBuilder();
+            ss.append("# This is a header\n" +
+                    "\n" +
+                    "key:\n" +
+                    "  subkey: value");
+            for (int n = 0; n < 100000; n++) {
+                ss.append("\0\0\0\0");
+            }
+
+            YamlDeserializer.INSTANCE.deserialize(ss.toString());
+
+            fail("Should not succeed in deserializing");
+        } catch (YAMLException ex) {
+        }
+
+        // Deserialize some valid YAML
+        YamlDeserializer.Output output = YamlDeserializer.INSTANCE.deserialize(
+                "#> Main file header\n" +
+                "\n" +
+                "# Header of hello\n" +
+                "hello:\n" +
+                "  # Header of cool\n" +
+                "  cool:\n" +
+                "\t\t# Header of text\n" +
+                "\n" +
+                "    # With a line gap in-between\n" +
+                "  \ttext: '&cColored text&&ampersand'\n" +
+                "\n" +
+                "    value: -5\n" +
+                "    123: 55\n" +
+                "  *:\n" +
+                "    - value1\n" +
+                "    - value2\n" +
+                "    - - value3\n" +
+                "      - value4\n");
 
         // Verification
         verifyDeserializeResults(output);

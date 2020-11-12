@@ -116,6 +116,8 @@ public class YamlDeserializer {
             this.nodeBuilder.reset(-1);
             this.mainHeader.setLength(0);
             this.headers.clear();
+            this.currentColumn = 0;
+            this.currentLine.setLength(0);
         }
 
         @Override
