@@ -453,32 +453,44 @@ public class StringUtil {
     }
 
     /**
-     * Converts the arguments to turn "-surrounded parts into a single element
+     * Converts the argument list to turn "-surrounded arguments into a single argument.
+     * To use "-characters, it can be escaped using \"
+     * 
+     * @param args Input argument array
+     * @return new array with the converted arguments
      */
     public static String[] convertArgs(String[] args) {
-        ArrayList<String> tmpargs = new ArrayList<String>(args.length);
-        boolean isCommenting = false;
+        return convertArgsList(Arrays.asList(args)).toArray(new String[0]);
+    }
+
+    /**
+     * Converts the argument list to turn "-surrounded arguments into a single argument.
+     * The "-characters not surrounded by spaces are not interpreted.
+     * To specify a single "-character as argument around spaces, it can be supplied as <code>"""</code>.<br>
+     * <br>
+     * For example:
+     * <pre>
+     * [0] = these
+     * [1] = are
+     * [2] = "command
+     * [3] = """arguments""
+     * </pre>
+     * Becomes:
+     * <pre>
+     * [0] = these
+     * [1] = are
+     * [2] = command "arguments"
+     * </pre>
+     * 
+     * @param args Input argument list or iterable
+     * @return New LinkedList with the converted arguments
+     */
+    public static LinkedList<String> convertArgsList(Iterable<String> args) {
+        StringArgTokenizer tokenizer = new StringArgTokenizer();
         for (String arg : args) {
-            if (!isCommenting && (arg.startsWith("\"") || arg.startsWith("'"))) {
-                if (arg.endsWith("\"") && arg.length() > 1) {
-                    tmpargs.add(arg.substring(1, arg.length() - 1));
-                } else {
-                    isCommenting = true;
-                    tmpargs.add(arg.substring(1));
-                }
-            } else if (isCommenting && (arg.endsWith("\"") || arg.endsWith("'"))) {
-                arg = arg.substring(0, arg.length() - 1);
-                arg = tmpargs.get(tmpargs.size() - 1) + " " + arg;
-                tmpargs.set(tmpargs.size() - 1, arg);
-                isCommenting = false;
-            } else if (isCommenting) {
-                arg = tmpargs.get(tmpargs.size() - 1) + " " + arg;
-                tmpargs.set(tmpargs.size() - 1, arg);
-            } else {
-                tmpargs.add(arg);
-            }
+            tokenizer.next(arg);
         }
-        return tmpargs.toArray(new String[0]);
+        return tokenizer.complete();
     }
 
     /**
@@ -576,5 +588,101 @@ public class StringUtil {
             }
         }
         return builder.toString();
+    }
+
+    // Used by convertArgsList
+    private static final class StringArgTokenizer {
+        private final LinkedList<String> result = new LinkedList<String>();
+        private final StringBuilder buffer = new StringBuilder();
+        private boolean isEscaped = false;
+
+        public void next(String arg) {
+            // If currently escaped, append space character to buffer first
+            if (isEscaped) {
+                buffer.append(' ');
+            }
+
+            int numEscapedAtStart = 0;
+            for (;numEscapedAtStart < arg.length() && arg.charAt(numEscapedAtStart)=='\"'; numEscapedAtStart++);
+            int remEscapedAtStart = (numEscapedAtStart % 3);
+
+            // Only "-characters are specified. This requires special handling.
+            // Replace """ with "-characters, and decide based on remainder what to do.
+            if (numEscapedAtStart == arg.length()) {
+                if (isEscaped) {
+                    if (remEscapedAtStart == 0) {
+                        // Doesn't change escape parity
+                        appendEscapedQuotes(numEscapedAtStart / 3);
+                    } else {
+                        // ["some | "] -> [some ]
+                        // ["some | ""] -> [some "]
+                        // ["some | """"] -> [some "]
+                        // ["some | """""] -> [some ""]
+                        appendEscapedQuotes((numEscapedAtStart / 3) + remEscapedAtStart - 1);
+                        commitBuffer();
+                    }
+                } else {
+                    appendEscapedQuotes(numEscapedAtStart / 3);
+                    if (remEscapedAtStart == 1) {
+                        isEscaped = true; // Start escape section
+                    } else {
+                        // When remainder isn't a single quote, commit the buffer
+                        commitBuffer();
+                    }
+                }
+                return;
+            }
+
+            // Handle start of an escaped section
+            if (!isEscaped && remEscapedAtStart > 0) {
+                isEscaped = true;
+                remEscapedAtStart--;
+            }
+
+            // Add all remaining quotes at the start
+            appendEscapedQuotes(numEscapedAtStart / 3 + remEscapedAtStart);
+
+            // Process remaining characters of argument in sequence
+            int numTrailingQuotes = 0;
+            for (int i = numEscapedAtStart; i < arg.length(); i++) {
+                char c = arg.charAt(i);
+                if (c != '\"') {
+                    appendEscapedQuotes(numTrailingQuotes);
+                    numTrailingQuotes = 0;
+                    buffer.append(c);
+                } else if (++numTrailingQuotes == 3) {
+                    numTrailingQuotes = 0;
+                    buffer.append('\"');
+                }
+            }
+
+            // Close escaped section
+            if (!isEscaped) {
+                appendEscapedQuotes(numTrailingQuotes);
+                commitBuffer();
+            } else if (numTrailingQuotes > 0) {
+                appendEscapedQuotes(numTrailingQuotes-1);
+                commitBuffer();
+            }
+        }
+
+        public LinkedList<String> complete() {
+            if (isEscaped) {
+                commitBuffer();
+            }
+            return result;
+        }
+
+        private void appendEscapedQuotes(int num_quotes) {
+            for (int n = 0; n < num_quotes; n++) {
+                buffer.append('\"');
+            }
+        }
+
+        private void commitBuffer() {
+            result.add(buffer.toString());
+            buffer.setLength(0);
+            isEscaped = false;
+        }
     }
 }
