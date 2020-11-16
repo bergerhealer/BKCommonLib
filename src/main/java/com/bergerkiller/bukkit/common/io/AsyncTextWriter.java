@@ -101,7 +101,7 @@ public class AsyncTextWriter {
                 result = _encoder.flush(buffer);
             }
         }
-        buffer.flip();
+        ((java.nio.Buffer) buffer).flip();
         if (result.isError()) {
             _finishedEncoding = true;
             try {
