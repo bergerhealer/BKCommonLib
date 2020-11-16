@@ -90,7 +90,7 @@ public class AsyncTextWriter {
     }
 
     private void encode(ByteBuffer buffer) {
-        buffer.clear();
+        ((java.nio.Buffer) buffer).clear();
         CoderResult result;
         if (_finishedReading) {
             result = _encoder.flush(buffer);
