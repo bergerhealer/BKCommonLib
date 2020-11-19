@@ -342,7 +342,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
-                    <argLine>-Xmx768m</argLine>
+                    <argLine>-Xmx512m</argLine>
                     <properties>
                         <property>
                             <name>listener</name>
