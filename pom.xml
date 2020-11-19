@@ -342,6 +342,7 @@
                 <version>2.22.0</version>
                 <configuration>
                     <trimStackTrace>false</trimStackTrace>
+                    <argLine>-Xmx768m</argLine>
                     <properties>
                         <property>
                             <name>listener</name>
