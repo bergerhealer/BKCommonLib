@@ -365,6 +365,7 @@
                     <finalName>${project.finalNameBase}</finalName>
                     <failOnError>false</failOnError>
                     <doclint>none</doclint>
+                    <quiet>true</quiet>
                 </configuration>
             </plugin>
             <!-- Generate a jar containing the java sources -->
