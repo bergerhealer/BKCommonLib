@@ -93,7 +93,19 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
     @Override
     public void hook(World world) {
+        if (!this.accessListField.isValid()) {
+            Logging.LOGGER_REFLECTION.warning("Failed to hook world " + world.getName()
+                + " with entity listener hook, Entity Add/Remove events will not work");
+            return;
+        }
+
         List<Object> accessList = this.accessListField.get(Conversion.toWorldHandle.convert(world));
+        if (accessList == null) {
+            Logging.LOGGER_REFLECTION.warning("Failed to hook world " + world.getName()
+                + " with entity listener hook (null), Entity Add/Remove events will not work");
+            return;
+        }
+
         for (Object o : accessList) {
             if (WorldListenerHook.get(o, WorldListenerHook.class) != null) {
                 return; // Already hooked
@@ -106,10 +118,17 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
     @Override
     public void unhook(World world) {
-        Iterator<Object> iter = this.accessListField.get(Conversion.toWorldHandle.convert(world)).iterator();
-        while (iter.hasNext()) {
-            if (WorldListenerHook.get(iter.next(), WorldListenerHook.class) != null) {
-                iter.remove();
+        if (!this.accessListField.isValid()) {
+            return;
+        }
+
+        List<Object> accessList = this.accessListField.get(Conversion.toWorldHandle.convert(world));
+        if (accessList != null) {
+            Iterator<Object> iter = accessList.iterator();
+            while (iter.hasNext()) {
+                if (WorldListenerHook.get(iter.next(), WorldListenerHook.class) != null) {
+                    iter.remove();
+                }
             }
         }
     }
