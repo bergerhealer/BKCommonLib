@@ -339,7 +339,7 @@ class PlayerChunkMap {
     public (PlayerChunkHandle) PlayerChunk getVisibleChunk:b(int x, int z);
     public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:b(int x, int z);
 #else
-    #require net.minecraft.server.PlayerChunkMap private (Object) PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
+    #require net.minecraft.server.PlayerChunkMap private PlayerChunk getChunk_1_8_8:a(int x, int z, boolean create);
     public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
         return instance#getChunk_1_8_8(x, z, false);
     }
