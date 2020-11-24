@@ -10,6 +10,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.internal.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -113,7 +114,8 @@ public class MapShowEvent extends Event {
      * @return map display
      */
     public MapDisplay getDisplay() {
-        return CommonPlugin.getInstance().getMapController().getInfo(this.mapItem).getViewing(this.player);
+        MapDisplayInfo info = CommonPlugin.getInstance().getMapController().getInfo(this.mapItem);
+        return (info == null) ? null : info.getViewing(this.player);
     }
 
     /**
