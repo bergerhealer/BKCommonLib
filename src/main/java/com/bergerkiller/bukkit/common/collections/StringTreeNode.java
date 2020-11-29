@@ -77,20 +77,23 @@ public class StringTreeNode {
      * parent node.
      * 
      * @param index this tree node should get
+     * @return True if the order changed, False if nothing changed
      */
-    public void setIndex(int index) {
+    public boolean setIndex(int index) {
         if (this._parent == null) {
-            return;
+            return false;
         } else if (index < 0 || index >= this._parent._children.size()) {
             throw new IndexOutOfBoundsException("Index " +  index + " is out of range");
         } else if (this._parent.get(index) != this) {
             int oldIndex = this._parent._children.indexOf(this);
-            if (oldIndex != -1) {
+            if (oldIndex != -1 && oldIndex != index) {
                 this._parent._children.remove(oldIndex);
                 this._parent._children.add(index, this);
                 this._parent.markChanged();
+                return true;
             }
         }
+        return false;
     }
 
     /**

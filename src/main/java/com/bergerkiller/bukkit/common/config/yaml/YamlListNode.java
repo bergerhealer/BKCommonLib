@@ -28,8 +28,8 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
     }
 
     @Override
-    protected YamlEntry removeChildEntryAt(int index) {
-        YamlEntry removed = super.removeChildEntryAt(index);
+    protected YamlEntry removeChildEntryAtWithoutEvent(int index) {
+        YamlEntry removed = super.removeChildEntryAtWithoutEvent(index);
 
         // Item was removed, regenerate the paths for the entries that come after
         // Because index for these values went down by 1, do this in normal order
@@ -48,6 +48,9 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
         for (int i = this._children.size()-1; i >= index; i--) {
             this._children.get(i).setPath(this.getYamlPath().listChild(i));
         }
+
+        // Fire change event for list itself
+        this._entry.callChangeListeners();
 
         return created;
     }
@@ -107,7 +110,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
     public boolean remove(Object o) {
         int index = this.indexOfValue(o);
         if (index != -1) {
-            this.removeChildEntryAt(index);
+            this.removeChildEntryAtWithoutEvent(index);
             return true;
         }
         return false;
@@ -157,7 +160,9 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
     public boolean addAll(int index, Collection<? extends Object> c) {
         // Add all children without calling the path renaming logic
         for (Object element : c) {
-            super.createChildEntry(index, this.getYamlPath().listChild(index)).setValue(element);
+            YamlEntry entry = super.createChildEntry(index, this.getYamlPath().listChild(index));
+            this._entry.callChangeListeners();
+            entry.setValue(element);
             index++;
         }
 
@@ -165,6 +170,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
         for (int i = this._children.size()-1; i >= index; i--) {
             this._children.get(i).setPath(this.getYamlPath().listChild(i));
         }
+
         return true;
     }
 
@@ -186,7 +192,7 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
         while (--i >= 0) {
             if (remove == c.contains(this._children.get(i).getValue())) {
                 first_mod = i;
-                super.removeChildEntryAt(i);
+                super.removeChildEntryAtWithoutEvent(i);
             }
         }
 
@@ -195,7 +201,14 @@ public class YamlListNode extends YamlNodeAbstract<YamlListNode> implements List
         for (i = first_mod; i < this._children.size(); i++) {
             this._children.get(i).setPath(this.getYamlPath().listChild(i));
         }
-        return first_mod != Integer.MAX_VALUE;
+
+        // Event if changed
+        if (first_mod != Integer.MAX_VALUE) {
+            this._entry.callChangeListeners();
+            return true;
+        }
+
+        return false;
     }
 
     @Override

@@ -148,6 +148,90 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Adds a new change listener to this node. The listener will be
+     * called every time a change occurs to this node or a child
+     * node of this node, recursively.
+     * 
+     * @param listener The listener to add
+     * @throws IllegalArgumentException if listener is null
+     */
+    public void addChangeListener(YamlChangeListener listener) {
+        this._entry.addChangeListener(listener);
+    }
+
+    /**
+     * Removes a change listener from this node that was previously added
+     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * {@link Object#equals(Object)} is used.
+     * 
+     * @param listener The listener to remove
+     * @return True if the listener was removed, False otherwise
+     */
+    public boolean removeChangeListener(YamlChangeListener listener) {
+        return this._entry.removeChangeListener(listener);
+    }
+
+    /**
+     * Removes all previously registered change listeners from
+     * this node.
+     * 
+     * @see #addChangeListener(Runnable)
+     */
+    public void clearChangeListeners() {
+        this._entry.clearChangeListeners();
+    }
+
+    /**
+     * Adds a new change listener to a value stored at a path. The listener will be
+     * called every time a change occurs to this value or a child
+     * node of that value, recursively.
+     * 
+     * @param path The path to the value to add a listener to
+     * @param listener The listener to add
+     * @return True if the listener was added, False if no value exists at this path
+     * @throws IllegalArgumentException if listener is null
+     */
+    public boolean addChangeListener(String path, YamlChangeListener listener) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null) {
+            entry.addChangeListener(listener);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Removes a change listener from this node that was previously added
+     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * {@link Object#equals(Object)} is used.
+     * 
+     * @param path The path to the value to remove a listener of
+     * @param listener The listener to remove
+     * @return True if the value at this path exists and a listener was removed, False otherwise
+     */
+    public boolean removeChangeListener(String path, YamlChangeListener listener) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        return entry != null && entry.removeChangeListener(listener);
+    }
+
+    /**
+     * Removes all previously registered change listeners from
+     * this node.
+     * 
+     * @param path The path to the value to clear listeners of
+     * @return True if a value exists at this path, False otherwise
+     * @see #addChangeListener(Runnable)
+     */
+    public boolean clearChangeListeners(String path) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        if (entry != null) {
+            entry.clearChangeListeners();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Gets the header of this Node
      *
      * @return The header
@@ -306,8 +390,12 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * Nodes that were removed turn into a detached tree of their own.
      */
     public void clear() {
-        for (int i = this._children.size()-1; i >= 0; --i) {
-            this.removeChildEntryAt(i);
+        int num_children = this._children.size();
+        if (num_children > 0) {
+            do {
+                this.removeChildEntryAtWithoutEvent(--num_children);
+            } while (num_children > 0);
+            this._entry.callChangeListeners();
         }
     }
 
@@ -822,6 +910,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         newEntry.assignProperties(oldEntry);
         newEntry.yaml_check_children = oldEntry.yaml_check_children;
         newEntry.yaml_needs_generating = oldEntry.yaml_needs_generating;
+        newEntry.listeners = oldEntry.listeners;
+        newEntry.all_listeners = oldEntry.all_listeners;
         this._children.set(index, newEntry);
         this._root.putEntry(newEntry);
         if (oldEntry.isAbstractNode()) {
@@ -978,6 +1068,12 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     protected YamlEntry removeChildEntryAt(int index) {
+        YamlEntry entry = this.removeChildEntryAtWithoutEvent(index);
+        this._entry.callChangeListeners();
+        return entry;
+    }
+
+    protected YamlEntry removeChildEntryAtWithoutEvent(int index) {
         if (index < 0 || index >= this._children.size()) {
             throw new IndexOutOfBoundsException("Index " + index + " is out of bounds");
         }
@@ -995,5 +1091,4 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         // May be useful?
         return entry;
     }
-
 }

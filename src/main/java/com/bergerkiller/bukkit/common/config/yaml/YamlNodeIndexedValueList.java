@@ -63,10 +63,11 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> implements Ya
 
     @Override
     public Object remove(int index) {
-        Object result = _node.removeChildEntryAt(index);
+        Object result = _node.removeChildEntryAtWithoutEvent(index);
         if (_namedByIndex) {
             this.updateIndexFrom(index);
         }
+        _node._entry.callChangeListeners();
         return result;
     }
 
@@ -93,8 +94,10 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> implements Ya
             _namedByIndex = true;
             updateIndexFrom(0);
         }
-        _node.createChildEntry(index, getIndexedPath(index)).setValue(value);
+        YamlEntry newEntry = _node.createChildEntry(index, getIndexedPath(index));
         updateIndexFrom(index+1);
+        _node._entry.callChangeListeners();
+        newEntry.setValue(value);
     }
 
     @Override
@@ -136,8 +139,12 @@ public class YamlNodeIndexedValueList extends AbstractList<Object> implements Ya
                 return n1.compareTo(n2);
             }
         });
+        boolean changed = false;
         for (int i = 0; i < node._children.size(); i++) {
-            node._children.get(i).yaml.setIndex(i);
+            changed |= node._children.get(i).yaml.setIndex(i);
+        }
+        if (changed) {
+            node._entry.callChangeListeners();
         }
         return new YamlNodeIndexedValueList(node);
     }

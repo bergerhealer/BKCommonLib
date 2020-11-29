@@ -1,14 +1,18 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
 import java.lang.reflect.Array;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.StringTreeNode;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * A single entry inside the YAML document.
@@ -16,6 +20,7 @@ import com.bergerkiller.bukkit.common.collections.StringTreeNode;
  * Automatically regenerates the yaml when required.
  */
 public class YamlEntry implements Map.Entry<String, Object> {
+    private static final YamlChangeListener[] NO_LISTENERS = new YamlChangeListener[0];
     private final YamlNodeAbstract<?> parent;
     private YamlPath path;
     protected final StringTreeNode yaml;
@@ -23,6 +28,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
     protected boolean yaml_check_children;
     private String header;
     protected Object value;
+    protected YamlChangeListener[] listeners;
+    protected YamlChangeListener[] all_listeners;
 
     // Root node only
     protected YamlEntry(YamlNodeAbstract<?> rootNode) {
@@ -33,6 +40,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
         this.yaml = new StringTreeNode();
         this.yaml_needs_generating = true;
         this.yaml_check_children = false;
+        this.listeners = NO_LISTENERS;
+        this.all_listeners = NO_LISTENERS;
     }
 
     // Constructor used inside YamlNode to create new entries
@@ -44,6 +53,8 @@ public class YamlEntry implements Map.Entry<String, Object> {
         this.yaml = yaml;
         this.yaml_needs_generating = false;
         this.yaml_check_children = false;
+        this.listeners = NO_LISTENERS;
+        this.all_listeners = (parent == null) ? NO_LISTENERS : parent._entry.all_listeners;
         this.markYamlChanged(); // Updates check_children of parent
     }
 
@@ -90,6 +101,72 @@ public class YamlEntry implements Map.Entry<String, Object> {
      */
     public YamlNodeAbstract<?> getParentNode() {
         return this.parent;
+    }
+
+    /**
+     * Adds a new change listener to this node. The listener will be
+     * called every time a change occurs to this node or a child
+     * node of this node, recursively.
+     * 
+     * @param listener The listener to add
+     * @throws IllegalArgumentException if listener is null
+     */
+    public void addChangeListener(YamlChangeListener listener) {
+        int length = this.listeners.length;
+        if (listener == null) {
+            throw new IllegalArgumentException("Listener cannot be null");
+        } else if (length == 0) {
+            this.listeners = new YamlChangeListener[] { listener };
+            this.recalculateListeners();
+        } else {
+            this.listeners = Arrays.copyOf(this.listeners, length+1);
+            this.listeners[length] = listener;
+            this.recalculateListeners();
+        }
+    }
+
+    /**
+     * Removes a change listener from this node that was previously added
+     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * {@link Object#equals(Object)} is used.
+     * 
+     * @param listener The listener to remove
+     * @return True if the listener was removed, False otherwise
+     */
+    public boolean removeChangeListener(YamlChangeListener listener) {
+        int length = this.listeners.length;
+        if (length == 0) {
+            // No listeners
+            return false;
+        } else if (length > 1) {
+            // Complicated for-loop element removing
+            for (int i = 0; i < length; i++) {
+                if (this.listeners[i].equals(listener)) {
+                    this.listeners = LogicUtil.removeArrayElement(this.listeners, i);
+                    this.recalculateListeners();
+                    return true;
+                }
+            }
+            return false;
+        } else if (this.listeners[0].equals(listener)) {
+            // Removed a single listener
+            this.clearChangeListeners();
+            return true;
+        } else {
+            // One listener exists but is not this one
+            return false;
+        }
+    }
+
+    /**
+     * Removes all previously registered change listeners from
+     * this node.
+     * 
+     * @see #addChangeListener(Runnable)
+     */
+    public void clearChangeListeners() {
+        this.listeners = NO_LISTENERS;
+        this.recalculateListeners();
     }
 
     /**
@@ -230,6 +307,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * Sets a new value for this entry
      * 
      * @param value to set to
+     * @return Previous value
      */
     @Override
     public Object setValue(Object value) {
@@ -240,6 +318,9 @@ public class YamlEntry implements Map.Entry<String, Object> {
             this.removeNodeValue();
             this.value = null;
             this.markYamlChanged();
+            if (this.parent != null) {
+                this.parent._entry.callChangeListeners();
+            }
             return oldValue;
         } else if (!(oldValue instanceof YamlNodeAbstract) && value.equals(oldValue)) {
             this.value = value;
@@ -292,6 +373,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
             }
 
             // Turn a Map into a YamlNode
+            // TODO: Currently will fire events even when the same map is assigned
             if (value instanceof Map) {
                 YamlNodeAbstract<?> node = this.createNodeValue();
                 node.clear();
@@ -350,6 +432,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
         // Assign the new value and schedule YAML for rebuilding
         this.value = value;
         this.markYamlChanged();
+        this.callChangeListeners();
         return oldValue;
     }
 
@@ -434,8 +517,11 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * @param header to set to, an empty String to omit it
      */
     public void setHeader(String header) {
-        this.header = header;
-        this.markYamlChanged();
+        if (!header.equals(this.header)) {
+            this.header = header;
+            this.markYamlChanged();
+            this.callChangeListeners();
+        }
     }
 
     /**
@@ -452,6 +538,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
             this.header += "\n" + header;
         }
         this.markYamlChanged();
+        this.callChangeListeners();
     }
 
     /**
@@ -568,6 +655,58 @@ public class YamlEntry implements Map.Entry<String, Object> {
 
                 // Store it
                 this.yaml.setValue(this.serializeYamlValue(value));
+            }
+        }
+    }
+
+    /**
+     * Calls all the change listeners that are watching this entry
+     */
+    protected void callChangeListeners() {
+        if (all_listeners != NO_LISTENERS) {
+            for (YamlChangeListener listener : all_listeners) {
+                try {
+                    listener.onNodeChanged(path);
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to fire Yaml change callback", t);
+                }
+            }
+        }
+    }
+
+    /**
+     * Combines the listeners on the parent with the listeners of this node.
+     * This way, when a node calls the listeners, every listener registered
+     * on nodes below it is called as well. Some optimizations are done so
+     * that no new arrays are computed when a node has no listeners.
+     */
+    private void recalculateListeners() {
+        if (this.parent == null || this.parent._entry.all_listeners == NO_LISTENERS) {
+            // Take over all listeners of self
+            if (this.all_listeners == this.listeners) {
+                return;
+            }
+            this.all_listeners = this.listeners;
+        } else if (this.listeners == NO_LISTENERS) {
+            // Take over all listeners of parent
+            if (this.all_listeners == this.parent._entry.all_listeners) {
+                return;
+            }
+            this.all_listeners = this.parent._entry.all_listeners;
+        } else {
+            // Concatenate the two
+            // TODO: Should we bother to check if it is different?
+            int numParent = this.parent._entry.all_listeners.length;
+            int numSelf = this.listeners.length;
+            this.all_listeners = new YamlChangeListener[numParent + numSelf];
+            System.arraycopy(this.parent._entry.all_listeners, 0, this.all_listeners, 0, numParent);
+            System.arraycopy(this.listeners, 0, this.all_listeners, numParent, numSelf);
+        }
+
+        // Propagate own listeners to children of this node
+        if (this.isAbstractNode()) {
+            for (YamlEntry entry : this.getAbstractNode()._children) {
+                entry.recalculateListeners();
             }
         }
     }
