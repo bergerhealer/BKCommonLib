@@ -12,16 +12,20 @@ import java.io.Writer;
 import java.nio.CharBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.error.YAMLException;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.io.AsyncTextWriter;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 
@@ -865,8 +869,49 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     public N clone() {
         N clone = this.createNode(null);
         clone._entry.assignProperties(this._entry);
-        this.cloneChildrenTo(clone);
+        this.cloneChildrenTo(clone, LogicUtil.alwaysTruePredicate());
         return clone;
+    }
+
+    /**
+     * Clones all the child nodes and entries of this node and assigns them to another
+     * node. Further changes to this node's children will not affect the new entries
+     * added to the target node and vice-versa.
+     * 
+     * @param target Target node to which to assign the cloned children
+     */
+    public void cloneInto(N target) {
+        cloneChildrenTo(target, LogicUtil.alwaysTruePredicate());
+    }
+
+    /**
+     * Clones all the child nodes and entries of this node and assigns them to another
+     * node. Further changes to this node's children will not affect the new entries
+     * added to the target node and vice-versa.<br>
+     * <br>
+     * A filter can be specified to filter what nodes to clone and which to ignore.
+     * 
+     * @param target Target node to which to assign the cloned children
+     * @param filter Filter for paths of entries being cloned, test true to include them
+     */
+    public void cloneInto(N target, Predicate<YamlPath> filter) {
+        cloneChildrenTo(target, filter);
+    }
+
+    /**
+     * Clones all the child nodes and entries of this node and assigns them to another
+     * node. Further changes to this node's children will not affect the new entries
+     * added to the target node and vice-versa.<br>
+     * <br>
+     * The paths to exclude from cloning can be specified
+     * 
+     * @param target Target node to which to assign the cloned children
+     * @param excludedPaths Collection of paths to exclude from cloning
+     * @see #cloneInto(YamlNodeAbstract, Predicate)
+     */
+    public void cloneIntoExcept(N target, Collection<String> excludedPaths) {
+        final Set<YamlPath> pathsToExclude = excludedPaths.stream().map(YamlPath::create).collect(Collectors.toSet());
+        cloneInto(target, (path) -> !pathsToExclude.contains(path));
     }
 
     /**
@@ -875,8 +920,12 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * 
      * @param clone The clone to assign the clones entries to
      */
-    private void cloneChildrenTo(YamlNodeAbstract<?> clone) {
+    private void cloneChildrenTo(YamlNodeAbstract<?> clone, Predicate<YamlPath> filter) {
         for (YamlEntry child : this._children) {
+            if (!filter.test(child.getYamlPath())) {
+                continue;
+            }
+
             YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
             YamlEntry childClone = clone.createChildEntry(clone._children.size(), childPath);
             childClone.assignProperties(child);
@@ -889,7 +938,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 } else {
                     childCloneNode = childClone.createNodeValue();
                 }
-                originalChildNode.cloneChildrenTo(childCloneNode);
+                originalChildNode.cloneChildrenTo(childCloneNode, filter);
             } else {
                 childClone.value = child.value;
             }

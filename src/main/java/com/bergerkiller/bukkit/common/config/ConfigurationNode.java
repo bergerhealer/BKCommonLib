@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common.config;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.Predicate;
 
 import com.bergerkiller.bukkit.common.config.yaml.YamlEntry;
 import com.bergerkiller.bukkit.common.config.yaml.YamlNodeAbstract;
+import com.bergerkiller.bukkit.common.config.yaml.YamlPath;
 
 public class ConfigurationNode extends YamlNodeAbstract<ConfigurationNode> {
 
@@ -85,6 +88,21 @@ public class ConfigurationNode extends YamlNodeAbstract<ConfigurationNode> {
     @Override
     public ConfigurationNode clone() {
         return super.clone();
+    }
+
+    @Override
+    public void cloneInto(ConfigurationNode target) {
+        super.cloneInto(target);
+    }
+
+    @Override
+    public void cloneInto(ConfigurationNode target, Predicate<YamlPath> filter) {
+        super.cloneInto(target, filter);
+    }
+
+    @Override
+    public void cloneIntoExcept(ConfigurationNode target, Collection<String> excludedPaths) {
+        super.cloneIntoExcept(target, excludedPaths);
     }
 
     /*

@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import org.bukkit.block.Block;
@@ -31,6 +32,8 @@ import com.google.common.collect.BiMap;
 public class LogicUtil {
     private static Map<Class<?>, Method> _cloneMethodCache = Collections.emptyMap();
     private static final Consumer<Object> _noopConsumer = obj -> {};
+    private static final Predicate<Object> _alwaysTruePredicate = obj -> true;
+    private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -925,10 +928,33 @@ public class LogicUtil {
     /**
      * Gets a no-operation consumer, which accepts anything but does nothing
      * 
+     * @param <T> Type
      * @return no-op consumer
      */
     @SuppressWarnings("unchecked")
     public static <T> Consumer<T> noopConsumer() {
         return (Consumer<T>) _noopConsumer;
+    }
+
+    /**
+     * Gets a no-operation predicate, which accepts anything and always returns true
+     * 
+     * @param <T> Type
+     * @return always true predicate
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate<T> alwaysTruePredicate() {
+        return (Predicate<T>) _alwaysTruePredicate;
+    }
+
+    /**
+     * Gets a no-operation predicate, which accepts anything and always returns false
+     * 
+     * @param <T> Type
+     * @return always false predicate
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Predicate<T> alwaysFalsePredicate() {
+        return (Predicate<T>) _alwaysFalsePredicate;
     }
 }
