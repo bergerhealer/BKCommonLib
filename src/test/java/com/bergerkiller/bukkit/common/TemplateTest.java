@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.util.ArrayList;
 
 import org.bukkit.ChatColor;
-import org.bukkit.Material;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -16,12 +15,8 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
-import com.bergerkiller.bukkit.common.resources.ResourceKey;
-import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
