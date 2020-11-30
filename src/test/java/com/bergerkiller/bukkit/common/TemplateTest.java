@@ -267,17 +267,6 @@ public class TemplateTest {
     }
 
     @Test
-    public void testBlockPlaceSound() {
-        assertTrue(SoundEffectTypeHandle.T.isAvailable());
-        ResourceKey<SoundEffect> stepName = BlockData.fromMaterial(Material.GRASS).getPlaceSound();
-        if (CommonCapabilities.KEYED_EFFECTS) {
-            assertEquals("minecraft:block.grass.place", stepName.getPath());
-        } else {
-            assertEquals("minecraft:dig.grass", stepName.getPath());
-        }
-    }
-
-    @Test
     public void testChatColorConversion() {
         testChatColor(ChatColor.BLACK, 0);
         testChatColor(ChatColor.RED, 12);

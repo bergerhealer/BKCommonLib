@@ -1,6 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import org.bukkit.Sound;
 
 /**
@@ -20,8 +22,8 @@ public abstract class CraftSoundHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static String getSoundName(Sound sound) {
-        return T.getSoundName.invoker.invoke(null,sound);
+    public static ResourceKey<SoundEffect> getSoundEffect(Sound sound) {
+        return T.getSoundEffect.invoke(sound);
     }
 
     /**
@@ -29,7 +31,7 @@ public abstract class CraftSoundHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftSoundClass extends Template.Class<CraftSoundHandle> {
-        public final Template.StaticMethod<String> getSoundName = new Template.StaticMethod<String>();
+        public final Template.StaticMethod.Converted<ResourceKey<SoundEffect>> getSoundEffect = new Template.StaticMethod.Converted<ResourceKey<SoundEffect>>();
 
     }
 

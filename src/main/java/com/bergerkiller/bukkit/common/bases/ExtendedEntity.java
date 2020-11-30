@@ -504,7 +504,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch (average) to play at
      */
     public void makeRandomSound(Sound sound, float volume, float pitch) {
-        makeRandomSound(CraftSoundHandle.getSoundName(sound), volume, pitch);
+        makeRandomSound(CraftSoundHandle.getSoundEffect(sound), volume, pitch);
     }
 
     /**
@@ -515,12 +515,23 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch (average) to play at
      */
     public void makeRandomSound(String soundName, float volume, float pitch) {
+        makeRandomSound(ResourceCategory.sound_effect.createKey(soundName), volume, pitch);
+    }
+
+    /**
+     * Plays a sound for the Entity, but with a slightly random pitch
+     *
+     * @param soundName to play
+     * @param volume to play at
+     * @param pitch (average) to play at
+     */
+    public void makeRandomSound(ResourceKey<SoundEffect> sound, float volume, float pitch) {
         final Random rand = getRandom();
-        makeSound(soundName, volume, MathUtil.clamp(pitch + 0.4f * (rand.nextFloat() - rand.nextFloat()), 0.0f, 1.0f));
+        makeSound(sound, volume, MathUtil.clamp(pitch + 0.4f * (rand.nextFloat() - rand.nextFloat()), 0.0f, 1.0f));
     }
 
     public void makeSound(Sound sound, float volume, float pitch) {
-        makeSound(CraftSoundHandle.getSoundName(sound), volume, pitch);
+        makeSound(CraftSoundHandle.getSoundEffect(sound), volume, pitch);
     }
 
     public void makeSound(String soundName, float volume, float pitch) {
