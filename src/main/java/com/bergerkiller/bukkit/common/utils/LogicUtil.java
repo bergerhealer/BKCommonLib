@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -34,6 +35,21 @@ public class LogicUtil {
     private static final Consumer<Object> _noopConsumer = obj -> {};
     private static final Predicate<Object> _alwaysTruePredicate = obj -> true;
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
+    private static final ItemSynchronizer<Object, Object> _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
+        @Override
+        public boolean isItem(Object item, Object value) {
+            return Objects.equals(item, value);
+        }
+
+        @Override
+        public Object onAdded(Object value) {
+            return value;
+        }
+
+        @Override
+        public void onRemoved(Object item) {
+        }
+    };
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -752,6 +768,19 @@ public class LogicUtil {
          * @param item to be removed
          */
         public void onRemoved(E item);
+
+        /**
+         * Returns an identity item synchronizer which allows for synchronizing
+         * two collections with the same type of values stored
+         * 
+         * @param <V> value type bound to the element
+         * @param <E> element item type
+         * @return identity item synchronizer
+         */
+        @SuppressWarnings("unchecked")
+        public static <V, E extends V> ItemSynchronizer<V, E> identity() {
+            return (ItemSynchronizer<V, E>) _identityItemSynchronizer;
+        }
     }
 
     /**
