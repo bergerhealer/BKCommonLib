@@ -1271,6 +1271,43 @@ public class YamlTest {
         assertEquals(22, list_path_by_index.listIndex());
     }
 
+    @Test
+    public void testYamlAssignNodeNameChange() {
+        YamlNode root = new YamlNode();
+        YamlNode child = new YamlNode();
+        child.set("key", "value");
+        assertEquals("", child.getName());
+        assertEquals("", root.getName());
+
+        // Store under 'child', should bind it to root and set name
+        root.set("child", child);
+        assertEquals("child", child.getName());
+        assertEquals("", root.getName());
+
+        // Also store under 'new_child'. Should clone the original
+        // 'child' node and have child name be 'new_child' instead.
+        root.set("new_child", child);
+        assertEquals("new_child", child.getName());
+        assertEquals("", root.getName());
+        assertEquals("child", root.getNode("child").getName());
+        assertEquals("new_child", root.getNode("new_child").getName());
+
+        // Removing child should not affect new_child
+        root.remove("child");
+        assertEquals("new_child", child.getName());
+        assertEquals("", root.getName());
+
+        // Removing new_child should change name to empty
+        root.remove("new_child");
+        assertEquals("", child.getName());
+        assertEquals("", root.getName());
+
+        // Assign to new root
+        YamlNode new_root = new YamlNode();
+        new_root.set("new_root_child", child);
+        assertEquals("new_root_child", child.getName());
+    }
+
     // Used by saveToFileAsync()
     @Ignore
     @Test
