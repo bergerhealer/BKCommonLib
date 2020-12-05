@@ -1015,8 +1015,10 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             // Find or create the entry at this path
             YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
             YamlEntry childClone;
+            boolean isNewNode = false;
             if (isCloneEmpty || (childClone = clone._root.getEntryIfExists(childPath)) == null) {
                 childClone = clone.createChildEntry(clone._children.size(), childPath);
+                isNewNode = true;
             }
 
             childClone.assignProperties(child);
@@ -1030,8 +1032,12 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                     childCloneNode = childClone.createNodeValue();
                 }
                 originalChildNode.cloneChildrenTo(childCloneNode, filterPath, filter, removeOthers);
-            } else {
+            } else if (isNewNode) {
+                // Can set instantly, is a new node and yaml will regen
                 childClone.value = child.value;
+            } else {
+                // Use setValue, must refresh
+                childClone.setValue(child.value);
             }
         }
 
