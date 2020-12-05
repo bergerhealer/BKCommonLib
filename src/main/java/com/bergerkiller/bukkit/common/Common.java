@@ -22,7 +22,8 @@ public class Common {
             "Common:PacketPlayOutUpdateAttributes:createZeroMaxHealth",
             "Common:Yaml:ChangeListeners",
             "Common:Yaml:CloneInto",
-            "Common:Yaml:SetTo"
+            "Common:Yaml:SetTo",
+            "Common:Yaml:CloneAndSetToWithFixes"
     ).collect(Collectors.toSet());
 
     /**

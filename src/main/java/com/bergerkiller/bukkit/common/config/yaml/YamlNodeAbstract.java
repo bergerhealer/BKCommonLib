@@ -899,6 +899,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * entries added to the target node and vice-versa.<br>
      * <br>
      * A filter can be specified to filter what nodes to set and which to ignore.
+     * Elements of this node that are excluded are not removed when they are missing
+     * in the source.
      * 
      * @param source Source node from which to copy the values
      * @param filter Filter for paths of entries being cloned, test true to include them
@@ -916,6 +918,8 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * entries added to the target node and vice-versa.<br>
      * <br>
      * A filter can be specified to filter what nodes to clone and which to ignore.
+     * Elements of this node that are excluded are not removed when they are missing
+     * in the source.
      * 
      * @param source Source node from which to copy the values
      * @param excludedPaths Collection of paths to exclude from setting
@@ -976,6 +980,11 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param removeOthers Whether to remove values from the clone that don't exist in this node
      */
     protected void cloneChildrenTo(YamlNodeAbstract<?> clone, Predicate<YamlPath> filter, boolean removeOthers) {
+        // If source and target are the same, do nothing
+        if (this == clone) {
+            return;
+        }
+
         // If clone had no existing values, we don't need to check for them further down
         boolean isCloneEmpty = clone.isEmpty();
         if (isCloneEmpty) {
@@ -992,16 +1001,17 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
         // Perform copying of data
         for (YamlEntry child : this._children) {
-            if (!filter.test(child.getYamlPath())) {
-                continue;
-            }
-
             if (removeOthers) {
                 keysToRemove.remove(child.getKey());
             }
 
-            // Find or create the entry at this path
+            // Find the path of the cloned target object and pass it through a filter
             YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
+            if (!filter.test(childPath)) {
+                continue;
+            }
+
+            // Find or create the entry at this path
             YamlEntry childClone;
             if (isCloneEmpty || (childClone = clone._root.getEntryIfExists(childPath)) == null) {
                 childClone = clone.createChildEntry(clone._children.size(), childPath);
@@ -1027,7 +1037,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         if (!keysToRemove.isEmpty()) {
             for (String key : keysToRemove) {
                 YamlEntry childCloneToRemove = clone.getEntryIfExists(key);
-                if (childCloneToRemove != null) {
+                if (childCloneToRemove != null && filter.test(childCloneToRemove.getYamlPath())) {
                     int index = clone._children.indexOf(childCloneToRemove);
                     if (index != -1) {
                         clone.removeChildEntryAtWithoutEvent(index);

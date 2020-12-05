@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -1367,6 +1368,30 @@ public class YamlTest {
     }
 
     @Test
+    public void testYamlCloneIntoFilter() {
+        YamlNode target = new YamlNode();
+        target.set("a", "a");
+        target.set("b", "b");
+        target.set("c", "c");
+
+        YamlNode source = new YamlNode();
+        source.set("b", "bb");
+        source.set("d", "dd");
+
+        // We expect:
+        // - 'a' should stay the same
+        // - 'b' should be updated to bb
+        // - 'c' should be unchanged (is not in source)
+        // - 'd' should NOT be added
+        source.cloneIntoExcept(target, Arrays.asList("a", "d"));
+
+        assertEquals("a", target.get("a"));
+        assertEquals("bb", target.get("b"));
+        assertEquals("c", target.get("c"));
+        assertFalse(target.contains("d"));
+    }
+
+    @Test
     public void testYamlSetTo() {
         YamlNode target = new YamlNode();
         target.set("a", "Ta");
@@ -1388,5 +1413,29 @@ public class YamlTest {
         // Check changing source doesn't change target
         source.set("c.a", "Sca2");
         assertEquals("Sca", target.get("c.a"));
+    }
+
+    @Test
+    public void testYamlSetToFilter() {
+        YamlNode target = new YamlNode();
+        target.set("a", "a");
+        target.set("b", "b");
+        target.set("c", "c");
+
+        YamlNode source = new YamlNode();
+        source.set("b", "bb");
+        source.set("d", "dd");
+
+        // We expect:
+        // - 'a' should stay the same
+        // - 'b' should be updated to bb
+        // - 'c' should be removed
+        // - 'd' should NOT be added
+        target.setToExcept(source, Arrays.asList("a", "d"));
+
+        assertEquals("a", target.get("a"));
+        assertEquals("bb", target.get("b"));
+        assertFalse(target.contains("c"));
+        assertFalse(target.contains("d"));
     }
 }
