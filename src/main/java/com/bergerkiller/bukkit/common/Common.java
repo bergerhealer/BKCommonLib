@@ -21,8 +21,6 @@ public class Common {
             "Common:EntityController:SetBlockActivationEnabled",
             "Common:PacketPlayOutUpdateAttributes:createZeroMaxHealth",
             "Common:Yaml:ChangeListeners",
-            "Common:Yaml:CloneInto",
-            "Common:Yaml:SetTo",
             "Common:Yaml:CloneAndSetToWithFixes"
     ).collect(Collectors.toSet());
 

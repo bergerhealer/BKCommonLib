@@ -871,7 +871,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     public N clone() {
         N clone = this.createNode(null);
         clone._entry.assignProperties(this._entry);
-        this.cloneChildrenTo(clone, LogicUtil.alwaysTruePredicate(), false);
+        this.cloneChildrenTo(clone, YamlPath.ROOT, LogicUtil.alwaysTruePredicate(), false);
         return clone;
     }
 
@@ -887,7 +887,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param filter Filter for paths of entries being cloned, test true to include them
      */
     public void setTo(N source) {
-        source.cloneChildrenTo(this, LogicUtil.alwaysTruePredicate(), true);
+        setTo(source, LogicUtil.alwaysTruePredicate());
     }
 
     /**
@@ -906,7 +906,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param filter Filter for paths of entries being cloned, test true to include them
      */
     public void setTo(N source, Predicate<YamlPath> filter) {
-        source.cloneChildrenTo(this, filter, true);
+        source.cloneChildrenTo(this, YamlPath.ROOT, filter, true);
     }
 
     /**
@@ -933,17 +933,6 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     /**
      * Clones all the child nodes and entries of this node and assigns them to another
      * node. Further changes to this node's children will not affect the new entries
-     * added to the target node and vice-versa.
-     * 
-     * @param target Target node to which to assign the cloned children
-     */
-    public void cloneInto(N target) {
-        cloneChildrenTo(target, LogicUtil.alwaysTruePredicate(), false);
-    }
-
-    /**
-     * Clones all the child nodes and entries of this node and assigns them to another
-     * node. Further changes to this node's children will not affect the new entries
      * added to the target node and vice-versa.<br>
      * <br>
      * A filter can be specified to filter what nodes to clone and which to ignore.
@@ -952,7 +941,18 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param filter Filter for paths of entries being cloned, test true to include them
      */
     public void cloneInto(N target, Predicate<YamlPath> filter) {
-        cloneChildrenTo(target, filter, false);
+        cloneChildrenTo(target, YamlPath.ROOT, filter, false);
+    }
+
+    /**
+     * Clones all the child nodes and entries of this node and assigns them to another
+     * node. Further changes to this node's children will not affect the new entries
+     * added to the target node and vice-versa.
+     * 
+     * @param target Target node to which to assign the cloned children
+     */
+    public void cloneInto(N target) {
+        cloneInto(target, LogicUtil.alwaysTruePredicate());
     }
 
     /**
@@ -976,10 +976,11 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * This operation is recursive.
      * 
      * @param clone The clone to assign the clones entries to
+     * @param filterRoot The YamlPath root relative to which the filter is applied
      * @param filter The filter to use while cloning
      * @param removeOthers Whether to remove values from the clone that don't exist in this node
      */
-    protected void cloneChildrenTo(YamlNodeAbstract<?> clone, Predicate<YamlPath> filter, boolean removeOthers) {
+    protected void cloneChildrenTo(YamlNodeAbstract<?> clone, YamlPath filterRoot, Predicate<YamlPath> filter, boolean removeOthers) {
         // If source and target are the same, do nothing
         if (this == clone) {
             return;
@@ -1005,13 +1006,14 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 keysToRemove.remove(child.getKey());
             }
 
-            // Find the path of the cloned target object and pass it through a filter
-            YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
-            if (!filter.test(childPath)) {
+            // Find the filter-relative path to use and pass it through the filter
+            YamlPath filterPath = filterRoot.child(child.getKey());
+            if (!filter.test(filterPath)) {
                 continue;
             }
 
             // Find or create the entry at this path
+            YamlPath childPath = clone.getYamlPath().child(child.getYamlPath().name());
             YamlEntry childClone;
             if (isCloneEmpty || (childClone = clone._root.getEntryIfExists(childPath)) == null) {
                 childClone = clone.createChildEntry(clone._children.size(), childPath);
@@ -1027,17 +1029,21 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 } else {
                     childCloneNode = childClone.createNodeValue();
                 }
-                originalChildNode.cloneChildrenTo(childCloneNode, filter, removeOthers);
+                originalChildNode.cloneChildrenTo(childCloneNode, filterPath, filter, removeOthers);
             } else {
                 childClone.value = child.value;
             }
         }
 
-        // Clean up keys that need to be removed from
+        // Clean up keys that need to be removed from the clone target
         if (!keysToRemove.isEmpty()) {
             for (String key : keysToRemove) {
+                if (!filter.test(filterRoot.child(key))) {
+                    continue;
+                }
+  
                 YamlEntry childCloneToRemove = clone.getEntryIfExists(key);
-                if (childCloneToRemove != null && filter.test(childCloneToRemove.getYamlPath())) {
+                if (childCloneToRemove != null) {
                     int index = clone._children.indexOf(childCloneToRemove);
                     if (index != -1) {
                         clone.removeChildEntryAtWithoutEvent(index);

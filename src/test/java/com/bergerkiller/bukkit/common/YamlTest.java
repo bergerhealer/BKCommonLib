@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -1437,5 +1436,26 @@ public class YamlTest {
         assertEquals("bb", target.get("b"));
         assertFalse(target.contains("c"));
         assertFalse(target.contains("d"));
+    }
+
+    @Test
+    public void testYamlCloneIntoRelativePaths() {
+        YamlNode target = new YamlNode();
+        YamlNode target_child = target.getNode("a");
+        target_child.set("key", "value");
+        target_child.set("ignore", "value2");
+
+        YamlNode source = new YamlNode();
+        YamlNode source_child = source.getNode("a");
+        source_child.set("key", "Tvalue");
+        source_child.set("ignore", "Tvalue2");
+
+        source_child.cloneInto(target_child, path -> {
+            assertTrue(path.toString().equals("key") || path.toString().equals("ignore"));
+            return path.toString().equals("key");
+        });
+
+        assertEquals("Tvalue", target.get("a.key"));
+        assertEquals("value2", target.get("a.ignore"));
     }
 }
