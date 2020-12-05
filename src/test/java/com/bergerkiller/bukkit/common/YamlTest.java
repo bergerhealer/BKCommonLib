@@ -1184,6 +1184,40 @@ public class YamlTest {
                      serializer.serialize(Collections.singletonMap("key", 12), "\n\nSimple header", 3));
     }
 
+    // Used by saveToFileAsync()
+    @Ignore
+    @Test
+    public void stressTestAsyncTextWriter() {
+        StringBuilder testData = new StringBuilder();
+        int numLines = 10000;
+        for (int i = 0; i < numLines; i++) {
+            testData.append("123456789\n");
+        }
+        String testString = testData.toString();
+
+        java.io.File testFile = new java.io.File("test_async_writer.dat");
+        int n = 0;
+        int k = 0;
+        while (true) {
+            if (++n > 1000) {
+                System.out.println("RUN #" + ++k);
+            }
+            try {
+                AsyncTextWriter.write(testFile, testString).get();
+            } catch (Throwable t) {
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
+
+            List<String> lines;
+            try {
+                lines = Files.readAllLines(testFile.toPath());
+            } catch (Throwable t) {
+                throw MountiplexUtil.uncheckedRethrow(t);
+            }
+            assertEquals(numLines, lines.size());
+        }
+    }
+
     @Test
     public void testYamlPath() {
         // Check root node
@@ -1308,37 +1342,51 @@ public class YamlTest {
         assertEquals("new_root_child", child.getName());
     }
 
-    // Used by saveToFileAsync()
-    @Ignore
     @Test
-    public void stressTestAsyncTextWriter() {
-        StringBuilder testData = new StringBuilder();
-        int numLines = 10000;
-        for (int i = 0; i < numLines; i++) {
-            testData.append("123456789\n");
-        }
-        String testString = testData.toString();
+    public void testYamlCloneInto() {
+        YamlNode target = new YamlNode();
+        target.set("a", "a");
+        target.set("b", "b");
+        target.set("c.a", "ca");
+        target.set("c.b", "cb");
+        target.set("c.c.a", "cca");
 
-        java.io.File testFile = new java.io.File("test_async_writer.dat");
-        int n = 0;
-        int k = 0;
-        while (true) {
-            if (++n > 1000) {
-                System.out.println("RUN #" + ++k);
-            }
-            try {
-                AsyncTextWriter.write(testFile, testString).get();
-            } catch (Throwable t) {
-                throw MountiplexUtil.uncheckedRethrow(t);
-            }
+        YamlNode source = new YamlNode();
+        source.set("a", "a2"); // Updates a field
+        source.set("d", "d"); // Adds a field
+        source.set("c.c.a", "cca2"); // Updates a deep field
 
-            List<String> lines;
-            try {
-                lines = Files.readAllLines(testFile.toPath());
-            } catch (Throwable t) {
-                throw MountiplexUtil.uncheckedRethrow(t);
-            }
-            assertEquals(numLines, lines.size());
-        }
+        source.cloneInto(target);
+
+        assertEquals("a2", target.get("a"));
+        assertEquals("b", target.get("b"));
+        assertEquals("ca", target.get("c.a"));
+        assertEquals("cb", target.get("c.b"));
+        assertEquals("cca2", target.get("c.c.a"));
+        assertEquals("d", target.get("d"));
+    }
+
+    @Test
+    public void testYamlSetTo() {
+        YamlNode target = new YamlNode();
+        target.set("a", "Ta");
+        target.set("b", "Tb");
+        target.set("c.a", "Tca");
+        target.set("c.b", "Tcb");
+        target.set("c.a.a", "Tcaa");
+
+        YamlNode source = new YamlNode();
+        source.set("a", "Sa");
+        source.set("c.a", "Sca");
+        source.set("c.b.a", "Scb");
+
+        target.setTo(source);
+
+        // Check exactly the same yaml
+        assertEquals(source.toString(), target.toString());
+
+        // Check changing source doesn't change target
+        source.set("c.a", "Sca2");
+        assertEquals("Sca", target.get("c.a"));
     }
 }
