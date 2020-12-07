@@ -76,10 +76,8 @@ public class MaterialDataToIBlockData {
                         "        if (result != null) {\n" +
                         "            return result;\n" +
                         "        }\n" +
-                        "    } catch (IllegalArgumentException ex) {\n" +
-                        "    } catch (NullPointerException ex) {\n" +
-                        "    } catch (ArrayIndexOutOfBoundsException ex) {\n" +
-                        "        // Occurs on TacoSpigot and Forge when intermediate set() fails\n" +
+                        "    } catch (RuntimeException ex) {\n" +
+                        "        // Occurs on TacoSpigot and Forge (and mods!) when intermediate set() fails\n" +
                         "    } catch (Throwable t) {\n" +
                         "        System.err.println(\"[BKCommonLib] An error occurred inside fromLegacyData(\"+Byte.toString(materialdata.getData())+\"):\");\n" +
                         "        t.printStackTrace();\n" +
