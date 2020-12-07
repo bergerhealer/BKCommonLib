@@ -8,7 +8,6 @@ import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
@@ -34,7 +33,7 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlock(Object block) {
-        return BlockDataImpl.BY_BLOCK_DATA.get(BlockHandle.T.getBlockData.raw.invoke(block));
+        return fromBlockData(BlockHandle.T.getBlockData.raw.invoke(block));
     }
 
     /**
@@ -44,15 +43,13 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlockData(Object iBlockData) {
-        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(iBlockData);
+        BlockData data = BlockDataImpl.retrieveFromCache(iBlockData);
         if (data != null) {
             return data;
+        } else {
+            IBlockDataHandle b = IBlockDataHandle.createHandle(iBlockData);
+            return BlockDataImpl.createAndStoreInCache(b);
         }
-
-        IBlockDataHandle b = IBlockDataHandle.createHandle(iBlockData);
-        BlockDataImpl.BlockDataConstant c = new BlockDataImpl.BlockDataConstant(b);
-        BlockDataImpl.BY_BLOCK_DATA.put(b, c);
-        return c;
     }
 
     /**
@@ -173,6 +170,6 @@ public class BlockDataRegistry {
      * @return all BlockData values
      */
     public static Collection<BlockData> values() {
-        return CommonUtil.unsafeCast(BlockDataImpl.BY_BLOCK_DATA.values());
+        return BlockDataImpl.getAllCachedValues();
     }
 }

@@ -1,11 +1,15 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.locks.StampedLock;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -69,7 +73,8 @@ public class BlockDataImpl extends BlockData {
     public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
     public static final BlockDataConstant[] BY_ID_AND_DATA = new BlockDataConstant[REGISTRY_SIZE];
     public static final Map<Object, BlockDataConstant> BY_BLOCK = new IdentityHashMap<Object, BlockDataConstant>();
-    public static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
+    private static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
+    private static final StampedLock BY_BLOCK_DATA_LOCK = new StampedLock();
 
     // Legacy: array of all possible Material values with all possible legacy data values
     // Index into it by taking data x 1024 | mat.ordinal()
@@ -209,6 +214,40 @@ public class BlockDataImpl extends BlockData {
             BY_BLOCK_DATA.put(iblockdata.getRaw(), dataBlockConst);
         }
         return dataBlockConst;
+    }
+
+    public static Collection<BlockData> getAllCachedValues() {
+        final StampedLock lock = BY_BLOCK_DATA_LOCK;
+        long stamp = lock.readLock();
+        try {
+            return Collections.unmodifiableCollection(new ArrayList<BlockData>(BY_BLOCK_DATA.values()));
+        } finally {
+            lock.unlockRead(stamp);
+        }
+    }
+
+    public static BlockDataConstant retrieveFromCache(Object rawIBlockData) {
+        final StampedLock lock = BY_BLOCK_DATA_LOCK;
+        long stamp = lock.readLock();
+        try {
+            return BY_BLOCK_DATA.get(rawIBlockData);
+        } finally {
+            lock.unlockRead(stamp);
+        }
+    }
+
+    public static BlockDataConstant createAndStoreInCache(IBlockDataHandle iblockdataHandle) {
+        final BlockDataConstant c = new BlockDataImpl.BlockDataConstant(iblockdataHandle);
+        final StampedLock lock = BY_BLOCK_DATA_LOCK;
+
+        long stamp = lock.writeLock();
+        try {
+            BY_BLOCK_DATA.put(iblockdataHandle.getRaw(), c);
+        } finally {
+            lock.unlockWrite(stamp);
+        }
+
+        return c;
     }
 
     /**
@@ -581,29 +620,23 @@ public class BlockDataImpl extends BlockData {
     @Override
     public BlockData setState(String key, Object value) {
         IBlockDataHandle updated_data = this.data.set(key, value);
-        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(updated_data.getRaw());
+        BlockData data = retrieveFromCache(updated_data.getRaw());
         if (data != null) {
             return data;
+        } else {
+            return createAndStoreInCache(updated_data);
         }
-
-        // Store in map (should only rarely happen)
-        BlockDataConstant c = new BlockDataImpl.BlockDataConstant(updated_data);
-        BY_BLOCK_DATA.put(updated_data.getRaw(), c);
-        return c;
     }
 
     @Override
     public BlockData setState(BlockState<?> state, Object value) {
         IBlockDataHandle updated_data = this.data.set(state.getBackingHandle(), value);
-        BlockData data = BlockDataImpl.BY_BLOCK_DATA.get(updated_data.getRaw());
+        BlockData data = retrieveFromCache(updated_data.getRaw());
         if (data != null) {
             return data;
+        } else {
+            return createAndStoreInCache(updated_data);
         }
-
-        // Store in map (should only rarely happen)
-        BlockDataConstant c = new BlockDataImpl.BlockDataConstant(updated_data);
-        BY_BLOCK_DATA.put(updated_data.getRaw(), c);
-        return c;
     }
 
     @Override
