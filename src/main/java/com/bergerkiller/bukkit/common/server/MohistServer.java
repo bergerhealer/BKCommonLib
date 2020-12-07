@@ -25,14 +25,31 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
         }
 
         // Check this is actually a Mohist server, we expect this Class to exist
-        try {
-            Class.forName("red.mohist.Mohist");
-        } catch (Throwable t) {
-            return false;
+        final String mohistNamespace;
+        final Class<? extends RemapUtilsClass> mohistRemapUtilsType;
+        {
+            String namespace;
+            Class<? extends RemapUtilsClass> remapUtilsType;
+            try {
+                Class.forName("com.mohistmc.MohistMC");
+                namespace = "com.mohistmc";
+                remapUtilsType = RemapUtilsClassImpl.class;
+            } catch (Throwable t) {
+                try {
+                    Class.forName("red.mohist.Mohist");
+                    namespace = "red.mohist";
+                    remapUtilsType = RemapUtilsClassImplLegacy.class;
+                } catch (Throwable t2) {
+                    return false;
+                }
+            }
+
+            mohistNamespace = namespace;
+            mohistRemapUtilsType = remapUtilsType;
         }
 
         // Make sure RemapUtils exists, this initializes the RemapUtilsHandle using the above initialized declaration
-        remapUtils = Template.Class.create(RemapUtilsClass.class);
+        remapUtils = Template.Class.create(mohistRemapUtilsType);
         if (!remapUtils.isAvailable()) {
             return false;
         }
@@ -43,7 +60,7 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
         // Custom entity class used for forge entities
         Stream.of("CraftCustomEntity", "CraftCustomChestHorse", "CraftCustomAbstractHorse").forEach(n -> {
             try {
-                Class<?> type = Class.forName("red.mohist.entity." + n);
+                Class<?> type = Class.forName(mohistNamespace + ".entity." + n);
                 customEntityBaseClasses.add(type);
             } catch (Throwable t) {}
         });
@@ -131,10 +148,40 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     }
 
     @Template.Optional
-    @Template.InstanceType("red.mohist.bukkit.nms.utils.RemapUtils")
-    public static abstract class RemapUtilsClass extends Template.Class<Template.Handle> {
+    @Template.InstanceType("com.mohistmc.bukkit.nms.utils.RemapUtils")
+    public static abstract class RemapUtilsClassImpl extends RemapUtilsClass {
         /*
-         * <MAP_CLASS_NAME>
+         * <MAP_CLASS_NAME_IMPL>
+         * public static String mapClassName(String className) {
+         *     if (className.startsWith("net.minecraft.server.")) {
+         *         com.mohistmc.bukkit.nms.model.ClassMapping mapping;
+         *         mapping = (com.mohistmc.bukkit.nms.model.ClassMapping) RemapUtils.jarMapping.byNMSName.get(className);
+         *         if (mapping != null) {
+         *             return mapping.getMcpName();
+         *         } else {
+         *             // Mohist BUGFIX!!!
+         *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
+         *             return "missing.type." + className;
+         *         }
+         *     }
+         *     return className;
+         * }
+         */
+        @Template.Generated("%MAP_CLASS_NAME_IMPL%")
+        public abstract String mapClassName(String className);
+
+        @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
+        public abstract String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes);
+
+        @Template.Generated("public static String mapFieldName(Class<?> type, String fieldName)")
+        public abstract String mapFieldName(Class<?> type, String fieldName);
+    }
+
+    @Template.Optional
+    @Template.InstanceType("red.mohist.bukkit.nms.utils.RemapUtils")
+    public static abstract class RemapUtilsClassImplLegacy extends RemapUtilsClass {
+        /*
+         * <MAP_CLASS_NAME_LEGACY>
          * public static String mapClassName(String className) {
          *     if (className.startsWith("net.minecraft.server.")) {
          *         red.mohist.bukkit.nms.model.ClassMapping mapping;
@@ -150,7 +197,7 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
          *     return className;
          * }
          */
-        @Template.Generated("%MAP_CLASS_NAME%")
+        @Template.Generated("%MAP_CLASS_NAME_LEGACY%")
         public abstract String mapClassName(String className);
 
         @Template.Generated("public static transient String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes)")
@@ -160,4 +207,9 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
         public abstract String mapFieldName(Class<?> type, String fieldName);
     }
 
+    public static abstract class RemapUtilsClass extends Template.Class<Template.Handle> {
+        public abstract String mapClassName(String className);
+        public abstract String mapMethodName(Class<?> type, String name, Class<?>[] parameterTypes);
+        public abstract String mapFieldName(Class<?> type, String fieldName);
+    }
 }
