@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 public final class LightingHandlerSelector extends LightingHandler {
     private final LightingHandler fallback;
     private final LightingHandler cubicchunks;
+    private final LightingHandler starlight;
 
     public LightingHandlerSelector() {
         // Vanilla fallback
@@ -30,6 +31,13 @@ public final class LightingHandlerSelector extends LightingHandler {
         } else {
             cubicchunks = new LightingHandlerDisabled(null);
         }
+
+        // Tuinity StarLight engine check, then initialize
+        if (CommonUtil.getClass("com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine") != null) {
+            starlight = new LightingHandler_1_16_4_StarLightEngine();
+        } else {
+            starlight = new LightingHandlerDisabled(null);
+        }
     }
 
     @Override
@@ -40,6 +48,8 @@ public final class LightingHandlerSelector extends LightingHandler {
     private LightingHandler getHandler(World world) {
         if (cubicchunks.isSupported(world)) {
             return cubicchunks;
+        } else if (starlight.isSupported(world)) {
+            return starlight;
         } else {
             return fallback;
         }
