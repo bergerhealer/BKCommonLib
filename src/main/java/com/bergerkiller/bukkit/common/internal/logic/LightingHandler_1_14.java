@@ -292,17 +292,11 @@ public class LightingHandler_1_14 extends LightingHandler {
          *     #require net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
          *     QueuedChangesMapLong2Object data = lightEngineStorageArray#data;
          *     final NibbleArray updating = (NibbleArray) data.getUpdating(key);
-         * 
-         *     // Queue update of the new data
-         *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
-         * 
-         *     // If previous data was pooled, release that data to prevent a memory leak
-         *     if (updating != null && updating.cleaner != null) {
-         *   #if exists net.minecraft.server.MCUtil public static org.bukkit.scheduler.BukkitTask scheduleTask(int ticks, Runnable runnable, String taskName);
-         *         MCUtil.scheduleTask(2, updating.cleaner, "Light Engine Release");
-         *   #else
-         *         MCUtil.scheduleTask(2, updating.cleaner);
-         *   #endif
+         *     if (updating != null) {
+         *         System.arraycopy((Object) data_bytes, 0, (Object) updating.asBytesPoolSafe(), 0, 2048);
+         *         lightEngineStorageArray.a(key, updating);
+         *     } else {
+         *         lightEngineStorageArray.a(key, new NibbleArray(data_bytes).markPoolSafe());
          *     }
          * #else
          *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
