@@ -1,12 +1,14 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.IntSupplier;
 import java.util.logging.Level;
 
 import org.bukkit.World;
@@ -28,6 +30,9 @@ public class LightingHandler_1_14 implements LightingHandler {
     private final Field light_layer_sky;
     private final Field light_storage;
     private final Field light_storage_array_live;
+    private final Object light_engine_pre_update;
+    private final Object light_engine_post_update;
+    private final Method light_engine_schedule;
     private final Map<World, EngineUpdateTaskLists> task_lists = new HashMap<>();
 
     public LightingHandler_1_14() throws Throwable {
@@ -74,11 +79,39 @@ public class LightingHandler_1_14 implements LightingHandler {
             throw new IllegalStateException("LightEngineStorage light_storage_array_live field is not of type LightEngineStorageArray");
         }
 
+        // Get PRE/POST_UPDATE constants
+        Class<?> updateType = CommonUtil.getNMSClass("LightEngineThreaded$Update");
+        {
+            Object preUpdate = null;
+            Object postUpdate = null;
+            for (Object constant : updateType.getEnumConstants()) {
+                String name = ((Enum<?>) constant).name();
+                if (name.equals("PRE_UPDATE")) {
+                    preUpdate = constant;
+                } else if (name.equals("POST_UPDATE")) {
+                    postUpdate = constant;
+                }
+            }
+            if (preUpdate == null) {
+                throw new IllegalStateException("LightEngineThreaded.Update has no PRE_UPDATE constant");
+            }
+            if (postUpdate == null) {
+                throw new IllegalStateException("LightEngineThreaded.Update has no POSTE_UPDATE constant");
+            }
+            light_engine_pre_update = preUpdate;
+            light_engine_post_update = postUpdate;
+        }
+
+        // Get the private schedule method of the engine
+        this.light_engine_schedule = CommonUtil.getNMSClass("LightEngineThreaded").getDeclaredMethod("a",
+                int.class, int.class, IntSupplier.class, updateType, Runnable.class);
+
         // Make all accessible
         this.light_layer_block.setAccessible(true);
         this.light_layer_sky.setAccessible(true);
         this.light_storage.setAccessible(true);
         this.light_storage_array_live.setAccessible(true);
+        this.light_engine_schedule.setAccessible(true);
     }
 
     @Override
@@ -112,134 +145,149 @@ public class LightingHandler_1_14 implements LightingHandler {
 
     @Override
     public CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        return scheduleUpdate(world, list -> list.block, cx, cy, cz, data);
+        return scheduleUpdate(world, new UpdateTask(cx, cy, cz, data) {
+            @Override
+            public void run(LightEngineData data) {
+                if (data.block_storage_array == null) {
+                    throw new UnsupportedOperationException("World does not store block light data");
+                }
+
+                handle.setLightDataOrStoreNew(data.lightEngine, data.block_storage, data.block_storage_array,
+                        false, this.cx, this.cy, this.cz, this.data);
+            }
+        });
     }
 
     @Override
     public CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        return scheduleUpdate(world, list -> list.sky, cx, cy, cz, data);
+        return scheduleUpdate(world, new UpdateTask(cx, cy, cz, data) {
+            @Override
+            public void run(LightEngineData data) {
+                if (data.sky_storage_array == null) {
+                    throw new UnsupportedOperationException("World does not store sky light data");
+                }
+
+                handle.setLightDataOrStoreNew(data.lightEngine, data.sky_storage, data.sky_storage_array,
+                        true, this.cx, this.cy, this.cz, this.data);
+            }
+        });
     }
 
     // Queues up and schedules the update for a 16x16x16 area of sky/light data
-    private CompletableFuture<Void> scheduleUpdate(World world, Function<EngineUpdateTaskLists, LayerUpdateTaskList> function,
-            int cx, int cy, int cz, byte[] data)
+    private CompletableFuture<Void> scheduleUpdate(World world, UpdateTask task)
     {
-        UpdateTask task = new UpdateTask(cx, cy, cz, data);
         synchronized (task_lists) {
             EngineUpdateTaskLists lists = task_lists.computeIfAbsent(world, EngineUpdateTaskLists::new);
-            function.apply(lists).tasks.add(task);
+            lists.tasks.add(task);
         }
         return task.future;
     }
 
     // All the updates to perform for a single (world) light engine
-    private final class EngineUpdateTaskLists implements Runnable {
+    private final class EngineUpdateTaskLists {
         public final World world;
-        public final LayerUpdateTaskList block;
-        public final LayerUpdateTaskList sky;
-        private boolean hasRun;
+        public final LightEngineThreadedHandle engine;
+        public final List<UpdateTask> tasks;
+        private final AtomicInteger stage;
 
         public EngineUpdateTaskLists(World world) {
-            LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
-            Object layer_block, layer_sky;
-            try {
-                layer_block = light_layer_block.get(engine.getRaw());
-                layer_sky = light_layer_sky.get(engine.getRaw());
-            } catch (Throwable t) {
-                layer_block = null;
-                layer_sky = null;
-            }
             this.world = world;
-            this.block = new LayerUpdateTaskList(engine, layer_block);
-            this.sky = new LayerUpdateTaskList(engine, layer_sky);
-            this.hasRun = false;
-            engine.schedule(this);
-        }
+            this.engine = LightEngineThreadedHandle.forWorld(world);
+            this.tasks = new ArrayList<UpdateTask>();
+            this.stage = new AtomicInteger(0);
 
-        @Override
-        public void run() {
-            // Remove from task lists, if different (should never happen!) run separately
-            EngineUpdateTaskLists removed;
-            synchronized (task_lists) {
-                removed = task_lists.remove(this.world);
-            }
-            if (removed != null && removed != this) {
-                removed.run();
-            }
-
-            // Protection
-            if (this.hasRun) {
-                return;
-            } else {
-                this.hasRun = true;
-            }
-
-            // Process all updates
-            block.run(false);
-            sky.run(true);
-
-            // Complete all callbacks
-            CommonUtil.nextTick(() -> {
-                fireCallbacks(block);
-                fireCallbacks(sky);
-            });
-        }
-
-        private void fireCallbacks(LayerUpdateTaskList list) {
-            for (UpdateTask task : list.tasks) {
-                if (task.error != null) {
-                    task.future.completeExceptionally(task.error);
-                } else {
-                    task.future.complete(null);
-                }
-            }
-        }
-    }
-
-    // All the tasks for a single layer (block/sky)
-    private final class LayerUpdateTaskList {
-        public final LightEngineThreadedHandle engine;
-        public final Object layer;
-        public final List<UpdateTask> tasks;
-
-        public LayerUpdateTaskList(LightEngineThreadedHandle engine, Object layer) {
-            this.engine = engine;
-            this.layer = layer;
-            this.tasks  = new ArrayList<UpdateTask>();
-        }
-
-        public void run(boolean isSkyLight) {
             try {
-                if (this.layer == null) {
-                    throw new IllegalStateException("Light layer field could not be retrieved");
-                }
+                final IntSupplier priority = () -> 0;
+                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_pre_update, (Runnable) this::preRun);
+                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_post_update, (Runnable) this::postRun);
+            } catch (Throwable t) {
+                throw new IllegalStateException("Failed to schedule updates", t);
+            }
+        }
 
-                // Apply all the changes we have queued up in one go
-                Object storage = light_storage.get(this.layer);
-                Object storage_array_live = light_storage_array_live.get(storage);
+        public void preRun() {
+            // Remove from task lists so no more tasks are scheduled
+            synchronized (task_lists) {
+                task_lists.remove(this.world);
+            }
 
+            // Process all updates, make sure it runs only once
+            if (stage.compareAndSet(0, 1)) {
+                LightEngineData data = new LightEngineData(engine.getRaw());
                 for (UpdateTask task : this.tasks) {
                     try {
-                        handle.setLightDataOrStoreNew(engine.getRaw(), storage, storage_array_live, isSkyLight, task.cx, task.cy, task.cz, task.data);
+                        task.run(data);
                     } catch (Throwable t) {
                         task.error = t;
                     }
                 }
+            }
+        }
 
-                // This refreshes the thread-safe 'visible' layer
-                // All data updated earlier is copied and the immutable copy is
-                // assigned to a separate 'visible' representation.
-                handle.syncUpdatingToVisible(storage);
-            } catch (Throwable t) {
-                for (UpdateTask task : this.tasks) {
-                    task.error = t;
+        public void postRun() {
+            // Fire callbacks, make sure this happens only once
+            if (stage.compareAndSet(1, 2)) {
+                CommonUtil.nextTick(() -> {
+                    for (UpdateTask task : tasks) {
+                        if (task.error != null) {
+                            task.future.completeExceptionally(task.error);
+                        } else {
+                            task.future.complete(null);
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    private final class LightEngineData {
+        public final Object lightEngine;
+
+        public final Object block_storage;
+        public final Object block_storage_array;
+
+        public final Object sky_storage;
+        public final Object sky_storage_array;
+
+        public LightEngineData(Object lightEngine) {
+            this.lightEngine = lightEngine;
+
+            // Get block layer
+            {
+                Object layer = null, storage = null, array = null;
+                try {
+                    layer = light_layer_block.get(lightEngine);
+                    if (layer != null) {
+                        storage = light_storage.get(layer);
+                        array = light_storage_array_live.get(storage);
+                    }
+                } catch (Throwable t) {}
+
+                this.block_storage = storage;
+                this.block_storage_array = array;
+            }
+
+            // Get sky layer
+            {
+                Object layer = null, storage = null, array = null;
+                try {
+                    layer = light_layer_sky.get(lightEngine);
+                    if (layer != null) {
+                        storage = light_storage.get(layer);
+                        array = light_storage_array_live.get(storage);
+                    }
+                } catch (Throwable t) {
+                    t.printStackTrace();
                 }
+
+                this.sky_storage = storage;
+                this.sky_storage_array = array;
             }
         }
     }
 
     // A single task to change a single 16x16x16 slice
-    private static final class UpdateTask {
+    private static abstract class UpdateTask {
         public final CompletableFuture<Void> future = new CompletableFuture<Void>();
         public final int cx;
         public final int cy;
@@ -253,6 +301,8 @@ public class LightingHandler_1_14 implements LightingHandler {
             this.cz = cz;
             this.data = data;
         }
+
+        public abstract void run(LightEngineData data);
     }
 
     @Template.Optional
@@ -317,19 +367,5 @@ public class LightingHandler_1_14 implements LightingHandler {
          */
         @Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW%")
         public abstract void setLightDataOrStoreNew(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
-
-        /*
-         * <SYNC_UPDATING_TO_VISIBLE>
-         * public static void syncUpdatingToVisible(net.minecraft.server.LightEngineStorage lightEngineStorage) {
-         * #if version >= 1.15
-         *     #require net.minecraft.server.LightEngineStorage protected void sync:e();
-         * #else
-         *     #require net.minecraft.server.LightEngineStorage protected void sync:d();
-         * #endif
-         *     lightEngineStorage#sync();
-         * }
-         */
-        @Template.Generated("%SYNC_UPDATING_TO_VISIBLE%")
-        public abstract void syncUpdatingToVisible(Object lightEngineStorage);
     }
 }
