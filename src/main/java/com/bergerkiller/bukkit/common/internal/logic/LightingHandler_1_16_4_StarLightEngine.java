@@ -13,6 +13,7 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -20,7 +21,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 /**
  * Interfaces with the Tuinity server 1.16.4 starlight engine
  */
-public class LightingHandler_1_16_4_StarLightEngine extends LightingHandler {
+public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     private StarLightEngineHandle handle;
     private final Map<World, List<Runnable>> lightUpdateQueue = new IdentityHashMap<>();
 

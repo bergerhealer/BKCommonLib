@@ -5,6 +5,7 @@ import java.util.concurrent.CompletableFuture;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -12,7 +13,18 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Selects the most appropriate lighting handler for a world, then
  * forwards calls to that handler.
  */
-public final class LightingHandlerSelector extends LightingHandler {
+public final class LightingHandlerSelector implements LightingHandler {
+    public static final LightingHandler INSTANCE;
+    static {
+        LightingHandler tmp;
+        try {
+            tmp = new LightingHandlerSelector();
+        } catch (Throwable cause) {
+            tmp = new LightingHandlerDisabled(cause);
+        }
+        INSTANCE = tmp;
+    }
+
     private final LightingHandler fallback;
     private final LightingHandler cubicchunks;
     private final LightingHandler starlight;

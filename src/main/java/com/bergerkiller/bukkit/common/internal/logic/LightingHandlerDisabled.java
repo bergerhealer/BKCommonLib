@@ -6,8 +6,9 @@ import java.util.logging.Level;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 
-public class LightingHandlerDisabled extends LightingHandler {
+public class LightingHandlerDisabled implements LightingHandler {
     private final Throwable cause;
 
     public LightingHandlerDisabled(Throwable cause) {

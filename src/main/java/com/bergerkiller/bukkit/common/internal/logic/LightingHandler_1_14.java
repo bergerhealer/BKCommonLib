@@ -13,6 +13,7 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -21,7 +22,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Lighting handler for Minecraft 1.14 and later. A new asynchronous lighting engine was introduced,
  * which means changes to light requires scheduling tasks on a worker thread.
  */
-public class LightingHandler_1_14 extends LightingHandler {
+public class LightingHandler_1_14 implements LightingHandler {
     private final LightEngineHandle handle;
     private final Field light_layer_block;
     private final Field light_layer_sky;
@@ -70,7 +71,7 @@ public class LightingHandler_1_14 extends LightingHandler {
 
         this.light_storage_array_live = lightEngineStorageType.getDeclaredField("f");
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_array_live.getType())) {
-            throw new IllegalStateException("LightEngineStorage light_storage_live field is not of type LightEngineStorageArray");
+            throw new IllegalStateException("LightEngineStorage light_storage_array_live field is not of type LightEngineStorageArray");
         }
 
         // Make all accessible
@@ -90,7 +91,7 @@ public class LightingHandler_1_14 extends LightingHandler {
         LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
             Object layer = this.light_layer_block.get(engine.getRaw());
-            return readLayerData(engine, layer, cx, cy, cz);
+            return this.handle.getLightData(layer, cx, cy, cz);
         } catch (Throwable ex) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
             return null;
@@ -102,18 +103,10 @@ public class LightingHandler_1_14 extends LightingHandler {
         LightEngineThreadedHandle engine = LightEngineThreadedHandle.forWorld(world);
         try {
             Object layer = this.light_layer_sky.get(engine.getRaw());
-            return readLayerData(engine, layer, cx, cy, cz);
+            return this.handle.getLightData(layer, cx, cy, cz);
         } catch (Throwable ex) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
             return null;
-        }
-    }
-
-    private byte[] readLayerData(LightEngineThreadedHandle engine, Object layer, int cx, int cy, int cz) throws Throwable {
-        if (layer == null) {
-            return null;
-        } else {
-            return this.handle.getData(layer, cx, cy, cz);
         }
     }
 
@@ -157,8 +150,8 @@ public class LightingHandler_1_14 extends LightingHandler {
                 layer_sky = null;
             }
             this.world = world;
-            this.block = new LayerUpdateTaskList(layer_block);
-            this.sky = new LayerUpdateTaskList(layer_sky);
+            this.block = new LayerUpdateTaskList(engine, layer_block);
+            this.sky = new LayerUpdateTaskList(engine, layer_sky);
             this.hasRun = false;
             engine.schedule(this);
         }
@@ -182,8 +175,8 @@ public class LightingHandler_1_14 extends LightingHandler {
             }
 
             // Process all updates
-            block.run();
-            sky.run();
+            block.run(false);
+            sky.run(true);
 
             // Complete all callbacks
             CommonUtil.nextTick(() -> {
@@ -205,15 +198,17 @@ public class LightingHandler_1_14 extends LightingHandler {
 
     // All the tasks for a single layer (block/sky)
     private final class LayerUpdateTaskList {
+        public final LightEngineThreadedHandle engine;
         public final Object layer;
         public final List<UpdateTask> tasks;
 
-        public LayerUpdateTaskList(Object layer) {
+        public LayerUpdateTaskList(LightEngineThreadedHandle engine, Object layer) {
+            this.engine = engine;
             this.layer = layer;
             this.tasks  = new ArrayList<UpdateTask>();
         }
 
-        public void run() {
+        public void run(boolean isSkyLight) {
             try {
                 if (this.layer == null) {
                     throw new IllegalStateException("Light layer field could not be retrieved");
@@ -222,22 +217,19 @@ public class LightingHandler_1_14 extends LightingHandler {
                 // Apply all the changes we have queued up in one go
                 Object storage = light_storage.get(this.layer);
                 Object storage_array_live = light_storage_array_live.get(storage);
+
                 for (UpdateTask task : this.tasks) {
                     try {
-                        handle.setData(storage_array_live, task.cx, task.cy, task.cz, task.data);
+                        handle.setLightDataOrStoreNew(engine.getRaw(), storage, storage_array_live, isSkyLight, task.cx, task.cy, task.cz, task.data);
                     } catch (Throwable t) {
                         task.error = t;
                     }
                 }
 
-                // There's a small cache of the last two 16x16x16 slices queried
-                // We clear this cache to make sure data is updated
-                handle.clearCache(storage_array_live);
-
                 // This refreshes the thread-safe 'visible' layer
                 // All data updated earlier is copied and the immutable copy is
                 // assigned to a separate 'visible' representation.
-                handle.assignUpdatingToVisible(storage);
+                handle.syncUpdatingToVisible(storage);
             } catch (Throwable t) {
                 for (UpdateTask task : this.tasks) {
                     task.error = t;
@@ -270,8 +262,11 @@ public class LightingHandler_1_14 extends LightingHandler {
     public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
-         * <GET_LAYER_DATA>
+         * <GET_LAYER_LIGHT_DATA>
          * public static byte[] getLayerData(net.minecraft.server.LightEngineLayer layer, int cx, int cy, int cz) {
+         *    if (layer == null) {
+         *        return null;
+         *    }
          *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
          *    if (array == null) {
          *        return null;
@@ -279,66 +274,62 @@ public class LightingHandler_1_14 extends LightingHandler {
          *    return array.asBytes();
          * }
          */
-        @Template.Generated("%GET_LAYER_DATA%")
-        public abstract byte[] getData(Object lightEngineLayer, int cx, int cy, int cz);
+        @Template.Generated("%GET_LAYER_LIGHT_DATA%")
+        public abstract byte[] getLightData(Object lightEngineLayer, int cx, int cy, int cz);
 
         /*
-         * <SET_LIVE_DATA>
-         * public static void setLiveData(net.minecraft.server.LightEngineStorageArray lightEngineStorageArray, int cx, int cy, int cz, byte[] data_bytes) {
+         * <SET_LIGHT_DATA_OR_STORE_NEW>
+         * public static void setLightDataOrStoreNew(net.minecraft.server.LightEngine engine, net.minecraft.server.LightEngineStorage lightEngineStorage, net.minecraft.server.LightEngineStorageArray lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
          *     long key = SectionPosition.b(cx, cy, cz);
          * 
-         * #if exists net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
-         *     // Retrieve previously stored data for releasing, if needed
-         *     #require net.minecraft.server.LightEngineStorageArray protected final QueuedChangesMapLong2Object<NibbleArray> data;
-         *     QueuedChangesMapLong2Object data = lightEngineStorageArray#data;
-         *     final NibbleArray updating = (NibbleArray) data.getUpdating(key);
-         *     if (updating != null) {
-         *         System.arraycopy((Object) data_bytes, 0, (Object) updating.asBytesPoolSafe(), 0, 2048);
-         *         lightEngineStorageArray.a(key, updating);
-         *     } else {
-         *         lightEngineStorageArray.a(key, new NibbleArray(data_bytes).markPoolSafe());
+         *     NibbleArray dataNibble = lightEngineStorageArray.c(key);
+         *     if (dataNibble == null) {
+         *         // Missing, use engine to register and store a new section
+         *         final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         *         final EnumSkyBlock enumSky = skyLight ? EnumSkyBlock.SKY : EnumSkyBlock.BLOCK;
+         *         engine.a(enumSky, pos, new NibbleArray(data_bytes), true);
+         *         return;
          *     }
-         * #else
-         *     lightEngineStorageArray.a(key, new NibbleArray(data_bytes));
-         * #endif
-         * }
-         */
-        @Template.Generated("%SET_LIVE_DATA%")
-        public abstract void setData(Object lightEngineStorageArray, int cx, int cy, int cz, byte[] data);
-
-        /*
-         * <CLEAR_CACHE>
-         * public static void setLiveData(net.minecraft.server.LightEngineStorageArray lightEngineStorageArray) {
-         *     lightEngineStorageArray.c();
-         * }
-         */
-        @Template.Generated("%CLEAR_CACHE%")
-        public abstract void clearCache(Object lightEngineStorageArray);
-
-        /*
-         * <ASSIGN_UPDATING_TO_VISIBLE>
-         * public static void assignUpdatingToVisible(net.minecraft.server.LightEngineStorage lightEngineStorage) {
-         * #if exists net.minecraft.server.LightEngineStorage protected final Object visibleUpdateLock;
-         *     #require net.minecraft.server.LightEngineStorage protected final Object visibleUpdateLock;
-         *     Object lock = lightEngineStorage#visibleUpdateLock;
-         *     synchronized (lock)
-         * #endif
-         *     {
-         *         #require net.minecraft.server.LightEngineStorage protected final net.minecraft.server.LightEngineStorageArray liveArray:f;
-         * #if exists net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray e_visible;
-         *         #require net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray visible:e_visible;
-         * #else
-         *         #require net.minecraft.server.LightEngineStorage protected volatile LightEngineStorageArray visible:e;
-         * #endif
          * 
-         *         net.minecraft.server.LightEngineStorageArray m0 = lightEngineStorage#liveArray;
-         *         m0 = m0.b();
-         *         m0.d();
-         *         lightEngineStorage#visible = m0;
-         *     }
+         *     // Copy new section light data and mark for updating
+         * #if exists net.minecraft.server.NibbleArray public byte[] asBytesPoolSafe();
+         *     System.arraycopy(data_bytes, 0, dataNibble.asBytesPoolSafe(), 0, 2048);
+         * #else
+         *     System.arraycopy(data_bytes, 0, dataNibble.asBytes(), 0, 2048);
+         * #endif
+         *     lightEngineStorageArray.a(key, dataNibble);
+         * 
+         *     // Track the nibbles we have pushed in this set
+         *     #require net.minecraft.server.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet syncPendingSet:g;
+         *     it.unimi.dsi.fastutil.longs.LongSet syncPending = lightEngineStorage#syncPendingSet;
+         *     syncPending.add(key);
+         * 
+         *     // When storing light data, make sure to refresh the top section where light data is stored
+         *     // Otherwise it will send all-15 light levels for sky light mistakingly
+         *     // notifyCubePresent(long) implementation is in LightEngineStorageSky
+         * #if version >= 1.14.1
+         *     #require net.minecraft.server.LightEngineStorage protected void notifyCubePresent:k(long i);
+         * #else
+         *     #require net.minecraft.server.LightEngineStorage protected void notifyCubePresent:j(long i);
+         * #endif
+         *     lightEngineStorage#notifyCubePresent(key);
          * }
          */
-        @Template.Generated("%ASSIGN_UPDATING_TO_VISIBLE%")
-        public abstract void assignUpdatingToVisible(Object lightEngineStorage);
+        @Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW%")
+        public abstract void setLightDataOrStoreNew(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
+
+        /*
+         * <SYNC_UPDATING_TO_VISIBLE>
+         * public static void syncUpdatingToVisible(net.minecraft.server.LightEngineStorage lightEngineStorage) {
+         * #if version >= 1.15
+         *     #require net.minecraft.server.LightEngineStorage protected void sync:e();
+         * #else
+         *     #require net.minecraft.server.LightEngineStorage protected void sync:d();
+         * #endif
+         *     lightEngineStorage#sync();
+         * }
+         */
+        @Template.Generated("%SYNC_UPDATING_TO_VISIBLE%")
+        public abstract void syncUpdatingToVisible(Object lightEngineStorage);
     }
 }

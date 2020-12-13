@@ -1,11 +1,17 @@
-package com.bergerkiller.bukkit.common.internal.logic;
+package com.bergerkiller.bukkit.common.lighting;
 
 import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.World;
 
-public abstract class LightingHandler {
-    public static final LightingHandler INSTANCE = new LightingHandlerSelector();
+import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerSelector;
+
+/**
+ * Interfaces with server internals to retrieve and apply block and sky lighting
+ * information to 16x16x16 sections of chunks. Reading can be done blocking/synchronously,
+ * while writing is done asynchronously.
+ */
+public interface LightingHandler {
 
     /**
      * Gets whether this lighting handler can support operations on the world specified.
@@ -13,7 +19,7 @@ public abstract class LightingHandler {
      * @param world
      * @return True if the world is supported
      */
-    public abstract boolean isSupported(World world);
+    boolean isSupported(World world);
 
     /**
      * Gets the sky light values for a single 16x16x16 section of blocks
@@ -24,7 +30,7 @@ public abstract class LightingHandler {
      * @param cz Chunk Section Z-coordinate
      * @return 4096-size array of sky lighting data
      */
-    public abstract byte[] getSectionSkyLight(World world, int cx, int cy, int cz);
+    byte[] getSectionSkyLight(World world, int cx, int cy, int cz);
 
     /**
      * Gets the block light values for a single 16x16x16 section of blocks
@@ -35,7 +41,7 @@ public abstract class LightingHandler {
      * @param cz Chunk Section Z-coordinate
      * @return 4096-size array of block lighting data
      */
-    public abstract byte[] getSectionBlockLight(World world, int cx, int cy, int cz);
+    byte[] getSectionBlockLight(World world, int cx, int cy, int cz);
 
     /**
      * Sets the sky light values for a single 16x16x16 section of blocks asynchronously
@@ -47,7 +53,7 @@ public abstract class LightingHandler {
      * @param data
      * @return completable future completed when the light has been updated
      */
-    public abstract CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data);
+    CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data);
 
     /**
      * Sets the block light values for a single 16x16x16 section of blocks asynchronously
@@ -59,5 +65,14 @@ public abstract class LightingHandler {
      * @param data
      * @return completable future completed when the light has been updated
      */
-    public abstract CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data);
+    CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data);
+
+    /**
+     * Gets the BKCommonLib LightingHandler API interface
+     * 
+     * @return lighting handler interface
+     */
+    public static LightingHandler instance() {
+        return LightingHandlerSelector.INSTANCE;
+    }
 }

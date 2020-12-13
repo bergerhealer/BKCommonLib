@@ -371,6 +371,7 @@ public class CommonBootstrap {
                         "longs.Long2ObjectLinkedOpenHashMap",
                         "ints.Int2ObjectOpenHashMap",
                         "longs.Long2ObjectOpenHashMap",
+                        "longs.Long2IntOpenHashMap",
                         "longs.LongIterator",
                         "longs.LongLinkedOpenHashSet",
                         "longs.LongOpenHashSet",

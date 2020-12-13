@@ -6,6 +6,7 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -13,7 +14,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Lighting handler for Minecraft 1.8 to 1.13.2. This is before the introduction
  * of a new asynchronous light engine, which means everything happens on the main thread.
  */
-public class LightingHandler_1_8_to_1_13_2 extends LightingHandler {
+public class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
     private final LightingLogicHandle handle = Template.Class.create(LightingLogicHandle.class, Common.TEMPLATE_RESOLVER);
 
     @Override

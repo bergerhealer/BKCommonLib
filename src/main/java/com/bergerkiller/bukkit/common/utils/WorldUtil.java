@@ -9,10 +9,10 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
@@ -1175,7 +1175,6 @@ public class WorldUtil extends ChunkUtil {
         return RegionHandler.INSTANCE.getRegionChunks3(world, rx, ry, rz);
     }
 
-    
     /**
      * Gets the raw nibble data storing the sky light for a 16x16x16 section of the world
      * 
@@ -1186,7 +1185,7 @@ public class WorldUtil extends ChunkUtil {
      * @return sky light data
      */
     public static byte[] getSectionSkyLight(World world, int cx, int cy, int cz) {
-        return LightingHandler.INSTANCE.getSectionSkyLight(world, cx, cy, cz);
+        return LightingHandler.instance().getSectionSkyLight(world, cx, cy, cz);
     }
 
     /**
@@ -1199,7 +1198,7 @@ public class WorldUtil extends ChunkUtil {
      * @return block light data
      */
     public static byte[] getSectionBlockLight(World world, int cx, int cy, int cz) {
-        return LightingHandler.INSTANCE.getSectionBlockLight(world, cx, cy, cz);
+        return LightingHandler.instance().getSectionBlockLight(world, cx, cy, cz);
     }
 
     /**
@@ -1251,7 +1250,7 @@ public class WorldUtil extends ChunkUtil {
      * @return completable future completed when the light has been updated, executed on the main thread
      */
     public static CompletableFuture<Void> setSectionSkyLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        return LightingHandler.INSTANCE.setSectionSkyLightAsync(world, cx, cy, cz, data);
+        return LightingHandler.instance().setSectionSkyLightAsync(world, cx, cy, cz, data);
     }
 
     /**
@@ -1269,6 +1268,6 @@ public class WorldUtil extends ChunkUtil {
      * @return completable future completed when the light has been updated, executed on the main thread
      */
     public static CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
-        return LightingHandler.INSTANCE.setSectionBlockLightAsync(world, cx, cy, cz, data);
+        return LightingHandler.instance().setSectionBlockLightAsync(world, cx, cy, cz, data);
     }
 }

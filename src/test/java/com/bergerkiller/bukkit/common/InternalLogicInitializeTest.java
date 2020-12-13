@@ -6,10 +6,10 @@ import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
-import com.bergerkiller.bukkit.common.internal.logic.LightingHandler;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerDisabled;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
+import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 
 /**
@@ -29,7 +29,7 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testLightingHandler() {
-        assertFalse(LightingHandler.INSTANCE instanceof LightingHandlerDisabled);
+        assertFalse(LightingHandler.instance() instanceof LightingHandlerDisabled);
     }
 
     @Test
