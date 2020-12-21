@@ -1,8 +1,5 @@
 package com.bergerkiller.bukkit.common.permissions;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.StringUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.PermissionDefault;
 
@@ -12,11 +9,9 @@ import java.util.Locale;
  * Basic implementation of IPermissionDefault that supplies additional function
  * routines
  */
-public abstract class PermissionEnum implements IPermissionDefault {
+public abstract class PermissionEnum implements IPermissionEnum {
 
     private final String node;
-    private final String[] nodeArr;
-    private final String name;
     private final PermissionDefault def;
     private final String desc;
 
@@ -26,10 +21,8 @@ public abstract class PermissionEnum implements IPermissionDefault {
 
     protected PermissionEnum(String node, PermissionDefault def, String description, int argCount) {
         this.node = node.toLowerCase(Locale.ENGLISH);
-        this.nodeArr = this.node.split("\\.");
         this.def = def;
         this.desc = description;
-        this.name = this.node + StringUtil.getFilledString(".*", argCount);
     }
 
     /**
@@ -38,6 +31,7 @@ public abstract class PermissionEnum implements IPermissionDefault {
      *
      * @return permission root name
      */
+    @Override
     public String getRootName() {
         return this.node;
     }
@@ -45,11 +39,6 @@ public abstract class PermissionEnum implements IPermissionDefault {
     @Override
     public String toString() {
         return this.getName();
-    }
-
-    @Override
-    public String getName() {
-        return this.name;
     }
 
     @Override
@@ -62,6 +51,11 @@ public abstract class PermissionEnum implements IPermissionDefault {
         return this.desc;
     }
 
+    @Override
+    public String getName() {
+        return IPermissionEnum.super.getName();
+    }
+
     /**
      * Checks whether a CommandSender has this permission<br>
      * If the sender does not have this permission, the message specified is
@@ -71,8 +65,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
      * @param message to send if the sender has no permission
      * @return True if the sender has permission, False if not
      */
+    @Override
     public boolean handleMsg(CommandSender sender, String message) {
-        return handleMsg(sender, message, StringUtil.EMPTY_ARRAY);
+        return IPermissionEnum.super.handleMsg(sender, message);
     }
 
     /**
@@ -85,12 +80,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
      * @param args to use for this permission node (appended to the node name)
      * @return True if the sender has permission, False if not
      */
+    @Override
     public boolean handleMsg(CommandSender sender, String message, String... args) {
-        if (this.has(sender, args)) {
-            return true;
-        }
-        sender.sendMessage(message);
-        return false;
+        return IPermissionEnum.super.handleMsg(sender, message, args);
     }
 
     /**
@@ -100,8 +92,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
      *
      * @param sender to check the permission for
      */
+    @Override
     public void handle(CommandSender sender) {
-        handle(sender, StringUtil.EMPTY_ARRAY);
+        IPermissionEnum.super.handle(sender);
     }
 
     /**
@@ -113,10 +106,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
      * @param args to use for this permission node (appended to the node name)
      * @throws NoPermissionException
      */
+    @Override
     public void handle(CommandSender sender, String... args) {
-        if (!has(sender, args)) {
-            throw new NoPermissionException();
-        }
+        IPermissionEnum.super.handle(sender, args);
     }
 
     /**
@@ -125,8 +117,9 @@ public abstract class PermissionEnum implements IPermissionDefault {
      * @param sender to check the permission for
      * @return True if the sender has permission for this node, False if not
      */
+    @Override
     public boolean has(CommandSender sender) {
-        return has(sender, StringUtil.EMPTY_ARRAY);
+        return IPermissionEnum.super.has(sender);
     }
 
     /**
@@ -136,12 +129,8 @@ public abstract class PermissionEnum implements IPermissionDefault {
      * @param args to use for this permission node (appended to the node name)
      * @return True if the sender has permission for this node, False if not
      */
+    @Override
     public boolean has(CommandSender sender, String... args) {
-        if (args.length == 0) {
-            // No-argument version
-            return CommonUtil.hasPermission(sender, this.node);
-        } else {
-            return CommonUtil.hasPermission(sender, LogicUtil.appendArray(this.nodeArr, args));
-        }
+        return IPermissionEnum.super.has(sender, args);
     }
 }

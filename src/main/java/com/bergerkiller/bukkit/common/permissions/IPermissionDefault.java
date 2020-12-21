@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common.permissions;
 
 import org.bukkit.permissions.PermissionDefault;
 
+/**
+ * Base interface for registering permissions used by a plugin.
+ */
 public interface IPermissionDefault {
 
     /**
