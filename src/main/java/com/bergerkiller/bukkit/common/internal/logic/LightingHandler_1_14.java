@@ -152,8 +152,7 @@ public class LightingHandler_1_14 implements LightingHandler {
                     throw new UnsupportedOperationException("World does not store block light data");
                 }
 
-                handle.setLightDataOrStoreNew(data.lightEngine, data.block_storage, data.block_storage_array,
-                        false, this.cx, this.cy, this.cz, this.data);
+                handle.storeBlockLightData(data.lightEngine, this.cx, this.cy, this.cz, this.data);
             }
         });
     }
@@ -167,8 +166,7 @@ public class LightingHandler_1_14 implements LightingHandler {
                     throw new UnsupportedOperationException("World does not store sky light data");
                 }
 
-                handle.setLightDataOrStoreNew(data.lightEngine, data.sky_storage, data.sky_storage_array,
-                        true, this.cx, this.cy, this.cz, this.data);
+                handle.storeSkyLightData(data.lightEngine, this.cx, this.cy, this.cz, this.data);
             }
         });
     }
@@ -240,6 +238,7 @@ public class LightingHandler_1_14 implements LightingHandler {
         }
     }
 
+    @SuppressWarnings("unused")
     private final class LightEngineData {
         public final Object lightEngine;
 
@@ -261,7 +260,9 @@ public class LightingHandler_1_14 implements LightingHandler {
                         storage = light_storage.get(layer);
                         array = light_storage_array_live.get(storage);
                     }
-                } catch (Throwable t) {}
+                } catch (Throwable t) {
+                    t.printStackTrace();
+                }
 
                 this.block_storage = storage;
                 this.block_storage_array = array;
@@ -328,7 +329,27 @@ public class LightingHandler_1_14 implements LightingHandler {
         public abstract byte[] getLightData(Object lightEngineLayer, int cx, int cy, int cz);
 
         /*
-         * <SET_LIGHT_DATA_OR_STORE_NEW>
+         * <STORE_SKY_LIGHT_DATA>
+         * public static void storeSkyLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         * }
+         */
+        @Template.Generated("%STORE_SKY_LIGHT_DATA%")
+        public abstract void storeSkyLightData(Object lightEngine, int cx, int cy, int cz, byte[] data);
+
+        /*
+         * <STORE_BLOCK_LIGHT_DATA>
+         * public static void storeBlockLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         * }
+         */
+        @Template.Generated("%STORE_BLOCK_LIGHT_DATA%")
+        public abstract void storeBlockLightData(Object lightEngine, int cx, int cy, int cz, byte[] data);
+
+        /*
+         * <SET_LIGHT_DATA_OR_STORE_NEW_OLD>
          * public static void setLightDataOrStoreNew(net.minecraft.server.LightEngine engine, net.minecraft.server.LightEngineStorage lightEngineStorage, net.minecraft.server.LightEngineStorageArray lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
          *     long key = SectionPosition.b(cx, cy, cz);
          * 
@@ -365,7 +386,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     lightEngineStorage#notifyCubePresent(key);
          * }
          */
-        @Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW%")
-        public abstract void setLightDataOrStoreNew(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
+        @Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW_OLD%")
+        public abstract void setLightDataOrStoreNewOld(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
     }
 }
