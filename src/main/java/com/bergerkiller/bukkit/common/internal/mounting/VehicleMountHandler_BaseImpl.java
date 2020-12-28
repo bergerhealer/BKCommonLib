@@ -7,10 +7,12 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -349,8 +351,12 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
     // Calls a runnable while synchronized, afterwards flushes all queued packets
     protected final void synchronizeAndQueuePackets(Runnable r) {
-        synchronized (this) {
-            r.run();
+        try {
+            synchronized (this) {
+                r.run();
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error handling vehicle mount packets for player " + this._player.getName(), t);
         }
 
         PacketHandle p;
