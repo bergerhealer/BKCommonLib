@@ -65,7 +65,7 @@ public interface IPermissionEnum extends IPermissionDefault {
      * @throws IllegalArgumentException If incorrect number of arguments were specified
      */
     default boolean has(CommandSender sender, String... args) {
-        if (this.getArgumentCount() != args.length) {
+        if (this.getArgumentCount() > args.length) {
             throw new IllegalArgumentException("This permission requires " + this.getArgumentCount()
                     + " arguments, but " + args.length + " were provided");
         }
@@ -136,7 +136,7 @@ public interface IPermissionEnum extends IPermissionDefault {
      * @throws IllegalArgumentException If incorrect number of arguments were specified
      */
     default void handle(CommandSender sender, String... args) {
-        if (this.getArgumentCount() != args.length) {
+        if (this.getArgumentCount() > args.length) {
             throw new IllegalArgumentException("This permission requires " + this.getArgumentCount()
                     + " arguments, but " + args.length + " were provided");
         }
