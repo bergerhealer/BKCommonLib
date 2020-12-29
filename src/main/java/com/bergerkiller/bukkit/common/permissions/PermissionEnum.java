@@ -14,6 +14,7 @@ public abstract class PermissionEnum implements IPermissionEnum {
     private final String node;
     private final PermissionDefault def;
     private final String desc;
+    private final int argCount;
 
     protected PermissionEnum(String node, PermissionDefault def, String description) {
         this(node, def, description, 0);
@@ -23,6 +24,7 @@ public abstract class PermissionEnum implements IPermissionEnum {
         this.node = node.toLowerCase(Locale.ENGLISH);
         this.def = def;
         this.desc = description;
+        this.argCount = argCount;
     }
 
     /**
@@ -34,6 +36,11 @@ public abstract class PermissionEnum implements IPermissionEnum {
     @Override
     public String getRootName() {
         return this.node;
+    }
+
+    @Override
+    public int getArgumentCount() {
+        return this.argCount;
     }
 
     @Override
