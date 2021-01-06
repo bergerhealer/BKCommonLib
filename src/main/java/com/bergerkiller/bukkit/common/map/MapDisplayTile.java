@@ -15,7 +15,10 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
  * A single 128x128 map display tile. Multiple tiles may be used to make up a single map display.
  */
 public class MapDisplayTile {
-    private static final int RESOLUTION = 128;
+    /**
+     * The resolution of a single tile
+     */
+    public static final int RESOLUTION = 128;
 
     private final MapUUID uuid;
     public final int tileX, tileY;

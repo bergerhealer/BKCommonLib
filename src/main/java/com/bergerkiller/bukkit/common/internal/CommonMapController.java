@@ -811,8 +811,8 @@ public class CommonMapController implements PacketListener, Listener {
         if (player.isSneaking()) {
             return false; // do not click while sneaking to allow for normal block interaction
         }
-        int px = (int) (dx * 127.0);
-        int py = (int) (dy * 127.0);
+        double px = (dx * (double) MapDisplayTile.RESOLUTION);
+        double py = (dy * (double) MapDisplayTile.RESOLUTION);
         if (px < 0 || py < 0 || px >= 128 || py >= 128) {
             return false; // not within map canvas
         }
@@ -834,8 +834,8 @@ public class CommonMapController implements PacketListener, Listener {
             frameInfo.updateItem();
             frameInfo.lastFrameItemUpdateNeeded = true; // post-click refresh
             if (frameInfo.lastMapUUID != null) {
-                px += 128 * frameInfo.lastMapUUID.getTileX();
-                py += 128 * frameInfo.lastMapUUID.getTileY();
+                px += MapDisplayTile.RESOLUTION * frameInfo.lastMapUUID.getTileX();
+                py += MapDisplayTile.RESOLUTION * frameInfo.lastMapUUID.getTileY();
             }
         }
 
@@ -877,7 +877,7 @@ public class CommonMapController implements PacketListener, Listener {
             if (attachedFace == BlockFace.NORTH) {
                 dx = 1.0 - dx;
             }
-        } else {
+        } else if (FaceUtil.isAlongX(attachedFace)) {
             if (attachedFace == BlockFace.WEST) {
                 target_x -= 1.0;
             }
@@ -888,6 +888,10 @@ public class CommonMapController implements PacketListener, Listener {
             if (attachedFace == BlockFace.EAST) {
                 dx = 1.0 - dx;
             }
+        } else {
+            //TODO: Vertical
+            dx = 0.5;
+            dy = 0.5;
         }
         return dispatchClickAction(player, itemFrame, dx, dy, action);
     }

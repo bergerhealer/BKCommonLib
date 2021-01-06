@@ -7,6 +7,7 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import com.bergerkiller.bukkit.common.map.MapDisplay;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 
 /**
  * Player left-clicked or right-clicked somewhere on a map in an {@link ItemFrame} managed by a {@link MapDisplay}.
@@ -19,11 +20,15 @@ public class MapClickEvent extends Event implements Cancellable {
     private final ItemFrame itemFrame;
     private final MapDisplay display;
     private final MapAction action;
-    private final int px;
-    private final int py;
+    private final double px;
+    private final double py;
     private boolean cancelled;
 
     public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, MapAction action, int px, int py) {
+        this(player, itemFrame, display, action, (double) px, (double) py);
+    }
+
+    public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, MapAction action, double px, double py) {
         this.player = player;
         this.itemFrame = itemFrame;
         this.display = display;
@@ -75,7 +80,7 @@ public class MapClickEvent extends Event implements Cancellable {
      * @return clicked x-coordinate
      */
     public int getX() {
-        return px;
+        return MathUtil.floor(this.px);
     }
 
     /**
@@ -84,7 +89,27 @@ public class MapClickEvent extends Event implements Cancellable {
      * @return clicked y-coordinate
      */
     public int getY() {
-        return py;
+        return MathUtil.floor(this.py);
+    }
+
+    /**
+     * Gets the x-coordinate of the pixel that the player clicked
+     * with floating point (sub-pixel) precision.
+     * 
+     * @return clicked x-coordinate
+     */
+    public double getDoubleX() {
+        return this.px;
+    }
+
+    /**
+     * Gets the y-coordinate of the pixel that the player clicked
+     * with floating point (sub-pixel) precision.
+     * 
+     * @return clicked y-coordinate
+     */
+    public double getDoubleY() {
+        return this.py;
     }
 
     @Override
