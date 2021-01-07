@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -53,7 +52,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -65,6 +63,8 @@ import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayProperties;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
+import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
+import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
@@ -76,17 +76,13 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
@@ -211,8 +207,8 @@ public class CommonMapController implements PacketListener, Listener {
     public synchronized void resendMapData(Player player) {
         UUID playerUUID = player.getUniqueId();
         for (MapDisplayInfo display : maps.values()) {
-            if (display.views.containsKey(playerUUID)) {
-                for (MapSession session : display.sessions) {
+            if (display.getViewStackByPlayerUUID(playerUUID) != null) {
+                for (MapSession session : display.getSessions()) {
                     for (MapSession.Owner owner : session.onlineOwners) {
                         if (owner.player == player) {
                             owner.clip.markEverythingDirty();
@@ -323,7 +319,7 @@ public class CommonMapController implements PacketListener, Listener {
             // All map displays showing this item
             MapDisplayInfo info = maps.get(oldMapUUID);
             if (info != null) {
-                for (MapSession session : info.sessions) {
+                for (MapSession session : info.getSessions()) {
                     session.display.setMapItemSilently(newItem);
                 }
             }
@@ -372,7 +368,7 @@ public class CommonMapController implements PacketListener, Listener {
         if (this.isEnabled) {
             this.isEnabled = false;
             for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
-                for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+                for (MapSession session : new ArrayList<MapSession>(map.getSessions())) {
                     session.display.setRunning(false);
                 }
             }
@@ -503,7 +499,7 @@ public class CommonMapController implements PacketListener, Listener {
                 // Invalidate display if it exists
                 MapDisplayInfo mapInfo = maps.get(mapUUID.getUUID());
                 if (mapInfo != null) {
-                    for (MapSession session : mapInfo.sessions) {
+                    for (MapSession session : mapInfo.getSessions()) {
                         session.display.invalidate();
                     }
                 }
@@ -677,7 +673,7 @@ public class CommonMapController implements PacketListener, Listener {
         // Let everyone know we got a player over here!
         Player player = event.getPlayer();
         for (MapDisplayInfo map : this.maps.values()) {
-            for (MapSession session : map.sessions) {
+            for (MapSession session : map.getSessions()) {
                 session.updatePlayerOnline(player);
             }
         }
@@ -754,7 +750,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Add Item Frame Info
-        ItemFrameInfo frameInfo = new ItemFrameInfo(frame);
+        ItemFrameInfo frameInfo = new ItemFrameInfo(this, frame);
         itemFrames.put(entityId, frameInfo);
         if (itemFrameMetaMisses.remove(entityId)) {
             frameInfo.needsItemRefresh = true;
@@ -823,7 +819,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Find the Display this player is sees on this map
-        ViewStack stack = info.views.get(player.getUniqueId());
+        MapDisplayInfo.ViewStack stack = info.getViewStackByPlayerUUID(player.getUniqueId());
         if (stack == null || stack.stack.isEmpty()) {
             return false; // no visible display for this player
         }
@@ -998,7 +994,7 @@ public class CommonMapController implements PacketListener, Listener {
             // Clean up the map display information first
             MapDisplayInfo displayInfo = maps.get(toRemove.getUUID());
             if (displayInfo != null) {
-                if (displayInfo.sessions.isEmpty()) {
+                if (displayInfo.getSessions().isEmpty()) {
                     maps.remove(toRemove.getUUID());
                 } else {
                     continue; // still has an active session; cannot remove
@@ -1022,7 +1018,7 @@ public class CommonMapController implements PacketListener, Listener {
         MapDisplayInfo info = CommonMapController.this.getInfo(event.getMapUUID());
         boolean hasDisplay = false;
         if (info != null) {
-            for (MapSession session : info.sessions) {
+            for (MapSession session : info.getSessions()) {
                 if (session.display.isGlobal()) {
                     session.display.addOwner(event.getPlayer());
                     hasDisplay = true;
@@ -1067,541 +1063,6 @@ public class CommonMapController implements PacketListener, Listener {
             } else {
                 info.updateItem();
                 return info.lastMapUUID;
-            }
-        }
-    }
-
-    /**
-     * Maintains the metadata information for a map
-     */
-    public class MapDisplayInfo {
-        public final UUID uuid; /* map UUID */
-
-        // Maintains information about the item frames that show this map, and what players
-        // can see this map on the item frames
-        public final ArrayList<ItemFrameInfo> itemFrames = new ArrayList<ItemFrameInfo>();
-        public final LinkedHashSet<Player> frameViewers = new LinkedHashSet<Player>();
-        private boolean hasFrameViewerChanges = true;
-        private boolean refreshItemFramesRequest = false;
-        private int desiredWidth, desiredHeight;
-
-        // A list of all active running displays bound to this map
-        public final ArrayList<MapSession> sessions = new ArrayList<MapSession>();
-
-        // Maps the display view stack by player
-        public final HashMap<UUID, ViewStack> views = new HashMap<UUID, ViewStack>();
-
-        public MapDisplayInfo(UUID uuid) {
-            this.uuid = uuid;
-            this.desiredWidth = 128;
-            this.desiredHeight = 128;
-        }
-
-        /**
-         * Gets the desired width of the map displays for this map
-         * 
-         * @return desired width
-         */
-        public int getDesiredWidth() {
-            return this.desiredWidth;
-        }
-
-        /**
-         * Gets the desired height of the map displays for this map
-         * 
-         * @return desired height
-         */
-        public int getDesiredHeight() {
-            return this.desiredHeight;
-        }
-
-        /**
-         * Removes a tile from already running displays, so that players no longer
-         * receive update packets for them, if that tile is no longer represented on
-         * an item frame.
-         * Does nothing if the display session is going to be reset, or no display sessions exist.
-         * Tile 0,0 will never be removed as it can be held.
-         * 
-         * @param tileX
-         * @param tileY
-         */
-        public void removeTileIfMissing(int tileX, int tileY) {
-            if (this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
-                return;
-            }
-
-            // Check not contained on some item frame
-            for (ItemFrameInfo frame : this.itemFrames) {
-                if (frame.lastMapUUID != null && frame.lastMapUUID.getTileX() == tileX && frame.lastMapUUID.getTileY() == tileY) {
-                    return;
-                }
-            }
-
-            // Remove from all sessions
-            for (MapSession session : this.sessions) {
-                if (session.refreshResolutionRequested) {
-                    continue;
-                }
-                Iterator<MapDisplayTile> iter = session.tiles.iterator();
-                while (iter.hasNext()) {
-                    MapDisplayTile tile = iter.next();
-                    if (tile.tileX == tileX && tile.tileY == tileY) {
-                        iter.remove();
-                        break;
-                    }
-                }
-            }
-        }
-
-        /**
-         * Adds a new display tile to already running displays.
-         * Does nothing if the display is going to be reset, or no display sessions exist.
-         * Since tile 0,0 is always added by the display, that tile is ignored.
-         * 
-         * @param tileX
-         * @param tileY
-         */
-        public void addTileIfMissing(int tileX, int tileY) {
-            if (this.sessions.isEmpty() || (tileX == 0 && tileY == 0)) {
-                return;
-            }
-            if ((tileX << 7) >= this.desiredWidth) {
-                return;
-            }
-            if ((tileY << 7) >= this.desiredHeight) {
-                return;
-            }
-
-            for (MapSession session : this.sessions) {
-                if (session.refreshResolutionRequested) {
-                    continue;
-                }
-                if (session.display.containsTile(tileX, tileY)) {
-                    continue;
-                }
-
-                MapDisplayTile newTile = new MapDisplayTile(this.uuid, tileX, tileY);
-                session.tiles.add(newTile);
-
-                for (MapSession.Owner owner : session.onlineOwners) {
-                    owner.sendDirtyTile(newTile);
-                }
-            }
-        }
-
-        /**
-         * Refreshes the desired width and height of the map displays based on the
-         * item frames that are currently loaded.
-         */
-        public void refreshResolution() {
-            int min_x = 0;
-            int min_y = 0;
-            int max_x = 0;
-            int max_y = 0;
-            boolean first = true;
-            for (ItemFrameInfo itemFrame : itemFrames) {
-                if (itemFrame.lastMapUUID != null) {
-                    int tx = itemFrame.lastMapUUID.getTileX() << 7;
-                    int ty = itemFrame.lastMapUUID.getTileY() << 7;
-                    if (first) {
-                        first = false;
-                        min_x = max_x = tx;
-                        min_y = max_y = ty;
-                        continue;
-                    }
-                    if (tx < min_x) min_x = tx;
-                    if (tx > max_x) max_x = tx;
-                    if (ty < min_y) min_y = ty;
-                    if (ty > max_y) max_y = ty;
-                }
-            }
-            int new_width = max_x - min_x + 128;
-            int new_height = max_y - min_y + 128;
-            if (new_width != this.desiredWidth || new_height != this.desiredHeight) {
-                this.desiredWidth = new_width;
-                this.desiredHeight = new_height;
-                this.refreshItemFramesRequest = true;
-                for (MapSession session : this.sessions) {
-                    if (session.refreshResolutionRequested) {
-                        continue;
-                    }
-                    if (session.display.getWidth() != this.desiredWidth ||
-                        session.display.getHeight() != this.desiredHeight)
-                    {
-                        session.refreshResolutionRequested = true;
-                    }
-                }
-            }
-        }
-
-        /**
-         * Loads the tiles in a Map Display. This also removes tiles in the display
-         * that don't actually exist.
-         * 
-         * @param session The session of the map display
-         * @param initialize Whether the tiles are initialized, and contents are not yet drawn
-         */
-        public void loadTiles(MapSession session, boolean initialize) {
-            // Collect all tile x/y coordinates into a long hashset
-            LongHashSet tile_coords = new LongHashSet();
-            for (ItemFrameInfo itemFrame : this.itemFrames) {
-                MapUUID uuid = itemFrame.lastMapUUID;
-                if (uuid != null) {
-                    tile_coords.add(uuid.getTileX(), uuid.getTileY());
-                }
-            }
-            tile_coords.add(0, 0);
-
-            if (initialize) {
-                // Wipe previous tiles when initializing
-                session.tiles.clear();
-            } else {
-                // Remove tiles from the display that are no longer present
-                // Remove existing tiles from the set at the same time
-                // We are left with a set containing tiles that must be added
-                Iterator<MapDisplayTile> iter = session.tiles.iterator();
-                while (iter.hasNext()) {
-                    MapDisplayTile tile = iter.next();
-                    if (!tile_coords.remove(tile.tileX, tile.tileY)) {
-                        iter.remove();
-                    }
-                }
-            }
-
-            // Add all remaining tiles to the display
-            LongHashSet.LongIterator iter = tile_coords.longIterator();
-            while (iter.hasNext()) {
-                long coord = iter.next();
-                MapDisplayTile newTile = new MapDisplayTile(this.uuid,
-                        MathUtil.longHashMsw(coord), MathUtil.longHashLsw(coord));
-                session.tiles.add(newTile);
-
-                // Send map packets for the added tile
-                if (!initialize) {
-                    for (MapSession.Owner owner : session.onlineOwners) {
-                        owner.sendDirtyTile(newTile);
-                    }
-                }
-            }
-        }
-
-        /**
-         * Gets whether a certain ItemStack contains this map
-         * 
-         * @param item to check
-         * @return True if the item contains this map
-         */
-        public boolean isMap(ItemStack item) {
-            return this.uuid.equals(CommonMapUUIDStore.getMapUUID(item));
-        }
-
-        /**
-         * Gets the stack of Map Displays used to display information to a certain player
-         * 
-         * @param player
-         * @return view stack
-         */
-        public ViewStack getStack(Player player) {
-            UUID playerUUID = player.getUniqueId();
-            ViewStack stack = views.get(playerUUID);
-            if (stack == null) {
-                stack = new ViewStack();
-                views.put(playerUUID, stack);
-            }
-            return stack;
-        }
-
-        /**
-         * Sets whether a certain player is viewing a certain Map Display.
-         * 
-         * @param player
-         * @param display
-         * @param viewing
-         */
-        public void setViewing(Player player, MapDisplay display, boolean viewing) {
-            UUID playerUUID = player.getUniqueId();
-            ViewStack stack = views.get(playerUUID);
-            if (viewing) {
-                if (stack == null) {
-                    stack = new ViewStack();
-                    stack.stack.add(display);
-                    views.put(playerUUID, stack);
-                } else {
-                    // Make sure the display is at the very end of the list
-                    stack.stack.remove(display);
-                    stack.stack.add(display);
-                }
-            } else if (stack != null) {
-                stack.stack.remove(display);
-            }
-        }
-
-        /**
-         * Gets the Map Display that is currently displayed on this map for a player
-         * 
-         * @param player to get the display for
-         * @return map display, null if no display is set for this Player
-         */
-        public MapDisplay getViewing(Player player) {
-            ViewStack stack = views.get(player.getUniqueId());
-            return (stack == null || stack.stack.isEmpty()) ? null : stack.stack.getLast();
-        }
-
-        /**
-         * Checks whether a player is viewing a certain map display
-         * 
-         * @param player
-         * @param display
-         * @return True if viewing, False if not
-         */
-        public boolean isViewing(Player player, MapDisplay display) {
-            return getViewing(player) == display;
-        }
-    }
-
-    /**
-     * Maintains a list of past Map Displays that will be shown in order as sessions end.
-     * For example, if a map display for showing on an Item Frame was set, and a new one was set
-     * for when the player holds the map, it will 'take over' from the item frame version. Once the
-     * player stops viewing the map again, and that session ends, it will automatically fall back to
-     * showing the item frame version.
-     */
-    public class ViewStack {
-        public final LinkedList<MapDisplay> stack = new LinkedList<MapDisplay>();
-
-        @Override
-        public String toString() {
-            String str = "ViewStack:";
-            for (MapDisplay display : this.stack) {
-                str += "\n  " + display.toString();
-            }
-            return str;
-        }
-    }
-
-    /**
-     * Maintains metadata information for a single item frame
-     */
-    public class ItemFrameInfo {
-        public final ItemFrame itemFrame;
-        public final EntityItemFrameHandle itemFrameHandle;
-        public final DataWatcher.Item<?> itemFrame_dw_item;
-        public final HashSet<Player> viewers;
-        public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
-        public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
-        public boolean needsItemRefresh; // UUID was changed and item in the item frame needs refreshing
-        public boolean sentToPlayers; // players have received item information for this item frame
-        public MapDisplayInfo displayInfo;
-
-        // These fields are used in updateItem() to speed up performance, due to how often it is called
-        private Object lastFrameRawItem = null; // performance optimization to avoid conversion
-        private ItemStack lastFrameItem = null; // performance optimization to simplify item change detection
-        private ItemStack lastFrameItemUpdate = null; // to detect a change in item in updateItem()
-        public boolean lastFrameItemUpdateNeeded = true; // tells the underlying system to refresh the item
-
-        // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
-        private EntityTrackerEntryStateHandle entityTrackerEntryState = null; // Entity tracker entry state for resetting tick timer
-        private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
-
-        public ItemFrameInfo(EntityItemFrameHandle itemFrame) {
-            this.itemFrame = (ItemFrame) itemFrame.getBukkitEntity();
-            this.itemFrameHandle = itemFrame;
-            this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
-            this.viewers = new HashSet<Player>();
-            this.removed = false;
-            this.lastMapUUID = null;
-            this.displayInfo = null;
-            this.needsItemRefresh = false;
-            this.sentToPlayers = false;
-        }
-
-        public void updateItem() {
-            // Reset flag
-            this.lastFrameItemUpdateNeeded = false;
-
-            // Avoid expensive conversion and creation of CraftItemStack by detecting changes
-            boolean raw_item_changed = false;
-            Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
-            raw_item = CommonNMS.unwrapDWROptional(raw_item); // May be needed
-            if (this.lastFrameRawItem != raw_item) {
-                this.lastFrameRawItem = raw_item;
-                this.lastFrameItem = WrapperConversion.toItemStack(this.lastFrameRawItem);
-                raw_item_changed = true;
-            }
-
-            // If the raw item has not changed, and the item is not a map, don't bother checking
-            // The equality check for ItemStack is very slow, because of the deep NBT check that occurs
-            // When the item in the item frame is not a map item, there is no use wasting time here
-            if (!raw_item_changed && lastMapUUID == null && !CommonMapUUIDStore.isMap(this.lastFrameItem)) {
-                return;
-            }
-
-            // Check item changed
-            if (LogicUtil.bothNullOrEqual(this.lastFrameItemUpdate, this.lastFrameItem)) {
-                return;
-            }
-
-            // Assign & clone so that changes can be detected
-            this.lastFrameItemUpdate = this.lastFrameItem;
-            if (this.lastFrameItemUpdate != null) {
-                this.lastFrameItemUpdate = this.lastFrameItemUpdate.clone();
-            }
-
-            // Handle changes in map item shown in item frames
-            UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.lastFrameItemUpdate);
-            if (mapUUID == null) {
-                // Map was removed
-                this.sentToPlayers = false;
-                if (lastMapUUID != null) {
-                    remove();
-                }
-            } else if (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID)) {
-                // Map UUID was changed, or neighbours need to be re-calculated
-                recalculateUUID();
-            }
-        }
-
-        public void recalculateUUID() {
-            UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
-
-            // Find out the tile information of this item frame
-            // This is a slow and lengthy procedure; hopefully it does not happen too often
-            // What we do is: we add all neighbours, then find the most top-left item frame
-            // Subtracting coordinates will give us the tile x/y of this item frame
-            IntVector3 itemFramePosition = itemFrameHandle.getBlockPosition();
-            ItemFrameCluster cluster = findCluster(itemFrameHandle, itemFramePosition);
-            MapUUID newMapUUID;
-
-            if (cluster.hasMultipleTiles()) {
-                int tileX = 0;
-                int tileY = 0;
-                if (cluster.facing.getModY() > 0) {
-                    // Vertical pointing up
-                    // We use rotation of the item frame to decide which side is up
-                    switch (cluster.rotation) {
-                    case 90:
-                        tileX = (itemFramePosition.z - cluster.min_coord.z);
-                        tileY = (cluster.max_coord.x - itemFramePosition.x);
-                        break;
-                    case 180:
-                        tileX = (cluster.max_coord.x - itemFramePosition.x);
-                        tileY = (cluster.max_coord.z - itemFramePosition.z);
-                        break;
-                    case 270:
-                        tileX = (cluster.max_coord.z - itemFramePosition.z);
-                        tileY = (itemFramePosition.x - cluster.min_coord.x);
-                        break;
-                    default:
-                        tileX = (itemFramePosition.x - cluster.min_coord.x);
-                        tileY = (itemFramePosition.z - cluster.min_coord.z);
-                        break;
-                    }
-                } else if (cluster.facing.getModY() < 0) {
-                    // Vertical pointing down
-                    // We use rotation of the item frame to decide which side is up
-                    switch (cluster.rotation) {
-                    case 90:
-                        tileX = (cluster.max_coord.z - itemFramePosition.z);
-                        tileY = (cluster.max_coord.x - itemFramePosition.x);
-                        break;
-                    case 180:
-                        tileX = (cluster.max_coord.x - itemFramePosition.x);
-                        tileY = (itemFramePosition.z - cluster.min_coord.z);
-                        break;
-                    case 270:
-                        tileX = (itemFramePosition.z - cluster.min_coord.z);
-                        tileY = (itemFramePosition.x - cluster.min_coord.x);
-                        break;
-                    default:
-                        tileX = (itemFramePosition.x - cluster.min_coord.x);
-                        tileY = (cluster.max_coord.z - itemFramePosition.z);
-                        break;
-                    }
-                } else {
-                    // On the wall
-                    switch (cluster.facing) {
-                    case NORTH:
-                        tileX = (cluster.max_coord.x - itemFramePosition.x);
-                        break;
-                    case EAST:
-                        tileX = (cluster.max_coord.z - itemFramePosition.z);
-                        break;
-                    case SOUTH:
-                        tileX = (itemFramePosition.x - cluster.min_coord.x);
-                        break;
-                    case WEST:
-                        tileX = (itemFramePosition.z - cluster.min_coord.z);
-                        break;
-                    default:
-                        tileX = 0;
-                        break;
-                    }
-                    tileY = cluster.max_coord.y - itemFramePosition.y;
-                }
-
-                newMapUUID = new MapUUID(mapUUID, tileX, tileY);
-            } else {
-                newMapUUID = new MapUUID(mapUUID, 0, 0);
-            }
-
-            if (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID)) {
-                // Map item UUID changed entirely. Remove the previous and add the new.
-                remove();
-                lastMapUUID = newMapUUID;
-                needsItemRefresh = sentToPlayers;
-                add();
-            } else if (newMapUUID.equals(lastMapUUID)) {
-                // No change occurred
-            } else if (this.displayInfo != null) {
-                // Tile coordinates of this map were changed
-
-                // Ensure the new tile coordinates are added
-                this.displayInfo.addTileIfMissing(newMapUUID.getTileX(), newMapUUID.getTileY());
-
-                // Refresh state now so that removeTileIfMissing works correctly
-                int oldTileX = lastMapUUID.getTileX();
-                int oldTileY = lastMapUUID.getTileY();
-                lastMapUUID = newMapUUID;
-                needsItemRefresh = sentToPlayers;
-
-                // If the previous coordinates are now no longer used, remove the tile
-                this.displayInfo.removeTileIfMissing(oldTileX, oldTileY);
-            } else {
-                // Tile coordinates changed, but we had no previous display info
-                // Strange.
-                lastMapUUID = newMapUUID;
-                needsItemRefresh = sentToPlayers;
-            }
-        }
-
-        public void remove() {
-            if (displayInfo != null) {
-                displayInfo.itemFrames.remove(this);
-                displayInfo.hasFrameViewerChanges = true;
-                displayInfo.refreshResolution();
-                displayInfo.removeTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
-                if (!displayInfo.itemFrames.isEmpty()) {
-                    displayInfo.refreshItemFramesRequest = true;
-                }
-                displayInfo = null;
-            }
-            if (!this.viewers.isEmpty()) {
-                //for (Player viewer : viewers) {
-                    //TODO NEEDS HIDE EVENT
-                    //CommonUtil.callEvent(new HideFramedMapEvent(viewer, itemFrame));
-                //}
-                viewers.clear();
-            }
-            this.lastMapUUID = null;
-        }
-
-        public void add() {
-            if (this.displayInfo == null && this.lastMapUUID != null) {
-                this.displayInfo = getInfo(this.lastMapUUID.getUUID());
-                this.displayInfo.itemFrames.add(this);
-                displayInfo.refreshItemFramesRequest = true;
-                displayInfo.refreshResolution();
-                displayInfo.addTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
             }
         }
     }
@@ -1757,74 +1218,23 @@ public class CommonMapController implements PacketListener, Listener {
             Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
             while (itemFrames_iter.hasNext()) {
                 info = itemFrames_iter.next();
-                if (info.removed) {
-                    // Remove all players that have been set as viewers
-                    info.remove();
+                if (info.handleRemoved()) {
                     itemFrames_iter.remove();
                     continue;
                 }
 
-                // Refreshes cached information about this item frame's item
-                if (info.lastFrameItemUpdateNeeded) {
-                    info.updateItem();
-                }
+                info.updateItemAndViewers(synchronizer);
 
-                // Update list of players for item frames showing maps
-                if (info.lastMapUUID != null) {
-                    if (info.entityTrackerEntryState == null) {
-                        EntityTrackerEntryHandle entry = WorldUtil.getTracker(info.itemFrame.getWorld()).getEntry(info.itemFrame);
-
-                        // Item Frame isn't tracked on the server, so no players can view it
-                        if (entry == null) {
-                            info.remove();
-                            itemFrames_iter.remove();
-                            continue;
-                        }
-
-                        info.entityTrackerEntryState = entry.getState();
-                        info.entityTrackerViewers = entry.getViewers();
-                    }
-
-                    boolean changes = LogicUtil.synchronizeUnordered(info.viewers, info.entityTrackerViewers, synchronizer);
-
-                    if (changes && info.displayInfo != null) {
-                        info.displayInfo.hasFrameViewerChanges = true;
-                    }
-
-                    // Reset tick counter to 1 so that the normal WorldMap refreshing never occurs
-                    // Only do this for non-vanilla maps
-                    if (!info.lastMapUUID.isStaticUUID()) {
-                        info.entityTrackerEntryState.setTickCounter(1);
-                    }
+                // May find out it's removed during the update
+                if (info.handleRemoved()) {
+                    itemFrames_iter.remove();
+                    continue;
                 }
             }
 
             // Update the player viewers of all map displays
             for (MapDisplayInfo map : maps.values()) {
-                if (map.hasFrameViewerChanges) {
-                    map.hasFrameViewerChanges = false;
-
-                    // Recalculate the list of players that can see an item frame
-                    map.frameViewers.clear();
-                    for (ItemFrameInfo itemFrame : map.itemFrames) {
-                        map.frameViewers.addAll(itemFrame.viewers);
-                    }
-
-                    // Synchronize this list with the 'global' viewer
-                    //if (map.globalFramedDisplay != null) {
-                        //map.globalFramedDisplay.setViewers(map.frameViewers);
-                    //}
-                }
-
-                // Refresh all item frames' items showing this map
-                // It is possible their UUID changed as a result of the new tiling
-                if (map.refreshItemFramesRequest) {
-                    for (int i = map.itemFrames.size()-1; i >= 0; i--) {
-                        map.itemFrames.get(i).recalculateUUID();
-                    }
-                    map.refreshResolution();
-                    map.refreshItemFramesRequest = false;
-                }
+                map.updateViewersAndResolution();
             }
 
             for (ItemFrameInfo info : itemFrames.values()) {
@@ -2009,7 +1419,7 @@ public class CommonMapController implements PacketListener, Listener {
      * @param itemFrame
      * @return cluster
      */
-    private final synchronized ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
+    public final synchronized ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
         UUID itemFrameMapUUID;
         if (!this.isFrameTilingSupported || (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) == null) {
             return new ItemFrameCluster(itemFrame.getFacing(),
@@ -2111,103 +1521,6 @@ public class CommonMapController implements PacketListener, Listener {
         } finally {
             // Return to cache
             this.findNeighboursCache = cache;
-        }
-    }
-
-    private static final class ItemFrameCluster {
-        // Facing of the display
-        public final BlockFace facing;
-        // List of coordinates where item frames are stored
-        public final List<IntVector3> coordinates;
-        // Most common ItemFrame rotation used for the display
-        public final int rotation;
-        // Minimum/maximum coordinates and size of the item frame coordinates in this cluster
-        public final IntVector3 min_coord, max_coord;
-        // Resolution in rotation/facing relative space (unused)
-        // public final IntVector3 size;
-        // public final IntVector2 resolution;
-
-        public ItemFrameCluster(BlockFace facing, List<IntVector3> coordinates, int rotation) {
-            this.facing = facing;
-            this.coordinates = coordinates;
-            this.rotation = rotation;
-
-            if (hasMultipleTiles()) {
-                // Compute minimum/maximum x and z coordinates
-                Iterator<IntVector3> iter = coordinates.iterator();
-                IntVector3 coord = iter.next();
-                int min_x, max_x, min_y, max_y, min_z, max_z;
-                min_x = max_x = coord.x; min_y = max_y = coord.y; min_z = max_z = coord.z;
-                while (iter.hasNext()) {
-                    coord = iter.next();
-                    if (coord.x < min_x) min_x = coord.x;
-                    if (coord.y < min_y) min_y = coord.y;
-                    if (coord.z < min_z) min_z = coord.z;
-                    if (coord.x > max_x) max_x = coord.x;
-                    if (coord.y > max_y) max_y = coord.y;
-                    if (coord.z > max_z) max_z = coord.z;
-                }
-                min_coord = new IntVector3(min_x, min_y, min_z);
-                max_coord = new IntVector3(max_x, max_y, max_z);
-            } else {
-                min_coord = max_coord = coordinates.get(0);
-            }
-
-            // Compute resolution (unused)
-            /*
-            if (hasMultipleTiles()) {
-                size = max_coord.subtract(min_coord);
-                if (facing.getModY() > 0) {
-                    // Vertical pointing up
-                    // We use rotation of the item frame to decide which side is up
-                    switch (rotation) {
-                    case 90:
-                    case 270:
-                        resolution = new IntVector2(size.z+1, size.x+1);
-                        break;
-                    case 180:
-                    default:
-                        resolution = new IntVector2(size.x+1, size.z+1);
-                        break;
-                    }
-                } else if (facing.getModY() < 0) {
-                    // Vertical pointing down
-                    // We use rotation of the item frame to decide which side is up
-                    switch (rotation) {
-                    case 90:
-                    case 270:
-                        resolution = new IntVector2(size.z+1, size.x+1);
-                        break;
-                    case 180:
-                    default:
-                        resolution = new IntVector2(size.x+1, size.z+1);
-                        break;
-                    }
-                } else {
-                    // On the wall
-                    switch (facing) {
-                    case NORTH:
-                    case SOUTH:
-                        resolution = new IntVector2(size.x+1, size.y+1);
-                        break;
-                    case EAST:
-                    case WEST:
-                        resolution = new IntVector2(size.z+1, size.y+1);
-                        break;
-                    default:
-                        resolution = new IntVector2(1, 1);
-                        break;
-                    }
-                }
-            } else {
-                resolution = new IntVector2(1, 1);
-                size = IntVector3.ZERO;
-            }
-            */
-        }
-
-        public boolean hasMultipleTiles() {
-            return coordinates.size() > 1;
         }
     }
 
@@ -2334,6 +1647,106 @@ public class CommonMapController implements PacketListener, Listener {
         item = ItemUtil.cloneItem(item);
         ItemUtil.setMetaTag(item, newTag);
         return item;
+    }
+
+    /**
+     * Group of item frames that are connected together and face the same way
+     */
+    public static class ItemFrameCluster {
+        // Facing of the display
+        public final BlockFace facing;
+        // List of coordinates where item frames are stored
+        public final List<IntVector3> coordinates;
+        // Most common ItemFrame rotation used for the display
+        public final int rotation;
+        // Minimum/maximum coordinates and size of the item frame coordinates in this cluster
+        public final IntVector3 min_coord, max_coord;
+        // Resolution in rotation/facing relative space (unused)
+        // public final IntVector3 size;
+        // public final IntVector2 resolution;
+
+        public ItemFrameCluster(BlockFace facing, List<IntVector3> coordinates, int rotation) {
+            this.facing = facing;
+            this.coordinates = coordinates;
+            this.rotation = rotation;
+
+            if (hasMultipleTiles()) {
+                // Compute minimum/maximum x and z coordinates
+                Iterator<IntVector3> iter = coordinates.iterator();
+                IntVector3 coord = iter.next();
+                int min_x, max_x, min_y, max_y, min_z, max_z;
+                min_x = max_x = coord.x; min_y = max_y = coord.y; min_z = max_z = coord.z;
+                while (iter.hasNext()) {
+                    coord = iter.next();
+                    if (coord.x < min_x) min_x = coord.x;
+                    if (coord.y < min_y) min_y = coord.y;
+                    if (coord.z < min_z) min_z = coord.z;
+                    if (coord.x > max_x) max_x = coord.x;
+                    if (coord.y > max_y) max_y = coord.y;
+                    if (coord.z > max_z) max_z = coord.z;
+                }
+                min_coord = new IntVector3(min_x, min_y, min_z);
+                max_coord = new IntVector3(max_x, max_y, max_z);
+            } else {
+                min_coord = max_coord = coordinates.get(0);
+            }
+
+            // Compute resolution (unused)
+            /*
+            if (hasMultipleTiles()) {
+                size = max_coord.subtract(min_coord);
+                if (facing.getModY() > 0) {
+                    // Vertical pointing up
+                    // We use rotation of the item frame to decide which side is up
+                    switch (rotation) {
+                    case 90:
+                    case 270:
+                        resolution = new IntVector2(size.z+1, size.x+1);
+                        break;
+                    case 180:
+                    default:
+                        resolution = new IntVector2(size.x+1, size.z+1);
+                        break;
+                    }
+                } else if (facing.getModY() < 0) {
+                    // Vertical pointing down
+                    // We use rotation of the item frame to decide which side is up
+                    switch (rotation) {
+                    case 90:
+                    case 270:
+                        resolution = new IntVector2(size.z+1, size.x+1);
+                        break;
+                    case 180:
+                    default:
+                        resolution = new IntVector2(size.x+1, size.z+1);
+                        break;
+                    }
+                } else {
+                    // On the wall
+                    switch (facing) {
+                    case NORTH:
+                    case SOUTH:
+                        resolution = new IntVector2(size.x+1, size.y+1);
+                        break;
+                    case EAST:
+                    case WEST:
+                        resolution = new IntVector2(size.z+1, size.y+1);
+                        break;
+                    default:
+                        resolution = new IntVector2(1, 1);
+                        break;
+                    }
+                }
+            } else {
+                resolution = new IntVector2(1, 1);
+                size = IntVector3.ZERO;
+            }
+            */
+        }
+
+        public boolean hasMultipleTiles() {
+            return coordinates.size() > 1;
+        }
     }
 
     /**

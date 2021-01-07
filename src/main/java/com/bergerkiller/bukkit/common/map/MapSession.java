@@ -8,9 +8,8 @@ import java.util.UUID;
 
 import org.bukkit.entity.Player;
 
-import com.bergerkiller.bukkit.common.internal.CommonMapController.ViewStack;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
+import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -77,7 +76,7 @@ public class MapSession {
 
                 // Check if viewing the map at all
                 owner.wasViewing = owner.viewing;
-                owner.viewing = owner.holding || info.frameViewers.contains(owner.player);
+                owner.viewing = owner.holding || info.getViewers().contains(owner.player);
                 if (!owner.viewing && this.mode == MapSessionMode.VIEWING) {
                     this.owners.remove(owner.player.getUniqueId());
                     onOwnerRemoved(owner);
@@ -139,7 +138,7 @@ public class MapSession {
         // Add to map display by-player mapping
         MapDisplayInfo info = this.display.getMapInfo();
         if (info != null) {
-            ViewStack views = info.getStack(owner.player);
+            MapDisplayInfo.ViewStack views = info.getOrCreateViewStack(owner.player);
             if (views.stack.isEmpty()) {
                 views.stack.addLast(this.display);
             } else {
@@ -157,7 +156,7 @@ public class MapSession {
         // Remove map display from by-player mapping
         MapDisplayInfo info = this.display.getMapInfo();
         if (info != null) {
-            ViewStack views = info.getStack(owner.player);
+            MapDisplayInfo.ViewStack views = info.getOrCreateViewStack(owner.player);
             if (!views.stack.isEmpty() && views.stack.getLast() == this.display) {
                 // Stop intercepting input
                 owner.interceptInput = false;

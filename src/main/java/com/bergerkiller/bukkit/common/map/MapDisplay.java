@@ -19,11 +19,11 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.bukkit.common.internal.CommonMapController.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -108,7 +108,7 @@ public class MapDisplay implements MapDisplayEvents {
         @Override
         public UUID getUniqueId() {
             MapDisplayInfo info = MapDisplay.this.getMapInfo();
-            return (info != null) ? info.uuid : super.getUniqueId();
+            return (info != null) ? info.getUniqueId() : super.getUniqueId();
         }
     };
 
@@ -959,7 +959,7 @@ public class MapDisplay implements MapDisplayEvents {
     private void handleStartRunning() {
         if (this.info != null) {
             this.preRunInitialize();
-            this.info.sessions.add(this.session);
+            this.info.addSession(this.session);
         }
 
         this.session.initOwners();
@@ -982,7 +982,7 @@ public class MapDisplay implements MapDisplayEvents {
 
         // Remove session
         if (this.info != null) {
-            this.info.sessions.remove(this.session);
+            this.info.removeSession(this.session);
         }
     }
 
@@ -1463,7 +1463,7 @@ public class MapDisplay implements MapDisplayEvents {
     public static void restartDisplays(ItemStack mapItem) {
         MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
         if (mapInfo != null) {
-            for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
+            for (MapSession session : new ArrayList<MapSession>(mapInfo.getSessions())) {
                 MapDisplay display = session.display;
                 if (display.isRunning()) {
                     display.handleStopRunning();
@@ -1481,7 +1481,7 @@ public class MapDisplay implements MapDisplayEvents {
     public static void stopDisplays(ItemStack mapItem) {
         MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
         if (mapInfo != null) {
-            for (MapSession session : new ArrayList<MapSession>(mapInfo.sessions)) {
+            for (MapSession session : new ArrayList<MapSession>(mapInfo.getSessions())) {
                 session.display.setRunning(false);
             }
         }
@@ -1495,7 +1495,7 @@ public class MapDisplay implements MapDisplayEvents {
     public static void stopDisplaysForPlugin(Plugin plugin) {
         // End all map display sessions for this plugin
         for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(CommonPlugin.getInstance().getMapController().getMaps())) {
-            for (MapSession session : new ArrayList<MapSession>(map.sessions)) {
+            for (MapSession session : new ArrayList<MapSession>(map.getSessions())) {
                 if (session.display.getPlugin() == plugin) {
                     session.display.setRunning(false);
                 }
@@ -1540,8 +1540,8 @@ public class MapDisplay implements MapDisplayEvents {
 
     private static Collection<MapDisplay> getAllDisplaysFromInfo(MapDisplayInfo info) {
         if (info != null) {
-            HashSet<MapDisplay> uniqueDisplays = new HashSet<MapDisplay>(info.sessions.size());
-            for (MapSession session : info.sessions) {
+            HashSet<MapDisplay> uniqueDisplays = new HashSet<MapDisplay>(info.getSessions().size());
+            for (MapSession session : info.getSessions()) {
                 if (session.display != null) {
                     uniqueDisplays.add(session.display);
                 }
