@@ -7,34 +7,28 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
 import com.bergerkiller.bukkit.common.map.MapDisplay;
-import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
+import com.bergerkiller.bukkit.common.map.util.IMapLookPosition;
+import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 
 /**
  * Player left-clicked or right-clicked somewhere on a map in an {@link ItemFrame} managed by a {@link MapDisplay}.
  * Cancelling this event will cancel any underlying handling of the click, such as removing the item,
  * rotating the item, or placing a new item.
  */
-public class MapClickEvent extends Event implements Cancellable {
+public class MapClickEvent extends Event implements Cancellable, IMapLookPosition {
     private static final HandlerList handlers = new HandlerList();
     private final Player player;
-    private final ItemFrame itemFrame;
+    private final MapLookPosition position;
     private final MapDisplay display;
     private final MapAction action;
-    private final double px;
-    private final double py;
     private boolean cancelled;
 
-    public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, MapAction action, int px, int py) {
-        this(player, itemFrame, display, action, (double) px, (double) py);
-    }
-
-    public MapClickEvent(Player player, ItemFrame itemFrame, MapDisplay display, MapAction action, double px, double py) {
+    public MapClickEvent(Player player, MapLookPosition position, MapDisplay display, MapAction action) {
         this.player = player;
-        this.itemFrame = itemFrame;
+        this.position = position;
         this.display = display;
         this.action = action;
-        this.px = px;
-        this.py = py;
         this.cancelled = false;
     }
 
@@ -56,13 +50,19 @@ public class MapClickEvent extends Event implements Cancellable {
         return this.display;
     }
 
+    @Override
+    public ItemFrameInfo getItemFrameInfo() {
+        return this.position.getItemFrameInfo();
+    }
+
     /**
      * Gets the ItemFrame that was clicked
      * 
      * @return item frame
      */
+    @Override
     public ItemFrame getItemFrame() {
-        return this.itemFrame;
+        return this.position.getItemFrame();
     }
 
     /**
@@ -79,8 +79,9 @@ public class MapClickEvent extends Event implements Cancellable {
      * 
      * @return clicked x-coordinate
      */
+    @Override
     public int getX() {
-        return MathUtil.floor(this.px);
+        return this.position.getX();
     }
 
     /**
@@ -88,8 +89,9 @@ public class MapClickEvent extends Event implements Cancellable {
      * 
      * @return clicked y-coordinate
      */
+    @Override
     public int getY() {
-        return MathUtil.floor(this.py);
+        return this.position.getY();
     }
 
     /**
@@ -98,8 +100,9 @@ public class MapClickEvent extends Event implements Cancellable {
      * 
      * @return clicked x-coordinate
      */
+    @Override
     public double getDoubleX() {
-        return this.px;
+        return this.position.getDoubleX();
     }
 
     /**
@@ -108,8 +111,14 @@ public class MapClickEvent extends Event implements Cancellable {
      * 
      * @return clicked y-coordinate
      */
+    @Override
     public double getDoubleY() {
-        return this.py;
+        return this.position.getDoubleY();
+    }
+
+    @Override
+    public double getDistance() {
+        return this.position.getDistance();
     }
 
     @Override
@@ -130,5 +139,4 @@ public class MapClickEvent extends Event implements Cancellable {
     public static HandlerList getHandlerList() {
         return handlers;
     }
-
 }

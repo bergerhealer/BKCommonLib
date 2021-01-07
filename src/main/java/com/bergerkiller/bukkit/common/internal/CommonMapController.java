@@ -61,10 +61,10 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayProperties;
-import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
+import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
@@ -72,10 +72,10 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -803,14 +803,9 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private boolean dispatchClickAction(Player player, ItemFrame itemFrame, double dx, double dy, MapAction action) {
+    private boolean dispatchClickAction(Player player, ItemFrame itemFrame, Vector startPosition, Vector lookDirection, MapAction action) {
         if (player.isSneaking()) {
             return false; // do not click while sneaking to allow for normal block interaction
-        }
-        double px = (dx * (double) MapDisplayTile.RESOLUTION);
-        double py = (dy * (double) MapDisplayTile.RESOLUTION);
-        if (px < 0 || py < 0 || px >= 128 || py >= 128) {
-            return false; // not within map canvas
         }
 
         MapDisplayInfo info = getInfo(itemFrame);
@@ -824,18 +819,31 @@ public class CommonMapController implements PacketListener, Listener {
             return false; // no visible display for this player
         }
 
-        // Adjust px/py based on item frame tile information
+        // Find the item frame metadata information
         ItemFrameInfo frameInfo = this.itemFrames.get(itemFrame.getEntityId());
-        if (frameInfo != null) {
-            frameInfo.updateItem();
-            frameInfo.lastFrameItemUpdateNeeded = true; // post-click refresh
-            if (frameInfo.lastMapUUID != null) {
-                px += MapDisplayTile.RESOLUTION * frameInfo.lastMapUUID.getTileX();
-                py += MapDisplayTile.RESOLUTION * frameInfo.lastMapUUID.getTileY();
-            }
+        if (frameInfo == null) {
+            return false; // not tracked
         }
 
-        MapClickEvent event = new MapClickEvent(player, itemFrame, stack.stack.getLast(), action, px, py);
+        // Ask item frame to compute look-at information
+        MapLookPosition position = frameInfo.findLookPosition(startPosition, lookDirection, false);
+        if (position == null) {
+            return false; // doesn't really happen (withinBounds = false), but just in case
+        }
+
+        // Keep position within bounds of the display
+        MapDisplay display = stack.stack.getLast();
+        double new_x = position.getDoubleX();
+        double new_y = position.getDoubleY();
+        if (new_x < 0.0 || new_y < 0.0 || new_x >= display.getWidth() || new_y >= display.getHeight()) {
+            new_x = MathUtil.clamp(new_x, 0.0, (double) display.getWidth() - 1e-10);
+            new_y = MathUtil.clamp(new_y, 0.0, (double) display.getHeight() - 1e-10);
+            position = new MapLookPosition(position.getItemFrameInfo(), new_x, new_y, position.getDistance());
+        }
+
+        // Fire event
+        System.out.println(position);
+        MapClickEvent event = new MapClickEvent(player, position, display, action);
         CommonUtil.callEvent(event);
         if (!event.isCancelled()) {
             if (action == MapAction.LEFT_CLICK) {
@@ -850,46 +858,8 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private boolean dispatchClickActionApprox(Player player, ItemFrame itemFrame, MapAction action) {
-        // Calculate the vector position on the map that was clicked
-        BlockFace attachedFace = itemFrame.getAttachedFace();
-        Location playerPos = player.getEyeLocation();
-        Vector dir = playerPos.getDirection();
-        Block itemBlock = EntityUtil.getHangingBlock(itemFrame);
-        double target_x = (double) itemBlock.getX() + 1.0;
-        double target_y = (double) itemBlock.getY() + 1.0;
-        double target_z = (double) itemBlock.getZ() + 1.0;
-
-        final double FRAME_OFFSET = 0.0625; // offset from wall
-        double dx, dy;
-
-        if (FaceUtil.isAlongZ(attachedFace)) {
-            if (attachedFace == BlockFace.NORTH) {
-                target_z -= 1.0;
-            }
-            target_z -= attachedFace.getModZ() * FRAME_OFFSET;
-            dir.multiply((target_z - playerPos.getZ()) / dir.getZ());
-            dx = target_x - (playerPos.getX() + dir.getX());
-            dy = target_y - (playerPos.getY() + dir.getY());
-            if (attachedFace == BlockFace.NORTH) {
-                dx = 1.0 - dx;
-            }
-        } else if (FaceUtil.isAlongX(attachedFace)) {
-            if (attachedFace == BlockFace.WEST) {
-                target_x -= 1.0;
-            }
-            target_x -= attachedFace.getModX() * FRAME_OFFSET;
-            dir.multiply((target_x - playerPos.getX()) / dir.getX());
-            dx = target_z - (playerPos.getZ() + dir.getZ());
-            dy = target_y - (playerPos.getY() + dir.getY());
-            if (attachedFace == BlockFace.EAST) {
-                dx = 1.0 - dx;
-            }
-        } else {
-            //TODO: Vertical
-            dx = 0.5;
-            dy = 0.5;
-        }
-        return dispatchClickAction(player, itemFrame, dx, dy, action);
+        Location eye = player.getEyeLocation();
+        return dispatchClickAction(player, itemFrame, eye.toVector(), eye.getDirection(), action);
     }
 
     private boolean dispatchClickActionFromBlock(Player player, Block clickedBlock, BlockFace clickedFace, MapAction action) {
@@ -934,24 +904,17 @@ public class CommonMapController implements PacketListener, Listener {
         }
         ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
         if (lastClickOffset != null) {
-            Vector pos = lastClickOffset;
+            Location eye = event.getPlayer().getEyeLocation();
+            Location pos = itemFrame.getLocation().add(lastClickOffset);
+            Vector dir = eye.getDirection();
             lastClickOffset = null;
-            BlockFace attachedFace = itemFrame.getAttachedFace();
-            double dx, dy;
-            if (FaceUtil.isAlongZ(attachedFace)) {
-                dx = pos.getX() + 0.5;
-                dy = 1.0 - (pos.getY() + 0.5);
-                if (attachedFace == BlockFace.SOUTH) {
-                    dx = 1.0 - dx;
-                }
-            } else {
-                dx = pos.getZ() + 0.5;
-                dy = 1.0 - (pos.getY() + 0.5);
-                if (attachedFace == BlockFace.WEST) {
-                    dx = 1.0 - dx;
-                }
-            }
-            event.setCancelled(dispatchClickAction(event.getPlayer(), itemFrame, dx, dy, MapAction.RIGHT_CLICK));
+
+            // Move the position back a distance so the computed distance later matches up
+            // A bit of a hack, but easier than injecting distance after the fact
+            double distance = eye.distance(pos);
+            pos.subtract(dir.clone().multiply(distance));
+
+            event.setCancelled(dispatchClickAction(event.getPlayer(), itemFrame, pos.toVector(), dir, MapAction.RIGHT_CLICK));
         } else {
             event.setCancelled(dispatchClickActionApprox(event.getPlayer(), itemFrame, MapAction.RIGHT_CLICK));
         }

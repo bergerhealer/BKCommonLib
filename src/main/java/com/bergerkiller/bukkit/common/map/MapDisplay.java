@@ -9,18 +9,23 @@ import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
+import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
 import com.bergerkiller.bukkit.common.map.widgets.MapWidgetRoot;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -655,6 +660,55 @@ public class MapDisplay implements MapDisplayEvents {
             }
         }
         throw new IllegalArgumentException("Player is not an owner of this display");
+    }
+
+    /**
+     * Follows the ray formed by where the player is looking, and calculates the
+     * pixel coordinates on this map display that are looked at. Only item frames
+     * in the world that show this display are checked. If no item frame is found,
+     * returns null.
+     *
+     * @param player The player whose eye location to use
+     * @return MapLookPosition if found, otherwise null
+     */
+    public MapLookPosition findLookPosition(Player viewer) {
+        return findLookPosition(viewer.getEyeLocation());
+    }
+
+    /**
+     * Follows the ray formed by looking from a position into a certain direction,
+     * and calculates the pixel coordinates on this map display that are looked at.
+     * Only item frames in the world that show this display are checked.
+     * If no item frame is found, returns null.
+     *
+     * @param eyeLocation Position and direction of the eye performing the looking
+     * @return MapLookPosition if found, otherwise null
+     */
+    public MapLookPosition findLookPosition(Location eyeLocation) {
+        return findLookPosition(eyeLocation.getWorld(), eyeLocation.toVector(), eyeLocation.getDirection());
+    }
+
+    /**
+     * Follows the ray formed by looking from a position into a certain direction,
+     * and calculates the pixel coordinates on this map display that are looked at.
+     * Only item frames in the world that show this display are checked.
+     * If no item frame is found, returns null.
+     *
+     * @param world World to look for item frames
+     * @param startPosition Start position in the world
+     * @param lookDirection Direction vector, must be normalized
+     * @return MapLookPosition if found, otherwise null
+     */
+    public MapLookPosition findLookPosition(World world, Vector startPosition, Vector lookDirection) {
+        for (ItemFrameInfo itemFrame : this.info.getItemFrames()) {
+            if (itemFrame.getWorld() == world) {
+                MapLookPosition position = itemFrame.findLookPosition(startPosition, lookDirection, true);
+                if (position != null) {
+                    return position;
+                }
+            }
+        }
+        return null;
     }
 
     /**

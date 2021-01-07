@@ -4,17 +4,23 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.UUID;
 
+import org.bukkit.World;
+import org.bukkit.block.BlockFace;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonMapController;
+import com.bergerkiller.bukkit.common.map.MapDisplayTile;
+import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
@@ -57,6 +63,186 @@ public class ItemFrameInfo {
         this.displayInfo = null;
         this.needsItemRefresh = false;
         this.sentToPlayers = false;
+    }
+
+    /**
+     * Gets the World the item frame is in
+     *
+     * @return item frame world
+     */
+    public World getWorld() {
+        return this.itemFrame.getWorld();
+    }
+
+    /**
+     * Follows an eye ray to see if it lands on this item frame. If it does,
+     * returns the exact coordinates on the display shown on this item frame.
+     * If there is no map display being displayed, or the eye isn't looking at
+     * this item frame, null is returned.
+     *
+     * @param startPosition Start position of the eye ray
+     * @param lookDirection Normalized direction vector of the eye ray
+     * @param withinBounds Whether the position looked at must be within bounds of the item frame
+     * @return Map Look Position, or null if the eye ray doesn't land on this
+     *         item frame, or this item frame isn't displaying a map display.
+     */
+    public MapLookPosition findLookPosition(Vector startPosition, Vector lookDirection, boolean withinBounds) {
+        // If it shows no display, don't bother checking
+        if (this.lastMapUUID == null) {
+            return null;
+        }
+
+        // Offset from block face to canvas
+        final double FRAME_OFFSET = 0.0625;
+
+        // Compare facing with the eye ray to calculate the eye distance to the item frame
+        double distance;
+        IntVector3 frameBlock = this.itemFrameHandle.getBlockPosition();
+        BlockFace facing = this.itemFrameHandle.getFacing();
+        switch (facing) {
+        case NORTH:
+            if (lookDirection.getZ() > 1e-10) {
+                distance = (frameBlock.z + 1.0 - FRAME_OFFSET - startPosition.getZ()) / lookDirection.getZ();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        case SOUTH:
+            if (lookDirection.getZ() < -1e-10) {
+                distance = (frameBlock.z + FRAME_OFFSET - startPosition.getZ()) / lookDirection.getZ();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        case WEST:
+            if (lookDirection.getX() > 1e-10) {
+                distance = (frameBlock.x + 1.0 - FRAME_OFFSET - startPosition.getX()) / lookDirection.getX();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        case EAST:
+            if (lookDirection.getX() < -1e-10) {
+                distance = (frameBlock.x + FRAME_OFFSET - startPosition.getX()) / lookDirection.getX();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        case DOWN:
+            if (lookDirection.getY() > 1e-10) {
+                distance = (frameBlock.y + 1.0 - FRAME_OFFSET - startPosition.getY()) / lookDirection.getY();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        case UP:
+            if (lookDirection.getY() < -1e-10) {
+                distance = (frameBlock.y + FRAME_OFFSET - startPosition.getY()) / lookDirection.getY();
+                break;
+            } else if (!withinBounds) {
+                distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
+                        startPosition.getX(), startPosition.getY(), startPosition.getZ());
+                break;
+            } else {
+                return null;
+            }
+        default:
+            return null;
+        }
+
+        // Add distance * lookDirection to startPosition and subtract item frame coordinates
+        // to find the coordinates relative to the middle of the block that are looked at
+        double at_x = distance * lookDirection.getX() + startPosition.getX() - frameBlock.x - 0.5;
+        double at_y = distance * lookDirection.getY() + startPosition.getY() - frameBlock.y - 0.5;
+        double at_z = distance * lookDirection.getZ() + startPosition.getZ() - frameBlock.z - 0.5;
+
+        // If outside range [-0.5 .. 0.5] then this item frame was not looked at
+        if (withinBounds && (at_x < -0.5 || at_x > 0.5 || at_z < -0.5 || at_z > 0.5 || at_y < -0.5 || at_y > 0.5)) {
+            return null;
+        }
+
+        // Convert x/y/z into x/y using facing information
+        double map_x, map_y;
+        switch (facing) {
+        case NORTH:
+            map_x = 0.5 - at_x;
+            map_y = 0.5 - at_y;
+            break;
+        case SOUTH:
+            map_x = 0.5 + at_x;
+            map_y = 0.5 - at_y;
+            break;
+        case WEST:
+            map_x = 0.5 + at_z;
+            map_y = 0.5 - at_y;
+            break;
+        case EAST:
+            map_x = 0.5 - at_z;
+            map_y = 0.5 - at_y;
+            break;
+        case DOWN:
+            map_x = 0.5 + at_x;
+            map_y = 0.5 - at_z;
+            break;
+        case UP:
+            map_x = 0.5 + at_x;
+            map_y = 0.5 + at_z;
+            break;
+        default:
+            return null;
+        }
+
+        // Adjust the coordinates if a non-zero rotation is set
+        switch (this.itemFrameHandle.getRotationOrdinal() & 0x3) {
+        case 1:
+        {
+            double tmp = map_x;
+            map_x = map_y;
+            map_y = 1.0 - tmp;
+            break;
+        }
+        case 2:
+        {
+            map_x = 1.0 - map_x;
+            map_y = 1.0 - map_y;
+            break;
+        }
+        case 3:
+        {
+            double tmp = map_x;
+            map_x = 1.0 - map_y;
+            map_y = tmp;
+            break;
+        }
+        default:
+            break;
+        }
+
+        // Change to pixel coordinates based on resolution and done!
+        return new MapLookPosition(this,
+                MapDisplayTile.RESOLUTION * (map_x + this.lastMapUUID.getTileX()),
+                MapDisplayTile.RESOLUTION * (map_y + this.lastMapUUID.getTileY()),
+                distance);
     }
 
     /**
