@@ -21,14 +21,34 @@ class DimensionManager {
   #endif
 
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
+        // First, ask the dimension manager registry what the key is
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server#customRegistry;
         java.util.Optional key_opt = registry.a().c(instance);
         if (key_opt.isPresent()) {
             return (ResourceKey) key_opt.get();
-        } else {
-            throw new IllegalArgumentException("This dimension is not registered");
         }
+
+        // Maybe the dimension was only temporarily registered while the world was constructed
+        // In that case, the only way to find out is to go by all worlds and compare the manager
+        // The world stores the ResourceKey Type too, so then we can use that.
+        // One problem with this is that it is not thread-safe. If worlds are loaded, unloaded or
+        // created, this could cause a concurrent modification situation. It is unlikely to happen,
+        // but it's been wrapped in a loop just in case.
+        while (true) {
+            try {
+                java.util.Iterator worlds_iter = server.worldServer.values().iterator();
+                while (worlds_iter.hasNext()) {
+                    World world = (World) worlds_iter.next();
+                    if (world.getDimensionManager() == instance) {
+                        return world.getTypeKey();
+                    }
+                }
+                break;
+            } catch (java.util.ConcurrentModificationException ex) { /* oops! */ }
+        }
+
+        throw new IllegalArgumentException("This dimension is not registered");
     }
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
