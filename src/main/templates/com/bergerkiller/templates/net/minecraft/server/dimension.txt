@@ -29,23 +29,12 @@ class DimensionManager {
             return (ResourceKey) key_opt.get();
         }
 
-        // Maybe the dimension was only temporarily registered while the world was constructed
-        // In that case, the only way to find out is to go by all worlds and compare the manager
-        // The world stores the ResourceKey Type too, so then we can use that.
-        // One problem with this is that it is not thread-safe. If worlds are loaded, unloaded or
-        // created, this could cause a concurrent modification situation. It is unlikely to happen,
-        // but it's been wrapped in a loop just in case.
-        while (true) {
-            try {
-                java.util.Iterator worlds_iter = server.worldServer.values().iterator();
-                while (worlds_iter.hasNext()) {
-                    World world = (World) worlds_iter.next();
-                    if (world.getDimensionManager() == instance) {
-                        return world.getTypeKey();
-                    }
-                }
-                break;
-            } catch (java.util.ConcurrentModificationException ex) { /* oops! */ }
+        // We track a pair of dimension manager and dimension type when worlds initialize and unload
+        // In case it is not part of the registry but a pair is in use by a world, this method
+        // can find those.
+        Object cached_key = com.bergerkiller.bukkit.common.internal.CommonListener.getResourceKey(instance);
+        if (cached_key != null) {
+            return (ResourceKey) cached_key;
         }
 
         throw new IllegalArgumentException("This dimension is not registered");

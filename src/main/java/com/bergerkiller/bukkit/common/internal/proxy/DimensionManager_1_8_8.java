@@ -3,11 +3,11 @@ package com.bergerkiller.bukkit.common.internal.proxy;
 /**
  * Used on Minecraft 1.8.8 and before to represent a dimension
  */
-public enum DimensionManager_1_8_8 {
-    OVERWORLD(0, ""),
-    NETHER(-1, "_nether"),
-    THE_END(1, "_end");
-    
+public final class DimensionManager_1_8_8 {
+    public static final DimensionManager_1_8_8 OVERWORLD = new DimensionManager_1_8_8(0, "");
+    public static final DimensionManager_1_8_8 NETHER = new DimensionManager_1_8_8(-1, "_nether");
+    public static final DimensionManager_1_8_8 THE_END = new DimensionManager_1_8_8(1, "_end");
+
     private final int id;
     private final String suffix;
 
@@ -18,6 +18,20 @@ public enum DimensionManager_1_8_8 {
 
     public int getDimensionID() {
         return this.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return this.id;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DimensionManager_1_8_8) {
+            return ((DimensionManager_1_8_8) o).id == this.id;
+        } else {
+            return false;
+        }
     }
 
     // getSuffix
@@ -35,7 +49,7 @@ public enum DimensionManager_1_8_8 {
         case 1:
             return THE_END;
         default:
-            throw new IllegalArgumentException("Invalid dimension id " + i);
+            return new DimensionManager_1_8_8(i, "");
         }
     }
 }

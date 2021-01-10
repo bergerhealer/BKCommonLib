@@ -149,7 +149,10 @@ class World extends IBlockAccess {
     }
 
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey getDimensionTypeKey() {
-        DimensionManager dimensionType = (DimensionManager) com.bergerkiller.generated.net.minecraft.server.WorldHandle.T.getDimensionType.raw.invoke(instance);
+        com.bergerkiller.mountiplex.reflection.declarations.Template$Method method;
+        method = (com.bergerkiller.mountiplex.reflection.declarations.Template$Method) com.bergerkiller.generated.net.minecraft.server.WorldHandle.T.getDimensionType.raw;
+
+        DimensionManager dimensionType = (DimensionManager) method.invoke(instance);
         if (dimensionType == DimensionManager.NETHER) {
             return ResourceKey.WORLD_DIMENSION_TYPE_THE_NETHER;
         } else if (dimensionType == DimensionManager.THE_END) {
