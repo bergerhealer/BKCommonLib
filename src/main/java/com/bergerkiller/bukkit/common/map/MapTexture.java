@@ -12,6 +12,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 
+/**
+ * An implementation of {@link MapCanvas} that is backed by
+ * a simple <code>byte[]</code> buffer. Drawing operations can
+ * be performed on it, after which the drawn data can be efficiently
+ * copied to another texture or display canvas.<br>
+ * <br>
+ * {@link #getBuffer()} grants access to the internal buffer,
+ * which is guaranteed to store the pixel data from left to right
+ * and top to bottom. No copy is created.
+ */
 public final class MapTexture extends MapCanvas {
     private final byte[] buffer;
     private final int width, height;
