@@ -55,7 +55,9 @@ public class CommonListener implements Listener {
     private static Map<Object, Object> RESOURCE_KEY_BY_DIMENSION_MANAGER = new HashMap<>();
 
     public static Object getResourceKey(Object dimensionManagerHandle) {
-        return RESOURCE_KEY_BY_DIMENSION_MANAGER.get(dimensionManagerHandle);
+        synchronized (RESOURCE_KEY_BY_DIMENSION_MANAGER) {
+            return RESOURCE_KEY_BY_DIMENSION_MANAGER.get(dimensionManagerHandle);
+        }
     }
 
     public CommonListener() {
