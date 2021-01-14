@@ -842,7 +842,6 @@ public class CommonMapController implements PacketListener, Listener {
         }
 
         // Fire event
-        System.out.println(position);
         MapClickEvent event = new MapClickEvent(player, position, display, action);
         CommonUtil.callEvent(event);
         if (!event.isCancelled()) {
