@@ -897,9 +897,17 @@ public class CommonUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] getClassConstants(Class<?> theClass, Class<T> type) {
-        if (type.isEnum()) {
-            // Get using enum constants
-            return type.getEnumConstants();
+        if (theClass.isEnum() && type.isAssignableFrom(theClass)) {
+            if (type.equals(theClass)) {
+                // If same class, return the enum constants instantly
+                return type.getEnumConstants();
+            } else {
+                // Need to create a new array of the type specified
+                Object[] constants = theClass.getEnumConstants();
+                T[] result = LogicUtil.createArray(type, constants.length);
+                System.arraycopy(constants, 0, result, 0, constants.length);
+                return result;
+            }
         } else {
             // Get using reflection
             try {
