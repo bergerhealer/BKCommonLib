@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
+import com.bergerkiller.bukkit.common.config.yaml.YamlNodeAbstract;
 import com.bergerkiller.bukkit.common.internal.CommonClassManipulation;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -603,8 +604,8 @@ public abstract class PluginBase extends JavaPlugin {
             setPermissions(subNode);
         }
 
-        PermissionDefault def = node.get("default", PermissionDefault.class);
-        String desc = node.get("description", String.class);
+        PermissionDefault def = ParseUtil.convert(getNodeStringValue(node, "default"), PermissionDefault.class);
+        String desc = getNodeStringValue(node, "description");
         if (def != null || desc != null) {
             Permission permission = getPermission(node.getPath().toLowerCase(Locale.ENGLISH));
             if (def != null) {
@@ -613,6 +614,18 @@ public abstract class PluginBase extends JavaPlugin {
             if (desc != null) {
                 permission.setDescription(desc);
             }
+        }
+    }
+
+    // Gets the value stored at a key of a node, without trying to convert it
+    // Prevents nodes or lists being interpreted as a String
+    // Returns null if not something that can be interpreted as a String
+    private static String getNodeStringValue(ConfigurationNode node, String key) {
+        Object value = node.get(key);
+        if (value == null || value instanceof YamlNodeAbstract) {
+            return null;
+        } else {
+            return value.toString();
         }
     }
 
