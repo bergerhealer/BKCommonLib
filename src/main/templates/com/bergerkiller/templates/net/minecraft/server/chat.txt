@@ -62,11 +62,13 @@ class IChatBaseComponent {
   #else
         return instance.setChatModifier(modifier);
   #endif
+#else
+        // Feature is since 1.15, do nothing on older versions
+        return instance;
 #endif
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
-#if version >= 1.15
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
 
@@ -79,11 +81,9 @@ class IChatBaseComponent {
   #else
         return instance.setChatModifier(modifier);
   #endif
-#endif
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
-#if version >= 1.15
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
 
@@ -96,7 +96,6 @@ class IChatBaseComponent {
   #else
         return instance.setChatModifier(modifier);
   #endif
-#endif
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
