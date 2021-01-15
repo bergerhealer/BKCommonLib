@@ -164,7 +164,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @return this
      */
     public final ChatText setClickableURL(String url) {
-        handle.setClickableURL(url);
+        handle = handle.setClickableURL(url);
         return this;
     }
 
@@ -177,7 +177,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @return this
      */
     public final ChatText setClickableContent(String content) {
-        handle.setClickableContent(content);
+        handle = handle.setClickableContent(content);
         return this;
     }
 
@@ -189,7 +189,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      */
     public final ChatText setHoverText(ChatText hoverText) {
         if (hoverText != null) {
-            handle.setHoverText(hoverText.getBackingHandle());
+            handle = handle.setHoverText(hoverText.getBackingHandle());
         }
         return this;
     }
@@ -202,7 +202,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      */
     public final ChatText setHoverText(String hoverText) {
         if (hoverText != null) {
-            handle.setHoverText(ChatText.fromMessage(hoverText).getBackingHandle());
+            handle = handle.setHoverText(ChatText.fromMessage(hoverText).getBackingHandle());
         }
         return this;
     }
