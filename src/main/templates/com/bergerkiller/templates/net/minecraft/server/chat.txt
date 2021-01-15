@@ -65,6 +65,40 @@ class IChatBaseComponent {
 #endif
     }
 
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
+#if version >= 1.15
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+#endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
+#if version >= 1.15
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+#endif
+    }
+
     public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));

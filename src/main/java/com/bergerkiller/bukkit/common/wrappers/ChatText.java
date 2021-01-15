@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 
 import org.bukkit.ChatColor;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -28,6 +29,22 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      */
     public final void sendTo(Player player) {
         PlayerUtil.sendMessage(player, this);
+    }
+
+    /**
+     * Sends this chat text as a message to a command sender.
+     * If the sender supports special chat styling, then
+     * the style is preserved when sending. Otherwise, the
+     * {@link #getMessage()} is used.
+     *
+     * @param sender Recipient
+     */
+    public final void sendTo(CommandSender sender) {
+        if (sender instanceof Player) {
+            PlayerUtil.sendMessage((Player) sender, this);
+        } else {
+            sender.sendMessage(this.getMessage());
+        }
     }
 
     /**
@@ -182,6 +199,30 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
     }
 
     /**
+     * Makes this current chat text message clickable. When a player clicks on the text,
+     * it will place the command specified in the chat input box.
+     *
+     * @param command The command to suggest
+     * @return this
+     */
+    public final ChatText setClickableSuggestedCommand(String command) {
+        handle = handle.setClickableSuggestedCommand(command);
+        return this;
+    }
+
+    /**
+     * Makes this current chat text message clickable. When a player clicks on the text,
+     * it will execute the command specified.
+     *
+     * @param command The command to execute
+     * @return this
+     */
+    public final ChatText setClickableRunCommand(String command) {
+        handle = handle.setClickableRunCommand(command);
+        return this;
+    }
+
+    /**
      * Sets the text displayed to the player when he hovers his cursor on top of it
      * 
      * @param hoverText The text displayed
@@ -257,6 +298,31 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      */
     public static ChatText fromClickableContent(String text, String content) {
         return fromMessage(text).setClickableContent(content);
+    }
+
+    /**
+     * Creates the text component for representing a clickable link.
+     * When clicked, it will place the command specified in the
+     * chat input box.
+     *
+     * @param text The text visible to the player
+     * @param command The command to suggest
+     * @return content ChatText
+     */
+    public static ChatText fromClickableSuggestedCommand(String text, String command) {
+        return fromMessage(text).setClickableSuggestedCommand(command);
+    }
+
+    /**
+     * Creates the text component for representing a clickable link.
+     * When clicked, it will execute the command specified.
+     *
+     * @param text The text visible to the player
+     * @param command The command to run
+     * @return content ChatText
+     */
+    public static ChatText fromClickableRunCommand(String text, String command) {
+        return fromMessage(text).setClickableRunCommand(command);
     }
 
     /**

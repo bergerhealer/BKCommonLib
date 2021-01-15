@@ -26,6 +26,8 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
     public abstract IChatBaseComponentHandle createCopy();
     public abstract IChatBaseComponentHandle setClickableURL(String url);
     public abstract IChatBaseComponentHandle setClickableContent(String content);
+    public abstract IChatBaseComponentHandle setClickableSuggestedCommand(String command);
+    public abstract IChatBaseComponentHandle setClickableRunCommand(String command);
     public abstract IChatBaseComponentHandle setHoverText(IChatBaseComponentHandle hoverText);
     /**
      * Stores class members for <b>net.minecraft.server.IChatBaseComponent</b>.
@@ -37,6 +39,8 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
         public final Template.Method.Converted<IChatBaseComponentHandle> createCopy = new Template.Method.Converted<IChatBaseComponentHandle>();
         public final Template.Method.Converted<IChatBaseComponentHandle> setClickableURL = new Template.Method.Converted<IChatBaseComponentHandle>();
         public final Template.Method.Converted<IChatBaseComponentHandle> setClickableContent = new Template.Method.Converted<IChatBaseComponentHandle>();
+        public final Template.Method.Converted<IChatBaseComponentHandle> setClickableSuggestedCommand = new Template.Method.Converted<IChatBaseComponentHandle>();
+        public final Template.Method.Converted<IChatBaseComponentHandle> setClickableRunCommand = new Template.Method.Converted<IChatBaseComponentHandle>();
         public final Template.Method.Converted<IChatBaseComponentHandle> setHoverText = new Template.Method.Converted<IChatBaseComponentHandle>();
 
     }
