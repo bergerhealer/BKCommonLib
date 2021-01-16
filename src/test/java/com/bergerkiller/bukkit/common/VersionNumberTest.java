@@ -10,13 +10,13 @@ import com.bergerkiller.bukkit.common.internal.CommonMethods;
 /**
  * Checks Common.VERSION is correct.
  */
-public class VersionNumberCheck {
+public class VersionNumberTest {
 
     @Test
     public void testCheckVersionNumber() {
         // Read plugin version
         YamlNode plugin_yaml = new YamlNode();
-        plugin_yaml.loadFromStream(VersionNumberCheck.class.getResourceAsStream("/plugin.yml"));
+        plugin_yaml.loadFromStream(VersionNumberTest.class.getResourceAsStream("/plugin.yml"));
         String version_str = plugin_yaml.get("version", String.class);
         assertNotNull("Version missing in plugin.yml", version_str);
         int expected = CommonMethods.parseVersionNumber(version_str);

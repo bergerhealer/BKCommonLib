@@ -28,14 +28,21 @@ optional class SoundCategory {
 }
 
 class SoundEffectType {
-#if version >= 1.9
-    public (SoundEffectHandle) SoundEffect getBreakSound:d();
-    public (SoundEffectHandle) SoundEffect getStepSound:g();
+#if version >= 1.16.5
+    public (SoundEffectHandle) SoundEffect getStepSound();
+    public (SoundEffectHandle) SoundEffect getPlaceSound();
+    public (SoundEffectHandle) SoundEffect getBreakSound:getFallSound();
+    public (SoundEffectHandle) SoundEffect getFallSound();
+#elseif version >= 1.9
+    public (SoundEffectHandle) SoundEffect getStepSound:d();
     public (SoundEffectHandle) SoundEffect getPlaceSound:e();
+    public (SoundEffectHandle) SoundEffect getBreakSound:g();
+    public (SoundEffectHandle) SoundEffect getFallSound:g();
 #else
-    public (SoundEffectHandle) String getBreakSound();
     public (SoundEffectHandle) String getStepSound();
     public (SoundEffectHandle) String getPlaceSound();
+    public (SoundEffectHandle) String getBreakSound();
+    public (SoundEffectHandle) String getFallSound:getBreakSound();
 #endif
 }
 

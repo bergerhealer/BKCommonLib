@@ -19,17 +19,19 @@ public abstract class SoundEffectTypeHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract SoundEffectHandle getBreakSound();
     public abstract SoundEffectHandle getStepSound();
     public abstract SoundEffectHandle getPlaceSound();
+    public abstract SoundEffectHandle getBreakSound();
+    public abstract SoundEffectHandle getFallSound();
     /**
      * Stores class members for <b>net.minecraft.server.SoundEffectType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundEffectTypeClass extends Template.Class<SoundEffectTypeHandle> {
-        public final Template.Method.Converted<SoundEffectHandle> getBreakSound = new Template.Method.Converted<SoundEffectHandle>();
         public final Template.Method.Converted<SoundEffectHandle> getStepSound = new Template.Method.Converted<SoundEffectHandle>();
         public final Template.Method.Converted<SoundEffectHandle> getPlaceSound = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<SoundEffectHandle> getBreakSound = new Template.Method.Converted<SoundEffectHandle>();
+        public final Template.Method.Converted<SoundEffectHandle> getFallSound = new Template.Method.Converted<SoundEffectHandle>();
 
     }
 
