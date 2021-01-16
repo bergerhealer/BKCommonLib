@@ -1592,15 +1592,40 @@ public class MapDisplay implements MapDisplayEvents {
         return getAllDisplaysFromInfo(CommonPlugin.getInstance().getMapController().getInfo(item));
     }
 
+    /**
+     * Gets all display instances bound to the given map UUID. This is the same UUID
+     * as exposed through {@link MapDisplayProperties#getUniqueId()}. This UUID is
+     * stored in the map item as well.<br>
+     * <br>
+     * Usually only one map display is bound to a
+     * given UUID, but if different displays are used to display to different players,
+     * then more than one is returned.
+     *
+     * @param mapUniqueId Unique ID of the Map Display Map Item
+     * @return all map display instances using this UUID
+     */
+    public static Collection<MapDisplay> getAllDisplays(UUID mapUniqueId) {
+        return getAllDisplaysFromInfo(CommonPlugin.getInstance().getMapController()
+                .getInfoIfExists(mapUniqueId));
+    }
+
     private static Collection<MapDisplay> getAllDisplaysFromInfo(MapDisplayInfo info) {
         if (info != null) {
-            HashSet<MapDisplay> uniqueDisplays = new HashSet<MapDisplay>(info.getSessions().size());
-            for (MapSession session : info.getSessions()) {
+            int numSessions = info.getSessions().size();
+            if (numSessions > 1) {
+                HashSet<MapDisplay> uniqueDisplays = new HashSet<MapDisplay>(numSessions);
+                for (MapSession session : info.getSessions()) {
+                    if (session.display != null) {
+                        uniqueDisplays.add(session.display);
+                    }
+                }
+                return uniqueDisplays;
+            } else if (numSessions == 1) {
+                MapSession session = info.getSessions().get(0);
                 if (session.display != null) {
-                    uniqueDisplays.add(session.display);
+                    return Collections.singleton(session.display);
                 }
             }
-            return uniqueDisplays;
         }
         return Collections.emptySet();
     }

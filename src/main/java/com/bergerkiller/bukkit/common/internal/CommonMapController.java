@@ -258,20 +258,29 @@ public class CommonMapController implements PacketListener, Listener {
 
     /**
      * Gets the Map display information for a certain map item UUID.
+     * Creates a new instance if none exists yet. Returns null if
+     * the input UUID is null.
      * 
-     * @param mapUUID of the map
-     * @return display info for this UUID
+     * @param mapUUID The Unique ID of the map
+     * @return display info for this UUID, or null if mapUUID is null
      */
     public synchronized MapDisplayInfo getInfo(UUID mapUUID) {
         if (mapUUID == null) {
             return null;
+        } else {
+            return maps.computeIfAbsent(mapUUID, MapDisplayInfo::new);
         }
-        MapDisplayInfo info = maps.get(mapUUID);
-        if (info == null) {
-            info = new MapDisplayInfo(mapUUID);
-            maps.put(mapUUID, info);
-        }
-        return info;
+    }
+
+    /**
+     * Gets the Map display information for a certain map item UUID.
+     * Returns null if none exists by this UUID.
+     *
+     * @param mapUUID The Unique ID of the map
+     * @return display info for this UUID, or null if none exists
+     */
+    public synchronized MapDisplayInfo getInfoIfExists(UUID mapUUID) {
+        return maps.get(mapUUID);
     }
 
     /**
