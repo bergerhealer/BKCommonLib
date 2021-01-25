@@ -331,11 +331,21 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         @Override
         public void onPacketReceiving(PacketEvent event) {
+            // Check not temporary
+            if (this.isTemporary(event.getPlayer())) {
+                return;
+            }
+
             monitor.onMonitorPacketReceive(new CommonPacket(event.getPacket().getHandle()), event.getPlayer());
         }
 
         @Override
         public void onPacketSending(PacketEvent event) {
+            // Check not temporary
+            if (this.isTemporary(event.getPlayer())) {
+                return;
+            }
+
             monitor.onMonitorPacketSend(new CommonPacket(event.getPacket().getHandle()), event.getPlayer());
         }
     }
@@ -343,7 +353,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private static class CommonPacketListener extends CommonPacketAdapter {
 
         public final PacketListener listener;
-        private final Class<?> temporaryPlayerClass;
         private final ProtocolLibPacketHandler packetHandler;
 
         public CommonPacketListener(ProtocolLibPacketHandler packetHandler, Plugin plugin, PacketListener listener, PacketType[] types) {
@@ -351,27 +360,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.packetHandler = packetHandler;
             this.listener = listener;
 
-            Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
-            try {
-                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
-            } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
-            }
-            this.temporaryPlayerClass = tempPlayerClass;
         }
 
         @Override
         public void onPacketReceiving(PacketEvent event) {
-            // If coming from a pre-authenticated client, ignore the packet
-            // ProtocolLib uses a TemporaryPlayer for that, which throws errors for certain properties
-            // We rather not expose plugins to these problems.
-            Player player = event.getPlayer();
-            if (player == null || this.temporaryPlayerClass.isAssignableFrom(player.getClass())) {
+            // Check not temporary
+            if (this.isTemporary(event.getPlayer())) {
                 return;
             }
 
             CommonPacket packet = new CommonPacket(event.getPacket().getHandle());
-            PacketReceiveEvent receiveEvent = new PacketReceiveEvent(player, packet);
+            PacketReceiveEvent receiveEvent = new PacketReceiveEvent(event.getPlayer(), packet);
             receiveEvent.setCancelled(event.isCancelled());
             listener.onPacketReceive(receiveEvent);
             event.setCancelled(receiveEvent.isCancelled());
@@ -385,6 +384,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             if (this.packetHandler.useSilentPacketQueue &&
                 this.packetHandler.silentPacketQueueFallback.take(event.getPlayer(), raw_packet))
             {
+                return;
+            }
+
+            // Check not temporary
+            if (this.isTemporary(event.getPlayer())) {
                 return;
             }
 
@@ -402,12 +406,35 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         public final PacketType[] types;
         private final ListeningWhitelist receiving;
         private final ListeningWhitelist sending;
+        private final Class<?> temporaryPlayerClass;
 
         public CommonPacketAdapter(Plugin plugin, ListenerPriority priority, PacketType[] types) {
             this.plugin = plugin;
             this.types = types;
             this.receiving = getWhiteList(priority, types, true);
             this.sending = getWhiteList(priority, types, false);
+
+            // ProtocolLib uses a 'TemporaryPlayer' object to represent players before
+            // they are spawned in the world. We want to ignore events of players that
+            // use this, as it exposes plugins to a lot of potential errors.
+            Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
+            try {
+                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
+            } catch (Throwable t) {
+                Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+            }
+            this.temporaryPlayerClass = tempPlayerClass;
+        }
+
+        /**
+         * Gets whether the player instance is a temporary one. A temporary player has no entity
+         * id, no world and no location information.
+         *
+         * @param player
+         * @return True if temporary
+         */
+        protected boolean isTemporary(Player player) {
+            return player == null || this.temporaryPlayerClass.isAssignableFrom(player.getClass());
         }
 
         private static ListeningWhitelist getWhiteList(ListenerPriority priority, PacketType[] types, boolean receiving) {
