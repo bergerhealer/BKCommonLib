@@ -74,7 +74,7 @@ class World extends IBlockAccess {
 
     /* This is runtime generated to improve performance, avoiding the cost of creating BlockPosition objects */
     public BlockData getBlockDataAtCoord(int x, int y, int z) {
-#if exists net.minecraft.server.World public boolean captureTreeGeneration;
+#if exists net.minecraft.server.World public boolean captureTreeGeneration; && !exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         // CraftBukkit does some special stuff, sometimes, when captureTreeGeneration is set
         if (instance.captureTreeGeneration) {
             IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
