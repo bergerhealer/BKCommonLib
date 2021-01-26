@@ -138,7 +138,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
     @Template.Optional
     @Template.Import("net.minecraft.server.LightEngineThreaded")
-    @Template.InstanceType("com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine")
+    @Template.InstanceType("com.tuinity.tuinity.chunk.light.SWMRNibbleArray")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
@@ -157,7 +157,11 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <IS_SUPPORTED>
          * public static boolean isSupported(net.minecraft.server.LightEngineThreaded lightEngineThreaded) {
+         * #if exists net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
+         *     #require net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
+         * #else
          *     #require net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine theLightEngine;
+         * #endif
          *     return lightEngineThreaded#theLightEngine != null;
          * }
          */
@@ -171,9 +175,15 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;
          *     }
+         * 
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
+         *     NibbleArray nibble = nibbles[cy].toVanillaNibble();
+         *     return nibble.asBytes();
+         * #else
          *     byte[] newData = new byte[2048];
          *     nibbles[cy].copyInto(newData, 0);
          *     return newData;
+         * #endif
          * }
          */
         @Template.Generated("%GET_SKYLIGHT_DATA%")
@@ -186,9 +196,15 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;
          *     }
+         * 
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
+         *     NibbleArray nibble = nibbles[cy].toVanillaNibble();
+         *     return nibble.asBytes();
+         * #else
          *     byte[] newData = new byte[2048];
          *     nibbles[cy].copyInto(newData, 0);
          *     return newData;
+         * #endif
          * }
          */
         @Template.Generated("%GET_BLOCKLIGHT_DATA%")
@@ -198,7 +214,16 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * <SET_SKYLIGHT_DATA>
          * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
          *     SWMRNibbleArray nibble = chunk.getSkyNibbles()[cy+1]; // Note: below-bedrock +1 offset!
+         * 
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
+         * #else
+         *     nibble.set(0, 0);
+         *     #require com.tuinity.tuinity.chunk.light.SWMRNibbleArray protected byte[] storageUpdating;
+         *     byte[] updating = nibble#storageUpdating;
+         *     System.arraycopy(data, 0, updating, 0, 2048);
+         * #endif
+         * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
          *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy, cz));
@@ -212,7 +237,16 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * <SET_BLOCKLIGHT_DATA>
          * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
          *     SWMRNibbleArray nibble = chunk.getBlockNibbles()[cy+1]; // Note: below-bedrock +1 offset!
+         * 
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
+         * #else
+         *     nibble.set(0, 0);
+         *     #require com.tuinity.tuinity.chunk.light.SWMRNibbleArray protected byte[] storageUpdating;
+         *     byte[] updating = nibble#storageUpdating;
+         *     System.arraycopy(data, 0, updating, 0, 2048);
+         * #endif
+         * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
          *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy, cz));
