@@ -169,18 +169,22 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #endif
          * 
          * #if version >= 1.16
-         *     // WorldDataMutable and WorldDataServer fields
-         *     #require net.minecraft.server.World public final WorldDataMutable worldData;
-         *     #require net.minecraft.server.WorldServer public final WorldDataServer worldDataServer;
+         *     // WorldDataMutable field
+         *     #require net.minecraft.server.World public final net.minecraft.server.WorldDataMutable worldData;
          *     worldserver#worldData = worldData;
+         * 
+         *     // WorldDataServer field (on some servers, it uses the WorldDataMutable field instead)
+         *   #if exists net.minecraft.server.WorldServer public final net.minecraft.server.WorldDataServer worldDataServer;
+         *     #require net.minecraft.server.WorldServer public final net.minecraft.server.WorldDataServer worldDataServer;
          *     worldserver#worldDataServer = worldData;
+         *   #endif
          * #else
          *     // worldProvider field
          *     int envId = org.bukkit.World.Environment.NORMAL.getId();
-         *     worldserver.worldProvider = DimensionManager.a(envId).getWorldProvider((World) worldserver);
+         *     worldserver.worldProvider = net.minecraft.server.DimensionManager.a(envId).getWorldProvider((net.minecraft.server.World) worldserver);
          * 
          *     // worldData field
-         *     #require net.minecraft.server.World public final WorldData worldData;
+         *     #require net.minecraft.server.World public final net.minecraft.server.WorldData worldData;
          *     worldserver#worldData = worldData;
          * #endif    
          * }

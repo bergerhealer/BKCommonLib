@@ -24,7 +24,7 @@ class DimensionManager {
         // First, ask the dimension manager registry what the key is
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server#customRegistry;
-        java.util.Optional key_opt = registry.a().c(instance);
+        java.util.Optional key_opt = registry.a().c((Object) instance);
         if (key_opt.isPresent()) {
             return (ResourceKey) key_opt.get();
         }
@@ -50,7 +50,7 @@ class DimensionManager {
     public int getId() {
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server#customRegistry;
-        java.util.Optional key_opt = registry.a().c(instance);
+        java.util.Optional key_opt = registry.a().c((Object) instance);
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
             if (res_key == DimensionManager.OVERWORLD) {

@@ -896,7 +896,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if forge
+#if exists net.minecraft.server.Entity public void burn(float dmg);
+    public void burn(float dmg);
+#elseif forge
     public void burn(float dmg) {
         #require net.minecraft.server.Entity protected void burn(int dmg);
         instance#burn((int)dmg);

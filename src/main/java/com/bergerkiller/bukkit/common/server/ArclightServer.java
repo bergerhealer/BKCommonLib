@@ -172,7 +172,7 @@ public class ArclightServer extends SpigotServer implements FieldNameResolver, M
          *     ClassLoaderRemapper remapper = (ClassLoaderRemapper) classLoaderRemapper;
          *     java.lang.reflect.Method method = remapper.tryMapMethodToSrg(type, name, parameterTypes);
          *     if (method != null) {
-         *         return method.getName();
+         *         return com.bergerkiller.mountiplex.reflection.util.asm.MPLType.getName(method);
          *     }
          * 
          *     return name;
