@@ -75,7 +75,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         scheduleUpdate(world, () -> {
             try {
-                handle.setSkyLightData(HandleConversion.toChunkHandle(chunk), cx, cy, cz, data);
+                handle.setSkyLightData(HandleConversion.toChunkHandle(chunk), cx, cy + 1, cz, data);
                 future.complete(null);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
@@ -92,7 +92,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         scheduleUpdate(world, () -> {
             try {
-                handle.setBlockLightData(HandleConversion.toChunkHandle(chunk), cx, cy, cz, data);
+                handle.setBlockLightData(HandleConversion.toChunkHandle(chunk), cx, cy + 1, cz, data);
                 future.complete(null);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
@@ -172,16 +172,21 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * <GET_SKYLIGHT_DATA>
          * public static byte[] getSkyLightData(net.minecraft.server.Chunk chunk, int cy) {
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
-         *     if (cy < 0 || cy >= nibbles.length) {
+         *     SWMRNibbleArray swmr_nibble;
+         *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
          *         return null;
          *     }
          * 
          * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
-         *     NibbleArray nibble = nibbles[cy].toVanillaNibble();
-         *     return nibble.asBytes();
+         *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
+         *     if (nibble == null) {
+         *         return null;
+         *     } else {
+         *         return nibble.asBytes();
+         *     }
          * #else
          *     byte[] newData = new byte[2048];
-         *     nibbles[cy].copyInto(newData, 0);
+         *     swmr_nibble.copyInto(newData, 0);
          *     return newData;
          * #endif
          * }
@@ -193,16 +198,21 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * <GET_BLOCKLIGHT_DATA>
          * public static byte[] getBlockLightData(net.minecraft.server.Chunk chunk, int cy) {
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
-         *     if (cy < 0 || cy >= nibbles.length) {
+         *     SWMRNibbleArray swmr_nibble;
+         *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
          *         return null;
          *     }
          * 
          * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
-         *     NibbleArray nibble = nibbles[cy].toVanillaNibble();
-         *     return nibble.asBytes();
+         *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
+         *     if (nibble == null) {
+         *         return null;
+         *     } else {
+         *         return nibble.asBytes();
+         *     }
          * #else
          *     byte[] newData = new byte[2048];
-         *     nibbles[cy].copyInto(newData, 0);
+         *     swmr_nibble.copyInto(newData, 0);
          *     return newData;
          * #endif
          * }
@@ -213,7 +223,15 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <SET_SKYLIGHT_DATA>
          * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
-         *     SWMRNibbleArray nibble = chunk.getSkyNibbles()[cy+1]; // Note: below-bedrock +1 offset!
+         *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
+         *     if (cy < 0 || cy >= nibbles.length) {
+         *         return null;
+         *     }
+         *     SWMRNibbleArray nibble = nibbles[cy];
+         *     if (nibble == null) {
+         *         nibble = new SWMRNibbleArray();
+         *         nibbles[cy] = nibble;
+         *     }
          * 
          * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
@@ -226,7 +244,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */
@@ -236,7 +254,15 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <SET_BLOCKLIGHT_DATA>
          * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
-         *     SWMRNibbleArray nibble = chunk.getBlockNibbles()[cy+1]; // Note: below-bedrock +1 offset!
+         *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
+         *     if (cy < 0 || cy >= nibbles.length) {
+         *         return null;
+         *     }
+         *     SWMRNibbleArray nibble = nibbles[cy];
+         *     if (nibble == null) {
+         *         nibble = new SWMRNibbleArray();
+         *         nibbles[cy] = nibble;
+         *     }
          * 
          * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
@@ -249,7 +275,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */
