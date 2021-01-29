@@ -990,7 +990,11 @@ class EntityEnderCrystal extends Entity {
 }
 
 class EntityFishingHook extends Entity {
-    #if version >= 1.14
+    #if version >= 1.16.5
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:HOOKED_ENTITY;
+    #elseif version >= 1.16
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:e;
+    #elseif version >= 1.14
       private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:c;
     #elseif version >= 1.11
       private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:b;

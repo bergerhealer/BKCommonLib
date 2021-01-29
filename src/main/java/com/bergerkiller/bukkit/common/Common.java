@@ -22,7 +22,8 @@ public class Common {
             "Common:PacketPlayOutUpdateAttributes:createZeroMaxHealth",
             "Common:Yaml:ChangeListeners",
             "Common:Yaml:CloneAndSetToWithFixes",
-            "Common:IPermissionEnum"
+            "Common:IPermissionEnum",
+            "Common:FishingHookFixes1.16"
     ).collect(Collectors.toSet());
 
     /**
