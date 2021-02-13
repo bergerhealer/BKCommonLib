@@ -509,11 +509,17 @@ public class YamlSerializer {
             }
         }
 
+        // Only alphanumeric characters permitted
         for (; i != len; c = str.charAt(i++)) {
             if (c >= 'a' && c <= 'z') continue;
             if (c >= 'A' && c <= 'Z') continue;
             if (c == '_' || c == '-') continue;
             if (isKey && c >= '0' && c <= '9') continue;
+            return false;
+        }
+
+        // Check starts or ends with a space
+        if (Character.isWhitespace(str.charAt(0)) || Character.isWhitespace(str.charAt(len-1))) {
             return false;
         }
 
