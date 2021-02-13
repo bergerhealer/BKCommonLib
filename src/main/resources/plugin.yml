@@ -2,7 +2,7 @@ name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
 api-version: 1.13
 version: ${project.version}
-build: ${project.buildNumber}
+build: ${project.build.number}
 authors: [bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg_1999, Friwi]
 load: startup
 description: Is used in all of my plugins to re-use common functions

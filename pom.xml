@@ -15,8 +15,8 @@
     <properties>
         <!-- Project build properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.build.number>NO-CI</project.build.number>
         <jdk.version>1.8</jdk.version>
-        <project.buildNumber/>
         <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
         <!-- Library versions -->
         <minecraft.version>1.16.5</minecraft.version>
@@ -34,7 +34,7 @@
                 </property>
             </activation>
             <properties>
-                <project.buildNumber>${env.BUILD_NUMBER}</project.buildNumber>
+                <project.build.number>${env.BUILD_NUMBER}</project.build.number>
             </properties>
         </profile>
     </profiles>
@@ -223,8 +223,8 @@
 
     <!-- Build -->
     <build>
-        <!-- Little hack to prevent maven from uploading the shaded jar as main artifact, while keeping the original jar name -->
-        <finalName>${project.finalNameBase}-noshade</finalName>
+        <!-- Export artifact with name that includes the build number -->
+        <finalName>${project.finalNameBase}</finalName>
         <defaultGoal>clean package</defaultGoal>
 
         <!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
@@ -278,18 +278,14 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Clean the target folder content -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-clean-plugin</artifactId>
-                <version>3.1.0</version>
-            </plugin>
+
             <!-- Include resource files -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
                 <version>3.1.0</version>
             </plugin>
+
             <!-- Turns the reflection template files into Java source code -->
             <plugin>
                 <groupId>com.bergerkiller.mountiplex</groupId>
@@ -325,16 +321,7 @@
                     </execution>
                 </executions>
             </plugin>
-            <!-- Compile and include classes -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
-                <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-                </configuration>
-            </plugin>
+
             <!-- Surefire plugin for running the PostTestHandler after running all the tests -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -351,12 +338,7 @@
                     </properties>
                 </configuration>
             </plugin>
-            <!-- Generate a jar containing classes and resources -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.1.0</version>
-            </plugin>
+
             <!-- Generate a jar containing the source javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -369,6 +351,7 @@
                     <quiet>true</quiet>
                 </configuration>
             </plugin>
+
             <!-- Generate a jar containing the java sources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -378,6 +361,7 @@
                     <finalName>${project.finalNameBase}</finalName>
                 </configuration>
             </plugin>
+
             <!-- Needed for shading in Mountiplex, CGLib and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -385,7 +369,7 @@
                 <version>3.2.0</version>
                 <configuration>
                     <minimizeJar>true</minimizeJar>
-                    <finalName>${project.finalNameBase}</finalName>
+                    <finalName>${project.name}-${project.version}-${project.build.number}</finalName>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <relocations>
@@ -436,6 +420,13 @@
                 </executions>
             </plugin>
 
+            <!-- Clean the target folder content -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+
             <!-- Copy the produced target to the static directory with just a base name -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -451,11 +442,21 @@
                         </goals>
                         <configuration>
                             <target>
-                                <copy file="target/${project.finalNameBase}.jar" tofile="target/static/${project.name}.jar"/>
+                                <copy file="target/${project.name}-${project.version}-${project.build.number}.jar" tofile="target/static/${project.name}.jar"/>
                             </target>
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- Generate a jar containing classes and resources -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <finalName>${project.finalNameBase}-noshade</finalName>
+                </configuration>
             </plugin>
 
             <!-- Install the jars as artifacts into the local repository -->
@@ -464,11 +465,23 @@
                 <artifactId>maven-install-plugin</artifactId>
                 <version>2.5.2</version>
             </plugin>
+
             <!-- Deploy the jars as artifacts into the remote repository -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-deploy-plugin</artifactId>
                 <version>2.8.2</version>
+            </plugin>
+
+            <!-- Compile and include classes -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <source>${jdk.version}</source>
+                    <target>${jdk.version}</target>
+                </configuration>
             </plugin>
         </plugins>
 
