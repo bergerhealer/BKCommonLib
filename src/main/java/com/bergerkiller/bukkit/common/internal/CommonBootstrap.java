@@ -92,6 +92,7 @@ public class CommonBootstrap {
                 servers.add(new MohistServer());
                 servers.add(new MagmaServer());
                 servers.add(new ArclightServer());
+                servers.add(new ArclightServerLegacy());
                 servers.add(new CatServerServer());
                 servers.add(new Bukkit4FabricServer());
                 servers.add(new PurpurServer());
