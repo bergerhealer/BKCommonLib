@@ -66,12 +66,12 @@ public class BlockDataImpl extends BlockData {
     public static final int ID_BITS = 8;
     public static final int DATA_BITS = 4;
 
-    public static final int REGISTRY_SIZE = (1 << 16); // 65536
-    public static final int REGISTRY_MASK = (REGISTRY_SIZE - 1);
+    public static final int REGISTRY_SIZE;
+    public static final int REGISTRY_MASK;
+    public static final BlockDataConstant[] BY_ID_AND_DATA;
 
     public static final BlockDataConstant AIR;
     public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
-    public static final BlockDataConstant[] BY_ID_AND_DATA = new BlockDataConstant[REGISTRY_SIZE];
     public static final Map<Object, BlockDataConstant> BY_BLOCK = new IdentityHashMap<Object, BlockDataConstant>();
     private static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
     private static final StampedLock BY_BLOCK_DATA_LOCK = new StampedLock();
@@ -102,16 +102,33 @@ public class BlockDataImpl extends BlockData {
         }
 
         // Cache a mapping of all possible IBlockData instances
-        Arrays.fill(BY_ID_AND_DATA, AIR);
-        for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
-            IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
-            BlockDataConstant block_const = BY_BLOCK.get(blockData.getBlock().getRaw());
-            if (block_const.getData() != rawIBlockData) {
-                block_const = new BlockDataConstant(blockData);
+        {
+            BlockDataConstant[] tmp = new BlockDataConstant[1 << 14];
+            Arrays.fill(tmp, AIR);
+
+            for (Object rawIBlockData : BlockHandle.REGISTRY_ID) {
+                IBlockDataHandle blockData = IBlockDataHandle.createHandle(rawIBlockData);
+                BlockDataConstant block_const = BY_BLOCK.get(blockData.getBlock().getRaw());
+                if (block_const.getData() != rawIBlockData) {
+                    block_const = new BlockDataConstant(blockData);
+                }
+                BY_BLOCK_DATA.put(rawIBlockData, block_const);
+
+                int combined_id = block_const.getCombinedId_1_8_8();
+                while (combined_id >= tmp.length) {
+                    int oldLength = tmp.length;
+                    tmp = Arrays.copyOf(tmp, oldLength << 1);
+                    Arrays.fill(tmp, oldLength, tmp.length, AIR);
+                }
+                tmp[combined_id] = block_const;
             }
-            BY_BLOCK_DATA.put(rawIBlockData, block_const);
-            BY_ID_AND_DATA[block_const.getCombinedId_1_8_8()] = block_const;
+
+            // Note: array must be power of 2 in length
+            BY_ID_AND_DATA = tmp;
+            REGISTRY_SIZE = tmp.length;
+            REGISTRY_MASK = REGISTRY_SIZE - 1;
         }
+
         BY_BLOCK_DATA.put(null, AIR);
 
         // Sanity check
