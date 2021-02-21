@@ -217,7 +217,7 @@ public class TemplateTest {
             try {
                 templateClass.forceInitialization();
             } catch (Throwable t) {
-                Logging.LOGGER_REFLECTION.severe("Failed to initialize " + templateClass.getType());
+                Logging.LOGGER_REFLECTION.severe("Failed to initialize " + templateClass.getHandleType().getName());
                 throw MountiplexUtil.uncheckedRethrow(t);
             }
         }
