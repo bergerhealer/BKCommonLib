@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.PacketPlayOutTitle</b>.
@@ -19,11 +20,27 @@ public abstract class PacketPlayOutTitleHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract EnumTitleActionHandle getAction();
+    public abstract void setAction(EnumTitleActionHandle value);
+    public abstract ChatText getTitle();
+    public abstract void setTitle(ChatText value);
+    public abstract int getFadeIn();
+    public abstract void setFadeIn(int value);
+    public abstract int getStay();
+    public abstract void setStay(int value);
+    public abstract int getFadeOut();
+    public abstract void setFadeOut(int value);
     /**
      * Stores class members for <b>net.minecraft.server.PacketPlayOutTitle</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutTitleClass extends Template.Class<PacketPlayOutTitleHandle> {
+        public final Template.Field.Converted<EnumTitleActionHandle> action = new Template.Field.Converted<EnumTitleActionHandle>();
+        public final Template.Field.Converted<ChatText> title = new Template.Field.Converted<ChatText>();
+        public final Template.Field.Integer fadeIn = new Template.Field.Integer();
+        public final Template.Field.Integer stay = new Template.Field.Integer();
+        public final Template.Field.Integer fadeOut = new Template.Field.Integer();
+
     }
 
 

@@ -103,6 +103,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityPaintingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityWeatherHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUnloadChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHandle;
@@ -1959,24 +1960,34 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayOutTitle extends NMSPacket {
-        public final FieldAccessor<Object> action = nextField("private PacketPlayOutTitle.EnumTitleAction a");
-        public final FieldAccessor<Object> chatComponent = nextFieldSignature("private IChatBaseComponent b");
-        public final FieldAccessor<Integer> a = nextFieldSignature("private int c");
-        public final FieldAccessor<Integer> b = nextFieldSignature("private int d");
-        public final FieldAccessor<Integer> c = nextFieldSignature("private int e");
+        public final FieldAccessor<PacketPlayOutTitleHandle.EnumTitleActionHandle> action = PacketPlayOutTitleHandle.T.action.toFieldAccessor();
+        public final FieldAccessor<ChatText> chatComponent = PacketPlayOutTitleHandle.T.title.toFieldAccessor();
+        public final FieldAccessor<Integer> fadeIn = PacketPlayOutTitleHandle.T.fadeIn.toFieldAccessor();
+        public final FieldAccessor<Integer> stay = PacketPlayOutTitleHandle.T.stay.toFieldAccessor();
+        public final FieldAccessor<Integer> fadeOut = PacketPlayOutTitleHandle.T.fadeOut.toFieldAccessor();
 
         private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(EnumTitleActionHandle.T.getType(), IChatBaseComponentHandle.T.getType(), int.class, int.class, int.class);
 
-        public CommonPacket newInstance(int a, int b, int c) {
-            return constructor1.newInstance(EnumTitleActionHandle.TIMES.getRaw(), null, a, b, c);
+        public CommonPacket newInstance(int fadeIn, int stay, int fadeOut) {
+            return constructor1.newInstance(EnumTitleActionHandle.TIMES.getRaw(), null, fadeIn, stay, fadeOut);
         }
 
+        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ChatText title) {
+            return constructor1.newInstance(enumTitleAction.getRaw(), title.getRawHandle(), -1, -1, -1);
+        }
+
+        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, ChatText title, int fadeIn, int stay, int fadeOut) {
+            return constructor1.newInstance(enumTitleAction.getRaw(), title.getRawHandle(), fadeIn, stay, fadeOut);
+        }
+
+        @Deprecated
         public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, IChatBaseComponentHandle iChatBaseComponent) {
             return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), -1, -1, -1);
         }
 
-        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, IChatBaseComponentHandle iChatBaseComponent, int a, int b, int c) {
-            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), a, b, c);
+        @Deprecated
+        public CommonPacket newInstance(EnumTitleActionHandle enumTitleAction, IChatBaseComponentHandle iChatBaseComponent, int fadeIn, int stay, int fadeOut) {
+            return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), fadeIn, stay, fadeOut);
         }
     }
 

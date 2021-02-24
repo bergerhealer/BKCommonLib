@@ -40,6 +40,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHand
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPositionHandle.EnumPlayerTeleportFlagsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle;
 
 class Packet {
     <code>
@@ -510,6 +511,23 @@ class PacketPlayInBlockDig extends Packet {
 }
 
 class PacketPlayOutTitle extends Packet {
+    private (PacketPlayOutTitleHandle.EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction action:a;
+    private (ChatText) IChatBaseComponent title:b;
+
+    // Introduced in newer 1.16.5 paperspigot builds, replacing the "components" field
+    // If this field is set, it overrules the 'title' field
+#if exists net.minecraft.server.PacketPlayOutTitle public net.kyori.adventure.text.Component adventure$text;
+    public unknown net.kyori.adventure.text.Component adventure$text;
+#endif
+
+    private int fadeIn:c;
+    private int stay:d;
+    private int fadeOut:e;
+
+    // Note: paper includes a 'components' field for md_5's chat api
+    //       if this field is set, it overrules the 'title' field
+    // public net.md_5.bungee.api.chat.BaseComponent[] components;
+
     class PacketPlayOutTitle.EnumTitleAction {
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction TITLE;
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction SUBTITLE;
