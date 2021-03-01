@@ -34,6 +34,7 @@ public class LightingHandler_1_14 implements LightingHandler {
     private final Object light_engine_post_update;
     private final Method light_engine_schedule;
     private final Map<World, EngineUpdateTaskLists> task_lists = new HashMap<>();
+    private final IntSupplier golden_ticket;
 
     public LightingHandler_1_14() throws Throwable {
         this.handle = Template.Class.create(LightEngineHandle.class, Common.TEMPLATE_RESOLVER);
@@ -77,6 +78,13 @@ public class LightingHandler_1_14 implements LightingHandler {
         this.light_storage_array_live = lightEngineStorageType.getDeclaredField("f");
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_array_live.getType())) {
             throw new IllegalStateException("LightEngineStorage light_storage_array_live field is not of type LightEngineStorageArray");
+        }
+
+        // PlayerChunkMap.GOLDEN_TICKET
+        {
+            Field f = CommonUtil.getNMSClass("PlayerChunkMap").getDeclaredField("GOLDEN_TICKET");
+            final int golden_ticket_value = f.getInt(null);
+            this.golden_ticket = () -> golden_ticket_value;
         }
 
         // Get PRE/POST_UPDATE constants
@@ -195,7 +203,7 @@ public class LightingHandler_1_14 implements LightingHandler {
             this.stage = new AtomicInteger(0);
 
             try {
-                final IntSupplier priority = () -> 0;
+                final IntSupplier priority = golden_ticket;
                 light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_pre_update, (Runnable) this::preRun);
                 light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_post_update, (Runnable) this::postRun);
             } catch (Throwable t) {
