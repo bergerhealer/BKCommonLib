@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.*;
 import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
-import com.bergerkiller.reflection.net.minecraft.server.NMSRecipe;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;
@@ -18,10 +17,10 @@ public class CraftRecipe {
     private final ItemStack[] input;
     private final ItemStack[] output;
 
-    private CraftRecipe(Collection<CraftInputSlot> unmodifiedInputs, ItemStack output) {
+    private CraftRecipe(Collection<CraftInputSlot> unmodifiedIngredients, ItemStack output) {
         // Merge the input slots when possible
-        ArrayList<CraftInputSlot> inputSlotsList = new ArrayList<CraftInputSlot>(unmodifiedInputs.size());
-        for (CraftInputSlot unmodInput : unmodifiedInputs) {
+        ArrayList<CraftInputSlot> inputSlotsList = new ArrayList<CraftInputSlot>(unmodifiedIngredients.size());
+        for (CraftInputSlot unmodInput : unmodifiedIngredients) {
             boolean merged = false;
             for (int i = 0; i < inputSlotsList.size(); i++) {
                 CraftInputSlot mergedSlot = inputSlotsList.get(i).tryMergeWith(unmodInput);
@@ -281,19 +280,19 @@ public class CraftRecipe {
 
     public static CraftRecipe create(IRecipeHandle recipe) {
         final ItemStack output = recipe.getOutput();
-        final List<CraftInputSlot> inputs = NMSRecipe.getInputSlots(recipe);
-        if (inputs != null) {
-            return createSlots(inputs, output);
+        final List<CraftInputSlot> ingredients = recipe.getIngredients();
+        if (ingredients != null) {
+            return createSlots(ingredients, output);
         } else {
             return null;
         }
     }
 
-    public static CraftRecipe createSlots(Collection<CraftInputSlot> inputs, ItemStack output) {
-        if (LogicUtil.nullOrEmpty(inputs) || LogicUtil.nullOrEmpty(output)) {
+    public static CraftRecipe createSlots(Collection<CraftInputSlot> ingredients, ItemStack output) {
+        if (LogicUtil.nullOrEmpty(ingredients) || LogicUtil.nullOrEmpty(output)) {
             return null;
         } else {
-            CraftRecipe rval = new CraftRecipe(inputs, output);
+            CraftRecipe rval = new CraftRecipe(ingredients, output);
             // Check that input and output are not causing a loop
             // For example Sandstone has an infinite crafting loop going on
             // (You can craft 4 Sandstone using 4 Sandstone...yeah)

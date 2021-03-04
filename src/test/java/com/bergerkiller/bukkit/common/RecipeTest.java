@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
+
 import static com.bergerkiller.bukkit.common.utils.MaterialUtil.getFirst;
 
 import org.bukkit.Material;
@@ -8,11 +9,44 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.RecipeUtil;
 
 public class RecipeTest {
+
+    @Test
+    public void testFireworkRecipe() {
+        Material fireworkType = MaterialUtil.getFirst("FIREWORK_ROCKET", "LEGACY_FIREWORK");
+        CraftRecipe[] recipes = RecipeUtil.getCraftingRequirements(fireworkType, -1);
+        assertEquals(1, recipes.length);
+
+        // Check input is a paper + gunpowder (pre-1.15)
+        // or paper + 3x gunpowder (post-1.15)
+        CraftInputSlot[] inputs = recipes[0].getInputSlots();
+        assertEquals(2, inputs.length);
+        assertEquals(MaterialUtil.getFirst("PAPER", "LEGACY_PAPER"),
+                inputs[0].getDefaultChoice().getType());
+        assertEquals(MaterialUtil.getFirst("GUNPOWDER", "LEGACY_SULPHUR"),
+                inputs[1].getDefaultChoice().getType());
+        if (Common.evaluateMCVersion(">=", "1.15")) {
+            assertEquals(3, inputs[1].getDefaultChoice().getAmount());
+        }
+
+        // Check output is a flight-3 firework (1.15)
+        ItemStack[] outputs = recipes[0].getOutput();
+        assertEquals(1, outputs.length);
+        assertEquals(fireworkType, outputs[0].getType());
+        if (Common.evaluateMCVersion(">=", "1.15")) {
+            assertEquals(Byte.valueOf((byte) 3), ItemUtil.getMetaTag(outputs[0], false)
+                    .get("Fireworks", CommonTagCompound.class)
+                    .getValue("Flight", Byte.class));
+        }
+    }
 
     @Test
     public void testFurnaceRecipes() {

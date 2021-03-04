@@ -12,7 +12,17 @@ import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 
 class IRecipe {
 #if version >= 1.15
-    public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:getResult();
+    public (org.bukkit.inventory.ItemStack) ItemStack getOutput() {
+        if (instance instanceof RecipeFireworks) {
+            // Special case (see getIngredients code)
+            net.minecraft.server.ItemStack itemstack = new ItemStack(net.minecraft.server.Items.FIREWORK_ROCKET, 3);
+            net.minecraft.server.NBTTagCompound nbttagcompound = itemstack.a("Fireworks");
+            nbttagcompound.setByte("Flight", (byte) 3);
+            return itemstack;
+        } else {
+            return instance.getResult();
+        }
+    }
 #elseif version >= 1.14
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:c();
 #elseif version >= 1.13
@@ -20,28 +30,52 @@ class IRecipe {
 #else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
 #endif
-}
 
-class ShapedRecipes extends IRecipe {
-    private final (List<CraftInputSlot>) NonNullList<RecipeItemStack> inputItems:items;
-}
+    public abstract (List<CraftInputSlot>) NonNullList<RecipeItemStack> getIngredients() {
+        if (instance instanceof ShapedRecipes) {
+            ShapedRecipes s = (ShapedRecipes) instance;
+#select version >=
+#case 1.14:     return s.a();
+#case 1.13:     return s.e();
+#case 1.12.1:   return s.d();
+#case else:     #require net.minecraft.server.ShapedRecipes private final NonNullList<RecipeItemStack> items;
+                return instance#items;
+#endselect
+        } else if (instance instanceof ShapelessRecipes) {
+            ShapelessRecipes s = (ShapelessRecipes) instance;
+#select version >=
+#case 1.14:     return s.a();
+#case 1.13:     return s.e();
+#case 1.12.1:   return s.d();
+#case else:     #require net.minecraft.server.ShapelessRecipes private final NonNullList<RecipeItemStack> ingredients;
+                return instance#ingredients;
+#endselect
 
-class ShapelessRecipes extends IRecipe {
-    private final (List<CraftInputSlot>) NonNullList<RecipeItemStack> inputItems:ingredients;
+#if version >= 1.15
+        } else if (instance instanceof RecipeFireworks) {
+            // Fireworks are a 'complex' recipe with many possible options
+            // To sort of work properly rather than not at all, default to
+            // crafting a flight 3 firework:
+            // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
+            Object[] ingredients = new Object[4];
+            ingredients[0] = net.minecraft.server.RecipeItemStack.a(new net.minecraft.server.Item[] { net.minecraft.server.Items.PAPER });
+            ingredients[1] = net.minecraft.server.RecipeItemStack.a(new net.minecraft.server.Item[] { net.minecraft.server.Items.GUNPOWDER });
+            ingredients[2] = ingredients[1];
+            ingredients[3] = ingredients[1];
+            return NonNullList.a((Object) RecipeItemStack.a, ingredients);
+#endif
+
+        } else {
+            return null;
+        }
+    }
 }
 
 #else
 
 interface IRecipe {
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getOutput:b();
-}
-
-class ShapedRecipes extends IRecipe {
-    private final (List<CraftInputSlot>) ItemStack[] inputItems:items;
-}
-
-class ShapelessRecipes extends IRecipe {
-    private final (List<CraftInputSlot>) List<ItemStack> inputItems:ingredients;
+    public abstract (List<CraftInputSlot>) List<ItemStack> getIngredients();
 }
 
 #endif
