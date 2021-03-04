@@ -31,6 +31,10 @@ public class MapDisplayTile {
         this.uuid = new MapUUID(mapDisplayUUID, this.tileX, this.tileY);
     }
 
+    public MapUUID getMapTileUUID() {
+        return this.uuid;
+    }
+
     public int getMapId() {
         return CommonPlugin.getInstance().getMapController().getMapId(this.uuid);
     }

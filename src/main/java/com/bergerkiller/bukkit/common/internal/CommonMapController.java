@@ -12,6 +12,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -61,6 +62,7 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayProperties;
+import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
@@ -86,6 +88,8 @@ import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.SetMultimap;
 
 public class CommonMapController implements PacketListener, Listener {
     // Stores cached thread-safe lists of item frames by cluster key
@@ -110,7 +114,8 @@ public class CommonMapController implements PacketListener, Listener {
     // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
-    private HashSet<UUID> dirtyMapUUIDSet = new HashSet<UUID>();
+    private SetMultimap<UUID, MapUUID> dirtyMapUUIDSet = HashMultimap.create(5, 100);
+    private SetMultimap<UUID, MapUUID> dirtyMapUUIDSetTmp = HashMultimap.create(5, 100);
     // Whether to automatically load neighbouring chunks when item frames are found on the edges
     private boolean LOAD_BORDER_CHUNKS = false;
     // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
@@ -505,16 +510,11 @@ public class CommonMapController implements PacketListener, Listener {
                 mapUUIDById.put(mapidValue, mapUUID);
                 mapIdByUUID.put(mapUUID, Integer.valueOf(mapidValue));
 
-                // Invalidate display if it exists
-                MapDisplayInfo mapInfo = maps.get(mapUUID.getUUID());
-                if (mapInfo != null) {
-                    for (MapSession session : mapInfo.getSessions()) {
-                        session.display.invalidate();
-                    }
-                }
-
+                // If it had changed, update map items showing this map
+                // uuid, and also re-send map packets for this id.
+                // This is all done periodically on the main thread.
                 if (idChanged) {
-                    dirtyMapUUIDSet.add(mapUUID.getUUID());
+                    dirtyMapUUIDSet.get(mapUUID.getUUID()).add(mapUUID);
                 }
 
                 return mapidValue;
@@ -529,12 +529,22 @@ public class CommonMapController implements PacketListener, Listener {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {    
             int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
+            this.storeStaticMapId(itemid);
+
+            // This used to be used to just cancel interfering plugins
+            // However, sometimes map data is sent before any item frame
+            // set-item or similar packets. So, we'll have to act sooner.
+            //
+            // Note that we send packets with an ignoreListeners flag, causing
+            // such packets to not go through this listener.
+            /*
             MapUUID mapUUID = mapUUIDById.get(itemid);
             if (mapUUID == null) {
                 this.storeStaticMapId(itemid);
             } else if (CommonMapUUIDStore.getStaticMapId(mapUUID.getUUID()) == -1) {
                 event.setCancelled(true);
             }
+            */
         }
 
         // Correct Map ItemStacks as they are sent to the clients (virtual)
@@ -948,16 +958,6 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private synchronized Set<UUID> getDirtyMapUUIDs() {
-        if (this.dirtyMapUUIDSet.isEmpty()) {
-            return Collections.emptySet();
-        } else {
-            Set<UUID> result = this.dirtyMapUUIDSet;
-            this.dirtyMapUUIDSet = new HashSet<UUID>();
-            return result;
-        }
-    }
-
     private synchronized void cleanupUnusedUUIDs(Set<MapUUID> existingMapUUIDs) {
         HashSet<MapUUID> idsToRemove = new HashSet<MapUUID>(mapIdByUUID.keySet());
         idsToRemove.removeAll(existingMapUUIDs);
@@ -979,7 +979,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Clean up from 'dirty' set (probably never needed)
-            dirtyMapUUIDSet.remove(toRemove.getUUID());
+            dirtyMapUUIDSet.removeAll(toRemove.getUUID());
         }
     }
 
@@ -1083,31 +1083,53 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Refresh items known to clients when Map Ids are re-assigned
-            Set<UUID> dirtyMaps = getDirtyMapUUIDs();
+            // Swap around the tmp and main set every tick
+            final SetMultimap<UUID, MapUUID> dirtyMaps;
+            dirtyMaps = dirtyMapUUIDSet;
+            dirtyMapUUIDSet = dirtyMapUUIDSetTmp;
+            dirtyMapUUIDSetTmp = dirtyMaps;
             if (!dirtyMaps.isEmpty()) {
-                // Refresh all item frames that display this map
-                // This will result in a new EntityMetadata packets being sent, refreshing the map Id
-                for (Set<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
-                    for (EntityItemFrameHandle itemFrame : itemFrameSet) {
-                        UUID mapUUID = itemFrame.getItemMapDisplayUUID();
-                        if (dirtyMaps.contains(mapUUID)) {
-                            itemFrame.refreshItem();
-                        }
-                    }
-                }
-
                 // Refresh all player inventories that contain this map
                 // This will result in new SetItemSlot packets being sent, refreshing the map Id
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     PlayerInventory inv = player.getInventory();
                     for (int i = 0; i < inv.getSize(); i++) {
                         ItemStack item = inv.getItem(i);
-                        UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
-                        if (dirtyMaps.contains(mapUUID)) {
+                        UUID uuid = CommonMapUUIDStore.getMapUUID(item);
+                        if (dirtyMaps.containsKey(uuid)) {
                             inv.setItem(i, item.clone());
                         }
                     }
                 }
+
+                // Refresh all item frames that display this map
+                // This will result in a new EntityMetadata packets being sent, refreshing the map Id
+                // After updating all item frames, resend the maps
+                dirtyMaps.keySet().stream()
+                    .map(maps::get)
+                    .filter(Objects::nonNull)
+                    .forEach(info -> {
+                        // Refresh item of all affected item frames
+                        // This re-sends metadata packets
+                        final Set<MapUUID> mapUUIDs = dirtyMaps.get(info.getUniqueId());
+                        for (ItemFrameInfo itemFrameInfo : info.getItemFrames()) {
+                            if (mapUUIDs.contains(itemFrameInfo.lastMapUUID)) {
+                                itemFrameInfo.itemFrameHandle.refreshItem();
+                            }
+                        }
+
+                        // Resend map data for all affected tiles
+                        for (MapSession session : info.getSessions()) {
+                            for (MapDisplayTile tile : session.tiles) {
+                                if (mapUUIDs.contains(tile.getMapTileUUID())) {
+                                    session.onlineOwners.forEach(o -> o.sendDirtyTile(tile));
+                                }
+                            }
+                        }
+                    });
+
+                // Done processing, wipe
+                dirtyMaps.clear();
             }
         }
     }
