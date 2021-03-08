@@ -331,6 +331,8 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
             remappings.put(nms_root + ".ChatClickable$EnumClickAction", nms_root + ".EnumClickAction");
             remappings.put(nms_root + ".ChatHoverable$EnumHoverAction", nms_root + ".EnumHoverAction");
+            remappings.put(nms_root + ".PacketPlayInClientCommand$EnumClientCommand", nms_root + ".EnumClientCommand");
+            remappings.put(nms_root + ".PacketPlayInEntityAction$EnumPlayerAction", nms_root + ".EnumPlayerAction");
         }
 
         // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
