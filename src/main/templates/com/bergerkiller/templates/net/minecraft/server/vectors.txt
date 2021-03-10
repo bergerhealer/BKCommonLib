@@ -116,7 +116,12 @@ class Vector3f {
     </code>
 
     public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
-#if version >= 1.12
+#if exists net.minecraft.server.Vector3f public static Vector3f createWithoutValidityChecks(float x, float y, float z);
+        // paper optimization
+        return net.minecraft.server.Vector3f.createWithoutValidityChecks((float)vector.getX(),
+                                                                         (float)vector.getY(),
+                                                                         (float)vector.getZ());
+#elseif version >= 1.12
         Object v3 = com.bergerkiller.generated.net.minecraft.server.Vector3fHandle.T.newInstanceNull();
         #require net.minecraft.server.Vector3f protected final float x;
         #require net.minecraft.server.Vector3f protected final float y;
