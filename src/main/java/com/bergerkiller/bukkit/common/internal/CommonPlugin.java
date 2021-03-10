@@ -555,7 +555,10 @@ public class CommonPlugin extends PluginBase {
                 "Years of Minecraft history carefully catalogued",
                 "50% generated, 50% crafted by an artificial intelligence",
                 "Supplier supplying suppliers for your lazy needs!",
-                "Please wait while we get our code ready...");
+                "Please wait while we get our code ready...",
+                "60% of the time, it works all the time.",
+                "I don't make mistakes. I just find ways not to code this plugin.",
+                "Less complicated than the american election.");
 
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
