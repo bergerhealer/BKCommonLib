@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.CommonTimings;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
@@ -92,7 +94,9 @@ public class PacketUtil {
         if (packet != null) {
             Object rawPacket = packet.getHandle();
             if (rawPacket != null) {
-                CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getType(), rawPacket, throughListeners);
+                try (Timings t = CommonTimings.SEND_PACKET.start()) {
+                    CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getType(), rawPacket, throughListeners);
+                }
             }
         }
     }
@@ -119,7 +123,9 @@ public class PacketUtil {
      */
     public static void sendPacket(Player player, PacketHandle packet, boolean throughListeners) {
         if (packet != null) {
-            CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+            try (Timings t = CommonTimings.SEND_PACKET.start()) {
+                CommonPlugin.getInstance().getPacketHandler().sendPacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+            }
         }
     }
 
@@ -147,7 +153,9 @@ public class PacketUtil {
         if (packet != null) {
             Object rawPacket = packet.getHandle();
             if (rawPacket != null) {
-                CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getType(), rawPacket, throughListeners);
+                try (Timings t = CommonTimings.QUEUE_PACKET.start()) {
+                    CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getType(), rawPacket, throughListeners);
+                }
             }
         }
     }
@@ -174,7 +182,9 @@ public class PacketUtil {
      */
     public static void queuePacket(Player player, PacketHandle packet, boolean throughListeners) {
         if (packet != null) {
-            CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+            try (Timings t = CommonTimings.QUEUE_PACKET.start()) {
+                CommonPlugin.getInstance().getPacketHandler().queuePacket(player, packet.getPacketType(), packet.getRaw(), throughListeners);
+            }
         }
     }
 
@@ -246,7 +256,9 @@ public class PacketUtil {
         if (packet == null) {
             return;
         }
-        CommonPlugin.getInstance().getPacketHandler().sendPacket(player, PacketType.getType(packet), packet, throughListeners);
+        try (Timings t = CommonTimings.SEND_PACKET.start()) {
+            CommonPlugin.getInstance().getPacketHandler().sendPacket(player, PacketType.getType(packet), packet, throughListeners);
+        }
     }
 
     public static void broadcastBlockPacket(Block block, Object packet, boolean throughListeners) {

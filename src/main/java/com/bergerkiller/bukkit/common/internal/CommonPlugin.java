@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.MessageBuilder;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
@@ -519,6 +520,10 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("forceSynchronousSaving", "Synchronous saving (such as YAML) may hurt server performance for large files,");
         config.addHeader("forceSynchronousSaving", "but will prevent these issues from happening.");
         this.forceSynchronousSaving = config.get("forceSynchronousSaving", false);
+        config.setHeader("debugTimings", "\nWhether to instrument additional Timings for some of the core BKCommonLib components");
+        config.addHeader("debugTimings", "These timings might be useful to identify performance problems, or their causes");
+        config.addHeader("debugTimings", "They may cause a slight performance hit, so leave this option disabled unless you need them");
+        final boolean debugTimings = config.get("debugTimings", false);
         config.save();
 
         // Welcome message
@@ -559,6 +564,12 @@ public class CommonPlugin extends PluginBase {
 
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
+
+        // Timings, if enabled, otherwise no-op
+        if (debugTimings) {
+            CommonTimings.QUEUE_PACKET = Timings.create(this, "PacketHandler::queuePacket");
+            CommonTimings.SEND_PACKET = Timings.create(this, "PacketHandler::sendPacket");
+        }
 
         // Setup next tick executor
         CommonNextTickExecutor.INSTANCE.enable(this);
