@@ -18,12 +18,17 @@ import co.aikar.timings.lib.TimingManager;
  * Implements AutoCloseable so it can be used with Java7's try with resources statement.
  */
 public class Timings implements AutoCloseable {
+    private static final Map<TimingsKey, Timings> cachedTimings = new HashMap<TimingsKey, Timings>();
+    private static final boolean hasTimingsV2;
+    private static final MCTiming NOOP_MC_TIMINGS;
+    private static final Timings NOOP;
+
     private final Plugin plugin;
     private final MCTiming timing;
 
     public Timings(Plugin plugin) {
         this.plugin = plugin;
-        this.timing = null;
+        this.timing = NOOP_MC_TIMINGS;
     }
 
     public Timings(Plugin plugin, String name) {
@@ -83,18 +88,6 @@ public class Timings implements AutoCloseable {
         stop();
     }
 
-    private static String getTimingName(Plugin plugin, String name) {
-        if (hasTimingsV2) {
-            return name;
-        } else {
-            // Timings v1 requires this format or it won't work
-            return String.format("Plugin: %s v%s Event: %s", 
-                    plugin.getName(),
-                    plugin.getDescription().getVersion(),
-                    name);
-        }
-    }
-
     /**
      * Helper function for debugging that detects the plugin to use from a profiled class,
      * then creates a timings object if one does not exist in cache. The profiled class name
@@ -110,20 +103,51 @@ public class Timings implements AutoCloseable {
      */
     @Deprecated
     public static Timings start(Class<?> profiledClass, String name) {
-        final TimingsKey key = new TimingsKey(profiledClass, name);
-        Timings t = cachedTimings.get(key);
-        if (t == null) {
+        return cachedTimings.computeIfAbsent(new TimingsKey(profiledClass, name), key -> {
             Plugin plugin = CommonUtil.getPluginByClass(profiledClass);
             if (plugin == null) {
                 plugin = CommonPlugin.getInstance();
             }
-            t = new Timings(plugin, profiledClass.getSimpleName() + "::" + name);
-            cachedTimings.put(key, t);
-        }
-        return t.start();
+            return new Timings(plugin, profiledClass.getSimpleName() + "::" + name);
+        }).start();
     }
 
-    private static final Map<TimingsKey, Timings> cachedTimings = new HashMap<TimingsKey, Timings>();
+    /**
+     * Creates a new Timings instance for a plugin with the given name.
+     * These timings are not cached, so it is up to the caller to store the
+     * result in a field for better performance.
+     *
+     * @param plugin Plugin to file the timings under
+     * @param name Name to give to the timings
+     * @return timings object
+     */
+    public static Timings create(Plugin plugin, String name) {
+        try (Timings tmp = new Timings(plugin)) {
+            return tmp.create(name);
+        }
+    }
+
+    /**
+     * Obtains the no-operation timings instance. These timings do nothing when started and
+     * stopped, and as a result impose no performance penalty when used.
+     *
+     * @return No-Op timings instance
+     */
+    public static Timings noop() {
+        return NOOP;
+    }
+
+    private static String getTimingName(Plugin plugin, String name) {
+        if (hasTimingsV2) {
+            return name;
+        } else {
+            // Timings v1 requires this format or it won't work
+            return String.format("Plugin: %s v%s Event: %s", 
+                    plugin.getName(),
+                    plugin.getDescription().getVersion(),
+                    name);
+        }
+    }
 
     private static final class TimingsKey {
         public final Class<?> profiledClass;
@@ -146,7 +170,6 @@ public class Timings implements AutoCloseable {
         }
     }
 
-    private static final boolean hasTimingsV2;
     static {
         boolean tv2 = false;
         try {
@@ -154,5 +177,18 @@ public class Timings implements AutoCloseable {
             tv2 = true;
         } catch (Throwable t) {}
         hasTimingsV2 = tv2;
+
+        NOOP_MC_TIMINGS = new MCTiming() {
+            @Override
+            public MCTiming startTiming() {
+                return this;
+            }
+
+            @Override
+            public void stopTiming() {
+            }
+        };
+
+        NOOP = new Timings(CommonPlugin.hasInstance() ? CommonPlugin.getInstance() : null);
     }
 }
