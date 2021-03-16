@@ -33,17 +33,27 @@ public final class CommonNextTickExecutor implements Executor {
         }
     };
 
-    private CommonNextTickExecutor() {
+    /**
+     * Creates new next-tick executor handler. Call
+     * {@link #setExecutorTask(ExecutorTask)} to make it functional.
+     *
+     * @return next-tick executor
+     */
+    protected CommonNextTickExecutor() {
     }
 
-    protected void enable(JavaPlugin plugin) {
-        this.executorTask = new ExecutorTask(plugin);
-        this.executorTask.start(1, 1);
-    }
-
-    protected synchronized void disable() {
+    /**
+     * Sets the executor task used by this next-tick executor
+     *
+     * @param executorTask Executor task to use. Specify <i>null</i>
+     *        to disable the executor and use a fallback instead.
+     */
+    protected synchronized void setExecutorTask(ExecutorTask executorTask) {
         ExecutorTask previousExecutorTask = this.executorTask;
-        this.executorTask = null;
+        this.executorTask = executorTask;
+        if (executorTask != null) {
+            executorTask.start(1, 1);
+        }
 
         if (previousExecutorTask != null) {
             previousExecutorTask.stop();
@@ -117,7 +127,12 @@ public final class CommonNextTickExecutor implements Executor {
         CommonUtil.filterStackTrace(error).printStackTrace();
     }
 
-    private static final class ExecutorTask extends Task {
+    /**
+     * Bukkit task that actually executes scheduled runnables
+     * on the main thread. Can be extended to provide at-runtime
+     * context what executor is used.
+     */
+    protected static class ExecutorTask extends Task {
         private final Queue<Runnable> tasks = new ConcurrentLinkedQueue<>();
         private final AtomicInteger taskCount = new AtomicInteger(0);
 

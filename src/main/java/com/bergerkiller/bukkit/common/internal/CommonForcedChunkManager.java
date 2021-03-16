@@ -39,6 +39,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
+    private final CommonNextTickExecutor asyncLoadCallbackHandler = new CommonNextTickExecutor();
     private ChunkLoadTimeoutTracker loadTimeoutTracker = null;
 
     // After this number of ticks, consider the loading of a chunk to have failed
@@ -50,6 +51,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     public synchronized void enable() {
+        this.asyncLoadCallbackHandler.setExecutorTask(new ChunkLoadCallbackExecutor(this.plugin));
         this.loadTimeoutTracker = new ChunkLoadTimeoutTracker(this.plugin);
         this.loadTimeoutTracker.start(1, 1);
         this.pendingHandler = new Task(this.plugin) {
@@ -85,6 +87,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             }
         }
         this.chunks.clear();
+        this.asyncLoadCallbackHandler.setExecutorTask(null);
     }
 
     public synchronized int getNumberOfForcedLoadedChunks() {
@@ -268,19 +271,20 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         @Override
-        public void accept(Object chunk) {
+        public void accept(Object result) {
             // Either -> Left
-            chunk = RunnableConsumer.unpack(chunk);
+            result = RunnableConsumer.unpack(result);
 
             // If successful, complete the async chunk loading future
-            if (chunk != null) {
-                this.chunkFuture.complete(WrapperConversion.toChunk(chunk));
+            if (result != null) {
+                final org.bukkit.Chunk chunk = WrapperConversion.toChunk(result);
+                asyncLoadCallbackHandler.execute(() -> this.chunkFuture.complete(chunk));
                 return;
             }
 
             // If not successful, and this entry is still forced loaded, try again
             if (this.isForced()) {
-                startLoadingAsync();
+                asyncLoadCallbackHandler.execute(this::startLoadingAsync);
             }
         }
 
@@ -408,6 +412,16 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             while (!tasks.isEmpty() && (currentTick-FAIL_LOAD_AFTER_TICKS) >= tasks.peek().tick) {
                 tasks.poll().abortAllIfNotLoaded();
             }
+        }
+    }
+
+    /**
+     * Executes the load callbacks after a chunk finishes loading asynchronously
+     */
+    private static final class ChunkLoadCallbackExecutor extends CommonNextTickExecutor.ExecutorTask {
+
+        public ChunkLoadCallbackExecutor(JavaPlugin plugin) {
+            super(plugin);
         }
     }
 }

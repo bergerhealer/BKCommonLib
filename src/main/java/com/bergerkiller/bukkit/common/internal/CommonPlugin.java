@@ -465,7 +465,7 @@ public class CommonPlugin extends PluginBase {
 
         // Run any pending tasks in the next tick executor right now, so they are not forgotten
         // Disable the executor so that future attempts to queue tasks aren't handled by BKCommonLib
-        CommonNextTickExecutor.INSTANCE.disable();
+        CommonNextTickExecutor.INSTANCE.setExecutorTask(null);
 
         // Dereference
         MountiplexUtil.unloadMountiplex();
@@ -572,7 +572,7 @@ public class CommonPlugin extends PluginBase {
         }
 
         // Setup next tick executor
-        CommonNextTickExecutor.INSTANCE.enable(this);
+        CommonNextTickExecutor.INSTANCE.setExecutorTask(new CommonNextTickExecutor.ExecutorTask(this));
 
         // Initialize LookupEntityClassMap and hook it into the server
         try {
