@@ -221,7 +221,7 @@ public abstract class MapDisplayProperties {
             throw new UnsupportedOperationException("Map displays are disabled in BKCommonLib's config.yml!");
         }
         try {
-            mapDisplayClass.getDeclaredConstructor();
+            mapDisplayClass.getConstructor();
         } catch (Throwable t) {
             throw new IllegalArgumentException("The class " + mapDisplayClass.getName() + " does not have an empty constructor. Override onAttached() and use properties instead!");
         }
