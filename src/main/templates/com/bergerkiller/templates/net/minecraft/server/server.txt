@@ -26,6 +26,10 @@ class MinecraftServer {
 #endif
     }
 
+    public int getTicksSinceUnixEpoch() {
+        return net.minecraft.server.MinecraftServer.currentTick;
+    }
+
 #select version >=
 #case 1.16.4: public int getTicks:ai();
 #case 1.16.2: public int getTicks:ah();

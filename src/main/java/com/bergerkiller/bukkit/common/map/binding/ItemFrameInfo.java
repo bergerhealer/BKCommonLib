@@ -37,6 +37,7 @@ public class ItemFrameInfo {
     public final DataWatcher.Item<?> itemFrame_dw_item;
     public final HashSet<Player> viewers;
     public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
+    public MapUUID preReloadMapUUID; // Map UUID known from before a reload, and if encountered again, will avoid resending the item (popping)
     public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
     public boolean needsItemRefresh; // UUID was changed and item in the item frame needs refreshing
     public boolean sentToPlayers; // players have received item information for this item frame
@@ -60,6 +61,7 @@ public class ItemFrameInfo {
         this.viewers = new HashSet<Player>();
         this.removed = false;
         this.lastMapUUID = null;
+        this.preReloadMapUUID = null;
         this.displayInfo = null;
         this.needsItemRefresh = false;
         this.sentToPlayers = false;
@@ -434,7 +436,8 @@ public class ItemFrameInfo {
             // Map item UUID changed entirely. Remove the previous and add the new.
             remove();
             lastMapUUID = newMapUUID;
-            needsItemRefresh = sentToPlayers;
+            needsItemRefresh = sentToPlayers && !newMapUUID.equals(preReloadMapUUID);
+            preReloadMapUUID = null;
             add();
         } else if (newMapUUID.equals(lastMapUUID)) {
             // No change occurred
@@ -449,6 +452,7 @@ public class ItemFrameInfo {
             int oldTileY = lastMapUUID.getTileY();
             lastMapUUID = newMapUUID;
             needsItemRefresh = sentToPlayers;
+            preReloadMapUUID = null;
 
             // If the previous coordinates are now no longer used, remove the tile
             this.displayInfo.removeTileIfMissing(oldTileX, oldTileY);
@@ -457,6 +461,7 @@ public class ItemFrameInfo {
             // Strange.
             lastMapUUID = newMapUUID;
             needsItemRefresh = sentToPlayers;
+            preReloadMapUUID = null;
         }
     }
 

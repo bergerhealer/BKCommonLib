@@ -412,7 +412,7 @@ public class CommonPlugin extends PluginBase {
         PortalHandler.INSTANCE.disable(this);
 
         // Shut down map display controller
-        this.mapController.onDisable();
+        this.mapController.onDisable(this);
 
         // Disable listeners
         for (World world : Bukkit.getWorlds()) {

@@ -61,21 +61,19 @@ public abstract class DataWriter {
             try {
                 this.write(stream);
             } catch (IOException ex) {
-            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while saving file '" + this.file + "':");
-                ex.printStackTrace();
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while saving file '" + this.file + "':", ex);
+                return false;
             } catch (Throwable t) {
-            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while savingg file '" + this.file + "':");
-                t.printStackTrace();
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while savingg file '" + this.file + "':", t);
+                return false;
             } finally {
                 stream.close();
             }
             return true;
         } catch (FileNotFoundException ex) {
-        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to access file '" + this.file + "' for saving:");
-            ex.printStackTrace();
+            Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to access file '" + this.file + "' for saving:", ex);
         } catch (Throwable t) {
-        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to save to file '" + this.file + "':");
-            t.printStackTrace();
+            Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to save to file '" + this.file + "':", t);
         }
         return false;
     }

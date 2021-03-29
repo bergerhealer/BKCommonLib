@@ -79,11 +79,11 @@ public abstract class DataReader {
             try {
                 this.read(stream);
             } catch (IOException ex) {
-            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while loading file '" + this.file + "':");
-                ex.printStackTrace();
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "An IO Exception occured while loading file '" + this.file + "':", ex);
+                return false;
             } catch (Throwable t) {
-            	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':");
-                t.printStackTrace();
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':", t);
+                return false;
             } finally {
                 stream.close();
             }
@@ -91,8 +91,7 @@ public abstract class DataReader {
         } catch (FileNotFoundException ex) {
             // nothing, we allow non-existence of this file
         } catch (Throwable t) {
-        	Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':");
-            t.printStackTrace();
+            Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while loading file '" + this.file + "':", t);
         }
         return false;
     }

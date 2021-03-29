@@ -365,11 +365,50 @@ public class CommonMapController implements PacketListener, Listener {
 
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
+        // No actual initialization is done yet, this happens next tick cycle!
         for (World world : Bukkit.getWorlds()) {
             for (EntityItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
                 onAddItemFrame(itemFrame);
             }
         }
+
+        // For all item frames we know right now, assume players have seen them already (if reloading)
+        if (CommonUtil.getServerTicks() > 0) {
+            this.itemFrames.values().forEach(info -> info.sentToPlayers = true);
+        }
+
+        // If this is a reload, that means players have already been watching maps potentially
+        // To minimize glitches and problems, restore the map id data from last run
+        CommonMapReloadFile.load(plugin, reloadFile -> {
+
+            // Static reserved ids (other plugins have been using it)
+            for (Integer staticId : reloadFile.staticReservedIds) {
+                storeStaticMapId(staticId.intValue());
+            }
+
+            // Dynamic ids we have generated and assigned before
+            // To avoid 'popping', make sure to pre-cache the same ones
+            for (CommonMapReloadFile.DynamicMappedId dynamicMapId : reloadFile.dynamicMappedIds) {
+                if (mapUUIDById.contains(dynamicMapId.id)) {
+                    continue; // Already assigned, skip
+                }
+                if (mapIdByUUID.containsKey(dynamicMapId.uuid)) {
+                    continue; // Already assigned, skip
+                }
+
+                // Store
+                mapIdByUUID.put(dynamicMapId.uuid, dynamicMapId.id);
+                mapUUIDById.put(dynamicMapId.id, dynamicMapId.uuid);
+            }
+
+            // Give a hint about Map UUID to avoid 'popping' when the item is refreshed
+            for (CommonMapReloadFile.ItemFrameDisplayUUID displayUUID : reloadFile.itemFrameDisplayUUIDs) {
+                ItemFrameInfo itemFrame = itemFrames.get(displayUUID.entityId);
+                if (itemFrame != null) {
+                    itemFrame.preReloadMapUUID = displayUUID.uuid;
+                }
+            }
+        });
 
         // Done!
         this.isEnabled = true;
@@ -378,9 +417,31 @@ public class CommonMapController implements PacketListener, Listener {
     /**
      * Cleans up all running map displays and de-initializes all map display logic
      */
-    public void onDisable() {
+    public void onDisable(CommonPlugin plugin) {
         if (this.isEnabled) {
             this.isEnabled = false;
+
+            // If reloading, save current map id state to avoid glitches
+            CommonMapReloadFile.save(plugin, reloadFile -> {
+                // Add static reserved / dynamic map ids
+                for (Map.Entry<MapUUID, Integer> entry : mapIdByUUID.entrySet()) {
+                    MapUUID mapUUID = entry.getKey();
+                    if (mapUUID.isStaticUUID()) {
+                        reloadFile.staticReservedIds.add(entry.getValue());
+                    } else {
+                        reloadFile.addDynamicMapId(mapUUID, entry.getValue());
+                    }
+                }
+
+                // Add information about all item frames and what display they displayed last
+                for (Map.Entry<Integer, ItemFrameInfo> entry : itemFrames.entrySet()) {
+                    ItemFrameInfo info = entry.getValue();
+                    if (info.lastMapUUID != null) {
+                        reloadFile.addItemFrameDisplayUUID(entry.getKey().intValue(), info.lastMapUUID);
+                    }
+                }
+            });
+
             for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
                 for (MapSession session : new ArrayList<MapSession>(map.getSessions())) {
                     session.display.setRunning(false);
