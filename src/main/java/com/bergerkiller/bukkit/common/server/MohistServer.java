@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * Mohist is a PaperSpigot + Forge implementation
@@ -94,14 +95,26 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     }
 
     @Override
-    public String resolveClassPath(String path) {
+    public String resolveClassPath(final String path) {
         // Replaces path with proper net.minecraft.server.v1_1_1 path
-        path = super.resolveClassPath(path);
+        String remappedPath = super.resolveClassPath(path);
 
-        // Ask Mohist what the actual class name is on Forge
-        path = remapUtils.mapClassName(path);
+        // Perform remapping. If found, return
+        // For NMS paths null is returned if loading the path would cause an NPE
+        remappedPath = remapUtils.mapClassName(remappedPath);
+        if (remappedPath != null) {
+            return remappedPath;
+        }
 
-        return path;
+        // Missing class in net.minecraft.server
+        // If the original path refers to an existing Class, allow it
+        // Otherwise, return an on-purpose missing path, or it will suffer a NPE in the PluginClassLoader
+        try {
+            MPLType.getClassByName(path);
+            return path;
+        } catch (ClassNotFoundException e) {
+            return "missing.type." + path;
+        }
     }
 
     @Override
@@ -161,7 +174,7 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
          *         } else {
          *             // Mohist BUGFIX!!!
          *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
-         *             return "missing.type." + className;
+         *             return null;
          *         }
          *     }
          *     return className;
@@ -191,7 +204,7 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
          *         } else {
          *             // Mohist BUGFIX!!!
          *             // If we do not do this, it will suffer a NPE in the PluginClassLoader
-         *             return "missing.type." + className;
+         *             return null;
          *         }
          *     }
          *     return className;
