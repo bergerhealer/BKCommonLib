@@ -70,6 +70,29 @@ public class BlockDataTest {
     }
 
     @Test
+    public void testLever() {
+        BlockData d = BlockData.fromMaterial(MaterialsByName.getMaterial("LEVER"));
+
+        // Attached face
+        for (String face : new String[] { "ceiling", "floor", "wall" }) {
+            d = d.setState("face", face);
+
+            // Facing (rotation when ceiling/floor)
+            for (BlockFace facing : new BlockFace[] { BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST }) {
+                d = d.setState("facing", facing);
+
+                d = d.setState("powered", false);
+                assertFalse("isPowered()==false failed for " + facing,
+                        ((org.bukkit.material.Lever) d.getMaterialData()).isPowered());
+
+                d = d.setState("powered", true);
+                assertTrue("isPowered()==true failed for " + facing,
+                        ((org.bukkit.material.Lever) d.getMaterialData()).isPowered());
+            }
+        }
+    }
+
+    @Test
     public void testButtons() {
         for (Material material : MaterialsByName.getAllByName("STONE_BUTTON", "ACACIA_BUTTON",
                 "BIRCH_BUTTON", "DARK_OAK_BUTTON", "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON"))

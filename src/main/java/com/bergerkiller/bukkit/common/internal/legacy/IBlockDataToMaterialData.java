@@ -186,6 +186,47 @@ public class IBlockDataToMaterialData {
              .build();
         }
 
+        // Levers
+        {
+            new CustomMaterialDataBuilder<org.bukkit.material.Lever>() {
+                @Override
+                public org.bukkit.material.Lever create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Lever(material_type, legacy_data_value);
+                }
+
+                @Override
+                public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, org.bukkit.material.Lever button) {
+                    iblockdata = iblockdata.set("powered", button.isPowered());
+
+                    BlockFace attached = button.getAttachedFace();
+                    if (attached == BlockFace.UP) {
+                        // Attached to the ceiling
+                        // Facing controls what direction the lever points
+                        // However, legacy only supports ambiguous {north/south} and {east/west}
+                        BlockFace facing = ((button.getData() & 0x7) == 0x7) ? BlockFace.NORTH : BlockFace.EAST;
+                        iblockdata = iblockdata.set("face", "ceiling");
+                        return Arrays.asList(iblockdata.set("facing", facing),
+                                             iblockdata.set("facing", facing.getOppositeFace()));
+                    } else if (attached == BlockFace.DOWN) {
+                        // Attached to the floor
+                        // Facing controls what direction the lever points
+                        // However, legacy only supports ambiguous {north/south} and {east/west}
+                        BlockFace facing = ((button.getData() & 0x7) == 5) ? BlockFace.NORTH : BlockFace.EAST;
+                        iblockdata = iblockdata.set("face", "floor");
+                        return Arrays.asList(iblockdata.set("facing", facing),
+                                             iblockdata.set("facing", facing.getOppositeFace()));
+                    } else {
+                        // Attached to a wall, facing = orientation on block
+                        iblockdata = iblockdata.set("face", "wall");
+                        iblockdata = iblockdata.set("facing", button.getFacing());
+                        return Collections.singletonList(iblockdata);
+                    }
+                }
+            }.setTypes("LEVER")
+             .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
+             .build();
+        }
+
         // Pressureplates
         {
             new CustomMaterialDataBuilder<org.bukkit.material.PressurePlate>() {
