@@ -55,6 +55,12 @@ public class PermissionHandler implements PermissionChecker {
         if (this.needsWildcardCheck.clear()) {
             this.hasSuperWildcardSupport = false;
 
+            // Bugfix for UPerms: hangs on retrieving the non-existent player profile name
+            if (this.vaultPermission.getClass().getName().equals("me.TechsCode.UltraPermissions.hooks.pluginHooks.VaultPermissionHook")) {
+                this.hasSuperWildcardSupport = true; // Appears to support it
+                return this.hasSuperWildcardSupport;
+            }
+
             // Perform a little experiment with a random player name
             // Give the player a test node, and see if the *-permission is handled right
             // Also pass in an invalid value to check that there are no inconsistencies
