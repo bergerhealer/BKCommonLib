@@ -315,4 +315,9 @@ public abstract class InventoryBase implements Inventory {
         }
         return true;
     }
+
+    //@Override // Added during 1.16.5 for some servers
+    public int close() {
+        return 0;
+    }
 }
