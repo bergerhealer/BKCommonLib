@@ -204,10 +204,8 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                                             result.origin.getY(),
          *                                             result.origin.getZ());
          * #else
-         *   #if version >= 1.16.3
-         *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.ORIGIN, EnumDirection.NORTH, 0.5, 1.0, true, radius);
-         *   #elseif version >= 1.15.2
-         *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
+         *   #if version >= 1.15.2
+         *     ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
          *   #else
          *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
          *   #endif
@@ -245,7 +243,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #elseif version >= 1.16
          *     // Use default entity if null, set it up properly
          *     if (initiator == null) {
-         *         initiator = (Entity) com.bergerkiller.bukkit.common.internal.logic.PortalHandler_1_15_2.DUMMY_ENTITY_INSTANCE;
+         *         initiator = (Entity) dummyEntity;
          *         #require net.minecraft.server.Entity private Vec3D loc;
          *         #require net.minecraft.server.Entity private BlockPosition locBlock;
          *         initiator#loc = new Vec3D((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
@@ -255,7 +253,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #elseif version >= 1.15.2
          *     // Use default entity if null, set it up properly
          *     if (initiator == null) {
-         *         initiator = (Entity) com.bergerkiller.bukkit.common.internal.logic.PortalHandler_1_15_2.DUMMY_ENTITY_INSTANCE;
+         *         initiator = (Entity) dummyEntity;
          *         initiator.setPositionRaw((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
          *     }
          *     agent.createPortal(initiator, blockposition, createRadius);
