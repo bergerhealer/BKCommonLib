@@ -8,3 +8,10 @@ load: startup
 description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib]
 dev-url: ${project.url}
+permissions:
+  bkcommonlib.debug.variables:
+    default: OP
+    description: |
+        Allows use of the /debugvar command.
+        This command is only available when debugging variables are set.
+        In normal production buids, this command and permission are unused.

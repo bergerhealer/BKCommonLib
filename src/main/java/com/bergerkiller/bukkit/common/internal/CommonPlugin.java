@@ -389,6 +389,7 @@ public class CommonPlugin extends PluginBase {
             debugCommand.setDescription("Developer debugging commands for changing values at runtime. Not to be used in production.");
             debugCommand.setUsage("/debugvar [name] [value...]");
             debugCommand.setAliases(Arrays.asList("dvar"));
+            debugCommand.setPermission("bkcommonlib.debug.variables");
 
             // Get command map instance where commands are registered
             CommandMap commandMap = SafeField.get(Bukkit.getPluginManager(), "commandMap", SimpleCommandMap.class);
