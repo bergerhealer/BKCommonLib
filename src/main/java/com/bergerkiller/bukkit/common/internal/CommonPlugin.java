@@ -30,19 +30,25 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandMap;
 import org.bukkit.command.CommandSender;
+import org.bukkit.command.PluginCommand;
+import org.bukkit.command.SimpleCommandMap;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
@@ -53,6 +59,8 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.awt.Color;
 import java.io.File;
 import java.lang.ref.SoftReference;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.*;
 import java.util.logging.Level;
@@ -89,6 +97,7 @@ public class CommonPlugin extends PluginBase {
     private boolean isMapDisplaysEnabled = true;
     private boolean teleportPlayersToSeat = true;
     private boolean forceSynchronousSaving = false;
+    private boolean isDebugCommandRegistered = false;
 
     public static boolean hasInstance() {
         return instance != null;
@@ -126,6 +135,8 @@ public class CommonPlugin extends PluginBase {
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
+        registerDebugCommand(); // On first use!
+
         TypedValue typed = debugVariables.get(name);
         if (typed == null || typed.type != type) {
             typed = new TypedValue(type, value);
@@ -351,6 +362,56 @@ public class CommonPlugin extends PluginBase {
     public void onCriticalFailure() {
         log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
         Bukkit.getPluginManager().disablePlugin(this);
+    }
+
+    /**
+     * Registers the debug variable command. Is done when a debug
+     * variable is registered, which is normally not the case.
+     */
+    public void registerDebugCommand() {
+        if (this.isDebugCommandRegistered) {
+            return;
+        } else {
+            this.isDebugCommandRegistered = true;
+        }
+
+        try {
+            // Create a PluginCommand instance for the /debug command
+            // Constructor is protected, so that's fun.
+            Command debugCommand;
+            {
+                Constructor<PluginCommand> constr = PluginCommand.class.getDeclaredConstructor(String.class, Plugin.class);
+                constr.setAccessible(true);
+                debugCommand = constr.newInstance("debugvar", this);
+            }
+
+            // Setup some info
+            debugCommand.setDescription("Developer debugging commands for changing values at runtime. Not to be used in production.");
+            debugCommand.setUsage("/debugvar [name] [value...]");
+            debugCommand.setAliases(Arrays.asList("dvar"));
+
+            // Get command map instance where commands are registered
+            CommandMap commandMap = SafeField.get(Bukkit.getPluginManager(), "commandMap", SimpleCommandMap.class);
+
+            // Register the command. Note: does not register with brigadier
+            commandMap.register(this.getName(), debugCommand);
+
+            // Rebuild brigadier, otherwise it won't even show up :(
+            // Must do this next-tick, as doing this during command execution
+            // bricks the command currently being executed. (potentially)
+            if (Common.evaluateMCVersion(">=", "1.13")) {
+                CommonUtil.nextTick(() -> {
+                    try {
+                        Method m = Bukkit.getServer().getClass().getMethod("syncCommands");
+                        m.invoke(Bukkit.getServer());
+                    } catch (Throwable t) {
+                        getLogger().log(Level.WARNING, "Failed to update brigadier", t);
+                    }
+                });
+            }
+        } catch (Throwable t) {
+            getLogger().log(Level.WARNING, "Failed to register debug command", t);
+        }
     }
 
     @Override
@@ -680,7 +741,7 @@ public class CommonPlugin extends PluginBase {
         if (debugVariables.isEmpty()) {
             return false;
         }
-        if (command.equals("commondebug") || command.equals("debug")) {
+        if (LogicUtil.contains(command, "debugvar", "dvar")) {
             MessageBuilder message = new MessageBuilder();
             if (args.length == 0) {
                 message.green("This command allows you to tweak debug settings in plugins").newLine();

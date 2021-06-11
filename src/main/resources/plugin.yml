@@ -8,8 +8,3 @@ load: startup
 description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib]
 dev-url: ${project.url}
-commands:
-  commondebug:
-    description: Developer debugging commands for changing values
-    aliases: [debug]
-    usage: /debug [name] [value...]
