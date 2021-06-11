@@ -14,4 +14,4 @@ permissions:
     description: |
         Allows use of the /debugvar command.
         This command is only available when debugging variables are set.
-        In normal production buids, this command and permission are unused.
+        In normal production builds, this command and permission are unused.
