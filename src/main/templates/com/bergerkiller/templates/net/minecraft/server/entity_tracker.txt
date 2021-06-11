@@ -99,7 +99,12 @@ class EntityTracker {
 #endif
 
 #if version >= 1.14
+  #if exists net.minecraft.server.PlayerChunkMap public void addEntity(net.minecraft.server.Entity);
+    public void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
+  #else
     protected void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
+  #endif
+
     protected void untrackEntity:removeEntity((org.bukkit.entity.Entity) Entity entity);
 #else
     public void trackEntity:track((org.bukkit.entity.Entity) Entity entity);

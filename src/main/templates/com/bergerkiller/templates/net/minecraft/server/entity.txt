@@ -883,7 +883,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     ...
      * }
      */
-#if forge_nms_obfuscated
+#if exists net.minecraft.server.Entity public void setYawPitch(float yaw, float pitch);
     public void setRotation:setYawPitch(float yaw, float pitch);
 #else
     protected void setRotation:setYawPitch(float yaw, float pitch);
