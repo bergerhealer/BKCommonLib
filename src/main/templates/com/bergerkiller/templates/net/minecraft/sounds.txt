@@ -1,15 +1,13 @@
-package net.minecraft.server;
+package net.minecraft.sounds;
 
+import net.minecraft.core.IRegistry;
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
 
-import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
-import net.minecraft.server.SoundEffect;
-
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 
 optional class SoundCategory {
     public String getName:a();
@@ -27,25 +25,6 @@ optional class SoundCategory {
     }
 #else
     public static (SoundCategoryHandle) SoundCategory byName:a(String name);
-#endif
-}
-
-class SoundEffectType {
-#if version >= 1.16.5
-    public (SoundEffectHandle) SoundEffect getStepSound();
-    public (SoundEffectHandle) SoundEffect getPlaceSound();
-    public (SoundEffectHandle) SoundEffect getBreakSound:getFallSound();
-    public (SoundEffectHandle) SoundEffect getFallSound();
-#elseif version >= 1.9
-    public (SoundEffectHandle) SoundEffect getStepSound:d();
-    public (SoundEffectHandle) SoundEffect getPlaceSound:e();
-    public (SoundEffectHandle) SoundEffect getBreakSound:g();
-    public (SoundEffectHandle) SoundEffect getFallSound:g();
-#else
-    public (SoundEffectHandle) String getStepSound();
-    public (SoundEffectHandle) String getPlaceSound();
-    public (SoundEffectHandle) String getBreakSound();
-    public (SoundEffectHandle) String getFallSound:getBreakSound();
 #endif
 }
 
@@ -80,14 +59,14 @@ class SoundEffect {
     <code>
     public static SoundEffectHandle byName(String name) {
         if (T.opt_getRegistry.isAvailable()) {
-            Object mc_key_raw = MinecraftKeyHandle.T.createNew.raw.invoke(name);
+            Object mc_key_raw = com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.createNew.raw.invoke(name);
             if (mc_key_raw != null) {
                 return createHandle(T.opt_getRegistry.invoke().get(mc_key_raw));
             } else {
                 return null;
             }
         } else {
-            return createNew(MinecraftKeyHandle.createNew(name));
+            return createNew(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
         }
     }
     </code>

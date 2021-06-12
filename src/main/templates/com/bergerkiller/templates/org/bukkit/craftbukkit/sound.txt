@@ -4,9 +4,9 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 
 class CraftSound {
-#if exists org.bukkit.craftbukkit.CraftSound public static net.minecraft.server.SoundEffect getSoundEffect(org.bukkit.Sound sound);
+#if exists org.bukkit.craftbukkit.CraftSound public static net.minecraft.sounds.SoundEffect getSoundEffect(org.bukkit.Sound sound);
     // Since later build of 1.16.4: org.bukkit.Sound -> nms SoundEffect
-    public static (ResourceKey<SoundEffect>) net.minecraft.server.SoundEffect getSoundEffect(org.bukkit.Sound sound);
+    public static (ResourceKey<SoundEffect>) net.minecraft.sounds.SoundEffect getSoundEffect(org.bukkit.Sound sound);
 #else
     // On older versions this returned a String path name of the sound, we convert that to a resource key
     public static (ResourceKey<SoundEffect>) ResourceKey<SoundEffect> getSoundEffect(org.bukkit.Sound sound) {

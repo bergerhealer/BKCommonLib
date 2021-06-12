@@ -1,9 +1,12 @@
 package net.minecraft.server;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.entity.EnumItemSlot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.EnumGamemode;
 
 import com.mojang.authlib.GameProfile;
 
@@ -20,7 +23,7 @@ import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
@@ -1085,7 +1088,7 @@ optional class PacketPlayOutUnloadChunk extends Packet {
 
 class PacketPlayOutNamedSoundEffect extends Packet {
 #if version >= 1.9
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound:a;
     private optional (String) SoundCategory category_1_10_2:b;
     private int x:c;
     private int y:d;
@@ -1565,7 +1568,7 @@ class PacketPlayInSettings extends Packet {
     private (Object) EntityHuman.EnumChatVisibility chatVisibility:c;
     private boolean enableColors:d;
     private int modelPartFlags:e;
-    private optional (HumanHand) EnumMainHand mainHand:f;
+    private optional (HumanHand) net.minecraft.world.entity.EnumMainHand mainHand:f;
 
     <code>
     public HumanHand getMainHand() {

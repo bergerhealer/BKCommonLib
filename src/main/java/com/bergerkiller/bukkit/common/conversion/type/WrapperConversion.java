@@ -48,25 +48,25 @@ import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
@@ -280,7 +280,7 @@ public class WrapperConversion {
     }
 
     @SuppressWarnings("deprecation")
-    @ConverterMethod(input="net.minecraft.server.EnumGamemode")
+    @ConverterMethod(input="net.minecraft.world.level.EnumGamemode")
     public static org.bukkit.GameMode toGameMode(Object nmsEnumGamemodeHandle) {
         return org.bukkit.GameMode.getByValue(EnumGamemodeHandle.T.id.get(nmsEnumGamemodeHandle));
     }
@@ -311,7 +311,7 @@ public class WrapperConversion {
         return HumanHand.fromMainHand(mainHand);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumMainHand", optional=true)
+    @ConverterMethod(input="net.minecraft.world.entity.EnumMainHand", optional=true)
     public static HumanHand humanHandToEnumMainHandHandle(Object nmsEnumMainHandHandle) {
         if (nmsEnumMainHandHandle == EnumMainHandHandle.LEFT.getRaw()) {
             return HumanHand.LEFT;
@@ -325,7 +325,7 @@ public class WrapperConversion {
         return new CommonPacket(nmsPacketHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.ChunkCoordIntPair")
+    @ConverterMethod(input="net.minecraft.world.level.ChunkCoordIntPair")
     public static IntVector2 toIntVector2(Object nmsChunkCoordIntPairHandle) {
         return ChunkCoordIntPairHandle.T.toIntVector2.invoker.invoke(nmsChunkCoordIntPairHandle);
     }
@@ -504,12 +504,12 @@ public class WrapperConversion {
         return ChatText.fromMessage(message);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
+    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
     public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
         return ItemSlotConversion.getEquipmentSlot(enumItemSlotHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumItemSlot")
+    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
     public static int enumItemSlotToIndex(Object nmsEnumItemSlot) {
         return EnumItemSlotHandle.T.getIndex.invoker.invoke(nmsEnumItemSlot);
     }
@@ -519,7 +519,7 @@ public class WrapperConversion {
         return enumItemSlotToIndex(HandleConversion.toEnumItemSlotHandle(equipmentSlot));
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumItemSlot")
+    @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
     public static Object enumItemSlotFromIndex(int legacyEquipmentIndex) {
         return EnumItemSlotHandle.fromIndexRaw(legacyEquipmentIndex);
     }
@@ -558,12 +558,12 @@ public class WrapperConversion {
         return new CraftInputSlot(choices);
     }
 
-    @ConverterMethod(input="net.minecraft.server.SoundEffect")
+    @ConverterMethod(input="net.minecraft.sounds.SoundEffect")
     public static ResourceKey<SoundEffect> soundEffectToResourceKey(Object nmsSoundEffectHandle) {
         return ResourceCategory.sound_effect.createKey(SoundEffectHandle.T.name.get(nmsSoundEffectHandle));
     }
 
-    @ConverterMethod(output="net.minecraft.server.SoundEffect")
+    @ConverterMethod(output="net.minecraft.sounds.SoundEffect")
     public static Object soundEffectFromResourceKey(ResourceKey<SoundEffect> soundKey) {
         if (SoundEffectHandle.T.opt_getRegistry.isAvailable()) {
             Object mcKey = soundKey.getName().getRaw();
@@ -597,7 +597,7 @@ public class WrapperConversion {
         return ResourceCategory.sound_effect.createKey(MinecraftKeyHandle.createHandle(minecraftKeyHandle));
     }
 
-    @ConverterMethod(input="net.minecraft.server.MobSpawnerAbstract")
+    @ConverterMethod(input="net.minecraft.world.level.MobSpawnerAbstract")
     public static MobSpawner toMobSpawner(Object nmsMobSpawnerAbstractHandle) {
         return new MobSpawner(nmsMobSpawnerAbstractHandle);
     }

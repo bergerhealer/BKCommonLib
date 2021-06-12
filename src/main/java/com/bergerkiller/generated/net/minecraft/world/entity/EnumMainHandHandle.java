@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EnumMainHand</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.EnumMainHand</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.EnumMainHand")
+@Template.InstanceType("net.minecraft.world.entity.EnumMainHand")
 public abstract class EnumMainHandHandle extends Template.Handle {
     /** @See {@link EnumMainHandClass} */
     public static final EnumMainHandClass T = Template.Class.create(EnumMainHandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -23,7 +23,7 @@ public abstract class EnumMainHandHandle extends Template.Handle {
     /* ============================================================================== */
 
     /**
-     * Stores class members for <b>net.minecraft.server.EnumMainHand</b>.
+     * Stores class members for <b>net.minecraft.world.entity.EnumMainHand</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumMainHandClass extends Template.Class<EnumMainHandHandle> {

@@ -159,7 +159,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      */
     public void onMove(MoveType moveType, double dx, double dy, double dz) {
         moveHandler.move(this.entity.getWrappedHandle(), moveType, dx, dy ,dz);
-        //hook.base.onMove(com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle.SELF.getRaw(), dx, dy, dz);
+        //hook.base.onMove(com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle.SELF.getRaw(), dx, dy, dz);
     }
 
     /**

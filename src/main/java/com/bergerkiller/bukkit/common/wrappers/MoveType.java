@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle;
 
 public enum MoveType {
     PISTON(EnumMoveTypeHandle.PISTON),

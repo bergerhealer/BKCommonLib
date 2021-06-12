@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
@@ -6,11 +6,11 @@ import org.bukkit.entity.Entity;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.MobSpawnerAbstract</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.MobSpawnerAbstract</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.MobSpawnerAbstract")
+@Template.InstanceType("net.minecraft.world.level.MobSpawnerAbstract")
 public abstract class MobSpawnerAbstractHandle extends Template.Handle {
     /** @See {@link MobSpawnerAbstractClass} */
     public static final MobSpawnerAbstractClass T = Template.Class.create(MobSpawnerAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -46,7 +46,7 @@ public abstract class MobSpawnerAbstractHandle extends Template.Handle {
     public abstract int getSpawnRange();
     public abstract void setSpawnRange(int value);
     /**
-     * Stores class members for <b>net.minecraft.server.MobSpawnerAbstract</b>.
+     * Stores class members for <b>net.minecraft.world.level.MobSpawnerAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MobSpawnerAbstractClass extends Template.Class<MobSpawnerAbstractHandle> {

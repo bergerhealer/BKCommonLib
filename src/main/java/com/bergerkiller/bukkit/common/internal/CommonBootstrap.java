@@ -275,8 +275,8 @@ public class CommonBootstrap {
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (evaluateMCVersion("<=", "1.8.8")) {
-            remappings.put(nms_root + ".MobSpawnerData", nms_root + ".MobSpawnerAbstract$a");
-            remappings.put(nms_root + ".SoundEffectType", nms_root + ".Block$StepSound"); // workaround
+            remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
+            remappings.put("net.minecraft.world.level.block.SoundEffectType", nms_root + ".Block$StepSound"); // workaround
             remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".DataWatcher$WatchableObject");
             remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
@@ -287,17 +287,17 @@ public class CommonBootstrap {
             // Writing custom wrappers with switches would be too tiresome
             // This allows continued use of the same API without trouble
             // Converters take care to convert between the Class and Id used internally
-            remappings.put(nms_root + ".EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
+            remappings.put("net.minecraft.world.entity.EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
             remappings.put(nms_root + ".DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
             remappings.put(nms_root + ".DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
             remappings.put(nms_root + ".MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
-            remappings.put(nms_root + ".SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
+            remappings.put("net.minecraft.sounds.SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
             remappings.put(nms_root + ".DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
         }
 
         // Some classes were moved before around 1.8
         if (evaluateMCVersion("<=", "1.8")) {
-            remappings.put(nms_root + ".SoundEffectType", nms_root + ".StepSound");
+            remappings.put("net.minecraft.world.level.block.SoundEffectType", nms_root + ".StepSound");
             remappings.put(nms_root + ".Block$StepSound", nms_root + ".StepSound");
             remappings.put(nms_root + ".EnumDirection$EnumAxis", nms_root + ".EnumAxis");
             remappings.put(nms_root + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction", nms_root + ".EnumPlayerInfoAction");

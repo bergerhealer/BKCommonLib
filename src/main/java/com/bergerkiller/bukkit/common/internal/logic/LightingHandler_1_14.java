@@ -340,7 +340,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_SKY_LIGHT_DATA>
          * public static void storeSkyLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(net.minecraft.world.level.EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
          * }
          */
         @Template.Generated("%STORE_SKY_LIGHT_DATA%")
@@ -350,7 +350,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_BLOCK_LIGHT_DATA>
          * public static void storeBlockLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(net.minecraft.world.level.EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
          * }
          */
         @Template.Generated("%STORE_BLOCK_LIGHT_DATA%")
@@ -365,7 +365,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     if (dataNibble == null) {
          *         // Missing, use engine to register and store a new section
          *         final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *         final EnumSkyBlock enumSky = skyLight ? EnumSkyBlock.SKY : EnumSkyBlock.BLOCK;
+         *         final net.minecraft.world.level.EnumSkyBlock enumSky = skyLight ? net.minecraft.world.level.EnumSkyBlock.SKY : net.minecraft.world.level.EnumSkyBlock.BLOCK;
          *         engine.a(enumSky, pos, new NibbleArray(data_bytes), true);
          *         return;
          *     }

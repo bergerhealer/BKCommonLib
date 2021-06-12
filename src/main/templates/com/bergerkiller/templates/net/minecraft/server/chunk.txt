@@ -1,15 +1,16 @@
 package net.minecraft.server;
 
 import net.minecraft.world.entity.Entity;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import net.minecraft.world.level.EnumSkyBlock;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
+
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
@@ -317,17 +318,4 @@ class DataPaletteBlock {
     public (BlockData) BlockData getBlockData(int x, int y, int z);
     public void setBlockData(int x, int y, int z, (BlockData) BlockData data);
 #endif
-}
-
-class EnumSkyBlock {
-    enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
-    enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
-
-    public final int brightness:c;
-
-    <code>
-    public int ordinal() {
-        return ((Enum<?>) getRaw()).ordinal();
-    }
-    </code>
 }

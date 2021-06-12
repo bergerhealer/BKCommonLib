@@ -1303,7 +1303,7 @@ public class NMSPacketClasses {
     /*
     public static class NMSPacketPlayOutMultiBlockChange extends NMSPacket {
 
-        public final FieldAccessor<IntVector2> chunk = nextField("private ChunkCoordIntPair a").translate(DuplexConversion.chunkIntPair);
+        public final FieldAccessor<IntVector2> chunk = nextField("private net.minecraft.world.level.ChunkCoordIntPair a").translate(DuplexConversion.chunkIntPair);
         public final FieldAccessor<Object[]> blockChangeInfoArray = nextFieldSignature("private MultiBlockChangeInfo[] b");
 
         public ChangeInfo CHANGE_INFO = new ChangeInfo(resolveClass("MultiBlockChangeInfo"));

@@ -1,5 +1,8 @@
 package net.minecraft.server;
 
+import net.minecraft.core.BlockPosition;
+import net.minecraft.world.level.IBlockAccess;
+
 import com.google.common.collect.ImmutableMap;
 
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
@@ -79,7 +82,7 @@ interface IBlockData {
 
         // Query all 6 faces and produce a mask
         int mask = 0;
-        IBlockAccess emptyBlockAccess = BlockAccessAir.INSTANCE;
+        IBlockAccess emptyBlockAccess = net.minecraft.world.level.BlockAccessAir.INSTANCE;
   #if version >= 1.14.4
         if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
@@ -151,7 +154,7 @@ interface IBlockData {
         if (worldAccessRequired) {
             return -1;
         } else {
-            return instance.b((IBlockAccess) BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+            return instance.b((IBlockAccess) net.minecraft.world.level.BlockAccessAir.INSTANCE, BlockPosition.ZERO);
         }
     }
 #elseif version >= 1.13

@@ -55,6 +55,29 @@ optional class EnumHand {
     enum (EnumHandHandle) EnumHand OFF_HAND;
 }
 
+package net.minecraft.world.level;
+import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
+
+class EnumGamemode {
+    int id:f;
+
+    public static (EnumGamemodeHandle) EnumGamemode getById(int id);
+}
+
+class EnumSkyBlock {
+    enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
+    enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
+
+    public final int brightness:c;
+
+    <code>
+    public int ordinal() {
+        return ((Enum<?>) getRaw()).ordinal();
+    }
+    </code>
+}
+
 package net.minecraft.core;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;

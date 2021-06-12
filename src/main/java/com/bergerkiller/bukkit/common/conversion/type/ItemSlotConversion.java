@@ -7,7 +7,7 @@ import java.util.Map;
 import org.bukkit.inventory.EquipmentSlot;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
 
 public class ItemSlotConversion {
     private static final Map<Object, EquipmentSlot> slotMap_a = new IdentityHashMap<Object, EquipmentSlot>();

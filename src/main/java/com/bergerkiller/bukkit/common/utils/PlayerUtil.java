@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
@@ -121,38 +122,6 @@ public class PlayerUtil extends EntityUtil {
     @Deprecated
     public static void queueChunkSend(Player player, int chunkX, int chunkZ) {
         throw new RuntimeException("Queueing a chunk send for individual players is broken. Use WorldUtil.queueChunkSend instead.");
-    }
-
-    /**
-     * Removes the chunk coordinates from the player chunk sending queue
-     *
-     * @param player
-     * @param chunk
-     */
-    public static void cancelChunkSend(Player player, Chunk chunk) {
-        cancelChunkSend(player, chunk.getX(), chunk.getZ());
-    }
-
-    /**
-     * Removes the chunk coordinates from the player chunk sending queue
-     *
-     * @param player
-     * @param coordinates
-     */
-    public static void cancelChunkSend(Player player, IntVector2 coordinates) {
-        cancelChunkSend(player, coordinates.x, coordinates.z);
-    }
-
-    /**
-     * Removes the chunk coordinates from the player chunk sending queue
-     *
-     * @param player
-     * @param chunkX - coordinate
-     * @param chunkZ - coordinate
-     */
-    @Deprecated
-    public static void cancelChunkSend(Player player, int chunkX, int chunkZ) {
-//        CommonNMS.getNative(player).chunkCoordIntPairQueue.remove(VectorRef.newPair(chunkX, chunkZ));
     }
 
     /**
@@ -401,7 +370,7 @@ public class PlayerUtil extends EntityUtil {
      * @param volume of the sound
      * @param pitch of the sound
      */
-    public static void playSound(Player player, ResourceKey soundKey, float volume, float pitch) {
+    public static void playSound(Player player, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         if (soundKey != null) {
             player.playSound(player.getEyeLocation(), soundKey.getName().getName(), volume, pitch);
         }
@@ -416,7 +385,7 @@ public class PlayerUtil extends EntityUtil {
      * @param volume of the sound
      * @param pitch of the sound
      */
-    public static void playSound(Player player, Location location, ResourceKey soundKey, float volume, float pitch) {
+    public static void playSound(Player player, Location location, ResourceKey<SoundEffect> soundKey, float volume, float pitch) {
         if (soundKey != null) {
             player.playSound(location, soundKey.getName().getName(), volume, pitch);
         }

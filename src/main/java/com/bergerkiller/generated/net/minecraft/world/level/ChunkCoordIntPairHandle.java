@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.ChunkCoordIntPair</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.ChunkCoordIntPair</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.ChunkCoordIntPair")
+@Template.InstanceType("net.minecraft.world.level.ChunkCoordIntPair")
 public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     /** @See {@link ChunkCoordIntPairClass} */
     public static final ChunkCoordIntPairClass T = Template.Class.create(ChunkCoordIntPairClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -38,7 +38,7 @@ public abstract class ChunkCoordIntPairHandle extends Template.Handle {
     public abstract int getZ();
     public abstract void setZ(int value);
     /**
-     * Stores class members for <b>net.minecraft.server.ChunkCoordIntPair</b>.
+     * Stores class members for <b>net.minecraft.world.level.ChunkCoordIntPair</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkCoordIntPairClass extends Template.Class<ChunkCoordIntPairHandle> {

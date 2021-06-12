@@ -244,7 +244,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */
@@ -275,7 +275,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.server.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */

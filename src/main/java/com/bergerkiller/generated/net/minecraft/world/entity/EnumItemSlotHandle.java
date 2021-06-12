@@ -1,13 +1,13 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EnumItemSlot</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.EnumItemSlot</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EnumItemSlot")
+@Template.InstanceType("net.minecraft.world.entity.EnumItemSlot")
 public abstract class EnumItemSlotHandle extends Template.Handle {
     /** @See {@link EnumItemSlotClass} */
     public static final EnumItemSlotClass T = Template.Class.create(EnumItemSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -31,7 +31,7 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
         return null;
     }
     /**
-     * Stores class members for <b>net.minecraft.server.EnumItemSlot</b>.
+     * Stores class members for <b>net.minecraft.world.entity.EnumItemSlot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumItemSlotClass extends Template.Class<EnumItemSlotHandle> {

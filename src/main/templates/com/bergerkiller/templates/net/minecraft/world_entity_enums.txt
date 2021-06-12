@@ -1,0 +1,44 @@
+package net.minecraft.world.entity;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle;
+
+class EnumItemSlot {
+#if version >= 1.16.3
+    public int getIndex:getSlotFlag();
+#else
+    public int getIndex:c();
+#endif
+
+#if version >= 1.13.2
+    public String getName:getSlotName();
+#else
+    public String getName:d();
+#endif
+
+    <code>
+    public static Object fromIndexRaw(int index) {
+        for (Object value : T.getType().getEnumConstants()) {
+            if (T.getIndex.invoke(value).intValue() == index) {
+                return value;
+            }
+        }
+        return null;
+    }
+    </code>
+}
+
+// Since MC 1.9
+optional class EnumMainHand {
+    enum (EnumMainHandHandle) EnumMainHand LEFT;
+    enum (EnumMainHandHandle) EnumMainHand RIGHT;
+}
+
+optional class EnumMoveType {
+    enum (EnumMoveTypeHandle) EnumMoveType SELF;
+    enum (EnumMoveTypeHandle) EnumMoveType PLAYER;
+    enum (EnumMoveTypeHandle) EnumMoveType PISTON;
+    enum (EnumMoveTypeHandle) EnumMoveType SHULKER_BOX;
+    enum (EnumMoveTypeHandle) EnumMoveType SHULKER;
+}

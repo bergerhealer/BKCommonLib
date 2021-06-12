@@ -1,0 +1,8 @@
+package net.minecraft.world.level;
+
+// Since MC 1.13.1
+optional class ForcedChunk {
+}
+
+interface IBlockAccess {
+}

@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
 import java.util.Collection;

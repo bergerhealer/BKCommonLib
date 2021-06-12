@@ -1,14 +1,12 @@
-package net.minecraft.server;
-
-import net.minecraft.server.MobSpawnerData;
+package net.minecraft.world.level;
 
 import net.minecraft.core.IRegistry;
 import net.minecraft.resources.MinecraftKey;
-import net.minecraft.world.EntityTypes;
-import net.minecraft.world.Entity;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.Entity;
 
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerDataHandle;
 
 class MobSpawnerAbstract {
     public int spawnDelay;

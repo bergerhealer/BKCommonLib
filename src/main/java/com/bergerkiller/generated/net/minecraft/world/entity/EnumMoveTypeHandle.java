@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EnumMoveType</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.EnumMoveType</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.EnumMoveType")
+@Template.InstanceType("net.minecraft.world.entity.EnumMoveType")
 public abstract class EnumMoveTypeHandle extends Template.Handle {
     /** @See {@link EnumMoveTypeClass} */
     public static final EnumMoveTypeClass T = Template.Class.create(EnumMoveTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -26,7 +26,7 @@ public abstract class EnumMoveTypeHandle extends Template.Handle {
     /* ============================================================================== */
 
     /**
-     * Stores class members for <b>net.minecraft.server.EnumMoveType</b>.
+     * Stores class members for <b>net.minecraft.world.entity.EnumMoveType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumMoveTypeClass extends Template.Class<EnumMoveTypeHandle> {

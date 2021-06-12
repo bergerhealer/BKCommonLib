@@ -2,7 +2,7 @@ package net.minecraft.resources;
 
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 

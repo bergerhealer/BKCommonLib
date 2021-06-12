@@ -1,6 +1,6 @@
-package net.minecraft.server;
+package net.minecraft.world.level;
 
-import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 
 class ChunkCoordIntPair {
     public final int x;

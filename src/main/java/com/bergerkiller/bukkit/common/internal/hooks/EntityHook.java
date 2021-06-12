@@ -151,7 +151,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     // Minecraft 1.14 and later
-    @HookMethod(value="public void move(EnumMoveType enummovetype, Vec3D vec3d)", optional=true)
+    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, Vec3D vec3d)", optional=true)
     public void onMove_v3(Object enumMoveType, Object vec3d) {
         double dx = Vec3DHandle.T.x.getDouble(vec3d);
         double dy = Vec3DHandle.T.y.getDouble(vec3d);
@@ -160,7 +160,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     // Minecraft 1.11.2 and later
-    @HookMethod(value="public void move(EnumMoveType enummovetype, double d0, double d1, double d2)", optional=true)
+    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, double d0, double d1, double d2)", optional=true)
     public void onMove_v2(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {

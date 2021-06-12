@@ -550,9 +550,9 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
 
 class EntityMinecartMobSpawner extends EntityMinecartAbstract {
 #if version >= 1.14
-    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) MobSpawnerAbstract mobSpawner:b;
+    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:b;
 #else
-    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) MobSpawnerAbstract mobSpawner:a;
+    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:a;
 #endif
 }
 

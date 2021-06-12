@@ -1,21 +1,27 @@
 package net.minecraft.server;
 
+import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.ForcedChunk;
+import net.minecraft.world.level.IBlockAccess;
+
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
-import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
+
+import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
-import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
@@ -26,7 +32,6 @@ import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.S
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.ForcedChunkHandle
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 
 class World extends IBlockAccess {
@@ -694,10 +699,6 @@ optional class LightEngineThreaded {
     }
 }
 
-// Since MC 1.13.1
-optional class ForcedChunk {
-}
-
 class ChunkProviderServer {
     // Gone since MC 1.14
     // private final (Object) IChunkLoader chunkLoader;
@@ -742,7 +743,7 @@ class ChunkProviderServer {
 #elseif version >= 1.13
     public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
         Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
-  #if methodexists net.minecraft.server.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.server.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.server.Chunk> consumer)
+  #if methodexists net.minecraft.server.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.world.level.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.server.Chunk> consumer)
         instance.loadAllChunks(iterable, consumer);
   #else
         instance.a(iterable, consumer);
@@ -830,9 +831,6 @@ class BiomeSettingsMobs {
 
     }
 
-}
-
-interface IBlockAccess {
 }
 
 class RegionFile {

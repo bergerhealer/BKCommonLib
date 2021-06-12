@@ -1,13 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.SoundEffectType</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.SoundEffectType</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.SoundEffectType")
+@Template.InstanceType("net.minecraft.world.level.block.SoundEffectType")
 public abstract class SoundEffectTypeHandle extends Template.Handle {
     /** @See {@link SoundEffectTypeClass} */
     public static final SoundEffectTypeClass T = Template.Class.create(SoundEffectTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,7 +25,7 @@ public abstract class SoundEffectTypeHandle extends Template.Handle {
     public abstract SoundEffectHandle getBreakSound();
     public abstract SoundEffectHandle getFallSound();
     /**
-     * Stores class members for <b>net.minecraft.server.SoundEffectType</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.SoundEffectType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundEffectTypeClass extends Template.Class<SoundEffectTypeHandle> {

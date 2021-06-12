@@ -3,16 +3,19 @@ package net.minecraft.server;
 import net.minecraft.core.IRegistry;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.IBlockAccess;
+import net.minecraft.world.level.block.SoundEffectType;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
+import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
 
 class Block {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();

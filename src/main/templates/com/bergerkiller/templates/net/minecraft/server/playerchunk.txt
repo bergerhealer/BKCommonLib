@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.world.level.ChunkCoordIntPair;
+
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 

@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.sounds;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.SoundCategory</b>.
+ * Instance wrapper handle for type <b>net.minecraft.sounds.SoundCategory</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.SoundCategory")
+@Template.InstanceType("net.minecraft.sounds.SoundCategory")
 public abstract class SoundCategoryHandle extends Template.Handle {
     /** @See {@link SoundCategoryClass} */
     public static final SoundCategoryClass T = Template.Class.create(SoundCategoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -26,7 +26,7 @@ public abstract class SoundCategoryHandle extends Template.Handle {
 
     public abstract String getName();
     /**
-     * Stores class members for <b>net.minecraft.server.SoundCategory</b>.
+     * Stores class members for <b>net.minecraft.sounds.SoundCategory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundCategoryClass extends Template.Class<SoundCategoryHandle> {

@@ -2,57 +2,8 @@ package net.minecraft.server;
 
 import com.google.common.collect.BiMap;
 
-import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
-
-class EnumItemSlot {
-#if version >= 1.16.3
-    public int getIndex:getSlotFlag();
-#else
-    public int getIndex:c();
-#endif
-
-#if version >= 1.13.2
-    public String getName:getSlotName();
-#else
-    public String getName:d();
-#endif
-
-    <code>
-    public static Object fromIndexRaw(int index) {
-        for (Object value : T.getType().getEnumConstants()) {
-            if (T.getIndex.invoke(value).intValue() == index) {
-                return value;
-            }
-        }
-        return null;
-    }
-    </code>
-}
-
-// Since MC 1.9
-optional class EnumMainHand {
-    enum (EnumMainHandHandle) EnumMainHand LEFT;
-    enum (EnumMainHandHandle) EnumMainHand RIGHT;
-}
-
-optional class EnumMoveType {
-    enum (EnumMoveTypeHandle) EnumMoveType SELF;
-    enum (EnumMoveTypeHandle) EnumMoveType PLAYER;
-    enum (EnumMoveTypeHandle) EnumMoveType PISTON;
-    enum (EnumMoveTypeHandle) EnumMoveType SHULKER_BOX;
-    enum (EnumMoveTypeHandle) EnumMoveType SHULKER;
-}
-
-class EnumGamemode {
-    int id:f;
-
-    public static (EnumGamemodeHandle) EnumGamemode getById(int id);
-}
 
 class EnumProtocol {
     enum (EnumProtocolHandle) EnumProtocol PLAY;

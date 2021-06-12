@@ -1,13 +1,13 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EnumSkyBlock</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.EnumSkyBlock</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EnumSkyBlock")
+@Template.InstanceType("net.minecraft.world.level.EnumSkyBlock")
 public abstract class EnumSkyBlockHandle extends Template.Handle {
     /** @See {@link EnumSkyBlockClass} */
     public static final EnumSkyBlockClass T = Template.Class.create(EnumSkyBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -28,7 +28,7 @@ public abstract class EnumSkyBlockHandle extends Template.Handle {
     public abstract int getBrightness();
     public abstract void setBrightness(int value);
     /**
-     * Stores class members for <b>net.minecraft.server.EnumSkyBlock</b>.
+     * Stores class members for <b>net.minecraft.world.level.EnumSkyBlock</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumSkyBlockClass extends Template.Class<EnumSkyBlockHandle> {
