@@ -18,6 +18,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
@@ -26,7 +27,6 @@ import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionH
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
@@ -379,7 +379,7 @@ class WorldServer extends World {
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-        #require net.minecraft.server.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
         instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
     }
 

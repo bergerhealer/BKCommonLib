@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.level.levelgen;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.levelgen.HeightMap</b>.

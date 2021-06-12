@@ -1,15 +1,17 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block.state;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 import java.util.Map;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.IBlockData</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.state.IBlockData</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.IBlockData")
+@Template.InstanceType("net.minecraft.world.level.block.state.IBlockData")
 public abstract class IBlockDataHandle extends Template.Handle {
     /** @See {@link IBlockDataClass} */
     public static final IBlockDataClass T = Template.Class.create(IBlockDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -56,7 +58,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
         return com.bergerkiller.bukkit.common.conversion.Conversion.convert(get(state), type, null);
     }
     /**
-     * Stores class members for <b>net.minecraft.server.IBlockData</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.state.IBlockData</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IBlockDataClass extends Template.Class<IBlockDataHandle> {

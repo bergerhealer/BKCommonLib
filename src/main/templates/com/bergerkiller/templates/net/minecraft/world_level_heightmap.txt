@@ -4,11 +4,10 @@ import net.minecraft.core.BlockPosition;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.IChunkAccess;
 
-import net.minecraft.server.Chunk;
-
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 
 class HeightMap {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();

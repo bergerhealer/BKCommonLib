@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block.state.properties;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.IBlockState</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.state.properties.IBlockState</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.IBlockState")
+@Template.InstanceType("net.minecraft.world.level.block.state.properties.IBlockState")
 public abstract class IBlockStateHandle extends Template.Handle {
     /** @See {@link IBlockStateClass} */
     public static final IBlockStateClass T = Template.Class.create(IBlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,7 +24,7 @@ public abstract class IBlockStateHandle extends Template.Handle {
     public abstract String getValueToken(Comparable value);
     public abstract Collection getValues();
     /**
-     * Stores class members for <b>net.minecraft.server.IBlockState</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.state.properties.IBlockState</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IBlockStateClass extends Template.Class<IBlockStateHandle> {

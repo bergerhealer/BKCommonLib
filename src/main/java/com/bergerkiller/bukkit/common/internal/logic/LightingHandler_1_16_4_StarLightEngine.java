@@ -139,6 +139,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     @Template.Optional
     @Template.Import("net.minecraft.server.level.LightEngineThreaded")
     @Template.Import("net.minecraft.core.SectionPosition")
+    @Template.Import("net.minecraft.world.level.chunk.Chunk")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.InstanceType("com.tuinity.tuinity.chunk.light.SWMRNibbleArray")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
@@ -172,7 +173,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <GET_SKYLIGHT_DATA>
-         * public static byte[] getSkyLightData(net.minecraft.server.Chunk chunk, int cy) {
+         * public static byte[] getSkyLightData(Chunk chunk, int cy) {
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
          *     SWMRNibbleArray swmr_nibble;
          *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
@@ -198,7 +199,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <GET_BLOCKLIGHT_DATA>
-         * public static byte[] getBlockLightData(net.minecraft.server.Chunk chunk, int cy) {
+         * public static byte[] getBlockLightData(Chunk chunk, int cy) {
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
          *     SWMRNibbleArray swmr_nibble;
          *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
@@ -224,7 +225,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <SET_SKYLIGHT_DATA>
-         * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;
@@ -255,7 +256,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <SET_BLOCKLIGHT_DATA>
-         * public static void setSkyLightData(net.minecraft.server.Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;

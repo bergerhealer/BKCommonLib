@@ -1,0 +1,19 @@
+package net.minecraft.world.level.block.state.properties;
+
+interface IBlockState {
+#if version >= 1.16
+    public abstract String getKeyToken:getName();
+#else
+    public abstract String getKeyToken:a();
+#endif
+
+    public abstract String getValueToken:a(Comparable value);
+
+#if version >= 1.14.4
+    public abstract java.util.Collection getValues();
+#elseif version >= 1.13
+    public abstract java.util.Collection getValues:d();
+#else
+    public abstract java.util.Collection getValues:c();
+#endif
+}

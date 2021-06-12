@@ -49,7 +49,6 @@ import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
@@ -64,6 +63,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemSt
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
@@ -119,7 +119,7 @@ public class WrapperConversion {
         return toWorld(TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntityHandle));
     }
 
-    @ConverterMethod(input="net.minecraft.server.Chunk")
+    @ConverterMethod(input="net.minecraft.world.level.chunk.Chunk")
     public static org.bukkit.Chunk toChunk(Object nmsChunkHandle) {
         return ChunkHandle.T.bukkitChunk.get(nmsChunkHandle);
     }
@@ -187,7 +187,7 @@ public class WrapperConversion {
         return CraftMagicNumbersHandle.getMaterialFromItem(nmsItemHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.Block")
+    @ConverterMethod(input="net.minecraft.world.level.block.Block")
     public static org.bukkit.Material toMaterialFromBlockHandle(Object nmsBlockHandle) {
         return CraftMagicNumbersHandle.getMaterialFromBlock(nmsBlockHandle);
     }
@@ -396,12 +396,12 @@ public class WrapperConversion {
         return ScoreboardAction.fromHandle(nmsEnumScoreboardActionHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.IBlockData")
+    @ConverterMethod(input="net.minecraft.world.level.block.state.IBlockData")
     public static BlockData toBlockData(Object nmsIBlockDataHandle) {
         return BlockData.fromBlockData(nmsIBlockDataHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.Block")
+    @ConverterMethod(input="net.minecraft.world.level.block.Block")
     public static BlockData toBlockDataFromBlock(Object nmsBlockHandle) {
         return BlockData.fromBlock(nmsBlockHandle);
     }
@@ -649,7 +649,7 @@ public class WrapperConversion {
         return CraftBlockDataHandle.T.getState.invoke(bukkitBlockData);
     }
 
-    @ConverterMethod(input="org.bukkit.block.data.BlockData", output="net.minecraft.server.IBlockData", optional=true)
+    @ConverterMethod(input="org.bukkit.block.data.BlockData", output="net.minecraft.world.level.block.state.IBlockData", optional=true)
     public static Object iblockdataHandleFromBukkit(Object bukkitBlockData) {
         return CraftBlockDataHandle.T.getState.raw.invoke(bukkitBlockData);
     }

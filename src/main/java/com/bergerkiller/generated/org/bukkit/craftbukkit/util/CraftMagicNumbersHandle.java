@@ -41,8 +41,8 @@ public abstract class CraftMagicNumbersHandle extends Template.Handle {
     }
 
 
-    public static com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle getBlockDataFromMaterial(org.bukkit.Material material) {
-        return com.bergerkiller.generated.net.minecraft.server.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));
+    public static com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle getBlockDataFromMaterial(org.bukkit.Material material) {
+        return com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getBlockData.invoke(getBlockFromMaterial(material));
     }
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.CraftMagicNumbers</b>.

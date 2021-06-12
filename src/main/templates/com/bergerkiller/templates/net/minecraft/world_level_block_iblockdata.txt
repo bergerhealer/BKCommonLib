@@ -1,15 +1,17 @@
-package net.minecraft.server;
+package net.minecraft.world.level.block.state;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.EnumDirection;
+import net.minecraft.world.level.block.state.properties.IBlockState;
 import net.minecraft.world.level.IBlockAccess;
 
 import com.google.common.collect.ImmutableMap;
 
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
-import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
 interface IBlockData {
     public abstract (BlockHandle) Block getBlock();
@@ -45,11 +47,11 @@ interface IBlockData {
 
     // World access require check
 #if version >= 1.16
-    #require net.minecraft.server.Block public boolean isWorldAccessRequired:o();
+    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:o();
 #elseif version >= 1.15
-    #require net.minecraft.server.Block public boolean isWorldAccessRequired:q();
+    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:q();
 #elseif version >= 1.14
-    #require net.minecraft.server.Block public boolean isWorldAccessRequired:p();
+    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:p();
 #endif
 
     // Returns null when the opaque faces aren't cached
@@ -207,7 +209,7 @@ interface IBlockData {
 
 #select version >=
 #case 1.13.2
-  #if methodexists net.minecraft.server.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();
+  #if methodexists net.minecraft.world.level.block.state.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();
       public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
   #else
       public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:b();
@@ -219,22 +221,4 @@ interface IBlockData {
 #case else: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState, Comparable> getStates:b();
 #endselect
 
-}
-
-interface IBlockState {
-#if version >= 1.16
-    public abstract String getKeyToken:getName();
-#else
-    public abstract String getKeyToken:a();
-#endif
-
-    public abstract String getValueToken:a(Comparable value);
-
-#if version >= 1.14.4
-    public abstract java.util.Collection getValues();
-#elseif version >= 1.13
-    public abstract java.util.Collection getValues:d();
-#else
-    public abstract java.util.Collection getValues:c();
-#endif
 }

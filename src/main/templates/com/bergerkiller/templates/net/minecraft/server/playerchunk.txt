@@ -91,7 +91,7 @@ class PlayerChunk {
 #endif
 
         // Create a map chunk packet (version-specific code required)
-#if exists net.minecraft.server.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.server.Chunk chunk, int sectionsMask);
+#if exists net.minecraft.server.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.world.level.chunk.Chunk chunk, int sectionsMask);
         PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF);
 #else
         boolean flag = !WorldHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
@@ -241,7 +241,7 @@ class PlayerChunk {
 // Only used on 1.14 and onwards to patch up chunks that have unloaded
 #if version >= 1.14
     public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14() {
-        #require net.minecraft.server.PlayerChunk private static final java.util.List<net.minecraft.server.ChunkStatus> CHUNK_STATUSES;
+        #require net.minecraft.server.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.ChunkStatus> CHUNK_STATUSES;
         java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
         for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
             java.util.concurrent.CompletableFuture future;

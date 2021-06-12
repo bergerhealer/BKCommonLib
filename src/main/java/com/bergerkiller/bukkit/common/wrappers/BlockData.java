@@ -17,12 +17,12 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
 /**
- * Stores a reference to net.minecraft.server.Block and IBlockData objects,
+ * Stores a reference to net.minecraft.world.level.block.Block and IBlockData objects,
  * providing access to Block and Block Data properties.
  */
 public abstract class BlockData extends BlockDataRegistry {

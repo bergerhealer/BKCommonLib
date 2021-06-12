@@ -1,10 +1,18 @@
-package net.minecraft.server;
+package net.minecraft.world.level.block;
 
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.BlockPosition;
+import net.minecraft.core.EnumDirection;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.IBlockAccess;
-import net.minecraft.world.level.block.SoundEffectType;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.storage.loot.LootTableInfo;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParameters;
+import net.minecraft.world.level.World;
+import net.minecraft.world.phys.AxisAlignedBB;
+import net.minecraft.world.phys.shapes.OperatorBoolean;
+import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.VoxelShapeCollision;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
@@ -12,19 +20,19 @@ import com.bergerkiller.bukkit.common.bases.IntVector3
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 
 class Block {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     public static final Iterable<?> getRegistry() {
 #select version >=
-#case 1.14:   #require net.minecraft.core.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
-#case 1.13.1: #require net.minecraft.core.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
-#case else:   #require net.minecraft.server.Block public static final RegistryBlocks REGISTRY;
+#case 1.14:   #require net.minecraft.core.IRegistry public static final net.minecraft.core.RegistryBlocks<net.minecraft.world.level.block.Block> REGISTRY:BLOCK;
+#case 1.13.1: #require net.minecraft.core.IRegistry public static final net.minecraft.core.IRegistry<net.minecraft.world.level.block.Block> REGISTRY:BLOCK;
+#case else:   #require net.minecraft.world.level.block.Block public static final net.minecraft.core.RegistryBlocks REGISTRY;
 #endselect
         return #REGISTRY;
     }
@@ -205,9 +213,9 @@ class Block {
         }
 
   #if version >= 1.16
-        #require net.minecraft.server.Block private static final VoxelShape checkShape:b;
+        #require net.minecraft.world.level.block.Block private static final net.minecraft.world.phys.shapes.VoxelShape checkShape:b;
   #else
-        #require net.minecraft.server.Block private static final VoxelShape checkShape:c;
+        #require net.minecraft.world.level.block.Block private static final net.minecraft.world.phys.shapes.VoxelShape checkShape:c;
   #endif
         VoxelShape checkShape = Block#checkShape;
 
@@ -306,7 +314,7 @@ class Block {
 #if version >= 1.14
     // Since 1.14 it uses a LootTableInfo to store all the properties for the dropping of items
     // Call that one. See Explosion.java for details
-    public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
+    public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) net.minecraft.server.level.WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
         Block block = iblockdata.getBlock();
   #if version >= 1.16
         ItemStack EMPTY_ITEM = ItemStack.b;
@@ -314,7 +322,7 @@ class Block {
         ItemStack EMPTY_ITEM = ItemStack.a;
   #endif
 
-        TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
+        net.minecraft.world.level.block.entity.TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(world.random);
   #if version >= 1.16.2
@@ -355,7 +363,7 @@ class Block {
 
     public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition) {
 #if version >= 1.13
-        return Block.b(iblockdata, (GeneratorAccess) world, blockposition);
+        return Block.b(iblockdata, (net.minecraft.world.level.GeneratorAccess) world, blockposition);
 #else
         return instance.updateState(iblockdata, (IBlockAccess) world, blockposition);
 #endif
@@ -404,6 +412,15 @@ class Block {
 
     public static (IBlockDataHandle) IBlockData getByCombinedId(int combinedId);
     public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
+}
+
+class BlockCobbleWall {
+}
+
+class BlockFence {
+}
+
+class BlockFenceGate {
 }
 
 class Blocks {

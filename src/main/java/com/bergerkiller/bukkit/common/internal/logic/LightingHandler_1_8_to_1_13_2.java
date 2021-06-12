@@ -53,7 +53,7 @@ public class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
     @Template.Optional
     @Template.Import("net.minecraft.world.level.chunk.ChunkSection")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.InstanceType("net.minecraft.server.Chunk")
+    @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
         /*
          * <GET_SECTION_BLOCK_LIGHT>

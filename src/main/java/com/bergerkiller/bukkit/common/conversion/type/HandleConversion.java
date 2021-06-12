@@ -48,7 +48,6 @@ import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
@@ -62,6 +61,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
@@ -105,7 +105,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.Chunk")
+    @ConverterMethod(output="net.minecraft.world.level.chunk.Chunk")
     public static Object toChunkHandle(org.bukkit.Chunk chunk) {
         try {
             return CraftChunkHandle.T.getHandle.invoker.invoke(chunk);
@@ -182,22 +182,22 @@ public class HandleConversion {
         return CraftMagicNumbersHandle.getItemFromMaterial(material);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.Block")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.Block")
     public static Object toBlockHandle(org.bukkit.Material material) {
         return CraftMagicNumbersHandle.getBlockFromMaterial(material);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.Block")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.Block")
     public static Object toBlockHandle(com.bergerkiller.bukkit.common.wrappers.BlockData blockData) {
         return blockData.getBlockRaw();
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.IBlockData")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.state.IBlockData")
     public static Object toIBlockDataHandle(com.bergerkiller.bukkit.common.wrappers.BlockData blockData) {
         return blockData.getData();
     }
 
-    @ConverterMethod(input="net.minecraft.server.Block", output="T extends net.minecraft.server.IBlockData")
+    @ConverterMethod(input="net.minecraft.world.level.block.Block", output="T extends net.minecraft.world.level.block.state.IBlockData")
     public static Object toIBlockDataHandleFromBlock(Object nmsBlockHandle) {
         return BlockHandle.T.getBlockData.raw.invoke(nmsBlockHandle);
     }
@@ -484,7 +484,7 @@ public class HandleConversion {
         return toEntityTypesHandleWrapperFromEntityClass(entityClass).getRaw();
     }
 
-    @ConverterMethod(input="net.minecraft.server.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)
+    @ConverterMethod(input="net.minecraft.world.level.block.state.IBlockData", output="org.bukkit.block.data.BlockData", optional=true)
     public static Object bukkitBlockDataFromIBlockData(Object nmsIBlockdataHandle) {
         return CraftBlockDataHandle.T.fromData.raw.invoke(nmsIBlockdataHandle);
     }

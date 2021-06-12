@@ -194,7 +194,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #endif
 
     public org.bukkit.inventory.InventoryView openAnvilWindow() {
-        String titleStr = (String) com.bergerkiller.generated.net.minecraft.server.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
+        String titleStr = (String) com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
         IChatBaseComponent title = new ChatMessage(titleStr, new Object[0]);
 
         PlayerInventory playerInventory = instance.inventory;

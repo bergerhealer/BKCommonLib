@@ -60,8 +60,12 @@
 #include /net/minecraft/world_item_item.txt
 #include /net/minecraft/world_item_itemstack.txt
 #include /net/minecraft/world_level_biome.txt
+#include /net/minecraft/world_level_block.txt
 #include /net/minecraft/world_level_block_soundeffecttype.txt
 #include /net/minecraft/world_level_block_tileentity.txt
+#include /net/minecraft/world_level_block_iblockdata.txt
+#include /net/minecraft/world_level_block_iblockstate.txt
+#include /net/minecraft/world_level_chunk.txt
 #include /net/minecraft/world_level_chunk_datapalette.txt
 #include /net/minecraft/world_level_chunk_nibblearray.txt
 #include /net/minecraft/world_level_chunk_section.txt
@@ -91,8 +95,4 @@
 #include /net/minecraft/server/entity_subtype.txt
 #include /net/minecraft/server/particles.txt
 #include /net/minecraft/server/world.txt
-#include /net/minecraft/server/chunk.txt
-#include /net/minecraft/server/block.txt
-#include /net/minecraft/server/blockdata.txt
-#include /net/minecraft/server/block_subtype.txt
 #include /com/bergerkiller/bukkit/common/internal/longhashset.txt

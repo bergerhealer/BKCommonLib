@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Collection;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.IBlockStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.properties.IBlockStateHandle;
 
 /**
  * A single state of a block

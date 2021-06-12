@@ -7,7 +7,7 @@ import net.minecraft.world.level.chunk.storage.IChunkLoader;
 import net.minecraft.world.level.ChunkCoordIntPair;
 
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 
 class ChunkProviderServer {

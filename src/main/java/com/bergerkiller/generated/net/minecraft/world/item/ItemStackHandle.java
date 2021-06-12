@@ -3,7 +3,7 @@ package com.bergerkiller.generated.net.minecraft.world.item;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import java.util.UUID;

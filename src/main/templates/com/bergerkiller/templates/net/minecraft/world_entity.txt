@@ -750,7 +750,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean positionChanged:ai;
 #endif
 
-#if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.server.Chunk chunk);
+#if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.world.level.chunk.Chunk chunk);
     public void setChunkX(int value) {
         instance.setCurrentChunk(null);
         com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
@@ -787,7 +787,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
     </code>
 
-#if exists net.minecraft.world.entity.Entity public net.minecraft.server.Chunk getCurrentChunk();
+#if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
     public (org.bukkit.Chunk) Chunk getCurrentChunk();
 #elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
     public (org.bukkit.Chunk) Chunk getCurrentChunk() {

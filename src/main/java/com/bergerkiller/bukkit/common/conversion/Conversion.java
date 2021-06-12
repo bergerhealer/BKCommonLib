@@ -53,7 +53,7 @@ public class Conversion {
     public static final InputConverter<Object> toEntityHandle = getConverterToHandle("net.minecraft.world.entity.Entity");
     public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.EntityPlayer");
     public static final InputConverter<Object> toWorldHandle = getConverterToHandle("net.minecraft.server.World");
-    public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.server.Chunk");
+    public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.world.level.chunk.Chunk");
     public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.world.item.ItemStack");
     public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.world.item.Item");
     public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.world.level.block.TileEntity");
@@ -62,7 +62,7 @@ public class Conversion {
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcherObject");
     public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcher.Item");
     public static final InputConverter<Object> toNBTTagHandle = getConverterToHandle("net.minecraft.nbt.NBTBase");
-    public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.server.Block");
+    public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.world.level.block.Block");
     public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.world.level.EnumGamemode");
     public static final InputConverter<Object> toWorldTypeHandle = getConverterToHandle("net.minecraft.server.WorldType");
     public static final InputConverter<Object> toDifficultyHandle = getConverterToHandle("net.minecraft.world.EnumDifficulty");
@@ -76,7 +76,7 @@ public class Conversion {
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.util.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
     public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
-    public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.server.IBlockData");
+    public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.world.level.block.state.IBlockData");
     public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.world.level.chunk.ChunkSection");
     public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.world.effect.MobEffectList");
     public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.world.effect.MobEffect");

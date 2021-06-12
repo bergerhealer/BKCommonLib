@@ -1,10 +1,11 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.chunk;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 import org.bukkit.Chunk;
@@ -13,11 +14,11 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Chunk</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.chunk.Chunk</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Chunk")
+@Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
 public abstract class ChunkHandle extends Template.Handle {
     /** @See {@link ChunkClass} */
     public static final ChunkClass T = Template.Class.create(ChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -62,7 +63,7 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract Chunk getBukkitChunk();
     public abstract void setBukkitChunk(Chunk value);
     /**
-     * Stores class members for <b>net.minecraft.server.Chunk</b>.
+     * Stores class members for <b>net.minecraft.world.level.chunk.Chunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkClass extends Template.Class<ChunkHandle> {

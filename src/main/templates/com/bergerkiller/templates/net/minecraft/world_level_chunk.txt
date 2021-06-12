@@ -1,16 +1,19 @@
-package net.minecraft.server;
+package net.minecraft.world.level.chunk;
 
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.chunk.ChunkSection;
+import net.minecraft.world.level.EnumSkyBlock;
+import net.minecraft.world.level.levelgen.HeightMap;
+import net.minecraft.world.level.World;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
-import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
@@ -113,7 +116,7 @@ class Chunk {
         return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
     }
 
-#if exists net.minecraft.server.Chunk public final net.minecraft.util.EntitySlice<Entity>[] entitySlices;
+#if exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
     public final (List<Object>[]) net.minecraft.util.EntitySlice<Entity>[] entitySlices;
 #else
     public final (List<Object>[]) List<Entity>[] entitySlices;

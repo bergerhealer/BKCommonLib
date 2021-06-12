@@ -25,15 +25,15 @@ import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockCobbleWallHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockFenceGateHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockFenceHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlocksHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockCobbleWallHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockFenceGateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockFenceHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlocksHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 
 /**

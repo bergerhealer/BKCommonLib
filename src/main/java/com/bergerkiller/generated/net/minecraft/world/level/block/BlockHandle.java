@@ -1,10 +1,11 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -12,11 +13,11 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Block</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.Block</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Block")
+@Template.InstanceType("net.minecraft.world.level.block.Block")
 public abstract class BlockHandle extends Template.Handle {
     /** @See {@link BlockClass} */
     public static final BlockClass T = Template.Class.create(BlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -59,7 +60,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();
     /**
-     * Stores class members for <b>net.minecraft.server.Block</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.Block</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class BlockClass extends Template.Class<BlockHandle> {
