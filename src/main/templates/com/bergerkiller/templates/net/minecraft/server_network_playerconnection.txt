@@ -1,28 +1,18 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package net.minecraft.server.network;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
-/**
- * Instance wrapper handle for type <b>net.minecraft.server.PlayerConnection</b>.
- * To access members without creating a handle type, use the static {@link #T} member.
- * New handles can be created from raw instances using {@link #createHandle(Object)}.
- */
-@Template.InstanceType("net.minecraft.server.PlayerConnection")
-public abstract class PlayerConnectionHandle extends Template.Handle {
-    /** @See {@link PlayerConnectionClass} */
-    public static final PlayerConnectionClass T = Template.Class.create(PlayerConnectionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-    /* ============================================================================== */
+class PlayerConnection {
+    public final (Object) net.minecraft.network.NetworkManager networkManager;
 
-    public static PlayerConnectionHandle createHandle(Object handleInstance) {
-        return T.createHandle(handleInstance);
-    }
+#if version >= 1.9
+    public void sendPacket((Object) net.minecraft.network.protocol.Packet<?> packet);
+#else
+    public void sendPacket((Object) net.minecraft.network.protocol.Packet packet);
+#endif
 
-    /* ============================================================================== */
-
-    public abstract void sendPacket(Object packet);
-    public abstract void sendPos(double x, double y, double z);
-
-    private static final QueuePacketMethod defaultQueuePacketMethod = NetworkManagerHandle::queuePacketUnsafe;
+    <code>
+    private static final QueuePacketMethod defaultQueuePacketMethod = com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle::queuePacketUnsafe;
     private static final java.util.Map<Class<?>, QueuePacketMethod> queuePacketMethods = new java.util.concurrent.ConcurrentHashMap<Class<?>, QueuePacketMethod>(5, 0.75f, 2);
 
     private static interface QueuePacketMethod {
@@ -30,12 +20,14 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
     }
 
     static {
-        queuePacketMethods.put(NetworkManagerHandle.T.getType(), defaultQueuePacketMethod);
+        // Default method when the NetworkManager is vanilla unchanged
+        queuePacketMethods.put(com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle.T.getType(), defaultQueuePacketMethod);
     }
 
     private static QueuePacketMethod findPacketMethod(Class<?> networkManagerType) throws Throwable {
         String typeName = networkManagerType.getName();
 
+        // Denizens
         if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("DenizenNetworkManagerImpl")) {
             final com.bergerkiller.mountiplex.reflection.util.FastField<Object> oldManagerField = new com.bergerkiller.mountiplex.reflection.util.FastField<Object>();
             oldManagerField.init(networkManagerType.getDeclaredField("oldManager"));
@@ -45,9 +37,11 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
                 return queuePacket(oldManager, packet);
             };
         } else if (typeName.startsWith("com.denizenscript.denizen.nms.") && typeName.endsWith("FakeNetworkManagerImpl")) {
+            // No base implementation, we can treat it like a vanilla one
             return defaultQueuePacketMethod;
         }
 
+        // Unsupported
         return null;
     }
 
@@ -58,6 +52,8 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
                 try {
                     method = findPacketMethod(networkManager.getClass());
                 } catch (Throwable t) {
+                    // Ignore, assume it isn't supported
+                    //t.printStackTrace();
                 }
                 if (method != null) {
                     queuePacketMethods.put(networkManager.getClass(), method);
@@ -77,39 +73,40 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
 
     public void queuePacket(Object packet) {
         if (!queuePacket(getNetworkManager(), packet)) {
+            // Fallback: execute next tick
             com.bergerkiller.bukkit.common.utils.CommonUtil.nextTick(() -> sendPacket(packet));
         }
     }
+    </code>
 
-
+    <code>
     public boolean isConnected() {
-        return com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
+        return com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle.T.isConnected.invoke(getNetworkManager()).booleanValue();
     }
 
-
+    /**
+     * Gets the PlayerConnection NMS instance, which is used for sending packets to.
+     * If the player is an NPC, or is disconnected, this method returns null.
+     * 
+     * @param player
+     * @return player connection
+     */
     public static PlayerConnectionHandle forPlayer(org.bukkit.entity.Player player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
-        if (!EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
+        if (!com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
 
-        final PlayerConnectionHandle connection = EntityPlayerHandle.T.playerConnection.get(handle);
+        final PlayerConnectionHandle connection = com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.playerConnection.get(handle);
         if (connection == null || !connection.isConnected()) {
             return null; // No PlayerConnection instance or not connected
         }
         return connection;
     }
-    public abstract Object getNetworkManager();
-    public abstract void setNetworkManager(Object value);
-    /**
-     * Stores class members for <b>net.minecraft.server.PlayerConnection</b>.
-     * Methods, fields, and constructors can be used without using Handle Objects.
-     */
-    public static final class PlayerConnectionClass extends Template.Class<PlayerConnectionHandle> {
-        public final Template.Field.Converted<Object> networkManager = new Template.Field.Converted<Object>();
+    </code>
 
-        public final Template.Method.Converted<Void> sendPacket = new Template.Method.Converted<Void>();
-        public final Template.Method<Void> sendPos = new Template.Method<Void>();
-
+    public void sendPos(double x, double y, double z) {
+        java.util.HashSet flags = new java.util.HashSet();
+        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.X_ROT);
+        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.Y_ROT);
+        instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
     }
-
 }
-

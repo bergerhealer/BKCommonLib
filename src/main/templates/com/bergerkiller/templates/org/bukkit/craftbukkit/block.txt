@@ -2,11 +2,12 @@ package org.bukkit.craftbukkit.block;
 
 import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 
-import net.minecraft.server.TileEntity;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.block.TileEntity;
 
 class CraftBlockState {
 #if version >= 1.13
-    protected unknown net.minecraft.server.IBlockData data;
+    protected unknown IBlockData data;
 #else
     protected unknown int type;
     protected unknown org.bukkit.material.MaterialData data;
@@ -18,7 +19,7 @@ class CraftBlockState {
     // Fakes the constructor of BlockState or derived types, an a BlockState that is already created on MC 1.13 and later
     // Not supported on earlier versions, instantiation worked differently there
 #if version >= 1.13
-    public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, net.minecraft.server.IBlockData blockData, net.minecraft.server.TileEntity tileEntity) {
+    public optional void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) {
   #if exists org.bukkit.craftbukkit.block.CraftBlockState private final org.bukkit.craftbukkit.CraftWorld world;
         #require org.bukkit.craftbukkit.block.CraftBlockState private final org.bukkit.craftbukkit.CraftWorld blockState_world:world;
         instance#blockState_world = block.getWorld();
@@ -57,20 +58,20 @@ class CraftBlockState {
         }
     }
 #else
-    public optional void init:###(org.bukkit.block.Block block, org.bukkit.Chunk chunk, net.minecraft.server.IBlockData blockData, net.minecraft.server.TileEntity tileEntity);
+    public optional void init:###(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity);
 #endif
 }
 
 class CraftBlock {
 
 #if version >= 1.13.1
-    public (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData:getNMS();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getNMS();
 #elseif version >= 1.13
-    protected (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData:getNMS();
+    protected (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData:getNMS();
 #else
     // 1.8 -> 1.12.2 only, this code is unlikely to change
-    public (com.bergerkiller.bukkit.common.wrappers.BlockData) net.minecraft.server.IBlockData getBlockData() {
-        net.minecraft.server.Chunk chunk = ((org.bukkit.craftbukkit.CraftChunk) instance.getChunk()).getHandle();
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData getBlockData() {
+        net.minecraft.world.level.chunk.Chunk chunk = ((org.bukkit.craftbukkit.CraftChunk) instance.getChunk()).getHandle();
 
   #if version >= 1.9
         return chunk.a(instance.getX(), instance.getY(), instance.getZ());
@@ -92,8 +93,8 @@ class CraftBlock {
     }
 
     public static org.bukkit.block.Block createBlockAtTileEntity(Object nmsTileEntity) {
-        net.minecraft.server.TileEntity tileEntity = (net.minecraft.server.TileEntity) nmsTileEntity;
-        net.minecraft.server.World world = tileEntity.getWorld();
+        TileEntity tileEntity = (TileEntity) nmsTileEntity;
+        net.minecraft.world.level.World world = tileEntity.getWorld();
         if (world == null) {
             throw new IllegalArgumentException("Tile Entity has no world set");
         }

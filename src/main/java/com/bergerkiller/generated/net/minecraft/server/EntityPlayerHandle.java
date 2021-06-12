@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
 import org.bukkit.World;
 import org.bukkit.inventory.InventoryView;

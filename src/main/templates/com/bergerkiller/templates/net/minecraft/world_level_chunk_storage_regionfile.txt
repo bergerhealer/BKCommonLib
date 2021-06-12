@@ -1,0 +1,37 @@
+package net.minecraft.world.level.chunk.storage;
+
+import net.minecraft.world.level.ChunkCoordIntPair;
+
+class RegionFile {
+#if version >= 1.15
+    public void closeStream() {
+        try {
+            instance.close();
+        } catch (java.nio.channels.ClosedChannelException ex) {
+            // Suppress
+        }
+    }
+#elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public void close()
+    public void closeStream:close();
+#else
+    public void closeStream:c();
+#endif
+
+#if version >= 1.15
+    public boolean chunkExists(int cx, int cz) {
+        return instance.chunkExists(new ChunkCoordIntPair(cx, cz));
+    }
+#elseif version >= 1.14
+    public boolean chunkExists(int cx, int cz) {
+        return instance.d(new ChunkCoordIntPair(cx, cz));
+    }
+#elseif version >= 1.13
+    #if pre <= 7
+        public boolean chunkExists:c(int cx, int cz);
+    #else
+        public boolean chunkExists:d(int cx, int cz);
+    #endif
+#else
+    public boolean chunkExists:c(int cx, int cz);
+#endif
+}

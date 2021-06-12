@@ -1,0 +1,25 @@
+package net.minecraft.util;
+
+import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
+
+// This is only used on CraftBukkit servers
+// Spigot uses a simplified List<Entity>
+optional class EntitySlice {
+#if version >= 1.14
+    private optional final List<T> listValues_1_8_3:c;
+#elseif version >= 1.8.3
+    private optional final List<T> listValues_1_8_3:e;
+#else
+    private optional final List<T> listValues_1_8_3:###;
+#endif
+
+    public (EntitySliceHandle) EntitySlice((Class<?>) Class<T> oclass);
+
+    public boolean add(T value);
+
+    public boolean remove(Object value);
+
+    public Iterator iterator();
+
+    public int size();
+}

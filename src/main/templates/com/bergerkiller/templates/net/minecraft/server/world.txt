@@ -1,9 +1,11 @@
 package net.minecraft.server;
 
+import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.ForcedChunk;
 import net.minecraft.world.level.IBlockAccess;
+import net.minecraft.world.level.storage.WorldDataServer;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
@@ -11,10 +13,14 @@ import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
@@ -22,18 +28,13 @@ import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHand
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldDataServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 
 class World extends IBlockAccess {
     public final Random random;
@@ -89,7 +90,7 @@ class World extends IBlockAccess {
 
         // Check within bounds of the chunk slices before performing any expensive calls
         if (y >= 0 && y < 256) {
-            ChunkSection section = instance.getChunkAt(x >> 4, z >> 4).getSections()[y >> 4];
+            net.minecraft.world.level.chunk.ChunkSection section = instance.getChunkAt(x >> 4, z >> 4).getSections()[y >> 4];
             if (section != null) {
 #if version >= 1.9
                 Object blockData = section.getBlocks().a(x & 0xF, y & 0xF, z & 0xF);
@@ -682,152 +683,4 @@ class WorldServer extends World {
         }
     }
     </code>
-}
-
-// Since MC 1.14
-optional class LightEngineThreaded {
-
-    public void schedule(Runnable runnable) {
-#if exists net.minecraft.server.LightEngineThreaded
-        #require net.minecraft.server.LightEngineThreaded private final ThreadedMailbox<Runnable> mailbox:b;
-        ThreadedMailbox mailbox = instance#mailbox;
-        mailbox.a(runnable);
-#endif
-    }
-
-    public static LightEngineThreadedHandle forWorld((org.bukkit.World) World world) {
-        return com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle.createHandle(((ChunkProviderServer) world.getChunkProvider()).getLightEngine());
-    }
-}
-
-class ChunkProviderServer {
-    // Gone since MC 1.14
-    // private final (Object) IChunkLoader chunkLoader;
-
-    public final (WorldServerHandle) WorldServer world;
-
-#if version >= 1.14
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return (Chunk) instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
-    }
-#elseif version >= 1.13.1
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return instance.getChunkAt(cx, cz, true, true);
-    }
-#elseif forge
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return instance.getChunkAt(cx, cz, null);
-    }
-#else
-    public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
-#endif
-
-#if version >= 1.14
-    public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a serverThreadQueue;
-        return instance#serverThreadQueue;
-    }
-#else
-    public java.util.concurrent.Executor getAsyncExecutor() {
-        return null;
-    }
-#endif
-
-#if version >= 1.14
-    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        #require net.minecraft.server.ChunkProviderServer private java.util.concurrent.CompletableFuture<com.mojang.datafixers.util.Either<IChunkAccess, PlayerChunk.Failure>> getChunkFutureMainThread(int cx, int cz, ChunkStatus chunkstatus, boolean flag);
-
-        java.util.concurrent.CompletableFuture future;
-        future = instance#getChunkFutureMainThread(cx, cz, ChunkStatus.FULL, true);
-        future.thenAccept(consumer);
-    }
-#elseif version >= 1.13
-    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        Iterable iterable = java.util.Collections.singleton(new ChunkCoordIntPair(cx, cz));
-  #if methodexists net.minecraft.server.ChunkProviderServer public java.util.concurrent.CompletableFuture<Void> loadAllChunks(Iterable<net.minecraft.world.level.ChunkCoordIntPair> iterable, java.util.function.Consumer<net.minecraft.server.Chunk> consumer)
-        instance.loadAllChunks(iterable, consumer);
-  #else
-        instance.a(iterable, consumer);
-  #endif
-    }
-#else
-    public void getChunkAtAsync(int cx, int cz, java.util.function.Consumer<?> consumer) {
-        com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy proxy;
-        proxy = new com.bergerkiller.bukkit.common.internal.proxy.ChunkConsumerProxy(consumer, instance, cx, cz);
-  #if forge
-        instance.loadChunk(cx, cz, proxy);
-  #else
-        instance.getChunkAt(cx, cz, proxy);
-  #endif
-    }
-#endif
-
-#if version >= 1.14
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        // Since 1.14: moved to PlayerChunkMap
-        instance.playerChunkMap.saveChunk(chunk);
-    }
-#elseif exists net.minecraft.server.ChunkProviderServer public void saveChunk(Chunk chunk);
-    // <= 1.12
-    public void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
-#else
-    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        // Since 1.12.1 ish: added unloaded=false parameter
-        instance.saveChunk(chunk, false);
-    }
-#endif
-
-#if version >= 1.14
-    public void markBlockDirty:flagDirty((BlockPositionHandle) BlockPosition blockPosition);
-#else
-    public void markBlockDirty((BlockPositionHandle) BlockPosition blockPosition) {
-        instance.world.getPlayerChunkMap().flagDirty(blockPosition);
-    }
-#endif
-}
-
-class WorldDataServer {
-#if version >= 1.16.5
-    public void setClearTimer:setClearWeatherTime(int ticks);
-#elseif version >= 1.16.1
-    public void setClearTimer:a(int ticks);
-#elseif version >= 1.13
-    public void setClearTimer:g(int ticks);
-#else
-    public void setClearTimer:i(int ticks);
-#endif
-}
-
-class RegionFile {
-#if version >= 1.15
-    public void closeStream() {
-        try {
-            instance.close();
-        } catch (java.nio.channels.ClosedChannelException ex) {
-            // Suppress
-        }
-    }
-#elseif methodexists net.minecraft.server.RegionFile public void close()
-    public void closeStream:close();
-#else
-    public void closeStream:c();
-#endif
-
-#if version >= 1.15
-    public boolean chunkExists(int cx, int cz) {
-        return instance.chunkExists(new ChunkCoordIntPair(cx, cz));
-    }
-#elseif version >= 1.14
-    public boolean chunkExists(int cx, int cz) {
-        return instance.d(new ChunkCoordIntPair(cx, cz));
-    }
-#elseif version >= 1.13
-    #if pre <= 7
-        public boolean chunkExists:c(int cx, int cz);
-    #else
-        public boolean chunkExists:d(int cx, int cz);
-    #endif
-#else
-    public boolean chunkExists:c(int cx, int cz);
-#endif
 }

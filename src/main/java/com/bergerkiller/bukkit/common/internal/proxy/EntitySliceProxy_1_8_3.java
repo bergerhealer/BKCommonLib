@@ -4,7 +4,7 @@ import java.util.AbstractList;
 import java.util.Collection;
 import java.util.List;
 
-import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
+import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
 
 /**
  * This is a special proxy class for CraftBukkit so that a single EntitySlice

@@ -15,7 +15,7 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -31,7 +31,11 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
     public RegionHandler_Vanilla_1_14() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.RegionFileCache");
+        resolver.addImport("net.minecraft.world.level.ChunkCoordIntPair");
+        resolver.addImport("net.minecraft.server.level.PlayerChunkMap");
+        resolver.addImport("net.minecraft.server.level.ChunkProviderServer");
+        resolver.addImport("net.minecraft.server.level.WorldServer");
+        resolver.setDeclaredClassName("net.minecraft.world.level.chunk.storage.RegionFileCache");
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         {
@@ -67,8 +71,8 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
                     "    iter = coordSet.iterator();\n" +
                     "    while (iter.hasNext()) {\n" +
                     "        long coord = iter.nextLong();\n" +
-                    "        int coord_x = net.minecraft.world.level.ChunkCoordIntPair.getX(coord);\n" +
-                    "        int coord_z = net.minecraft.world.level.ChunkCoordIntPair.getZ(coord);\n" +
+                    "        int coord_x = ChunkCoordIntPair.getX(coord);\n" +
+                    "        int coord_z = ChunkCoordIntPair.getZ(coord);\n" +
                     "        result.add(new com.bergerkiller.bukkit.common.bases.IntVector3(coord_x, 0, coord_z));\n" +
                     "    }\n" +
                     "    return result;\n" +
@@ -80,7 +84,7 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         {
             MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver,
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
-                    "    long coord = net.minecraft.world.level.ChunkCoordIntPair.pair(rx, rz);\n" +
+                    "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
                     "    return (RegionFile) cache.get(coord);\n" +
                     "}");
             findRegionFileAt.init(findRegionFileAtMethod);

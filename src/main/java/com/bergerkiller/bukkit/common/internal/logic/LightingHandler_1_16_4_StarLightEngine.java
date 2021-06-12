@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -137,7 +137,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     }
 
     @Template.Optional
-    @Template.Import("net.minecraft.server.LightEngineThreaded")
+    @Template.Import("net.minecraft.server.level.LightEngineThreaded")
     @Template.Import("net.minecraft.core.SectionPosition")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.InstanceType("com.tuinity.tuinity.chunk.light.SWMRNibbleArray")
@@ -158,11 +158,11 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.LightEngineThreaded lightEngineThreaded) {
-         * #if exists net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
-         *     #require net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
+         * public static boolean isSupported(net.minecraft.server.level.LightEngineThreaded lightEngineThreaded) {
+         * #if exists net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
+         *     #require net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
          * #else
-         *     #require net.minecraft.server.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine theLightEngine;
+         *     #require net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine theLightEngine;
          * #endif
          *     return lightEngineThreaded#theLightEngine != null;
          * }

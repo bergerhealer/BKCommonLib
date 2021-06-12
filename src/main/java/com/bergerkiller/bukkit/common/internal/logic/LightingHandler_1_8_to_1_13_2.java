@@ -51,6 +51,7 @@ public class LightingHandler_1_8_to_1_13_2 implements LightingHandler {
     }
 
     @Template.Optional
+    @Template.Import("net.minecraft.world.level.chunk.ChunkSection")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.InstanceType("net.minecraft.server.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {

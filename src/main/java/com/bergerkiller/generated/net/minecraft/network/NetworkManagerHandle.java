@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.network;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import io.netty.channel.Channel;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.NetworkManager</b>.
+ * Instance wrapper handle for type <b>net.minecraft.network.NetworkManager</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.NetworkManager")
+@Template.InstanceType("net.minecraft.network.NetworkManager")
 public abstract class NetworkManagerHandle extends Template.Handle {
     /** @See {@link NetworkManagerClass} */
     public static final NetworkManagerClass T = Template.Class.create(NetworkManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -30,7 +30,7 @@ public abstract class NetworkManagerHandle extends Template.Handle {
     static {
         java.lang.reflect.Constructor c = null;
         try {
-            Class<?> queuedPacketType = com.bergerkiller.bukkit.common.utils.CommonUtil.getNMSClass("NetworkManager$QueuedPacket");
+            Class<?> queuedPacketType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("net.minecraft.network.NetworkManager$QueuedPacket");
             Class<?> listenerType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("io.netty.util.concurrent.GenericFutureListener");
             if (queuedPacketType == null) {
                 throw new IllegalStateException("Class QueuedPacket does not exist");
@@ -62,7 +62,7 @@ public abstract class NetworkManagerHandle extends Template.Handle {
     public abstract Channel getChannel();
     public abstract void setChannel(Channel value);
     /**
-     * Stores class members for <b>net.minecraft.server.NetworkManager</b>.
+     * Stores class members for <b>net.minecraft.network.NetworkManager</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class NetworkManagerClass extends Template.Class<NetworkManagerHandle> {

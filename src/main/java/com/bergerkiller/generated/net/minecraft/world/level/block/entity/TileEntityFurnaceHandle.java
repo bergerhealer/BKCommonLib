@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.TileEntityFurnace</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.entity.TileEntityFurnace</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.TileEntityFurnace")
+@Template.InstanceType("net.minecraft.world.level.block.entity.TileEntityFurnace")
 public abstract class TileEntityFurnaceHandle extends TileEntityHandle {
     /** @See {@link TileEntityFurnaceClass} */
     public static final TileEntityFurnaceClass T = Template.Class.create(TileEntityFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -25,7 +25,7 @@ public abstract class TileEntityFurnaceHandle extends TileEntityHandle {
     }
 
     /**
-     * Stores class members for <b>net.minecraft.server.TileEntityFurnace</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.entity.TileEntityFurnace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class TileEntityFurnaceClass extends Template.Class<TileEntityFurnaceHandle> {

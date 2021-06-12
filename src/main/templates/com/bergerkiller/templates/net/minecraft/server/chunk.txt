@@ -1,19 +1,17 @@
 package net.minecraft.server;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.EnumSkyBlock;
+import net.minecraft.world.level.chunk.ChunkSection;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 import io.github.opencubicchunks.cubicchunks.api.world.ICube;
@@ -115,8 +113,8 @@ class Chunk {
         return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
     }
 
-#if exists net.minecraft.server.Chunk public final EntitySlice<Entity>[] entitySlices;
-    public final (List<Object>[]) EntitySlice<Entity>[] entitySlices;
+#if exists net.minecraft.server.Chunk public final net.minecraft.util.EntitySlice<Entity>[] entitySlices;
+    public final (List<Object>[]) net.minecraft.util.EntitySlice<Entity>[] entitySlices;
 #else
     public final (List<Object>[]) List<Entity>[] entitySlices;
 #endif
@@ -246,58 +244,4 @@ class Chunk {
         }
     }
     </code>
-}
-
-class ChunkSection {
-#if version >= 1.14
-    public boolean isEmpty:c();
-#else
-    public boolean isEmpty:a();
-#endif
-
-    public int getYPosition();
-
-#if version >= 1.13
-    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
-#elseif version >= 1.9
-    public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
-#else
-    // For MC 1.8.8 we do some conversion magic to expose the same API
-    // DataPaletteBlock doesn't actually exist, it is emulated by BKCommonLib
-    public (DataPaletteBlockHandle) char[] getBlockPalette:getIdArray();
-#endif
-
-    public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
-
-#if version >= 1.14
-    public (void) IBlockData setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
-#else
-    public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
-#endif
-
-    public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) IBlockData data) {
-        instance.setType(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
-    }
-}
-
-// This is only used on CraftBukkit servers
-// Spigot uses a simplified List<Entity>
-optional class EntitySlice {
-#if version >= 1.14
-    private optional final List<T> listValues_1_8_3:c;
-#elseif version >= 1.8.3
-    private optional final List<T> listValues_1_8_3:e;
-#else
-    private optional final List<T> listValues_1_8_3:###;
-#endif
-
-    public (EntitySliceHandle) EntitySlice((Class<?>) Class<T> oclass);
-
-    public boolean add(T value);
-
-    public boolean remove(Object value);
-
-    public Iterator iterator();
-
-    public int size();
 }

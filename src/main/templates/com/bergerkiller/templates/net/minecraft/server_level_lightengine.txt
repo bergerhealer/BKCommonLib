@@ -1,0 +1,19 @@
+package net.minecraft.server.level;
+
+import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
+
+// Since MC 1.14
+optional class LightEngineThreaded {
+
+    public void schedule(Runnable runnable) {
+#if exists net.minecraft.server.LightEngineThreaded
+        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> mailbox:b;
+        net.minecraft.util.thread.ThreadedMailbox mailbox = instance#mailbox;
+        mailbox.a(runnable);
+#endif
+    }
+
+    public static LightEngineThreadedHandle forWorld((org.bukkit.World) net.minecraft.world.level.World world) {
+        return com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle.createHandle(((ChunkProviderServer) world.getChunkProvider()).getLightEngine());
+    }
+}

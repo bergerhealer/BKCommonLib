@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 import org.bukkit.entity.Player;

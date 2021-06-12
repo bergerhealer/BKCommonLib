@@ -40,7 +40,7 @@ class CraftInventoryCrafting {
 }
 
 class CraftInventoryFurnace {
-    public (org.bukkit.inventory.FurnaceInventory) CraftInventoryFurnace((Object) net.minecraft.server.TileEntityFurnace nmsTileEntityFurnace);
+    public (org.bukkit.inventory.FurnaceInventory) CraftInventoryFurnace((Object) net.minecraft.world.level.block.entity.TileEntityFurnace nmsTileEntityFurnace);
 }
 
 class CraftInventoryBrewer {
@@ -60,7 +60,7 @@ class CraftInventoryMerchant {
 
 class CraftInventoryBeacon {
 
-    public static org.bukkit.inventory.BeaconInventory createNew((Object) net.minecraft.server.TileEntityBeacon nmsTileEntityBeacon) {
+    public static org.bukkit.inventory.BeaconInventory createNew((Object) net.minecraft.world.level.block.entity.TileEntityBeacon nmsTileEntityBeacon) {
 #if version >= 1.14
         return new com.bergerkiller.bukkit.common.internal.proxy.BeaconInventory_1_14(nmsTileEntityBeacon);
 #else

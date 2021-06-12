@@ -26,8 +26,8 @@ import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 
 /**
  * Manages 'forced chunk' logic in a way that allows multiple owners

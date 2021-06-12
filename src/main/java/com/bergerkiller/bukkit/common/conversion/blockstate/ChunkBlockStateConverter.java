@@ -4,7 +4,7 @@ import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 
 public class ChunkBlockStateConverter extends DuplexConverter<Object, BlockState> {

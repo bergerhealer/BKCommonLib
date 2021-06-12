@@ -327,7 +327,7 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPosition", nms_root + ".PacketPlayInPosition");
             remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPositionLook", nms_root + ".PacketPlayInPositionLook");
             remappings.put("net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", "net.minecraft.network.chat.ChatSerializer");
-            remappings.put(nms_root + ".NetworkManager$QueuedPacket", nms_root + ".QueuedPacket");
+            remappings.put("net.minecraft.network.NetworkManager$QueuedPacket", "net.minecraft.network.QueuedPacket");
             remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
             remappings.put(nms_root + ".ChatClickable$EnumClickAction", nms_root + ".EnumClickAction");
             remappings.put(nms_root + ".ChatHoverable$EnumHoverAction", nms_root + ".EnumHoverAction");
@@ -425,7 +425,7 @@ public class CommonBootstrap {
 
         // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
         if (evaluateMCVersion("<", "1.16")) {
-            remappings.put(nms_root + ".WorldDataServer", nms_root + ".WorldData");
+            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.server.WorldData");
         }
 
         // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c

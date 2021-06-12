@@ -1,13 +1,13 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.chunk.storage;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.RegionFile</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.chunk.storage.RegionFile</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.RegionFile")
+@Template.InstanceType("net.minecraft.world.level.chunk.storage.RegionFile")
 public abstract class RegionFileHandle extends Template.Handle {
     /** @See {@link RegionFileClass} */
     public static final RegionFileClass T = Template.Class.create(RegionFileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -22,7 +22,7 @@ public abstract class RegionFileHandle extends Template.Handle {
     public abstract void closeStream();
     public abstract boolean chunkExists(int cx, int cz);
     /**
-     * Stores class members for <b>net.minecraft.server.RegionFile</b>.
+     * Stores class members for <b>net.minecraft.world.level.chunk.storage.RegionFile</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RegionFileClass extends Template.Class<RegionFileHandle> {

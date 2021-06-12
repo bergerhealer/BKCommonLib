@@ -1,0 +1,39 @@
+package net.minecraft.world.level.chunk;
+
+import net.minecraft.world.level.block.state.IBlockData;
+
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
+
+class ChunkSection {
+#if version >= 1.14
+    public boolean isEmpty:c();
+#else
+    public boolean isEmpty:a();
+#endif
+
+    public int getYPosition();
+
+#if version >= 1.13
+    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
+#elseif version >= 1.9
+    public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
+#else
+    // For MC 1.8.8 we do some conversion magic to expose the same API
+    // DataPaletteBlock doesn't actually exist, it is emulated by BKCommonLib
+    public (DataPaletteBlockHandle) char[] getBlockPalette:getIdArray();
+#endif
+
+    public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
+
+#if version >= 1.14
+    public (void) IBlockData setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+#else
+    public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
+#endif
+
+    public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) IBlockData data) {
+        instance.setType(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
+    }
+}

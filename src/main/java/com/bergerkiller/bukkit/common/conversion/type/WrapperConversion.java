@@ -50,8 +50,6 @@ import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHand
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
@@ -65,6 +63,8 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
@@ -114,7 +114,7 @@ public class WrapperConversion {
         return entity.getWorld();
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntity")
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntity")
     public static org.bukkit.World getWorldFromTileEntity(Object nmsTileEntityHandle) {
         return toWorld(TileEntityHandle.T.getWorld.raw.invoke(nmsTileEntityHandle));
     }
@@ -149,14 +149,14 @@ public class WrapperConversion {
         return blockState.getBlock();
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntity")
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntity")
     public static org.bukkit.block.Block getBlockFromTileEntity(Object nmsTileEntityHandle) {
         TileEntityHandle handle = TileEntityHandle.createHandle(nmsTileEntityHandle);
         BlockPositionHandle pos = handle.getPosition();
         return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntity")
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntity")
     public static org.bukkit.block.BlockState toBlockState(Object nmsTileEntityHandle) {
         return BlockStateConversion.INSTANCE.tileEntityToBlockState(nmsTileEntityHandle);
     }
@@ -221,12 +221,12 @@ public class WrapperConversion {
         return CraftInventoryPlayerHandle.createNew(nmsPlayerInventoryHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntityFurnace")
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntityFurnace")
     public static org.bukkit.inventory.FurnaceInventory toFurnaceInventory(Object nmsTileEntityFurnaceHandle) {
         return CraftInventoryFurnaceHandle.createNew(nmsTileEntityFurnaceHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntityBrewingStand")
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntityBrewingStand")
     public static org.bukkit.inventory.BrewerInventory toBrewerInventory(Object nmsTileEntityBrewingStandHandle) {
         return CraftInventoryBrewerHandle.createNew(nmsTileEntityBrewingStandHandle);
     }
@@ -236,7 +236,7 @@ public class WrapperConversion {
         return CraftInventoryMerchantHandle.createNew(nmsInventoryMerchantHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.TileEntityBeacon") 
+    @ConverterMethod(input="net.minecraft.world.level.block.TileEntityBeacon") 
     public static org.bukkit.inventory.BeaconInventory toBeaconInventory(Object nmsTileEntityBeaconHandle) {
         return CraftInventoryBeaconHandle.createNew(nmsTileEntityBeaconHandle);
     }
@@ -440,7 +440,7 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.ChunkSection")
+    @ConverterMethod(input="net.minecraft.world.level.chunk.ChunkSection")
     public static ChunkSection toChunkSection(Object nmsChunkSectionHandle) {
         return new ChunkSection(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
     }

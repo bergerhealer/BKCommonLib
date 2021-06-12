@@ -1,0 +1,88 @@
+package net.minecraft.network;
+
+class NetworkManager {
+#if version >= 1.8.4
+    public io.netty.channel.Channel channel;
+#elseif version >= 1.8.3
+    public io.netty.channel.Channel channel:k;
+#else
+    private io.netty.channel.Channel channel:i;
+#endif
+
+#if version >= 1.9
+    public boolean isConnected();
+#else
+    public boolean isConnected:g();
+#endif
+
+    // Unsafe! May not function under some conditions!
+    // Returns true if queuing was successful, false otherwise
+    public static boolean queuePacketUnsafe((Object) NetworkManager networkManager, Object packet) {
+#if version >= 1.13.2
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue;
+#elseif version >= 1.8.3
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:i;
+#else
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:h;
+#endif
+        java.util.Queue queue = networkManager#packetQueue;
+        Object queuedPacket = com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle.createQueuedPacket(packet);
+
+#if version >= 1.14.4
+        // Uses synchronized
+        synchronized (queue) {
+            queue.add(queuedPacket);
+        }
+#elseif version >= 1.8.3
+        // Uses ReentrantReadWriteLock
+        #require net.minecraft.network.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
+        java.util.concurrent.locks.ReentrantReadWriteLock lock = networkManager#packetQueueRWLock;
+        lock.writeLock().lock();
+        try {
+            queue.add(queuedPacket);
+        } finally {
+            lock.writeLock().unlock();
+        }
+#else
+        // No lock at all (relies on concurrent queue logic)
+        queue.add(queuedPacket);
+#endif
+        return true;
+    }
+
+    <code>
+    private static final java.lang.reflect.Constructor _queuedPacketConstructor;
+    static {
+        java.lang.reflect.Constructor c = null;
+        try {
+            Class<?> queuedPacketType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("net.minecraft.network.NetworkManager$QueuedPacket");
+            Class<?> listenerType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("io.netty.util.concurrent.GenericFutureListener");
+            if (queuedPacketType == null) {
+                throw new IllegalStateException("Class QueuedPacket does not exist");
+            }
+            if (listenerType == null) {
+                throw new IllegalStateException("Class GenericFutureListener does not exist");
+            }
+            Class<?> packetType = com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle.T.getType();
+            if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
+            } else {
+                listenerType = com.bergerkiller.bukkit.common.utils.LogicUtil.getArrayType(listenerType);
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
+            }
+            c.setAccessible(true);
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+        _queuedPacketConstructor = c;
+    }
+
+    public static Object createQueuedPacket(Object packet) {
+        try {
+            return _queuedPacketConstructor.newInstance(packet, null);
+        } catch (Throwable t) {
+            throw com.bergerkiller.mountiplex.MountiplexUtil.uncheckedRethrow(t);
+        }
+    }
+    </code>
+}

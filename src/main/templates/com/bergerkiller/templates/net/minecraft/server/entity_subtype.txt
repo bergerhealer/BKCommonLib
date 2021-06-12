@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
@@ -14,6 +15,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
@@ -22,7 +24,6 @@ import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     public (PlayerConnectionHandle) PlayerConnection playerConnection;

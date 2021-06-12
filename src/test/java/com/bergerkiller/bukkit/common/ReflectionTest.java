@@ -60,7 +60,6 @@ public class ReflectionTest {
             loadClass(NMSEntityHuman.class);
             loadClass(NMSEntityLiving.class);
             loadClass(NMSEntityInsentient.class);
-            loadClass(NMSPlayerConnection.class);
             loadClass(NMSNetworkManager.class);
             loadClass(NMSEntityPlayer.class);
             loadClass(NMSWorldServer.class);

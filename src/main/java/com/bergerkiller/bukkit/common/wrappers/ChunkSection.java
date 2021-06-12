@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
 
 public class ChunkSection extends BasicWrapper<ChunkSectionHandle> {

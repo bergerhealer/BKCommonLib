@@ -56,7 +56,7 @@ public class Conversion {
     public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.server.Chunk");
     public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.world.item.ItemStack");
     public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.world.item.Item");
-    public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.server.TileEntity");
+    public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.world.level.block.TileEntity");
     public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.world.IInventory");
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcher");
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcherObject");
@@ -77,7 +77,7 @@ public class Conversion {
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
     public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
     public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.server.IBlockData");
-    public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.server.ChunkSection");
+    public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.world.level.chunk.ChunkSection");
     public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.world.effect.MobEffectList");
     public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.world.effect.MobEffect");
     public static final InputConverter<Object> toMapIconHandle = getConverterToHandle("net.minecraft.world.level.saveddata.maps.MapIcon");

@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal.proxy;
 
 import java.util.function.Consumer;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 /**
@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.SafeMethod;
  * instead of a future / consumer system.
  */
 public class ChunkConsumerProxy implements Runnable {
-    private static final SafeMethod<Object> cps_getChunkAt = new SafeMethod<Object>(CommonUtil.getNMSClass("ChunkProviderServer"), "getChunkAt", int.class, int.class);
+    private static final SafeMethod<Object> cps_getChunkAt = new SafeMethod<Object>(ChunkProviderServerHandle.T.getType(), "getChunkAt", int.class, int.class);
     private final Consumer<Object> consumer;
     private final Object cps;
     private final int chunkX;

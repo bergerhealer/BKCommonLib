@@ -17,7 +17,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**

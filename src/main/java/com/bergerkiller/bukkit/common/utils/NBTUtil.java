@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
@@ -12,6 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerInvent
 import com.bergerkiller.generated.net.minecraft.world.food.FoodMetaDataHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.InventoryEnderChestHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 import org.bukkit.block.BlockState;

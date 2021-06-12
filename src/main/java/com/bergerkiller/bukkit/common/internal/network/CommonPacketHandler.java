@@ -4,9 +4,9 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.NetworkManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;

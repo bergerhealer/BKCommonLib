@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;

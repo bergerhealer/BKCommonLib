@@ -21,8 +21,8 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -40,14 +40,14 @@ public class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
 
     public RegionHandler_Vanilla_1_8() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.ChunkProviderServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.ChunkProviderServer");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         // chunkExists generated method
         {
             String source = SourceDeclaration.preprocess(
                     "public static boolean chunkExists(ChunkProviderServer cps, int cx, int cz) {\n" +
-                    "    #require net.minecraft.server.ChunkProviderServer private final IChunkLoader chunkLoader;\n" +
+                    "    #require net.minecraft.server.level.ChunkProviderServer private final IChunkLoader chunkLoader;\n" +
                     "    IChunkLoader loader = cps#chunkLoader;\n" +
                     "    if (loader instanceof ChunkRegionLoader) {\n" +
                     "        ChunkRegionLoader crl = (ChunkRegionLoader) loader;\n" +

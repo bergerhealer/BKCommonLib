@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.server.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.World;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.LightEngineThreaded</b>.
+ * Instance wrapper handle for type <b>net.minecraft.server.level.LightEngineThreaded</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.LightEngineThreaded")
+@Template.InstanceType("net.minecraft.server.level.LightEngineThreaded")
 public abstract class LightEngineThreadedHandle extends Template.Handle {
     /** @See {@link LightEngineThreadedClass} */
     public static final LightEngineThreadedClass T = Template.Class.create(LightEngineThreadedClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -27,7 +27,7 @@ public abstract class LightEngineThreadedHandle extends Template.Handle {
 
     public abstract void schedule(Runnable runnable);
     /**
-     * Stores class members for <b>net.minecraft.server.LightEngineThreaded</b>.
+     * Stores class members for <b>net.minecraft.server.level.LightEngineThreaded</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class LightEngineThreadedClass extends Template.Class<LightEngineThreadedHandle> {

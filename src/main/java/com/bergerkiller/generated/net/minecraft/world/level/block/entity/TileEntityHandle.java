@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level.block.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -6,15 +6,16 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import org.bukkit.Material;
 import org.bukkit.World;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.TileEntity</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.block.entity.TileEntity</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.TileEntity")
+@Template.InstanceType("net.minecraft.world.level.block.entity.TileEntity")
 public abstract class TileEntityHandle extends Template.Handle {
     /** @See {@link TileEntityClass} */
     public static final TileEntityClass T = Template.Class.create(TileEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -47,7 +48,7 @@ public abstract class TileEntityHandle extends Template.Handle {
     public abstract IntVector3 getPosition_field();
     public abstract void setPosition_field(IntVector3 value);
     /**
-     * Stores class members for <b>net.minecraft.server.TileEntity</b>.
+     * Stores class members for <b>net.minecraft.world.level.block.entity.TileEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class TileEntityClass extends Template.Class<TileEntityHandle> {

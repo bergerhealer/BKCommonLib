@@ -1,0 +1,13 @@
+package net.minecraft.world.level.storage;
+
+class WorldDataServer {
+#if version >= 1.16.5
+    public void setClearTimer:setClearWeatherTime(int ticks);
+#elseif version >= 1.16.1
+    public void setClearTimer:a(int ticks);
+#elseif version >= 1.13
+    public void setClearTimer:g(int ticks);
+#else
+    public void setClearTimer:i(int ticks);
+#endif
+}

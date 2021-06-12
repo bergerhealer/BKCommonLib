@@ -49,10 +49,10 @@ import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
+import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -142,12 +142,12 @@ public class HandleConversion {
         return raw_handle;
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.TileEntity")
     public static Object toTileEntityHandle(org.bukkit.block.BlockState blockState) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.TileEntity")
     public static Object getTileEntityHandle(org.bukkit.block.Block block) {
         Object blockPosition = BlockPositionHandle.createNew(block.getX(), block.getY(), block.getZ());
         return WorldHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
@@ -308,7 +308,7 @@ public class HandleConversion {
         return action.getHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.ChunkSection")
+    @ConverterMethod(output="net.minecraft.world.level.chunk.ChunkSection")
     public static Object toChunkSectionHandle(ChunkSection section) {
         return section.getRawHandle();
     }
@@ -445,7 +445,7 @@ public class HandleConversion {
         return inventoryClickType.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.server.EntitySlice<?>", optional=true)
+    @ConverterMethod(input="net.minecraft.util.EntitySlice<?>", optional=true)
     public static List<Object> cbEntitySliceToList(Object nmsEntitySliceHandle) {
         if (CommonCapabilities.REVISED_CHUNK_ENTITY_SLICE) {
             return new EntitySliceProxy_1_8_3<Object>(EntitySliceHandle.createHandle(nmsEntitySliceHandle));
@@ -454,7 +454,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.world.entity.Entity>", optional=true)
+    @ConverterMethod(output="net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>", optional=true)
     public static Object cbListToEntitySlice(List<?> entitySliceList) {
         if (entitySliceList instanceof EntitySliceProxy_1_8_3) {
             return ((EntitySliceProxy_1_8_3<?>) entitySliceList).getHandle().getRaw();

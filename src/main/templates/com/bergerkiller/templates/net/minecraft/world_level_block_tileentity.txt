@@ -1,15 +1,21 @@
-package net.minecraft.server;
+package net.minecraft.world.level.block.entity;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.network.protocol.game.PacketPlayOutTileEntityData
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 class TileEntity {
     protected (org.bukkit.World) World world_field:world;
@@ -21,18 +27,18 @@ class TileEntity {
 
     public (BlockData) IBlockData getBlockDataIfCached() {
 #if version >= 1.14
-        #require net.minecraft.server.TileEntity private IBlockData cachedBlockData:c;
+        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:c;
         return instance#cachedBlockData;
 #elseif version >= 1.13
-        #require net.minecraft.server.TileEntity private IBlockData cachedBlockData:f;
+        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:f;
         return instance#cachedBlockData;
 #else
   #if version >= 1.11
-        #require net.minecraft.server.TileEntity private int cachedBlockDataValue:g;
-        #require net.minecraft.server.TileEntity protected Block cachedBlockDataBlock:e;
+        #require net.minecraft.world.level.block.entity.TileEntity private int cachedBlockDataValue:g;
+        #require net.minecraft.world.level.block.entity.TileEntity protected Block cachedBlockDataBlock:e;
   #else
-        #require net.minecraft.server.TileEntity private int cachedBlockDataValue:h;
-        #require net.minecraft.server.TileEntity protected Block cachedBlockDataBlock:e;
+        #require net.minecraft.world.level.block.entity.TileEntity private int cachedBlockDataValue:h;
+        #require net.minecraft.world.level.block.entity.TileEntity protected Block cachedBlockDataBlock:e;
   #endif
 
         Block block = instance#cachedBlockDataBlock;
@@ -122,4 +128,30 @@ class TileEntity {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
     }
     </code>
+}
+
+class TileEntityFurnace extends TileEntity {
+#if version >= 1.14
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack) {
+        if (itemstack.isEmpty()) {
+            return 0;
+        } else {
+            Item item = itemstack.getItem();
+            Integer fuelTime = (Integer) TileEntityFurnace.f().get(item);
+            if (fuelTime == null) {
+                return 0;
+            } else {
+                return fuelTime.intValue();
+            }
+        }
+    }
+#elseif version >= 1.13
+    private static int fuelTime((ItemStackHandle) ItemStack itemstack);
+#else
+    public static int fuelTime((ItemStackHandle) ItemStack itemstack);
+#endif
+}
+
+class TileEntityHopper extends TileEntity {
+    public static boolean suckItems:a((Object) IHopper ihopper);
 }

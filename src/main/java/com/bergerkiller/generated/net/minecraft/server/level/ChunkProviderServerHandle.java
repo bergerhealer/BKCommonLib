@@ -1,16 +1,18 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.server.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.ChunkProviderServer</b>.
+ * Instance wrapper handle for type <b>net.minecraft.server.level.ChunkProviderServer</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.ChunkProviderServer")
+@Template.InstanceType("net.minecraft.server.level.ChunkProviderServer")
 public abstract class ChunkProviderServerHandle extends Template.Handle {
     /** @See {@link ChunkProviderServerClass} */
     public static final ChunkProviderServerClass T = Template.Class.create(ChunkProviderServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -30,7 +32,7 @@ public abstract class ChunkProviderServerHandle extends Template.Handle {
     public abstract WorldServerHandle getWorld();
     public abstract void setWorld(WorldServerHandle value);
     /**
-     * Stores class members for <b>net.minecraft.server.ChunkProviderServer</b>.
+     * Stores class members for <b>net.minecraft.server.level.ChunkProviderServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkProviderServerClass extends Template.Class<ChunkProviderServerHandle> {

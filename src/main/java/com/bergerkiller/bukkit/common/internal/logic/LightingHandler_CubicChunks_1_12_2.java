@@ -56,6 +56,7 @@ public class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.IColumn")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.cube.Cube")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
+    @Template.Import("net.minecraft.world.level.chunk.ChunkSection")
     @Template.InstanceType("net.minecraft.server.Chunk")
     public static abstract class LightingLogicHandle extends Template.Class<Template.Handle> {
 
