@@ -6,7 +6,9 @@ import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataServerHandle;
@@ -21,11 +23,9 @@ import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle;
-import com.bergerkiller.generated.net.minecraft.server.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ForcedChunkHandle
 import com.bergerkiller.generated.net.minecraft.server.LightEngineThreadedHandle;
 
@@ -833,22 +833,6 @@ class BiomeSettingsMobs {
 }
 
 interface IBlockAccess {
-}
-
-class MovingObjectPosition {
-    public readonly (org.bukkit.util.Vector) Vec3D pos;
-
-    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
-#if version >= 1.14
-        if (instance instanceof MovingObjectPositionBlock) {
-            return ((MovingObjectPositionBlock) instance).getDirection();
-        } else {
-            return EnumDirection.DOWN;
-        }
-#else
-        return instance.direction;
-#endif
-    }
 }
 
 class RegionFile {

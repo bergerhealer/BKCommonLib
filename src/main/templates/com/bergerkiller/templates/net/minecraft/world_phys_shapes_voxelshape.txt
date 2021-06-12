@@ -1,0 +1,148 @@
+package net.minecraft.world.phys.shapes;
+
+import net.minecraft.core.EnumDirection;
+import net.minecraft.world.phys.AxisAlignedBB;
+
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+
+class VoxelShape {
+
+#if version >= 1.13
+    public static (VoxelShapeHandle) VoxelShape empty() {
+        return VoxelShapes.a();
+    }
+
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+        if (handles.isEmpty()) {
+            return VoxelShapes.a();
+        } else {
+            VoxelShape shape = null;
+            java.util.Iterator iter = handles.iterator();
+            while (iter.hasNext()) {
+                AxisAlignedBB aabb = (AxisAlignedBB) iter.next();
+                VoxelShape aabb_shape = VoxelShapes.a(aabb);
+                if (shape == null) {
+                    shape = aabb_shape;
+                } else {
+                    shape = VoxelShapes.a(shape, aabb_shape); // OR
+                }
+            }
+            return shape;
+        }
+    }
+
+    public static (VoxelShapeHandle) VoxelShape fromAABB((AxisAlignedBBHandle) AxisAlignedBB aabb) {
+        return VoxelShapes.a(aabb);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        return VoxelShapes.b(a, b, OperatorBoolean.ONLY_FIRST);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        return VoxelShapes.a(a, b);
+    }
+
+#if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox()
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
+#endif
+
+#if version >= 1.13.2
+    public boolean isEmpty();
+#else
+    public boolean isEmpty:b();
+#endif
+
+#else
+    public static (VoxelShapeHandle) VoxelShape empty() {
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.EMPTY;
+    }
+
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromNMSAABB(handles);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape fromAABB(AxisAlignedBBHandle aabb) {
+        java.util.List list = java.util.Collections.singletonList(aabb);
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(list);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        // Unsure what this really does?
+        return a;
+    }
+
+    public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        java.util.List a_cubes = a.getCubes();
+        java.util.List b_cubes = b.getCubes();
+        if (a_cubes.isEmpty()) {
+            return b;
+        } else if (b_cubes.isEmpty()) {
+            return a;
+        }
+        int i = 0;
+        java.util.Iterator iter;
+        Object[] arr = new Object[a_cubes.size() + b_cubes.size()];
+        for (iter = a_cubes.iterator(); iter.hasNext(); ) {
+            arr[i++] = iter.next();
+        }
+        for (iter = b_cubes.iterator(); iter.hasNext(); ) {
+            arr[i++] = iter.next();
+        }
+        return com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy.fromAABBHandles(java.util.Arrays.asList(arr));
+    }
+
+    public (AxisAlignedBBHandle) AxisAlignedBBHandle getBoundingBox();
+
+    public boolean isEmpty();
+#endif
+
+    public static double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> voxels, double coordinate) {
+
+#if version >= 1.13.1
+        // Official API as of 1.13.1
+        return VoxelShapes.a(axis, boundingBox, voxels, coordinate);
+#elseif version >= 1.13
+        // Call the method for every item in the stream
+        java.util.Iterator iter = voxels.iterator();
+        while (iter.hasNext()) {
+            VoxelShape voxel = (VoxelShape) iter.next();
+            coordinate = VoxelShapes.a(axis, boundingBox, voxel, coordinate);
+
+            // Shortcut, see implementation of 1.13.1
+            if (Math.abs(coordinate) <= 1.0E-7D) {
+                return 0.0;
+            }
+        }
+        return coordinate;
+#else
+        // Custom implementation for 1.12.2 and before (fallback)
+        // Our custom proxy type accepts AxisAlignedBBHandle for performance reasons, really
+        AxisAlignedBBHandle boundingBoxHandle = AxisAlignedBBHandle.createHandle(boundingBox);
+
+        java.util.Iterator iter = voxels.iterator();
+        while (iter.hasNext()) {
+            VoxelShape voxel = (VoxelShape) iter.next();
+            if (axis == EnumDirection$EnumAxis.X) {
+                coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
+            } else if (axis == EnumDirection$EnumAxis.Y) {
+                coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
+            } else if (axis == EnumDirection$EnumAxis.Z) {
+                coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
+            }
+
+            // Shortcut, see implementation of 1.13.1
+            if (Math.abs(coordinate) <= 1.0E-7D) {
+                return 0.0;
+            }
+        }
+        return coordinate;
+#endif
+
+    }
+
+}

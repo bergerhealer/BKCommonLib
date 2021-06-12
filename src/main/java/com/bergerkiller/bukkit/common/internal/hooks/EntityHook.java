@@ -19,9 +19,9 @@ import com.bergerkiller.bukkit.common.wrappers.MoveType;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 @ClassHook.HookPackage("net.minecraft.server")

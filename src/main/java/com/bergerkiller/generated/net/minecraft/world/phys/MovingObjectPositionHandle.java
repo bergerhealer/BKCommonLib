@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.phys;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.MovingObjectPosition</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.phys.MovingObjectPosition</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.MovingObjectPosition")
+@Template.InstanceType("net.minecraft.world.phys.MovingObjectPosition")
 public abstract class MovingObjectPositionHandle extends Template.Handle {
     /** @See {@link MovingObjectPositionClass} */
     public static final MovingObjectPositionClass T = Template.Class.create(MovingObjectPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -25,7 +25,7 @@ public abstract class MovingObjectPositionHandle extends Template.Handle {
     @Template.Readonly
     public abstract Vector getPos();
     /**
-     * Stores class members for <b>net.minecraft.server.MovingObjectPosition</b>.
+     * Stores class members for <b>net.minecraft.world.phys.MovingObjectPosition</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class MovingObjectPositionClass extends Template.Class<MovingObjectPositionHandle> {

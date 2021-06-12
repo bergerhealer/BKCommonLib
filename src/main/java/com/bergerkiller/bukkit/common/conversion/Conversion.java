@@ -61,7 +61,7 @@ public class Conversion {
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.server.DataWatcher");
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.server.DataWatcherObject");
     public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.server.DataWatcher.Item");
-    public static final InputConverter<Object> toNBTTagHandle = getConverterToHandle("net.minecraft.server.NBTBase");
+    public static final InputConverter<Object> toNBTTagHandle = getConverterToHandle("net.minecraft.nbt.NBTBase");
     public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.server.Block");
     public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.server.EnumGamemode");
     public static final InputConverter<Object> toWorldTypeHandle = getConverterToHandle("net.minecraft.server.WorldType");

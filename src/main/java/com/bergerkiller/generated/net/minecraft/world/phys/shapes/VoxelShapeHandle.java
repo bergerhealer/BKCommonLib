@@ -1,15 +1,16 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.phys.shapes;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import java.util.stream.Stream;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.VoxelShape</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.phys.shapes.VoxelShape</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.VoxelShape")
+@Template.InstanceType("net.minecraft.world.phys.shapes.VoxelShape")
 public abstract class VoxelShapeHandle extends Template.Handle {
     /** @See {@link VoxelShapeClass} */
     public static final VoxelShapeClass T = Template.Class.create(VoxelShapeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -48,7 +49,7 @@ public abstract class VoxelShapeHandle extends Template.Handle {
     public abstract AxisAlignedBBHandle getBoundingBox();
     public abstract boolean isEmpty();
     /**
-     * Stores class members for <b>net.minecraft.server.VoxelShape</b>.
+     * Stores class members for <b>net.minecraft.world.phys.shapes.VoxelShape</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class VoxelShapeClass extends Template.Class<VoxelShapeHandle> {

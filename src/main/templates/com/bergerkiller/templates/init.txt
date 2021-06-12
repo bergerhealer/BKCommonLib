@@ -39,6 +39,10 @@
 #include /net/minecraft/world_item_crafting_recipes.txt
 #include /net/minecraft/world_item_item.txt
 #include /net/minecraft/world_item_itemstack.txt
+#include /net/minecraft/world_phys_axisalignedbb.txt
+#include /net/minecraft/world_phys_movingobject.txt
+#include /net/minecraft/world_phys_shapes_voxelshape.txt
+#include /net/minecraft/world_phys_vec3d.txt
 
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
@@ -61,7 +65,6 @@
 #include /net/minecraft/server/network.txt
 #include /net/minecraft/server/entity_tracker.txt
 #include /net/minecraft/server/entity_subtype.txt
-#include /net/minecraft/server/axisalignedbb.txt
 #include /net/minecraft/server/particles.txt
 #include /net/minecraft/server/dimension.txt
 #include /net/minecraft/server/world.txt

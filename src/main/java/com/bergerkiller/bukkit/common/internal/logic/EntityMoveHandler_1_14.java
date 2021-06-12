@@ -12,10 +12,10 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
-import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.Converter;
@@ -40,6 +40,15 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         ClassResolver resolver = new ClassResolver();
         resolver.setVariable("version", Common.MC_VERSION);
         resolver.setDeclaredClassName("net.minecraft.server.World");
+        resolver.addImport("net.minecraft.core.BlockPosition");
+        resolver.addImport("net.minecraft.core.EnumDirection");
+        resolver.addImport("net.minecraft.util.MathHelper");
+        resolver.addImport("net.minecraft.world.phys.AxisAlignedBB");
+        resolver.addImport("net.minecraft.world.phys.shapes.OperatorBoolean");
+        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
+        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
+        resolver.addImport("net.minecraft.world.level.border.WorldBorder");
+        resolver.addImport("net.minecraft.world.level.IBlockAccess");
         try {
             String method_path;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {

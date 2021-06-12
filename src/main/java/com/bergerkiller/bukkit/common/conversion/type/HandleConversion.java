@@ -57,14 +57,14 @@ import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
-import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -494,7 +494,7 @@ public class HandleConversion {
         return CraftBlockDataHandle.T.fromData.invoke(blockData);
     }
 
-    @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>", output="net.minecraft.server.VoxelShape", optional=true)
+    @ConverterMethod(input="List<net.minecraft.world.phys.AxisAlignedBB>", output="net.minecraft.world.phys.shapes.VoxelShape", optional=true)
     public static Object voxelShapeFromAxisAlignedBBList(List<?> axisAlignedBBHandles) {
         return VoxelShapeHandle.createRawFromAABB(axisAlignedBBHandles);
     }
@@ -560,7 +560,7 @@ public class HandleConversion {
         return DimensionManagerHandle.T.fromKey.raw.invoke(key.getRawHandle());
     }
 
-    @ConverterMethod(input="List<net.minecraft.server.AxisAlignedBB>")
+    @ConverterMethod(input="List<net.minecraft.world.phys.AxisAlignedBB>")
     public static java.util.stream.Stream<VoxelShapeHandle> axisAlignedBBListToVoxelShapeStream(List<?> axisAlignedBBList) {
         return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(voxelShapeFromAxisAlignedBBList(axisAlignedBBList)));
     }

@@ -1,13 +1,13 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.phys;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.AxisAlignedBB</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.phys.AxisAlignedBB</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.AxisAlignedBB")
+@Template.InstanceType("net.minecraft.world.phys.AxisAlignedBB")
 public abstract class AxisAlignedBBHandle extends Template.Handle {
     /** @See {@link AxisAlignedBBClass} */
     public static final AxisAlignedBBClass T = Template.Class.create(AxisAlignedBBClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -51,7 +51,7 @@ public abstract class AxisAlignedBBHandle extends Template.Handle {
     public abstract double getMaxZ();
     public abstract void setMaxZ(double value);
     /**
-     * Stores class members for <b>net.minecraft.server.AxisAlignedBB</b>.
+     * Stores class members for <b>net.minecraft.world.phys.AxisAlignedBB</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class AxisAlignedBBClass extends Template.Class<AxisAlignedBBHandle> {

@@ -7,7 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
@@ -374,7 +374,7 @@ class Block {
   #endif
             return null;
         } else {
-  #if methodexists net.minecraft.server.VoxelShape public AxisAlignedBB getBoundingBox();
+  #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
             return shape.getBoundingBox();
   #else
             return shape.a();

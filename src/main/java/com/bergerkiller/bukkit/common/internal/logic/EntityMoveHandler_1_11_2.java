@@ -2,9 +2,9 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.List;
 
-import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 
 /**
  * Logic for MC 1.11.2 - 1.12.2

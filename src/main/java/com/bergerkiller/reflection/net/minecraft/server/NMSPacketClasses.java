@@ -109,9 +109,9 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutUpdateSignHa
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWorldParticlesHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;

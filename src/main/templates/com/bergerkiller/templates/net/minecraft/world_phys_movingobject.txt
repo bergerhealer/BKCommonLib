@@ -1,0 +1,19 @@
+package net.minecraft.world.phys;
+
+import net.minecraft.core.EnumDirection;
+
+class MovingObjectPosition {
+    public readonly (org.bukkit.util.Vector) Vec3D pos;
+
+    public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
+#if version >= 1.14
+        if (instance instanceof MovingObjectPositionBlock) {
+            return ((MovingObjectPositionBlock) instance).getDirection();
+        } else {
+            return EnumDirection.DOWN;
+        }
+#else
+        return instance.direction;
+#endif
+    }
+}

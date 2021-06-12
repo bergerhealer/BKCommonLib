@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.phys;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.util.Vector;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Vec3D</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.phys.Vec3D</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Vec3D")
+@Template.InstanceType("net.minecraft.world.phys.Vec3D")
 public abstract class Vec3DHandle extends Template.Handle {
     /** @See {@link Vec3DClass} */
     public static final Vec3DClass T = Template.Class.create(Vec3DClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -40,7 +40,7 @@ public abstract class Vec3DHandle extends Template.Handle {
     public abstract double getZ();
     public abstract void setZ(double value);
     /**
-     * Stores class members for <b>net.minecraft.server.Vec3D</b>.
+     * Stores class members for <b>net.minecraft.world.phys.Vec3D</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class Vec3DClass extends Template.Class<Vec3DHandle> {

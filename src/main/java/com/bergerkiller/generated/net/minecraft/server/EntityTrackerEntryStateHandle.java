@@ -34,7 +34,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             return T.opt_xVel.getDouble(getRaw());
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
+            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
         }
     }
 
@@ -43,7 +43,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             return T.opt_yVel.getDouble(getRaw());
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
         }
     }
 
@@ -52,7 +52,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             return T.opt_zVel.getDouble(getRaw());
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
         }
     }
 
@@ -61,8 +61,8 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             T.opt_xVel.setDouble(getRaw(), x);
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
             setVelocity(x, y, z);
         }
     }
@@ -72,8 +72,8 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             T.opt_yVel.setDouble(getRaw(), y);
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.z.getDouble(vel);
+            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
+            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
             setVelocity(x, y, z);
         }
     }
@@ -83,8 +83,8 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
             T.opt_zVel.setDouble(getRaw(), z);
         } else {
             Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.x.getDouble(vel);
-            double y = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.y.getDouble(vel);
+            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
+            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
             setVelocity(x, y, z);
         }
     }
@@ -112,7 +112,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     public void setVelocity(double x, double y, double z) {
         if (T.opt_velocity.isAvailable()) {
-            Object vel = com.bergerkiller.generated.net.minecraft.server.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
+            Object vel = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
             T.opt_velocity.raw.set(getRaw(), vel);
         } else {
             T.opt_xVel.setDouble(getRaw(), x);
