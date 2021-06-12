@@ -50,14 +50,14 @@ public class Conversion {
     public static final InputConverter<Boolean> toBool = getConverterTo(boolean.class);
     public static final InputConverter<Character> toChar = getConverterTo(char.class);
     // Handles
-    public static final InputConverter<Object> toEntityHandle = getConverterToHandle("net.minecraft.server.Entity");
+    public static final InputConverter<Object> toEntityHandle = getConverterToHandle("net.minecraft.world.entity.Entity");
     public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.EntityPlayer");
     public static final InputConverter<Object> toWorldHandle = getConverterToHandle("net.minecraft.server.World");
     public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.server.Chunk");
     public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.server.ItemStack");
     public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.server.Item");
     public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.server.TileEntity");
-    public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.server.IInventory");
+    public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.world.IInventory");
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.server.DataWatcher");
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.server.DataWatcherObject");
     public static final InputConverter<Object> toDataWatcherItemHandle = getConverterToHandle("net.minecraft.server.DataWatcher.Item");
@@ -65,11 +65,11 @@ public class Conversion {
     public static final InputConverter<Object> toBlockHandle = getConverterToHandle("net.minecraft.server.Block");
     public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.server.EnumGamemode");
     public static final InputConverter<Object> toWorldTypeHandle = getConverterToHandle("net.minecraft.server.WorldType");
-    public static final InputConverter<Object> toDifficultyHandle = getConverterToHandle("net.minecraft.server.EnumDifficulty");
+    public static final InputConverter<Object> toDifficultyHandle = getConverterToHandle("net.minecraft.world.EnumDifficulty");
     public static final InputConverter<Object> toPacketHandle = getConverterToHandle("net.minecraft.server.Packet");
     public static final InputConverter<Object> toVec3DHandle = getConverterToHandle("net.minecraft.server.Vec3D");
     public static final InputConverter<Object> toChunkCoordIntPairHandle = getConverterToHandle("net.minecraft.server.ChunkCoordIntPair");
-    public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.server.BlockPosition");
+    public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.core.BlockPosition");
     public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.server.PlayerAbilities");
     public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
     public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("com.bergerkiller.bukkit.common.internal.LongHashSet");

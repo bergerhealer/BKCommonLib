@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -16,6 +17,7 @@ import org.bukkit.Bukkit;
 
 public class CraftBukkitServer extends CommonServerBase implements ClassPathResolver {
     private static final String CB_ROOT = "org.bukkit.craftbukkit";
+    private static final String NM_ROOT = "net.minecraft";
     private static final String NMS_ROOT = "net.minecraft.server";
 
     /**
@@ -38,6 +40,11 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
      * Defines the org.bukkit.craftbukkit.libs root path
      */
     public String CB_ROOT_LIBS;
+    /**
+     * Whether this is a Minecraft version before 1.17, where all net.minecraft classes
+     * were inside the net.minecraft.server package.
+     */
+    private boolean IS_LEGACY_MAPPINGS = false;
     /**
      * Defines class name remappings to perform right after the version info is included in the class path
      */
@@ -74,6 +81,55 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
 
     @Override
     public void postInit() {
+        MC_VERSION = identifyMinecraftVersion();
+        IS_LEGACY_MAPPINGS = MountiplexUtil.evaluateText(MC_VERSION, "<", "1.17");
+    }
+
+    @Override
+    public String resolveClassPath(String path) {
+        // Perform remappings first, so that they can be relocated
+        // to the right (versioned) package after. That way there is
+        // no need to track versions in the remapped paths.
+        path = this.remappings.getOrDefault(path, path);
+
+        // Remap org.bukkit.craftbukkit to the right package-versioned path
+        if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
+            path = CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
+        }
+
+        // Remap net.minecraft to net.minecraft.server.<package_version> on pre-1.17
+        // We cut the class name off the end. In case a class name is represented as
+        // 'SomeName.SubClass' then we will correctly identify 'SomeName' as the main class.
+        if (IS_LEGACY_MAPPINGS && path.startsWith(NM_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
+            int index = path.length();
+            String remapped = path;
+            boolean isLastPart = true;
+            do {
+                // Find earlier occurrence of a package-separator '.'
+                index = path.lastIndexOf('.', index - 1);
+                if (index == -1) {
+                    break;
+                }
+
+                // Check character following it is uppercase
+                // Ignore first occurrence (could be an obfuscated 'cz' class or something)
+                if (isLastPart) {
+                    isLastPart = false;
+                } else if (index < path.length() && !Character.isUpperCase(path.charAt(index + 1))) {
+                    break;
+                }
+
+                // Match
+                remapped = NMS_ROOT_VERSIONED + path.substring(index);
+            } while (true);
+
+            path = remapped;
+        }
+
+        return path;
+    }
+
+    private String identifyMinecraftVersion() throws VersionIdentificationFailureException {
         try {
             // Find getVersion() method using reflection
             Class<?> minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
@@ -89,11 +145,10 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
                 try {
                     java.lang.reflect.Method getServerMethod = getDeclaredMethod(server, "getServer");
                     minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
-                    MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
-                    return;
+                    return (String) getVersionMethod.invoke(minecraftServerInstance);
                 } catch (NoSuchMethodException ex) {}
 
-                throw new RuntimeException("Server version could not be identified");
+                throw new VersionIdentificationFailureException("Server has no MinecraftServer instance");
             }
 
             // If MinecraftVersion class exists, we can use the static a() method to retrieve it
@@ -109,41 +164,28 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
                     gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
                     Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
                 }
-                MC_VERSION = gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
+                return gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
 
             } catch (ClassNotFoundException | NoSuchMethodException ex) {
                 // No server instance is available, fastest way is to inspect the bytecode using ASM
                 // Creating an instance, even without calling constructors, takes a long while to initialize
-                MC_VERSION = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
+                String fromASM = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
+                if (fromASM != null) {
+                    return fromASM;
+                }
 
                 // Create an instance of Minecraft Server without calling any constructors
                 // This is a bit slower, but works as a reliable fallback
-                if (MC_VERSION == null) {
-                    Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
-                    ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
-                    Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
-                    MC_VERSION = (String) getVersionMethod.invoke(minecraftServerInstance);
-                }
+                Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
+                ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
+                return (String) getVersionMethod.invoke(minecraftServerInstance);
             }
+        } catch (VersionIdentificationFailureException e) {
+            throw e; // rethrow, don't wrap
         } catch (Throwable t) {
-            t.printStackTrace();
+            throw new VersionIdentificationFailureException(t);
         }
-    }
-
-    @Override
-    public String resolveClassPath(String path) {
-        if (path.startsWith(NMS_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
-            path = NMS_ROOT_VERSIONED + path.substring(NMS_ROOT.length());
-        } else if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
-            path = CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
-        }
-
-        String remapped = this.remappings.get(path);
-        if (remapped != null) {
-            path = remapped;
-        }
-
-        return path;
     }
 
     private Method getDeclaredMethod(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
@@ -198,5 +240,20 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
      */
     public void setEarlyRemappings(Map<String, String> remappings) {
         this.remappings = remappings;
+    }
+
+    /**
+     * Exception thrown when the minecraft version of the server could not be identified
+     */
+    public static final class VersionIdentificationFailureException extends RuntimeException {
+        private static final long serialVersionUID = -3513069083904231139L;
+
+        public VersionIdentificationFailureException(String reason) {
+            super("Failed to identify the Minecraft version of the server: " + reason);
+        }
+
+        public VersionIdentificationFailureException(Throwable cause) {
+            super("Failed to identify the Minecraft version of the server", cause);
+        }
     }
 }

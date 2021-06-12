@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
@@ -25,8 +25,8 @@ public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
         resolver.setDeclaredClassName("net.minecraft.server.Block");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         findBlockByNameMethod.init(new MethodDeclaration(resolver,
-                "public static Object findBlockByName(MinecraftKey minecraftKey) {\n" +
-                "    return Block.REGISTRY.get((Object)minecraftKey);\n" +
+                "public static Object findBlockByName(net.minecraft.resources.MinecraftKey minecraftKey) {\n" +
+                "    return Block.REGISTRY.get((Object)net.minecraft.resources.minecraftKey);\n" +
                 "}"));
         createLegacyBlockDataMethod.init(new MethodDeclaration(resolver,
                 "public static IBlockData createLegacyBlockData(Block block, int legacyData) {\n" +

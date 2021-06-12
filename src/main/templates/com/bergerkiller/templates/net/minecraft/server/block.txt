@@ -1,11 +1,14 @@
 package net.minecraft.server;
 
+import net.minecraft.world.entity.Entity;
+import net.minecraft.core.IRegistry;
+
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
 
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockAccessHandle
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle;
@@ -15,8 +18,8 @@ class Block {
 
     public static final Iterable<?> getRegistry() {
 #select version >=
-#case 1.14:   #require net.minecraft.server.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
-#case 1.13.1: #require net.minecraft.server.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
+#case 1.14:   #require net.minecraft.core.IRegistry public static final RegistryBlocks<Block> REGISTRY:BLOCK;
+#case 1.13.1: #require net.minecraft.core.IRegistry public static final IRegistry<Block> REGISTRY:BLOCK;
 #case else:   #require net.minecraft.server.Block public static final RegistryBlocks REGISTRY;
 #endselect
         return #REGISTRY;
@@ -292,7 +295,7 @@ class Block {
     #endif
 #else
     public float getDamageResillience() {
-        return instance.a((net.minecraft.server.Entity) null);
+        return instance.a((net.minecraft.world.entity.Entity) null);
     }
 #endif
 

@@ -1,5 +1,9 @@
 package net.minecraft.server;
 
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.EnumHand;
+
 import com.mojang.authlib.GameProfile;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -1143,7 +1147,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 // Since MC 1.9
 optional class PacketPlayOutCustomSoundEffect extends Packet {
 #if version >= 1.13
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) MinecraftKey sound:a;
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:a;
 #else
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
 #endif

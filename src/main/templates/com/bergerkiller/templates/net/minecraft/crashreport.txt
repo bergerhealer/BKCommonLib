@@ -1,0 +1,19 @@
+package net.minecraft;
+
+import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
+
+class CrashReport {
+    public static (CrashReportHandle) CrashReport create:a(Throwable throwable, String message);
+
+    public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:a(String message);
+}
+
+class CrashReportSystemDetails {
+
+}
+
+class ReportedException {
+    public (ReportedExceptionHandle) ReportedException((CrashReportHandle) CrashReport paramCrashReport);
+}

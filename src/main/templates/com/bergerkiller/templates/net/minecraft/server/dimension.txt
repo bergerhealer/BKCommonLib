@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.resources.MinecraftKey;
+
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 
 class DimensionManager {
@@ -82,7 +84,7 @@ class DimensionManager {
 #else
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         net.minecraft.server.ResourceKey category = (net.minecraft.server.ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();
-        net.minecraft.server.MinecraftKey name;
+        MinecraftKey name;
 
   #if version >= 1.13.1
         name = IRegistry.DIMENSION_TYPE.getKey((Object) instance);
@@ -92,11 +94,11 @@ class DimensionManager {
   #else
         // Is an enum here, with always only 3 possible values anyway
         if (instance == DimensionManager.NETHER) {
-            name = new net.minecraft.server.MinecraftKey("the_nether");
+            name = new MinecraftKey("the_nether");
         } else if (instance == DimensionManager.THE_END) {
-            name = new net.minecraft.server.MinecraftKey("the_end");
+            name = new MinecraftKey("the_end");
         } else {
-            name = new net.minecraft.server.MinecraftKey("overworld");
+            name = new MinecraftKey("overworld");
         }
   #endif
 
@@ -104,7 +106,7 @@ class DimensionManager {
     }
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
-        net.minecraft.server.MinecraftKey mc_key = (net.minecraft.server.MinecraftKey) key.name;
+        MinecraftKey mc_key = (MinecraftKey) key.name;
 
   #if version >= 1.13.1
         return (DimensionManager) IRegistry.DIMENSION_TYPE.get(mc_key);

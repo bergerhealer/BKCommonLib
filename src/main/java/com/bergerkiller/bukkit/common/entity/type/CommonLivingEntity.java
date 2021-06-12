@@ -10,8 +10,8 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
-import com.bergerkiller.generated.net.minecraft.server.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.GenericAttributesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 
 /**
  * A Common Entity implementation for Living Entities

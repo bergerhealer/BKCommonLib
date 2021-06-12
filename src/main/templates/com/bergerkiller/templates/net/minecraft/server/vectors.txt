@@ -1,49 +1,7 @@
 package net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
-
-class BaseBlockPosition {
-    public int getX();
-    public int getY();
-    public int getZ();
-
-    public boolean isPositionInBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax) {
-        int x = instance.getX();
-        int y = instance.getY();
-        int z = instance.getZ();
-        return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
-    }
-
-    public com.bergerkiller.bukkit.common.bases.IntVector3 toIntVector3() {
-        return new com.bergerkiller.bukkit.common.bases.IntVector3(instance.getX(), instance.getY(), instance.getZ());
-    }
-}
-
-class BlockPosition extends BaseBlockPosition {
-
-    public (BlockPositionHandle) BlockPosition(int x, int y, int z);
-
-    <code>
-    public static BlockPositionHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
-        return createHandle(fromIntVector3Raw(vector));
-    }
-
-    public static BlockPositionHandle fromBukkitBlock(org.bukkit.block.Block block) {
-        return createHandle(fromBukkitBlock(block));
-    }
-    </code>
-
-    public static Object fromIntVector3Raw(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
-        return new BlockPosition(vector.x, vector.y, vector.z);
-    }
-
-    public static Object fromBukkitBlockRaw(org.bukkit.block.Block block) {
-        return new BlockPosition(block.getX(), block.getY(), block.getZ());
-    }
-}
 
 class Vec3D {
 #if version >= 1.9
@@ -95,43 +53,5 @@ class ChunkCoordIntPair {
 
     public static Object fromIntVector2Raw(com.bergerkiller.bukkit.common.bases.IntVector2 vector) {
         return new ChunkCoordIntPair(vector.x, vector.z);
-    }
-}
-
-class Vector3f {
-    public float getX();
-    public float getY();
-    public float getZ();
-
-    public org.bukkit.util.Vector toBukkit() {
-        return new org.bukkit.util.Vector(instance.getX(), instance.getY(), instance.getZ());
-    }
-
-    public (Vector3fHandle) Vector3f(float x, float y, float z);
-
-    <code>
-    public static Vector3fHandle fromBukkit(org.bukkit.util.Vector vector) {
-        return createHandle(fromBukkitRaw(vector));
-    }
-    </code>
-
-    public static Object fromBukkitRaw(org.bukkit.util.Vector vector) {
-#if exists net.minecraft.server.Vector3f public static Vector3f createWithoutValidityChecks(float x, float y, float z);
-        // paper optimization
-        return net.minecraft.server.Vector3f.createWithoutValidityChecks((float)vector.getX(),
-                                                                         (float)vector.getY(),
-                                                                         (float)vector.getZ());
-#elseif version >= 1.12
-        Object v3 = com.bergerkiller.generated.net.minecraft.server.Vector3fHandle.T.newInstanceNull();
-        #require net.minecraft.server.Vector3f protected final float x;
-        #require net.minecraft.server.Vector3f protected final float y;
-        #require net.minecraft.server.Vector3f protected final float z;
-        v3#x = (float)vector.getX();
-        v3#y = (float)vector.getY();
-        v3#z = (float)vector.getZ();
-        return v3;
-#else
-        return new Vector3f((float) vector.getX(), (float) vector.getY(), (float) vector.getZ());
-#endif
     }
 }

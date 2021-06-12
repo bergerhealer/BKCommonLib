@@ -17,11 +17,11 @@ import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -48,19 +48,19 @@ public class TemplateTest {
 
             // NBT classes have been moved
             {
-                String prefix = "com.bergerkiller.generated.net.minecraft.server.NBTTag";
+                String prefix = "com.bergerkiller.generated.net.minecraft.nbt.NBTTag";
                 if (genClassPath.startsWith(prefix)
-                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle")
-                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle"))
+                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle")
+                        && !genClassPath.equals("com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle"))
                 {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle.NBTTag" + genClassPath.substring(prefix.length());
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTag" + genClassPath.substring(prefix.length());
                 }
             }
 
             // MC 1.8 class translation fixes
             {
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumAxisHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.core.EnumAxisHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.TileEntityMobSpawnerDataHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";

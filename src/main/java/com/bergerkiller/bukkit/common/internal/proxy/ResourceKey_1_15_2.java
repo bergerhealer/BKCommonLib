@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 /**
  * Used as net.minecraft.server.ResourceKey on 1.15.2 and earlier, before this class was introduced.

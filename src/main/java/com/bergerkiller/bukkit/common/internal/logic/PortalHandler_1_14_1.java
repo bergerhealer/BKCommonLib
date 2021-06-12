@@ -244,8 +244,8 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     // Use default entity if null, set it up properly
          *     if (initiator == null) {
          *         initiator = (Entity) dummyEntity;
-         *         #require net.minecraft.server.Entity private Vec3D loc;
-         *         #require net.minecraft.server.Entity private BlockPosition locBlock;
+         *         #require net.minecraft.world.entity.Entity private Vec3D loc;
+         *         #require net.minecraft.world.entity.Entity private BlockPosition locBlock;
          *         initiator#loc = new Vec3D((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
          *         initiator#locBlock = blockposition;
          *     }

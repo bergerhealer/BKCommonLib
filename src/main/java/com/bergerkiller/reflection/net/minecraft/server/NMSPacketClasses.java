@@ -45,9 +45,8 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
@@ -112,6 +111,7 @@ import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWindowItemsH
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
@@ -1564,7 +1564,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
         
-        public final FieldAccessor<Difficulty> difficulty = nextField("private EnumDifficulty a").translate(DuplexConversion.difficulty);
+        public final FieldAccessor<Difficulty> difficulty = nextField("private net.minecraft.world.EnumDifficulty a").translate(DuplexConversion.difficulty);
         public final FieldAccessor<Boolean> hardcore = nextFieldSignature("private boolean b");
     }
 

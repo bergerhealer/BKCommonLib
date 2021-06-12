@@ -1,0 +1,5 @@
+package net.minecraft.core;
+
+optional class NonNullList {
+    public static (List<?>) NonNullList<E> create:a();
+}

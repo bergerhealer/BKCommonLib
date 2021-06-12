@@ -1,6 +1,13 @@
 package net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
+import net.minecraft.server.MobSpawnerData;
+
+import net.minecraft.core.IRegistry;
+import net.minecraft.resources.MinecraftKey;
+import net.minecraft.world.EntityTypes;
+import net.minecraft.world.Entity;
+
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle;
 
 class MobSpawnerAbstract {

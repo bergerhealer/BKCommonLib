@@ -2,14 +2,14 @@ package org.bukkit.craftbukkit.entity;
 
 import org.bukkit.craftbukkit.CraftServer;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 class CraftEntity {
-    protected (EntityHandle) net.minecraft.server.Entity entityHandle:entity;
+    protected (EntityHandle) net.minecraft.world.entity.Entity entityHandle:entity;
 
-    public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (EntityHandle) net.minecraft.server.Entity entity);
+    public static (org.bukkit.entity.Entity) CraftEntity createCraftEntity:getEntity((org.bukkit.Server) CraftServer server, (EntityHandle) net.minecraft.world.entity.Entity entity);
 
-    public void setHandle((EntityHandle) net.minecraft.server.Entity entity)
+    public void setHandle((EntityHandle) net.minecraft.world.entity.Entity entity)
 
-    public (Object) net.minecraft.server.Entity getHandle();
+    public (Object) net.minecraft.world.entity.Entity getHandle();
 }

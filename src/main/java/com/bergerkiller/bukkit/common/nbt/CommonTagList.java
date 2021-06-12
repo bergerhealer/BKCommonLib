@@ -5,8 +5,8 @@ import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
-import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingIterator;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingListIterator;
 

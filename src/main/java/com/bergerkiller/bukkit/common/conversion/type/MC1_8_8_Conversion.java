@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 /**

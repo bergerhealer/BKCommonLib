@@ -13,8 +13,8 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
-import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
 
 public class NBTTest {
 

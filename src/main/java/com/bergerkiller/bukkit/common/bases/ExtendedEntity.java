@@ -40,12 +40,12 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftSoundHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
@@ -240,7 +240,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      */
     protected T entity;
     /**
-     * A reference to the internal net.minecraft.server.Entity (or its extension)
+     * A reference to the internal net.minecraft.world.entity.Entity (or its extension)
      */
     protected EntityHandle handle = EntityHandle.T.createHandle(null, true);
 

@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
-import com.bergerkiller.generated.net.minecraft.server.IRegistryHandle;
+import com.bergerkiller.generated.net.minecraft.core.IRegistryHandle;
 
 /**
  * A type of Window (Menu UI) in Minecraft

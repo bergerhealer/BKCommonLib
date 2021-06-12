@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 @Deprecated

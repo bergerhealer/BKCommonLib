@@ -16,7 +16,7 @@ class IRecipe {
         if (instance instanceof RecipeFireworks) {
             // Special case (see getIngredients code)
             net.minecraft.server.ItemStack itemstack = new ItemStack(net.minecraft.server.Items.FIREWORK_ROCKET, 3);
-            net.minecraft.server.NBTTagCompound nbttagcompound = itemstack.a("Fireworks");
+            net.minecraft.nbt.NBTTagCompound nbttagcompound = itemstack.a("Fireworks");
             nbttagcompound.setByte("Flight", (byte) 3);
             return itemstack;
         } else {

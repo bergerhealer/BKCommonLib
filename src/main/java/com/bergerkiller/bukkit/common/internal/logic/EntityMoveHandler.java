@@ -21,20 +21,20 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
+import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
+import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockCobbleWallHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockFenceGateHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockFenceHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlocksHandle;
-import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
-import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 /**
  * Handles the full Entity move() physics function. It should be kept completely in sync with what is used on the server,

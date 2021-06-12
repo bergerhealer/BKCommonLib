@@ -1,0 +1,1429 @@
+package net.minecraft.world.entity;
+
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.EnumHand;
+
+import org.bukkit.craftbukkit.entity.CraftEntity;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+
+import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+
+class Entity {
+#if version >= 1.9
+    protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
+#endif
+
+optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
+
+#if version >= 1.14
+    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:entityCount;
+    private static optional int opt_int_entityCount:###;
+#else
+    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:###;
+    private static optional int opt_int_entityCount:entityCount;
+#endif
+
+    private int idField:id;
+
+#if version >= 1.14
+    public boolean preventBlockPlace:i;
+#elseif version >= 1.13
+    public boolean preventBlockPlace:j;
+#elseif version >= 1.9
+    public boolean preventBlockPlace:i;
+#else
+    public boolean preventBlockPlace:k;
+#endif
+
+    /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
+#if version >= 1.14
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:###;
+    protected unknown int j;
+#elseif version >= 1.13
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:###;
+    protected unknown int k;
+#elseif version >= 1.9
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
+    public optional (EntityHandle) Entity opt_passenger:###;
+    protected unknown int j;
+#else
+    public optional final (List<EntityHandle>) List<Entity> opt_passengers:###;
+    public optional (EntityHandle) Entity opt_passenger:passenger;
+#endif
+
+#select version >=
+#case 1.13.1: private (EntityHandle) Entity vehicle:vehicle;
+#case 1.13:   private (EntityHandle) Entity vehicle:ax;
+#case 1.10.2: private (EntityHandle) Entity vehicle:au;
+#case 1.9.4:  private (EntityHandle) Entity vehicle:at;
+#case 1.9:    private (EntityHandle) Entity vehicle:as;
+#case else:   private (EntityHandle) Entity vehicle;
+#endselect
+
+    <code>
+    public List<EntityHandle> getPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
+            if (passengers == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return passengers;
+            }
+        } else {
+            EntityHandle passenger = T.opt_passenger.get(getRaw());
+            if (passenger == null) {
+                return java.util.Collections.emptyList();
+            } else {
+                return java.util.Arrays.asList(passenger);
+            }
+        }
+    }
+
+    public boolean hasPassengers() {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
+            return passengers != null && passengers.size() > 0;
+        } else {
+            return T.opt_passenger.get(getRaw()) != null;
+        }
+    }
+
+    public void setPassengers(List<EntityHandle> passengers) {
+        if (T.opt_passengers.isAvailable()) {
+            List<EntityHandle> entity_passengers = T.opt_passengers.get(getRaw());
+            if (entity_passengers == null) {
+                T.opt_passengers.set(getRaw(), passengers);
+            } else {
+                entity_passengers.clear();
+                entity_passengers.addAll(passengers);
+            }
+        } else if (passengers.size() == 0) {
+            T.opt_passenger.set(getRaw(), null);
+        } else {
+            T.opt_passenger.set(getRaw(), passengers.get(0));
+        }
+    }
+    </code>
+    /* ====== END OF PASSENGER AND VEHICLE LOGIC ====== */
+
+    public boolean ignoreChunkCheck:attachedToPlayer;
+    public double lastX;
+    public double lastY;
+    public double lastZ;
+
+#if version >= 1.15
+    // locX/Y/Z fields became private on 1.15
+    public double getLocX:locX();
+    public double getLocY:locY();
+    public double getLocZ:locZ();
+
+  #if version >= 1.16
+    // Since 1.16 they got merged into a 'Vec3D loc' field
+    // It is better and safer to just call setPositionRaw
+    public void setLocX(double x) {
+        instance.setPositionRaw(x, instance.locY(), instance.locZ());
+    }
+
+    public void setLocY(double y) {
+        instance.setPositionRaw(instance.locX(), y, instance.locZ());
+    }
+
+    public void setLocZ(double z) {
+        instance.setPositionRaw(instance.locX(), instance.locY(), z);
+    }
+  #else
+    // We can use reflection to set the individual fields efficiently
+    public void setLocX(double x) {
+        #require net.minecraft.world.entity.Entity private double locX;
+        instance#locX = x;
+    }
+
+    public void setLocY(double y) {
+        #require net.minecraft.world.entity.Entity private double locY;
+        instance#locY = y;
+    }
+
+    public void setLocZ(double z) {
+        #require net.minecraft.world.entity.Entity private double locZ;
+        instance#locZ = z;
+    }
+  #endif
+
+    public void setLoc:setPositionRaw(double x, double y, double z);
+#else
+    public double getLocX() { return instance.locX; }
+    public double getLocY() { return instance.locY; }
+    public double getLocZ() { return instance.locZ; }
+
+    public void setLocX(double x) { instance.locX = x; }
+    public void setLocY(double y) { instance.locY = y; }
+    public void setLocZ(double z) { instance.locZ = z; }
+
+    public void setLoc(double x, double y, double z) {
+        instance.locX = x;
+        instance.locY = y;
+        instance.locZ = z;
+    }
+#endif
+
+    public (WorldHandle) World getWorld() {
+        return instance.world;
+    }
+
+    <code>
+    public com.bergerkiller.generated.net.minecraft.server.WorldServerHandle getWorldServer() {
+        return com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    }
+    </code>
+
+    public void setWorld((WorldHandle) World world) {
+        instance.world = world;
+#if version < 1.16
+        if (world != null) {
+  #if version >= 1.13.1
+            instance.dimension = world.worldProvider.getDimensionManager();
+  #elseif version >= 1.9
+            instance.dimension = world.worldProvider.getDimensionManager().getDimensionID();
+  #else
+            instance.dimension = world.worldProvider.getDimension();
+  #endif
+        } else {
+  #if version >= 1.13.1
+            instance.dimension = null;
+  #else
+            instance.dimension = 0;
+  #endif
+        }
+#endif
+    }
+
+#if version >= 1.15
+    public boolean isLastAndCurrentPositionDifferent() {
+        return instance.locX() != instance.lastX || instance.locY() != instance.lastY || instance.locZ() != instance.lastZ ||
+               instance.yaw != instance.lastYaw || instance.pitch != instance.lastPitch;
+    }
+#else
+    public boolean isLastAndCurrentPositionDifferent() {
+        return instance.locX != instance.lastX || instance.locY != instance.lastY || instance.locZ != instance.lastZ ||
+               instance.yaw != instance.lastYaw || instance.pitch != instance.lastPitch;
+    }
+#endif
+
+    // motX/Y/Z is private 'mot' field on 1.14
+    // For performance reasons, use the getMot/setMot methods
+    // Reflection to access the private mot Vec3D is likely slower.
+#if version >= 1.14
+    public org.bukkit.util.Vector getMot() {
+        Vec3D mot = instance.getMot();
+        return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
+    }
+
+    public void setMotVector(org.bukkit.util.Vector mot) {
+        instance.setMot(new Vec3D(mot.getX(), mot.getY(), mot.getZ()));
+    }
+
+    public void setMot(double x, double y, double z) {
+        instance.setMot(new Vec3D(x, y, z));
+    }
+
+    public void fixMotNaN() {
+        Vec3D mot = instance.getMot();
+        if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
+            double x = mot.x;
+            double y = mot.y;
+            double z = mot.z;
+            if (Double.isNaN(x)) x = 0.0;
+            if (Double.isNaN(y)) y = 0.0;
+            if (Double.isNaN(z)) z = 0.0;
+            instance.setMot(new Vec3D(x, y, z));
+        }
+    }
+
+    public void setMotX(double x) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(x, mot.y, mot.z));
+    }
+
+    public void setMotY(double y) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(mot.x, y, mot.z));
+    }
+
+    public void setMotZ(double z) {
+        Vec3D mot = instance.getMot();
+        instance.setMot(new Vec3D(mot.x, mot.y, z));
+    }
+
+    public double getMotX() {
+        return instance.getMot().x;
+    }
+
+    public double getMotY() {
+        return instance.getMot().y;
+    }
+
+    public double getMotZ() {
+        return instance.getMot().z;
+    }
+#else
+    public org.bukkit.util.Vector getMot() {
+        return new org.bukkit.util.Vector(instance.motX, instance.motY, instance.motZ);
+    }
+
+    public void setMotVector(org.bukkit.util.Vector mot) {
+        instance.motX = mot.getX();
+        instance.motY = mot.getY();
+        instance.motZ = mot.getZ();
+    }
+
+    public void setMot(double x, double y, double z) {
+        instance.motX = x;
+        instance.motY = y;
+        instance.motZ = z;
+    }
+
+    public void fixMotNaN() {
+        if (Double.isNaN(instance.motX)) {
+            instance.motX = 0.0;
+        }
+        if (Double.isNaN(instance.motY)) {
+            instance.motY = 0.0;
+        }
+        if (Double.isNaN(instance.motZ)) {
+            instance.motZ = 0.0;
+        }
+    }
+
+    public void setMotX(double x) {
+        instance.motX = x;
+    }
+
+    public void setMotY(double y) {
+        instance.motY = y;
+    }
+
+    public void setMotZ(double z) {
+        instance.motZ = z;
+    }
+
+    public double getMotX() {
+        return instance.motX;
+    }
+
+    public double getMotY() {
+        return instance.motY;
+    }
+
+    public double getMotZ() {
+        return instance.motZ;
+    }
+#endif
+
+    public float yaw;
+    public float pitch;
+    public float lastYaw;
+    public float lastPitch;
+    private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
+
+#if version >= 1.16
+    protected boolean onGround;
+#else
+    public boolean onGround;
+#endif
+
+    public readonly boolean horizontalMovementBlocked:positionChanged;
+
+#if version >= 1.16
+    public readonly boolean verticalMovementBlocked:v;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.v = blocked;
+    }
+#elseif version >= 1.15
+    public readonly boolean verticalMovementBlocked:v;
+    public unknown boolean movementBlocked:w;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.w = instance.positionChanged || instance.v;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.v = blocked;
+        instance.w = instance.positionChanged || instance.v;
+    }
+#elseif version >= 1.14
+    public readonly boolean verticalMovementBlocked:y;
+    public unknown boolean movementBlocked:z;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.z = instance.positionChanged || instance.y;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.y = blocked;
+        instance.z = instance.positionChanged || instance.y;
+    }
+#elseif version >= 1.13
+    public readonly boolean verticalMovementBlocked:C;
+    public unknown boolean movementBlocked:D;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.D = instance.positionChanged || instance.C;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.C = blocked;
+        instance.D = instance.positionChanged || instance.C;
+    }
+#elseif version >= 1.9
+    public readonly boolean verticalMovementBlocked:B;
+    public unknown boolean movementBlocked:C;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.C = instance.positionChanged || instance.B;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.B = blocked;
+        instance.C = instance.positionChanged || instance.B;
+    }
+#else
+    public readonly boolean verticalMovementBlocked:E;
+    public unknown boolean movementBlocked:F;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.positionChanged = blocked;
+        instance.F = instance.positionChanged || instance.E;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.E = blocked;
+        instance.F = instance.positionChanged || instance.E;
+    }
+#endif
+
+    public boolean velocityChanged;
+
+#if version >= 1.14
+    // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
+    // If this is greater than 1.0E-7D then the factor should be applied
+  #if version >= 1.16
+    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:x;
+  #elseif version >= 1.15
+    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:y;
+  #else
+    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:B;
+  #endif
+
+    public boolean isCollidingWithBlock() {
+        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        return multiplier.g() > 1.0E-7;
+    }
+
+    public org.bukkit.util.Vector getBlockCollisionMultiplier() {
+        Vec3D multiplier = instance#collidingWithBlockMultiplier;
+        return new org.bukkit.util.Vector(multiplier.x, multiplier.y, multiplier.z);
+    }
+
+    public void setNotCollidingWithBlock() {
+  #if version >= 1.16.3
+        instance#collidingWithBlockMultiplier = Vec3D.ORIGIN;
+  #else
+        instance#collidingWithBlockMultiplier = Vec3D.a;
+  #endif
+    }
+#else
+    // On Minecraft 1.13.2 and before, there was only a 'collidingWithBlock' property
+    // This always has the effect of slowing down the entity with factor 0.25/0.05/0.25
+  #if version >= 1.13
+    #require net.minecraft.world.entity.Entity protected boolean collidingWithBlock:F;
+  #elseif version >= 1.9
+    #require net.minecraft.world.entity.Entity protected boolean collidingWithBlock:E;
+  #else
+    #require net.minecraft.world.entity.Entity protected boolean collidingWithBlock:H;
+  #endif
+
+    public boolean isCollidingWithBlock() {
+        return instance#collidingWithBlock;
+    }
+
+    public org.bukkit.util.Vector getBlockCollisionMultiplier() {
+        boolean colliding = instance#collidingWithBlock;
+        if (colliding) {
+            return new org.bukkit.util.Vector(0.25, 0.05, 0.25);
+        } else {
+            return new org.bukkit.util.Vector(0.0, 0.0, 0.0);
+        }
+    }
+
+    public void setNotCollidingWithBlock() {
+        instance#collidingWithBlock = false;
+    }
+#endif
+
+    // Seems unused.
+    // #if version >= 1.13
+    //     private unknown boolean outsideWorldBorderField:az;
+    // #elseif version >= 1.10.2
+    //     private unknown boolean outsideWorldBorderField:aw;
+    // #elseif version >= 1.9.4
+    //     private unknown boolean outsideWorldBorderField:av;
+    // #elseif version >= 1.9
+    //     private unknown boolean outsideWorldBorderField:au;
+    // #else
+    //     private unknown boolean outsideWorldBorderField:g;
+    // #endif
+
+    public boolean dead;
+
+#if version >= 1.14
+    public float getWidth();
+    public float getHeight();
+#else
+    public unknown float width;
+    public unknown float length;
+
+    public float getWidth() {
+        return instance.width;
+    }
+
+    public float getHeight() {
+        return instance.length;
+    }
+#endif
+
+#select version >=
+#case 1.16
+    public unknown float z;
+    public float walkedDistanceXZ:A;
+    public float walkedDistanceXYZ:B;
+#case 1.15
+    public unknown float A;
+    public float walkedDistanceXZ:B;
+    public float walkedDistanceXYZ:C;
+#case 1.14
+    public unknown float D;
+    public float walkedDistanceXZ:E;
+    public float walkedDistanceXYZ:F;
+#case 1.13
+    public unknown float J;
+    public float walkedDistanceXZ:K;
+    public float walkedDistanceXYZ:L;
+#case 1.9
+    public unknown float I;
+    public float walkedDistanceXZ:J;
+    public float walkedDistanceXYZ:K;
+#case else
+    public unknown float L;
+    public float walkedDistanceXZ:M;
+    public float walkedDistanceXYZ:N;
+#endselect
+
+    public float fallDistance;
+
+#select version >=
+#case 1.16.2: #require net.minecraft.world.entity.Entity private float stepCounter:am;
+#case 1.16:   #require net.minecraft.world.entity.Entity private float stepCounter:at;
+#case 1.14:   #require net.minecraft.world.entity.Entity private float stepCounter:av;
+#case 1.13:   #require net.minecraft.world.entity.Entity private float stepCounter:aA;
+#case 1.10.2: #require net.minecraft.world.entity.Entity private int stepCounter:ax;
+#case 1.9.4:  #require net.minecraft.world.entity.Entity private int stepCounter:aw;
+#case 1.9:    #require net.minecraft.world.entity.Entity private int stepCounter:av;
+#case else:   #require net.minecraft.world.entity.Entity private int stepCounter:h;
+#endselect
+
+    public void setStepCounter(float value) {
+#if version >= 1.13
+        instance#stepCounter = value;
+#else
+        instance#stepCounter = (int)value;
+#endif
+    }
+
+    public float getStepCounter() {
+        return (float) instance#stepCounter;
+    }
+
+#select version >=
+#case 1.16:  public float heightOffset:G;
+#case 1.15:  public float heightOffset:H;
+#case 1.14:  public float heightOffset:K;
+#case 1.13:  public float heightOffset:Q;
+#case 1.9:   public float heightOffset:P;
+#case else:  public float heightOffset:S;
+#endselect
+
+#if version >= 1.8.3
+    public boolean noclip;
+#else
+    public boolean noclip:T;
+#endif
+
+    protected Random random;
+    public int ticksLived;
+    public optional int field_maxFireTicks:maxFireTicks;
+    public int fireTicks;
+    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
+
+#if version >= 1.16.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aq;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ar;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:as;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:at;
+
+#elseif version >= 1.16
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:ax;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:ay;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:az;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aA;
+
+#elseif version >= 1.14
+  #if version >= 1.15
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:T;
+  #else
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:W;
+  #endif
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:az;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aC;
+
+    // TODO: New Pose datawatcher entry since 1.14
+    // protected static final DataWatcherObject<EntityPose> X = DataWatcher.a(Entity.class, DataWatcherRegistry.s);
+
+#elseif version >= 1.9
+    /* === MC 1.9 and onwards has constants like these for datawatcher keys === */
+    #select version >=
+    #case 1.13:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ac;
+    #case 1.11:   protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:Z;
+    #case 1.10.2: protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:aa;
+    #case 1.9.4:  private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ay;
+    #case else:   private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:ax;
+    #endselect
+    #if version >= 1.13
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aD;
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aE;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aF;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aG;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aH;
+    #elseif version >= 1.12
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:aA;
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aD;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aE;
+    #elseif version >= 1.10.2
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:aD;
+    #elseif version >= 1.9.4
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:az;
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aC;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+    #else
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:ay;
+        private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:az;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:aA;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:aB;
+        private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+    #endif
+#else
+    /* === MC 1.8.8: These constants do not exist == */
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:###;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
+#endif
+    <code>
+    public static final DataWatcher.Key<Byte> DATA_FLAGS = DataWatcher.Key.Type.BYTE.createKey(T.DATA_FLAGS, 0);
+    public static final DataWatcher.Key<Integer> DATA_AIR_TICKS = DataWatcher.Key.Type.INTEGER.createKey(T.DATA_AIR_TICKS, 1);
+    public static final DataWatcher.Key<ChatText> DATA_CUSTOM_NAME;
+    static {
+        if (com.bergerkiller.bukkit.common.Common.evaluateMCVersion(">=", "1.13")) {
+            DATA_CUSTOM_NAME = DataWatcher.Key.Type.CHAT_TEXT.createKey(T.DATA_CUSTOM_NAME, 2);
+        } else {
+            DATA_CUSTOM_NAME = DataWatcher.Key.Type.STRING.translate(ChatText.class).createKey(T.DATA_CUSTOM_NAME, 2);
+        }
+    }
+    public static final DataWatcher.Key<Boolean> DATA_CUSTOM_NAME_VISIBLE = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_CUSTOM_NAME_VISIBLE, 3);
+    public static final DataWatcher.Key<Boolean> DATA_SILENT = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_SILENT, 4);
+    public static final DataWatcher.Key<Boolean> DATA_NO_GRAVITY = DataWatcher.Key.Type.BOOLEAN.createKey(T.DATA_NO_GRAVITY, -1);
+
+    public static final int DATA_FLAG_ON_FIRE = (1 << 0);
+    public static final int DATA_FLAG_SNEAKING = (1 << 1);
+    public static final int DATA_FLAG_UNKNOWN1 = (1 << 2);
+    public static final int DATA_FLAG_SPRINTING = (1 << 3);
+    public static final int DATA_FLAG_UNKNOWN2 = (1 << 4);
+    public static final int DATA_FLAG_INVISIBLE = (1 << 5);
+    public static final int DATA_FLAG_GLOWING = (1 << 6);
+    public static final int DATA_FLAG_FLYING = (1 << 7);
+    </code>
+
+#if version >= 1.13
+    public boolean isLoaded:inChunk;
+  #if fieldexists net.minecraft.world.entity.Entity public int chunkX
+      public optional int chunkX;
+      public optional int chunkY;
+      public optional int chunkZ;
+  #else
+      public optional int chunkX:ae;
+      public optional int chunkY:af;
+      public optional int chunkZ:ag;
+  #endif
+    public boolean positionChanged:impulse;
+#elseif version >= 1.11
+    public boolean isLoaded:aa;
+    public optional int chunkX:ab;
+    public optional int chunkY:ac;
+    public optional int chunkZ:ad;
+    public unknown boolean ah;
+    public boolean positionChanged:impulse;
+#elseif version >= 1.10.2
+    public boolean isLoaded:ab;
+    public optional int chunkX:ac;
+    public optional int chunkY:ad;
+    public optional int chunkZ:ae;
+    public unknown boolean ai;
+    public boolean positionChanged:impulse;
+#elseif version >= 1.9
+    public boolean isLoaded:aa;
+    public optional int chunkX:ab;
+    public optional int chunkY:ac;
+    public optional int chunkZ:ad;
+    public unknown boolean ah;
+    public boolean positionChanged:impulse;
+#elseif version >= 1.8.3
+    private unknown double ar;
+    private unknown double as;
+    public boolean isLoaded:ad;
+    public optional int chunkX:ae;
+    public optional int chunkY:af;
+    public optional int chunkZ:ag;
+    public unknown boolean ah;
+    public boolean positionChanged:ai;
+#else
+    private unknown double ap;
+    private unknown double aq;
+    public boolean isLoaded:ad;
+    public optional int chunkX:ae;
+    public optional int chunkY:af;
+    public optional int chunkZ:ag;
+    public unknown boolean ah;
+    public boolean positionChanged:ai;
+#endif
+
+#if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.server.Chunk chunk);
+    public void setChunkX(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
+    }
+    public void setChunkY(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
+    }
+    public void setChunkZ(int value) {
+        instance.setCurrentChunk(null);
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
+    }
+#else
+    public void setChunkX(int value) {
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
+    }
+    public void setChunkY(int value) {
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
+    }
+    public void setChunkZ(int value) {
+        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
+    }
+#endif
+
+    <code>
+    public int getChunkX() {
+        return T.chunkX.getInteger(getRaw());
+    }
+    public int getChunkY() {
+        return T.chunkY.getInteger(getRaw());
+    }
+    public int getChunkZ() {
+        return T.chunkZ.getInteger(getRaw());
+    }
+    </code>
+
+#if exists net.minecraft.world.entity.Entity public net.minecraft.server.Chunk getCurrentChunk();
+    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+#elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        if (!instance.inChunk) {
+            return null;
+        }
+  #if version >= 1.16
+        return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+  #elseif exists net.minecraft.server.World public Chunk getChunkIfLoaded(int x, int z);
+        return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+  #else
+        return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
+  #endif
+    }
+#else
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        if (!com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.isLoaded.getBoolean(instance)) {
+            return null;
+        }
+        int chunkX = com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.getInteger(instance);
+        int chunkZ = com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.getInteger(instance);
+        return instance.world.getChunkIfLoaded(chunkX, chunkZ);
+    }
+#endif
+
+    public int portalCooldown;
+
+#select version >=
+#case 1.16:   protected boolean allowTeleportation:inPortal;
+#case 1.15:   protected boolean allowTeleportation:af;
+#case 1.14:   protected boolean allowTeleportation:ai;
+#case 1.13:   protected boolean allowTeleportation:an;
+#case 1.11:   protected boolean allowTeleportation:ak;
+#case 1.10.2: protected boolean allowTeleportation:al;
+#case else:   protected boolean allowTeleportation:ak;
+#endselect
+
+#if version >= 1.16.2
+    optional private final double[] move_SomeArray:aA;
+    optional private long move_SomeState:aB;
+#elseif version >= 1.16
+    optional private final double[] move_SomeArray:aF;
+    optional private long move_SomeState:aG;
+#elseif version >= 1.14
+    optional private final double[] move_SomeArray:aG;
+    optional private long move_SomeState:aH;
+#elseif version >= 1.13
+    optional private final double[] move_SomeArray:aL;
+    optional private long move_SomeState:aM;
+#elseif version >= 1.12
+    optional private final double[] move_SomeArray:aJ;
+    optional private long move_SomeState:aK;
+#elseif version >= 1.11.2
+    optional private double[] move_SomeArray:aI;
+    optional private long move_SomeState:aJ;
+#else
+    optional private double[] move_SomeArray:###;
+    optional private long move_SomeState:###;
+#endif
+
+    public boolean valid;
+
+// For some reason was down here on 1.8.8 and earlier
+#if version <= 1.8.8
+    protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
+#endif
+
+    /*
+     # protected void ##METHODNAME##(BlockPosition blockposition, Block block) {
+     *     SoundEffectType soundeffecttype = block.getStepSound();
+     *     if (this.world.getType(blockposition.up()).getBlock() == Blocks.SNOW_LAYER) {
+     *         soundeffecttype = Blocks.SNOW_LAYER.getStepSound();
+     *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     } else if (!block.getBlockData().getMaterial().isLiquid()) {
+     *         this.a(soundeffecttype.d(), soundeffecttype.a() * 0.15F, soundeffecttype.b());
+     *     }
+     * }
+     */
+#if version >= 1.16.2
+    protected void playStepSound:b((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+#elseif version >= 1.13
+    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+#else
+    protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) Block blockData);
+#endif
+
+    /*
+     # protected void ##METHODNAME##(float f, float f1) {
+     *     // CraftBukkit start - yaw was sometimes set to NaN, so we need to set it back to 0
+     *     if (Float.isNaN(f)) {
+     *         f = 0;
+     *     }
+     *     if (f == Float.POSITIVE_INFINITY || f == Float.NEGATIVE_INFINITY) {
+     *         if (this instanceof EntityPlayer) {
+     *             this.world.getServer().getLogger().warning(this.getName() + " was caught trying to crash the server with an invalid yaw");
+     *             ((CraftPlayer) this.getBukkitEntity()).kickPlayer("Infinite yaw (Hacking?)"); //Spigot "Nope" -> Descriptive reason
+     *         }
+     *         f = 0;
+     *     }
+     *     ...
+     * }
+     */
+#if exists net.minecraft.world.entity.Entity public void setYawPitch(float yaw, float pitch);
+    public void setRotation:setYawPitch(float yaw, float pitch);
+#else
+    protected void setRotation:setYawPitch(float yaw, float pitch);
+#endif
+
+    /*
+     # protected void ##METHODNAME##(float i) { // CraftBukkit - int -> float
+     *     if (!this.fireProof) {
+     *         this.damageEntity(DamageSource.FIRE, (float) i);
+     *     }
+     * }
+     */
+#if exists net.minecraft.world.entity.Entity public void burn(float dmg);
+    public void burn(float dmg);
+#elseif forge
+    public void burn(float dmg) {
+        #require net.minecraft.world.entity.Entity protected void burn(int dmg);
+        instance#burn((int)dmg);
+    }
+#elseif version >= 1.16
+    public void burn(float dmg) {
+        if (!instance.isFireProof()) {
+            instance.damageEntity(DamageSource.FIRE, dmg);
+        }
+    }
+#else
+    protected void burn(float dmg);
+#endif
+
+#if version >= 1.13
+    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+        return instance.a(new ItemStack(material, amount), force);
+    }
+#else
+    public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
+#endif
+
+    public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
+
+    /*
+     * void move(...) {
+     *     ...
+     #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+     * }
+     */
+#if version >= 1.14
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSoundSwim();
+#elseif version >= 1.13
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ad();
+#elseif version >= 1.12
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ae();
+#elseif version >= 1.9
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:aa();
+#else
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String getSwimSound:P();
+#endif
+
+    /*
+     * void move(...) {
+     *     ...
+     *     this.##METHODNAME##(this.aa(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
+     * }
+     * 
+     # public void ##METHODNAME##(SoundEffect soundeffect, float f, float f1) {
+     *     if (!this.isSilent()) {
+     *         this.world.a((EntityHuman) null, this.locX, this.locY, this.locZ, soundeffect, this.bC(), f, f1);
+     *     }
+     * }
+     */
+#if version >= 1.16
+    public void makeSound:playSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
+#elseif version >= 1.9
+    public void makeSound:a((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect soundeffect, float volume, float pitch);
+#else
+    public void makeSound:makeSound((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String soundeffect, float volume, float pitch);
+#endif
+
+    // Note: counts rain too as being wet!
+#select version >=
+#case 1.16.4: public boolean isWet:aG();
+#case 1.16.2: public boolean isWet:aF();
+#case 1.16:   public boolean isWet:aC();
+#case 1.15:   public boolean isWet:ay();
+#case 1.14.3: public boolean isWet:au();
+#case 1.14:   public boolean isWet:at();
+#case 1.13:   public boolean isWet:ap();
+#case 1.12:   public boolean isWet:an();
+#case 1.10.2: public boolean isWet:ai();
+#case 1.9.4:  public boolean isWet:ah();
+#case 1.9:    public boolean isWet:ah();
+#case else:   public boolean isWet:U();
+#endselect
+
+    /*
+     # public boolean ###METHODNAME###() {
+     *     if (this.world.a(this.boundingBox.grow(0.0D, -0.4000000059604645D, 0.0D).shrink(0.001D, 0.001D, 0.001D), Material.WATER, this)) {
+     *         if (!this.inWater && !this.justCreated) {
+     *             ...
+     *         }
+     *     }
+     * }
+     */
+    // Note: checks just standing in water! Rain does not count.
+#select version >=
+#case 1.16.4: public boolean isInWaterUpdate:aH();
+#case 1.16.2: public boolean isInWaterUpdate:aG();
+#case 1.16:   public boolean isInWaterUpdate:aD();
+#case 1.15:   public boolean isInWaterUpdate:az();
+#case 1.14:   public boolean isInWaterUpdate:au();
+#case 1.12:   public boolean isInWaterUpdate:aq();
+#case 1.10.2: public boolean isInWaterUpdate:ak();
+#case 1.9:    public boolean isInWaterUpdate:aj();
+#case else:   public boolean isInWaterUpdate:W();
+#endselect
+
+    /*
+     # public boolean ###METHODNAME###() {
+     *     return this.inWater;
+     * }
+     */
+#if version >= 1.9
+    public boolean isInWater();
+#else
+    public boolean isInWater:V();
+#endif
+
+    /*
+     * public void move(double d0, double d1, double d2) {
+     *     ....
+     *     {
+     *         if (bl.getType() != org.bukkit.Material.AIR) {
+     *             VehicleBlockCollisionEvent event = new VehicleBlockCollisionEvent(vehicle, bl);
+     *             world.getServer().getPluginManager().callEvent(event);
+     *         }
+     *     }
+     *     
+     *     // CraftBukkit end
+     *
+     #     if (this.###METHODNAME###() && (!this.onGround || !this.isSneaking() || !(this instanceof EntityHuman)) && !this.isPassenger()) {
+     *         double d22 = this.locX - d4;
+     *         double d23 = this.locY - d5;
+     *         ...
+     *     }
+     * }
+     */
+#if version >= 1.9
+    protected boolean hasMovementSound:playStepSound();
+#elseif version >= 1.8.3
+    protected boolean hasMovementSound:s_();
+#else
+    protected boolean hasMovementSound:r_();
+#endif
+
+    /*
+     # protected void ##METHODNAME##(double d0, boolean flag, IBlockData iblockdata, BlockPosition blockposition) {
+     *     if (flag) {
+     *         if (this.fallDistance > 0.0F) {
+     *             iblockdata.getBlock().fallOn(this.world, blockposition, this, this.fallDistance);
+     *         }
+     *
+     *         this.fallDistance = 0.0F;
+     *     } else if (d0 < 0.0D) {
+     *         this.fallDistance = ((float)(this.fallDistance - d0));
+     *     }
+     * }
+     */
+#if version >= 1.9
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+#else
+    protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
+#endif
+
+    // Purpur: enables the use of legacy entity tracking, which calls updateViewer() every tick
+    public optional final void setLegacyTrackingEntity(boolean isLegacyTrackingEntity);
+
+    // See outsideWorldBorderField - is set and returned by these methods
+#if version >= 1.14
+    // Removed
+    public boolean isOutsideWorldBorder() {
+        return false;
+    }
+    public void setOutsideWorldBorder(boolean outside) {
+    }
+#elseif version >= 1.13
+    public boolean isOutsideWorldBorder:bG();
+    public void setOutsideWorldBorder:n(boolean outside);
+#elseif version >= 1.12
+    public boolean isOutsideWorldBorder:bz();
+    public void setOutsideWorldBorder:k(boolean outside);
+#elseif version >= 1.10.2
+    public boolean isOutsideWorldBorder:br();
+    public void setOutsideWorldBorder:k(boolean outside);
+#elseif version >= 1.9.4
+    public boolean isOutsideWorldBorder:bp();
+    public void setOutsideWorldBorder:j(boolean outside);
+#elseif version >= 1.9
+    public boolean isOutsideWorldBorder:bo();
+    public void setOutsideWorldBorder:j(boolean outside);
+#elseif version >= 1.8.3
+    public boolean isOutsideWorldBorder:aT();
+    public void setOutsideWorldBorder:h(boolean outside);
+#else
+    public boolean isOutsideWorldBorder:aS();
+    public void setOutsideWorldBorder:h(boolean outside);
+#endif
+
+    /*
+     * protected void checkBlockCollisions() {
+     *     AxisAlignedBB axisalignedbb = getBoundingBox();
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition = BlockPosition.PooledBlockPosition.d(axisalignedbb.a + 0.001D, axisalignedbb.b + 0.001D, axisalignedbb.c + 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition1 = BlockPosition.PooledBlockPosition.d(axisalignedbb.d - 0.001D, axisalignedbb.e - 0.001D, axisalignedbb.f - 0.001D);
+     *     BlockPosition.PooledBlockPosition blockposition_pooledblockposition2 = BlockPosition.PooledBlockPosition.s();
+     *     ...
+     * }
+     */
+    protected void checkBlockCollisions();
+
+    /*
+     * public double ##METHODNAME##(double d0, double d1, double d2) {
+     *     double d3 = this.locX - d0;
+     *     double d4 = this.locY - d1;
+     *     double d5 = this.locZ - d2;
+     *
+     *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
+     * }
+     */
+#if version >= 1.16.2
+    public double calculateDistance:h(double x, double y, double z);
+#elseif version >= 1.15
+    public double calculateDistance:g(double x, double y, double z);
+#else
+    public double calculateDistance:e(double x, double y, double z);
+#endif
+
+    public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
+
+    public void setPosition(double x, double y, double z);
+
+#if version >= 1.14
+    public void setSize(float width, float height) {
+        #require net.minecraft.world.entity.Entity private EntitySize size;
+        #require net.minecraft.world.entity.Entity private float headHeight;
+        #require net.minecraft.world.entity.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+
+  #if version >= 1.14.1
+        EntityPose entitypose = instance.getPose();
+  #else
+        EntityPose entitypose = instance.Z();
+  #endif
+        EntitySize newSize = EntitySize.b(width, height);
+
+        instance#size = newSize;
+        instance#headHeight = instance#getHeadHeight(entitypose, newSize);
+
+        double half_width = (double) width / 2.0;
+  #if version >= 1.15
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.locX() - half_width, instance.locY(), instance.locZ() - half_width,
+            instance.locX() + half_width, instance.locY() + (double) height, instance.locZ() + half_width);
+  #else
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.locX - half_width, instance.locY, instance.locZ - half_width,
+            instance.locX + half_width, instance.locY + (double) height, instance.locZ + half_width);
+  #endif
+
+        instance.a(new_BoundingBox);
+    }
+#elseif version >= 1.8.3
+  #if forge
+    protected void setSize(float width, float height);
+  #else
+    public void setSize(float width, float height);
+  #endif
+#else
+    public void setSize:a(float width, float height);
+#endif
+
+    public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
+
+    public void setLocation(double x, double y, double z, float yaw, float pitch);
+
+    public float getHeadRotation();
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
+
+    public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
+
+#select version >=
+#case 1.16.2
+    // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
+    // Only the Shulker and Boat entity appear to use this flag
+    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
+  #if version >= 1.16.4
+        return instance.aZ() ? instance.getBoundingBox() : null;
+  #else
+        return instance.aY() ? instance.getBoundingBox() : null;
+  #endif
+    }
+#case 1.16:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ay();
+#case 1.15:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:au();
+#case 1.14.3: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:aq();
+#case 1.14:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ap();
+#case 1.12:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:al();
+#case 1.10.2: public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:ag();
+#case 1.9:    public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:af();
+#case else:   public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox:S();
+#endselect
+
+#if version >= 1.16.2
+    // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
+    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox((EntityHandle) Entity entity) {
+        return instance.isCollidable() ? entity.getBoundingBox() : null;
+    }
+#else
+    public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
+#endif
+
+#if version >= 1.9
+    public optional boolean isVehicle();
+    public optional boolean isPassenger();
+    public void recalcPosition();
+#else
+    public optional boolean isVehicle:###();
+    public optional boolean isPassenger:###();
+    private void recalcPosition();
+#endif
+
+    <code>
+    public boolean isPassenger() {
+        if (T.isPassenger.isAvailable()) {
+            return T.isPassenger.invoke(getRaw());
+        } else {
+            return T.vehicle.raw.get(getRaw()) != null;
+        }
+    }
+
+    public boolean isVehicle() {
+        if (T.isVehicle.isAvailable()) {
+            return T.isVehicle.invoke(getRaw());
+        } else {
+            return T.opt_passenger.get(getRaw()) != null;
+        }
+    }
+    </code>
+
+    public boolean isBurning();
+
+    public void setOnFire(int numSeconds);
+
+    public optional int prop_getMaxFireTicks:getMaxFireTicks();
+
+    <code>
+    public int getMaxFireTicks() {
+        if (T.prop_getMaxFireTicks.isAvailable()) {
+            return T.prop_getMaxFireTicks.invoke(getRaw());
+        } else if (T.field_maxFireTicks.isAvailable()) {
+            return T.field_maxFireTicks.getInteger(getRaw());
+        } else {
+            throw new UnsupportedOperationException("Max Fire Ticks can not be read");
+        }
+    }
+    </code>
+
+#if version >= 1.14
+    public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+#elseif version >= 1.13
+    public optional (EntityHandle) Entity getDriverEntity:bO();
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+
+#elseif version >= 1.12
+    #if pre
+        // This was on the pre-release version
+        public optional (EntityHandle) Entity getDriverEntity:bC();
+    #else
+        // Official 1.12
+        public optional (EntityHandle) Entity getDriverEntity:bE();
+    #endif
+
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.10.2
+    public optional (EntityHandle) Entity getDriverEntity:bw();
+
+    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.9.4
+    public optional (EntityHandle) Entity getDriverEntity:bu();
+
+    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.9
+    public optional (EntityHandle) Entity getDriverEntity:bt();
+
+    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#else
+    public optional (EntityHandle) Entity getDriverEntity:###();
+
+    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#endif
+
+    <code>
+    public EntityHandle getDriverEntity() {
+        if (T.getDriverEntity.isAvailable()) {
+            return T.getDriverEntity.invoke(getRaw());
+        } else {
+            return null; // driver feature not a thing on this server
+        }
+    }
+    </code>
+
+#if version >= 1.13
+    public void onTick:tick();
+#elseif version >= 1.12
+    public void onTick:B_();
+#else if version >= 1.11
+    public void onTick:A_();
+#elseif version >= 1.9
+    public void onTick:m();
+#elseif version >= 1.8.3
+    public void onTick:t_();
+#else
+    public void onTick:s_();
+#endif
+
+#if version >= 1.16
+    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public boolean savePassenger:a_((CommonTagCompound) NBTTagCompound compound);
+#else
+    public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
+    public boolean savePassenger:c((CommonTagCompound) NBTTagCompound compound);
+#endif
+
+    public boolean saveEntity:d((CommonTagCompound) NBTTagCompound compound);
+
+    public boolean isSneaking();
+
+#if version >= 1.15.2
+    public optional boolean isInSameVehicle:isSameVehicle((EntityHandle) Entity entity);
+#elseif version >= 1.9
+    public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
+#else
+    public optional boolean isInSameVehicle:###((EntityHandle) Entity entity);
+#endif
+    <code>
+    public boolean isInSameVehicle(EntityHandle entity) {
+        if (T.isInSameVehicle.isAvailable()) {
+            return T.isInSameVehicle.invoke(getRaw(), entity);
+        } else {
+            Object rawPassenger = T.opt_passenger.raw.get(this.getRaw());
+            Object rawVehicle = T.vehicle.raw.get(this.getRaw());
+            Object rawEntity = entity.getRaw();
+            return rawEntity == rawPassenger || rawEntity == rawVehicle;
+        }
+    }
+    </code>
+
+    public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+
+    public int getId();
+
+    public UUID getUniqueID();
+
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
+
+#if version >= 1.16.2
+    public void onPush:i(double d0, double d1, double d2);
+#elseif version >= 1.15
+    public void onPush:h(double d0, double d1, double d2);
+#elseif version >= 1.11
+    public void onPush:f(double d0, double d1, double d2);
+#else
+    public void onPush:g(double d0, double d1, double d2);
+#endif
+
+    /*
+     * Entity class:
+     *
+     * public int ##METHODNAME##() {
+     *     return 300;
+     * }
+     */
+#select version >=
+#case 1.16:   public int getPortalCooldownMaximum:getDefaultPortalCooldown();
+#case 1.15:   public int getPortalCooldownMaximum:ba();
+#case 1.14.3: public int getPortalCooldownMaximum:aX();
+#case 1.14:   public int getPortalCooldownMaximum:aW();
+#case 1.13:   public int getPortalCooldownMaximum:aQ();
+#case 1.12:   public int getPortalCooldownMaximum:aM();
+#case 1.10.2: public int getPortalCooldownMaximum:aE();
+#case 1.9:    public int getPortalCooldownMaximum:aC();
+#case 1.8.3:  public int getPortalCooldownMaximum:aq();
+#case else:   public int getPortalCooldownMaximum:ar();
+#endselect
+
+    // Since MC 1.8.8
+    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+
+    // Since MC 1.9
+    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+
+    // Since MC 1.11.2
+    public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+
+    // Since MC 1.16
+    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+
+    public boolean hasCustomName();
+
+#if version >= 1.13
+    public (ChatText) IChatBaseComponent getCustomName();
+#else
+    public (ChatText) String getCustomName();
+#endif
+
+    public void collide((EntityHandle) Entity entity);
+
+    public org.bukkit.World getBukkitWorld() {
+        return instance.world.getWorld();
+    }
+
+    public org.bukkit.entity.Entity getBukkitEntity() {
+        if (instance.world == null) {
+            // We need this to avoid NPE's for non-spawned entities!
+            #require net.minecraft.world.entity.Entity protected org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity;
+            org.bukkit.entity.Entity entity = instance#bukkitEntity;
+            if (entity == null) {
+                org.bukkit.craftbukkit.CraftServer server = (org.bukkit.craftbukkit.CraftServer) org.bukkit.Bukkit.getServer();
+                entity = org.bukkit.craftbukkit.entity.CraftEntity.getEntity(server, instance);
+                instance#bukkitEntity = entity;
+            }
+            return entity;
+        } else {
+            return instance.getBukkitEntity();
+        }
+    }
+
+    <code>
+    public static EntityHandle fromBukkit(org.bukkit.entity.Entity entity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(entity));
+    }
+    </code>
+}

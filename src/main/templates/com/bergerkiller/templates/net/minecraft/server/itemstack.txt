@@ -1,5 +1,10 @@
 package net.minecraft.server;
 
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTNumber;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagLong;
+
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;

@@ -373,7 +373,7 @@ class PlayerChunkMap {
 #endif
 
 // Needed to make sure the EntityTracker hook works
-#if exists net.minecraft.server.PlayerChunkMap public void addEntity(net.minecraft.server.Entity);
+#if exists net.minecraft.server.PlayerChunkMap public void addEntity(net.minecraft.world.entity.Entity);
     public optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
 #elseif version >= 1.14
     protected optional void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);

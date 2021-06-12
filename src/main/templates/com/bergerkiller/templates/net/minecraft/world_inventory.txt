@@ -1,0 +1,53 @@
+package net.minecraft.world;
+
+import net.minecraft.server.ItemStack;
+import net.minecraft.server.EntityHuman;
+
+import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+
+interface IInventory {
+    public abstract int getSize();
+    public abstract (ItemStackHandle) ItemStack getItem(int index);
+    public abstract void setItem(int paramInt, (ItemStackHandle) ItemStack paramItemStack);
+
+    public abstract void update();
+
+    public abstract boolean canOpen:a((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
+
+    public abstract boolean canStoreItem:b(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
+
+#if version >= 1.14
+    // Removed
+    public optional abstract int getProperty:###(int key);
+    public optional abstract void setProperty:###(int key, int value);
+    public optional abstract int someFunction:###();
+#else
+    public optional abstract int getProperty(int key);
+  #if version >= 1.9
+    public optional abstract void setProperty(int key, int value);
+  #else
+    public optional abstract void setProperty:b(int key, int value);
+  #endif
+  #if version >= 1.11
+    public optional abstract int someFunction:h();
+  #else
+    public optional abstract int someFunction:g();
+  #endif
+#endif
+
+#if version >= 1.11
+    public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
+    public abstract void clear();
+#else
+    public abstract (List<ItemStackHandle>) ItemStack[] getContents();
+    public abstract void clear:l();
+#endif
+
+#if version >= 1.12
+    public optional abstract boolean someFunction2:x_();
+#elseif version >= 1.11
+    public optional abstract boolean someFunction2:w_();
+#else
+    public optional abstract boolean someFunction2:###();
+#endif
+}

@@ -30,7 +30,7 @@ class CraftBlockState {
   #endif
 
   #if version >= 1.13.2
-        #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.server.BlockPosition blockState_position:position;
+        #require org.bukkit.craftbukkit.block.CraftBlockState private final net.minecraft.core.BlockPosition blockState_position:position;
         instance#blockState_position = ((org.bukkit.craftbukkit.block.CraftBlock) block).getPosition();
   #else
         #require org.bukkit.craftbukkit.block.CraftBlockState private final int blockState_x:x;
@@ -75,7 +75,7 @@ class CraftBlock {
   #if version >= 1.9
         return chunk.a(instance.getX(), instance.getY(), instance.getZ());
   #else
-        return chunk.getBlockData(new net.minecraft.server.BlockPosition(instance.getX(), instance.getY(), instance.getZ()));
+        return chunk.getBlockData(new net.minecraft.core.BlockPosition(instance.getX(), instance.getY(), instance.getZ()));
   #endif
     }
 #endif
@@ -87,7 +87,7 @@ class CraftBlock {
         } else
 #endif
         {
-            return new net.minecraft.server.BlockPosition(block.getX(), block.getY(), block.getZ());
+            return new net.minecraft.core.BlockPosition(block.getX(), block.getY(), block.getZ());
         }
     }
 

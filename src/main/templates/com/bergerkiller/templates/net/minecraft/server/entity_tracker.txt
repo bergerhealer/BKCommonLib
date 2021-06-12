@@ -1,6 +1,6 @@
 package net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -99,7 +99,7 @@ class EntityTracker {
 #endif
 
 #if version >= 1.14
-  #if exists net.minecraft.server.PlayerChunkMap public void addEntity(net.minecraft.server.Entity);
+  #if exists net.minecraft.server.PlayerChunkMap public void addEntity(net.minecraft.world.entity.Entity);
     public void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);
   #else
     protected void trackEntity:addEntity((org.bukkit.entity.Entity) Entity entity);

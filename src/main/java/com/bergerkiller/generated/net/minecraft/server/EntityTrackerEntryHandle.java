@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import org.bukkit.entity.Player;
 import java.util.Collection;
 import java.util.List;

@@ -1,12 +1,15 @@
 package net.minecraft.server;
 
+import net.minecraft.core.BlockPosition;
+import net.minecraft.nbt.NBTTagCompound;
+
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 
 class TileEntity {
     protected (org.bukkit.World) World world_field:world;

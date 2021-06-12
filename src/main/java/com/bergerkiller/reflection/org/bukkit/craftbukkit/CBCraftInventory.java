@@ -5,7 +5,7 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class CBCraftInventory {
 	public static final ClassTemplate<?> T = ClassTemplate.createCB("inventory.CraftInventory")
-			.addImport("net.minecraft.server.IInventory");
+			.addImport("net.minecraft.world.IInventory");
 	
 	public static final FieldAccessor<Object> handle = T.selectField("protected final IInventory inventory");
 }

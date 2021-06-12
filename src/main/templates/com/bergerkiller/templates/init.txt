@@ -2,6 +2,7 @@
 
 #include /com/mojang/authlib/gameprofile.txt
 #include /com/mojang/authlib/properties.txt
+
 #include /org/bukkit/plugin.txt
 #include /org/bukkit/entity.txt
 #include /org/bukkit/inventory.txt
@@ -20,13 +21,26 @@
 #include /org/bukkit/craftbukkit/sound.txt
 #include /org/bukkit/craftbukkit/art.txt
 #include /org/bukkit/craftbukkit/scheduler.txt
+
+#include /net/minecraft/core_blockposition.txt
+#include /net/minecraft/core_nonnulllist.txt
+#include /net/minecraft/core_registry.txt
+#include /net/minecraft/core_vector3f.txt
+#include /net/minecraft/crashreport.txt
+#include /net/minecraft/entity_insentient.txt
+#include /net/minecraft/entity_living.txt
+#include /net/minecraft/entity_types.txt
+#include /net/minecraft/entity.txt
+#include /net/minecraft/enums.txt
+#include /net/minecraft/nbt.txt
+#include /net/minecraft/resources_minecraftkey.txt
+#include /net/minecraft/resources_resourcekey.txt
+#include /net/minecraft/world_inventory.txt
+
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
 #include /net/minecraft/server/sound.txt
 #include /net/minecraft/server/nibblearray.txt
-#include /net/minecraft/server/nbt.txt
-#include /net/minecraft/server/minecraftkey.txt
-#include /net/minecraft/server/nonnulllist.txt
 #include /net/minecraft/server/packets.txt
 #include /net/minecraft/server/packets_movement.txt
 #include /net/minecraft/server/packets_spawn.txt
@@ -43,9 +57,7 @@
 #include /net/minecraft/server/player.txt
 #include /net/minecraft/server/playerchunk.txt
 #include /net/minecraft/server/network.txt
-#include /net/minecraft/server/entity.txt
 #include /net/minecraft/server/entity_tracker.txt
-#include /net/minecraft/server/entity_types.txt
 #include /net/minecraft/server/entity_subtype.txt
 #include /net/minecraft/server/axisalignedbb.txt
 #include /net/minecraft/server/particles.txt

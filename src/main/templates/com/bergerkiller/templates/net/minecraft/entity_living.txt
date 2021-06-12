@@ -1,0 +1,270 @@
+package net.minecraft.world.entity;
+
+import net.minecraft.core.BlockPosition;
+import net.minecraft.server.AttributeBase;
+import net.minecraft.server.AttributeModifiable;
+import net.minecraft.server.AttributeMapBase;
+import net.minecraft.server.AttributeDefaults;
+import net.minecraft.core.NonNullList;
+import net.minecraft.server.ItemStack;
+import net.minecraft.server.MobEffectList;
+import net.minecraft.server.MobEffect;
+import net.minecraft.server.EnumItemSlot;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
+
+class EntityLiving extends Entity {
+
+#if version >= 1.16.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ag;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+  #if version >= 1.16.3
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:ARROWS_IN_BODY;
+  #else
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bh;
+  #endif
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bj;
+#elseif version >= 1.16
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:an;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bo;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bq;
+#elseif version >= 1.15
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ao;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:f;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:g;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bq;
+#elseif version >= 1.14
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ar;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:e;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:f;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:g;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:bs;
+#elseif version >= 1.13
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:aw;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bx;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#elseif version >= 1.12
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:br;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#elseif version >= 1.11
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:g;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:h;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:bq;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#elseif version >= 1.10.2
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:au;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#elseif version >= 1.9.4
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:at;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#elseif version >= 1.9
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:as;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:g;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:h;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#else
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:###;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:###;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:###;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:###;
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:###;
+#endif
+
+    <code>
+    public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
+    public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
+    public static final Key<Integer> DATA_PARTICLES_TIMER = Key.Type.INTEGER.createKey(T.DATA_PARTICLES_TIMER, 7);
+    public static final Key<Boolean> DATA_PARTICLES_HIDDEN = Key.Type.BOOLEAN.createKey(T.DATA_PARTICLES_HIDDEN, 8);
+    public static final Key<Integer> DATA_UNKNOWN1 = Key.Type.INTEGER.createKey(T.DATA_ARROWCOUNT, 9);
+    public static final Key<IntVector3> DATA_BEDPOSITION = Key.Type.BLOCK_POSITION.createKey(T.DATA_BEDPOSITION, -1);
+    </code>
+
+    public void resetAttributes() {
+#if version >= 1.16
+        // Is only set in constructor, so we'll have to force it
+        // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
+        #require net.minecraft.world.entity.EntityLiving private final AttributeMapBase attributeMapField:attributeMap;
+        #require net.minecraft.world.entity.EntityLiving private final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
+        AttributeMapBase new_attributes = new AttributeMapBase(AttributeDefaults.a(instance.getEntityType()));
+        org.bukkit.craftbukkit.attribute.CraftAttributeMap new_craftAttributes = new org.bukkit.craftbukkit.attribute.CraftAttributeMap(new_attributes);
+        instance#attributeMapField = new_attributes;
+        instance#craftAttributes = new_craftAttributes;
+
+        // Item attributes need to be re-applied later, they are lost as part of this reset
+  #if version >= 1.16.2
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bn;
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bo;
+  #else
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> handItems:bu;
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> armorItems:bv;
+  #endif
+        NonNullList handItems = instance#handItems;
+        NonNullList armorItems = instance#armorItems;
+        handItems.clear();
+        armorItems.clear();
+#else
+        // Set attributeMapField to null and call getAttributeMap()
+        // This will initialize the field (and possibly related CraftAttributeMap >= 1.11)
+        #if version >= 1.11
+            #require net.minecraft.world.entity.EntityLiving private AttributeMapBase attributeMapField:attributeMap;
+        #elseif version >= 1.10.2
+            #require net.minecraft.world.entity.EntityLiving private AttributeMapBase attributeMapField:br;
+        #elseif version >= 1.9.4
+            #require net.minecraft.world.entity.EntityLiving private AttributeMapBase attributeMapField:bq;
+        #elseif version >= 1.9
+            #require net.minecraft.world.entity.EntityLiving private AttributeMapBase attributeMapField:bp;
+        #else
+            #require net.minecraft.world.entity.EntityLiving private AttributeMapBase attributeMapField:c;
+        #endif
+        instance#attributeMapField = null;
+        instance.getAttributeMap();
+
+        // Then call initAttributes() to initialize the values used by the entity
+        #if version >= 1.8.3
+            #require net.minecraft.world.entity.EntityLiving protected void initAttributes();
+        #else
+            #require net.minecraft.world.entity.EntityLiving protected void initAttributes:aW();
+        #endif
+        instance#initAttributes();
+#endif
+    }
+
+    public (AttributeMapBaseHandle) AttributeMapBase getAttributeMap();
+
+#if version >= 1.16
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Object) AttributeBase iattribute);
+#else
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) IAttribute iattribute) {
+        return (AttributeModifiable) instance.getAttributeInstance(iattribute);
+    }
+#endif
+
+#if version >= 1.9
+    public final (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> mobEffects:effects;
+#else
+    public final (Map<MobEffectListHandle, MobEffectHandle>) Map<Integer, MobEffect> mobEffects:effects;
+#endif
+
+    public float lastDamage;
+
+#if version >= 1.16.2
+    protected unknown boolean jumping;
+    public float sideMovement:aR;
+    public unknown float aS;
+    public float forwardMovement:aT;
+#elseif version >= 1.16
+    protected unknown boolean jumping;
+    public float sideMovement:aY;
+    public unknown float aZ;
+    public float forwardMovement:ba;
+#elseif version >= 1.15
+    protected unknown boolean jumping;
+    public float sideMovement:aZ;
+    public unknown float ba;
+    public float forwardMovement:bb;
+#elseif version >= 1.14
+    protected unknown boolean jumping;
+    public float sideMovement:bb;
+    public unknown float bc;
+    public float forwardMovement:bd;
+    public unknown float be;
+#elseif version >= 1.13
+    protected unknown boolean bg;
+    public float sideMovement:bh;
+    public unknown float bi;
+    public float forwardMovement:bj;
+    public unknown float bk;
+#elseif version >= 1.12
+    protected unknown boolean bd;
+    public float sideMovement:be;
+    public unknown float bf;
+    public float forwardMovement:bg;
+    public unknown float bh;
+#elseif version >= 1.11
+    protected unknown boolean bd;
+    public float sideMovement:be;
+    public float forwardMovement:bf;
+    public unknown float bg;
+#elseif version >= 1.10.2
+    protected unknown boolean be;
+    public float sideMovement:bf;
+    public float forwardMovement:bg;
+    public unknown float bh;
+#elseif version >= 1.9.4
+    protected unknown boolean bd;
+    public float sideMovement:be;
+    public float forwardMovement:bf;
+    public unknown float bg;
+#elseif version >= 1.9
+    protected unknown boolean bc;
+    public float sideMovement:bd;
+    public float forwardMovement:be;
+    public unknown float bf;
+#elseif version >= 1.8.3
+    protected unknown boolean aY;
+    public float sideMovement:aZ;
+    public float forwardMovement:ba;
+    protected unknown float bb;
+#else
+    protected unknown boolean aW;
+    public float sideMovement:aX;
+    public float forwardMovement:aY;
+    protected unknown float aZ;
+#endif
+
+    public boolean updateEffects;
+
+    public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
+
+#if version >= 1.9
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
+#else
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);
+#endif
+
+    public final float getHealth();
+
+    public final float getMaxHealth();
+
+    <code>
+    public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));
+    }
+    </code>
+}

@@ -1,13 +1,14 @@
 package net.minecraft.server;
 
-/* import com.bergerkiller.generated.net.minecraft.server.EntityHandle; */
+import net.minecraft.world.entity.Entity;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;

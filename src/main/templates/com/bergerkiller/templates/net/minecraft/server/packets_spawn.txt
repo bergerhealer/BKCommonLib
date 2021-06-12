@@ -4,7 +4,7 @@ import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
 

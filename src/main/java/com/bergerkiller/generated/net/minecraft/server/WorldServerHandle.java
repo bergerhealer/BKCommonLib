@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;

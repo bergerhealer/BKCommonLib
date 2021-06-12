@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;

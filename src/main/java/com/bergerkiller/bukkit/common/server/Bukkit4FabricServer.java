@@ -43,10 +43,10 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
         // A basic test.
         /*
         try {
-            System.out.println(this.resolveClassPath("net.minecraft.server.MinecraftKey"));
-            System.out.println(this.resolveClassPath("net.minecraft.server.ResourceKey"));
-            Class<?> mckey = Class.forName(this.resolveClassPath("net.minecraft.server.MinecraftKey"));
-            Class<?> reskey = Class.forName(this.resolveClassPath("net.minecraft.server.ResourceKey"));
+            System.out.println(this.resolveClassPath("net.minecraft.resources.MinecraftKey"));
+            System.out.println(this.resolveClassPath("net.minecraft.resources.ResourceKey"));
+            Class<?> mckey = Class.forName(this.resolveClassPath("net.minecraft.resources.MinecraftKey"));
+            Class<?> reskey = Class.forName(this.resolveClassPath("net.minecraft.resources.ResourceKey"));
             System.out.println(this.resolveMethodName(mckey, "a", new Class<?>[0]));
             for (Method m : reskey.getDeclaredMethods()) {
                 System.out.println("- " + m);

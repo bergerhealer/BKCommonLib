@@ -1,7 +1,7 @@
 package net.minecraft.server;
 
 import com.bergerkiller.generated.net.minecraft.server.AxisAlignedBBHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 
 class AxisAlignedBB {
@@ -280,7 +280,7 @@ class VoxelShape {
     public boolean isEmpty();
 #endif
 
-    public static double traceAxis((EnumAxisHandle) net.minecraft.server.EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) net.minecraft.server.AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<net.minecraft.server.VoxelShape> voxels, double coordinate) {
+    public static double traceAxis((EnumAxisHandle) net.minecraft.core.EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) net.minecraft.server.AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<net.minecraft.server.VoxelShape> voxels, double coordinate) {
 
 #if version >= 1.13.1
         // Official API as of 1.13.1
@@ -307,11 +307,11 @@ class VoxelShape {
         java.util.Iterator iter = voxels.iterator();
         while (iter.hasNext()) {
             net.minecraft.server.VoxelShape voxel = (net.minecraft.server.VoxelShape) iter.next();
-            if (axis == net.minecraft.server.EnumDirection$EnumAxis.X) {
+            if (axis == net.minecraft.core.EnumDirection$EnumAxis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == net.minecraft.server.EnumDirection$EnumAxis.Y) {
+            } else if (axis == net.minecraft.core.EnumDirection$EnumAxis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == net.minecraft.server.EnumDirection$EnumAxis.Z) {
+            } else if (axis == net.minecraft.core.EnumDirection$EnumAxis.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
 

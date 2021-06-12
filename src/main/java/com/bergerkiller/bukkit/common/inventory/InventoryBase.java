@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.inventory;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.hooks.IInventoryProxyHook;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
-import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 

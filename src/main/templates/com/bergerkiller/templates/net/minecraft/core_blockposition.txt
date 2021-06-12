@@ -1,0 +1,43 @@
+package net.minecraft.core;
+
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+
+class BaseBlockPosition {
+    public int getX();
+    public int getY();
+    public int getZ();
+
+    public boolean isPositionInBox(int xMin, int yMin, int zMin, int xMax, int yMax, int zMax) {
+        int x = instance.getX();
+        int y = instance.getY();
+        int z = instance.getZ();
+        return x >= xMin && y >= yMin && z >= zMin && x <= xMax && y <= yMax && z <= zMax;
+    }
+
+    public com.bergerkiller.bukkit.common.bases.IntVector3 toIntVector3() {
+        return new com.bergerkiller.bukkit.common.bases.IntVector3(instance.getX(), instance.getY(), instance.getZ());
+    }
+}
+
+class BlockPosition extends BaseBlockPosition {
+
+    public (BlockPositionHandle) BlockPosition(int x, int y, int z);
+
+    <code>
+    public static BlockPositionHandle fromIntVector3(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
+        return createHandle(fromIntVector3Raw(vector));
+    }
+
+    public static BlockPositionHandle fromBukkitBlock(org.bukkit.block.Block block) {
+        return createHandle(fromBukkitBlock(block));
+    }
+    </code>
+
+    public static Object fromIntVector3Raw(com.bergerkiller.bukkit.common.bases.IntVector3 vector) {
+        return new BlockPosition(vector.x, vector.y, vector.z);
+    }
+
+    public static Object fromBukkitBlockRaw(org.bukkit.block.Block block) {
+        return new BlockPosition(block.getX(), block.getY(), block.getZ());
+    }
+}

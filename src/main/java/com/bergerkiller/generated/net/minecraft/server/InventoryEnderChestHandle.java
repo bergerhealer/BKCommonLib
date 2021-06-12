@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.InventoryEnderChest</b>.

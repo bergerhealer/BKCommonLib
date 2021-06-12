@@ -2,23 +2,12 @@ package net.minecraft.server;
 
 import com.google.common.collect.BiMap;
 
-import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDirectionHandle.EnumAxisHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMoveTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumProtocolDirectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumChatFormatHandle;
-
-class EnumDifficulty {
-    public int getId:a();
-
-    public static (EnumDifficultyHandle) EnumDifficulty getById(int id);
-}
 
 class EnumItemSlot {
 #if version >= 1.16.3
@@ -46,36 +35,9 @@ class EnumItemSlot {
 }
 
 // Since MC 1.9
-optional class EnumHand {
-    enum (EnumHandHandle) EnumHand MAIN_HAND;
-    enum (EnumHandHandle) EnumHand OFF_HAND;
-}
-
-// Since MC 1.9
 optional class EnumMainHand {
     enum (EnumMainHandHandle) EnumMainHand LEFT;
     enum (EnumMainHandHandle) EnumMainHand RIGHT;
-}
-
-class EnumDirection {
-    enum (EnumDirectionHandle) EnumDirection DOWN;
-    enum (EnumDirectionHandle) EnumDirection UP;
-    enum (EnumDirectionHandle) EnumDirection NORTH;
-    enum (EnumDirectionHandle) EnumDirection SOUTH;
-    enum (EnumDirectionHandle) EnumDirection WEST;
-    enum (EnumDirectionHandle) EnumDirection EAST;
-
-    class EnumDirection.EnumAxis {
-        enum (EnumAxisHandle) EnumDirection.EnumAxis X;
-        enum (EnumAxisHandle) EnumDirection.EnumAxis Y;
-        enum (EnumAxisHandle) EnumDirection.EnumAxis Z;
-
-        <code>
-        public int ordinal() {
-            return ((Enum<?>) getRaw()).ordinal();
-        }
-        </code>
-    }
 }
 
 optional class EnumMoveType {
@@ -177,44 +139,6 @@ class EnumProtocol {
 class EnumProtocolDirection {
     enum (EnumProtocolDirectionHandle) EnumProtocolDirection SERVERBOUND;
     enum (EnumProtocolDirectionHandle) EnumProtocolDirection CLIENTBOUND;
-}
-
-class EnumChatFormat {
-    enum (EnumChatFormatHandle) EnumChatFormat RESET;
-
-    public int getId:b();
-
-    <code>
-    public static final Object[] RAW_VALUES = T.getType().getEnumConstants();
-    public static final EnumChatFormatHandle[] VALUES;
-    static {
-        VALUES = new EnumChatFormatHandle[RAW_VALUES.length];
-        for (int i = 0; i < VALUES.length; i++) {
-            VALUES[i] = createHandle(RAW_VALUES[i]);
-        }
-    }
-
-    public static EnumChatFormatHandle byChar(char c) {
-        for (EnumChatFormatHandle format : VALUES) {
-            String s = format.toString();
-            if (s.length() >= 2 && s.charAt(1) == c) {
-                return format;
-            }
-        }
-        return RESET;
-    }
-
-    public static EnumChatFormatHandle byId(int id) {
-        if (id >= 0) {
-            for (EnumChatFormatHandle format : VALUES) {
-                if (format.getId() == id) {
-                    return format;
-                }
-            }
-        }
-        return RESET;
-    }
-    </code>
 }
 
 // version >= 1.12

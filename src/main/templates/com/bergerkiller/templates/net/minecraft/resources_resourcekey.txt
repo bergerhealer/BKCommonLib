@@ -1,0 +1,37 @@
+package net.minecraft.resources;
+
+import net.minecraft.resources.MinecraftKey;
+import net.minecraft.resources.ResourceKey;
+
+import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+
+class ResourceKey {
+#if version >= 1.16
+    public (MinecraftKeyHandle) MinecraftKey getCategory() {
+        #require net.minecraft.server.ResourceKey private final MinecraftKey category:b;
+        return instance#category;
+    }
+
+    public (MinecraftKeyHandle) MinecraftKey getName:a();
+
+    public static (ResourceKeyHandle) ResourceKey create:a((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
+    public static (ResourceKeyHandle) ResourceKey createCategory:a((MinecraftKeyHandle) MinecraftKey categoryName);
+#else
+    public (MinecraftKeyHandle) MinecraftKey getCategory() {
+        return (net.minecraft.server.MinecraftKey) instance.category;
+    }
+
+    public (MinecraftKeyHandle) MinecraftKey getName() {
+        return (net.minecraft.server.MinecraftKey) instance.name;
+    }
+
+    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name) {
+        return net.minecraft.server.ResourceKey.create(category, (Object) name);
+    }
+
+    public static (ResourceKeyHandle) ResourceKey createCategory((MinecraftKeyHandle) MinecraftKey categoryName) {
+        return net.minecraft.server.ResourceKey.createCategory((Object) categoryName);
+    }
+#endif
+}

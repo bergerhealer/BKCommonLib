@@ -14,9 +14,9 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
 import com.bergerkiller.bukkit.common.wrappers.ItemRenderOptions;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
 
 /**
  * This is needed because Minecraft is really stupid sometimes

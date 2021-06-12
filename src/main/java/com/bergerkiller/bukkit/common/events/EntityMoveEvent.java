@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.events;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.entity.EntityEvent;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 /**
  * Fired when an entity moves

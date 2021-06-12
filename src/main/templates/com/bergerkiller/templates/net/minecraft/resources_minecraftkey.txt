@@ -1,0 +1,106 @@
+package net.minecraft.resources;
+
+import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
+
+import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+
+class MinecraftKey {
+#if version >= 1.14.4
+    protected final String namespace;
+    protected final String name:key;
+#else
+    protected final String namespace:a;
+    protected final String name:b;
+#endif
+
+    // Used in generated code. Does not exist on 1.13 and later.
+    protected optional transient (Object) MinecraftKey(int code, String[] parts);
+
+#if version >= 1.13
+    public static (MinecraftKeyHandle) MinecraftKey createNew(String keyToken) {
+        try {
+            return new MinecraftKey(keyToken);
+        } catch (ResourceKeyInvalidException ex) {
+            return null;
+        }
+    }
+
+    public static optional (MinecraftKeyHandle) MinecraftKey createNew2(String namespace, String name) {
+        try {
+            return new MinecraftKey(namespace, name);
+        } catch (ResourceKeyInvalidException ex) {
+            return null;
+        }
+    }
+#else
+    public static (MinecraftKeyHandle) MinecraftKey createNew(String keyToken) {
+        if (keyToken == null) {
+            return null;
+        }
+        MinecraftKey key = new MinecraftKey(keyToken);
+        String namespace = (String) MinecraftKeyHandle.T.namespace.get(key);
+        String name = (String) MinecraftKeyHandle.T.name.get(key);
+        if (!MinecraftKeyHandle.isValidNamespace(namespace)) {
+            return null;
+        }
+        if (!MinecraftKeyHandle.isValidName(name)) {
+            return null;
+        }
+        return key;
+    }
+
+    public static optional (MinecraftKeyHandle) MinecraftKey createNew2(String namespace, String name) {
+        if (!MinecraftKeyHandle.isValidNamespace(namespace)) {
+            return null;
+        }
+        if (!MinecraftKeyHandle.isValidName(name)) {
+            return null;
+        }
+        return (MinecraftKey) MinecraftKeyHandle.T.constr_code_parts.newInstance(
+            0,
+            new String[] { namespace, name }
+        );
+    }
+#endif
+
+    <code>
+    public static boolean isValid(String key) {
+        return createNew(key) != null;
+    }
+
+    public static boolean isValidNamespace(String namespace) {
+        if (namespace == null || namespace.isEmpty()) {
+            // defaults to minecraft namespace in these cases
+            return true;
+        }
+        for (int cidx = 0; cidx < namespace.length(); cidx++) {
+            char i = namespace.charAt(cidx);
+            if (i == 95 || i == 45 || (i >= 97 && i <= 122) || (i >= 48 && i <= 57) || i == 46) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean isValidName(String name) {
+        if (name == null || name.isEmpty()) {
+            return false;
+        }
+        for (int cidx = 0; cidx < name.length(); cidx++) {
+            char i = name.charAt(cidx);
+            if (i == 95 || i == 45 || (i >= 97 && i <= 122) || (i >= 48 && i <= 57) || i == 47 || i == 46) {
+                continue;
+            }
+            return false;
+        }
+        return true;
+    }
+
+    public static MinecraftKeyHandle createNew(String namespace, String name) {
+        return T.createNew2.invoke(namespace, name);
+    }
+    </code>
+}

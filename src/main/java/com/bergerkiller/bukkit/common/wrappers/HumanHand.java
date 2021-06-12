@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.generated.net.minecraft.server.EnumHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.EnumHandHandle;
 import com.bergerkiller.generated.org.bukkit.entity.HumanEntityHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.MainHandHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;

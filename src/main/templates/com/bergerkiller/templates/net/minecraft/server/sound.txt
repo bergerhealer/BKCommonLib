@@ -1,11 +1,14 @@
 package net.minecraft.server;
 
+import net.minecraft.core.RegistryMaterials;
+import net.minecraft.resources.MinecraftKey;
+
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 import net.minecraft.server.SoundEffect;
 
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 
 optional class SoundCategory {

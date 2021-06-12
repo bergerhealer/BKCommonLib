@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 
 /**

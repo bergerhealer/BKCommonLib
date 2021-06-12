@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 public abstract class EntityAddRemoveHandler {
     public static final EntityAddRemoveHandler INSTANCE;

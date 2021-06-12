@@ -1,0 +1,44 @@
+package net.minecraft.core;
+
+import net.minecraft.resources.MinecraftKey;
+
+// Only available >= MC 1.9
+optional class RegistryBlockID {
+    public int getId(T value);
+}
+
+class RegistryMaterials {
+#if version >= 1.13
+    protected optional final Map<V, K> opt_inverseLookupField:###;
+#else
+    protected optional final Map<V, K> opt_inverseLookupField:b;
+#endif
+
+#if version >= 1.13.1
+    public V get((Object) MinecraftKey key);
+    public (Object) MinecraftKey getKey:getKey(V value);
+#elseif version >= 1.9
+    public V get((Object) K key);
+    public (Object) K getKey:b(V value);
+#else
+    public V get((Object) K key);
+    public (Object) K getKey:c(V value);
+#endif
+}
+
+// Since MC 1.14 has static fields
+optional class IRegistry {
+
+#if version >= 1.14
+    public static int getWindowIdFromName(String name) {
+        if (name == null) return -1;
+        Object item = IRegistry.MENU.get(new MinecraftKey(name));
+        return (item == null) ? -1 : IRegistry.MENU.a(item);
+    }
+#else
+    public static int getWindowIdFromName(String name) {
+        return -1;
+    }
+#endif
+
+}

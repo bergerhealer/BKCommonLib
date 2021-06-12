@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.nbt;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTCompressedStreamToolsHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 

@@ -7,7 +7,7 @@ class Entity {
 #elseif version >= 1.9
     // Multiple passengers were possible since 1.9, but Bukkit API was missing
     public List<Entity> getPassengers() {
-        net.minecraft.server.Entity handle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        net.minecraft.world.entity.Entity handle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
         if (handle == null || handle.passengers.isEmpty()) {
             return java.util.Collections.emptyList();
         } else if (handle.passengers.size() == 1) {
@@ -43,15 +43,15 @@ class Entity {
         com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");
         com.google.common.base.Preconditions.checkArgument(!instance.equals(passenger), "Entity cannot ride itself.");
 
-        net.minecraft.server.Entity vehicleHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
-        net.minecraft.server.Entity passengerHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
+        net.minecraft.world.entity.Entity vehicleHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        net.minecraft.world.entity.Entity passengerHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
         if (vehicleHandle == null || passengerHandle == null || !passengerHandle.a(vehicleHandle, true)) {
             return false;
         }
 
         // Requires type conversion to use raw
         com.bergerkiller.mountiplex.reflection.declarations.Template$Field entityVehicleField;
-        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.vehicle.raw;
+        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.vehicle.raw;
 
   #if version >= 1.13.2
         // Since 1.13.2 Bukkit fixed a bug that the vehicle field wasn't set back to null
@@ -76,15 +76,15 @@ class Entity {
     public boolean removePassenger(Entity passenger) {
         com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");
 
-        net.minecraft.server.Entity vehicleHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
-        net.minecraft.server.Entity passengerHandle = (net.minecraft.server.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
+        net.minecraft.world.entity.Entity vehicleHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(instance);
+        net.minecraft.world.entity.Entity passengerHandle = (net.minecraft.world.entity.Entity) com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(passenger);
         if (vehicleHandle == null || passengerHandle == null) {
             return false;
         }
 
         // Requires type conversion to use raw
         com.bergerkiller.mountiplex.reflection.declarations.Template$Field entityVehicleField;
-        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.server.EntityHandle.T.vehicle.raw;
+        entityVehicleField = (com.bergerkiller.mountiplex.reflection.declarations.Template$Field) com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.vehicle.raw;
 
   #if version >= 1.13
         // Since 1.13 Bukkit fixed a bug that the vehicle field wasn't reset to the original vehicle when cancelled

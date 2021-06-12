@@ -1,6 +1,8 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.SoundEffect</b>.

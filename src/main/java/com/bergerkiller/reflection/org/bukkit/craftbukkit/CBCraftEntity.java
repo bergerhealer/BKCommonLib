@@ -10,7 +10,7 @@ public class CBCraftEntity {
     public static final ClassTemplate<?> T = ClassTemplate.createCB("entity.CraftEntity");
     public static final MethodAccessor<Entity> getEntity = T.selectMethod(
     		"public static CraftEntity getEntity(org.bukkit.craftbukkit.CraftServer server," +
-    		                                    "net.minecraft.server.Entity entity)");
+    		                                    "net.minecraft.world.entity.Entity entity)");
 
-    public static final FieldAccessor<Object> entity = T.selectField("protected net.minecraft.server.Entity entity");
+    public static final FieldAccessor<Object> entity = T.selectField("protected net.minecraft.world.entity.Entity entity");
 }

@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import org.bukkit.inventory.Inventory;
 

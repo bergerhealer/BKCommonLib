@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;

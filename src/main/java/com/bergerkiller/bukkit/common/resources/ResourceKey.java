@@ -5,8 +5,8 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.ResourceKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
 
 /**
  * Stores information for accessing a resource, such as a sound, texture, entity, block, etc.

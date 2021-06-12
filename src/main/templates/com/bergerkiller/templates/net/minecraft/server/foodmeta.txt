@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.nbt.NBTTagCompound;
+
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class FoodMetaData {

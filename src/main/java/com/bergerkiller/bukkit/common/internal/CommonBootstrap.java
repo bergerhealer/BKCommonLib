@@ -257,8 +257,8 @@ public class CommonBootstrap {
             });
         }
 
-        final String nms_root = server.getNMSRoot();
-        final String cb_root = server.getCBRoot();
+        final String nms_root = "net.minecraft.server";
+        final String cb_root = "org.bukkit.craftbukkit";
         final Map<String, String> remappings = new HashMap<String, String>();
 
         // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later

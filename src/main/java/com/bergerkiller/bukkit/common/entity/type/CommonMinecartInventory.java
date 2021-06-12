@@ -4,7 +4,7 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
 
-import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 
 /**
  * Base class for Minecart entities with an Inventory

@@ -5,11 +5,11 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.config.TempFileOutputStream;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTBaseHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTCompressedStreamToolsHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.server.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTCompressedStreamToolsHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 import java.io.*;
 import java.util.*;

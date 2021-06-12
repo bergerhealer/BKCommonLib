@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 

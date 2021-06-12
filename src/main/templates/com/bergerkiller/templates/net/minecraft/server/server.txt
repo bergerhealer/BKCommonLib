@@ -6,9 +6,9 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
-import com.bergerkiller.generated.net.minecraft.server.CrashReportHandle;
-import com.bergerkiller.generated.net.minecraft.server.CrashReportSystemDetailsHandle;
-import com.bergerkiller.generated.net.minecraft.server.ReportedExceptionHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
+import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
+import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
 
 class MinecraftServer {
     private boolean hasStopped;
@@ -105,18 +105,4 @@ class LocaleLanguage {
 #endif
 
     public synchronized String get:a(String s);
-}
-
-class CrashReport {
-    public static (CrashReportHandle) CrashReport create:a(Throwable throwable, String message);
-
-    public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:a(String message);
-}
-
-class CrashReportSystemDetails {
-
-}
-
-class ReportedException {
-    public (ReportedExceptionHandle) ReportedException((CrashReportHandle) CrashReport paramCrashReport);
 }

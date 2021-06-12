@@ -42,29 +42,29 @@ import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
+import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumChatFormatHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -79,7 +79,7 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class HandleConversion {
 
-    @ConverterMethod(output="T extends net.minecraft.server.Entity")
+    @ConverterMethod(output="T extends net.minecraft.world.entity.Entity")
     public static Object toEntityHandle(org.bukkit.entity.Entity entity) {
         try {
             return CraftEntityHandle.T.getHandle.invoker.invoke(entity);
@@ -153,12 +153,12 @@ public class HandleConversion {
         return WorldHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
     }
 
-    @ConverterMethod(output="net.minecraft.server.IInventory")
+    @ConverterMethod(output="net.minecraft.world.IInventory")
     public static Object toIInventoryHandle(InventoryBase inventory) {
         return inventory.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.IInventory")
+    @ConverterMethod(output="net.minecraft.world.IInventory")
     public static Object toIInventoryHandle(org.bukkit.inventory.Inventory inventory) {
         if (CraftInventoryHandle.T.isAssignableFrom(inventory)) {
             return CraftInventoryHandle.T.getHandle.raw.invoke(inventory);
@@ -172,7 +172,7 @@ public class HandleConversion {
         return dataWatcher.getRawHandle();
     }
 
-    @ConverterMethod(input="net.minecraft.server.Entity", output="net.minecraft.server.DataWatcher")
+    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="net.minecraft.server.DataWatcher")
     public static Object toDataWatcherHandle(Object nmsEntityHandle) {
         return EntityHandle.T.getDataWatcher.raw.invoke(nmsEntityHandle);
     }
@@ -208,12 +208,12 @@ public class HandleConversion {
         return EnumGamemodeHandle.T.getById.raw.invoke(gameMode.getValue());
     }
 
-    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.server.EnumHand", optional=true)
+    @ConverterMethod(input="org.bukkit.inventory.MainHand", output="net.minecraft.world.EnumHand", optional=true)
     public static Object mainHandToEnumHandHandle(Object mainHand) {
         return HumanHand.fromMainHand(mainHand).toNMSEnumHand(null);
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumHand", optional=true)
+    @ConverterMethod(output="net.minecraft.world.EnumHand", optional=true)
     public static Object humanHandToEnumHandHandle(HumanHand hand) {
         return hand.toNMSEnumHand(null);
     }
@@ -247,12 +247,12 @@ public class HandleConversion {
         return ChunkCoordIntPairHandle.T.fromIntVector2Raw.invoker.invoke(null, intVector2);
     }
 
-    @ConverterMethod(output="net.minecraft.server.BlockPosition")
+    @ConverterMethod(output="net.minecraft.core.BlockPosition")
     public static Object toBlockPositionHandle(IntVector3 intVector3) {
         return BlockPositionHandle.T.fromIntVector3Raw.invoker.invoke(null, intVector3);
     }
 
-    @ConverterMethod(output="net.minecraft.server.BlockPosition")
+    @ConverterMethod(output="net.minecraft.core.BlockPosition")
     public static Object toBlockPositionHandle(Block block) {
         return BlockPositionHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
     }
@@ -262,7 +262,7 @@ public class HandleConversion {
         return Vec3DHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
-    @ConverterMethod(output="net.minecraft.server.Vector3f")
+    @ConverterMethod(output="net.minecraft.core.Vector3f")
     public static Object toVector3fHandle(Vector vector) {
         return Vector3fHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
@@ -292,13 +292,13 @@ public class HandleConversion {
         return action.getHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumDifficulty")
+    @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Integer difficultyId) {
         return EnumDifficultyHandle.T.getById.raw.invoke(difficultyId);
     }
 
     @SuppressWarnings("deprecation")
-    @ConverterMethod(output="net.minecraft.server.EnumDifficulty")
+    @ConverterMethod(output="net.minecraft.world.EnumDifficulty")
     public static Object toEnumDifficultyHandle(Difficulty difficulty) {
         return EnumDifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
     }
@@ -382,7 +382,7 @@ public class HandleConversion {
     }
 
     @SuppressWarnings("unchecked")
-    @ConverterMethod(output="net.minecraft.server.NonNullList<E>", optional=true)
+    @ConverterMethod(output="net.minecraft.core.NonNullList<E>", optional=true)
     public static <E> Object toNonNullListHandle(List<E> list) {
         List<E> result = (List<E>) NonNullListHandle.create();
         result.addAll(list);
@@ -401,12 +401,12 @@ public class HandleConversion {
         return RecipeItemStackHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
     }
 
-    @ConverterMethod(output="net.minecraft.server.MinecraftKey")
+    @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
     public static Object getMinecraftKeyFromName(String name) {
         return MinecraftKeyHandle.T.createNew.raw.invoke(name);
     }
 
-    @ConverterMethod(input="net.minecraft.server.MinecraftKey")
+    @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
     public static String getNameFromMinecraftKey(Object minecraftKeyHandle) {
         return minecraftKeyHandle.toString();
     }
@@ -454,7 +454,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.server.Entity>", optional=true)
+    @ConverterMethod(output="net.minecraft.server.EntitySlice<net.minecraft.world.entity.Entity>", optional=true)
     public static Object cbListToEntitySlice(List<?> entitySliceList) {
         if (entitySliceList instanceof EntitySliceProxy_1_8_3) {
             return ((EntitySliceProxy_1_8_3<?>) entitySliceList).getHandle().getRaw();
@@ -499,7 +499,7 @@ public class HandleConversion {
         return VoxelShapeHandle.createRawFromAABB(axisAlignedBBHandles);
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumChatFormat")
+    @ConverterMethod(output="net.minecraft.EnumChatFormat")
     public static Object chatColorToEnumChatFormatHandle(ChatColor color) {
         return EnumChatFormatHandle.byChar(color.getChar()).getRaw();
     }

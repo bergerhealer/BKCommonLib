@@ -11,9 +11,9 @@ import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldDataServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
@@ -417,11 +417,11 @@ class WorldServer extends World {
 
         // Custom world, dimension key is by world name lower-cased
         String name = instance.worldData.getName().toLowerCase(java.util.Locale.ENGLISH);
-        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, new MinecraftKey(name));
+        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, new net.minecraft.resources.MinecraftKey(name));
     }
 
     public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
-        String name = (String) com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle.T.name.get(key.name);
+        String name = (String) com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.name.get(key.name);
         MinecraftServer server = MinecraftServer.getServer();
 
   #if version >= 1.13.1

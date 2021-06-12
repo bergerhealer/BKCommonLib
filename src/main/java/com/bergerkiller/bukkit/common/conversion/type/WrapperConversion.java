@@ -42,32 +42,32 @@ import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
-import com.bergerkiller.generated.net.minecraft.server.BaseBlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
+import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumChatFormatHandle;
-import com.bergerkiller.generated.net.minecraft.server.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
-import com.bergerkiller.generated.net.minecraft.server.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -84,7 +84,7 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
 
-    @ConverterMethod(input="net.minecraft.server.Entity", output="T extends org.bukkit.entity.Entity")
+    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="T extends org.bukkit.entity.Entity")
     public static org.bukkit.entity.Entity toEntity(Object nmsEntityHandle) {
         return EntityHandle.T.getBukkitEntity.invoker.invoke(nmsEntityHandle);
     }
@@ -241,7 +241,7 @@ public class WrapperConversion {
         return CraftInventoryBeaconHandle.createNew(nmsTileEntityBeaconHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.IInventory")
+    @ConverterMethod(input="net.minecraft.world.IInventory")
     public static org.bukkit.inventory.Inventory toInventory(Object nmsIInventoryHandle) {
         return CraftInventoryHandle.createNew(nmsIInventoryHandle);
     }
@@ -257,7 +257,7 @@ public class WrapperConversion {
     }
 
     @SuppressWarnings("deprecation")
-    @ConverterMethod(input="net.minecraft.server.EnumDifficulty")
+    @ConverterMethod(input="net.minecraft.world.EnumDifficulty")
     public static org.bukkit.Difficulty toDifficulty(Object nmsEnumDifficultyHandle) {
         Integer id = EnumDifficultyHandle.T.getId.invoker.invoke(nmsEnumDifficultyHandle);
         return Difficulty.getByValue(id.intValue());
@@ -296,12 +296,12 @@ public class WrapperConversion {
         return ParseUtil.parseEnum(org.bukkit.GameMode.class, text, null);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumHand", output="org.bukkit.inventory.MainHand", optional=true)
+    @ConverterMethod(input="net.minecraft.world.EnumHand", output="org.bukkit.inventory.MainHand", optional=true)
     public static Object fromEnumHandToMainHand(Object nmsEnumHandHandle) {
         return HumanHand.fromNMSEnumHand(null, nmsEnumHandHandle).toMainHand();
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumHand", optional=true)
+    @ConverterMethod(input="net.minecraft.world.EnumHand", optional=true)
     public static HumanHand fromEnumHandToHumanHand(Object nmsEnumHandHandle) {
         return HumanHand.fromNMSEnumHand(null, nmsEnumHandHandle);
     }
@@ -330,7 +330,7 @@ public class WrapperConversion {
         return ChunkCoordIntPairHandle.T.toIntVector2.invoker.invoke(nmsChunkCoordIntPairHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.BlockPosition")
+    @ConverterMethod(input="net.minecraft.core.BlockPosition")
     public static IntVector3 toIntVector3(Object nmsBlockPositionHandle) {
         return BaseBlockPositionHandle.T.toIntVector3.invoker.invoke(nmsBlockPositionHandle);
     }
@@ -345,7 +345,7 @@ public class WrapperConversion {
         return Vec3DHandle.T.toBukkit.invoker.invoke(nmsVec3DHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.Vector3f")
+    @ConverterMethod(input="net.minecraft.core.Vector3f")
     public static Vector fromVector3fToVector(Object nmsVector3fHandle) {
         Vector3fHandle handle = Vector3fHandle.createHandle(nmsVector3fHandle);
         return new Vector(handle.getX(), handle.getY(), handle.getZ());
@@ -535,7 +535,7 @@ public class WrapperConversion {
     }
 
     @SuppressWarnings({ "unchecked" })
-    @ConverterMethod(input="net.minecraft.server.NonNullList<E>", optional=true)
+    @ConverterMethod(input="net.minecraft.core.NonNullList<E>", optional=true)
     public static <E> List<E> toList(Object nonNullListHandle) {
         return (List<E>) nonNullListHandle;
     }
@@ -587,12 +587,12 @@ public class WrapperConversion {
         return key.getPath();
     }
 
-    @ConverterMethod(output="net.minecraft.server.MinecraftKey")
+    @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
     public static Object resourceKeyToMinecraftKey(ResourceKey<?> key) {
         return key.getName().getRaw();
     }
 
-    @ConverterMethod(input="net.minecraft.server.MinecraftKey")
+    @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
     public static ResourceKey<SoundEffect> minecraftKeyToSoundEffectResourceKey(Object minecraftKeyHandle) {
         return ResourceCategory.sound_effect.createKey(MinecraftKeyHandle.createHandle(minecraftKeyHandle));
     }
@@ -614,12 +614,12 @@ public class WrapperConversion {
 
     private static final BlockFace[] enumDirectionValues = { BlockFace.DOWN, BlockFace.UP, BlockFace.NORTH, BlockFace.SOUTH, BlockFace.WEST, BlockFace.EAST };
 
-    @ConverterMethod(input="net.minecraft.server.EnumDirection")
+    @ConverterMethod(input="net.minecraft.core.EnumDirection")
     public static BlockFace blockFaceFromEnumDirection(Object nmsEnumDirectionHandle) {
         return enumDirectionValues[((Enum<?>) nmsEnumDirectionHandle).ordinal()];
     }
 
-    @ConverterMethod(output="net.minecraft.server.EnumDirection")
+    @ConverterMethod(output="net.minecraft.core.EnumDirection")
     public static Object blockFaceToEnumDirection(BlockFace direction) {
         Class<?> enumClass = CommonUtil.getNMSClass("EnumDirection");
         if (enumClass != null) {
@@ -654,7 +654,7 @@ public class WrapperConversion {
         return CraftBlockDataHandle.T.getState.raw.invoke(bukkitBlockData);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EnumChatFormat")
+    @ConverterMethod(input="net.minecraft.EnumChatFormat")
     public static ChatColor chatColorFromEnumChatFormatHandle(Object nmsEnumChatFormat) {
         String s = nmsEnumChatFormat.toString();
         if (s.length() >= 2) {

@@ -4,8 +4,8 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-import com.bergerkiller.generated.net.minecraft.server.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.ResourceKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
 
 /**
  * Type of resource represented by a resource key

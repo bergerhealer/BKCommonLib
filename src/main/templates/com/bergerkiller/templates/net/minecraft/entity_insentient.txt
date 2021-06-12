@@ -1,0 +1,30 @@
+package net.minecraft.world.entity;
+
+import net.minecraft.server.NavigationAbstract;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+
+class EntityInsentient extends EntityLiving {
+    public (EntityHandle) Entity getLeashHolder();
+
+    public (Object) NavigationAbstract getNavigation();
+
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:b;
+#elseif version >= 1.9
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:a;
+#else
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:###;
+#endif
+
+    public boolean isSleeping();
+
+    <code>
+    public static final Key<Byte> DATA_INSENTIENT_FLAGS = Key.Type.BYTE.createKey(T.DATA_INSENTIENT_FLAGS, 11);
+    public static final int DATA_INSENTIENT_FLAG_NOAI = (1 << 0);
+    public static final int DATA_INSENTIENT_FLAG_LEFT_HANDED = (1 << 1);
+    </code>
+}

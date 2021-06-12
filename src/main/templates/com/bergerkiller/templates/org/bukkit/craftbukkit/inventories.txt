@@ -1,9 +1,9 @@
 package org.bukkit.craftbukkit.inventory;
 
-import com.bergerkiller.generated.net.minecraft.server.IInventoryHandle;
+import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
 
-import net.minecraft.server.IInventory;
+import net.minecraft.world.IInventory;
 
 class CraftItemStack {
     (Object) net.minecraft.server.ItemStack handle;

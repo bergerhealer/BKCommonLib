@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.HeightMap;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import org.bukkit.Chunk;
 import org.bukkit.block.BlockState;
 import java.util.Collection;

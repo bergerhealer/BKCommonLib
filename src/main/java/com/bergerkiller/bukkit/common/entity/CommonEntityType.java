@@ -12,7 +12,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;

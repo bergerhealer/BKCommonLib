@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import java.util.List;
 
 /**

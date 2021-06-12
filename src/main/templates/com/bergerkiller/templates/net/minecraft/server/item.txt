@@ -1,13 +1,21 @@
 package net.minecraft.server;
 
+import net.minecraft.server.Item;
+import net.minecraft.server.ItemStack;
+import net.minecraft.server.CreativeModeTab;
+
+import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryMaterials;
+import net.minecraft.resources.MinecraftKey;
+
 import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 
 class Item {
     public static Iterable<?> getRegistry() {
 #if version >= 1.14
-        #require net.minecraft.server.IRegistry public static final RegistryBlocks<Item> REGISTRY:ITEM;
+        #require net.minecraft.core.IRegistry public static final RegistryBlocks<Item> REGISTRY:ITEM;
 #elseif version >= 1.13.1
-        #require net.minecraft.server.IRegistry public static final IRegistry<Item> REGISTRY:ITEM;
+        #require net.minecraft.core.IRegistry public static final IRegistry<Item> REGISTRY:ITEM;
 #else
         #require net.minecraft.server.Item public static final RegistryMaterials<MinecraftKey, Item> REGISTRY;
 #endif
