@@ -32,6 +32,3 @@ class InventoryMerchant extends IInventory {
     private final (Object) IMerchant merchant;
 }
 
-class CreativeModeTab {
-    public static final (CreativeModeTabHandle) CreativeModeTab SEARCH:g;
-}

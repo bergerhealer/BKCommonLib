@@ -3,6 +3,7 @@ package net.minecraft.server;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.world.item.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -18,7 +19,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
@@ -582,7 +583,7 @@ class EntityItemFrame extends Entity {
         if (item == null) {
             return null;
         }
-        return (java.util.UUID) com.bergerkiller.generated.net.minecraft.server.ItemStackHandle.T.getMapDisplayUUID.invoke(item);
+        return (java.util.UUID) com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle.T.getMapDisplayUUID.invoke(item);
     }
 
     public (org.bukkit.inventory.ItemStack) ItemStack getItem();

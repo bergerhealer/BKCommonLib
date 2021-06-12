@@ -1,18 +1,19 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.item;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.server.IBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.ItemStack</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.item.ItemStack</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.ItemStack")
+@Template.InstanceType("net.minecraft.world.item.ItemStack")
 public abstract class ItemStackHandle extends Template.Handle {
     /** @See {@link ItemStackClass} */
     public static final ItemStackClass T = Template.Class.create(ItemStackClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -82,7 +83,7 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract CommonTagCompound getTagField();
     public abstract void setTagField(CommonTagCompound value);
     /**
-     * Stores class members for <b>net.minecraft.server.ItemStack</b>.
+     * Stores class members for <b>net.minecraft.world.item.ItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ItemStackClass extends Template.Class<ItemStackHandle> {

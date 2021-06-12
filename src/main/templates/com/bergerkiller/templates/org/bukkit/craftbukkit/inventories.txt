@@ -6,13 +6,13 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventor
 import net.minecraft.world.IInventory;
 
 class CraftItemStack {
-    (Object) net.minecraft.server.ItemStack handle;
+    (Object) net.minecraft.world.item.ItemStack handle;
 
-    public static (Object) net.minecraft.server.ItemStack asNMSCopy(org.bukkit.inventory.ItemStack original);
+    public static (Object) net.minecraft.world.item.ItemStack asNMSCopy(org.bukkit.inventory.ItemStack original);
 
     public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftCopy(org.bukkit.inventory.ItemStack original);
 
-    public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.server.ItemStack nmsItemStack);
+    public static (org.bukkit.inventory.ItemStack) CraftItemStack asCraftMirror((Object) net.minecraft.world.item.ItemStack nmsItemStack);
 
     public static org.bukkit.inventory.meta.ItemMeta deserializeItemMeta(java.util.Map<String, Object> values) {
         return CraftMetaItem$SerializableMeta.deserialize(values);

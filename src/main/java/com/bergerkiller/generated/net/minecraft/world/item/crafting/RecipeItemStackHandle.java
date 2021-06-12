@@ -1,16 +1,16 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.item.crafting;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.RecipeItemStack</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.item.crafting.RecipeItemStack</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.RecipeItemStack")
+@Template.InstanceType("net.minecraft.world.item.crafting.RecipeItemStack")
 public abstract class RecipeItemStackHandle extends Template.Handle {
     /** @See {@link RecipeItemStackClass} */
     public static final RecipeItemStackClass T = Template.Class.create(RecipeItemStackClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -30,7 +30,7 @@ public abstract class RecipeItemStackHandle extends Template.Handle {
         return raw;
     }
     /**
-     * Stores class members for <b>net.minecraft.server.RecipeItemStack</b>.
+     * Stores class members for <b>net.minecraft.world.item.crafting.RecipeItemStack</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RecipeItemStackClass extends Template.Class<RecipeItemStackHandle> {

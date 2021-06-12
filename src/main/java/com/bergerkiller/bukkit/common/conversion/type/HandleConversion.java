@@ -54,10 +54,8 @@ import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
 import com.bergerkiller.generated.net.minecraft.server.VoxelShapeHandle;
@@ -65,6 +63,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
@@ -118,7 +118,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.ItemStack", acceptsNull = true)
+    @ConverterMethod(output="net.minecraft.world.item.ItemStack", acceptsNull = true)
     public static Object toItemStackHandle(org.bukkit.inventory.ItemStack itemStack) {
         Object raw_handle = null;
         if (itemStack != null) {
@@ -177,7 +177,7 @@ public class HandleConversion {
         return EntityHandle.T.getDataWatcher.raw.invoke(nmsEntityHandle);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.Item")
+    @ConverterMethod(output="T extends net.minecraft.world.item.Item")
     public static Object toItemHandle(org.bukkit.Material material) {
         return CraftMagicNumbersHandle.getItemFromMaterial(material);
     }
@@ -390,13 +390,13 @@ public class HandleConversion {
     }
 
     // <= 1.11.2
-    @ConverterMethod(output="net.minecraft.server.ItemStack")
+    @ConverterMethod(output="net.minecraft.world.item.ItemStack")
     public static Object toDefaultItemStackHandle(CraftInputSlot slot) {
         return toItemStackHandle(slot.getDefaultChoice());
     }
 
     // 1.12 =>
-    @ConverterMethod(output="net.minecraft.server.RecipeItemStack", optional=true)
+    @ConverterMethod(output="net.minecraft.world.item.crafting.RecipeItemStack", optional=true)
     public static Object toRecipeItemStackHandle(CraftInputSlot slot) {
         return RecipeItemStackHandle.createRawRecipeItemStack(Arrays.asList(slot.getChoices()));
     }

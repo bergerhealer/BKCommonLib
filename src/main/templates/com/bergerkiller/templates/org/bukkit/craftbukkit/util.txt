@@ -79,18 +79,18 @@ class LongObjectHashMap {
 class CraftMagicNumbers {
     public static org.bukkit.Material getMaterialFromBlock:getMaterial((Object) net.minecraft.server.Block nmsBlock);
 
-    public static org.bukkit.Material getMaterialFromItem:getMaterial((Object) net.minecraft.server.Item nmsItem);
+    public static org.bukkit.Material getMaterialFromItem:getMaterial((Object) net.minecraft.world.item.Item nmsItem);
 
 #if version >= 1.15.2
     // Workaround for bug since 1.15.2 with legacy materials
-    public static (Object) net.minecraft.server.Item getItemFromMaterial(org.bukkit.Material material) {
+    public static (Object) net.minecraft.world.item.Item getItemFromMaterial(org.bukkit.Material material) {
         return CraftMagicNumbers.getItem(org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material));
     }
     public static (Object) net.minecraft.server.Block getBlockFromMaterial(org.bukkit.Material material) {
         return CraftMagicNumbers.getBlock(org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(material));
     }
 #else
-    public static (Object) net.minecraft.server.Item getItemFromMaterial:getItem(org.bukkit.Material material);
+    public static (Object) net.minecraft.world.item.Item getItemFromMaterial:getItem(org.bukkit.Material material);
     public static (Object) net.minecraft.server.Block getBlockFromMaterial:getBlock(org.bukkit.Material material);
 #endif
 

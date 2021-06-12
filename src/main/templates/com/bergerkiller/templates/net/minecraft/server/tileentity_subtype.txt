@@ -1,6 +1,8 @@
 package net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import net.minecraft.world.item.ItemStack;
+
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 class TileEntityFurnace extends TileEntity {
 #if version >= 1.14

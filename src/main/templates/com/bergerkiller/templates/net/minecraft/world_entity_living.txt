@@ -6,7 +6,7 @@ import net.minecraft.server.AttributeModifiable;
 import net.minecraft.server.AttributeMapBase;
 import net.minecraft.server.AttributeDefaults;
 import net.minecraft.core.NonNullList;
-import net.minecraft.server.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.MobEffectList;
 import net.minecraft.server.MobEffect;
 import net.minecraft.server.EnumItemSlot;

@@ -1,16 +1,17 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.item.crafting;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.inventory.ItemStack;
 import java.util.Map;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.RecipesFurnace</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.item.crafting.RecipesFurnace</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.RecipesFurnace")
+@Template.InstanceType("net.minecraft.world.item.crafting.RecipesFurnace")
 public abstract class RecipesFurnaceHandle extends Template.Handle {
     /** @See {@link RecipesFurnaceClass} */
     public static final RecipesFurnaceClass T = Template.Class.create(RecipesFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -30,7 +31,7 @@ public abstract class RecipesFurnaceHandle extends Template.Handle {
     public abstract Map<ItemStack, ItemStack> getRecipes();
     public abstract void setRecipes(Map<ItemStack, ItemStack> value);
     /**
-     * Stores class members for <b>net.minecraft.server.RecipesFurnace</b>.
+     * Stores class members for <b>net.minecraft.world.item.crafting.RecipesFurnace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class RecipesFurnaceClass extends Template.Class<RecipesFurnaceHandle> {

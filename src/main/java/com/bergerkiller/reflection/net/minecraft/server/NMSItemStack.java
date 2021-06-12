@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 

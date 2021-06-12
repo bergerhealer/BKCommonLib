@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.item.crafting;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
@@ -6,11 +6,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.IRecipe</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.item.crafting.IRecipe</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.IRecipe")
+@Template.InstanceType("net.minecraft.world.item.crafting.IRecipe")
 public abstract class IRecipeHandle extends Template.Handle {
     /** @See {@link IRecipeClass} */
     public static final IRecipeClass T = Template.Class.create(IRecipeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -25,7 +25,7 @@ public abstract class IRecipeHandle extends Template.Handle {
     public abstract ItemStack getOutput();
     public abstract List<CraftInputSlot> getIngredients();
     /**
-     * Stores class members for <b>net.minecraft.server.IRecipe</b>.
+     * Stores class members for <b>net.minecraft.world.item.crafting.IRecipe</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IRecipeClass extends Template.Class<IRecipeHandle> {

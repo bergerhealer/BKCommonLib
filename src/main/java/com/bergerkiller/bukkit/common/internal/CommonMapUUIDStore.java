@@ -5,7 +5,7 @@ import java.util.UUID;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
 /**

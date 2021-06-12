@@ -1,9 +1,9 @@
 package net.minecraft.world;
 
-import net.minecraft.server.ItemStack;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.server.EntityHuman;
 
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 interface IInventory {
     public abstract int getSize();

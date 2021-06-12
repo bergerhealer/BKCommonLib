@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
-import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 import org.bukkit.inventory.ItemStack;

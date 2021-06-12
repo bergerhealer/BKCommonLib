@@ -3,6 +3,7 @@ package net.minecraft.server;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.item.ItemStack;
 
 import com.mojang.authlib.GameProfile;
 

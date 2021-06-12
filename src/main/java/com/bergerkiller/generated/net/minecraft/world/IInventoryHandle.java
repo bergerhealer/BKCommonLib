@@ -1,7 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;

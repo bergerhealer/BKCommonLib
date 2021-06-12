@@ -1,14 +1,10 @@
-package net.minecraft.server;
-
-import net.minecraft.server.Item;
-import net.minecraft.server.ItemStack;
-import net.minecraft.server.CreativeModeTab;
+package net.minecraft.world.item;
 
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
 
-import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.CreativeModeTabHandle;
 
 class Item {
     public static Iterable<?> getRegistry() {
@@ -17,7 +13,7 @@ class Item {
 #elseif version >= 1.13.1
         #require net.minecraft.core.IRegistry public static final IRegistry<Item> REGISTRY:ITEM;
 #else
-        #require net.minecraft.server.Item public static final RegistryMaterials<MinecraftKey, Item> REGISTRY;
+        #require net.minecraft.world.item.Item public static final RegistryMaterials<MinecraftKey, Item> REGISTRY;
 #endif
         return #REGISTRY;
     }
@@ -58,4 +54,8 @@ class Item {
         return result;
     }
 #endif
+}
+
+class CreativeModeTab {
+    public static final (CreativeModeTabHandle) CreativeModeTab SEARCH:g;
 }

@@ -11,10 +11,10 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
-import com.bergerkiller.generated.net.minecraft.server.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.CreativeModeTabHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
 import java.util.ArrayList;

@@ -1,12 +1,16 @@
-package net.minecraft.server;
+package net.minecraft.world.item.crafting;
+
+import net.minecraft.core.NonNullList;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
 
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 
-import com.bergerkiller.generated.net.minecraft.server.RegistryMaterialsHandle;
-import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.FurnaceRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 #if version >= 1.12
 
@@ -15,7 +19,7 @@ class IRecipe {
     public (org.bukkit.inventory.ItemStack) ItemStack getOutput() {
         if (instance instanceof RecipeFireworks) {
             // Special case (see getIngredients code)
-            net.minecraft.server.ItemStack itemstack = new ItemStack(net.minecraft.server.Items.FIREWORK_ROCKET, 3);
+            net.minecraft.world.item.ItemStack itemstack = new ItemStack(net.minecraft.world.item.Items.FIREWORK_ROCKET, 3);
             net.minecraft.nbt.NBTTagCompound nbttagcompound = itemstack.a("Fireworks");
             nbttagcompound.setByte("Flight", (byte) 3);
             return itemstack;
@@ -38,7 +42,7 @@ class IRecipe {
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
 #case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.server.ShapedRecipes private final NonNullList<RecipeItemStack> items;
+#case else:     #require net.minecraft.world.item.crafting.ShapedRecipes private final NonNullList<RecipeItemStack> items;
                 return instance#items;
 #endselect
         } else if (instance instanceof ShapelessRecipes) {
@@ -47,7 +51,7 @@ class IRecipe {
 #case 1.14:     return s.a();
 #case 1.13:     return s.e();
 #case 1.12.1:   return s.d();
-#case else:     #require net.minecraft.server.ShapelessRecipes private final NonNullList<RecipeItemStack> ingredients;
+#case else:     #require net.minecraft.world.item.crafting.ShapelessRecipes private final NonNullList<RecipeItemStack> ingredients;
                 return instance#ingredients;
 #endselect
 
@@ -58,8 +62,8 @@ class IRecipe {
             // crafting a flight 3 firework:
             // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
             Object[] ingredients = new Object[4];
-            ingredients[0] = net.minecraft.server.RecipeItemStack.a(new net.minecraft.server.Item[] { net.minecraft.server.Items.PAPER });
-            ingredients[1] = net.minecraft.server.RecipeItemStack.a(new net.minecraft.server.Item[] { net.minecraft.server.Items.GUNPOWDER });
+            ingredients[0] = RecipeItemStack.a(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.PAPER });
+            ingredients[1] = RecipeItemStack.a(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.GUNPOWDER });
             ingredients[2] = ingredients[1];
             ingredients[3] = ingredients[1];
             return NonNullList.a((Object) RecipeItemStack.a, ingredients);
@@ -114,14 +118,14 @@ optional class RecipesFurnace {
 optional class FurnaceRecipe extends IRecipe {
     public (CraftInputSlot) RecipeItemStack getIngredient() {
 #if version >= 1.14
-        #require net.minecraft.server.RecipeCooking protected final RecipeItemStack ingredient;
+        #require net.minecraft.world.item.crafting.RecipeCooking protected final RecipeItemStack ingredient;
 #elseif version >= 1.13
-        #require net.minecraft.server.FurnaceRecipe private final RecipeItemStack ingredient;
+        #require net.minecraft.world.item.crafting.FurnaceRecipe private final RecipeItemStack ingredient;
 #endif
         return instance#ingredient;
     }
 
-    public static (Iterable<com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
+    public static (Iterable<FurnaceRecipeHandle>) Iterable<FurnaceRecipe> getRecipes() {
         java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
         java.util.List filteredResult = new java.util.ArrayList();
         while (allRecipes.hasNext()) {
@@ -135,7 +139,7 @@ optional class FurnaceRecipe extends IRecipe {
 }
 
 class CraftingManager {
-    public static (Iterable<com.bergerkiller.generated.net.minecraft.server.IRecipeHandle>) Iterable<IRecipe> getRecipes() {
+    public static (Iterable<IRecipeHandle>) Iterable<IRecipe> getRecipes() {
 #if version >= 1.13
         java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
         java.util.List filteredResult = new java.util.ArrayList();

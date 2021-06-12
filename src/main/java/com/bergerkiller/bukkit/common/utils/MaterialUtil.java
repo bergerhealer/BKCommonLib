@@ -16,7 +16,7 @@ import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 
 import org.bukkit.Material;

@@ -7,12 +7,12 @@ import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.inventory.CraftRecipe;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
-import com.bergerkiller.generated.net.minecraft.server.CraftingManagerHandle;
-import com.bergerkiller.generated.net.minecraft.server.FurnaceRecipeHandle;
-import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
-import com.bergerkiller.generated.net.minecraft.server.RecipesFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.CraftingManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.FurnaceRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipesFurnaceHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingSet;
 

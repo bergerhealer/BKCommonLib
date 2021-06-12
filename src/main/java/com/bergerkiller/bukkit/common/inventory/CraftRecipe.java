@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.inventory;
 
 import com.bergerkiller.bukkit.common.utils.*;
-import com.bergerkiller.generated.net.minecraft.server.IRecipeHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.IRecipeHandle;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.Inventory;

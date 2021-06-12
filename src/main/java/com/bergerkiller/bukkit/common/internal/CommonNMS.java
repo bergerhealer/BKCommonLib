@@ -9,11 +9,11 @@ import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 

@@ -57,10 +57,8 @@ import com.bergerkiller.generated.net.minecraft.server.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.server.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.Vec3DHandle;
@@ -68,6 +66,8 @@ import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryBeaconHandle;
@@ -182,7 +182,7 @@ public class WrapperConversion {
         return block.getType();
     }
 
-    @ConverterMethod(input="net.minecraft.server.Item")
+    @ConverterMethod(input="net.minecraft.world.item.Item")
     public static org.bukkit.Material toMaterialFromItemHandle(Object nmsItemHandle) {
         return CraftMagicNumbersHandle.getMaterialFromItem(nmsItemHandle);
     }
@@ -197,7 +197,7 @@ public class WrapperConversion {
         return ParseUtil.parseMaterial(text, null);
     }
 
-    @ConverterMethod(input="net.minecraft.server.ItemStack", acceptsNull = true)
+    @ConverterMethod(input="net.minecraft.world.item.ItemStack", acceptsNull = true)
     public static org.bukkit.inventory.ItemStack toItemStack(Object nmsItemStackHandle) {
         if (nmsItemStackHandle == null || ItemStackHandle.T.getTypeField.raw.invoke(nmsItemStackHandle) == null) {
             return null;
@@ -549,7 +549,7 @@ public class WrapperConversion {
     }
 
     // 1.12 =>
-    @ConverterMethod(input="net.minecraft.server.RecipeItemStack", optional=true)
+    @ConverterMethod(input="net.minecraft.world.item.crafting.RecipeItemStack", optional=true)
     public static CraftInputSlot toCraftInputSlot(Object recipeItemStackHandle) {
         List<org.bukkit.inventory.ItemStack> choices = RecipeItemStackHandle.T.getChoices.invoke(recipeItemStackHandle);
         if (choices == null) {

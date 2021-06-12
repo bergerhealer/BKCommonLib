@@ -27,15 +27,18 @@
 #include /net/minecraft/core_registry.txt
 #include /net/minecraft/core_vector3f.txt
 #include /net/minecraft/crashreport.txt
-#include /net/minecraft/entity_insentient.txt
-#include /net/minecraft/entity_living.txt
-#include /net/minecraft/entity_types.txt
-#include /net/minecraft/entity.txt
 #include /net/minecraft/enums.txt
 #include /net/minecraft/nbt.txt
 #include /net/minecraft/resources_minecraftkey.txt
 #include /net/minecraft/resources_resourcekey.txt
+#include /net/minecraft/world_entity_insentient.txt
+#include /net/minecraft/world_entity_living.txt
+#include /net/minecraft/world_entity_types.txt
+#include /net/minecraft/world_entity.txt
 #include /net/minecraft/world_inventory.txt
+#include /net/minecraft/world_item_crafting_recipes.txt
+#include /net/minecraft/world_item_item.txt
+#include /net/minecraft/world_item_itemstack.txt
 
 #include /net/minecraft/server/server.txt
 #include /net/minecraft/server/enums.txt
@@ -47,7 +50,6 @@
 #include /net/minecraft/server/mobspawner.txt
 #include /net/minecraft/server/inthashmap.txt
 #include /net/minecraft/server/vectors.txt
-#include /net/minecraft/server/recipes.txt
 #include /net/minecraft/server/map.txt
 #include /net/minecraft/server/registry.txt
 #include /net/minecraft/server/mobeffect.txt
@@ -65,7 +67,6 @@
 #include /net/minecraft/server/world.txt
 #include /net/minecraft/server/chunk.txt
 #include /net/minecraft/server/heightmap.txt
-#include /net/minecraft/server/item.txt
 #include /net/minecraft/server/foodmeta.txt
 #include /net/minecraft/server/block.txt
 #include /net/minecraft/server/blockdata.txt
@@ -73,7 +74,6 @@
 #include /net/minecraft/server/datawatcher.txt
 #include /net/minecraft/server/inventories.txt
 #include /net/minecraft/server/container.txt
-#include /net/minecraft/server/itemstack.txt
 #include /net/minecraft/server/tileentity.txt
 #include /net/minecraft/server/tileentity_subtype.txt
 #include /com/bergerkiller/bukkit/common/internal/longhashset.txt

@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.item;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Item</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.item.Item</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Item")
+@Template.InstanceType("net.minecraft.world.item.Item")
 public abstract class ItemHandle extends Template.Handle {
     /** @See {@link ItemClass} */
     public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -31,7 +31,7 @@ public abstract class ItemHandle extends Template.Handle {
     public abstract String getInternalName(ItemStack itemstack);
     public abstract List<ItemStack> getItemVariants(CreativeModeTabHandle creativemodetab);
     /**
-     * Stores class members for <b>net.minecraft.server.Item</b>.
+     * Stores class members for <b>net.minecraft.world.item.Item</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ItemClass extends Template.Class<ItemHandle> {

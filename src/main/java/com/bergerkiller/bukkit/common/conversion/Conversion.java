@@ -54,8 +54,8 @@ public class Conversion {
     public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.EntityPlayer");
     public static final InputConverter<Object> toWorldHandle = getConverterToHandle("net.minecraft.server.World");
     public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.server.Chunk");
-    public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.server.ItemStack");
-    public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.server.Item");
+    public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.world.item.ItemStack");
+    public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.world.item.Item");
     public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.server.TileEntity");
     public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.world.IInventory");
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.server.DataWatcher");
