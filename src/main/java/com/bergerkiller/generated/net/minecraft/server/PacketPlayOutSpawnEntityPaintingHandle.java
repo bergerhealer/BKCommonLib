@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.server;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.Art;
 import org.bukkit.block.BlockFace;
 import java.util.UUID;

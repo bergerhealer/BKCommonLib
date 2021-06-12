@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.network.protocol.Packet;
+
 import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityLivingHandle;

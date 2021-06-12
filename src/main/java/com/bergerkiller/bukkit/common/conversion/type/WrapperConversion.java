@@ -46,12 +46,11 @@ import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
@@ -63,6 +62,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
@@ -166,7 +166,7 @@ public class WrapperConversion {
         return BlockStateConversion.INSTANCE.blockToBlockState(block);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcher")
+    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher")
     public static com.bergerkiller.bukkit.common.wrappers.DataWatcher toDataWatcher(Object nmsDataWatcherHandle) {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher(nmsDataWatcherHandle);
     }
@@ -320,7 +320,7 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.Packet")
+    @ConverterMethod(input="net.minecraft.network.protocol.Packet")
     public static CommonPacket toCommonPacket(Object nmsPacketHandle) {
         return new CommonPacket(nmsPacketHandle);
     }
@@ -464,12 +464,12 @@ public class WrapperConversion {
         return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcherObject")
+    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcherObject")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> toKey(Object nmsDataWatcherObjectHandle) {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T>(nmsDataWatcherObjectHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcher.Item")
+    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.Item")
     public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T> toDataWatcherItem(Object nmsDataWatcherItemHandle) {
         DataWatcherHandle.ItemHandle handle = DataWatcherHandle.ItemHandle.createHandle(nmsDataWatcherItemHandle);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
@@ -524,7 +524,7 @@ public class WrapperConversion {
         return EnumItemSlotHandle.fromIndexRaw(legacyEquipmentIndex);
     }
 
-    @ConverterMethod(input="net.minecraft.server.ChatMessageType", optional=true)
+    @ConverterMethod(input="net.minecraft.network.chat.ChatMessageType", optional=true)
     public static ChatMessageType toChatMessageType(Object nmsChatMessageType) {
         return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoker.invoke(nmsChatMessageType).byteValue());
     }

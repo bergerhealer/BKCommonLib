@@ -5,7 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
+import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityDestroyHandle;
 

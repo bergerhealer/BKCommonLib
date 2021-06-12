@@ -46,9 +46,9 @@ import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
@@ -167,12 +167,12 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.DataWatcher")
+    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher")
     public static Object toDataWatcherHandle(com.bergerkiller.bukkit.common.wrappers.DataWatcher dataWatcher) {
         return dataWatcher.getRawHandle();
     }
 
-    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="net.minecraft.server.DataWatcher")
+    @ConverterMethod(input="net.minecraft.world.entity.Entity", output="net.minecraft.network.syncher.DataWatcher")
     public static Object toDataWatcherHandle(Object nmsEntityHandle) {
         return EntityHandle.T.getDataWatcher.raw.invoke(nmsEntityHandle);
     }
@@ -232,12 +232,12 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.Packet")
+    @ConverterMethod(output="T extends net.minecraft.network.protocol.Packet")
     public static Object toPacketHandle(CommonPacket commonPacket) {
         return commonPacket.getHandle();
     }
 
-    @ConverterMethod(output="T extends net.minecraft.server.Packet<?>")
+    @ConverterMethod(output="T extends net.minecraft.network.protocol.Packet<?>")
     public static Object toPacketHandle2(CommonPacket commonPacket) {
         return commonPacket.getHandle();
     }
@@ -331,12 +331,12 @@ public class HandleConversion {
         return mobSpawner.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.DataWatcherObject<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcherObject<V>")
     public static Object toDataWatcherObjectHandle(DataWatcher.Key<?> keyWrapper) {
         return keyWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.DataWatcher.Item<V>")
+    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher.Item<V>")
     public static Object toDataWatcherItemHandle(DataWatcher.Item<?> itemWrapper) {
         return itemWrapper.getRawHandle();
     }
@@ -371,7 +371,7 @@ public class HandleConversion {
         return ItemSlotConversion.getEnumItemSlot(equipmentSlot);
     }
 
-    @ConverterMethod(output="net.minecraft.server.ChatMessageType", optional=true)
+    @ConverterMethod(output="net.minecraft.network.chat.ChatMessageType", optional=true)
     public static Object toChatMessageTypeHandle(ChatMessageType chatMessageType) {
         return ChatMessageTypeHandle.getRawById(chatMessageType.getId());
     }

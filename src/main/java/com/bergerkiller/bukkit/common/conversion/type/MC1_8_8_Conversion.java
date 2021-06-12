@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 /**
@@ -29,7 +29,7 @@ public class MC1_8_8_Conversion {
         return list.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.server.DataWatcher.WatchableObject")
+    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.WatchableObject")
     public static com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?> watchableObjectToItem(Object watchableObject) {
         DataWatcherHandle.ItemHandle handle = DataWatcherHandle.ItemHandle.createHandle(watchableObject);
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>(handle);

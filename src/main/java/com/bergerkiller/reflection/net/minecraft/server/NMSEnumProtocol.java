@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.generated.net.minecraft.server.EnumProtocolHandle;
+import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 @Deprecated

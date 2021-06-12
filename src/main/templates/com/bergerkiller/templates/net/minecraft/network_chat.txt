@@ -1,0 +1,8 @@
+package net.minecraft.network.chat;
+
+// version >= 1.12
+optional class ChatMessageType {
+    public byte getId:a();
+
+    public static (Object) ChatMessageType getRawById:a(byte id);
+}

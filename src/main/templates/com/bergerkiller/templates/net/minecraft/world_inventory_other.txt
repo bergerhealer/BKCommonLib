@@ -1,11 +1,33 @@
-package net.minecraft.server;
+package net.minecraft.world.inventory;
 
 import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.IInventory;
 import net.minecraft.world.item.ItemStack;
 
-import com.bergerkiller.generated.net.minecraft.server.SlotHandle;
-import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
-import com.bergerkiller.generated.net.minecraft.server.ContainerAnvilHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.SlotHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle;
+
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+
+class InventoryEnderChest extends IInventory {
+    public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist)
+
+#if version >= 1.16
+    public (CommonTagList) NBTTagList saveToNBT:g()
+#elseif version >= 1.14
+    public (CommonTagList) NBTTagList saveToNBT:f()
+#elseif version >= 1.11
+    public (CommonTagList) NBTTagList saveToNBT:i()
+#else
+    public (CommonTagList) NBTTagList saveToNBT:h()
+#endif
+}
+
+class InventoryMerchant extends IInventory {
+    private final (Object) net.minecraft.world.item.trading.IMerchant merchant;
+}
 
 class Container {
 #if version >= 1.12.2
@@ -28,9 +50,9 @@ class Container {
 
     public static ContainerHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
         if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
-            net.minecraft.server.Container handle;
+            net.minecraft.world.inventory.Container handle;
             handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
-            return com.bergerkiller.generated.net.minecraft.server.ContainerHandle.createHandle(handle);
+            return com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle.createHandle(handle);
         } else {
             return null;
         }
@@ -48,9 +70,9 @@ class ContainerAnvil extends Container {
 
     public static ContainerAnvilHandle fromBukkit(org.bukkit.inventory.InventoryView bukkitView) {
         if (bukkitView instanceof org.bukkit.craftbukkit.inventory.CraftInventoryView) {
-            net.minecraft.server.Container handle;
+            net.minecraft.world.inventory.Container handle;
             handle = ((org.bukkit.craftbukkit.inventory.CraftInventoryView) bukkitView).getHandle();
-            return com.bergerkiller.generated.net.minecraft.server.ContainerAnvilHandle.createHandle(handle);
+            return com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle.createHandle(handle);
         } else {
             return null;
         }

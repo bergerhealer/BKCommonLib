@@ -38,11 +38,12 @@ public abstract class NetworkManagerHandle extends Template.Handle {
             if (listenerType == null) {
                 throw new IllegalStateException("Class GenericFutureListener does not exist");
             }
+            Class<?> packetType = com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle.T.getType();
             if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
             } else {
                 listenerType = com.bergerkiller.bukkit.common.utils.LogicUtil.getArrayType(listenerType);
-                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
             }
             c.setAccessible(true);
         } catch (Throwable t) {

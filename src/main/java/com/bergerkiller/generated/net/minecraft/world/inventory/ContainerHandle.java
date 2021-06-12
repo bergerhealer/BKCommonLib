@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.InventoryView;
@@ -6,11 +6,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Container</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.inventory.Container</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Container")
+@Template.InstanceType("net.minecraft.world.inventory.Container")
 public abstract class ContainerHandle extends Template.Handle {
     /** @See {@link ContainerClass} */
     public static final ContainerClass T = Template.Class.create(ContainerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -34,7 +34,7 @@ public abstract class ContainerHandle extends Template.Handle {
     public abstract int getWindowId();
     public abstract void setWindowId(int value);
     /**
-     * Stores class members for <b>net.minecraft.server.Container</b>.
+     * Stores class members for <b>net.minecraft.world.inventory.Container</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ContainerClass extends Template.Class<ContainerHandle> {

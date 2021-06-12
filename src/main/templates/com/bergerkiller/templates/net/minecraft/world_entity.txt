@@ -587,7 +587,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public int ticksLived;
     public optional int field_maxFireTicks:maxFireTicks;
     public int fireTicks;
-    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher datawatcherField:datawatcher;
+    protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:datawatcher;
 
 #if version >= 1.16.2
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
@@ -1349,7 +1349,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public UUID getUniqueID();
 
-    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.server.DataWatcher getDataWatcher();
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher getDataWatcher();
 
 #if version >= 1.16.2
     public void onPush:i(double d0, double d1, double d2);

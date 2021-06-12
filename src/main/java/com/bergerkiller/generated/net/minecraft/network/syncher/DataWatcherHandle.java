@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.network.syncher;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
@@ -7,11 +7,11 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import java.util.List;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.DataWatcher</b>.
+ * Instance wrapper handle for type <b>net.minecraft.network.syncher.DataWatcher</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.DataWatcher")
+@Template.InstanceType("net.minecraft.network.syncher.DataWatcher")
 public abstract class DataWatcherHandle extends Template.Handle {
     /** @See {@link DataWatcherClass} */
     public static final DataWatcherClass T = Template.Class.create(DataWatcherClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -67,7 +67,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract EntityHandle getOwner();
     public abstract void setOwner(EntityHandle value);
     /**
-     * Stores class members for <b>net.minecraft.server.DataWatcher</b>.
+     * Stores class members for <b>net.minecraft.network.syncher.DataWatcher</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DataWatcherClass extends Template.Class<DataWatcherHandle> {
@@ -91,11 +91,11 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
 
     /**
-     * Instance wrapper handle for type <b>net.minecraft.server.DataWatcher.Item</b>.
+     * Instance wrapper handle for type <b>net.minecraft.network.syncher.DataWatcher.Item</b>.
      * To access members without creating a handle type, use the static {@link #T} member.
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
-    @Template.InstanceType("net.minecraft.server.DataWatcher.Item")
+    @Template.InstanceType("net.minecraft.network.syncher.DataWatcher.Item")
     public abstract static class ItemHandle extends Template.Handle {
         /** @See {@link ItemClass} */
         public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -126,7 +126,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
         public abstract boolean isChanged();
         public abstract void setChanged(boolean value);
         /**
-         * Stores class members for <b>net.minecraft.server.DataWatcher.Item</b>.
+         * Stores class members for <b>net.minecraft.network.syncher.DataWatcher.Item</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class ItemClass extends Template.Class<ItemHandle> {

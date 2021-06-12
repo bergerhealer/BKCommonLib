@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.ItemStack;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.Slot</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.inventory.Slot</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.Slot")
+@Template.InstanceType("net.minecraft.world.inventory.Slot")
 public abstract class SlotHandle extends Template.Handle {
     /** @See {@link SlotClass} */
     public static final SlotClass T = Template.Class.create(SlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -22,7 +22,7 @@ public abstract class SlotHandle extends Template.Handle {
 
     public abstract ItemStack getItem();
     /**
-     * Stores class members for <b>net.minecraft.server.Slot</b>.
+     * Stores class members for <b>net.minecraft.world.inventory.Slot</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SlotClass extends Template.Class<SlotHandle> {

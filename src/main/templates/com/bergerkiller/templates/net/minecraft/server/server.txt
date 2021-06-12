@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.network.protocol.Packet;
+
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 

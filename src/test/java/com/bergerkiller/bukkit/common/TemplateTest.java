@@ -18,7 +18,7 @@ import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -71,11 +71,11 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.StepSoundHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.SpawnRateHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.world.level.biome.SpawnRateHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WeightedRandomChoiceHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.WeightedRandomHandle.WeightedRandomChoiceHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.util.WeightedRandomChoiceHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.util.WeightedRandomHandle.WeightedRandomChoiceHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ChatSerializerHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle.ChatSerializerHandle";

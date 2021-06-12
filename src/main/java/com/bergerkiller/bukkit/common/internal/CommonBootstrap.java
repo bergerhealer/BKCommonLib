@@ -270,8 +270,8 @@ public class CommonBootstrap {
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
 
         // Since Minecraft 1.16.2 it has an entirely new Class, this makes the API look clean
-        remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeBase$BiomeMeta");
-        remappings.put(nms_root + ".BiomeSettingsMobs", nms_root + ".BiomeBase");
+        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeBase$BiomeMeta");
+        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", nms_root + ".BiomeBase");
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (evaluateMCVersion("<=", "1.8.8")) {
@@ -316,8 +316,8 @@ public class CommonBootstrap {
             remappings.put(nms_root + ".PacketPlayInBlockDig$EnumPlayerDigType", nms_root + ".EnumPlayerDigType");
             remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
             remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
-            remappings.put(nms_root + ".WeightedRandom$WeightedRandomChoice", nms_root + ".WeightedRandomChoice");
-            remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeMeta");
+            remappings.put("net.minecraft.util.WeightedRandom$WeightedRandomChoice", "net.minecraft.util.WeightedRandomChoice");
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeMeta");
             remappings.put(nms_root + ".IScoreboardCriteria$EnumScoreboardHealthDisplay", nms_root + ".EnumScoreboardHealthDisplay");
             remappings.put(nms_root + ".IntHashMap$IntHashMapEntry", nms_root + ".IntHashMapEntry");
             remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
@@ -431,8 +431,8 @@ public class CommonBootstrap {
         // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
         // Assume a more human-readable name and remap the name prior to the right place
         if (evaluateMCVersion(">=", "1.16.2")) {
-            remappings.put(nms_root + ".BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeSettingsMobs$c");
-            remappings.put(nms_root + ".BiomeSettingsMobs", nms_root + ".BiomeSettingsMobs");
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
         }
 
         // If remappings exist, add a resolver for them

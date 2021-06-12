@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import org.bukkit.inventory.InventoryView;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.ContainerAnvil</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.inventory.ContainerAnvil</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.ContainerAnvil")
+@Template.InstanceType("net.minecraft.world.inventory.ContainerAnvil")
 public abstract class ContainerAnvilHandle extends ContainerHandle {
     /** @See {@link ContainerAnvilClass} */
     public static final ContainerAnvilClass T = Template.Class.create(ContainerAnvilClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -27,7 +27,7 @@ public abstract class ContainerAnvilHandle extends ContainerHandle {
     public abstract String getRenameText();
     public abstract void setRenameText(String value);
     /**
-     * Stores class members for <b>net.minecraft.server.ContainerAnvil</b>.
+     * Stores class members for <b>net.minecraft.world.inventory.ContainerAnvil</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ContainerAnvilClass extends Template.Class<ContainerAnvilHandle> {

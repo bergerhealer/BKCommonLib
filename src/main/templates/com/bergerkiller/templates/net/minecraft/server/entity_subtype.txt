@@ -3,6 +3,7 @@ package net.minecraft.server;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.item.ItemStack;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -12,17 +13,18 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+
 import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
-import com.bergerkiller.generated.net.minecraft.server.ContainerHandle;
 import com.bergerkiller.generated.net.minecraft.server.PlayerConnectionHandle;
 
 class EntityHuman extends EntityLiving {

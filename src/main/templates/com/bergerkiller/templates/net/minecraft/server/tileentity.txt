@@ -104,11 +104,11 @@ class TileEntity {
         public (void) NBTTagCompound save((CommonTagCompound) NBTTagCompound nbttagcompound);
     #elseif version >= 1.9
         public (org.bukkit.Material) Block getType:getBlock();
-        public (CommonPacket) Packet<?> getUpdatePacket();
+        public (CommonPacket) net.minecraft.network.protocol.Packet<?> getUpdatePacket();
         public (void) void save((CommonTagCompound) NBTTagCompound nbttagcompound);
     #else
         public (org.bukkit.Material) Block getType:w();
-        public (CommonPacket) Packet getUpdatePacket();
+        public (CommonPacket) net.minecraft.network.protocol.Packet getUpdatePacket();
         public void save:b((CommonTagCompound) NBTTagCompound nbttagcompound);
     #endif
 #endif

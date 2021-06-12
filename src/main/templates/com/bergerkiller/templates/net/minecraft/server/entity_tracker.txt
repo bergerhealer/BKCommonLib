@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import net.minecraft.network.protocol.Packet;
+
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;

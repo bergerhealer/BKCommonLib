@@ -50,7 +50,7 @@ class CraftInventoryBrewer {
 class CraftInventoryMerchant {
     public static org.bukkit.inventory.MerchantInventory createNew((Object) net.minecraft.server.InventoryMerchant nmsInventoryMerchant) {
 #if version >= 1.14
-        Object merchant = com.bergerkiller.generated.net.minecraft.server.InventoryMerchantHandle.T.merchant.get(nmsInventoryMerchant);
+        Object merchant = com.bergerkiller.generated.net.minecraft.world.inventory.InventoryMerchantHandle.T.merchant.get(nmsInventoryMerchant);
         return new CraftInventoryMerchant((net.minecraft.server.IMerchant) merchant, nmsInventoryMerchant);
 #else
         return new CraftInventoryMerchant(nmsInventoryMerchant);

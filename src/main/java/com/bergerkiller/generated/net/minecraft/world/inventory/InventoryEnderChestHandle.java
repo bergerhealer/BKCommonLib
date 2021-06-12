@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.InventoryEnderChest</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.inventory.InventoryEnderChest</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.InventoryEnderChest")
+@Template.InstanceType("net.minecraft.world.inventory.InventoryEnderChest")
 public abstract class InventoryEnderChestHandle extends IInventoryHandle {
     /** @See {@link InventoryEnderChestClass} */
     public static final InventoryEnderChestClass T = Template.Class.create(InventoryEnderChestClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,7 +24,7 @@ public abstract class InventoryEnderChestHandle extends IInventoryHandle {
     public abstract void loadFromNBT(CommonTagList nbttaglist);
     public abstract CommonTagList saveToNBT();
     /**
-     * Stores class members for <b>net.minecraft.server.InventoryEnderChest</b>.
+     * Stores class members for <b>net.minecraft.world.inventory.InventoryEnderChest</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class InventoryEnderChestClass extends Template.Class<InventoryEnderChestHandle> {

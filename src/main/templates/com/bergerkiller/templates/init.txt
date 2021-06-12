@@ -28,19 +28,27 @@
 #include /net/minecraft/core_vector3f.txt
 #include /net/minecraft/crashreport.txt
 #include /net/minecraft/enums.txt
+#include /net/minecraft/network_chat.txt
+#include /net/minecraft/network_datawatcher.txt
+#include /net/minecraft/network_enumprotocol.txt
+#include /net/minecraft/network_protocol_direction.txt
+#include /net/minecraft/network_protocol_packet.txt
 #include /net/minecraft/nbt.txt
 #include /net/minecraft/resources_minecraftkey.txt
 #include /net/minecraft/resources_resourcekey.txt
 #include /net/minecraft/sounds.txt
+#include /net/minecraft/util_weightedrandom.txt
 #include /net/minecraft/world_entity_enums.txt
 #include /net/minecraft/world_entity_insentient.txt
 #include /net/minecraft/world_entity_living.txt
 #include /net/minecraft/world_entity_types.txt
 #include /net/minecraft/world_entity.txt
 #include /net/minecraft/world_inventory.txt
+#include /net/minecraft/world_inventory_other.txt
 #include /net/minecraft/world_item_crafting_recipes.txt
 #include /net/minecraft/world_item_item.txt
 #include /net/minecraft/world_item_itemstack.txt
+#include /net/minecraft/world_level_biome.txt
 #include /net/minecraft/world_level_block_soundeffecttype.txt
 #include /net/minecraft/world_level_chunkcoordintpair.txt
 #include /net/minecraft/world_level_mobspawner.txt
@@ -51,7 +59,6 @@
 #include /net/minecraft/world_phys_vec3d.txt
 
 #include /net/minecraft/server/server.txt
-#include /net/minecraft/server/enums.txt
 #include /net/minecraft/server/nibblearray.txt
 #include /net/minecraft/server/packets.txt
 #include /net/minecraft/server/packets_movement.txt
@@ -77,9 +84,7 @@
 #include /net/minecraft/server/block.txt
 #include /net/minecraft/server/blockdata.txt
 #include /net/minecraft/server/block_subtype.txt
-#include /net/minecraft/server/datawatcher.txt
 #include /net/minecraft/server/inventories.txt
-#include /net/minecraft/server/container.txt
 #include /net/minecraft/server/tileentity.txt
 #include /net/minecraft/server/tileentity_subtype.txt
 #include /com/bergerkiller/bukkit/common/internal/longhashset.txt

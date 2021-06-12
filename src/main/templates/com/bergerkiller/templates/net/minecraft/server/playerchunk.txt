@@ -103,7 +103,7 @@ class PlayerChunk {
         while (iter.hasNext()) {
             EntityPlayer player = (EntityPlayer) iter.next();
             if (player.playerConnection != null) {
-                player.playerConnection.sendPacket((net.minecraft.server.Packet) packet);
+                player.playerConnection.sendPacket((net.minecraft.network.protocol.Packet) packet);
             }
         }
 
@@ -148,7 +148,7 @@ class PlayerChunk {
         while (players_iter.hasNext()) {
             EntityPlayer player = (EntityPlayer) players_iter.next();
             if (player.playerConnection != null) {
-                player.playerConnection.sendPacket((net.minecraft.server.Packet) packet);
+                player.playerConnection.sendPacket((net.minecraft.network.protocol.Packet) packet);
             }
         }
 

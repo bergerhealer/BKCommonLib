@@ -65,11 +65,12 @@ class NetworkManager {
             if (listenerType == null) {
                 throw new IllegalStateException("Class GenericFutureListener does not exist");
             }
+            Class<?> packetType = com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle.T.getType();
             if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
             } else {
                 listenerType = com.bergerkiller.bukkit.common.utils.LogicUtil.getArrayType(listenerType);
-                c = queuedPacketType.getDeclaredConstructor(PacketHandle.T.getType(), listenerType);
+                c = queuedPacketType.getDeclaredConstructor(packetType, listenerType);
             }
             c.setAccessible(true);
         } catch (Throwable t) {
@@ -92,9 +93,9 @@ class PlayerConnection {
     public final (Object) NetworkManager networkManager;
 
 #if version >= 1.9
-    public void sendPacket((Object) Packet<?> packet);
+    public void sendPacket((Object) net.minecraft.network.protocol.Packet<?> packet);
 #else
-    public void sendPacket((Object) Packet packet);
+    public void sendPacket((Object) net.minecraft.network.protocol.Packet packet);
 #endif
 
     <code>

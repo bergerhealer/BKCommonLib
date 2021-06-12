@@ -1,25 +1,7 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package net.minecraft.network.protocol;
 
-import com.bergerkiller.mountiplex.reflection.declarations.Template;
-
-/**
- * Instance wrapper handle for type <b>net.minecraft.server.Packet</b>.
- * To access members without creating a handle type, use the static {@link #T} member.
- * New handles can be created from raw instances using {@link #createHandle(Object)}.
- */
-@Template.InstanceType("net.minecraft.server.Packet")
-public abstract class PacketHandle extends Template.Handle {
-    /** @See {@link PacketClass} */
-    public static final PacketClass T = Template.Class.create(PacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-    /* ============================================================================== */
-
-    public static PacketHandle createHandle(Object handleInstance) {
-        return T.createHandle(handleInstance);
-    }
-
-    /* ============================================================================== */
-
-
+class Packet {
+    <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
     }
@@ -27,8 +9,10 @@ public abstract class PacketHandle extends Template.Handle {
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.getType(getRaw());
     }
+    </code>
 
-
+    // Protocol translation functions
+    <code>
     protected static final int serializeVelocity(double velocity) {
         return (int) (com.bergerkiller.bukkit.common.utils.MathUtil.clamp(velocity, 3.9) * 8000.0);
     }
@@ -114,12 +98,5 @@ public abstract class PacketHandle extends Template.Handle {
             field.set(getRaw(), com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand));
         }
     }
-    /**
-     * Stores class members for <b>net.minecraft.server.Packet</b>.
-     * Methods, fields, and constructors can be used without using Handle Objects.
-     */
-    public static final class PacketClass extends Template.Class<PacketHandle> {
-    }
-
+    </code>
 }
-

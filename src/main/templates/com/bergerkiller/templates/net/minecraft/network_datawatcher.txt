@@ -1,11 +1,11 @@
-package net.minecraft.server;
+package net.minecraft.network.syncher;
 
 import net.minecraft.world.entity.Entity;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataWatcherObjectHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
 
 class DataWatcher {
 #if version >= 1.14.4

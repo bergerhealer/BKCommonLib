@@ -1,0 +1,8 @@
+package net.minecraft.util;
+
+class WeightedRandom {
+
+    class WeightedRandom.WeightedRandomChoice {
+        protected int chance:a;
+    }
+}

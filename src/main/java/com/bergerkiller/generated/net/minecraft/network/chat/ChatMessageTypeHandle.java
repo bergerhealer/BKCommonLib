@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.network.chat;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.ChatMessageType</b>.
+ * Instance wrapper handle for type <b>net.minecraft.network.chat.ChatMessageType</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.ChatMessageType")
+@Template.InstanceType("net.minecraft.network.chat.ChatMessageType")
 public abstract class ChatMessageTypeHandle extends Template.Handle {
     /** @See {@link ChatMessageTypeClass} */
     public static final ChatMessageTypeClass T = Template.Class.create(ChatMessageTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -26,7 +26,7 @@ public abstract class ChatMessageTypeHandle extends Template.Handle {
 
     public abstract byte getId();
     /**
-     * Stores class members for <b>net.minecraft.server.ChatMessageType</b>.
+     * Stores class members for <b>net.minecraft.network.chat.ChatMessageType</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChatMessageTypeClass extends Template.Class<ChatMessageTypeHandle> {

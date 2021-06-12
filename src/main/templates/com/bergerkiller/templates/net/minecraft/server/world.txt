@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
@@ -28,7 +29,6 @@ import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
 import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.bergerkiller.generated.net.minecraft.server.RegionFileHandle;
 import com.bergerkiller.generated.net.minecraft.server.IWorldAccessHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
@@ -795,42 +795,6 @@ class WorldDataServer {
 #else
     public void setClearTimer:i(int ticks);
 #endif
-}
-
-class WeightedRandom {
-
-    class WeightedRandom.WeightedRandomChoice {
-        protected int chance:a;
-    }
-}
-
-class BiomeSettingsMobs {
-
-    class BiomeSettingsMobs.SpawnRate extends WeightedRandom.WeightedRandomChoice {
-#if version >= 1.16
-        public (java.lang.Class<?>) EntityTypes entityClass:c;
-#elseif version >= 1.13
-        public (java.lang.Class<?>) EntityTypes entityClass:b;
-#else
-        public (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass:b;
-#endif
-
-#if version >= 1.16
-        public final int minSpawnCount:d;
-        public final int maxSpawnCount:e;
-#else
-        public int minSpawnCount:c;
-        public int maxSpawnCount:d;
-#endif
-
-#if version >= 1.13
-        public (SpawnRateHandle) BiomeSettingsMobs.SpawnRate((java.lang.Class<?>) EntityTypes entityClass, int x, int y, int z);
-#else
-        public (SpawnRateHandle) BiomeSettingsMobs.SpawnRate((java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass, int x, int y, int z);
-#endif
-
-    }
-
 }
 
 class RegionFile {
