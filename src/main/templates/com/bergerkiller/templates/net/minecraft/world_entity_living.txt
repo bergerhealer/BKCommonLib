@@ -1,24 +1,25 @@
 package net.minecraft.world.entity;
 
 import net.minecraft.core.BlockPosition;
-import net.minecraft.server.AttributeBase;
-import net.minecraft.server.AttributeModifiable;
-import net.minecraft.server.AttributeMapBase;
-import net.minecraft.server.AttributeDefaults;
 import net.minecraft.core.NonNullList;
+import net.minecraft.world.effect.MobEffectList;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.ai.attributes.AttributeBase;
+import net.minecraft.world.entity.ai.attributes.AttributeDefaults;
+import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
+import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.server.MobEffectList;
-import net.minecraft.server.MobEffect;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
-import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeMapBaseHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
+
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 
 class EntityLiving extends Entity {
 

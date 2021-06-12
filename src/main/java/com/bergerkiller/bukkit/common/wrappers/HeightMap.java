@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
 
 /**
  * Heightmap information of a single chunk. There are different possible heightmap

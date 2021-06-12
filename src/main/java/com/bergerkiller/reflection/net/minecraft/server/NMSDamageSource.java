@@ -5,7 +5,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 
-import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
 /**
  * Use DamageSourceHandle instead

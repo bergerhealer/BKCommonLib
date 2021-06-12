@@ -115,6 +115,11 @@ public class PortalHandler_1_9 extends PortalHandler {
     }
 
     @Template.Optional
+    @Template.Import("net.minecraft.core.BlockPosition")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
+    @Template.Import("net.minecraft.server.level.EntityPlayer")
+    @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
 

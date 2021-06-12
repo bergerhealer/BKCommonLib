@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftChatMessageHandle;
 
 /**

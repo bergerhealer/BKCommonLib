@@ -1,5 +1,198 @@
 package net.minecraft.network.chat;
 
+import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
+
+class IChatBaseComponent {
+#if version >= 1.16
+    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).addSibling(sibling);
+        } else {
+            return instance.mutableCopy().addSibling(sibling);
+        }
+    }
+#else
+    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling);
+#endif
+
+    public boolean isMutable() {
+#if version >= 1.16
+        return instance instanceof IChatMutableComponent;
+#else
+        return true;
+#endif
+    }
+
+#if version >= 1.16
+    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:mutableCopy();
+#elseif version >= 1.13.1
+    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:h();
+#elseif version >= 1.13
+    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:e();
+#else
+    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:f();
+#endif
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableURL(String url) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
+
+#if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+#else
+        return instance.setChatModifier(modifier);
+#endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableContent(String content) {
+#if version >= 1.15
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+#else
+        // Feature is since 1.15, do nothing on older versions
+        return instance;
+#endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
+
+  #if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+  #else
+        return instance.setChatModifier(modifier);
+  #endif
+    }
+
+    public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
+        ChatModifier modifier = instance.getChatModifier();
+        modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
+
+#if version >= 1.16
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+#else
+        return instance.setChatModifier(modifier);
+#endif
+    }
+
+    class IChatBaseComponent.ChatSerializer {
+        public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
+
+#if version >= 1.16
+        public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:a(String jsonString);
+#else
+        public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
+#endif
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
+            return new ChatComponentText("");
+        }
+
+#if version >= 1.16
+        // ChatModifier is immutable since 1.16
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+  #if version >= 1.16.2
+            ChatModifier initial_modifier = ChatModifier.a;
+  #else
+            ChatModifier initial_modifier = ChatModifier.b;
+  #endif
+
+            ChatModifier modifier = initial_modifier;
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = initial_modifier;
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier = modifier.setBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier = modifier.setItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier = modifier.setStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier = modifier.setUnderline(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier = modifier.setRandom(Boolean.TRUE);
+                } else {
+                    modifier = initial_modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+                }
+            }
+            return new ChatComponentText("").setChatModifier(modifier);
+        }
+#else
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+            ChatModifier modifier = new ChatModifier();
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = new ChatModifier();
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier.setBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier.setItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier.setStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier.setUnderline(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier.setRandom(Boolean.TRUE);
+                } else {
+                    modifier = new ChatModifier();
+  #if version >= 1.12
+                    modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+  #else
+                    #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.EnumChatFormat> formatMap;
+                    java.util.Map formats = #formatMap;
+                    Object format = formats.get(Character.valueOf(color.getChar()));
+                    modifier.setColor((EnumChatFormat) format);
+  #endif
+                }
+            }
+            return new ChatComponentText("").setChatModifier(modifier);
+        }
+#endif
+    }
+}
+
 // version >= 1.12
 optional class ChatMessageType {
     public byte getId:a();

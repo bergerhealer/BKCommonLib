@@ -1,6 +1,8 @@
 package org.bukkit.craftbukkit.util;
 
-import com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle;
+import net.minecraft.network.chat.IChatBaseComponent;
+
+import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapHandle;
 
 class LongObjectHashMap {
@@ -112,7 +114,7 @@ class CraftMagicNumbers {
 class CraftChatMessage {
 
     // Original was modified so it does not erase a chat color style prefix character
-    public static String fromComponent((IChatBaseComponentHandle) net.minecraft.server.IChatBaseComponent component) {
+    public static String fromComponent((IChatBaseComponentHandle) IChatBaseComponent component) {
         if (component == null) {
             return "";
         }
@@ -128,8 +130,8 @@ class CraftChatMessage {
         boolean prev_was_obfuscated = false;
 
         while (iter.hasNext()) {
-            net.minecraft.server.IChatBaseComponent c = (net.minecraft.server.IChatBaseComponent) iter.next();
-            net.minecraft.server.ChatModifier modi = c.getChatModifier();
+            IChatBaseComponent c = (IChatBaseComponent) iter.next();
+            net.minecraft.network.chat.ChatModifier modi = c.getChatModifier();
 
             // Place reset character when too many style flags are active
             if ((prev_was_bold && !modi.isBold()) ||
@@ -183,5 +185,5 @@ class CraftChatMessage {
         return out.toString();
     }
 
-    public static (IChatBaseComponentHandle[]) net.minecraft.server.IChatBaseComponent[] fromString(String message, boolean keepNewlines);
+    public static (IChatBaseComponentHandle[]) IChatBaseComponent[] fromString(String message, boolean keepNewlines);
 }

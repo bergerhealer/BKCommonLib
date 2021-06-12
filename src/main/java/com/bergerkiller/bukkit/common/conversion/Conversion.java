@@ -70,18 +70,18 @@ public class Conversion {
     public static final InputConverter<Object> toVec3DHandle = getConverterToHandle("net.minecraft.server.Vec3D");
     public static final InputConverter<Object> toChunkCoordIntPairHandle = getConverterToHandle("net.minecraft.world.level.ChunkCoordIntPair");
     public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.core.BlockPosition");
-    public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.server.PlayerAbilities");
+    public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.world.entity.player.PlayerAbilities");
     public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
     public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("com.bergerkiller.bukkit.common.internal.LongHashSet");
-    public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.server.IntHashMap");
+    public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.util.IntHashMap");
     public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
     public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
     public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.server.IBlockData");
     public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.server.ChunkSection");
-    public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.server.MobEffectList");
-    public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.server.MobEffect");
-    public static final InputConverter<Object> toMapIconHandle = getConverterToHandle("net.minecraft.server.MapIcon");
-    public static final InputConverter<Object> toChatComponentHandle = getConverterToHandle("net.minecraft.server.IChatBaseComponent");
+    public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.world.effect.MobEffectList");
+    public static final InputConverter<Object> toMobEffect = getConverterToHandle("net.minecraft.world.effect.MobEffect");
+    public static final InputConverter<Object> toMapIconHandle = getConverterToHandle("net.minecraft.world.level.saveddata.maps.MapIcon");
+    public static final InputConverter<Object> toChatComponentHandle = getConverterToHandle("net.minecraft.network.chat.IChatBaseComponent");
     public static final InputConverter<Object> toEnumItemSlotHandle = getConverterToHandle("net.minecraft.world.entity.EnumItemSlot");
     // Wrappers
     public static final InputConverter<Entity> toEntity = getConverterTo(Entity.class);

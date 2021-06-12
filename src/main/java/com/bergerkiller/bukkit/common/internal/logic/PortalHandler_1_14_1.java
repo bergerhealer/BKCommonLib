@@ -152,6 +152,16 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     }
 
     @Template.Optional
+    @Template.Import("net.minecraft.core.BlockPosition")
+    @Template.Import("net.minecraft.core.EnumDirection")
+    @Template.Import("net.minecraft.server.level.EntityPlayer")
+    @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
+    @Template.Import("net.minecraft.world.entity.Entity")
+    @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
+    @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
+    @Template.Import("net.minecraft.world.level.World")
     @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
         /*
@@ -199,7 +209,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
-         *     BlockUtil$Rectangle result = (BlockUtil$Rectangle) opt_result.get();
+         *     net.minecraft.BlockUtil$Rectangle result = (net.minecraft.BlockUtil$Rectangle) opt_result.get();
          *     return startBlock.getWorld().getBlockAt(result.origin.getX(),
          *                                             result.origin.getY(),
          *                                             result.origin.getZ());

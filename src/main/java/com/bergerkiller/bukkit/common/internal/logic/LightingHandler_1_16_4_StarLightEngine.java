@@ -138,13 +138,15 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
     @Template.Optional
     @Template.Import("net.minecraft.server.LightEngineThreaded")
+    @Template.Import("net.minecraft.core.SectionPosition")
+    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.InstanceType("com.tuinity.tuinity.chunk.light.SWMRNibbleArray")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
          * <GET_LAYER_DATA>
          * public static byte[] getLayerData(net.minecraft.server.LightEngineLayer layer, int cx, int cy, int cz) {
-         *    net.minecraft.server.NibbleArray array = layer.a(net.minecraft.server.SectionPosition.a(cx, cy, cz));
+         *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
          *    if (array == null) {
          *        return null;
          *    }
@@ -177,7 +179,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
          *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
@@ -203,7 +205,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.server.NibbleArray toVanillaNibble();
+         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
          *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
@@ -244,7 +246,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.SKY, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.SKY, new SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */
@@ -275,7 +277,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          * 
          *     if (nibble.updateVisible()) {
          *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.BLOCK, new net.minecraft.server.SectionPosition(cx, cy-1, cz));
+         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.BLOCK, new SectionPosition(cx, cy-1, cz));
          *     }
          * }
          */

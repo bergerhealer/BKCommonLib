@@ -30,9 +30,9 @@ class Block {
     }
 
 #if version >= 1.9
-    public static final rawtype (Iterable) RegistryBlockID<IBlockData> REGISTRY_ID;
+    public static final rawtype (Iterable) net.minecraft.core.RegistryBlockID<IBlockData> REGISTRY_ID;
 #else
-    public static final rawtype (Iterable) RegistryID<IBlockData> REGISTRY_ID:d;
+    public static final rawtype (Iterable) net.minecraft.util.RegistryID<IBlockData> REGISTRY_ID:d;
 #endif
 
 #if version >= 1.14

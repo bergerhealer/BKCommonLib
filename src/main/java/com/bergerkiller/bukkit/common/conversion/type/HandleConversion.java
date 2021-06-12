@@ -49,14 +49,12 @@ import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
-import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
@@ -64,6 +62,8 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftChunkHandle;
@@ -267,7 +267,7 @@ public class HandleConversion {
         return Vector3fHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }
 
-    @ConverterMethod(output="net.minecraft.server.PlayerAbilities")
+    @ConverterMethod(output="net.minecraft.world.entity.player.PlayerAbilities")
     public static Object toPlayerAbilitiesHandle(PlayerAbilities playerAbilities) {
         return playerAbilities.getRawHandle();
     }
@@ -282,7 +282,7 @@ public class HandleConversion {
         return longHashSetWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.IntHashMap<T>")
+    @ConverterMethod(output="net.minecraft.util.IntHashMap<T>")
     public static Object toRawIntHashMapHandle(IntHashMap<?> intHashMapWrapper) {
         return intHashMapWrapper.getRawHandle();
     }
@@ -313,7 +313,7 @@ public class HandleConversion {
         return section.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.MobEffectList")
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
     public static Object toMobEffectListHandle(PotionEffectType potionEffectType) {
         @SuppressWarnings("deprecation")
         int id = potionEffectType.getId();
@@ -321,7 +321,7 @@ public class HandleConversion {
         return MobEffectListHandle.T.fromId.invoke(id);
     }
 
-    @ConverterMethod(output="net.minecraft.server.MobEffect")
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
     public static Object toMobEffectHandle(PotionEffect potionEffect) {
         return CraftPotionUtilHandle.fromBukkit(potionEffect);
     }
@@ -346,7 +346,7 @@ public class HandleConversion {
         return resourceKeyWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.MapIcon")
+    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon")
     public static Object toMapIconHandle(MapCursor cursor) {
         return MapIconHandle.fromCursor(cursor).getRaw();
     }
@@ -356,7 +356,7 @@ public class HandleConversion {
         return worldType.name();
     }
 
-    @ConverterMethod(output="net.minecraft.server.IChatBaseComponent")
+    @ConverterMethod(output="net.minecraft.network.chat.IChatBaseComponent")
     public static Object toChatBaseComponent(ChatText text) {
         return text.getRawHandle();
     }
@@ -469,7 +469,7 @@ public class HandleConversion {
         return entitySlice.getRaw();
     }
 
-    @ConverterMethod(output="net.minecraft.server.HeightMap")
+    @ConverterMethod(output="net.minecraft.world.level.levelgen.HeightMap")
     public static Object toHeightMapHandle(HeightMap heightmap) {
         return heightmap.getRawHandle();
     }
@@ -479,7 +479,7 @@ public class HandleConversion {
         return CommonEntityType.getNMSEntityTypeByEntityClass(entityClass);
     }
 
-    @ConverterMethod(output="net.minecraft.server.EntityTypes", optional=true)
+    @ConverterMethod(output="net.minecraft.world.entity.EntityTypes", optional=true)
     public static Object toEntityTypesHandleFromEntityClass(Class<?> entityClass) {
         return toEntityTypesHandleWrapperFromEntityClass(entityClass).getRaw();
     }
@@ -540,22 +540,22 @@ public class HandleConversion {
         return (dim == null) ? 0 : dim.getId();
     }
 
-    @ConverterMethod(input="net.minecraft.server.DimensionManager")
+    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager")
     public static DimensionType dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return DimensionType.fromDimensionManagerHandle(nmsDimensionManagerHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.server.DimensionManager")
+    @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionManager")
     public static Object dimensionManagerFromDimension(DimensionType dimension) {
         return dimension.getDimensionManagerHandle();
     }
 
-    @ConverterMethod(input="net.minecraft.server.DimensionManager")
+    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager")
     public static ResourceKey<DimensionType> dimensionKeyFromDimensionManager(Object nmsDimensionManagerHandle) {
         return DimensionManagerHandle.T.getKey.invoke(nmsDimensionManagerHandle);
     }
 
-    @ConverterMethod(output="net.minecraft.server.DimensionManager")
+    @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionManager")
     public static Object dimensionManagerFromKey(ResourceKey<DimensionType> key) {
         return DimensionManagerHandle.T.fromKey.raw.invoke(key.getRawHandle());
     }

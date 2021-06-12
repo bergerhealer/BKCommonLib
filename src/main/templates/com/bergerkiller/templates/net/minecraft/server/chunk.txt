@@ -1,18 +1,18 @@
 package net.minecraft.server;
 
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.chunk.DataPaletteBlock;
 import net.minecraft.world.level.EnumSkyBlock;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.DataPaletteBlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntitySliceHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
@@ -169,7 +169,7 @@ class Chunk {
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
         // Note: must always initialize, since the server does not store this data
         HeightMap heightMap = new HeightMap(instance, HeightMap$Type.values()[0]);
-        com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.T.initialize.invoke(heightMap);
+        com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle.T.initialize.invoke(heightMap);
         return heightMap;
     }
 #elseif version >= 1.13
@@ -184,7 +184,7 @@ class Chunk {
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
         HeightMap heightMap = new com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2(instance, instance.heightMap);
         if (initialize) {
-             com.bergerkiller.generated.net.minecraft.server.HeightMapHandle.T.initialize.invoke(heightMap);
+             com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle.T.initialize.invoke(heightMap);
         }
         return heightMap;
     }
@@ -300,22 +300,4 @@ optional class EntitySlice {
     public Iterator iterator();
 
     public int size();
-}
-
-class DataPaletteBlock {
-#if version >= 1.13
-    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
-        return (IBlockData) instance.a(x, y, z);
-    }
-    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
-        instance.setBlock(x, y, z, data);
-    }
-#elseif version >= 1.9
-    public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
-    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
-#else
-    // Emulated on MC 1.8.8
-    public (BlockData) BlockData getBlockData(int x, int y, int z);
-    public void setBlockData(int x, int y, int z, (BlockData) BlockData data);
-#endif
 }

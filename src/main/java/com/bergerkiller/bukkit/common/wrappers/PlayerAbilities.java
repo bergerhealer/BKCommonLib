@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
-import com.bergerkiller.generated.net.minecraft.server.PlayerAbilitiesHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
 
 import org.bukkit.entity.Player;
 

@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.resources;
 
 import com.bergerkiller.bukkit.common.wrappers.BasicWrapper;
-import com.bergerkiller.generated.net.minecraft.server.DimensionManagerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 
 /**
  * A type of dimension in the Minecraft universe. As of writing this can be overworld (0), the end (1) and the nether (-1).

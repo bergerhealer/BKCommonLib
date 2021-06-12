@@ -1,0 +1,119 @@
+package net.minecraft.world.entity.player;
+
+import net.minecraft.core.BlockPosition;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.food.FoodMetaData;
+import net.minecraft.world.inventory.Container;
+import net.minecraft.world.inventory.InventoryEnderChest;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+
+class EntityHuman extends net.minecraft.world.entity.EntityLiving {
+    public (Object) PlayerInventory inventoryRaw:inventory;
+#if version >= 1.12
+    protected (Object) InventoryEnderChest enderChestRaw:enderChest;
+#else
+    private (Object) InventoryEnderChest enderChestRaw:enderChest;
+#endif
+    public (ContainerHandle) Container activeContainer;
+    protected (Object) FoodMetaData foodDataRaw:foodData;
+
+    // Bed position is datawatcher value on 1.14
+    // Do we actually use this field?
+    //#if version >= 1.9
+    //    public (IntVector3) BlockPosition bedPosition;
+    //#elseif version >= 1.8.3
+    //    public (IntVector3) BlockPosition bedPosition:bx;
+    //#else
+    //    public (IntVector3) BlockPosition bedPosition:bv;
+    //#endif
+
+    public int sleepTicks;
+
+    public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
+    public int expLevel;
+    public int expTotal;
+    public float exp;
+
+#if version >= 1.16.2
+    protected unknown int bG;
+    protected unknown final float bH;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bJ;
+#elseif version >= 1.16
+    protected unknown int bN;
+    protected unknown final float bO;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bQ;
+#elseif version >= 1.15
+    protected unknown int bO;
+    protected unknown final float bP;
+    private unknown int bS;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bT;
+#elseif version >= 1.14.4
+    protected unknown int bR;
+    protected unknown final float bS;
+    private unknown int bV;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bW;
+#elseif version >= 1.14
+    protected unknown int bR;
+    protected unknown final float bS;
+    private unknown int bU;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bV;
+#elseif version >= 1.13
+    protected unknown int bZ;
+    protected unknown float ca;
+    private unknown int g;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:h;
+#elseif version >= 1.12
+    protected unknown int bS;
+    protected unknown float bT;
+    private unknown int f;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:g;
+#elseif version >= 1.11
+    private unknown int h;
+    protected unknown float bO;
+    protected unknown float bP;
+    private unknown int bR;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bS;
+#elseif version >= 1.10.2
+    private unknown int h;
+    protected unknown float bP;
+    protected unknown float bQ;
+    private unknown int bS;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bT;
+#elseif version >= 1.9.4
+    private unknown int h;
+    protected unknown float bO;
+    protected unknown float bP;
+    private unknown int bR;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bS;
+#elseif version >= 1.9
+    private unknown int h;
+    protected unknown float bN;
+    protected unknown float bO;
+    private unknown int bQ;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bR;
+#elseif version >= 1.8.3
+    private unknown int f;
+    private unknown ItemStack g;
+    private unknown int h;
+    protected unknown float bE;
+    protected unknown float bF;
+    private unknown int i;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bH;
+#else
+    private unknown int f;
+    private unknown ItemStack g;
+    private unknown int h;
+    protected unknown float bC;
+    protected unknown float bD;
+    private unknown int i;
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile:bF;
+#endif
+
+    public void attack((org.bukkit.entity.Entity) Entity entity);
+}

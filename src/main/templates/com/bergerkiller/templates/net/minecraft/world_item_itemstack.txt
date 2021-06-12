@@ -1,5 +1,6 @@
 package net.minecraft.world.item;
 
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTNumber;
 import net.minecraft.nbt.NBTTagCompound;

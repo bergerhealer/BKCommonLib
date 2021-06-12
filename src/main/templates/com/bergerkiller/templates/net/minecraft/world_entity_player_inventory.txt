@@ -1,0 +1,14 @@
+package net.minecraft.world.entity.player;
+
+import net.minecraft.nbt.NBTTagList;
+import net.minecraft.world.IInventory;
+
+import com.bergerkiller.bukkit.common.nbt.CommonTagList;
+
+class PlayerInventory extends IInventory {
+    public (CommonTagList) NBTTagList saveToNBT:a((CommonTagList) NBTTagList nbttaglist);
+
+    public void loadFromNBT:b((CommonTagList) NBTTagList nbttaglist);
+
+    public static int getHotbarSize();
+}

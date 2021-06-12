@@ -51,13 +51,11 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandl
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.ChunkSectionHandle;
-import com.bergerkiller.generated.net.minecraft.server.HeightMapHandle;
-import com.bergerkiller.generated.net.minecraft.server.MapIconHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.server.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
@@ -67,6 +65,8 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
@@ -216,7 +216,7 @@ public class WrapperConversion {
         return CraftInventoryCraftingHandle.createNew(nmsInventoryCraftingHandle, null);
     }
 
-    @ConverterMethod(input="net.minecraft.server.PlayerInventory")
+    @ConverterMethod(input="net.minecraft.world.entity.player.PlayerInventory")
     public static org.bukkit.inventory.PlayerInventory toPlayerInventory(Object nmsPlayerInventoryHandle) {
         return CraftInventoryPlayerHandle.createNew(nmsPlayerInventoryHandle);
     }
@@ -361,7 +361,7 @@ public class WrapperConversion {
         return new Vector(vector.x, vector.y, vector.z);
     }
 
-    @ConverterMethod(input="net.minecraft.server.PlayerAbilities")
+    @ConverterMethod(input="net.minecraft.world.entity.player.PlayerAbilities")
     public static PlayerAbilities toPlayerAbilities(Object nmsPlayerAbilitiesHandle) {
         return new PlayerAbilities(nmsPlayerAbilitiesHandle);
     }
@@ -376,12 +376,12 @@ public class WrapperConversion {
         return new LongHashSet(cbLongHashSetHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.IntHashMap<T>")
+    @ConverterMethod(input="net.minecraft.util.IntHashMap<T>")
     public static <T> IntHashMap<T> toIntHashMap(Object nmsIntHashMapHandle) {
         return new IntHashMap<T>(nmsIntHashMapHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.IntHashMap<?>")
+    @ConverterMethod(input="net.minecraft.util.IntHashMap<?>")
     public static IntHashMap<Object> toRawIntHashMap(Object nmsIntHashMapHandle) {
         return new IntHashMap<Object>(nmsIntHashMapHandle);
     }
@@ -445,7 +445,7 @@ public class WrapperConversion {
         return new ChunkSection(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
     }
 
-    @ConverterMethod(input="net.minecraft.server.MobEffectList")
+    @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
         int id = MobEffectListHandle.T.getId.invoke(nmsMobEffectListHandle);
 
@@ -459,7 +459,7 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.MobEffect")
+    @ConverterMethod(input="net.minecraft.world.effect.MobEffect")
     public static PotionEffect toPotionEffect(Object nmsMobEffectHandle) {
         return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
     }
@@ -480,12 +480,12 @@ public class WrapperConversion {
         return com.bergerkiller.bukkit.common.resources.ResourceKey.fromResourceKeyHandle(nmsResourceKeyHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.MapIcon")
+    @ConverterMethod(input="net.minecraft.world.level.saveddata.maps.MapIcon")
     public static MapCursor toMapCursor(Object nmsMapCursorHandle) {
         return MapIconHandle.createHandle(nmsMapCursorHandle).toCursor();
     }
 
-    @ConverterMethod(output="net.minecraft.server.MapIcon.Type", optional=true)
+    @ConverterMethod(output="net.minecraft.world.level.saveddata.maps.MapIcon.Type", optional=true)
     public static Object mapIconTypeIdToEnum(byte typeId) {
         if (MapIconHandle.TypeHandle.T.isValid()) {
             return MapIconHandle.TypeHandle.T.fromId.raw.invoke(typeId);
@@ -494,7 +494,7 @@ public class WrapperConversion {
         }
     }
 
-    @ConverterMethod(input="net.minecraft.server.IChatBaseComponent")
+    @ConverterMethod(input="net.minecraft.network.chat.IChatBaseComponent")
     public static ChatText toChatText(Object iChatBaseComponentHandle) {
         return ChatText.fromComponent(iChatBaseComponentHandle);
     }
@@ -634,12 +634,12 @@ public class WrapperConversion {
         return null;
     }
 
-    @ConverterMethod(input="net.minecraft.server.HeightMap")
+    @ConverterMethod(input="net.minecraft.world.level.levelgen.HeightMap")
     public static HeightMap heightMapFromHandle(Object handle) {
         return new HeightMap(HeightMapHandle.createHandle(handle));
     }
 
-    @ConverterMethod(input="net.minecraft.server.EntityTypes", optional=true)
+    @ConverterMethod(input="net.minecraft.world.entity.EntityTypes", optional=true)
     public static Class<?> entityClassFromEntityTypes(Object nmsEntityTypesHandle) {
         return EntityTypesHandle.T.getEntityClassInst.invoke(nmsEntityTypesHandle);
     }

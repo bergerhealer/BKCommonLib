@@ -5,7 +5,9 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 /**
  * Applies the marker objects inside a marker tile to a PacketPlayOutMap
  */
-@Template.Package("net.minecraft.server")
+@Template.Package("net.minecraft.world.level.saveddata.maps")
+@Template.Import("net.minecraft.network.chat.IChatBaseComponent")
+@Template.Import("net.minecraft.network.protocol.game.PacketPlayOutMap")
 @Template.Import("com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkerTile")
 @Template.Import("com.bergerkiller.bukkit.common.map.MapMarker")
 @Template.Import("com.bergerkiller.bukkit.common.wrappers.ChatText")
@@ -42,11 +44,11 @@ public abstract class MapDisplayMarkerApplier extends Template.Class<Template.Ha
      * 
      *     // Assign cursors[] array to cursors field of packet using reflection
      * #if version >= 1.14
-     *     #require net.minecraft.server.PacketPlayOutMap private MapIcon[] cursors:e;
+     *     #require net.minecraft.network.protocol.game.PacketPlayOutMap private MapIcon[] cursors:e;
      * #elseif version >= 1.9
-     *     #require net.minecraft.server.PacketPlayOutMap private MapIcon[] cursors:d;
+     *     #require net.minecraft.network.protocol.game.PacketPlayOutMap private MapIcon[] cursors:d;
      * #else
-     *     #require net.minecraft.server.PacketPlayOutMap private MapIcon[] cursors:c;
+     *     #require net.minecraft.network.protocol.game.PacketPlayOutMap private MapIcon[] cursors:c;
      * #endif
      *     packet#cursors = cursors;
      * }

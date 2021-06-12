@@ -1,6 +1,6 @@
 package com.bergerkiller.bukkit.common.bases;
 
-import com.bergerkiller.generated.net.minecraft.server.NibbleArrayHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHandle;
 import com.bergerkiller.reflection.net.minecraft.server.NMSNibbleArray;
 
 /**

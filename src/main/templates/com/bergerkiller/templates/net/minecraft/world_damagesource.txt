@@ -1,0 +1,62 @@
+package net.minecraft.world.damagesource;
+
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.world.entity.projectile.EntityArrow;
+import net.minecraft.world.entity.projectile.EntityFireball;
+
+import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
+
+class DamageSource {
+    public String translationIndex;
+
+    public boolean isExplosion();
+
+#if version >= 1.15
+    public boolean isFireDamage:isFire();
+#elseif version >= 1.13
+    public boolean isFireDamage:p();
+#else
+    public boolean isFireDamage:o();
+#endif
+
+    public (org.bukkit.entity.Entity) Entity getEntity();
+
+    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) EntityLiving livingEntity);
+
+    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) EntityHuman humanEntity);
+
+    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) EntityArrow arrow, (org.bukkit.entity.Entity) Entity damager);
+
+    // Now uses EntityFireballFireball but no clue what that is?
+    //public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
+
+    public static (DamageSourceHandle) DamageSource thrownHit:projectile((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
+
+#if version >= 1.13
+    public static (DamageSourceHandle) DamageSource magicHit:c((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
+#else
+    public static (DamageSourceHandle) DamageSource magicHit:b((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
+#endif
+
+    public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
+
+    /* Get damage source by translationIndex key */
+    <code>
+    private static final java.util.HashMap<String, DamageSourceHandle> _values = new java.util.HashMap<String, DamageSourceHandle>();
+    public static DamageSourceHandle byName(String name) {
+        if (_values.size() == 0) {
+            for (Object rawValue : com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(T.getType())) {
+                DamageSourceHandle handle = createHandle(rawValue);
+                _values.put(handle.getTranslationIndex(), handle);
+            }
+        }
+        DamageSourceHandle result = _values.get(name);
+        if (result == null) {
+            result = _values.get("generic");
+        }
+        return result;
+    }
+    </code>
+}

@@ -181,7 +181,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #else
          *     // worldProvider field
          *     int envId = org.bukkit.World.Environment.NORMAL.getId();
-         *     worldserver.worldProvider = net.minecraft.server.DimensionManager.a(envId).getWorldProvider((net.minecraft.server.World) worldserver);
+         *     worldserver.worldProvider = net.minecraft.world.level.dimension.DimensionManager.a(envId).getWorldProvider((net.minecraft.server.World) worldserver);
          * 
          *     // worldData field
          *     #require net.minecraft.server.World public final net.minecraft.server.WorldData worldData;

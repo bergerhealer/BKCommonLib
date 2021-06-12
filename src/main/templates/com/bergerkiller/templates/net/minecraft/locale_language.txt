@@ -1,0 +1,13 @@
+package net.minecraft.locale;
+
+import com.bergerkiller.generated.net.minecraft.locale.LocaleLanguageHandle;
+
+class LocaleLanguage {
+#if version >= 1.16
+    private static volatile (LocaleLanguageHandle) LocaleLanguage INSTANCE:d;
+#else
+    private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
+#endif
+
+    public synchronized String get:a(String s);
+}

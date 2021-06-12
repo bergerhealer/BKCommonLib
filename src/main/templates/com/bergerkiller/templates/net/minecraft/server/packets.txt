@@ -1,13 +1,18 @@
 package net.minecraft.server;
 
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.EnumItemSlot;
+import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
+import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EnumGamemode;
+import net.minecraft.world.level.dimension.DimensionManager;
 
 import com.mojang.authlib.GameProfile;
 
@@ -22,10 +27,9 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 
-import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
-import com.bergerkiller.generated.net.minecraft.server.AttributeModifiableHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
 import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardTeamHandle;
@@ -796,7 +800,7 @@ class PacketPlayOutMap extends Packet {
 #if version >= 1.14
     private optional boolean track:c;
     private optional boolean locked:d;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:e;
+    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:e;
     private int xmin:f;
     private int ymin:g;
     private int width:h;
@@ -805,7 +809,7 @@ class PacketPlayOutMap extends Packet {
 #elseif version >= 1.9
     private optional boolean track:c;
     private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
+    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:d;
     private int xmin:e;
     private int ymin:f;
     private int width:g;
@@ -814,7 +818,7 @@ class PacketPlayOutMap extends Packet {
 #else
     private optional boolean track:###;
     private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
+    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:c;
     private int xmin:d;
     private int ymin:e;
     private int width:f;

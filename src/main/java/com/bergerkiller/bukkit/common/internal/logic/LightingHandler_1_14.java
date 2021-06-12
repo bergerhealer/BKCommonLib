@@ -317,6 +317,8 @@ public class LightingHandler_1_14 implements LightingHandler {
     @Template.Optional
     @Template.Import("com.destroystokyo.paper.util.map.QueuedChangesMapLong2Object")
     @Template.Import("net.minecraft.server.MCUtil")
+    @Template.Import("net.minecraft.core.SectionPosition")
+    @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.InstanceType("net.minecraft.server.LightEngineStorage")
     public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
 

@@ -1,9 +1,0 @@
-package net.minecraft.server;
-
-class RegistryID {
-#if version >= 1.9
-    public int getId(K value);
-#else
-    public int getId:b(T value);
-#endif
-}

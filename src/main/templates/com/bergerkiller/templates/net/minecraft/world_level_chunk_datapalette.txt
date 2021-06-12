@@ -1,0 +1,23 @@
+package net.minecraft.world.level.chunk;
+
+import net.minecraft.world.level.block.state.IBlockData;
+
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+
+class DataPaletteBlock {
+#if version >= 1.13
+    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
+        return (IBlockData) instance.a(x, y, z);
+    }
+    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
+        instance.setBlock(x, y, z, data);
+    }
+#elseif version >= 1.9
+    public (BlockData) IBlockData getBlockData:a(int x, int y, int z);
+    public void setBlockData:setBlock(int x, int y, int z, (BlockData) IBlockData data);
+#else
+    // Emulated on MC 1.8.8
+    public (BlockData) BlockData getBlockData(int x, int y, int z);
+    public void setBlockData(int x, int y, int z, (BlockData) BlockData data);
+#endif
+}

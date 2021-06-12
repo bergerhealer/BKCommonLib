@@ -3,8 +3,8 @@ package com.bergerkiller.reflection.net.minecraft.server;
 import org.bukkit.potion.PotionEffectType;
 
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;

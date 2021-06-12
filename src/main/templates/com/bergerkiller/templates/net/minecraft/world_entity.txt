@@ -1,5 +1,6 @@
 package net.minecraft.world.entity;
 
+import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.EnumHand;
@@ -15,12 +16,12 @@ import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
-import com.bergerkiller.generated.net.minecraft.server.SoundEffectHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
-import com.bergerkiller.generated.net.minecraft.server.DamageSourceHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+
+import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
 
 class Entity {
 #if version >= 1.9

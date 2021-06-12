@@ -1,0 +1,29 @@
+package net.minecraft.world.level.chunk;
+
+import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHandle;
+
+class NibbleArray {
+    private final byte[] dataField:a;
+
+    public (NibbleArrayHandle) NibbleArray();
+    public (NibbleArrayHandle) NibbleArray(byte[] data);
+
+    public int get:a(int x, int y, int z);
+    public void set:a(int x, int y, int z, int nibbleValue);
+
+#if version >= 1.9
+    public byte[] getData:asBytes();
+#else
+    public byte[] getData:a();
+#endif
+
+    <code>
+    public void fill(int nibbleValue) {
+        java.util.Arrays.fill(getData(), (byte) (nibbleValue & 0xF));
+    }
+
+    public boolean dataEquals(NibbleArrayHandle other) {
+        return java.util.Arrays.equals(this.getData(), other.getData());
+    }
+    </code>
+}

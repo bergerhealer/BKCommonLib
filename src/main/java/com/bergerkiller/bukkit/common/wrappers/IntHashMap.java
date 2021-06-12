@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.List;
 
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.IntHashMapHandle;
+import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 
 /**
  * Wrapper class for the nms.IntHashMap implementation

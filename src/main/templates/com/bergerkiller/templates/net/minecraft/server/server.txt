@@ -7,7 +7,6 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.LocaleLanguageHandle;
 import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
@@ -97,14 +96,4 @@ class PlayerList {
 
 class DedicatedPlayerList extends PlayerList {
 
-}
-
-class LocaleLanguage {
-#if version >= 1.16
-    private static volatile (LocaleLanguageHandle) LocaleLanguage INSTANCE:d;
-#else
-    private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
-#endif
-
-    public synchronized String get:a(String s);
 }

@@ -37,7 +37,7 @@ public abstract class GameProfileHandle extends Template.Handle {
 
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
-        return com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle.T.gameProfile.get(handle);
+        return com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle.T.gameProfile.get(handle);
     }
     /**
      * Stores class members for <b>com.mojang.authlib.GameProfile</b>.

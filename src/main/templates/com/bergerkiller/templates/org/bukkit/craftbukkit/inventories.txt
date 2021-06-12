@@ -1,9 +1,9 @@
 package org.bukkit.craftbukkit.inventory;
 
+import net.minecraft.world.IInventory;
+
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
-
-import net.minecraft.world.IInventory;
 
 class CraftItemStack {
     (Object) net.minecraft.world.item.ItemStack handle;
@@ -28,7 +28,7 @@ class CraftInventory extends org.bukkit.inventory.Inventory {
 }
 
 class CraftInventoryPlayer {
-    public (org.bukkit.inventory.PlayerInventory) CraftInventoryPlayer((Object) net.minecraft.server.PlayerInventory nmsPlayerInventory);
+    public (org.bukkit.inventory.PlayerInventory) CraftInventoryPlayer((Object) net.minecraft.world.entity.player.PlayerInventory nmsPlayerInventory);
 }
 
 class CraftInventoryCrafting {
