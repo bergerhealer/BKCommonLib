@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Import("com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkerTile")
 @Template.Import("com.bergerkiller.bukkit.common.map.MapMarker")
 @Template.Import("com.bergerkiller.bukkit.common.wrappers.ChatText")
-@Template.InstanceType("net.minecraft.server.PacketPlayOutMap")
+@Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutMap")
 public abstract class MapDisplayMarkerApplier extends Template.Class<Template.Handle> {
     /*
      * <MAP_APPLY_MARKERS>

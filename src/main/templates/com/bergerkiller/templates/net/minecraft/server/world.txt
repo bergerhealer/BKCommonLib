@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import net.minecraft.server.level.ChunkProviderServer;
+import net.minecraft.server.level.EntityTracker;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.ForcedChunk;
@@ -14,6 +15,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle;
@@ -29,7 +31,6 @@ import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHand
 import com.bergerkiller.generated.net.minecraft.server.WorldNBTStorageHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldTypeHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.server.MethodProfilerHandle;
@@ -485,18 +486,18 @@ class WorldServer extends World {
 #if version >= 1.14
         long key = ChunkCoordIntPair.pair(cx, cz);
 
-  #if exists net.minecraft.server.PlayerChunkMap public net.minecraft.server.PlayerChunk getVisibleChunk(long key);
+  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
         PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.getVisibleChunk(key);
   #else
         PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
   #endif
 
         if (chunk != null) {
-#if exists net.minecraft.server.PlayerChunk public Chunk getFullChunk()
+#if exists net.minecraft.server.level.PlayerChunk public Chunk getFullChunk()
             return chunk.getFullChunk();
 #else
             java.util.concurrent.CompletableFuture statusFuture;
-  #if exists net.minecraft.server.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(ChunkStatus chunkstatus)
+  #if exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.ChunkStatus chunkstatus)
             statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
   #else
             statusFuture = chunk.a(ChunkStatus.FULL);
@@ -523,7 +524,7 @@ class WorldServer extends World {
 #if exists net.minecraft.server.TicketType public static final net.minecraft.server.TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
     public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
         ChunkMapDistance chunkDistanceManager;
-  #if exists net.minecraft.server.PlayerChunkMap public final net.minecraft.server.PlayerChunkMap.a chunkDistanceManager;
+  #if exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
         chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
   #else
         chunkDistanceManager = instance.getChunkProvider().playerChunkMap.u;
@@ -618,7 +619,7 @@ class WorldServer extends World {
 
 #if version >= 1.14
     public void saveLevel() {
-        #require net.minecraft.server.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
+        #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
         ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
         cps.playerChunkMap#saveChunkMap(true);
     }

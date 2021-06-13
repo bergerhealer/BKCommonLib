@@ -6,7 +6,7 @@ import java.util.Random;
 
 import org.junit.Test;
 
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 
 public class ProtocolTest {
 

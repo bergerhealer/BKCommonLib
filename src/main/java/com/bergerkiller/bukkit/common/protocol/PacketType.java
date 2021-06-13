@@ -190,7 +190,7 @@ public class PacketType extends ClassTemplate<Object> {
 
         // If not specified, find NMS Packet Class Type
         if (packetClass == null) {
-            packetClass = CommonUtil.getNMSClass(this.name);
+            packetClass = CommonUtil.getClass("net.minecraft.network.protocol.game." + this.name);
         }
 
         if (packetClass == null) {
@@ -216,7 +216,7 @@ public class PacketType extends ClassTemplate<Object> {
 
         // Apply the packet class
         this.setClass((Class<Object>) packetClass);
-        this.addImport("net.minecraft.server.*");
+        this.addImport("net.minecraft.network.protocol.game.*");
 
         // Obtain ID and determine in/outgoing
         int tmpId;

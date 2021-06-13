@@ -245,24 +245,10 @@ public class CommonBootstrap {
      * @param server
      */
     private static void initResolvers(CommonServer server) {
-        // Enum Gamemode not available in package space on <= MC 1.9; we must proxy it
-        if (Resolver.loadClass("net.minecraft.server.EnumGamemode", false) == null) {
-            final String eg_path = Resolver.resolveClassPath("net.minecraft.server.EnumGamemode");
-            final String eg_path_proxy = Resolver.resolveClassPath("net.minecraft.server.WorldSettings$EnumGamemode");
-            Resolver.registerClassResolver(classPath -> {
-                if (classPath.equals(eg_path)) {
-                    return eg_path_proxy;
-                }
-                return classPath;
-            });
-        }
-
-        final String nms_root = "net.minecraft.server";
-        final String cb_root = "org.bukkit.craftbukkit";
         final Map<String, String> remappings = new HashMap<String, String>();
 
         // We renamed EntityTrackerEntry to EntityTrackerEntryState to account for the wrapping EntityTracker on 1.14 and later
-        remappings.put(nms_root + ".EntityTrackerEntryState", nms_root + ".EntityTrackerEntry");
+        remappings.put("net.minecraft.server.level.EntityTrackerEntryState", "net.minecraft.server.level.EntityTrackerEntry");
 
         // Instead of CraftBukkit LongHashSet, we use a custom implementation with bugfixes on 1.13.2 and earlier
         // This is now possible since we no longer interface with CraftBukkit LongHashSet anywhere
@@ -270,18 +256,28 @@ public class CommonBootstrap {
         remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet$LongIterator", "com.bergerkiller.bukkit.common.internal.proxy.LongHashSet_pre_1_13_2$LongIterator");
 
         // Since Minecraft 1.16.2 it has an entirely new Class, this makes the API look clean
-        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeBase$BiomeMeta");
-        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", nms_root + ".BiomeBase");
+        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeBase$BiomeMeta");
+        remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeBase");
+
+        // Before Minecraft 1.10 EnumGameMode sat inside WorldSettings
+        if (evaluateMCVersion("<", "1.10.2")) {
+            remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.WorldSettings$EnumGamemode");
+        }
+
+        // EnumChatVisibility moved from EntityHuman to package level during MC 1.14
+        if (evaluateMCVersion("<", "1.14")) {
+            remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EntityHuman$EnumChatVisibility");
+        }
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
         if (evaluateMCVersion("<=", "1.8.8")) {
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
-            remappings.put("net.minecraft.world.level.block.SoundEffectType", nms_root + ".Block$StepSound"); // workaround
-            remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".DataWatcher$WatchableObject");
-            remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
+            remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.Block$StepSound"); // workaround
+            remappings.put("net.minecraft.network.syncher.DataWatcher$Item", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
+            remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
             // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
-            remappings.put(nms_root + ".PacketPlayInUseItem", nms_root + ".PacketPlayInBlockPlace");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseItem", "net.minecraft.network.protocol.game.PacketPlayInBlockPlace");
 
             // We proxy a bunch of classes, because they don't exist in 1.8.8
             // Writing custom wrappers with switches would be too tiresome
@@ -295,71 +291,71 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.dimension.DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
         }
 
-        // Some classes were moved before around 1.8
+        // On version 1.8, for some reason all member classes were on package level
         if (evaluateMCVersion("<=", "1.8")) {
-            remappings.put("net.minecraft.world.level.block.SoundEffectType", nms_root + ".StepSound");
-            remappings.put(nms_root + ".Block$StepSound", nms_root + ".StepSound");
-            remappings.put(nms_root + ".EnumDirection$EnumAxis", nms_root + ".EnumAxis");
-            remappings.put(nms_root + ".PacketPlayOutPlayerInfo$EnumPlayerInfoAction", nms_root + ".EnumPlayerInfoAction");
-            remappings.put(nms_root + ".PacketPlayInUseEntity$EnumEntityUseAction", nms_root + ".EnumEntityUseAction");
-            remappings.put(nms_root + ".MobSpawnerData", nms_root + ".TileEntityMobSpawnerData");
-            remappings.put(nms_root + ".DataWatcher$Item", nms_root + ".WatchableObject");
-            remappings.put(nms_root + ".DataWatcher$WatchableObject", nms_root + ".WatchableObject");
-            remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".EnumScoreboardAction");
-            remappings.put(nms_root + ".PacketPlayOutMapChunk$ChunkMap", nms_root + ".ChunkMap");
-            remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
-            remappings.put(nms_root + ".PacketPlayOutTitle$EnumTitleAction", nms_root + ".EnumTitleAction");
-            remappings.put(nms_root + ".PacketPlayOutCombatEvent$EnumCombatEventType", nms_root + ".EnumCombatEventType");
-            remappings.put(nms_root + ".PacketPlayOutWorldBorder$EnumWorldBorderAction", nms_root + ".EnumWorldBorderAction");
-            remappings.put(nms_root + ".PacketPlayOutPlayerInfo$PlayerInfoData", nms_root + ".PlayerInfoData");
-            remappings.put(nms_root + ".PacketPlayInResourcePackStatus$EnumResourcePackStatus", nms_root + ".EnumResourcePackStatus");
-            remappings.put(nms_root + ".PacketPlayInBlockDig$EnumPlayerDigType", nms_root + ".EnumPlayerDigType");
-            remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
-            remappings.put(nms_root + ".PlayerChunk", nms_root + ".PlayerChunk");
+            remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.EnumGamemode");
+            remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.StepSound");
+            remappings.put("net.minecraft.world.level.block.Block$StepSound", "net.minecraft.world.level.block.StepSound");
+            remappings.put("net.minecraft.core.EnumDirection$EnumAxis", "net.minecraft.core.EnumAxis");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.EnumEntityUseAction");
+            remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.block.entity.TileEntityMobSpawnerData");
+            remappings.put("net.minecraft.network.syncher.DataWatcher$Item", "net.minecraft.network.syncher.WatchableObject");
+            remappings.put("net.minecraft.network.syncher.DataWatcher$WatchableObject", "net.minecraft.network.syncher.WatchableObject");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutTitle$EnumTitleAction", "net.minecraft.network.protocol.game.EnumTitleAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent$EnumCombatEventType", "net.minecraft.network.protocol.game.EnumCombatEventType");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder$EnumWorldBorderAction", "net.minecraft.network.protocol.game.EnumWorldBorderAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus", "net.minecraft.network.protocol.game.EnumResourcePackStatus");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInBlockDig$EnumPlayerDigType", "net.minecraft.network.protocol.game.EnumPlayerDigType");
+            remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EnumChatVisibility");
+            remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunk");
             remappings.put("net.minecraft.util.WeightedRandom$WeightedRandomChoice", "net.minecraft.util.WeightedRandomChoice");
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", nms_root + ".BiomeMeta");
-            remappings.put(nms_root + ".IScoreboardCriteria$EnumScoreboardHealthDisplay", nms_root + ".EnumScoreboardHealthDisplay");
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeMeta");
             remappings.put("net.minecraft.util.IntHashMap$IntHashMapEntry", "net.minecraft.util.IntHashMapEntry");
-            remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutEntityLook", nms_root + ".PacketPlayOutEntityLook");
-            remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMove", nms_root + ".PacketPlayOutRelEntityMove");
-            remappings.put(nms_root + ".PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", nms_root + ".PacketPlayOutRelEntityMoveLook");
-            remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInLook", nms_root + ".PacketPlayInLook");
-            remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPosition", nms_root + ".PacketPlayInPosition");
-            remappings.put(nms_root + ".PacketPlayInFlying$PacketPlayInPositionLook", nms_root + ".PacketPlayInPositionLook");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutEntityLook", "net.minecraft.network.protocol.game.PacketPlayOutEntityLook");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutRelEntityMove", "net.minecraft.network.protocol.game.PacketPlayOutRelEntityMove");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook", "net.minecraft.network.protocol.game.PacketPlayOutRelEntityMoveLook");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInLook", "net.minecraft.network.protocol.game.PacketPlayInLook");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPosition", "net.minecraft.network.protocol.game.PacketPlayInPosition");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInFlying$PacketPlayInPositionLook", "net.minecraft.network.protocol.game.PacketPlayInPositionLook");
             remappings.put("net.minecraft.network.chat.IChatBaseComponent$ChatSerializer", "net.minecraft.network.chat.ChatSerializer");
             remappings.put("net.minecraft.network.NetworkManager$QueuedPacket", "net.minecraft.network.QueuedPacket");
-            remappings.put(nms_root + ".PacketPlayOutPosition$EnumPlayerTeleportFlags", nms_root + ".EnumPlayerTeleportFlags");
-            remappings.put(nms_root + ".ChatClickable$EnumClickAction", nms_root + ".EnumClickAction");
-            remappings.put(nms_root + ".ChatHoverable$EnumHoverAction", nms_root + ".EnumHoverAction");
-            remappings.put(nms_root + ".PacketPlayInClientCommand$EnumClientCommand", nms_root + ".EnumClientCommand");
-            remappings.put(nms_root + ".PacketPlayInEntityAction$EnumPlayerAction", nms_root + ".EnumPlayerAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
+            remappings.put("net.minecraft.network.chat.ChatClickable$EnumClickAction", "net.minecraft.network.chat.EnumClickAction");
+            remappings.put("net.minecraft.network.chat.ChatHoverable$EnumHoverAction", "net.minecraft.network.chat.EnumHoverAction");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInClientCommand$EnumClientCommand", "net.minecraft.network.protocol.game.EnumClientCommand");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInEntityAction$EnumPlayerAction", "net.minecraft.network.protocol.game.EnumPlayerAction");
         }
 
         // Proxy classes that were added in 1.13 so that 1.12.2 and before works with the same API
         if (evaluateMCVersion("<", "1.13")) {
-            remappings.put(nms_root + ".HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
-            remappings.put(nms_root + ".HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
+            remappings.put("net.minecraft.world.level.levelgen.HeightMap", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2");
+            remappings.put("net.minecraft.world.level.levelgen.HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
             remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
-            remappings.put(nms_root + ".VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
+            remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
         }
-
+        
         // EnumArt has seen many places...
         if (evaluateMCVersion("<=", "1.8")) {
-            remappings.put(nms_root + ".Paintings", nms_root + ".EnumArt");
+            remappings.put("net.minecraft.world.entity.decoration.Paintings", "net.minecraft.world.entity.decoration.EnumArt");
         } else if (evaluateMCVersion("<", "1.13")) {
-            remappings.put(nms_root + ".Paintings", nms_root + ".EntityPainting$EnumArt");
+            remappings.put("net.minecraft.world.entity.decoration.Paintings", "net.minecraft.world.entity.decoration.EntityPainting$EnumArt");
         } else {
-            // Located at net.minecraft.server.Paintings like normal.
+            // Located at net.minecraft.world.entity.decoration.Paintings like normal.
         }
 
         // Still obfuscated on these versions of MC
         if (evaluateMCVersion(">=", "1.14") && evaluateMCVersion("<=", "1.14.1")) {
-            remappings.put(nms_root + ".ShapeDetector$Shape", nms_root + ".ShapeDetector$c");
+            remappings.put("net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape", "net.minecraft.world.level.block.state.pattern.ShapeDetector$c");
         }
 
-        // Some classes were moved after 1.13
+        // EnumScoreboardAction was moved to a ScoreboardServer class during 1.13
         if (evaluateMCVersion(">=", "1.13")) {
-            remappings.put(nms_root + ".PacketPlayOutScoreboardScore$EnumScoreboardAction", nms_root + ".ScoreboardServer$Action");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.server.ScoreboardServer$Action");
         }
 
         // Many classes disappeared, merged or moved with MC 1.14
@@ -387,15 +383,13 @@ public class CommonBootstrap {
                 unimi_fastutil_path = "it.unimi.dsi.fastutil.";
             }
 
-            remappings.put(nms_root + ".EntityHuman$EnumChatVisibility", nms_root + ".EnumChatVisibility");
-            remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap$EntityTracker");
             remappings.put("com.bergerkiller.bukkit.common.internal.LongHashSet", unimi_fastutil_path + "longs.LongSet");
-            remappings.put(cb_root + ".util.LongObjectHashMap", unimi_fastutil_path + "longs.Long2ObjectMap");
+            remappings.put("org.bukkit.craftbukkit.util.LongObjectHashMap", unimi_fastutil_path + "longs.Long2ObjectMap");
             remappings.put("net.minecraft.util.IntHashMap", unimi_fastutil_path + "ints.Int2ObjectMap");
             remappings.put("net.minecraft.util.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
             remappings.put(unimi_fastutil_path + "ints.IntHashMap$IntHashMapEntry", unimi_fastutil_path + "ints.Int2ObjectMap$Entry");
-            remappings.put(nms_root + ".EntityTracker", nms_root + ".PlayerChunkMap");
-            remappings.put(nms_root + ".EntityTrackerEntry", nms_root + ".PlayerChunkMap$EntityTracker");
+            remappings.put("net.minecraft.server.level.EntityTracker", "net.minecraft.server.level.PlayerChunkMap");
+            remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.PlayerChunkMap$EntityTracker");
         }
 
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
@@ -405,7 +399,7 @@ public class CommonBootstrap {
                 craftLegacyIsInUtil = true;
             } else if (evaluateMCVersion("==", "1.15.2")) {
                 try {
-                    Class.forName(cb_root + ".legacy.CraftLegacy");
+                    Class.forName(server.getCBRoot() + ".legacy.CraftLegacy");
                     craftLegacyIsInUtil = false;
                 } catch (Throwable t) {
                     craftLegacyIsInUtil = true;
@@ -414,18 +408,18 @@ public class CommonBootstrap {
                 craftLegacyIsInUtil = false;
             }
             if (craftLegacyIsInUtil) {
-                remappings.put(cb_root + ".legacy.CraftLegacy", cb_root + ".util.CraftLegacy");
+                remappings.put("org.bukkit.craftbukkit.legacy.CraftLegacy", "org.bukkit.craftbukkit.util.CraftLegacy");
             }
         }
 
         // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
         if (evaluateMCVersion("<", "1.16")) {
-            remappings.put(nms_root + ".ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
+            remappings.put("net.minecraft.resources.ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
         }
 
         // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
         if (evaluateMCVersion("<", "1.16")) {
-            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.server.WorldData");
+            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.world.level.storage.WorldData");
         }
 
         // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c

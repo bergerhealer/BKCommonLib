@@ -9,9 +9,9 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayInFlyingHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityTeleportHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityVelocityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle;
 
 /**
  * Used on MC 1.16 and later, when multiple passengers could be mounted inside a vehicle,

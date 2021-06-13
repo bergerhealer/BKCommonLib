@@ -366,7 +366,7 @@ public class WrapperConversion {
         return new PlayerAbilities(nmsPlayerAbilitiesHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.EntityTracker")
+    @ConverterMethod(input="net.minecraft.server.level.EntityTracker")
     public static EntityTracker toEntityTracker(Object nmsEntityTrackerHandle) {
         return new EntityTracker(nmsEntityTrackerHandle);
     }
@@ -386,12 +386,12 @@ public class WrapperConversion {
         return new IntHashMap<Object>(nmsIntHashMapHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction")
+    @ConverterMethod(input="net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction")
     public static UseAction toUseAction(Object nmsEnumEntityUseActionHandle) {
         return UseAction.fromHandle(nmsEnumEntityUseActionHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction")
+    @ConverterMethod(input="net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction")
     public static ScoreboardAction toScoreboardAction(Object nmsEnumScoreboardActionHandle) {
         return ScoreboardAction.fromHandle(nmsEnumScoreboardActionHandle);
     }

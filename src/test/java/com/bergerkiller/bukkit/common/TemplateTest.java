@@ -18,9 +18,9 @@ import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutSpawnEntityHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
@@ -62,14 +62,14 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.core.EnumAxisHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.TileEntityMobSpawnerDataHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityMobSpawnerDataHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerDataHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.WatchableObjectHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.DataWatcherHandle.ItemHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.syncher.WatchableObjectHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.ItemHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.StepSoundHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.SoundEffectTypeHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.world.level.block.StepSoundHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.world.level.block.SoundEffectTypeHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.world.level.biome.SpawnRateHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle";
@@ -77,41 +77,41 @@ public class TemplateTest {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.util.WeightedRandomChoiceHandle")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.util.WeightedRandomHandle.WeightedRandomChoiceHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ChatSerializerHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.IChatBaseComponentHandle.ChatSerializerHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.chat.ChatSerializerHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle.ChatSerializerHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumScoreboardActionHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityLookHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityLookHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRelEntityMoveLookHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRelEntityMoveLookHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PacketPlayOutRelEntityMoveHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRelEntityMoveHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumTitleActionHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutTitleHandle.EnumTitleActionHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumTitleActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.ChunkMapHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapChunkHandle.ChunkMapHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.ChunkMapHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle.ChunkMapHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumPlayerDigTypeHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumPlayerDigTypeHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumEntityUseActionHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumEntityUseActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.PlayerInfoDataHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.PlayerInfoDataHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EnumPlayerInfoActionHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.network.protocol.game.EnumPlayerInfoActionHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle";
                 }
-                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle")) {
-                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle";
+                if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle")) {
+                    genClassPath = "com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle";
                 }
                 if (genClassPath.equals("com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.logic.LongHashSet_pre_1_13_2Handle")) {
                     genClassPath = "com.bergerkiller.generated.com.bergerkiller.bukkit.common.internal.LongHashSetHandle";

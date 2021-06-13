@@ -1,0 +1,37 @@
+package net.minecraft.server.players;
+
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.level.EntityPlayer;
+import net.minecraft.server.level.WorldServer;
+
+class PlayerList {
+    public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
+
+    protected int maxPlayers;
+
+    public void savePlayers();
+
+    protected void savePlayerFile((org.bukkit.entity.Player) EntityPlayer entityplayer);
+
+#if version >= 1.16
+    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.getDimensionKey(), packet);
+    }
+#elseif version >= 1.14.1
+    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
+    }
+#elseif version >= 1.9
+    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
+    }
+#else
+    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet packet) {
+        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
+    }
+#endif
+}
+
+class net.minecraft.server.dedicated.DedicatedPlayerList extends net.minecraft.server.players.PlayerList {
+
+}

@@ -1,15 +1,6 @@
 package net.minecraft.server;
 
-import net.minecraft.network.protocol.Packet;
-
-import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
-
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
-import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
-import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
-import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
 
 class MinecraftServer {
     private boolean hasStopped;
@@ -64,36 +55,4 @@ class MinecraftServer {
         return _cached_instance;
     }
     </code>
-}
-
-class PlayerList {
-    public final (List<org.bukkit.entity.Player) List<EntityPlayer> players;
-
-    protected int maxPlayers;
-
-    public void savePlayers();
-
-    protected void savePlayerFile((org.bukkit.entity.Player) EntityPlayer entityplayer);
-
-#if version >= 1.16
-    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby(null, x, y, z, radius, world.getDimensionKey(), packet);
-    }
-#elseif version >= 1.14.1
-    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby(null, x, y, z, radius, world.worldProvider.getDimensionManager().getType(), packet);
-    }
-#elseif version >= 1.9
-    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
-        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
-    }
-#else
-    public void sendRawPacketNearby((org.bukkit.World) net.minecraft.server.WorldServer world, double x, double y, double z, double radius, (Object) Packet packet) {
-        instance.sendPacketNearby(null, x, y, z, radius, world.dimension, packet);
-    }
-#endif
-}
-
-class DedicatedPlayerList extends PlayerList {
-
 }

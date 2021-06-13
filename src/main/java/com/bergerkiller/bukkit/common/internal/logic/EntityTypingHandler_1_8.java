@@ -16,11 +16,11 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_8_to_1_13_2;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -53,11 +53,11 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
         this.fallbackConstructor = new FastMethod<Object>();
         {
             ClassResolver resolver = new ClassResolver();
-            resolver.setPackage("net.minecraft.server");
+            resolver.setPackage("net.minecraft.server.level");
             resolver.setDeclaredClass(EntityTrackerEntryStateHandle.T.getType());
             MethodDeclaration fallbackConstructorMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static EntityTrackerEntry createNew(Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile) {\n" +
-                    "#if exists net.minecraft.server.EntityTrackerEntry public EntityTrackerEntry(net.minecraft.world.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile);\n" +
+                    "#if exists net.minecraft.server.level.EntityTrackerEntry public EntityTrackerEntry(net.minecraft.world.entity.Entity entity, int viewDistance, int playerViewDistance, int updateInterval, boolean isMobile);\n" +
                     "    return new EntityTrackerEntry(entity, viewDistance, playerViewDistance, updateInterval, isMobile);\n" +
                     "#else\n" +
                     "    return new EntityTrackerEntry(entity, viewDistance, updateInterval, isMobile);\n" +

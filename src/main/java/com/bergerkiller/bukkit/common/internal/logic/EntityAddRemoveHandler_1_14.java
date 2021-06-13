@@ -21,12 +21,12 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityTrackerEntryStateHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerChunkHandle;
-import com.bergerkiller.generated.net.minecraft.server.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
@@ -100,6 +100,7 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entityListType = Class.forName("com.destroystokyo.paper.util.maplist.EntityList");
             if (SafeField.contains(ChunkHandle.T.getType(), "entities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
+                
                 resolver.setDeclaredClassName("net.minecraft.world.level.chunk.Chunk");
                 resolver.addImport("net.minecraft.world.entity.Entity");
                 paperspigotSwapEntityInChunkEntityListMethod.init(new MethodDeclaration(resolver,

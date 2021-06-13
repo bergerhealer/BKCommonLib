@@ -1,8 +1,8 @@
 package com.bergerkiller.generated.org.bukkit.craftbukkit;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.dedicated.DedicatedPlayerListHandle;
 import org.bukkit.command.SimpleCommandMap;
 import java.io.File;
 

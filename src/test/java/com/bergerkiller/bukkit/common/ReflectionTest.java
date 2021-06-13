@@ -77,7 +77,6 @@ public class ReflectionTest {
             loadClass(NMSMobSpawnerAbstract.class);
             loadClass(NMSVector.class);
             loadClass(NMSEntityMinecart.class);
-            loadClass(NMSPlayerList.class);
             loadClass(PacketType.class);
             loadClass(NMSEntityItem.class);
             loadClass(NMSItem.class);

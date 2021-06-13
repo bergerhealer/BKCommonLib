@@ -1,15 +1,15 @@
 package org.bukkit.craftbukkit;
 
-import com.bergerkiller.generated.net.minecraft.server.DedicatedPlayerListHandle;
+import net.minecraft.server.dedicated.DedicatedPlayerList;
 
-import org.bukkit.command.SimpleCommandMap;
+import com.bergerkiller.generated.net.minecraft.server.dedicated.DedicatedPlayerListHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 
 class CraftServer {
-    public SimpleCommandMap getCommandMap();
+    public org.bukkit.command.SimpleCommandMap getCommandMap();
 
-    public (DedicatedPlayerListHandle) net.minecraft.server.DedicatedPlayerList getPlayerList:getHandle();
+    public (DedicatedPlayerListHandle) DedicatedPlayerList getPlayerList:getHandle();
 
 #if version >= 1.14
     public (MinecraftServerHandle) net.minecraft.server.DedicatedServer getServer();

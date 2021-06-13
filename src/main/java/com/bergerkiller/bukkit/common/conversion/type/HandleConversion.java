@@ -272,7 +272,7 @@ public class HandleConversion {
         return playerAbilities.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.EntityTracker")
+    @ConverterMethod(output="net.minecraft.server.level.EntityTracker")
     public static Object toEntityTrackerHandle(EntityTracker entityTracker) {
         return entityTracker.getRawHandle();
     }
@@ -287,7 +287,7 @@ public class HandleConversion {
         return intHashMapWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction")
+    @ConverterMethod(output="net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction")
     public static Object toEnumEntityUseActionHandle(UseAction action) {
         return action.getHandle();
     }
@@ -303,7 +303,7 @@ public class HandleConversion {
         return EnumDifficultyHandle.T.getById.raw.invoke(difficulty.getValue());
     }
 
-    @ConverterMethod(output="net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction")
+    @ConverterMethod(output="net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction")
     public static Object toEnumScoreboardActionHandle(ScoreboardAction action) {
         return action.getHandle();
     }
@@ -341,7 +341,7 @@ public class HandleConversion {
         return itemWrapper.getRawHandle();
     }
 
-    @ConverterMethod(output="net.minecraft.server.ResourceKey<V>")
+    @ConverterMethod(output="net.minecraft.resources.ResourceKey<V>")
     public static Object toResourceKeyHandle(ResourceKey<?> resourceKeyWrapper) {
         return resourceKeyWrapper.getRawHandle();
     }

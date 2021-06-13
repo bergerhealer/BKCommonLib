@@ -9,7 +9,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.generated.net.minecraft.server.PacketPlayOutMapHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 
 /**
  * A single 128x128 map display tile. Multiple tiles may be used to make up a single map display.

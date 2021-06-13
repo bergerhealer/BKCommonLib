@@ -71,11 +71,11 @@ public class Conversion {
     public static final InputConverter<Object> toChunkCoordIntPairHandle = getConverterToHandle("net.minecraft.world.level.ChunkCoordIntPair");
     public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.core.BlockPosition");
     public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.world.entity.player.PlayerAbilities");
-    public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.EntityTracker");
+    public static final InputConverter<Object> toEntityTrackerHandle = getConverterToHandle("net.minecraft.server.level.EntityTracker");
     public static final InputConverter<Object> toLongHashSetHandle = getConverterToHandle("com.bergerkiller.bukkit.common.internal.LongHashSet");
     public static final InputConverter<Object> toIntHashMapHandle = getConverterToHandle("net.minecraft.util.IntHashMap");
-    public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayInUseEntity.EnumEntityUseAction");
-    public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.server.PacketPlayOutScoreboardScore.EnumScoreboardAction");
+    public static final InputConverter<Object> toUseActionHandle = getConverterToHandle("net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction");
+    public static final InputConverter<Object> toScoreboardActionHandle = getConverterToHandle("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction");
     public static final InputConverter<Object> toBlockDataHandle = getConverterToHandle("net.minecraft.world.level.block.state.IBlockData");
     public static final InputConverter<Object> toChunkSectionHandle = getConverterToHandle("net.minecraft.world.level.chunk.ChunkSection");
     public static final InputConverter<Object> toMobEffectList = getConverterToHandle("net.minecraft.world.effect.MobEffectList");
