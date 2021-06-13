@@ -1,21 +1,29 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
+import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
-public class CraftBukkitServer extends CommonServerBase implements ClassPathResolver {
+public class CraftBukkitServer extends CommonServerBase implements FieldNameResolver, ClassPathResolver {
     private static final String CB_ROOT = "org.bukkit.craftbukkit";
     private static final String NM_ROOT = "net.minecraft";
     private static final String NMS_ROOT = "net.minecraft.server";
@@ -41,10 +49,16 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
      */
     public String CB_ROOT_LIBS;
     /**
-     * Whether this is a Minecraft version before 1.17, where all net.minecraft classes
-     * were inside the net.minecraft.server package.
+     * Whether this is a Minecraft version after 1.17, where all net.minecraft classes
+     * were no longer inside the net.minecraft.server package. Instead Mojang's mappings
+     * are required to de-obfuscate field names.
      */
-    private boolean IS_LEGACY_MAPPINGS = false;
+    private boolean HAS_MOJANG_MAPPINGS = false;
+    /**
+     * Mojang mappings used to de-obfuscate the server at runtime.
+     * Is downloaded / cached, if required.
+     */
+    private Map<String, MojangMappings.ClassMappings> mojangMappingsByBukkitClass = null;
     /**
      * Defines class name remappings to perform right after the version info is included in the class path
      */
@@ -82,7 +96,43 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
     @Override
     public void postInit() {
         MC_VERSION = identifyMinecraftVersion();
-        IS_LEGACY_MAPPINGS = MountiplexUtil.evaluateText(MC_VERSION, "<", "1.17");
+        HAS_MOJANG_MAPPINGS = MountiplexUtil.evaluateText(MC_VERSION, ">=", "1.17");
+
+        // Initialize the mappings on Minecraft 1.17 and later
+        if (HAS_MOJANG_MAPPINGS) {
+            // We require mojang's mappings
+            MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(MC_VERSION);
+
+            // Retrieve Bukkit-Mojang class name mappings
+            // We need this to properly remap the mojang field names later
+            SpigotMappings spigotMappings = new SpigotMappings();
+            String classMappingsFile = "/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat";
+            try {
+                try (InputStream in = CraftBukkitServer.class.getResourceAsStream(classMappingsFile)) {
+                    spigotMappings.read(in);
+                }
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings (corrupted jar?)", ex);
+            }
+
+            // Read the required mappings, or downloads it if missing for some weird reason
+            if (!spigotMappings.byVersion.containsKey(MC_VERSION)) {
+                Logging.LOGGER.log(Level.WARNING, "[Developer] Class mappings file has no mappings for this Minecraft version. Build problem?");
+                try {
+                    spigotMappings.downloadMappings(mojangMappings, MC_VERSION);
+                } catch (IOException ex) {
+                    throw new IllegalStateException("Failed to download Bukkit-Mojang class name mappings");
+                }
+            }
+
+            // Apply spigot's mapping to mojang's mappings (got to reverse keys and values)
+            final Map<String, String> classMappings = spigotMappings.byVersion.get(MC_VERSION)
+                    .entrySet().stream().collect(Collectors.toMap(
+                            Map.Entry::getValue, Map.Entry::getKey));
+            mojangMappingsByBukkitClass = mojangMappings.classes.stream().collect(Collectors.toMap(
+                    v -> classMappings.getOrDefault(v.name, v.name),
+                    Function.identity()));
+        }
     }
 
     @Override
@@ -100,7 +150,7 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
         // Remap net.minecraft to net.minecraft.server.<package_version> on pre-1.17
         // We cut the class name off the end. In case a class name is represented as
         // 'SomeName.SubClass' then we will correctly identify 'SomeName' as the main class.
-        if (IS_LEGACY_MAPPINGS && path.startsWith(NM_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
+        if (!HAS_MOJANG_MAPPINGS && path.startsWith(NM_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
             int index = path.length();
             String remapped = path;
             boolean isLastPart = true;
@@ -129,14 +179,29 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
         return path;
     }
 
+    @Override
+    public String resolveFieldName(Class<?> declaringClass, String fieldName) {
+        // Minecraft 1.17 and later require remapping, as all field names are obfuscated
+        if (HAS_MOJANG_MAPPINGS) {
+            MojangMappings.ClassMappings mappings = mojangMappingsByBukkitClass.get(declaringClass.getName());
+            if (mappings != null) {
+                System.out.println("REMAP " + declaringClass.getName() + " -> " + mappings.name + " FIELD " + fieldName 
+                        + " = " + mappings.fieldMappings.get(fieldName));
+                fieldName = mappings.fieldMappings.getOrDefault(fieldName, fieldName);
+            }
+        }
+
+        return fieldName;
+    }
+
     private String identifyMinecraftVersion() throws VersionIdentificationFailureException {
         try {
             // Find getVersion() method using reflection
             Class<?> minecraftServerType;
             try {
-                minecraftServerType = loadClass(NMS_ROOT + ".MinecraftServer");
+                minecraftServerType = MPLType.getClassByName(NMS_ROOT + ".MinecraftServer");
             } catch (ClassNotFoundException ex) {
-                minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
+                minecraftServerType = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".MinecraftServer");
             }
 
             java.lang.reflect.Method getVersionMethod = getDeclaredMethod(minecraftServerType, "getVersion");
@@ -144,7 +209,7 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
             // This is easy when the server is already initialized
             if (Bukkit.getServer() != null) {
                 // Obtain MinecraftServer instance from server
-                Class<?> server = loadClass(CB_ROOT_VERSIONED + ".CraftServer");
+                Class<?> server = MPLType.getClassByName(CB_ROOT_VERSIONED + ".CraftServer");
 
                 // Standard CraftServer::getServer()
                 Object minecraftServerInstance;
@@ -168,16 +233,16 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
                     // This is at net.minecraft.MinecraftVersion for MC 1.17 and later
                     Class<?> minecraftVersionClass;
                     try {
-                        minecraftVersionClass = loadClass("net.minecraft.MinecraftVersion");
+                        minecraftVersionClass = MPLType.getClassByName("net.minecraft.MinecraftVersion");
                     } catch (ClassNotFoundException ex) {
-                        minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                        minecraftVersionClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".MinecraftVersion");
                     }
 
                     // Call the static method of MinecraftVersion to obtain the GameVersion instance
                     gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
                 } catch (ClassNotFoundException | NoSuchMethodException ex) {
                     // Older versions of Minecraft: use SharedConstants instead
-                    Class<?> sharedConstantsClass = loadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
+                    Class<?> sharedConstantsClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".SharedConstants");
                     gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
                     Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
                 }
@@ -191,10 +256,18 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
                     return fromASM;
                 }
 
+                // Find DedicatedServer object, differs on 1.17 and later
+                Class<?> dedicatedServerClass;
+                try {
+                    dedicatedServerClass = MPLType.getClassByName("net.minecraft.server.dedicated.DedicatedServer");
+                } catch (ClassNotFoundException ex2) {
+                    dedicatedServerClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                }
+
                 // Create an instance of Minecraft Server without calling any constructors
                 // This is a bit slower, but works as a reliable fallback
                 Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
-                ClassTemplate<?> nms_server_tpl = ClassTemplate.create(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                ClassTemplate<?> nms_server_tpl = ClassTemplate.create(dedicatedServerClass);
                 Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
                 return (String) getVersionMethod.invoke(minecraftServerInstance);
             }

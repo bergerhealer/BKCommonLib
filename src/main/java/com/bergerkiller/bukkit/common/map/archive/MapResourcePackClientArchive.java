@@ -1,12 +1,8 @@
 package com.bergerkiller.bukkit.common.map.archive;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.net.URL;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,10 +10,7 @@ import java.util.zip.ZipEntry;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.map.util.VersionManifest;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangIO;
 
 /**
  * Retrieves assets from the stock Minecraft client jar.
@@ -33,17 +26,9 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
         super();
         this.log = Logging.LOGGER;
 
-        File file;
-        if (Common.IS_TEST_MODE) {
-            file = new File(System.getProperty("user.dir"));
-        } else {
-            file = CommonPlugin.getInstance().getDataFolder();
-        }
-        file = new File(file, "minecraft");
-        file.mkdirs();
-
-        this.clientJarFile = new File(file, Common.MC_VERSION + ".jar");
-        this.clientJarTempFile = new File(file, Common.MC_VERSION + ".jar.tmp");
+        File cacheFolder = MojangIO.getCacheFolder();
+        this.clientJarFile = new File(cacheFolder, Common.MC_VERSION + ".jar");
+        this.clientJarTempFile = new File(cacheFolder, Common.MC_VERSION + ".jar.tmp");
         this.loadArchive();
     }
 
@@ -70,62 +55,30 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                 log.warning("To display Minecraft assets (models, textures) on maps, the Minecraft client jar is required");
                 log.warning("BKCommonLib will now download Minecraft " + Common.MC_VERSION + " client jar from Mojang's servers");
                 log.warning("The file will be installed in: " + this.clientJarFile.toString());
-                log.warning("By installing this Minecraft client you further indicate agreement to Mojang's EULA.");
+                log.warning("By installing this Minecraft client you further agree with Mojang's EULA.");
                 log.warning("The EULA can be read here: https://account.mojang.com/documents/minecraft_eula");
 
                 // Download the version manifest, to find all available versions
-                VersionManifest versionManifest = downloadJson(VersionManifest.class, "https://launchermeta.mojang.com/mc/game/version_manifest.json");
+                MojangIO.VersionManifest versionManifest = MojangIO.downloadJson(MojangIO.VersionManifest.class, MojangIO.VersionManifest.URL);
                 if (versionManifest.versions.isEmpty()) {
-                    throw new DownloadFailure("Version manifest does not contain any downloadable versions");
+                    throw new DownloadFailure("Failed to download the game version manifest from Mojangs servers");
                 }
 
                 // Find version suitable for this server
-                VersionManifest.Version currentVersion = null;
-                for (VersionManifest.Version version : versionManifest.versions) {
-                    if (version.id != null && version.id.equals(Common.MC_VERSION)) {
-                        currentVersion = version;
-                        break;
-                    }
-                }
+                MojangIO.VersionManifest.Version currentVersion = versionManifest.findVersion(Common.MC_VERSION);
                 if (currentVersion == null) {
                     throw new DownloadFailure("This Minecraft version is not available");
                 }
 
                 // Find this version's asset information
-                VersionManifest.VersionAssets versionAssets = downloadJson(VersionManifest.VersionAssets.class, currentVersion.url);
-                VersionManifest.VersionAssets.Download download = versionAssets.downloads.get("client");
+                MojangIO.VersionManifest.VersionAssets versionAssets = MojangIO.downloadJson(MojangIO.VersionManifest.VersionAssets.class, currentVersion.url);
+                MojangIO.VersionManifest.VersionAssets.Download download = versionAssets.downloads.get("client");
                 if (download == null) {
                     throw new DownloadFailure("This Minecraft version has no downloadable client jar");
                 }
 
                 // Download the file
-                log.warning("> Fetching Minecraft Client " + Common.MC_VERSION + " from Mojang servers: " + download.url);
-                FileOutputStream outStream = new FileOutputStream(this.clientJarTempFile);
-                try {
-                    URL dlUrl = new URL(download.url);
-                    InputStream dlInputStream = dlUrl.openStream();
-                    try {
-                        int n;
-                        int old_progress = 0;
-                        long downloaded = 0L;
-                        byte[] buffer = new byte[4096];
-                        while ((n = dlInputStream.read(buffer)) != -1) {
-                            outStream.write(buffer, 0, n);
-                            downloaded += n;
-
-                            // percentage indication in 10 steps
-                            int progress = (int) ((100 * downloaded) / download.size);
-                            if (progress >= (old_progress + 10)) {
-                                old_progress = progress;
-                                log.warning("> Downloading Minecraft Client " + Common.MC_VERSION + ".jar: " + progress + "%");
-                            }
-                        }
-                    } finally {
-                        dlInputStream.close();
-                    }
-                } finally {
-                    outStream.close();
-                }
+                MojangIO.downloadFile("Minecraft Client " + Common.MC_VERSION + ".jar", download, this.clientJarTempFile);
 
                 // Done, move temporary file to final destination
                 this.clientJarFile.delete();
@@ -147,20 +100,6 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
                 this.clientJarTempFile.delete();
                 logAlternative();
             }
-        }
-    }
-
-    private static <T> T downloadJson(Class<T> type, String urlString) throws IOException {
-        Logging.LOGGER.warning("> Fetching JSON from Mojang servers: " + urlString);
-        URL url = new URL(urlString);
-        InputStream inputStream = url.openStream();
-        try {
-            Reader reader = new InputStreamReader(inputStream, "UTF-8");
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            Gson gson = gsonBuilder.create();
-            return gson.fromJson(reader, type);
-        } finally {
-            inputStream.close();
         }
     }
 

@@ -1,9 +1,9 @@
 package org.bukkit.craftbukkit.block;
 
-import org.bukkit.craftbukkit.block.CraftBlockEntityState;
-
 import net.minecraft.world.level.block.state.IBlockData;
-import net.minecraft.world.level.block.TileEntity;
+import net.minecraft.world.level.block.entity.TileEntity;
+
+import org.bukkit.craftbukkit.block.CraftBlockEntityState;
 
 class CraftBlockState {
 #if version >= 1.13

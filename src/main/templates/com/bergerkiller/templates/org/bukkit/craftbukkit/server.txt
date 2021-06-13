@@ -12,7 +12,7 @@ class CraftServer {
     public (DedicatedPlayerListHandle) DedicatedPlayerList getPlayerList:getHandle();
 
 #if version >= 1.14
-    public (MinecraftServerHandle) net.minecraft.server.DedicatedServer getServer();
+    public (MinecraftServerHandle) net.minecraft.server.dedicated.DedicatedServer getServer();
 #else
     public (MinecraftServerHandle) net.minecraft.server.MinecraftServer getServer();
 #endif

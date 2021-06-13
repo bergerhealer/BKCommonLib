@@ -2,7 +2,15 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import org.bukkit.ChatColor;
 import org.junit.Test;
@@ -10,6 +18,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
@@ -304,6 +313,42 @@ public class TemplateTest {
     @Test
     public void testMapDisplayMarkerApplier() {
         MapDisplayMarkers.APPLIER.forceInitialization();
+    }
+
+    @Test
+    public void testGenerateBukkitClassMapping() {
+        SpigotMappings mappings = new SpigotMappings();
+        File mappingsFile = new File("src/main/resources/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat");
+        if (mappingsFile.exists()) {
+            try {
+                try (InputStream input = new FileInputStream(mappingsFile)) {
+                    mappings.read(input);
+                }
+            } catch (IOException ex) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings", ex);
+            }
+        }
+
+        // Make sure all mappings for versions we need are present
+        try {
+            if (!mappings.assertMappings(Stream.of(Common.TEMPLATE_RESOLVER.getSupportedVersions())
+                    .filter(s -> MountiplexUtil.evaluateText(s, ">=", "1.17"))
+                    .toArray(String[]::new))
+            ) {
+                return; // No changes
+            }
+        } catch (IOException ex) {
+            throw new RuntimeException("Failed to download some mappings", ex);
+        }
+
+        Logging.LOGGER.warning("Class mappings have changed, writing out new file!");
+        try {
+            try (OutputStream output = new FileOutputStream(mappingsFile)) {
+                mappings.write(output);
+            }
+        } catch (IOException ex) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to write class mappings", ex);
+        }
     }
 
     private void assertAvailable(Template.TemplateElement<?>... elements) {
