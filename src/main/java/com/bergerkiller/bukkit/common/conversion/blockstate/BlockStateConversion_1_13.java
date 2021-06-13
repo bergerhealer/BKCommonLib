@@ -52,7 +52,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
     public BlockStateConversion_1_13() throws Throwable {
         // Find CraftBlock class
-        final Class<?> craftBlock_type = CommonUtil.getCBClass("block.CraftBlock");
+        final Class<?> craftBlock_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlock");
         final java.lang.reflect.Field worldField = craftBlock_type.getDeclaredField("world");
         worldField.setAccessible(true);
 
@@ -60,7 +60,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         this.blockStateInstantiators = new EnumMap<Material, NullInstantiator<BlockState>>(Material.class);
 
         // Find CraftBlockEntityState class; we need to fix up the 'world' property of the snapshot tile
-        this.craftBlockEntityState_type = CommonUtil.getCBClass("block.CraftBlockEntityState");
+        this.craftBlockEntityState_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlockEntityState");
         this.craftBlockEntityState_snapshot_field = SafeField.create(this.craftBlockEntityState_type,
                 "snapshot", TileEntityHandle.T.getType());
 
@@ -79,7 +79,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return non_instrumented_invokable;
                 }
             }
-        }.createInstance(CommonUtil.getNMSClass("TickListServer"));
+        }.createInstance(CommonUtil.getClass("net.minecraft.world.level.TickListServer"));
 
         // Create a NMS World proxy for handling the getTileEntity call
         proxy_nms_world = new ClassInterceptor() {
@@ -114,7 +114,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 }
 
                 // Fluid and Block Tick list
-                if (params.length == 0 && CommonUtil.getNMSClass("TickList").isAssignableFrom(method.getReturnType())) {
+                if (params.length == 0 && CommonUtil.getClass("net.minecraft.world.level.TickList").isAssignableFrom(method.getReturnType())) {
                     return ConstantReturningInvoker.of(proxy_nms_world_ticklist);
                 }
 

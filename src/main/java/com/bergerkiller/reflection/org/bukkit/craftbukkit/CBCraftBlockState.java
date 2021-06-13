@@ -4,7 +4,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
@@ -14,7 +13,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
  */
 @Deprecated
 public class CBCraftBlockState {
-    public static final ClassTemplate<?> T = ClassTemplate.create(CommonUtil.getCBClass("block.CraftBlockState"));
+    public static final ClassTemplate<?> T = ClassTemplate.create("org.bukkit.craftbukkit.block.CraftBlockState");
 
     public static Object toTileEntity(BlockState state) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(state);

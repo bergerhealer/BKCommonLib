@@ -30,17 +30,19 @@ public class ChunkGeneratorHook {
     static {
         if (CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
             cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
-                    "chunkGenerator", CommonUtil.getNMSClass("ChunkGenerator")));
+                    "chunkGenerator", CommonUtil.getClass("net.minecraft.world.level.chunk.ChunkGenerator")));
         } else {
             cpsChunkGeneratorField = CommonUtil.unsafeCast(SafeField.create(ChunkProviderServerHandle.T.getType(),
-                    "chunkProvider", CommonUtil.getNMSClass("IChunkProvider")));
+                    "chunkProvider", CommonUtil.getClass("net.minecraft.world.level.chunk.IChunkProvider")));
         }
         if (CommonBootstrap.evaluateMCVersion("<", "1.16")) {
             hookType = ChunkGeneratorHook_1_8_to_1_15_2.class;
             hookConstructor = ChunkGeneratorHook_1_8_to_1_15_2::new;
         } else if (SafeMethod.contains(cpsChunkGeneratorField.getType(), "getMobsFor",
-                CommonUtil.getNMSClass("BiomeBase"), CommonUtil.getNMSClass("StructureManager"),
-                CommonUtil.getNMSClass("EnumCreatureType"), CommonUtil.getNMSClass("BlockPosition")))
+                CommonUtil.getClass("net.minecraft.world.level.biome.BiomeBase"),
+                CommonUtil.getClass("net.minecraft.world.level.StructureManager"),
+                CommonUtil.getClass("net.minecraft.world.entity.EnumCreatureType"),
+                CommonUtil.getClass("net.minecraft.core.BlockPosition")))
         {
             // Paper
             hookType = ChunkGeneratorHook_1_16_paper.class;

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class NMSRecipe {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("IRecipe");
+    public static final ClassTemplate<?> T = ClassTemplate.create(IRecipeHandle.T.getType());
 
     /**
      * Deprecated: use {@link IRecipeHandle#getOutput()} instead.

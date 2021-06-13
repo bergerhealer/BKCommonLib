@@ -12,7 +12,7 @@ import io.netty.channel.Channel;
  */
 @Deprecated
 public class NMSNetworkManager {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NetworkManager");
+    public static final ClassTemplate<?> T = ClassTemplate.create(NetworkManagerHandle.T.getType());
 
     //	public static final FieldAccessor<Queue<Object>> highPriorityQueue = TEMPLATE.getField("l");
 

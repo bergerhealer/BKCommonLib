@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle;
+import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
@@ -938,8 +939,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         private static final HashMap<Class<?>, Class<?>> typeMapping = new HashMap<Class<?>, Class<?>>();
 
         static {
-            Class<?> registryClass = CommonUtil.getNMSClass("DataWatcherRegistry");
-            Class<?> serializerClass = CommonUtil.getNMSClass("DataWatcherSerializer");
+            Class<?> registryClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherRegistry");
+            Class<?> serializerClass = CommonUtil.getClass("net.minecraft.network.syncher.DataWatcherSerializer");
             if (registryClass != null && serializerClass != null) {
                 // Since MC 1.9
                 for (Field f : registryClass.getDeclaredFields()) {
@@ -981,7 +982,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 register(String.class, 4);
                 register(ItemStackHandle.T.getType(), 5);
                 register(BlockPositionHandle.T.getType(), 6);
-                register(CommonUtil.getNMSClass("Vector3f"), 7);
+                register(Vector3fHandle.T.getType(), 7);
 
                 // Booleans are stored as Byte
                 typeMapping.put(Boolean.class, Byte.class);
@@ -1005,7 +1006,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             }
 
             // Vector -> Vector3f
-            typeMapping.put(Vector.class, CommonUtil.getNMSClass("Vector3f"));
+            typeMapping.put(Vector.class, Vector3fHandle.T.getType());
             // IntVector3 -> BlockPosition
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
             // Bukkit ItemStack -> nms ItemStack

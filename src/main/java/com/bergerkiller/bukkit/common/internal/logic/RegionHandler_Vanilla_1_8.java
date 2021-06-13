@@ -34,7 +34,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * Handles region-based operations from MC 1.8 to MC 1.13.2
  */
 public class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
-    private final Class<?> regionFileCacheType = CommonUtil.getNMSClass("RegionFileCache");
+    private final Class<?> regionFileCacheType = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileCache");
     private final FastMethod<Boolean> chunkExists = new FastMethod<Boolean>();
     private final FastField<Map<File, Object>> cacheField = new FastField<Map<File, Object>>();
 

@@ -53,13 +53,13 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         }
 
         // Pre-register certain classes that cause events to be fired when constructing
-        registerEntityTypes("AREA_EFFECT_CLOUD", "EntityAreaEffectCloud");
-        registerEntityTypes("ENDER_DRAGON", "EntityEnderDragon");
-        registerEntityTypes("FIREBALL", "EntityLargeFireball");
-        registerEntityTypes("FISHING_BOBBER", "EntityFishingHook");
-        registerEntityTypes("LIGHTNING_BOLT", "EntityLightning");
-        registerEntityTypes("PLAYER", "EntityPlayer");
-        registerEntityTypes("WITHER", "EntityWither"); // scoreboard things
+        registerEntityTypes("AREA_EFFECT_CLOUD", "net.minecraft.world.entity.EntityAreaEffectCloud");
+        registerEntityTypes("ENDER_DRAGON", "net.minecraft.world.entity.boss.enderdragon.EntityEnderDragon");
+        registerEntityTypes("FIREBALL", "net.minecraft.world.entity.projectile.EntityLargeFireball");
+        registerEntityTypes("FISHING_BOBBER", "net.minecraft.world.entity.projectile.EntityFishingHook");
+        registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.EntityLightning");
+        registerEntityTypes("PLAYER", "net.minecraft.server.level.EntityPlayer");
+        registerEntityTypes("WITHER", "net.minecraft.world.entity.boss.wither.EntityWither"); // scoreboard things
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
@@ -78,7 +78,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
                 nmsEntityTypes = field.get(null);
             }
 
-            Class<?> type = CommonUtil.getNMSClass(nmsClassName);
+            Class<?> type = CommonUtil.getClass(nmsClassName);
             if (type == null) {
                 throw new IllegalStateException("EntityTypes type " + nmsClassName + " not found");
             }

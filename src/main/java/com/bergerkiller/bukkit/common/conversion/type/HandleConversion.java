@@ -427,7 +427,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.server.InventoryClickType", optional=true)
     public static Object inventoryClickTypeToHandle(InventoryClickType inventoryClickType) {
-        Class<?> type = CommonUtil.getNMSClass("InventoryClickType");
+        Class<?> type = CommonUtil.getClass("net.minecraft.world.inventory.InventoryClickType");
         if (type != null) {
             Object[] values = type.getEnumConstants();
             int id = inventoryClickType.getId();

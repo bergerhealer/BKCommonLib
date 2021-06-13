@@ -17,7 +17,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 public class VoxelShapeProxy {
     public static final VoxelShapeProxy EMPTY = new VoxelShapeProxy(Collections.emptyList());
     private static final DuplexConverter<Object, AxisAlignedBBHandle> toAABBHandle = CommonUtil.unsafeCast(Conversion.findDuplex(
-            CommonUtil.getNMSClass("AxisAlignedBB"), AxisAlignedBBHandle.class));
+            CommonUtil.getClass("net.minecraft.world.phys.AxisAlignedBB"), AxisAlignedBBHandle.class));
     private final List<AxisAlignedBBHandle> _aabb;
 
     private VoxelShapeProxy(List<AxisAlignedBBHandle> aabbObjectHandles) {

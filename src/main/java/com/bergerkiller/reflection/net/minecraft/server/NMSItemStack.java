@@ -9,7 +9,7 @@ import org.bukkit.Material;
 
 @Deprecated
 public class NMSItemStack {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("ItemStack");
+    public static final ClassTemplate<?> T = ClassTemplate.create(ItemStackHandle.T.getType());
     public static final FieldAccessor<Integer> data   = ItemStackHandle.T.durabilityField.toFieldAccessor();
     public static final FieldAccessor<Integer> amount = ItemStackHandle.T.amountField.toFieldAccessor();
     public static final FieldAccessor<CommonTagCompound> tag = ItemStackHandle.T.tagField.toFieldAccessor();

@@ -114,36 +114,36 @@ public class CommonEntityType {
 
             // Types without a clear mapping
             if (entityTypeEnumName.equals("PLAYER")) {
-                nmsName = "EntityPlayer";
+                nmsName = "net.minecraft.server.level.EntityPlayer";
             } else if (entityTypeEnumName.equals("FISHING_HOOK")) {
-                nmsName = "EntityFishingHook";
+                nmsName = "net.minecraft.world.entity.projectile.EntityFishingHook";
             } else if (entityTypeEnumName.equals("LIGHTNING")) {
-                nmsName = "EntityLightning";
+                nmsName = "net.minecraft.world.entity.EntityLightning";
             } else if (entityTypeEnumName.equals("WEATHER")) {
-                nmsName = "EntityWeather";
+                nmsName = "net.minecraft.world.entity.EntityWeather";
             } else if (entityTypeEnumName.equals("COMPLEX_PART")) {
-                nmsName = "EntityComplexPart";
+                nmsName = "net.minecraft.world.entity.boss.EntityComplexPart";
             }
 
             // <= 1.10.2 (now removed)
             if (entityTypeEnumName.equals("EGG")) {
-                nmsName = "EntityEgg";
+                nmsName = "net.minecraft.world.entity.projectile.EntityEgg";
             } else if (entityTypeEnumName.equals("AREA_EFFECT_CLOUD")) {
-                nmsName = "EntityAreaEffectCloud";
+                nmsName = "net.minecraft.world.entity.EntityAreaEffectCloud";
             } else if (entityTypeEnumName.equals("SPLASH_POTION")) {
-                nmsName = "EntityPotion";
+                nmsName = "net.minecraft.world.entity.projectile.EntityPotion";
             }
 
             // Added in >= 1.10.2
             if (entityTypeEnumName.equals("TIPPED_ARROW")) {
-                nmsName = "EntityTippedArrow";
+                nmsName = "net.minecraft.world.entity.projectile.EntityTippedArrow";
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
-                nmsName = "EntityPotion";
+                nmsName = "net.minecraft.world.entity.projectile.EntityPotion";
             }
 
             // Try retrieving NMS class again
             if (nmsName != null) {
-                nmsType = CommonUtil.getNMSClass(nmsName);
+                nmsType = CommonUtil.getClass(nmsName);
             }
 
             // Check this Entity Type isn't a custom Forge Entity type
@@ -216,7 +216,7 @@ public class CommonEntityType {
         if (nmsType != null) {
             boolean hasConstructor = false;
             try {
-                nmsType.getConstructor(CommonUtil.getNMSClass("World"), double.class, double.class, double.class);
+                nmsType.getConstructor(CommonUtil.getClass("net.minecraft.world.level.World"), double.class, double.class, double.class);
                 hasConstructor = true;
             } catch (Throwable t) {
             }

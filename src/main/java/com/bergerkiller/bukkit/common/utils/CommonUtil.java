@@ -73,20 +73,6 @@ public class CommonUtil {
     }
 
     /**
-     * Defines the net.minecraft.server. constant used by getNMSClass() (which is not inlined or
-     * relocated). Implementer note: do NOT change this to a constant or maven
-     * shading will rename it.
-     */
-    private static final String NMS_ROOT = StringUtil.join(".", "net", "minecraft", "server", "");
-
-    /**
-     * Defines the org.bukkit.craftbukkit. constant used by getCBClass() (which is not inlined or
-     * relocated). Implementer note: do NOT change this to a constant or maven
-     * shading will rename it.
-     */
-    private static final String CB_ROOT = StringUtil.join(".", "org", "bukkit", "craftbukkit", "");
-
-    /**
      * When under test internal classes have to be loaded in a very specific order.
      * This function makes sure the server registers are initialized.
      */
@@ -827,26 +813,6 @@ public class CommonUtil {
      */
     public static Class<?> getClass(String path, boolean initialize) {
         return Resolver.loadClass(path, initialize);
-    }
-
-    /**
-     * Tries to get the net.minecraft.server class at the path specified
-     *
-     * @param name of the NMS class
-     * @return the class, or null if not found
-     */
-    public static Class<?> getNMSClass(String name) {
-        return getClass(NMS_ROOT + name, false);
-    }
-
-    /**
-     * Tries to get the org.bukkit.craftbukkit class at the path specified
-     *
-     * @param name of the CB class
-     * @return the class, or null if not found
-     */
-    public static Class<?> getCBClass(String name) {
-        return getClass(CB_ROOT + name, false);
     }
 
     /**

@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -40,22 +41,22 @@ public class LightingHandler_1_14 implements LightingHandler {
         this.handle = Template.Class.create(LightEngineHandle.class, Common.TEMPLATE_RESOLVER);
         this.handle.forceInitialization();
 
-        Class<?> lightEngineType = CommonUtil.getNMSClass("LightEngine");
+        Class<?> lightEngineType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngine");
         if (lightEngineType == null) {
             throw new IllegalStateException("LightEngine class not found");
         }
 
-        Class<?> lightEngineLayerType = CommonUtil.getNMSClass("LightEngineLayer");
+        Class<?> lightEngineLayerType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngineLayer");
         if (lightEngineLayerType == null) {
             throw new IllegalStateException("LightEngineLayer class not found");
         }
 
-        Class<?> lightEngineStorageType = CommonUtil.getNMSClass("LightEngineStorage");
+        Class<?> lightEngineStorageType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngineStorage");
         if (lightEngineStorageType == null) {
             throw new IllegalStateException("LightEngineStorage class not found");
         }
 
-        Class<?> lightEngineStorageArrayType = CommonUtil.getNMSClass("LightEngineStorageArray");
+        Class<?> lightEngineStorageArrayType = CommonUtil.getClass("net.minecraft.world.level.lighting.LightEngineStorageArray");
         if (lightEngineStorageArrayType == null) {
             throw new IllegalStateException("LightEngineStorageArray class not found");
         }
@@ -82,13 +83,13 @@ public class LightingHandler_1_14 implements LightingHandler {
 
         // PlayerChunkMap.GOLDEN_TICKET
         {
-            Field f = CommonUtil.getNMSClass("PlayerChunkMap").getDeclaredField("GOLDEN_TICKET");
+            Field f = PlayerChunkMapHandle.T.getType().getDeclaredField("GOLDEN_TICKET");
             final int golden_ticket_value = f.getInt(null);
             this.golden_ticket = () -> golden_ticket_value;
         }
 
         // Get PRE/POST_UPDATE constants
-        Class<?> updateType = CommonUtil.getNMSClass("LightEngineThreaded$Update");
+        Class<?> updateType = CommonUtil.getClass("net.minecraft.server.level.LightEngineThreaded$Update");
         {
             Object preUpdate = null;
             Object postUpdate = null;
@@ -111,7 +112,7 @@ public class LightingHandler_1_14 implements LightingHandler {
         }
 
         // Get the private schedule method of the engine
-        this.light_engine_schedule = CommonUtil.getNMSClass("LightEngineThreaded").getDeclaredMethod("a",
+        this.light_engine_schedule = CommonUtil.getClass("net.minecraft.server.level.LightEngineThreaded").getDeclaredMethod("a",
                 int.class, int.class, IntSupplier.class, updateType, Runnable.class);
 
         // Make all accessible

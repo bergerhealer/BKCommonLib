@@ -62,8 +62,8 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = pair(toDataWatcherKey, toDataWatcherObjectHandle);
     public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = pair(toDataWatcherItem, toDataWatcherItemHandle);
     public static final DuplexConverter<Object, CommonTag> commonTag = pair(toCommonTag, toNBTTagHandle);
-    public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findNMS("NBTTagCompound", CommonTagCompound.class);
-    public static final DuplexConverter<Object, CommonTagList> commonTagList = findNMS("NBTTagList", CommonTagList.class);
+    public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findByPath("net.minecraft.nbt.NBTTagCompound", CommonTagCompound.class);
+    public static final DuplexConverter<Object, CommonTagList> commonTagList = findByPath("net.minecraft.nbt.NBTTagList", CommonTagList.class);
     public static final DuplexConverter<Integer, Object> paintingFacing = pair(toPaintingFacing, toPaintingFacingId);
     public static final DuplexConverter<Object, IntVector3> blockPosition = pair(toIntVector3, toBlockPositionHandle);
     public static final DuplexConverter<Object, IntVector2> chunkIntPair = pair(toIntVector2, toChunkCoordIntPairHandle);
@@ -138,8 +138,8 @@ public class DuplexConversion {
         return (T) Conversion.findDuplex(input, output);
     }
 
-    private static final <T> T findNMS(String nmsClassName, Class<?> output) {
-        return find(CommonUtil.getNMSClass(nmsClassName), output);
+    private static final <T> T findByPath(String nmsClassName, Class<?> output) {
+        return find(CommonUtil.getClass(nmsClassName), output);
     }
 
     @SuppressWarnings("unchecked")

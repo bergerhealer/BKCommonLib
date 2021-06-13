@@ -46,7 +46,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     private final SafeField<Collection<Object>> entityRemoveQueue;
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
-        this.iWorldAccessType = CommonUtil.getNMSClass("IWorldAccess");
+        this.iWorldAccessType = CommonUtil.getClass("net.minecraft.world.level.IWorldAccess");
         this.entitiesByIdField = SafeField.create(WorldHandle.T.getType(), "entitiesById", IntHashMapHandle.T.getType());
         this.entityListField = new FastField<List<Object>>();
         try {

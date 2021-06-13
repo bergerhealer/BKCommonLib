@@ -18,6 +18,11 @@ class Item {
         return #REGISTRY;
     }
 
+    public void setMaxStackSize(int maxStackSize) {
+        #require net.minecraft.world.item.Item private final int maxStackSize;
+        instance#maxStackSize = maxStackSize;
+    }
+
     public int getMaxStackSize();
 
     public int getMaxDurability();

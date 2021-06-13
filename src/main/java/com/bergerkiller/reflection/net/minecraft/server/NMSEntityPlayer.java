@@ -13,7 +13,7 @@ import org.bukkit.entity.Player;
  */
 @Deprecated
 public class NMSEntityPlayer extends NMSEntityHuman {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityPlayer");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityPlayerHandle.T.getType());
 
     public static final FieldAccessor<Object> playerConnection = EntityPlayerHandle.T.playerConnection.raw.toFieldAccessor();
 

@@ -35,7 +35,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
     static {
         // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
         streamConverter = CommonUtil.unsafeCast(Conversion.find(
-                TypeDeclaration.createGeneric(Stream.class, CommonUtil.getNMSClass("VoxelShape")),
+                TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.T.getType()),
                 TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
 
         boolean success = true;

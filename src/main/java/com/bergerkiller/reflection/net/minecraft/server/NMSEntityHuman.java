@@ -14,7 +14,7 @@ import org.bukkit.entity.HumanEntity;
  */
 @Deprecated
 public class NMSEntityHuman extends NMSEntityLiving {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityHuman");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityHumanHandle.T.getType());
 
     public static final FieldAccessor<Object> inventory = EntityHumanHandle.T.inventoryRaw.toFieldAccessor();
     public static final FieldAccessor<Object> enderChest = EntityHumanHandle.T.enderChestRaw.toFieldAccessor();

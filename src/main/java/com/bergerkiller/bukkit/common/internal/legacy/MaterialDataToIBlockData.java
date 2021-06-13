@@ -37,7 +37,7 @@ public class MaterialDataToIBlockData {
         // Initialize craftBukkitgetIBlockData to a runtime-generated method
         {
             ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(CommonUtil.getCBClass("util.CraftMagicNumbers"));
+            resolver.setDeclaredClass(CommonUtil.getClass("org.bukkit.craftbukkit.util.CraftMagicNumbers"));
             resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(

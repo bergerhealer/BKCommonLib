@@ -12,7 +12,7 @@ import java.util.UUID;
 
 @Deprecated
 public class NMSWorldServer extends NMSWorld {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("WorldServer");
+    public static final ClassTemplate<?> T = ClassTemplate.create(WorldServerHandle.T.getType());
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public static final FieldAccessor<Map<UUID, Object>> entitiesByUUID = (FieldAccessor) WorldServerHandle.T.entitiesByUUID.raw.toFieldAccessor();

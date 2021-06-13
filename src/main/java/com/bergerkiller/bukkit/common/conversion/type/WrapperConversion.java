@@ -621,7 +621,7 @@ public class WrapperConversion {
 
     @ConverterMethod(output="net.minecraft.core.EnumDirection")
     public static Object blockFaceToEnumDirection(BlockFace direction) {
-        Class<?> enumClass = CommonUtil.getNMSClass("EnumDirection");
+        Class<?> enumClass = CommonUtil.getClass("net.minecraft.core.EnumDirection");
         if (enumClass != null) {
             Object[] values = enumClass.getEnumConstants();
             for (int i = 0; i < enumDirectionValues.length; i++) {

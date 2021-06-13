@@ -14,7 +14,7 @@ import java.util.List;
 
 @Deprecated
 public class NMSMobSpawnerAbstract {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobSpawnerAbstract");
+    public static final ClassTemplate<?> T = ClassTemplate.create(MobSpawnerAbstractHandle.T.getType());
 
     public static final FieldAccessor<Integer> spawnDelay = MobSpawnerAbstractHandle.T.spawnDelay.toFieldAccessor();
     public static final FieldAccessor<List<Object>> mobs = CommonUtil.unsafeCast(MobSpawnerAbstractHandle.T.mobs.raw.toFieldAccessor());

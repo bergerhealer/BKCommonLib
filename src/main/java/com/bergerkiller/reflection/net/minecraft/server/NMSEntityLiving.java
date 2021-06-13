@@ -11,7 +11,7 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
  */
 @Deprecated
 public class NMSEntityLiving extends NMSEntity {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityLiving");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityLivingHandle.T.getType());
 
     public static final DataWatcher.Key<Byte> DATA_LIVING_FLAGS = EntityLivingHandle.DATA_LIVING_FLAGS;
     public static final DataWatcher.Key<Float> DATA_HEALTH = EntityLivingHandle.DATA_HEALTH;

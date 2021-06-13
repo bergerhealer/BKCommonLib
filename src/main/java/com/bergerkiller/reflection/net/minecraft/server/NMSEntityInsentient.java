@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
  */
 @Deprecated
 public class NMSEntityInsentient extends NMSEntityLiving {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityInsentient");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityInsentientHandle.T.getType());
 
     public static final MethodAccessor<Object> getNavigation = EntityInsentientHandle.T.getNavigation.toMethodAccessor();
 }

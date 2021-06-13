@@ -8,11 +8,11 @@ import org.bukkit.entity.Item;
 
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -22,7 +22,7 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
 @Deprecated
 public class NMSEntity {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("Entity")
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityHandle.T.getType())
     		.addImport("org.bukkit.craftbukkit.entity.CraftEntity");
 
     /* ================================================================================================================ */
@@ -260,7 +260,7 @@ public class NMSEntity {
     public static final MethodAccessor<Object> getBoundingBox = EntityHandle.T.getBoundingBox.raw.toMethodAccessor();
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private static final SafeConstructor entityItemConstr = new SafeConstructor(CommonUtil.getNMSClass("EntityItem"),
+    private static final SafeConstructor entityItemConstr = new SafeConstructor(EntityItemHandle.T.getType(),
             NMSWorld.T.getType(), double.class, double.class, double.class);
 
     public static Item createEntityItem(World world, double x, double y, double z) {

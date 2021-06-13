@@ -5,7 +5,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 @Deprecated
 public class NMSEntityTypes {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityTypes");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityTypesHandle.T.getType());
 
     /**
      * Retrieves the class belonging to an Entity, by name.

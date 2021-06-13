@@ -5,7 +5,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 
 public class NMSNibbleArray {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("NibbleArray");
+    public static final ClassTemplate<?> T = ClassTemplate.create(NibbleArrayHandle.T.getType());
     public static final FieldAccessor<byte[]> array = NibbleArrayHandle.T.dataField.toFieldAccessor();
 
     /**

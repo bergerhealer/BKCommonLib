@@ -120,7 +120,7 @@ public class Conversion {
     public static final InputConverter<EquipmentSlot> toEquipmentSlot = getConverterTo(EquipmentSlot.class);
     // Arrays
     public static final InputConverter<ItemStack[]> toItemStackArr = getConverterTo(ItemStack[].class);
-    public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getNMSClass("ItemStack")));
+    public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getClass("net.minecraft.world.item.ItemStack")));
     public static final InputConverter<Object[]> toObjectArr = getConverterTo(Object[].class);
     public static final InputConverter<boolean[]> toBoolArr = getConverterTo(boolean[].class);
     public static final InputConverter<char[]> toCharArr = getConverterTo(char[].class);

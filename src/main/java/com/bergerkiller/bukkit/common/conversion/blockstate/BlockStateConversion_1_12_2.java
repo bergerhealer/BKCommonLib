@@ -49,7 +49,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
 
     public BlockStateConversion_1_12_2() throws Throwable {
         // Find CraftBlock class
-        final Class<?> craftBlock_type = CommonUtil.getCBClass("block.CraftBlock");
+        final Class<?> craftBlock_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlock");
         final java.lang.reflect.Field chunkField = craftBlock_type.getDeclaredField("chunk");
         chunkField.setAccessible(true);
 

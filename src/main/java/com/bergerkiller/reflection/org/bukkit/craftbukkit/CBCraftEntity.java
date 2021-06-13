@@ -7,7 +7,7 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class CBCraftEntity {
-    public static final ClassTemplate<?> T = ClassTemplate.createCB("entity.CraftEntity");
+    public static final ClassTemplate<?> T = ClassTemplate.create("org.bukkit.craftbukkit.entity.CraftEntity");
     public static final MethodAccessor<Entity> getEntity = T.selectMethod(
     		"public static CraftEntity getEntity(org.bukkit.craftbukkit.CraftServer server," +
     		                                    "net.minecraft.world.entity.Entity entity)");

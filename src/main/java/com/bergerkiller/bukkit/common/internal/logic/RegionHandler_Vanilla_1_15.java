@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -42,7 +43,8 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         // This is slightly different on PaperSpigot, where they changed the IChunkLoader to extend RegionFileCache, rather than adding a field
-        if (CommonUtil.getNMSClass("RegionFileCache").isAssignableFrom(CommonUtil.getNMSClass("PlayerChunkMap"))) {
+        Class<?> t_RegionFileCache = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileCache");
+        if (t_RegionFileCache.isAssignableFrom(PlayerChunkMapHandle.T.getType())) {
             // PaperMC
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +

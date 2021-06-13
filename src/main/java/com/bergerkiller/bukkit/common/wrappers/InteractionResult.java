@@ -38,7 +38,7 @@ public enum InteractionResult {
             if (name.equals("CONSUME") && !CommonBootstrap.evaluateMCVersion(">=", "1.15")) {
                 name = "SUCCESS";
             }
-            for (Enum<?> enumConstant : (Enum[]) CommonUtil.getNMSClass("EnumInteractionResult").getEnumConstants()) {
+            for (Enum<?> enumConstant : (Enum[]) CommonUtil.getClass("net.minecraft.world.EnumInteractionResult").getEnumConstants()) {
                 if (enumConstant.name().equals(name)) {
                     this._handle = enumConstant;
                     return;

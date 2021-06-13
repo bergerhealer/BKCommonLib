@@ -198,15 +198,15 @@ public class BlockDataImpl extends BlockData {
         // Some materials do not exist on all MC versions, hence the hack with the enum names
         try {
             String[] blocked_types =new String[] {
-                    "BlockPlant",
-                    "BlockObserver",
-                    "BlockBubbleColumn",
-                    "BlockConcretePowder",
-                    "BlockLeaves",
-                    "BlockDirtSnow"
+                    "net.minecraft.world.level.block.BlockPlant",
+                    "net.minecraft.world.level.block.BlockObserver",
+                    "net.minecraft.world.level.block.BlockBubbleColumn",
+                    "net.minecraft.world.level.block.BlockConcretePowder",
+                    "net.minecraft.world.level.block.BlockLeaves",
+                    "net.minecraft.world.level.block.BlockDirtSnow"
             };
             for (String nmsBlockTypeName : blocked_types) {
-                Class<?> nmsBlockType = CommonUtil.getNMSClass(nmsBlockTypeName);
+                Class<?> nmsBlockType = CommonUtil.getClass(nmsBlockTypeName);
                 if (nmsBlockType != null) {
                     for (Material mat : CommonLegacyMaterials.getAllMaterials()) {
                         BlockDataConstant blockData = BY_MATERIAL.get(mat);

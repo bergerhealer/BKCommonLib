@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
  */
 @Deprecated
 public class NMSChunkSection {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("ChunkSection");
+    public static final ClassTemplate<?> T = ClassTemplate.create(ChunkSectionHandle.T.getType());
 
     public static final MethodAccessor<Boolean> isEmpty  = ChunkSectionHandle.T.isEmpty.toMethodAccessor();
 

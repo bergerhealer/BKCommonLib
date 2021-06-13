@@ -26,9 +26,9 @@ public class EntityRegistryTest {
         }
 
         Class<?>[] input_types = new Class<?>[] {
-                CommonUtil.getNMSClass("EntityCreeper"),
-                CommonUtil.getNMSClass("EntityGhast"),
-                CommonUtil.getNMSClass("EntityMinecartRideable")
+                CommonUtil.getClass("net.minecraft.world.entity.monster.EntityCreeper"),
+                CommonUtil.getClass("net.minecraft.world.entity.monster.EntityGhast"),
+                CommonUtil.getClass("net.minecraft.world.entity.vehicle.EntityMinecartRideable")
         };
         for (Class<?> input_type : input_types) {
             Object type = HandleConversion.toEntityTypesHandleFromEntityClass(input_type);

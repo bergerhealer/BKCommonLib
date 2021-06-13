@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 
 @Deprecated
 public class CBCraftItemStack {
-	public static final ClassTemplate<?> T = ClassTemplate.createCB("inventory.CraftItemStack");
+	public static final ClassTemplate<?> T = ClassTemplate.create("org.bukkit.craftbukkit.inventory.CraftItemStack");
 
     public static final FieldAccessor<Object> handle = T.selectField("net.minecraft.world.item.ItemStack handle");
 

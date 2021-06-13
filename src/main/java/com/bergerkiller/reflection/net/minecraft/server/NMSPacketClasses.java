@@ -112,6 +112,7 @@ import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
@@ -385,7 +386,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayInFlying extends NMSPacket {
 
         protected NMSPacketPlayInFlying(String subType) {
-            super(CommonUtil.getNMSClass("PacketPlayInFlying." + subType));
+            super(CommonUtil.getClass("net.minecraft.network.protocol.game.PacketPlayInFlying." + subType));
         }
 
         public final FieldAccessor<Double> x = PacketPlayInFlyingHandle.T.x.toFieldAccessor();
@@ -578,7 +579,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Boolean> canInstantlyBuild = nextFieldSignature("private boolean d");
         public final FieldAccessor<Float> flySpeed = nextFieldSignature("private float e");
         public final FieldAccessor<Float> walkSpeed = nextFieldSignature("private float f");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(NMSPlayerAbilities.T.getType());
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(PlayerAbilitiesHandle.T.getType());
 
         public CommonPacket newInstance(PlayerAbilities abilities) {
             return constructor1.newInstance(abilities.getRawHandle());
@@ -816,7 +817,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRelEntityMove extends NMSPacketPlayOutEntity {
 
         public NMSPacketPlayOutRelEntityMove() {
-            super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutRelEntityMove"));
+            super(PacketPlayOutRelEntityMoveHandle.T.getType());
         }
 
         public CommonPacket newInstance(int entityId, double dx, double dy, double dz, boolean onGround) {
@@ -827,7 +828,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutRelEntityMoveLook extends NMSPacketPlayOutEntity {
 
         public NMSPacketPlayOutRelEntityMoveLook() {
-            super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook"));
+            super(PacketPlayOutRelEntityMoveLookHandle.T.getType());
         }
 
         public CommonPacket newInstance(int entityId, double dx, double dy, double dz, float dyaw, float dpitch, boolean onGround) {
@@ -838,7 +839,7 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityLook extends NMSPacketPlayOutEntity {
 
         public NMSPacketPlayOutEntityLook() {
-            super(CommonUtil.getNMSClass("PacketPlayOutEntity.PacketPlayOutEntityLook"));
+            super(PacketPlayOutEntityLookHandle.T.getType());
         }
 
         public CommonPacket newInstance(int entityId, float dyaw, float dpitch, boolean onGround) {
@@ -1063,7 +1064,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> pushMotX = nextFieldSignature("private float f");
         public final FieldAccessor<Float> pushMotY = nextFieldSignature("private float g");
         public final FieldAccessor<Float> pushMotZ = nextFieldSignature("private float h");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(double.class, double.class, double.class, float.class, List.class, CommonUtil.getNMSClass("Vec3D"));
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(double.class, double.class, double.class, float.class, List.class, Vec3DHandle.T.getType());
 
         @SuppressWarnings("unchecked")
         public CommonPacket newInstance(double x, double y, double z, float radius) {
@@ -2064,7 +2065,9 @@ public class NMSPacketClasses {
         public final FieldAccessor<Long> g = nextFieldSignature("private long g");
         public final FieldAccessor<Integer> warningTime = nextFieldSignature("private int h");
         public final FieldAccessor<Integer> warningDistance = nextFieldSignature("private int i");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(CommonUtil.getNMSClass("WorldBorder"), CommonUtil.getNMSClass("PacketPlayOutWorldBorder.EnumWorldBorderAction"));
+        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(
+                CommonUtil.getClass("net.minecraft.world.level.border.WorldBorder"),
+                CommonUtil.getClass("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder.EnumWorldBorderAction"));
 
         public CommonPacket newInstance (Object nmsWorldBorder, Object nmsEnumBorderAction) {
             return constructor1.newInstance(nmsWorldBorder, nmsEnumBorderAction);

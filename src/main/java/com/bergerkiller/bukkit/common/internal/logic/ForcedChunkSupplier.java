@@ -4,7 +4,7 @@ import java.lang.reflect.Constructor;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
 /**
@@ -16,7 +16,7 @@ public class ForcedChunkSupplier implements Supplier<Object>, Function<String, O
 
     public ForcedChunkSupplier() {
         Constructor<?> constructor = null;
-        Class<?> type = CommonUtil.getNMSClass("ForcedChunk");
+        Class<?> type = ForcedChunkHandle.T.getType();
         if (type != null) {
             try {
                 try {

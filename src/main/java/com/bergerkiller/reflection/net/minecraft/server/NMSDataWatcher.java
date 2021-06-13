@@ -17,7 +17,7 @@ import org.bukkit.entity.Entity;
  */
 @Deprecated
 public class NMSDataWatcher {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("DataWatcher");
+    public static final ClassTemplate<?> T = ClassTemplate.create(DataWatcherHandle.T.getType());
 
     public static final TranslatorFieldAccessor<Entity> owner = DataWatcherHandle.T.owner.raw.toFieldAccessor().translate(DuplexConversion.entity);
 

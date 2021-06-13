@@ -14,7 +14,7 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
  */
 @Deprecated
 public class NMSMobEffect {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobEffect");
+    public static final ClassTemplate<?> T = ClassTemplate.create(MobEffectHandle.T.getType());
     public static final TranslatorFieldAccessor<PotionEffectType> effectType = MobEffectHandle.T.effectList.toFieldAccessor().translate(DuplexConversion.potionEffectType);
     public static final FieldAccessor<Integer> duration = MobEffectHandle.T.duration.toFieldAccessor();
     public static final FieldAccessor<Integer> amplification = MobEffectHandle.T.amplification.toFieldAccessor();
@@ -24,7 +24,7 @@ public class NMSMobEffect {
 
     @Deprecated
     public static class List {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("MobEffectList");
+        public static final ClassTemplate<?> T = ClassTemplate.create(MobEffectListHandle.T.getType());
         public static final MethodAccessor<Integer> getId = MobEffectListHandle.T.getId.raw.toMethodAccessor();
         public static final MethodAccessor<Object> fromId = MobEffectListHandle.T.fromId.raw.toMethodAccessor();
     }

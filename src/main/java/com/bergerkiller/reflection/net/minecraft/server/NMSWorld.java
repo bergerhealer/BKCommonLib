@@ -14,7 +14,7 @@ import java.util.List;
 
 @Deprecated
 public class NMSWorld {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("World");
+    public static final ClassTemplate<?> T = ClassTemplate.create(WorldHandle.T.getType());
 
     private static final MethodAccessor<Server> getServer  = WorldHandle.T.getServer.raw.toMethodAccessor();
 

@@ -10,7 +10,7 @@ import org.bukkit.World;
 import java.util.Map;
 
 public class CBCraftServer {
-    public static final ClassTemplate<?> T = ClassTemplate.createCB("CraftServer")
+    public static final ClassTemplate<?> T = ClassTemplate.create("org.bukkit.craftbukkit.CraftServer")
             .addImport("net.minecraft.server.MinecraftServer")
             .addImport("net.minecraft.server.DedicatedPlayerList")
             .addImport("org.bukkit.World");

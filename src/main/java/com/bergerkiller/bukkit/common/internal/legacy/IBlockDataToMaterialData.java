@@ -44,7 +44,7 @@ public class IBlockDataToMaterialData {
         // Used on MC 1.13 and onwards for legacy conversions
         Map<Object, MaterialData> iblockdataToMaterialdata_map = Collections.emptyMap();
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            Class<?> craftLegacyClass = CommonUtil.getCBClass("legacy.CraftLegacy");
+            Class<?> craftLegacyClass = CommonUtil.getClass("org.bukkit.craftbukkit.legacy.CraftLegacy");
             if (craftLegacyClass != null) {
                 try {
                     java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
@@ -62,7 +62,7 @@ public class IBlockDataToMaterialData {
         // Generated method for generating MaterialData from IBlockData
         {
             ClassResolver resolver = new ClassResolver();
-            resolver.setDeclaredClass(CommonUtil.getCBClass("util.CraftMagicNumbers"));
+            resolver.setDeclaredClass(CommonUtil.getClass("org.bukkit.craftbukkit.util.CraftMagicNumbers"));
             resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftbukkitGetMaterialdata.init(new MethodDeclaration(resolver, 
@@ -729,7 +729,7 @@ public class IBlockDataToMaterialData {
     }
 
     private static class CraftBukkitToLegacy {
-        private static final SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getCBClass("legacy.CraftLegacy"), "toLegacy", Material.class);
+        private static final SafeMethod<Material> craftbukkitToLegacy = new SafeMethod<Material>(CommonUtil.getClass("org.bukkit.craftbukkit.legacy.CraftLegacy"), "toLegacy", Material.class);
 
         public static Material toLegacy(Material material) {
             return craftbukkitToLegacy.invoke(null, material);

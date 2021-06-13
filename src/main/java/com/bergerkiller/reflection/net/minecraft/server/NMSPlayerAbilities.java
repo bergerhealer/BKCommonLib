@@ -7,7 +7,7 @@ import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 
 @Deprecated
 public class NMSPlayerAbilities {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("PlayerAbilities");
+    public static final ClassTemplate<?> T = ClassTemplate.create(PlayerAbilitiesHandle.T.getType());
 
     public static final FieldAccessor<Boolean> isInvulnerable    = PlayerAbilitiesHandle.T.isInvulnerable.toFieldAccessor();
     public static final FieldAccessor<Boolean> isFlying          = PlayerAbilitiesHandle.T.isFlying.toFieldAccessor();

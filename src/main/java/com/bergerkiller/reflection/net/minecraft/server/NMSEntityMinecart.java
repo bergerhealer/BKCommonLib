@@ -7,6 +7,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinec
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartFurnaceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartHopperHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartMobSpawnerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartTNTHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -14,7 +15,7 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 @Deprecated
 public class NMSEntityMinecart {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartAbstract");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartAbstractHandle.T.getType);
 
     public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR;
     public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION;
@@ -26,11 +27,11 @@ public class NMSEntityMinecart {
     public static final MethodAccessor<Void> activate = EntityMinecartAbstractHandle.T.activate.toMethodAccessor();
 
     public static class Rideable {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartRideable");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartRideableHandle.T.getType());
     }
 
     public static class Furnace {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartFurnace");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartFurnaceHandle.T.getType());
 
         public static DataWatcher.Key<Boolean> DATA_SMOKING = EntityMinecartFurnaceHandle.DATA_SMOKING;
 
@@ -40,24 +41,24 @@ public class NMSEntityMinecart {
     }
 
     public static class MobSpawner {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartMobSpawner");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartMobSpawnerHandle.T.getType());
         public static final FieldAccessor<Object> mobSpawner = EntityMinecartMobSpawnerHandle.T.mobSpawner.raw.toFieldAccessor();
     }
 
     public static class Hopper {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartHopper");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartHopperHandle.T.getType());
         public static final FieldAccessor<Integer> suckingCooldown = EntityMinecartHopperHandle.T.suckingCooldown.toFieldAccessor();
     }
 
     public static class TNT {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartTNT");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartTNTHandle.T.getType());
         public static final FieldAccessor<Integer> fuse = EntityMinecartTNTHandle.T.fuse.toFieldAccessor();
         public static final MethodAccessor<Void> explode = EntityMinecartTNTHandle.T.explode.toMethodAccessor();
         public static final MethodAccessor<Void> prime = EntityMinecartTNTHandle.T.prime.toMethodAccessor();
     }
 
     public static class CommandBlock {
-        public static final ClassTemplate<?> T = ClassTemplate.createNMS("EntityMinecartCommandBlock");
+        public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartCommandBlockHandle.T.getType());
 
         public static final DataWatcher.Key<String> DATA_COMMAND = EntityMinecartCommandBlockHandle.DATA_COMMAND;
         public static final DataWatcher.Key<ChatText> DATA_PREVIOUS_OUTPUT = EntityMinecartCommandBlockHandle.DATA_PREVIOUS_OUTPUT;

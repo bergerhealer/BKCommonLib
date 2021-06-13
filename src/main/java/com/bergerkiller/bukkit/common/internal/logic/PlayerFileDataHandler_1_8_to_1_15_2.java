@@ -37,7 +37,7 @@ public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
 
-        Class<?> playerFileDataType = CommonUtil.getNMSClass("IPlayerFileData");
+        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.IPlayerFileData");
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType));
     }
 

@@ -91,7 +91,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
             }
         }
     };
-    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(CommonUtil.getNMSClass("EnumDirection")) {
+    public static final PropertyConverter<Object> toPaintingFacing = new PropertyConverter<Object>(CommonUtil.getClass("net.minecraft.core.EnumDirection")) {
         @Override
         public Object convertInput(Object value) {
             Integer id = toPaintingFacingId.convert(value);

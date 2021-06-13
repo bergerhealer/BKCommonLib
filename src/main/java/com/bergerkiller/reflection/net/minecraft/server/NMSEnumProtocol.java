@@ -5,7 +5,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 
 @Deprecated
 public class NMSEnumProtocol {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("EnumProtocol");
+    public static final ClassTemplate<?> T = ClassTemplate.create(EnumProtocolHandle.T.getType());
 
     public static Class<?> getPacketClassIn(Integer id) {
         return EnumProtocolHandle.PLAY.getPacketClassIn(id.intValue());

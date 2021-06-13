@@ -13,7 +13,7 @@ import org.bukkit.World;
 
 @Deprecated
 public class NMSChunk {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("Chunk");
+    public static final ClassTemplate<?> T = ClassTemplate.create(ChunkHandle.T.getType());
 
     private static final MethodAccessor<Void> addEntities = ChunkHandle.T.addEntities.toMethodAccessor();
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();

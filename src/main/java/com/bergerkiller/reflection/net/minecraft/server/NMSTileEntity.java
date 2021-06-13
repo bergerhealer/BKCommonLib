@@ -18,7 +18,7 @@ import org.bukkit.block.Block;
  */
 @Deprecated
 public class NMSTileEntity {
-    public static final ClassTemplate<?> T = ClassTemplate.createNMS("TileEntity");
+    public static final ClassTemplate<?> T = ClassTemplate.create(TileEntityHandle.T.getType);
     public static final TranslatorFieldAccessor<World> world = TileEntityHandle.T.world_field.toFieldAccessor();
     public static final TranslatorFieldAccessor<IntVector3> position = TileEntityHandle.T.position_field.toFieldAccessor();
 
