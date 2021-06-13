@@ -11,9 +11,9 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Material;
@@ -168,8 +168,8 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
 
-    public com.bergerkiller.generated.net.minecraft.server.WorldServerHandle getWorldServer() {
-        return com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
+        return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
 
 

@@ -1,0 +1,363 @@
+package net.minecraft.server.level;
+
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.EntityHuman;
+import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.level.ForcedChunk;
+import net.minecraft.world.level.IBlockAccess;
+import net.minecraft.world.level.storage.WorldDataServer;
+import net.minecraft.world.level.World;
+
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
+
+class WorldServer extends World {
+    private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
+
+    public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
+
+#if version >= 1.14
+    public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers();
+#else
+    // Note: is List<EntityHuman> on 1.13.2 and before, but only stores players, so this is safe.
+    public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers() {
+        return ((World)instance).players;
+    }
+#endif
+
+    public com.bergerkiller.bukkit.common.wrappers.EntityTracker getEntityTracker() {
+        Object handle = com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getEntityTrackerHandle.invoke(instance);
+
+        // If hooked, make sure to take the original so that changes can be made safely
+        com.bergerkiller.mountiplex.reflection.ClassInterceptor hook;
+        hook = com.bergerkiller.mountiplex.reflection.ClassInterceptor.get(handle, com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook.class);
+        if (hook != null) {
+            handle = ((com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook) hook).original;
+        }
+
+        // Convert to EntityTracker
+        return new com.bergerkiller.bukkit.common.wrappers.EntityTracker(handle);
+    }
+
+#if version >= 1.14
+    public Object getEntityTrackerHandle() {
+        return instance.getChunkProvider().playerChunkMap;
+    }
+
+    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+        instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
+    }
+
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return instance.getChunkProvider().playerChunkMap;
+    }
+#else
+    public Object getEntityTrackerHandle() {
+        return instance.tracker;
+    }
+
+    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+        instance.tracker = entityTrackerHandle;
+    }
+
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+#endif
+
+#if version >= 1.16
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey();
+
+    public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+        return MinecraftServer.getServer().getWorldServer(key);
+    }
+#else
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey() {
+        // If one of the main worlds (world, world_nether, world_the_end), then use the overworld, the_nether or the_end constants
+        // Otherwise, create a new resource key using the world name
+    #if version >= 1.13.1
+        int dimension = instance.dimension.getDimensionID();
+    #else
+        int dimension = instance.dimension;
+    #endif
+        // First three default main worlds
+        if (dimension == 0) {
+            return ResourceKey.WORLD_DIMENSION_OVERWORLD;
+        } else if (dimension == -1) {
+            return ResourceKey.WORLD_DIMENSION_THE_NETHER;
+        } else if (dimension == 1) {
+            return ResourceKey.WORLD_DIMENSION_THE_END;
+        }
+
+        // Custom world, dimension key is by world name lower-cased
+        String name = instance.worldData.getName().toLowerCase(java.util.Locale.ENGLISH);
+        return ResourceKey.create(ResourceKey.CATEGORY_WORLD_DIMENSION, new net.minecraft.resources.MinecraftKey(name));
+    }
+
+    public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+        String name = (String) com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.name.get(key.name);
+        MinecraftServer server = MinecraftServer.getServer();
+
+  #if version >= 1.13.1
+        // Uses DimensionManager, rather than dimension id's
+        if (name.equals("overworld")) {
+            return server.getWorldServer(DimensionManager.OVERWORLD);
+        } else if (name.equals("the_nether")) {
+            return server.getWorldServer(DimensionManager.THE_NETHER);
+        } else if (name.equals("the_end")) {
+            return server.getWorldServer(DimensionManager.THE_END);
+        }
+  #else
+        // Uses dimension id's
+        if (name.equals("overworld")) {
+            return server.getWorldServer(0);
+        } else if (name.equals("the_nether")) {
+            return server.getWorldServer(-1);
+        } else if (name.equals("the_end")) {
+            return server.getWorldServer(1);
+        }
+  #endif
+
+        // Non-main world, get by name
+        return ((org.bukkit.craftbukkit.CraftWorld) server.server.getWorld(name)).getHandle();
+    }
+#endif
+
+#if version >= 1.16
+    public (WorldDataServerHandle) WorldDataServer getWorldData() {
+        return instance.worldDataServer;
+    }
+#else
+    public (WorldDataServerHandle) WorldDataServer getWorldData();
+#endif
+
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+#if version >= 1.9
+        return (ChunkProviderServer) instance.getChunkProvider();
+#else
+        return instance.chunkProviderServer;
+#endif
+    }
+
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {
+        ChunkProviderServer cps;
+#if version >= 1.13.2
+        cps = (ChunkProviderServer) instance.getChunkProvider();
+#elseif version >= 1.9
+        cps = instance.getChunkProviderServer();
+#else
+        cps = instance.chunkProviderServer;
+#endif
+
+#if version >= 1.14
+        long key = ChunkCoordIntPair.pair(cx, cz);
+
+  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
+        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.getVisibleChunk(key);
+  #else
+        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
+  #endif
+
+        if (chunk != null) {
+#if exists net.minecraft.server.level.PlayerChunk public Chunk getFullChunk()
+            return chunk.getFullChunk();
+#else
+            java.util.concurrent.CompletableFuture statusFuture;
+  #if exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.ChunkStatus chunkstatus)
+            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
+  #else
+            statusFuture = chunk.a(ChunkStatus.FULL);
+  #endif
+            com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) statusFuture.getNow(null);
+            return either == null ? null : (Chunk) either.left().orElse(null);
+#endif
+        }
+        return null;
+
+        // Note: suffers server crash bug on earlier versions of Spigot
+        // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
+#elseif version >= 1.13.1
+        long key = ChunkCoordIntPair.a(cx, cz);
+        return (Chunk) cps.chunks.get(key);
+
+        // Note: suffers deadlock because of synchronized (this.chunkLoader) (chunks are already synchronized, anyway)
+        // return cps.getChunkAt(cx, cz, false, false);
+#else
+        return cps.getChunkIfLoaded(cx, cz);
+#endif
+    }
+
+#if exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
+    public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
+        ChunkMapDistance chunkDistanceManager;
+  #if exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
+        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
+  #else
+        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.u;
+  #endif
+
+        int level = 31;
+        ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
+        if (loaded) {
+            chunkDistanceManager.addTicketAtLevel(TicketType.PLUGIN_TICKET, chunkCoord, level, plugin);
+        } else {
+            chunkDistanceManager.removeTicketAtLevel(TicketType.PLUGIN_TICKET, chunkCoord, level, plugin);
+        }
+    }
+#elseif version >= 1.13.1
+    public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
+        com.bergerkiller.mountiplex.reflection.declarations.Template.Method getForcedChunkMethod;
+        getForcedChunkMethod = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getForcedChunk.raw;
+        ForcedChunk forcedchunk = (ForcedChunk) getForcedChunkMethod.invoke(instance);
+
+  #if version >= 1.14
+        long key = ChunkCoordIntPair.pair(x, z);
+  #else
+        long key = ChunkCoordIntPair.a(x, z);
+  #endif
+
+        boolean changed;
+        if (loaded) {
+            changed = forcedchunk.a().add(key);
+        } else {
+            changed = forcedchunk.a().remove(key);
+        }
+        forcedchunk.a(changed);
+
+  #if version >= 1.14
+        if (changed) {
+            ChunkCoordIntPair chunkcoordintpair = new ChunkCoordIntPair(x, z);
+            instance.getChunkProvider().a(chunkcoordintpair, loaded);
+        }
+  #endif
+    }
+#else
+    public optional void setForceLoadedAsync:###(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded);
+#endif
+
+#if version >= 1.14
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        return (ForcedChunk) instance.getWorldPersistentData().a(
+            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+    }
+#elseif version >= 1.13.1
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        ForcedChunk forcedchunk = (ForcedChunk) instance.a(
+            instance.worldProvider.getDimensionManager(),
+            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+        if (forcedchunk == null) {
+            forcedchunk = new ForcedChunk("chunks");
+            instance.a(instance.worldProvider.getDimensionManager(), "chunks", forcedchunk);
+        }
+        return forcedchunk;
+    }
+#else
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
+#endif
+
+#if version >= 1.14
+    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
+        return instance.entitiesById.values();
+    }
+#elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
+    public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
+        return ((World)instance).entityList;
+    }
+#else
+    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
+        return ((World)instance).entityList;
+    }
+#endif
+
+    public void removeEntity((EntityHandle) Entity entity);
+
+#if forge_nms_obfuscated
+    public boolean addEntity:a((EntityHandle) Entity entity);
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer:u();
+#else
+    public boolean addEntity((EntityHandle) Entity entity);
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
+#endif
+
+#if version >= 1.14
+    public void saveLevel() {
+        #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
+        ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
+        cps.playerChunkMap#saveChunkMap(true);
+    }
+#elseif version >= 1.13
+    public void saveLevel() {
+        instance.getDataManager().a();
+    }
+#else
+    public void saveLevel();
+#endif
+
+    public org.bukkit.Location findSafeSpawn(PlayerRespawnPoint respawnPoint, boolean alsoWhenDestroyed, boolean isDeathRespawn) {
+        if (respawnPoint.isNone()) {
+            return null;
+        }
+
+        BlockPosition blockposition = new BlockPosition(respawnPoint.getX(), respawnPoint.getY(), respawnPoint.getZ());
+
+        // If isDeathRespawn is true, removes one use tick from a bed respawn anchor, if used
+        boolean ignoreRespawnAnchorUses = !isDeathRespawn;
+
+#if version >= 1.14
+        // Optional<Vec3D>
+  #if version >= 1.16.2
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+  #elseif version >= 1.16
+        java.util.Optional result = EntityHuman.getBed(instance, blockposition, alsoWhenDestroyed, ignoreRespawnAnchorUses);
+  #else
+        java.util.Optional result = EntityHuman.getBed((IWorldReader) instance, blockposition, alsoWhenDestroyed);
+  #endif
+        Vec3D vec3d = (Vec3D) result.orElse(null);
+        if (vec3d == null) {
+            return null;
+        } else {
+            return new org.bukkit.Location(respawnPoint.getWorld(), vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        }
+#else
+  #if version >= 1.13
+        BlockPosition result = EntityHuman.getBed((IBlockAccess) instance, blockposition, alsoWhenDestroyed);
+  #else
+        BlockPosition result = EntityHuman.getBed((World) instance, blockposition, alsoWhenDestroyed);
+  #endif
+        if (result == null) {
+            return null;
+        } else {
+            return new org.bukkit.Location(respawnPoint.getWorld(), (double) result.getX() + 0.5, (double) result.getY(), (double) result.getZ() + 0.5);
+        }
+#endif
+    }
+
+    <code>
+    public static WorldServerHandle fromBukkit(org.bukkit.World world) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+
+    public void setChunkProviderServer(ChunkProviderServerHandle chunkProviderServerHandle) {
+        if (T.field_chunkProviderServer.isAvailable()) {
+            T.field_chunkProviderServer.set(getRaw(), chunkProviderServerHandle);
+        }
+        if (WorldHandle.T.field_chunkProvider.isAvailable()) {
+            WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
+        }
+    }
+    </code>
+}

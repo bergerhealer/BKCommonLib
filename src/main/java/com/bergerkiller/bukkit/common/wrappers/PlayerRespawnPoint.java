@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 
 /**
  * All the information of a bed (re)spawn point,

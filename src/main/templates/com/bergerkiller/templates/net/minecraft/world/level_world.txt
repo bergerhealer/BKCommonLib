@@ -1,5 +1,332 @@
 package net.minecraft.world.level;
 
+import net.minecraft.core.BlockPosition;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.TileEntity;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.level.chunk.IChunkProvider;
+import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.phys.AxisAlignedBB;
+import net.minecraft.world.phys.MovingObjectPosition;
+import net.minecraft.world.phys.Vec3D;
+
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
+import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
+
+class World extends IBlockAccess {
+    public final Random random;
+    protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
+    private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld bukkitWorld:world;
+    public boolean keepSpawnInMemory;
+
+    public void method_profiler_begin(String label) {
+#if version >= 1.14
+        instance.getMethodProfiler().enter(label);
+#elseif exists net.minecraft.util.profiling.MethodProfiler public void enter(String label)
+        instance.methodProfiler.enter(label);
+#else
+        instance.methodProfiler.a(label);
+#endif
+    }
+
+    public void method_profiler_end() {
+#if version >= 1.14
+        instance.getMethodProfiler().exit();
+#elseif exists net.minecraft.util.profiling.MethodProfiler public void exit()
+        instance.methodProfiler.exit();
+#elseif version >= 1.13
+        instance.methodProfiler.e();
+#else
+        instance.methodProfiler.b();
+#endif
+    }
+
+    public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
+
+    public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer();
+
+#if forge_nms_obfuscated
+    public (BlockData) IBlockData getBlockData:o((IntVector3) BlockPosition blockposition);
+#else
+    public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
+#endif
+
+    /* This is runtime generated to improve performance, avoiding the cost of creating BlockPosition objects */
+    public BlockData getBlockDataAtCoord(int x, int y, int z) {
+#if exists net.minecraft.world.level.World public boolean captureTreeGeneration; && !exists io.github.opencubicchunks.cubicchunks.api.world.ICube
+        // CraftBukkit does some special stuff, sometimes, when captureTreeGeneration is set
+        if (instance.captureTreeGeneration) {
+            IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
+            return BlockData.fromBlockData(blockData);
+        }
+
+        // Check within bounds of the chunk slices before performing any expensive calls
+        if (y >= 0 && y < 256) {
+            net.minecraft.world.level.chunk.ChunkSection section = instance.getChunkAt(x >> 4, z >> 4).getSections()[y >> 4];
+            if (section != null) {
+#if version >= 1.9
+                Object blockData = section.getBlocks().a(x & 0xF, y & 0xF, z & 0xF);
+#else
+                Object blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
+#endif
+                return BlockData.fromBlockData(blockData);
+            }
+        }
+
+        // Fallback is AIR
+        return BlockData.AIR;
+#else
+        // Weird stuff on forge
+        IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
+        return BlockData.fromBlockData(blockData);
+#endif
+    }
+
+    <code>
+    public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
+    public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
+    public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
+    </code>
+
+    public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
+
+    public long getTime();
+
+    public optional (Object) IChunkProvider getChunkProvider();
+
+#if version >= 1.16
+    public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
+#else
+    public (DimensionType) DimensionManager getDimensionType() {
+  #if version >= 1.14.1
+        // Since 1.14.1 Bukkit added a method to easily obtain the dimension type
+        return instance.worldProvider.getDimensionManager().getType();
+
+  #elseif version >= 1.14
+        // Since 1.14 the DimensionManager has multiple instances for many worlds
+        // As a result, it is not an accurate way to obtain the world type
+        // There is no getType() we can use yet, so the next best way is to check the type of world provider
+        if (instance.worldProvider instanceof WorldProviderHell) {
+            return DimensionManager.NETHER;
+        } else if (instance.worldProvider instanceof WorldProviderTheEnd) {
+            return DimensionManager.THE_END;
+        } else {
+            return DimensionManager.OVERWORLD;
+        }
+  #elseif version >= 1.9
+        // Uses DimensionManager. Since 1.13.1 DimensionManager is no longer an enum.
+        // However, WorldProvider does not return the DimensionManager of the world, but
+        // rather the enum constants, so the result of WorldProvider:getDimensionManager()
+        // is safe to use!
+        return instance.worldProvider.getDimensionManager();
+  #else
+        // Uses a dimension ID, instead of a DimensionManager instance.
+        // WorldProvider:getDimension() only returns -1, 0 or 1, as set in the constructor
+        return DimensionManager.a(instance.worldProvider.getDimension());
+  #endif
+    }
+
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey getDimensionTypeKey() {
+        com.bergerkiller.mountiplex.reflection.declarations.Template$Method method;
+        method = (com.bergerkiller.mountiplex.reflection.declarations.Template$Method) com.bergerkiller.generated.net.minecraft.world.level.WorldHandle.T.getDimensionType.raw;
+
+        DimensionManager dimensionType = (DimensionManager) method.invoke(instance);
+        if (dimensionType == DimensionManager.NETHER) {
+            return ResourceKey.WORLD_DIMENSION_TYPE_THE_NETHER;
+        } else if (dimensionType == DimensionManager.THE_END) {
+            return ResourceKey.WORLD_DIMENSION_TYPE_THE_END;
+        } else {
+            return ResourceKey.WORLD_DIMENSION_TYPE_OVERWORLD;
+        }
+    }
+#endif
+
+#if version >= 1.14
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.getWorldBorder().a(entity.getBoundingBox());
+    }
+#elseif version >= 1.13
+    public boolean isWithinWorldBorder:i((EntityHandle) Entity entity);
+#elseif version >= 1.11.2
+    public boolean isWithinWorldBorder:g((EntityHandle) Entity entity);
+#elseif version >= 1.8.3
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.a(instance.getWorldBorder(), entity);
+    }
+#else
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.a(instance.af(), entity);
+    }
+#endif
+
+#if version >= 1.13
+    private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#elseif version >= 1.11.2
+    private optional boolean getBlockCollisions:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#else
+    private optional boolean getBlockCollisions:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB bounds, boolean flag, (List<AxisAlignedBBHandle>) List<AxisAlignedBB> list);
+#endif
+
+    //#if version >= 1.13.1
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+    //#elseif version >= 1.13
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) VoxelShape getCollisionShapes:a((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz);
+    //#elseif version >= 1.11
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    //        return instance.getCubes(entity, boundingBox.b(dx, dy, dz));
+    //    }
+    //#else
+    //    public (java.util.stream.Stream<VoxelShapeHandle>) List<AxisAlignedBB> getCollisionShapes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, double dx, double dy, double dz) {
+    //        return instance.getCubes(entity, boundingBox.a(dx, dy, dz));
+    //    }
+    //#endif
+    //
+
+#if version >= 1.13
+    public boolean isNotCollidingWithBlocks:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#else
+    public boolean isNotCollidingWithBlocks((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb) {
+        return instance.getCubes(entity, axisalignedbb).isEmpty();
+    }
+#endif
+
+    // Used by the EntityMoveHandler_1_8 only
+#if version >= 1.13
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:###((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#else
+    public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#endif
+
+    public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+
+    public (List<EntityHandle>) List<Entity> getNearbyEntities:getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+
+    public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
+
+    // Used on MC 1.8.8 only!
+#if version >= 1.9
+    public optional void makeSound:###(double x, double y, double z, String name, float volume, float pitch);
+#else
+    public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
+#endif
+
+#if version >= 1.16
+    public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
+        java.util.stream.Stream iblockdata_in_bounds_stream = instance.c(bounds);
+        java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
+        while (iter.hasNext()) {
+            IBlockData iblockdata1 = (IBlockData) iter.next();
+            if (iblockdata1.a((Tag) TagsBlock.FIRE) || iblockdata1.a(Blocks.LAVA)) {
+                return true;
+            }
+        }
+        return false;
+    }
+#elseif version >= 1.15
+    public boolean isBurnArea:c((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.13
+    public boolean isBurnArea:b((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.11.2
+    public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.9
+    public boolean isBurnArea:f((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#else
+    public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
+#endif
+
+#if version >= 1.9
+    public (org.bukkit.entity.Entity) Entity getEntityById:getEntity(int entityId);
+#else
+    public (org.bukkit.entity.Entity) Entity getEntityById:a(int entityId);
+#endif
+
+    // Gone since 1.14
+    // public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+
+#if version >= 1.14
+    // Gone since 1.14, but isAreaLoaded still exists
+    public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance) {
+        return instance.isAreaLoaded(blockposition.getX() - distance, blockposition.getY() - distance, blockposition.getZ() - distance,
+                                     blockposition.getX() + distance, blockposition.getY() + distance, blockposition.getZ() + distance);
+    }
+#else
+    // Note: moved to IWorldReader interface on MC 1.13
+    public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance);
+#endif
+
+#if version >= 1.14
+    // Fallback...
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
+        RayTrace rayTrace = new RayTrace(point1, point2, RayTrace$BlockCollisionOption.OUTLINE, RayTrace$FluidCollisionOption.NONE, null);
+        MovingObjectPosition result = instance.rayTrace(rayTrace);
+        if (result != null && result.getType() == MovingObjectPosition$EnumMovingObjectType.MISS) {
+            result = null;
+        }
+        return result;
+    }
+#elseif version >= 1.13
+    // Fallback...
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
+        return instance.rayTrace(point1, point2);
+    }
+#else
+    public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2);
+#endif
+
+    // >= 1.11 (has 'self' option)
+    public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
+
+    // <= 1.10.2 (lacks 'self' option)
+    public optional void opt_applyPhysics_old:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType);
+
+    <code>
+    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        if (T.opt_applyPhysics.isAvailable()) {
+            T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
+        } else if (T.opt_applyPhysics_old.isAvailable()) {
+            T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
+        } else {
+            throw new UnsupportedOperationException("Apply physics function not available on this server");
+        }
+        // Update self
+        if (self) {
+            applyBlockPhysics(position, causeType);
+        }
+    }
+    </code>
+
+    public void applyBlockPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType) {
+#if version >= 1.11
+        instance.a(position, causeType, position);
+#elseif version >= 1.9
+        instance.e(position, causeType);
+#else
+        instance.d(position, causeType);
+#endif
+    }
+
+    <code>
+    public org.bukkit.World toBukkit() {
+        return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());
+    }
+
+    public static WorldHandle fromBukkit(org.bukkit.World world) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
+    }
+    </code>
+}
+
 // Since MC 1.13.1
 optional class ForcedChunk {
 }

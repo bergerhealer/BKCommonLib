@@ -2,8 +2,8 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.List;
 
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 
 /**

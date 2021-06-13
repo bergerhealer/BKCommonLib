@@ -49,7 +49,6 @@ import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
@@ -61,6 +60,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
@@ -92,7 +92,7 @@ public class HandleConversion {
         }
     }
 
-    @ConverterMethod(output="net.minecraft.server.WorldServer")
+    @ConverterMethod(output="net.minecraft.server.level.WorldServer")
     public static Object toWorldHandle(org.bukkit.World world) {
         try {
             return CraftWorldHandle.T.getHandle.invoker.invoke(world);

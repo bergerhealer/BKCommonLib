@@ -14,8 +14,8 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 class TileEntity {
     protected (org.bukkit.World) World world_field:world;

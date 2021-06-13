@@ -42,11 +42,13 @@
 #include /net/minecraft/resources_minecraftkey.txt
 #include /net/minecraft/resources_resourcekey.txt
 #include /net/minecraft/server_level_chunkproviderserver.txt
+#include /net/minecraft/server_level_entity_tracker.txt
 #include /net/minecraft/server_level_lightengine.txt
 #include /net/minecraft/server_level_playerchunk.txt
-#include /net/minecraft/server_level_entity_tracker.txt
-#include /net/minecraft/server_playerlist.txt
+#include /net/minecraft/server_level_worldserver.txt
+#include /net/minecraft/server_minecraftserver.txt
 #include /net/minecraft/server_network_playerconnection.txt
+#include /net/minecraft/server_playerlist.txt
 #include /net/minecraft/sounds.txt
 #include /net/minecraft/util_entityslice.txt
 #include /net/minecraft/util_inthashmap.txt
@@ -92,8 +94,6 @@
 #include /net/minecraft/world/phys_shapes_voxelshape.txt
 #include /net/minecraft/world/phys_vec3d.txt
 
-#include /net/minecraft/server/server.txt
 #include /net/minecraft/server/entity_subtype.txt
-#include /net/minecraft/server/world.txt
 
 #include /com/bergerkiller/bukkit/common/internal/longhashset.txt

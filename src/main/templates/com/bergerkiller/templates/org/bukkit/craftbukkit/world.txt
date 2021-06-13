@@ -1,5 +1,5 @@
 package org.bukkit.craftbukkit;
 
 class CraftWorld extends org.bukkit.World {
-    public (Object) net.minecraft.server.WorldServer getHandle();
+    public (Object) net.minecraft.server.level.WorldServer getHandle();
 }

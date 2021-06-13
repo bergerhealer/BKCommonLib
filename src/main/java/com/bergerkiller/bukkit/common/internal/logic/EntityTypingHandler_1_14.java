@@ -13,11 +13,11 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_14;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -145,14 +145,14 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * public static void initWorldServer((Object) WorldServer worldserver, (Object) WorldDataServer worldData) {
          * 
          * // Spigot World configuration
-         * #if fieldexists net.minecraft.server.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         * #if fieldexists net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
          *     #require net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
          *     org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig("DUMMY");
          *     worldserver#spigotConfig = spigotConfig;
          * #endif
          * 
          * // PaperSpigot World configuration
-         * #if fieldexists net.minecraft.server.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         * #if fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig("DUMMY", spigotConfig);
          *     worldserver#paperConfig = paperConfig;
@@ -174,7 +174,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * 
          * #if version >= 1.16
          *     // WorldDataMutable field
-         *     #require net.minecraft.world.level.World public final net.minecraft.server.WorldDataMutable worldData;
+         *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldDataMutable worldData;
          *     worldserver#worldData = worldData;
          * 
          *     // WorldDataServer field (on some servers, it uses the WorldDataMutable field instead)

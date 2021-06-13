@@ -62,7 +62,7 @@ public class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.WorldServer world) {
+         * public static boolean isSupported(net.minecraft.server.level.WorldServer world) {
          *     return world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld();
          * }
          */

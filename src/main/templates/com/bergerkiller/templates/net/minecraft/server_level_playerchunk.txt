@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandl
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
 
 import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
 import io.github.opencubicchunks.cubicchunks.api.world.IColumn;

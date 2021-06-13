@@ -49,7 +49,6 @@ import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -62,6 +61,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.crafting.RecipeItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
@@ -89,7 +89,7 @@ public class WrapperConversion {
         return EntityHandle.T.getBukkitEntity.invoker.invoke(nmsEntityHandle);
     }
 
-    @ConverterMethod(input="net.minecraft.server.World")
+    @ConverterMethod(input="net.minecraft.world.level.World")
     public static org.bukkit.World toWorld(Object nmsWorldHandle) {
         return (org.bukkit.World) WorldHandle.T.getWorld.raw.invoke(nmsWorldHandle);
     }

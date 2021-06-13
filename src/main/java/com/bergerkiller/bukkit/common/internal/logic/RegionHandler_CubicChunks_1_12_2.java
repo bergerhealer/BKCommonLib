@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -243,12 +243,12 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     @Template.Import("cubicchunks.regionlib.impl.save.SaveSection3D")
     @Template.Import("cubicchunks.regionlib.impl.SaveCubeColumns")
     @Template.Import("cubicchunks.regionlib.impl.EntryLocation3D")
-    @Template.InstanceType("net.minecraft.server.World")
+    @Template.InstanceType("net.minecraft.world.level.World")
     public static abstract class CubicChunksHandle extends Template.Class<Template.Handle> {
 
         /*
          * <IS_SUPPORTED>
-         * public static boolean isSupported(net.minecraft.server.WorldServer world) {
+         * public static boolean isSupported(net.minecraft.server.level.WorldServer world) {
          *     return world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld();
          * }
          */

@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -6,7 +6,6 @@ import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.IBlockAccessHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
@@ -18,11 +17,11 @@ import java.util.List;
 import java.util.Random;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.World</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.level.World</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.World")
+@Template.InstanceType("net.minecraft.world.level.World")
 public abstract class WorldHandle extends IBlockAccessHandle {
     /** @See {@link WorldClass} */
     public static final WorldClass T = Template.Class.create(WorldClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -88,13 +87,11 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract boolean isKeepSpawnInMemory();
     public abstract void setKeepSpawnInMemory(boolean value);
     /**
-     * Stores class members for <b>net.minecraft.server.World</b>.
+     * Stores class members for <b>net.minecraft.world.level.World</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
         public final Template.Field<Random> random = new Template.Field<Random>();
-        @Template.Optional
-        public final Template.Field.Converted<Object> navigationListener = new Template.Field.Converted<Object>();
         @Template.Optional
         public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();

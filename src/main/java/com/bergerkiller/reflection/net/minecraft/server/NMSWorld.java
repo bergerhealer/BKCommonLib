@@ -2,7 +2,7 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
@@ -19,12 +19,6 @@ public class NMSWorld {
     private static final MethodAccessor<Server> getServer  = WorldHandle.T.getServer.raw.toMethodAccessor();
 
     public static final FieldAccessor<World> bukkitWorld   =  WorldHandle.T.bukkitWorld.toFieldAccessor();
-
-    /**
-     * This field is only available >= MC 1.10.2
-     */
-    @Deprecated
-    public static final FieldAccessor<Object> navigationListener = WorldHandle.T.navigationListener.raw.toFieldAccessor();
 
     public static final MethodAccessor<Boolean> getBlockCollisions = WorldHandle.T.getBlockCollisions.raw.toMethodAccessor();
 

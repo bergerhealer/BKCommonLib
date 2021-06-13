@@ -21,9 +21,8 @@ import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
-
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 
 class Entity {
 #if version >= 1.9
@@ -190,8 +189,8 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     <code>
-    public com.bergerkiller.generated.net.minecraft.server.WorldServerHandle getWorldServer() {
-        return com.bergerkiller.generated.net.minecraft.server.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
+        return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
     }
     </code>
 
@@ -796,7 +795,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         }
   #if version >= 1.16
         return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
-  #elseif exists net.minecraft.server.World public Chunk getChunkIfLoaded(int x, int z);
+  #elseif exists net.minecraft.world.level.World public net.minecraft.world.level.chunk.Chunk getChunkIfLoaded(int x, int z);
         return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
   #else
         return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);

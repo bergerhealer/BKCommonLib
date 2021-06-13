@@ -25,7 +25,7 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
 
     public PlayerFileDataHandler_1_16() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
+        resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
 
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
@@ -35,7 +35,7 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
 
-        Class<?> playerFileDataType = CommonUtil.getNMSClass("WorldNBTStorage");
+        Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType));
     }
 

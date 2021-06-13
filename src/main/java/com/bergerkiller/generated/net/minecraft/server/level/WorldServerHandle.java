@@ -1,13 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.server.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
-import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
-import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
@@ -18,11 +19,11 @@ import java.util.Map;
 import java.util.UUID;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.WorldServer</b>.
+ * Instance wrapper handle for type <b>net.minecraft.server.level.WorldServer</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.WorldServer")
+@Template.InstanceType("net.minecraft.server.level.WorldServer")
 public abstract class WorldServerHandle extends WorldHandle {
     /** @See {@link WorldServerClass} */
     public static final WorldServerClass T = Template.Class.create(WorldServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -69,7 +70,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
     public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
     /**
-     * Stores class members for <b>net.minecraft.server.WorldServer</b>.
+     * Stores class members for <b>net.minecraft.server.level.WorldServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {

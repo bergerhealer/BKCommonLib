@@ -21,14 +21,14 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -66,7 +66,8 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entityListType = Class.forName("com.tuinity.tuinity.util.EntityList");
             if (SafeField.contains(WorldServerHandle.T.getType(), "loadedEntities", entityListType)) {
                 ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
+                resolver.addImport("net.minecraft.world.entity.Entity");
+                resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
                 tuinitySwapEntityInWorldEntityListMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
                         "    if (instance.loadedEntities.remove(oldEntity)) {\n" +
@@ -82,10 +83,11 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Class<?> entitySetType = Class.forName("com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet");
             if (SafeField.contains(WorldServerHandle.T.getType(), "entitiesForIteration", entitySetType)) {
                 ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClassName("net.minecraft.server.WorldServer");
+                resolver.addImport("net.minecraft.world.entity.Entity");
+                resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
                 tuinitySwapEntityInWorldEntityIterationSetMethod.init(new MethodDeclaration(resolver,
                         "public void swap(Entity oldEntity, Entity newEntity) {\n" +
-                        "    #require net.minecraft.server.WorldServer final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entitiesForIteration;\n" +
+                        "    #require net.minecraft.server.level.WorldServer final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<net.minecraft.world.entity.Entity> entitiesForIteration;\n" +
                         "    com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = instance#entitiesForIteration;\n" +
                         "    if (set.remove(oldEntity)) {\n" +
                         "        set.add(newEntity);\n" +

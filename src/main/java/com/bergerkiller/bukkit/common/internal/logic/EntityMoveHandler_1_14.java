@@ -13,8 +13,8 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
-import com.bergerkiller.generated.net.minecraft.server.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
@@ -39,7 +39,6 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         boolean success = true;
         ClassResolver resolver = new ClassResolver();
         resolver.setVariable("version", Common.MC_VERSION);
-        resolver.setDeclaredClassName("net.minecraft.server.World");
         resolver.addImport("net.minecraft.core.BlockPosition");
         resolver.addImport("net.minecraft.core.EnumDirection");
         resolver.addImport("net.minecraft.util.MathHelper");
@@ -49,6 +48,7 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
         resolver.addImport("net.minecraft.world.level.border.WorldBorder");
         resolver.addImport("net.minecraft.world.level.IBlockAccess");
+        resolver.setDeclaredClassName("net.minecraft.world.level.World");
         try {
             String method_path;
             if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
