@@ -1,0 +1,40 @@
+package net.minecraft.world.entity.item;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.World;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+
+class EntityItem extends Entity {
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
+#elseif version >= 1.13
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:b;
+#elseif version >= 1.11
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+#elseif version >= 1.9
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
+#else
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
+#endif
+
+    <code>
+    public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 10);
+    </code>
+
+    private int age;
+    public int pickupDelay;
+
+    public (EntityItemHandle) EntityItem((WorldHandle) World world, double x, double y, double z, (ItemStackHandle) ItemStack itemstack);
+
+    public (ItemStackHandle) ItemStack getItemStack();
+
+    public void setItemStack((ItemStackHandle) ItemStack itemstack);
+}

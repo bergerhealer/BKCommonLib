@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.item;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
@@ -7,11 +7,11 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityItem</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.item.EntityItem</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityItem")
+@Template.InstanceType("net.minecraft.world.entity.item.EntityItem")
 public abstract class EntityItemHandle extends EntityHandle {
     /** @See {@link EntityItemClass} */
     public static final EntityItemClass T = Template.Class.create(EntityItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -36,7 +36,7 @@ public abstract class EntityItemHandle extends EntityHandle {
     public abstract int getPickupDelay();
     public abstract void setPickupDelay(int value);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityItem</b>.
+     * Stores class members for <b>net.minecraft.world.entity.item.EntityItem</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityItemClass extends Template.Class<EntityItemHandle> {

@@ -1,7 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.server.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.level.PlayerChunkMap</b>.

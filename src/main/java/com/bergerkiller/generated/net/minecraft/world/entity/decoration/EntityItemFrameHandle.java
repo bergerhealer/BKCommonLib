@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.decoration;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -9,11 +9,11 @@ import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityItemFrame</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.decoration.EntityItemFrame</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityItemFrame")
+@Template.InstanceType("net.minecraft.world.entity.decoration.EntityItemFrame")
 public abstract class EntityItemFrameHandle extends EntityHandle {
     /** @See {@link EntityItemFrameClass} */
     public static final EntityItemFrameClass T = Template.Class.create(EntityItemFrameClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -41,7 +41,7 @@ public abstract class EntityItemFrameHandle extends EntityHandle {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(itemFrame));
     }
     /**
-     * Stores class members for <b>net.minecraft.server.EntityItemFrame</b>.
+     * Stores class members for <b>net.minecraft.world.entity.decoration.EntityItemFrame</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityItemFrameClass extends Template.Class<EntityItemFrameHandle> {

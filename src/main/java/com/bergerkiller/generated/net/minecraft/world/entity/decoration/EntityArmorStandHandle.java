@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.decoration;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
@@ -6,11 +6,11 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import org.bukkit.util.Vector;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityArmorStand</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.decoration.EntityArmorStand</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityArmorStand")
+@Template.InstanceType("net.minecraft.world.entity.decoration.EntityArmorStand")
 public abstract class EntityArmorStandHandle extends EntityLivingHandle {
     /** @See {@link EntityArmorStandClass} */
     public static final EntityArmorStandClass T = Template.Class.create(EntityArmorStandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -36,7 +36,7 @@ public abstract class EntityArmorStandHandle extends EntityLivingHandle {
     public static final int DATA_FLAG_NO_BASEPLATE = (1 << 3);
     public static final int DATA_FLAG_SET_MARKER = (1 << 4);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityArmorStand</b>.
+     * Stores class members for <b>net.minecraft.world.entity.decoration.EntityArmorStand</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityArmorStandClass extends Template.Class<EntityArmorStandHandle> {

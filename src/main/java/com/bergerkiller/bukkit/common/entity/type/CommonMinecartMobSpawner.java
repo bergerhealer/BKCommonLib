@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.entity.type;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartMobSpawnerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartMobSpawnerHandle;
 
 import org.bukkit.Material;
 import org.bukkit.entity.minecart.SpawnerMinecart;

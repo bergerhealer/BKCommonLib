@@ -2,12 +2,12 @@ package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartCommandBlockHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartFurnaceHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartHopperHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartMobSpawnerHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartTNTHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartCommandBlockHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartFurnaceHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartHopperHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartMobSpawnerHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartTNTHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;

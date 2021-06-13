@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.monster;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -7,12 +7,12 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHan
 import org.bukkit.block.BlockFace;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityShulker</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.monster.EntityShulker</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.Optional
-@Template.InstanceType("net.minecraft.server.EntityShulker")
+@Template.InstanceType("net.minecraft.world.entity.monster.EntityShulker")
 public abstract class EntityShulkerHandle extends EntityInsentientHandle {
     /** @See {@link EntityShulkerClass} */
     public static final EntityShulkerClass T = Template.Class.create(EntityShulkerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -30,7 +30,7 @@ public abstract class EntityShulkerHandle extends EntityInsentientHandle {
     public static final Key<Byte> DATA_PEEK = Key.Type.BYTE.createKey(T.DATA_PEEK, -1);
     public static final Key<Byte> DATA_COLOR = Key.Type.BYTE.createKey(T.DATA_COLOR, -1);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityShulker</b>.
+     * Stores class members for <b>net.minecraft.world.entity.monster.EntityShulker</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityShulkerClass extends Template.Class<EntityShulkerHandle> {

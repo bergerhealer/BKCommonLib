@@ -1,7 +1,7 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.generated.net.minecraft.server.EntityHangingHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHangingHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 

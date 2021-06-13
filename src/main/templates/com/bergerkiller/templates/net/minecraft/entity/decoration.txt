@@ -1,0 +1,124 @@
+package net.minecraft.world.entity.decoration;
+
+import net.minecraft.core.BlockPosition;
+import net.minecraft.core.EnumDirection;
+import net.minecraft.core.Vector3f;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.item.ItemStack;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
+
+class EntityArmorStand extends EntityLiving {
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:b;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:c;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:d;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:e;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:f;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:g;
+  #if version >= 1.16.2
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bh;
+  #elseif version >= 1.16
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bo;
+  #elseif version >= 1.15
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bp;
+  #else
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:bs;
+  #endif
+#elseif version >= 1.9
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:a;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:b;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:c;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:d;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:e;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:f;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:g;
+#else
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:###;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:###;
+#endif
+
+    <code>
+    public static final Key<Byte> DATA_ARMORSTAND_FLAGS = Key.Type.BYTE.createKey(T.DATA_ARMORSTAND_FLAGS, 10);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_HEAD = Key.Type.VECTOR.createKey(T.DATA_POSE_HEAD, 11);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_BODY = Key.Type.VECTOR.createKey(T.DATA_POSE_BODY, 12);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_LEFT, 13);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_RIGHT, 14);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_LEFT, 15);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_RIGHT, 16);
+
+    public static final int DATA_FLAG_IS_SMALL = (1 << 0);
+    public static final int DATA_FLAG_HAS_ARMS = (1 << 2);
+    public static final int DATA_FLAG_NO_BASEPLATE = (1 << 3);
+    public static final int DATA_FLAG_SET_MARKER = (1 << 4);
+    </code>
+}
+
+
+class EntityItemFrame extends Entity {
+#if version >= 1.14
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
+#elseif version >= 1.13
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;
+#elseif version >= 1.11
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:c;
+#elseif version >= 1.9
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<com.google.common.base.Optional<ItemStack>> DATA_ITEM:c;
+#else
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:###;
+#endif
+
+    <code>
+    public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
+    </code>
+
+    public boolean getItemIsMap() {
+        ItemStack item = instance.getItem();
+        return item != null && item.getItem() == Items.FILLED_MAP;
+    }
+
+    public java.util.UUID getItemMapDisplayUUID() {
+        ItemStack item = instance.getItem();
+        if (item == null) {
+            return null;
+        }
+        return (java.util.UUID) com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle.T.getMapDisplayUUID.invoke(item);
+    }
+
+    public (org.bukkit.inventory.ItemStack) ItemStack getItem();
+    public void setItem((org.bukkit.inventory.ItemStack) ItemStack newItemStack);
+
+    public void refreshItem() {
+        instance.setItem(instance.getItem());
+    }
+
+    public (IntVector3) BlockPosition getBlockPosition();
+    public int getRotationOrdinal:getRotation();
+
+#if forge_nms_obfuscated
+    public (org.bukkit.block.BlockFace) EnumDirection getFacing:bt();
+#else
+    public (org.bukkit.block.BlockFace) EnumDirection getFacing:getDirection();
+#endif
+
+    <code>
+    public static EntityItemFrameHandle fromBukkit(org.bukkit.entity.ItemFrame itemFrame) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(itemFrame));
+    }
+    </code>
+}
+
+class EntityHanging extends Entity {
+    public (IntVector3) BlockPosition blockPosition;
+}

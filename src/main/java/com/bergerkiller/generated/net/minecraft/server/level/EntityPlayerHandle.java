@@ -1,4 +1,4 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.server.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -10,11 +10,11 @@ import org.bukkit.inventory.InventoryView;
 import java.util.Collection;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityPlayer</b>.
+ * Instance wrapper handle for type <b>net.minecraft.server.level.EntityPlayer</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityPlayer")
+@Template.InstanceType("net.minecraft.server.level.EntityPlayer")
 public abstract class EntityPlayerHandle extends EntityHumanHandle {
     /** @See {@link EntityPlayerClass} */
     public static final EntityPlayerClass T = Template.Class.create(EntityPlayerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -49,7 +49,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     @Template.Readonly
     public abstract boolean isViewingCredits();
     /**
-     * Stores class members for <b>net.minecraft.server.EntityPlayer</b>.
+     * Stores class members for <b>net.minecraft.server.level.EntityPlayer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityPlayerClass extends Template.Class<EntityPlayerHandle> {

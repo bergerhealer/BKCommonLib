@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityMinecartAbstract</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.EntityMinecartAbstract</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityMinecartAbstract")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartAbstract")
 public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     /** @See {@link EntityMinecartAbstractClass} */
     public static final EntityMinecartAbstractClass T = Template.Class.create(EntityMinecartAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -33,7 +33,7 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
     public static final Key<Integer> DATA_BLOCK_OFFSET = Key.Type.INTEGER.createKey(T.DATA_BLOCK_OFFSET, 21);
     public static final Key<Boolean> DATA_BLOCK_VISIBLE = Key.Type.BOOLEAN.createKey(T.DATA_BLOCK_VISIBLE, 22);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityMinecartAbstract</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartAbstract</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartAbstractClass extends Template.Class<EntityMinecartAbstractHandle> {

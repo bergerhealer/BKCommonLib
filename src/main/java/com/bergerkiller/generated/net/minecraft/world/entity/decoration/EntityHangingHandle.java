@@ -1,15 +1,15 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.decoration;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityHanging</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.decoration.EntityHanging</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityHanging")
+@Template.InstanceType("net.minecraft.world.entity.decoration.EntityHanging")
 public abstract class EntityHangingHandle extends EntityHandle {
     /** @See {@link EntityHangingClass} */
     public static final EntityHangingClass T = Template.Class.create(EntityHangingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -24,7 +24,7 @@ public abstract class EntityHangingHandle extends EntityHandle {
     public abstract IntVector3 getBlockPosition();
     public abstract void setBlockPosition(IntVector3 value);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityHanging</b>.
+     * Stores class members for <b>net.minecraft.world.entity.decoration.EntityHanging</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityHangingClass extends Template.Class<EntityHangingHandle> {

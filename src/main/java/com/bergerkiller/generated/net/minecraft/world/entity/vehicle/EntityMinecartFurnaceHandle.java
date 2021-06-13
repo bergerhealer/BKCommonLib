@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityMinecartFurnace</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.EntityMinecartFurnace</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityMinecartFurnace")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartFurnace")
 public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartFurnaceClass} */
     public static final EntityMinecartFurnaceClass T = Template.Class.create(EntityMinecartFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -29,7 +29,7 @@ public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstract
     public abstract double getPushForceZ();
     public abstract void setPushForceZ(double value);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityMinecartFurnace</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartFurnace</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartFurnaceClass extends Template.Class<EntityMinecartFurnaceHandle> {

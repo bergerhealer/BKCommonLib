@@ -89,9 +89,9 @@ public abstract class PlayerConnectionHandle extends Template.Handle {
 
     public static PlayerConnectionHandle forPlayer(org.bukkit.entity.Player player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
-        if (!com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
+        if (!com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.isType(handle)) return null; // Check not NPC player
 
-        final PlayerConnectionHandle connection = com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle.T.playerConnection.get(handle);
+        final PlayerConnectionHandle connection = com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle.T.playerConnection.get(handle);
         if (connection == null || !connection.isConnected()) {
             return null; // No PlayerConnection instance or not connected
         }

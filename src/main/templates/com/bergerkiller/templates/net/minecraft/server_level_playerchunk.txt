@@ -8,10 +8,9 @@ import net.minecraft.world.level.ChunkCoordIntPair;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
-
-import com.bergerkiller.generated.net.minecraft.server.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;

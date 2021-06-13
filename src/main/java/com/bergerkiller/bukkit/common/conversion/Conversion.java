@@ -51,7 +51,7 @@ public class Conversion {
     public static final InputConverter<Character> toChar = getConverterTo(char.class);
     // Handles
     public static final InputConverter<Object> toEntityHandle = getConverterToHandle("net.minecraft.world.entity.Entity");
-    public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.EntityPlayer");
+    public static final InputConverter<Object> toEntityPlayerHandle = getConverterToHandle("net.minecraft.server.level.EntityPlayer");
     public static final InputConverter<Object> toWorldHandle = getConverterToHandle("net.minecraft.world.level.World");
     public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.world.level.chunk.Chunk");
     public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.world.item.ItemStack");

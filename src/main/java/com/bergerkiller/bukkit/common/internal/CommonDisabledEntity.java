@@ -3,8 +3,8 @@ package com.bergerkiller.bukkit.common.internal;
 import java.lang.reflect.Method;
 
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;

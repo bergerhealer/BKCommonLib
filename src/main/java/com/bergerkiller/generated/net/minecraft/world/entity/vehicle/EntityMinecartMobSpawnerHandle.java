@@ -1,14 +1,14 @@
-package com.bergerkiller.generated.net.minecraft.server;
+package com.bergerkiller.generated.net.minecraft.world.entity.vehicle;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 
 /**
- * Instance wrapper handle for type <b>net.minecraft.server.EntityMinecartMobSpawner</b>.
+ * Instance wrapper handle for type <b>net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner</b>.
  * To access members without creating a handle type, use the static {@link #T} member.
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
-@Template.InstanceType("net.minecraft.server.EntityMinecartMobSpawner")
+@Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner")
 public abstract class EntityMinecartMobSpawnerHandle extends EntityMinecartAbstractHandle {
     /** @See {@link EntityMinecartMobSpawnerClass} */
     public static final EntityMinecartMobSpawnerClass T = Template.Class.create(EntityMinecartMobSpawnerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
@@ -23,7 +23,7 @@ public abstract class EntityMinecartMobSpawnerHandle extends EntityMinecartAbstr
     public abstract MobSpawner getMobSpawner();
     public abstract void setMobSpawner(MobSpawner value);
     /**
-     * Stores class members for <b>net.minecraft.server.EntityMinecartMobSpawner</b>.
+     * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartMobSpawnerClass extends Template.Class<EntityMinecartMobSpawnerHandle> {

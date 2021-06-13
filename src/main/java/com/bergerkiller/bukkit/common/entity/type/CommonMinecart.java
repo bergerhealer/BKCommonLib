@@ -12,8 +12,8 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartAbstractHandle;
-import com.bergerkiller.generated.net.minecraft.server.EntityMinecartRideableHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 
 /**
  * An abstract implementation for all Minecarts

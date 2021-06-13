@@ -1,0 +1,241 @@
+package net.minecraft.server.level;
+
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.server.network.PlayerConnection;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityLiving;
+import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.world.inventory.ContainerAnvil;
+import net.minecraft.world.item.ItemStack;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
+import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+
+import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
+import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
+
+class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
+    public (PlayerConnectionHandle) PlayerConnection playerConnection;
+    // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
+    // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
+
+#if version >= 1.16
+    // World dimension on 1.16 and later
+    public org.bukkit.World getSpawnWorld() {
+        ResourceKey spawn = instance.getSpawnDimension();
+        World world = MinecraftServer.getServer().getWorldServer(spawn);
+        return (world == null) ? null : world.getWorld();
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
+        instance#spawnDimension = key;
+    }
+#else
+    // World name on 1.15.2 and earlier
+    public org.bukkit.World getSpawnWorld() {
+        return org.bukkit.Bukkit.getWorld(instance.spawnWorld);
+    }
+    public void setSpawnWorld(org.bukkit.World world) {
+        instance.spawnWorld = (world == null) ? "" : world.getName();
+    }
+#endif
+
+#if version >= 1.16
+    #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:spawn;
+    #require net.minecraft.server.level.EntityPlayer private boolean spawnForced;
+#elseif version >= 1.15
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bR;
+#elseif version >= 1.14.4
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:g;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:bU;
+#elseif version >= 1.14
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:f;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:g;
+#elseif version >= 1.13
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+#elseif version >= 1.12
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:d;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:e;
+#elseif version >= 1.11
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+#elseif version >= 1.10.2
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+#elseif version >= 1.9.4
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f; 
+#elseif version >= 1.9
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:e;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:f;
+#elseif version >= 1.8.3
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
+#else
+    #require net.minecraft.world.entity.player.EntityHuman private net.minecraft.core.BlockPosition spawnCoord:c;
+    #require net.minecraft.world.entity.player.EntityHuman private boolean spawnForced:d;
+#endif
+
+    public (IntVector3) BlockPosition getSpawnCoord() {
+        return instance#spawnCoord;
+    }
+
+    public void setSpawnCoord((IntVector3) BlockPosition coord) {
+        instance#spawnCoord = coord;
+    }
+
+    public boolean isSpawnForced() {
+        return instance#spawnForced;
+    }
+
+    public void setSpawnForced(boolean forced) {
+        instance#spawnForced = forced;
+    }
+
+#if version >= 1.16.2
+    #require net.minecraft.server.level.EntityPlayer private float spawnAngle;
+#endif
+
+#if version >= 1.16.2
+    public float getSpawnAngle() {
+        return instance#spawnAngle;
+    }
+
+    public void setSpawnAngle(float angle) {
+        instance#spawnAngle = angle;
+    }
+#else
+    public float getSpawnAngle() {
+        return 0.0f;
+    }
+
+    public void setSpawnAngle(float angle) {
+    }
+#endif
+
+    public int ping;
+    public readonly boolean viewingCredits;
+
+    // Seen credits getter/setter
+#if version >= 1.12
+    // Since Minecraft 1.12 this is just a boolean property of the player
+  #if version >= 1.16.2
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cd;
+  #elseif version >= 1.16.1
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:ck;
+  #elseif version >= 1.15
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cm;
+  #elseif version >= 1.14
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cp;
+  #elseif version >= 1.13.1
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cx;
+  #elseif version >= 1.13
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cy;
+  #else
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cq;
+  #endif
+
+    public boolean hasSeenCredits() {
+        return instance#seenCredits;
+    }
+
+    public void setHasSeenCredits(boolean hasSeen) {
+        instance#seenCredits = hasSeen;
+    }
+#else
+    // Older versions of Minecraft used the achievement list for this
+    public boolean hasSeenCredits() {
+  #if version >= 1.9
+        return instance.a(AchievementList.D);
+  #else
+        return instance.getStatisticManager().hasAchievement(AchievementList.D);
+  #endif
+    }
+
+    public void setHasSeenCredits(boolean hasSeen) {
+        instance.getStatisticManager().setStatistic(instance, (Statistic) AchievementList.D, hasSeen ? 1 : 0);
+    }
+#endif
+
+#if forge_nms_obfuscated
+    public void sendMessage:a((ChatText) IChatBaseComponent ichatbasecomponent);
+#elseif version >= 1.16
+    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
+        instance.sendMessage(ichatbasecomponent, SystemUtils.b);
+    }
+#else
+    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent);
+#endif
+
+#if exists net.minecraft.server.level.EntityPlayer public final java.util.List<Integer> removeQueue;
+    public optional Collection<Integer> getRemoveQueue() {
+        return instance.removeQueue;
+    }
+#elseif exists net.minecraft.server.level.EntityPlayer public final java.util.Deque<Integer> removeQueue;
+    public optional Collection<Integer> getRemoveQueue() {
+        return instance.removeQueue;
+    }
+#else
+    public optional Collection<Integer> getRemoveQueue:###();
+#endif
+
+    public org.bukkit.inventory.InventoryView openAnvilWindow() {
+        String titleStr = (String) com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
+        IChatBaseComponent title = new ChatMessage(titleStr, new Object[0]);
+
+        PlayerInventory playerInventory = instance.inventory;
+        World world = instance.getWorld();
+        BlockPosition position = instance.getChunkCoordinates();
+
+        int windowId = instance.nextContainerCounter();
+
+#if version >= 1.14
+        ContainerAccess access = ContainerAccess.at(world, position);
+        ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+#else
+        ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, instance);
+        container.windowId = windowId;
+#endif
+        container.checkReachable = false;
+
+        // Hook required so we can track when the text changes
+#if version < 1.9
+        com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook hook;
+        hook = new com.bergerkiller.bukkit.common.internal.hooks.LegacyContainerAnvilHook();
+        container = (ContainerAnvil) hook.hook(container);
+#endif
+
+        instance.activeContainer = container;
+
+#if version >= 1.14
+        instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, Containers.ANVIL, title));
+#else
+        instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, "minecraft:anvil", title));
+#endif
+
+        instance.activeContainer.addSlotListener(instance);
+
+        return container.getBukkitView();
+    }
+
+    <code>
+    public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
+    }
+    </code>
+}

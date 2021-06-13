@@ -1,0 +1,27 @@
+package net.minecraft.world.entity.projectile;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+import net.minecraft.world.entity.Entity;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+class EntityFishingHook extends Entity {
+    #if version >= 1.16.5
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:HOOKED_ENTITY;
+    #elseif version >= 1.16
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:e;
+    #elseif version >= 1.14
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:c;
+    #elseif version >= 1.11
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:b;
+    #elseif version >= 1.9
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:c;
+    #else
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:###;
+    #endif
+
+    <code>
+    public static final Key<java.util.OptionalInt> DATA_HOOKED_ENTITY_ID = Key.Type.ENTITY_ID.createKey(T.DATA_HOOKED_ENTITY_ID, -1);
+    </code>
+}

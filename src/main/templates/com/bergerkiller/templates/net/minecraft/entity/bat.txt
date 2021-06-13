@@ -1,0 +1,22 @@
+package net.minecraft.world.entity.ambient;
+
+import net.minecraft.world.entity.EntityInsentient;
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+class EntityBat extends EntityInsentient {
+#if version >= 1.14
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:b;
+#elseif version >= 1.9
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:a;
+#else
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:###;
+#endif
+
+    <code>
+    public static final Key<Byte> DATA_BAT_FLAGS = Key.Type.BYTE.createKey(T.DATA_BAT_FLAGS, 16);
+    public static final int DATA_BAT_FLAG_HANGING = (1 << 0);
+    </code>
+}

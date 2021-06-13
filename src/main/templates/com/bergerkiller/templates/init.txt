@@ -27,6 +27,23 @@
 #include /net/minecraft/core_registry.txt
 #include /net/minecraft/core_vector3f.txt
 #include /net/minecraft/crashreport.txt
+#include /net/minecraft/entity/entity_attributes.txt
+#include /net/minecraft/entity/bat.txt
+#include /net/minecraft/entity/decoration.txt
+#include /net/minecraft/entity/endercrystal.txt
+#include /net/minecraft/entity/entity_enums.txt
+#include /net/minecraft/entity/fishinghook.txt
+#include /net/minecraft/entity/insentient.txt
+#include /net/minecraft/entity/item.txt
+#include /net/minecraft/entity/living.txt
+#include /net/minecraft/entity/player.txt
+#include /net/minecraft/entity/player_abilities.txt
+#include /net/minecraft/entity/human.txt
+#include /net/minecraft/entity/player_inventory.txt
+#include /net/minecraft/entity/shulker.txt
+#include /net/minecraft/entity/entity_types.txt
+#include /net/minecraft/entity/vehicles.txt
+#include /net/minecraft/entity/entity.txt
 #include /net/minecraft/enums.txt
 #include /net/minecraft/locale_language.txt
 #include /net/minecraft/network/chat.txt
@@ -55,15 +72,6 @@
 #include /net/minecraft/util_registryid.txt
 #include /net/minecraft/util_weightedrandom.txt
 #include /net/minecraft/world/damagesource.txt
-#include /net/minecraft/world/entity_attributes.txt
-#include /net/minecraft/world/entity_enums.txt
-#include /net/minecraft/world/entity_insentient.txt
-#include /net/minecraft/world/entity_living.txt
-#include /net/minecraft/world/entity_player_abilities.txt
-#include /net/minecraft/world/entity_player_entityhuman.txt
-#include /net/minecraft/world/entity_player_inventory.txt
-#include /net/minecraft/world/entity_types.txt
-#include /net/minecraft/world/entity.txt
 #include /net/minecraft/world/foodmeta.txt
 #include /net/minecraft/world/inventory.txt
 #include /net/minecraft/world/inventory_other.txt
@@ -93,7 +101,5 @@
 #include /net/minecraft/world/phys_movingobject.txt
 #include /net/minecraft/world/phys_shapes_voxelshape.txt
 #include /net/minecraft/world/phys_vec3d.txt
-
-#include /net/minecraft/server/entity_subtype.txt
 
 #include /com/bergerkiller/bukkit/common/internal/longhashset.txt
