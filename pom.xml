@@ -14,12 +14,15 @@
 
     <properties>
         <!-- Project build properties -->
+        <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.number>NO-CI</project.build.number>
-        <jdk.version>1.8</jdk.version>
-        <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
+        <jdk.version.release>8</jdk.version.release>
+        <jdk.version.test>16</jdk.version.test>
+
         <!-- Library versions -->
-        <minecraft.version>1.16.5</minecraft.version>
+        <minecraft.version>1.17</minecraft.version>
+        <minecraft.serverAPIVersion>1.16.5-R0.1-SNAPSHOT</minecraft.serverAPIVersion>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>2.35</mountiplex.version>
         <junit.version>4.12</junit.version>
@@ -479,8 +482,11 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
+                    <release>${jdk.version.release}</release>
+                    <source>${jdk.version.release}</source>
+                    <target>${jdk.version.release}</target>
+                    <testSource>${jdk.version.test}</testSource>
+                    <testTarget>${jdk.version.test}</testTarget>
                 </configuration>
             </plugin>
         </plugins>

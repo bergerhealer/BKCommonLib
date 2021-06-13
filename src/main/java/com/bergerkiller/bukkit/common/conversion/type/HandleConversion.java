@@ -142,12 +142,12 @@ public class HandleConversion {
         return raw_handle;
     }
 
-    @ConverterMethod(output="T extends net.minecraft.world.level.block.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.TileEntity")
     public static Object toTileEntityHandle(org.bukkit.block.BlockState blockState) {
         return BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState);
     }
 
-    @ConverterMethod(output="T extends net.minecraft.world.level.block.TileEntity")
+    @ConverterMethod(output="T extends net.minecraft.world.level.block.entity.TileEntity")
     public static Object getTileEntityHandle(org.bukkit.block.Block block) {
         Object blockPosition = BlockPositionHandle.createNew(block.getX(), block.getY(), block.getZ());
         return WorldHandle.T.getTileEntity.raw.invoke(toWorldHandle(block.getWorld()), blockPosition);
@@ -257,7 +257,7 @@ public class HandleConversion {
         return BlockPositionHandle.T.fromBukkitBlockRaw.invoker.invoke(null, block);
     }
 
-    @ConverterMethod(output="net.minecraft.server.Vec3D")
+    @ConverterMethod(output="net.minecraft.world.phys.Vec3D")
     public static Object toVec3DHandle(Vector vector) {
         return Vec3DHandle.T.fromBukkitRaw.invoker.invoke(null, vector);
     }

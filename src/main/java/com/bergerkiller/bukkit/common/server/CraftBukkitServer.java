@@ -132,7 +132,13 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
     private String identifyMinecraftVersion() throws VersionIdentificationFailureException {
         try {
             // Find getVersion() method using reflection
-            Class<?> minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
+            Class<?> minecraftServerType;
+            try {
+                minecraftServerType = loadClass(NMS_ROOT + ".MinecraftServer");
+            } catch (ClassNotFoundException ex) {
+                minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
+            }
+
             java.lang.reflect.Method getVersionMethod = getDeclaredMethod(minecraftServerType, "getVersion");
 
             // This is easy when the server is already initialized
@@ -155,11 +161,22 @@ public class CraftBukkitServer extends CommonServerBase implements ClassPathReso
             // Alternative is using SharedConstants, but it initializes a whole lot extra and is therefore slow
             // Both of these methods work since MC 1.14
             try {
-                Object gameVersion;
+                Object gameVersion = null;
+
                 try {
-                    Class<?> minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                    // Try to identify the MinecraftVersion class
+                    // This is at net.minecraft.MinecraftVersion for MC 1.17 and later
+                    Class<?> minecraftVersionClass;
+                    try {
+                        minecraftVersionClass = loadClass("net.minecraft.MinecraftVersion");
+                    } catch (ClassNotFoundException ex) {
+                        minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                    }
+
+                    // Call the static method of MinecraftVersion to obtain the GameVersion instance
                     gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
                 } catch (ClassNotFoundException | NoSuchMethodException ex) {
+                    // Older versions of Minecraft: use SharedConstants instead
                     Class<?> sharedConstantsClass = loadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
                     gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
                     Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
