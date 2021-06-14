@@ -87,7 +87,10 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
     private int fuel:c;
 #endif
 
-#if version >= 1.14
+#if version >= 1.17
+    public double pushForceX:xPush;
+    public double pushForceZ:zPush;
+#elseif version >= 1.14
     public double pushForceX:b;
     public double pushForceZ:c;
 #else
@@ -97,7 +100,9 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 }
 
 class EntityMinecartHopper extends EntityMinecartAbstract {
-#if version >= 1.13
+#if version >= 1.17
+    private int suckingCooldown:cooldownTime;
+#elseif version >= 1.13
     private int suckingCooldown:e;
 #else
     private int suckingCooldown:b;
@@ -130,7 +135,9 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
 }
 
 class EntityMinecartTNT extends EntityMinecartAbstract {
-#if version >= 1.14
+#if version >= 1.17
+    private int fuse;
+#elseif version >= 1.14
     private int fuse:b;
 #else
     private int fuse:a;
@@ -144,7 +151,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    public void prime:w();
+#elseif version >= 1.16
     public void prime:u();
 #elseif version >= 1.14
     public void prime:v();
@@ -179,7 +188,9 @@ class EntityMinecartCommandBlock extends EntityMinecartAbstract {
 }
 
 class EntityMinecartMobSpawner extends EntityMinecartAbstract {
-#if version >= 1.14
+#if version >= 1.17
+    private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:spawner;
+#elseif version >= 1.14
     private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:b;
 #else
     private final (com.bergerkiller.bukkit.common.wrappers.MobSpawner) net.minecraft.world.level.MobSpawnerAbstract mobSpawner:a;

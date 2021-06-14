@@ -1,12 +1,19 @@
 package net.minecraft.world.entity;
 
+import net.minecraft.core.BlockPosition;
+import net.minecraft.CrashReportSystemDetails;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.server.level.ChunkProviderServer;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundEffect;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.item.EntityItem;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.IBlockData;
+import net.minecraft.world.phys.AxisAlignedBB;
+import net.minecraft.world.phys.Vec3D;
 
 import org.bukkit.craftbukkit.entity.CraftEntity;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
@@ -31,7 +38,10 @@ class Entity {
 
 optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
-#if version >= 1.14
+#if version >= 1.17
+    private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:ENTITY_COUNTER;
+    private static optional int opt_int_entityCount:###;
+#elseif version >= 1.14
     private static optional java.util.concurrent.atomic.AtomicInteger opt_atomic_entityCount:entityCount;
     private static optional int opt_int_entityCount:###;
 #else
@@ -41,7 +51,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     private int idField:id;
 
-#if version >= 1.14
+#if version >= 1.17
+    public boolean preventBlockPlace:blocksBuilding;
+#elseif version >= 1.14
     public boolean preventBlockPlace:i;
 #elseif version >= 1.13
     public boolean preventBlockPlace:j;
@@ -70,7 +82,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #select version >=
-#case 1.13.1: private (EntityHandle) Entity vehicle:vehicle;
+#case 1.13.1: private (EntityHandle) Entity vehicle;
 #case 1.13:   private (EntityHandle) Entity vehicle:ax;
 #case 1.10.2: private (EntityHandle) Entity vehicle:au;
 #case 1.9.4:  private (EntityHandle) Entity vehicle:at;
@@ -124,10 +136,18 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     </code>
     /* ====== END OF PASSENGER AND VEHICLE LOGIC ====== */
 
+    //TODO: Was removed?
     public boolean ignoreChunkCheck:attachedToPlayer;
+
+#if version >= 1.17
+    public double lastX:xo;
+    public double lastY:yo;
+    public double lastZ:zo;
+#else
     public double lastX;
     public double lastY;
     public double lastZ;
+#endif
 
 #if version >= 1.15
     // locX/Y/Z fields became private on 1.15
@@ -337,11 +357,19 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
+#if version >= 1.17
+    private float yaw:yRot;
+    private float pitch:xRot;
+    public float lastYaw:yRotO;
+    public float lastPitch:xRotO;
+    private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:bb;
+#else
     public float yaw;
     public float pitch;
     public float lastYaw;
     public float lastPitch;
     private (AxisAlignedBBHandle) AxisAlignedBB boundingBoxField:boundingBox;
+#endif
 
 #if version >= 1.16
     protected boolean onGround;
@@ -349,9 +377,23 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean onGround;
 #endif
 
+#if version >= 1.17
+    public readonly boolean horizontalMovementBlocked:horizontalCollision;
+#else
     public readonly boolean horizontalMovementBlocked:positionChanged;
+#endif
 
-#if version >= 1.16
+#if version >= 1.17
+    public readonly boolean verticalMovementBlocked:verticalCollision;
+
+    public void setHorizontalMovementBlocked(boolean blocked) {
+        instance.horizontalCollision = blocked;
+    }
+
+    public void setVerticalMovementBlocked(boolean blocked) {
+        instance.verticalCollision = blocked;
+    }
+#elseif version >= 1.16
     public readonly boolean verticalMovementBlocked:v;
 
     public void setHorizontalMovementBlocked(boolean blocked) {
@@ -428,12 +470,18 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
+#if version >= 1.17
+    public boolean velocityChanged:hurtMarked;
+#else
     public boolean velocityChanged;
+#endif
 
 #if version >= 1.14
     // On Minecraft 1.14 and later, instead of a boolean, it stores the actual slowdown to apply
     // If this is greater than 1.0E-7D then the factor should be applied
-  #if version >= 1.16
+  #if version >= 1.17
+    #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:stuckSpeedMultiplier;
+  #elseif version >= 1.16
     #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:x;
   #elseif version >= 1.15
     #require net.minecraft.world.entity.Entity protected Vec3D collidingWithBlockMultiplier:y;
@@ -452,7 +500,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public void setNotCollidingWithBlock() {
-  #if version >= 1.16.3
+  #if version >= 1.17
+        instance#collidingWithBlockMultiplier = Vec3D.ZERO;
+  #elseif version >= 1.16.3
         instance#collidingWithBlockMultiplier = Vec3D.ORIGIN;
   #else
         instance#collidingWithBlockMultiplier = Vec3D.a;
@@ -500,6 +550,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     //     private unknown boolean outsideWorldBorderField:g;
     // #endif
 
+    //TODO: is now private Entity.RemovalReason removalReason;
     public boolean dead;
 
 #if version >= 1.14
@@ -519,6 +570,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #select version >=
+#case 1.17
+    public float walkedDistanceXZ:walkDist;
+    public float walkedDistanceXYZ:moveDist;
 #case 1.16
     public unknown float z;
     public float walkedDistanceXZ:A;
@@ -545,9 +599,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public float walkedDistanceXYZ:N;
 #endselect
 
+#if version >= 1.17
+    public float fallDistance:flyDist;
+#else
     public float fallDistance;
+#endif
 
 #select version >=
+#case 1.7:    #require net.minecraft.world.entity.Entity private float stepCounter:nextStep;
 #case 1.16.2: #require net.minecraft.world.entity.Entity private float stepCounter:am;
 #case 1.16:   #require net.minecraft.world.entity.Entity private float stepCounter:at;
 #case 1.14:   #require net.minecraft.world.entity.Entity private float stepCounter:av;
@@ -571,6 +630,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
 #select version >=
+#case 1.17:  public float heightOffset:maxUpStep;
 #case 1.16:  public float heightOffset:G;
 #case 1.15:  public float heightOffset:H;
 #case 1.14:  public float heightOffset:K;
@@ -579,19 +639,37 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:  public float heightOffset:S;
 #endselect
 
-#if version >= 1.8.3
+#if version >= 1.17
+    public boolean noclip:noPhysics;
+#elseif version >= 1.8.3
     public boolean noclip;
 #else
     public boolean noclip:T;
 #endif
 
     protected Random random;
+
+#if version >= 1.17
+    public int ticksLived:tickCount;
+    public optional int field_maxFireTicks:maxFireTicks;
+    public int fireTicks:remainingFireTicks;
+    protected final (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:entityData;
+#else
     public int ticksLived;
     public optional int field_maxFireTicks:maxFireTicks;
     public int fireTicks;
     protected (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher datawatcherField:datawatcher;
+#endif
 
-#if version >= 1.16.2
+#if version >= 1.17
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:DATA_SHARED_FLAGS_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:DATA_AIR_SUPPLY_ID;
+    private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_CUSTOM_NAME_VISIBLE;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_SILENT;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY;
+
+#elseif version >= 1.16.2
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:S;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:AIR_TICKS;
     private static optional final (DataWatcher.Key<?>) DataWatcherObject<java.util.Optional<IChatBaseComponent>> DATA_CUSTOM_NAME:aq;
@@ -696,7 +774,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public static final int DATA_FLAG_FLYING = (1 << 7);
     </code>
 
-#if version >= 1.13
+#if version >= 1.17
+    //TODO: chunkXYZ and isLoaded are gone, what to do with that?
+    public boolean isLoaded:inChunk;
+    public optional int chunkX;
+    public optional int chunkY;
+    public optional int chunkZ;
+
+    public boolean positionChanged:hasImpulse;
+#elseif version >= 1.13
     public boolean isLoaded:inChunk;
   #if fieldexists net.minecraft.world.entity.Entity public int chunkX
       public optional int chunkX;
@@ -815,6 +901,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public int portalCooldown;
 
 #select version >=
+#case 1.17:   protected boolean allowTeleportation:isInsidePortal;
 #case 1.16:   protected boolean allowTeleportation:inPortal;
 #case 1.15:   protected boolean allowTeleportation:af;
 #case 1.14:   protected boolean allowTeleportation:ai;
@@ -824,7 +911,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   protected boolean allowTeleportation:ak;
 #endselect
 
-#if version >= 1.16.2
+#if version >= 1.17
+    optional private final double[] move_SomeArray:pistonDeltas;
+    optional private long move_SomeState:pistonDeltasGameTime;
+#elseif version >= 1.16.2
     optional private final double[] move_SomeArray:aA;
     optional private long move_SomeState:aB;
 #elseif version >= 1.16
@@ -969,6 +1059,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     // Note: counts rain too as being wet!
 #select version >=
+#case 1.17:   public boolean isWet:aN();
 #case 1.16.4: public boolean isWet:aG();
 #case 1.16.2: public boolean isWet:aF();
 #case 1.16:   public boolean isWet:aC();
@@ -983,17 +1074,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   public boolean isWet:U();
 #endselect
 
-    /*
-     # public boolean ###METHODNAME###() {
-     *     if (this.world.a(this.boundingBox.grow(0.0D, -0.4000000059604645D, 0.0D).shrink(0.001D, 0.001D, 0.001D), Material.WATER, this)) {
-     *         if (!this.inWater && !this.justCreated) {
-     *             ...
-     *         }
-     *     }
-     * }
-     */
     // Note: checks just standing in water! Rain does not count.
 #select version >=
+#case 1.17:   public boolean isInWaterUpdate:aO();
 #case 1.16.4: public boolean isInWaterUpdate:aH();
 #case 1.16.2: public boolean isInWaterUpdate:aG();
 #case 1.16:   public boolean isInWaterUpdate:aD();
@@ -1035,7 +1118,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.9
+#if version >= 1.17
+    protected boolean hasMovementSound() {
+        #require net.minecraft.world.entity.Entity protected Entity.MovementEmission getMovementEmission:aI();
+        Entity.MovementEmission entity_movementemission = instance#getMovementEmission();
+        return entity_movementemission.c(); // sound only
+    }
+#elseif version >= 1.9
     protected boolean hasMovementSound:playStepSound();
 #elseif version >= 1.8.3
     protected boolean hasMovementSound:s_();
@@ -1128,7 +1217,26 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public void setPosition(double x, double y, double z);
 
-#if version >= 1.14
+#if version >= 1.17
+    public void setSize(float width, float height) {
+        #require net.minecraft.world.entity.Entity private EntitySize dimensions;
+        #require net.minecraft.world.entity.Entity private float eyeHeight;
+        #require net.minecraft.world.entity.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+
+        EntityPose entitypose = instance.getPose();
+        EntitySize newSize = EntitySize.b(width, height);
+
+        instance#dimensions = newSize;
+        instance#eyeHeight = instance#getHeadHeight(entitypose, newSize);
+
+        double half_width = (double) width / 2.0;
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.locX() - half_width, instance.locY(), instance.locZ() - half_width,
+            instance.locX() + half_width, instance.locY() + (double) height, instance.locZ() + half_width);
+
+        instance.a(new_BoundingBox);
+    }
+#elseif version >= 1.14
     public void setSize(float width, float height) {
         #require net.minecraft.world.entity.Entity private EntitySize size;
         #require net.minecraft.world.entity.Entity private float headHeight;
@@ -1313,7 +1421,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void onTick:s_();
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public boolean savePassenger:d((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.16
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
     public boolean savePassenger:a_((CommonTagCompound) NBTTagCompound compound);
 #else

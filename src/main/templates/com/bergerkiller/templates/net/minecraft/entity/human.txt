@@ -13,12 +13,21 @@ import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
 
 class EntityHuman extends net.minecraft.world.entity.EntityLiving {
     public (Object) PlayerInventory inventoryRaw:inventory;
-#if version >= 1.12
+
+#if version >= 1.17
+    protected (Object) InventoryEnderChest enderChestRaw:enderChestInventory;
+#elseif version >= 1.12
     protected (Object) InventoryEnderChest enderChestRaw:enderChest;
 #else
     private (Object) InventoryEnderChest enderChestRaw:enderChest;
 #endif
+
+#if version >= 1.17
+    public (ContainerHandle) Container activeContainer:containerMenu;
+#else
     public (ContainerHandle) Container activeContainer;
+#endif
+
     protected (Object) FoodMetaData foodDataRaw:foodData;
 
     // Bed position is datawatcher value on 1.14
@@ -31,14 +40,27 @@ class EntityHuman extends net.minecraft.world.entity.EntityLiving {
     //    public (IntVector3) BlockPosition bedPosition:bv;
     //#endif
 
+#if version >= 1.17
+    public int sleepTicks:sleepCounter;
+#else
     public int sleepTicks;
+#endif
 
     public (com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) PlayerAbilities abilities;
+
+#if version >= 1.17
+    public int expLevel:experienceLevel;
+    public int expTotal:totalExperience;
+    public float exp:experienceProgress;
+#else
     public int expLevel;
     public int expTotal;
     public float exp;
+#endif
 
-#if version >= 1.16.2
+#if version >= 1.17
+    private final (GameProfileHandle) com.mojang.authlib.GameProfile gameProfile;
+#elseif version >= 1.16.2
     protected unknown int bG;
     protected unknown final float bH;
     private unknown int g;

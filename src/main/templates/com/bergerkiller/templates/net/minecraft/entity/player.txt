@@ -27,9 +27,12 @@ import com.bergerkiller.generated.net.minecraft.server.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 
 class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
+
+#if version >= 1.17
+    public (PlayerConnectionHandle) PlayerConnection playerConnection:connection;
+#else
     public (PlayerConnectionHandle) PlayerConnection playerConnection;
-    // public double chunkSyncX:d; // TODO: Used? is 'cv' Section coords on 1.14
-    // public double chunkSyncZ:e; // TODO: Used? is 'cv' Section coords on 1.14
+#endif
 
 #if version >= 1.16
     // World dimension on 1.16 and later
@@ -39,7 +42,11 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         return (world == null) ? null : world.getWorld();
     }
     public void setSpawnWorld(org.bukkit.World world) {
+  #if version >= 1.17
+        #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension:respawnDimension;
+  #else
         #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
+  #endif
         ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
         instance#spawnDimension = key;
     }
@@ -53,7 +60,10 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     }
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:respawnPosition;
+    #require net.minecraft.server.level.EntityPlayer private boolean spawnForced:respawnForced;
+#elseif version >= 1.16
     #require net.minecraft.server.level.EntityPlayer private net.minecraft.core.BlockPosition spawnCoord:spawn;
     #require net.minecraft.server.level.EntityPlayer private boolean spawnForced;
 #elseif version >= 1.15
@@ -107,7 +117,9 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         instance#spawnForced = forced;
     }
 
-#if version >= 1.16.2
+#if version >= 1.17
+    #require net.minecraft.server.level.EntityPlayer private float spawnAngle:respawnAngle;
+#elseif version >= 1.16.2
     #require net.minecraft.server.level.EntityPlayer private float spawnAngle;
 #endif
 
@@ -128,13 +140,20 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     }
 #endif
 
+#if version >= 1.17
+    public int ping:latency;
+    public readonly boolean viewingCredits:wonGame;
+#else
     public int ping;
     public readonly boolean viewingCredits;
+#endif
 
     // Seen credits getter/setter
 #if version >= 1.12
     // Since Minecraft 1.12 this is just a boolean property of the player
-  #if version >= 1.16.2
+  #if version >= 1.17
+    #require net.minecraft.server.level.EntityPlayer private boolean seenCredits;
+  #elseif version >= 1.16.2
     #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:cd;
   #elseif version >= 1.16.1
     #require net.minecraft.server.level.EntityPlayer private boolean seenCredits:ck;

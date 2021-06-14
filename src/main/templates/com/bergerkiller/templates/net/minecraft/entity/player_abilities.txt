@@ -3,14 +3,25 @@ package net.minecraft.world.entity.player;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
 
 class PlayerAbilities {
+#if version >= 1.17
+    public boolean isInvulnerable:invulnerable;
+    public boolean isFlying:flying;
+    public boolean canFly:mayfly;
+    public boolean canInstantlyBuild:instabuild;
+    public boolean mayBuild;
+#else
     public boolean isInvulnerable;
     public boolean isFlying;
     public boolean canFly;
     public boolean canInstantlyBuild;
     public boolean mayBuild;
+#endif
 
     // Changed from float to double in MC 1.13
-#if version >= 1.13
+#if version >= 1.17
+    public optional float flySpeed_float:###;
+    public optional double flySpeed_double:flySpeed:flyingSpeed;
+#elseif version >= 1.13
     public optional float flySpeed_float:###;
     public optional double flySpeed_double:flySpeed;
 #else
@@ -35,7 +46,11 @@ class PlayerAbilities {
     }
     </code>
 
+#if version >= 1.17
+    public float walkSpeed:walkingSpeed;
+#else
     public float walkSpeed;
+#endif
 
     public (PlayerAbilitiesHandle) PlayerAbilities();
 }

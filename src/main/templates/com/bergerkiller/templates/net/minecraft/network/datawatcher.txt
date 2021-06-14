@@ -42,7 +42,9 @@ class DataWatcher {
     /*
      * Same signature as unwatchAndReturnAllWatched, find other function that matches
      */
-#if version >= 1.9
+#if version >= 1.17
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:getAll();
+#elseif version >= 1.9
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:c();
 #else
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();

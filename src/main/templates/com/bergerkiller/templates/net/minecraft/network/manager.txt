@@ -18,7 +18,9 @@ class NetworkManager {
     // Unsafe! May not function under some conditions!
     // Returns true if queuing was successful, false otherwise
     public static boolean queuePacketUnsafe((Object) NetworkManager networkManager, Object packet) {
-#if version >= 1.13.2
+#if version >= 1.17
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:queue;
+#elseif version >= 1.13.2
         #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue;
 #elseif version >= 1.8.3
         #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:i;
