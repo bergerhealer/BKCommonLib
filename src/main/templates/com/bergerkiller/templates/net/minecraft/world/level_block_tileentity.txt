@@ -18,15 +18,23 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 class TileEntity {
-    protected (org.bukkit.World) World world_field:world;
+#if version >= 1.17
+    protected (org.bukkit.World) World world_field:level;
     protected (IntVector3) BlockPosition position_field:position;
+#else
+    protected (org.bukkit.World) World world_field:world;
+    protected (IntVector3) BlockPosition position_field:worldPosition;
+#endif
 
     public (WorldHandle) World getWorld();
 
     public (BlockPositionHandle) BlockPosition getPosition();
 
     public (BlockData) IBlockData getBlockDataIfCached() {
-#if version >= 1.14
+#if version >= 1.17
+        #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:blockState;
+        return instance#cachedBlockData;
+#elseif version >= 1.14
         #require net.minecraft.world.level.block.entity.TileEntity private IBlockData cachedBlockData:c;
         return instance#cachedBlockData;
 #elseif version >= 1.13
@@ -53,7 +61,11 @@ class TileEntity {
 #endif
     }
 
-#if version >= 1.16
+#if version >= 1.17
+    public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {
+        instance.load(nbttagcompound);
+    }
+#elseif version >= 1.16
     public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound);
 #elseif version >= 1.12.1
     public void load((BlockData) IBlockData blockData, (CommonTagCompound) NBTTagCompound nbttagcompound) {

@@ -1,6 +1,7 @@
 package net.minecraft.core;
 
 import net.minecraft.resources.MinecraftKey;
+import net.minecraft.world.item.Item;
 
 // Only available >= MC 1.9
 optional class RegistryBlockID {

@@ -7,24 +7,38 @@ import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class MobEffect {
-#if version >= 1.9
+#if version >= 1.17
+    private final (MobEffectListHandle) MobEffectList effectList:effect;
+#elseif version >= 1.9
     private final (MobEffectListHandle) MobEffectList effectList:b;
 #else
     private (MobEffectListHandle) int effectList:effectId;
 #endif
 
+#if version >= 1.17
     private int duration;
-    private int amplification;
-    private boolean splash;
+    private int amplifier;
     private boolean ambient;
+    private boolean noCounter;
+#else
+    private int duration;
+    private int amplifier:amplification;
+    private boolean ambient:splash;
+    private boolean noCounter:ambient;
+#endif
 
-#if version >= 1.15.2
+#if version >= 1.17
+    private boolean particles:visible;
+#elseif version >= 1.15.2
     private boolean particles:showParticles;
 #elseif version >= 1.9
     private boolean particles:h;
 #else
     private boolean particles:particles;
 #endif
+
+    //TODO: showIcon?
+    //TODO: hiddenEffect?
 
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
 }

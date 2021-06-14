@@ -28,12 +28,12 @@ public abstract class MobEffectHandle extends Template.Handle {
     public abstract void setEffectList(MobEffectListHandle value);
     public abstract int getDuration();
     public abstract void setDuration(int value);
-    public abstract int getAmplification();
-    public abstract void setAmplification(int value);
-    public abstract boolean isSplash();
-    public abstract void setSplash(boolean value);
+    public abstract int getAmplifier();
+    public abstract void setAmplifier(int value);
     public abstract boolean isAmbient();
     public abstract void setAmbient(boolean value);
+    public abstract boolean isNoCounter();
+    public abstract void setNoCounter(boolean value);
     public abstract boolean isParticles();
     public abstract void setParticles(boolean value);
     /**
@@ -43,9 +43,9 @@ public abstract class MobEffectHandle extends Template.Handle {
     public static final class MobEffectClass extends Template.Class<MobEffectHandle> {
         public final Template.Field.Converted<MobEffectListHandle> effectList = new Template.Field.Converted<MobEffectListHandle>();
         public final Template.Field.Integer duration = new Template.Field.Integer();
-        public final Template.Field.Integer amplification = new Template.Field.Integer();
-        public final Template.Field.Boolean splash = new Template.Field.Boolean();
+        public final Template.Field.Integer amplifier = new Template.Field.Integer();
         public final Template.Field.Boolean ambient = new Template.Field.Boolean();
+        public final Template.Field.Boolean noCounter = new Template.Field.Boolean();
         public final Template.Field.Boolean particles = new Template.Field.Boolean();
 
         public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();

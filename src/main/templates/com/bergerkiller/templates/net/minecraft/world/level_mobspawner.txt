@@ -10,14 +10,22 @@ import com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerDataHandle
 
 class MobSpawnerAbstract {
     public int spawnDelay;
+
+#if version >= 1.17
+    private final (List<MobSpawnerDataHandle>) List<MobSpawnerData> mobs:spawnPotentials;
+    private (MobSpawnerDataHandle) MobSpawnerData spawnData:nextSpawnData;
+#else
     private final (List<MobSpawnerDataHandle>) List<MobSpawnerData> mobs;
     private (MobSpawnerDataHandle) MobSpawnerData spawnData;
+#endif
 
     private int minSpawnDelay;
     private int maxSpawnDelay;
     private int spawnCount;
 
-#if version >= 1.13
+#if version >= 1.17
+    private (org.bukkit.entity.Entity) Entity entity:displayEntity;
+#elseif version >= 1.13
     private (org.bukkit.entity.Entity) Entity entity:j;
 #elseif version >= 1.9
     private (org.bukkit.entity.Entity) Entity entity:i;

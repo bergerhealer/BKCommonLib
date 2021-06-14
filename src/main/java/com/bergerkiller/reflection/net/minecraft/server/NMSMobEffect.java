@@ -17,9 +17,9 @@ public class NMSMobEffect {
     public static final ClassTemplate<?> T = ClassTemplate.create(MobEffectHandle.T.getType());
     public static final TranslatorFieldAccessor<PotionEffectType> effectType = MobEffectHandle.T.effectList.toFieldAccessor().translate(DuplexConversion.potionEffectType);
     public static final FieldAccessor<Integer> duration = MobEffectHandle.T.duration.toFieldAccessor();
-    public static final FieldAccessor<Integer> amplification = MobEffectHandle.T.amplification.toFieldAccessor();
-    public static final FieldAccessor<Boolean> splash = MobEffectHandle.T.splash.toFieldAccessor();
+    public static final FieldAccessor<Integer> amplification = MobEffectHandle.T.amplifier.toFieldAccessor();
     public static final FieldAccessor<Boolean> ambient = MobEffectHandle.T.ambient.toFieldAccessor();
+    public static final FieldAccessor<Boolean> noCounter = MobEffectHandle.T.noCounter.toFieldAccessor();
     public static final FieldAccessor<Boolean> particles = MobEffectHandle.T.particles.toFieldAccessor();
 
     @Deprecated

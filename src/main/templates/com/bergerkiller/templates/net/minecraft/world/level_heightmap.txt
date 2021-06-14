@@ -1,6 +1,7 @@
 package net.minecraft.world.level.levelgen;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.util.DataBits;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.IBlockData;
@@ -12,21 +13,21 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 class HeightMap {
     #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
-#if version >= 1.14
+#if version >= 1.17
+    #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk;
+#elseif version >= 1.14
     #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk:e;
-    public (ChunkHandle) Chunk getChunk() {
-        return (Chunk) instance#chunk;
-    }
 #elseif version >= 1.13
-    public (ChunkHandle) Chunk getChunk() {
-        #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk:c;
-        return (Chunk) instance#chunk;
-    }
-#else
-    public (ChunkHandle) Chunk getChunk() {
-        return (Chunk) instance.chunk;
-    }
+    #require net.minecraft.world.level.levelgen.HeightMap private final IChunkAccess chunk:c;
 #endif
+
+    public (ChunkHandle) Chunk getChunk() {
+#if version >= 1.13
+        return (Chunk) instance#chunk;
+#else
+        return (Chunk) instance.chunk;
+#endif
+    }
 
 #if version >= 1.13
     public int getHeight:a(int x, int z);
@@ -46,7 +47,11 @@ class HeightMap {
         char[] databits = instance#databits;
   #else
         // Standard spigot
+    #if version >= 1.17
+        #require net.minecraft.world.level.levelgen.HeightMap private final DataBits databits:data;
+    #else
         #require net.minecraft.world.level.levelgen.HeightMap private final DataBits databits:c;
+    #endif
         DataBits databits = instance#databits;
   #endif
 

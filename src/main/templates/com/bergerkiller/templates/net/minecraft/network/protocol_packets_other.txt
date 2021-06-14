@@ -11,9 +11,11 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.player.EnumChatVisibility;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.phys.Vec3D;
 
 import com.mojang.authlib.GameProfile;
 
@@ -414,9 +416,15 @@ class PacketPlayInUseItem extends Packet {
 }
 
 class PacketPlayInBlockDig extends Packet {
+#if version >= 1.17
+    private (IntVector3) BlockPosition position:pos;
+    private (org.bukkit.block.BlockFace) EnumDirection direction;
+    private (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType digType:action;
+#else
     private (IntVector3) BlockPosition position:a;
     private (org.bukkit.block.BlockFace) EnumDirection direction:b;
     private (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType digType:c;
+#endif
 
     class PacketPlayInBlockDig.EnumPlayerDigType {
         enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType START_DESTROY_BLOCK;
@@ -425,6 +433,7 @@ class PacketPlayInBlockDig extends Packet {
         enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ALL_ITEMS;
         enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType DROP_ITEM;
         enum (EnumPlayerDigTypeHandle) PacketPlayInBlockDig.EnumPlayerDigType RELEASE_USE_ITEM;
+        //TODO: SWAP_ITEM_WITH_OFFHAND?
     }
 }
 
@@ -478,9 +487,15 @@ class PacketPlayOutCollect extends Packet {
 }
 
 class PacketPlayOutSetSlot extends Packet {
+#if version >= 1.17
+    private int windowId:containerId;
+    private int slot;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:itemstack;
+#else
     private int windowId:a;
     private int slot:b;
     private (org.bukkit.inventory.ItemStack) ItemStack item:c;
+#endif
 }
 
 class PacketPlayOutWindowItems extends Packet {
@@ -494,13 +509,22 @@ class PacketPlayOutWindowItems extends Packet {
 }
 
 class PacketPlayOutOpenWindow extends Packet {
+#if version >= 1.17
+    private int windowId:containerId;
+    private (ChatText) IChatBaseComponent windowTitle:title;
+#else
     private int windowId:a;
     private (ChatText) IChatBaseComponent windowTitle:c;
+#endif
 
     public (PacketPlayOutOpenWindowHandle) PacketPlayOutOpenWindow();
 
 #if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int windowTypeId:type;
+  #else
     #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int windowTypeId:b;
+  #endif
 
     public WindowType getWindowType() {
         return com.bergerkiller.bukkit.common.wrappers.WindowType.fromWindowTypeId(instance#windowTypeId);
@@ -573,9 +597,17 @@ class PacketPlayOutRemoveEntityEffect extends Packet {
 }
 
 class PacketPlayOutLogin extends Packet {
+#if version >= 1.17
+    private int playerId;
+#else
     private int playerId:a;
+#endif
 
-#if version >= 1.15
+#if version >= 1.17
+    private unknown long encryptedWorldSeed:seed;
+    private boolean hardcore;
+    private (org.bukkit.GameMode) EnumGamemode gameMode:gameType;
+#elseif version >= 1.15
     private unknown long encryptedWorldSeed:b;
     private boolean hardcore:c;
     private (org.bukkit.GameMode) EnumGamemode gameMode:d;
@@ -587,7 +619,11 @@ class PacketPlayOutLogin extends Packet {
     // Since 1.16 the previous game mode of the player is also sent
     // This allows the player to toggle back and forth between modes
 #if version >= 1.16
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:previousGameType;
+  #else
     #require net.minecraft.network.protocol.game.PacketPlayOutLogin private net.minecraft.world.level.EnumGamemode previousGameMode:e;
+  #endif
 
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
         EnumGamemode mode = instance#previousGameMode;
@@ -613,7 +649,9 @@ class PacketPlayOutLogin extends Packet {
     }
 #endif
 
-#if version >= 1.16.2
+#if version >= 1.17
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType;
+#elseif version >= 1.16.2
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:h;
 #elseif version >= 1.16
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:h;
@@ -633,9 +671,11 @@ class PacketPlayOutLogin extends Packet {
 #endif
 
     // View distance field only exists >= 1.14
-#if version >= 1.16
+#if version >= 1.17
+    private int maxPlayers;
+    private optional int viewDistance:chunkRadius;
+#elseif version >= 1.16
     private int maxPlayers:j;
-
     private optional int viewDistance:k;
 #elseif version >= 1.15
     private int maxPlayers:f;
@@ -654,7 +694,12 @@ class PacketPlayOutLogin extends Packet {
     private optional int viewDistance:###;
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    private boolean reducedDebugInfo;
+    private unknown boolean noImmediateRespawn:showDeathScreen;
+    private unknown boolean isDebugWorld:isDebug;
+    private unknown boolean isFlatWorld:isFlat;
+#elseif version >= 1.16
     private boolean reducedDebugInfo:l;
     private unknown boolean noImmediateRespawn:m;
     private unknown boolean isDebugWorld:n;
@@ -669,7 +714,10 @@ class PacketPlayOutLogin extends Packet {
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
     public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
-#if version >= 1.16
+#if version >= 1.17
+        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+        instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
+#elseif version >= 1.16
         #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:b;
         instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.15
@@ -800,10 +848,28 @@ class PacketPlayOutPlayerListHeaderFooter extends Packet {
 }
 
 class PacketPlayOutMap extends Packet {
+#if version >= 1.17
+    private int itemId:mapId;
+    private byte scale;
+#else
     private int itemId:a;
     private byte scale:b;
+#endif
 
-#if version >= 1.14
+#if version >= 1.17
+    //TODO: ITs all gone! :(
+    // =============================
+    private optional boolean track:MOVED;
+    private optional boolean locked:MOVED;
+    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:MOVED;
+    private int xmin:MOVED;
+    private int ymin:MOVED;
+    private int width:MOVED;
+    private int height:MOVED;
+    private byte[] pixels:MOVED;
+    // =============================
+    
+#elseif version >= 1.14
     private optional boolean track:c;
     private optional boolean locked:d;
     private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:e;
@@ -874,10 +940,23 @@ class PacketPlayOutMap extends Packet {
 }
 
 class PacketPlayOutMapChunk extends Packet {
+#if version >= 1.17
+    private int x;
+    private int z;
+#else
     private int x:a;
     private int z:b;
+#endif
 
-#if version >= 1.15
+#if version >= 1.17
+    private optional int sectionsMask:availableSections;
+    private optional (CommonTagCompound) NBTTagCompound metadata:heightmaps;
+    private unknown int[] biomeStorage:biomes;
+    private optional byte[] data:buffer;
+    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:blockEntitiesTags;
+    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
+    private boolean hasBiomeData:h;
+#elseif version >= 1.15
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:d;
   #if version >= 1.16.2
@@ -997,7 +1076,16 @@ optional class PacketPlayOutUnloadChunk extends Packet {
 }
 
 class PacketPlayOutNamedSoundEffect extends Packet {
-#if version >= 1.9
+#if version >= 1.17
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound;
+    private optional (String) SoundCategory category_1_10_2:source;
+    private int x;
+    private int y;
+    private int z;
+    private float volume;
+    private optional int pitch_1_8_8:###;
+    private optional float pitch_1_10_2:pitch;
+#elseif version >= 1.9
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound:a;
     private optional (String) SoundCategory category_1_10_2:b;
     private int x:c;
@@ -1060,17 +1148,32 @@ class PacketPlayOutNamedSoundEffect extends Packet {
 
 // Since MC 1.9
 optional class PacketPlayOutCustomSoundEffect extends Packet {
-#if version >= 1.13
+#if version >= 1.17
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:name;
+#elseif version >= 1.13
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.resources.MinecraftKey sound:a;
 #else
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) String sound:a;
 #endif
+
+#if version >= 1.17
+    private (String) SoundCategory category:source;
+    private int x;
+    private int y;
+    private int z;
+    private float volume;
+#else
     private (String) SoundCategory category:b;
     private int x:c;
     private int y:d;
     private int z:e;
     private float volume:f;
-#if version >= 1.10.2
+#endif
+
+#if version >= 1.17
+    private optional float opt_pitch_float:pitch;
+    private optional int opt_pitch_integer:###;
+#elseif version >= 1.10.2
     private optional float opt_pitch_float:g;
     private optional int opt_pitch_integer:###;
 #else
@@ -1193,6 +1296,22 @@ class PacketPlayOutPosition extends Packet {
 
 // Available >= MC 1.9
 optional class PacketPlayOutBoss extends Packet {
+#if version >= 1.17
+    private UUID entityUUID:id;
+    private (Object) PacketPlayOutBoss.Action action:operation;
+
+    //TODO: Moved to Action class!
+    // ==================
+    private (Object) IChatBaseComponent chat:MOVED;
+    private float progress:MOVED;
+    private (Object) BossBattle.BarColor bossBarColor:MOVED;
+    private (Object) BossBattle.BarStyle bossBarStyle:MOVED;
+    private boolean unknown1:MOVED;
+    private boolean unknown2:MOVED;
+    private boolean unknown3:MOVED;
+    // ==================
+    
+#else
     private UUID entityUUID:a;
     private (Object) PacketPlayOutBoss.Action action:b;
     private (Object) IChatBaseComponent chat:c;
@@ -1202,6 +1321,7 @@ optional class PacketPlayOutBoss extends Packet {
     private boolean unknown1:g;
     private boolean unknown2:h;
     private boolean unknown3:i;
+#endif
 }
 
 class PacketPlayOutAttachEntity extends Packet {
@@ -1274,10 +1394,18 @@ class PacketPlayOutAttachEntity extends Packet {
 }
 
 class PacketPlayOutEntityEquipment extends Packet {
+#if version >= 1.17
+    private int entityId:entity;
+#else
     private int entityId:a;
+#endif
 
 #if version >= 1.16
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EnumItemSlot, net.minecraft.world.item.ItemStack>> slots;
+  #else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private final java.util.List<com.mojang.datafixers.util.Pair<net.minecraft.world.entity.EnumItemSlot, net.minecraft.world.item.ItemStack>> slots:b;
+  #endif
 
     // Multiple slots are possible
     public int getSlotCount() {
@@ -1366,8 +1494,13 @@ class PacketPlayOutEntityEquipment extends Packet {
 
 // Only available >= MC 1.9
 optional class PacketPlayOutMount extends Packet {
+#if version >= 1.17
+    private int entityId:vehicle;
+    private int[] mountedEntityIds:passengers;
+#else
     private int entityId:a;
     private int[] mountedEntityIds:b;
+#endif
 
     public (PacketPlayOutMountHandle) PacketPlayOutMount();
 
@@ -1409,12 +1542,24 @@ class PacketPlayOutCombatEvent {
 
 // Only >= MC 1.9
 optional class PacketPlayOutSetCooldown extends Packet {
+#if version >= 1.17
+    private (org.bukkit.Material) Item material:item;
+    private int cooldown:duration;
+#else
     private (org.bukkit.Material) Item material:a;
     private int cooldown:b;
+#endif
 }
 
 class PacketPlayOutScoreboardTeam extends Packet {
+#if version >= 1.17
+    private String name;
+#else
     private String name:a;
+#endif
+
+    //TODO: Most below is parameters for 1.17
+
 #if version >= 1.13
     private (ChatText) IChatBaseComponent displayName:b;
     private (ChatText) IChatBaseComponent prefix:c;
@@ -1465,20 +1610,35 @@ class PacketPlayOutScoreboardTeam extends Packet {
 }
 
 class PacketPlayInSettings extends Packet {
-#if version >= 1.16
+#if version >= 1.17
+    public String locale:language;
+#elseif version >= 1.16
     public String locale;
 #else
     private String locale:a;
 #endif
-#if fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
+
+#if version >= 1.17
+    public int view:viewDistance;
+#elseif fieldexists net.minecraft.network.protocol.game.PacketPlayInSettings public int viewDistance
     public int view:viewDistance;
 #else
     private int view:b;
 #endif
+
+#if version >= 1.17
+    private (Object) EnumChatVisibility chatVisibility;
+    private boolean enableColors:chatColors;
+    private int modelPartFlags:modelCustomisation;
+    private optional (HumanHand) net.minecraft.world.entity.EnumMainHand mainHand;
+#else
     private (Object) EnumChatVisibility chatVisibility:c;
     private boolean enableColors:d;
     private int modelPartFlags:e;
     private optional (HumanHand) net.minecraft.world.entity.EnumMainHand mainHand:f;
+#endif
+
+    //TODO: textFilteringEnabled
 
     <code>
     public HumanHand getMainHand() {
@@ -1511,7 +1671,9 @@ class PacketPlayInSettings extends Packet {
 
 class PacketPlayInResourcePackStatus extends Packet {
     private optional String message:a;
-#if version >= 1.9
+#if version >= 1.17
+    public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:action;
+#elseif version >= 1.9
     public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status;
 #else
     public (Object) PacketPlayInResourcePackStatus.EnumResourcePackStatus status:b;
@@ -1519,13 +1681,25 @@ class PacketPlayInResourcePackStatus extends Packet {
 }
 
 class PacketPlayInSetCreativeSlot extends Packet {
+#if version >= 1.17
+    private int slot:slotNum;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
+#else
     private int slot;
     private (org.bukkit.inventory.ItemStack) ItemStack item:b;
+#endif
 }
 
 class PacketPlayOutEntityMetadata extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+#else
     private int entityId:a;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> metadataItems:packedItems;
+#elseif version >= 1.9
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> metadataItems:b;
 #else
     private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.WatchableObject> metadataItems:b;
@@ -1573,8 +1747,15 @@ class PacketPlayOutUpdateAttributes extends Packet {
 }
 
 class PacketPlayInUpdateSign extends Packet {
+#if version >= 1.17
+    private (IntVector3) BlockPosition position:pos;
+#else
     private (IntVector3) BlockPosition position:a;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private (ChatText[]) String[] lines;
+#elseif version >= 1.9
     private (ChatText[]) String[] lines:b;
 #else
     private (ChatText[]) IChatBaseComponent[] lines:b;
@@ -1582,12 +1763,23 @@ class PacketPlayInUpdateSign extends Packet {
 }
 
 class PacketPlayInWindowClick extends Packet {
+#if version >= 1.17
+    private int windowId:containerId;
+    private int slot:slotNum;
+    private int button:buttonNum;
+    private short action:d;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
+#else
     private int windowId:a;
     private int slot;
     private int button;
     private short action:d;
     private (org.bukkit.inventory.ItemStack) ItemStack item;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:clickType;
+#elseif version >= 1.9
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:shift;
 #else
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
@@ -1610,7 +1802,18 @@ class PacketPlayOutWorldParticles {
     // TODO: Create a common interface for particle + data
     // Since 1.13 there is a ParticleParam with many different types
     // Best option would be coming up with a proxy similar to this for <= 1.12.2
-#if version >= 1.15
+#if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_x:x;
+    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_y:y;
+    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_z:z;
+    private float randomX:xDist;
+    private float randomY:yDist;
+    private float randomZ:zDist;
+    private float speed:maxSpeed;
+    private int count;
+    private boolean longDistance:overrideLimiter;
+    private unknown ParticleParam particle;
+#elseif version >= 1.15
     #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_x:a;
     #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_y:b;
     #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_z:c;
@@ -1686,7 +1889,12 @@ class PacketPlayOutWorldParticles {
 }
 
 class PacketPlayOutScoreboardObjective {
-#if version >= 1.13
+#if version >= 1.17
+    private String name:objectiveName;
+    private (ChatText) IChatBaseComponent displayName;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:renderType;
+    private int action:method;
+#elseif version >= 1.13
     private String name:a;
     private (ChatText) IChatBaseComponent displayName:b;
     private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;

@@ -12,12 +12,11 @@ class EnumProtocol {
     // Is no longer a BiMap on 1.15
   #if version >= 1.17
     #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, ? extends net.minecraft.network.EnumProtocol.a<?>> packetMap:flows;
-    #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:classToId;
   #else
     #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, ? extends net.minecraft.network.EnumProtocol.a<?>> packetMap:h;
-    #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:a;
   #endif
 
+    #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:a;
     #require net.minecraft.network.EnumProtocol.a public Integer getPacketClassId:a(Class<?> packetClass);
 
     public Class<?> getPacketClassIn(int id) {

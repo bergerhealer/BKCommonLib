@@ -129,15 +129,24 @@ class PlayerChunk {
         }
 
         // Reset dirty mask so it does not send twice
-  #if version >= 1.16.2
+  #if version >= 1.17
+        #require net.minecraft.server.level.PlayerChunk private final BitSet blockChangedLightSectionFilter;
+        #require net.minecraft.server.level.PlayerChunk private final BitSet skyChangedLightSectionFilter;
+        BitSet blockFilter = instance#blockChangedLightSectionFilter;
+        BitSet skyFilter = instance#skyChangedLightSectionFilter;
+        blockFilter.clear();
+        skyFilter.clear();
+  #else
+    #if version >= 1.16.2
         #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:r;
         #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:s;
-  #else
+    #else
         #require net.minecraft.server.level.PlayerChunk private int pc_dirtyBlockLightMask:s;
         #require net.minecraft.server.level.PlayerChunk private int pc_dirtySkyLightMask:t;
-  #endif
+    #endif
         instance#pc_dirtyBlockLightMask = 0;
         instance#pc_dirtySkyLightMask = 0;
+  #endif
 
         // Retrieve LightEngine (used to make the update packet)
         #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LightEngine lightEngine;
@@ -219,9 +228,15 @@ class PlayerChunk {
     }
 #endif
 
+#if version >= 1.17
+    private final (IntVector2) ChunkCoordIntPair location:loc;
+#else
     private final (IntVector2) ChunkCoordIntPair location;
+#endif
 
-#if version >= 1.14.1
+#if version >= 1.17
+    private boolean done:wasAccessibleSinceLastSave;
+#elseif version >= 1.14.1
     private boolean done:hasBeenLoaded;
 #elseif version >= 1.14
     private boolean done:x;

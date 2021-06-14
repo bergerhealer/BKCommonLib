@@ -397,6 +397,11 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.PlayerChunkMap$EntityTracker");
         }
 
+        // 1.17 mappings
+        if (evaluateMCVersion(">=", "1.17")) {
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
+        }
+
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
         {
             boolean craftLegacyIsInUtil;

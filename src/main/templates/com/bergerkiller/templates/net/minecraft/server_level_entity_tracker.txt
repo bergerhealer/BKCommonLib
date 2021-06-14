@@ -1,6 +1,7 @@
 package net.minecraft.server.level;
 
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.entity.Entity;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
@@ -10,7 +11,11 @@ import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 // Same as PlayerChunkMap on MC 1.14 and later
 class EntityTracker {
 #if version >= 1.14
+  #if version >= 1.17
+    public final (org.bukkit.World) WorldServer world:level;
+  #else
     public final (org.bukkit.World) WorldServer world;
+  #endif
 
     public (Collection<com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
         return instance.trackedEntities.values();
@@ -125,7 +130,7 @@ class EntityTrackerEntry {
     private final int trackingDistance;
 
     public int getPlayerViewDistance() {
-        #require net.minecraft.server.level.EntityTrackerEntry final PlayerChunkMap entityTracker:this$0;
+        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:this$0;
   #if version >= 1.14.1
         #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:viewDistance;
   #else
@@ -195,9 +200,15 @@ class EntityTrackerEntry {
 #endif
 
 #if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final net.minecraft.world.entity.Entity entity;
+    #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry:serverEntity;
+    #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity trackerEntryEntity:entity;
+  #else
     #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final net.minecraft.world.entity.Entity entity:tracker;
     #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final EntityTrackerEntryState trackerEntry;
     #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity trackerEntryEntity:tracker;
+  #endif
 
     public (EntityTrackerEntryStateHandle) EntityTrackerEntryState getState() {
         return instance#trackerEntry;
@@ -270,7 +281,25 @@ class EntityTrackerEntry {
 // Alias for EntityTrackerEntry, but because we're using PlayerChunkMap$EntityTracker as
 // main handle on 1.14 it is renamed to differentiate the two.
 class EntityTrackerEntryState {
-#if version >= 1.14
+#if version >= 1.17
+    private final (EntityHandle) Entity entity;
+
+    private final int updateInterval;
+    private final boolean isMobile:trackDelta;
+
+    private optional final java.util.function.Consumer broadcastMethod:broadcast;
+
+    private optional long long_xLoc:xp;
+    private optional long long_yLoc:yp;
+    private optional long long_zLoc:zp;
+    private optional int int_xLoc:###;
+    private optional int int_yLoc:###;
+    private optional int int_zLoc:###;
+
+    public int raw_xRot:yRotp;
+    public int raw_yRot:xRotp;
+    public int raw_headYaw:yHeadRotp;
+#elseif version >= 1.14
     private final (EntityHandle) Entity entity:tracker;
 
     private final int updateInterval:d;
@@ -324,7 +353,13 @@ class EntityTrackerEntryState {
     public int raw_headYaw:i;
 #endif
 
-#if version >= 1.14
+#if version >= 1.17
+    private optional double opt_xVel:###;
+    private optional double opt_yVel:###;
+    private optional double opt_zVel:###;
+    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:ap;
+    public int tickCounter:tickCount;
+#elseif version >= 1.14
     private optional double opt_xVel:###;
     private optional double opt_yVel:###;
     private optional double opt_zVel:###;
@@ -635,7 +670,11 @@ class EntityTrackerEntryState {
     }
     </code>
 
-#if version >= 1.14
+#if version >= 1.17
+    private int timeSinceLocationSync:teleportDelay;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:lastPassengers;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;
+#elseif version >= 1.14
     private int timeSinceLocationSync:o;
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:p;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;

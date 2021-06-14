@@ -8,7 +8,9 @@ import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsM
 class BiomeSettingsMobs {
 
     class BiomeSettingsMobs.SpawnRate extends net.minecraft.util.WeightedRandom.WeightedRandomChoice {
-#if version >= 1.16
+#if version >= 1.17
+        public (java.lang.Class<?>) EntityTypes entityClass:b;
+#elseif version >= 1.16
         public (java.lang.Class<?>) EntityTypes entityClass:c;
 #elseif version >= 1.13
         public (java.lang.Class<?>) EntityTypes entityClass:b;
@@ -16,7 +18,10 @@ class BiomeSettingsMobs {
         public (java.lang.Class<?>) java.lang.Class<? extends EntityInsentient> entityClass:b;
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+        public final int minSpawnCount:minCount;
+        public final int maxSpawnCount:maxCount;
+#elseif version >= 1.16
         public final int minSpawnCount:d;
         public final int maxSpawnCount:e;
 #else

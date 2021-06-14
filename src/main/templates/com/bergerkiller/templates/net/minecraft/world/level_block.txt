@@ -36,7 +36,9 @@ class Block {
         return #REGISTRY;
     }
 
-#if version >= 1.9
+#if version >= 1.17
+    public static final rawtype (Iterable) net.minecraft.core.RegistryBlockID<IBlockData> REGISTRY_ID:BLOCK_STATE_REGISTRY;
+#elseif version >= 1.9
     public static final rawtype (Iterable) net.minecraft.core.RegistryBlockID<IBlockData> REGISTRY_ID;
 #else
     public static final rawtype (Iterable) net.minecraft.util.RegistryID<IBlockData> REGISTRY_ID:d;
@@ -65,6 +67,7 @@ class Block {
 #endif
 
 #select version >=
+#case 1.17: public String getTitle:h();
 #case 1.16: public String getTitle:i();
 #case 1.15: public String getTitle:k();
 #case 1.14: public String getTitle:l();

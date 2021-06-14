@@ -3,7 +3,11 @@ package net.minecraft.server.network;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class PlayerConnection {
+#if version >= 1.17
+    public final (Object) net.minecraft.network.NetworkManager networkManager:connection;
+#else
     public final (Object) net.minecraft.network.NetworkManager networkManager;
+#endif
 
 #if version >= 1.9
     public void sendPacket((Object) net.minecraft.network.protocol.Packet<?> packet);

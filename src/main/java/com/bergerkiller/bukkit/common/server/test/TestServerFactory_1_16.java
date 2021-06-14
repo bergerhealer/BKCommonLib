@@ -64,7 +64,9 @@ class TestServerFactory_1_16 extends TestServerFactory {
             // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
             // this.f = iregistrycustom_dimension; (MinecraftServer.java)
             Object customRegistry = createFromCode(minecraftServerType, "return IRegistryCustom.b();");
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.16.3")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+                setField(mc_server, "registryHolder", customRegistry);
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16.3")) {
                 setField(mc_server, "customRegistry", customRegistry);
             } else {
                 setField(mc_server, "f", customRegistry);

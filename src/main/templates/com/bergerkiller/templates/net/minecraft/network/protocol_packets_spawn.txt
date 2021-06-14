@@ -14,7 +14,24 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
 
-#if version >= 1.9
+#if version >= 1.17
+    private int entityId:id;
+    private optional UUID entityUUID:uuid;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
+    private optional double posX_1_10_2:x;
+    private optional double posY_1_10_2:y;
+    private optional double posZ_1_10_2:z;
+    private optional int motX_raw:xa;
+    private optional int motY_raw:ya;
+    private optional int motZ_raw:za;
+    private optional int pitch_raw:xRot;
+    private optional int yaw_raw:yRot;
+    private optional int opt_entityTypeId:###;
+    private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:type;
+    private int extraData:data;
+#elseif version >= 1.9
     private int entityId:a;
     private optional UUID entityUUID:b;
     private optional int posX_1_8_8:###;
@@ -331,9 +348,28 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
 }
 
 class PacketPlayOutSpawnEntityLiving extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+#else
     private int entityId:a;
+#endif
 
-#if version >= 1.9
+#if version >= 1.17
+    private optional UUID entityUUID:uuid;
+    private int entityTypeId:type;
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
+    private optional double posX_1_10_2:x;
+    private optional double posY_1_10_2:y;
+    private optional double posZ_1_10_2:z;
+    private optional int motX_raw:xd;
+    private optional int motY_raw:yd;
+    private optional int motZ_raw:zd;
+    private optional byte yaw_raw:yRot;
+    private optional byte pitch_raw:xRot;
+    private optional byte headYaw_raw:yHeadRot;
+#elseif version >= 1.9
     private optional UUID entityUUID:b;
     private int entityTypeId:c;
     private optional int posX_1_8_8:###;

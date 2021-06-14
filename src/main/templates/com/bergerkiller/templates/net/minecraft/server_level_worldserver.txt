@@ -11,6 +11,8 @@ import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.level.World;
 
+import net.minecraft.server.MinecraftServer;
+
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
@@ -56,7 +58,11 @@ class WorldServer extends World {
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+  #if version >= 1.17
+        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap:chunkMap;
+  #else
         #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+  #endif
         instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
     }
 

@@ -452,7 +452,9 @@ class NBTTagList extends NBTBase {
     public boolean isEmpty();
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    public (byte) byte getElementTypeId:e();
+#elseif version >= 1.16
     public (byte) byte getElementTypeId:d_();
 #elseif version >= 1.14
     public (byte) int getElementTypeId:a_();
@@ -593,7 +595,11 @@ class NBTTagList extends NBTBase {
 
 class NBTTagCompound extends NBTBase {
     // Results in getData() being added, which overrides the one in NBTBase
+#if version >= 1.17
+    private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:tags;
+#else
     private final readonly (Map<String, NBTBaseHandle>) Map<String, NBTBase> data:map;
+#endif
 
     public static (NBTTagCompoundHandle) NBTTagCompound createEmpty() { return new NBTTagCompound(); }
 

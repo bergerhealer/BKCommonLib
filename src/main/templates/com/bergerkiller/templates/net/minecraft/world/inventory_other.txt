@@ -30,7 +30,9 @@ class InventoryMerchant extends IInventory {
 }
 
 class Container {
-#if version >= 1.12.2
+#if version >= 1.17
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:lastSlots;
+#elseif version >= 1.12.2
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:items;
 #elseif version >= 1.11
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> oldItems:b;
@@ -38,13 +40,19 @@ class Container {
     public (List<org.bukkit.inventory.ItemStack>) List<ItemStack> oldItems:b;
 #endif
 
-#if version >= 1.12.2
+#if version >= 1.17
+    public (List<SlotHandle>) NonNullList<Slot> slots;
+#elseif version >= 1.12.2
     public (List<SlotHandle>) List<Slot> slots:slots;
 #else
     public (List<SlotHandle>) List<Slot> slots:c;
 #endif
 
+#if version >= 1.17
+    public int windowId:containerId;
+#else
     public int windowId;
+#endif
 
     public abstract org.bukkit.inventory.InventoryView getBukkitView();
 
@@ -60,7 +68,9 @@ class Container {
 }
 
 class ContainerAnvil extends Container {
-#if version >= 1.12
+#if version >= 1.17
+    public String renameText:itemName;
+#elseif version >= 1.12
     public String renameText;
 #elseif version >= 1.11
     public String renameText:l;

@@ -14,7 +14,11 @@ class ChunkProviderServer {
     // Gone since MC 1.14
     // private final (Object) IChunkLoader chunkLoader;
 
+#if version >= 1.17
+    public final (WorldServerHandle) WorldServer world:level;
+#else
     public final (WorldServerHandle) WorldServer world;
+#endif
 
 #if version >= 1.14
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
@@ -32,7 +36,12 @@ class ChunkProviderServer {
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 #endif
 
-#if version >= 1.14
+#if version >= 1.17
+    public java.util.concurrent.Executor getAsyncExecutor() {
+        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a mainThreadProcessor;
+        return instance#mainThreadProcessor;
+    }
+#elseif version >= 1.14
     public java.util.concurrent.Executor getAsyncExecutor() {
         #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a serverThreadQueue;
         return instance#serverThreadQueue;
@@ -72,7 +81,11 @@ class ChunkProviderServer {
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.17
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        instance.chunkMap.saveChunk(chunk);
+    }
+#elseif version >= 1.14
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
         // Since 1.14: moved to PlayerChunkMap
         instance.playerChunkMap.saveChunk(chunk);

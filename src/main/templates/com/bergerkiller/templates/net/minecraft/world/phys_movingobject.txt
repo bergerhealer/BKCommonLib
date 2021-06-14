@@ -3,7 +3,11 @@ package net.minecraft.world.phys;
 import net.minecraft.core.EnumDirection;
 
 class MovingObjectPosition {
+#if version >= 1.17
+    public readonly (org.bukkit.util.Vector) Vec3D pos:location;
+#else
     public readonly (org.bukkit.util.Vector) Vec3D pos;
+#endif
 
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
 #if version >= 1.14

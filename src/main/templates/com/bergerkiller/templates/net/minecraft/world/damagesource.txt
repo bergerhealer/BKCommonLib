@@ -9,7 +9,11 @@ import net.minecraft.world.entity.projectile.EntityFireball;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
 class DamageSource {
+#if version >= 1.17
+    public String translationIndex:msgId;
+#else
     public String translationIndex;
+#endif
 
     public boolean isExplosion();
 

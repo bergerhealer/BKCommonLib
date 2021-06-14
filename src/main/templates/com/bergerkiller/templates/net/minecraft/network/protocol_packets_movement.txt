@@ -413,9 +413,17 @@ class PacketPlayInFlying extends Packet {
     protected double x;
     protected double y;
     protected double z;
+#if version >= 1.17
+    protected float yaw:yRot;
+    protected float pitch:xRot;
+    protected boolean onGround;
+    protected boolean hasPos;
+    protected boolean hasLook:hasRot;
+#else
     protected float yaw;
     protected float pitch;
     protected boolean onGround:f;
     protected boolean hasPos;
     protected boolean hasLook;
+#endif
 }

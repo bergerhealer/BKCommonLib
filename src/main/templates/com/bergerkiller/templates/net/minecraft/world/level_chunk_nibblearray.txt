@@ -3,7 +3,11 @@ package net.minecraft.world.level.chunk;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHandle;
 
 class NibbleArray {
+#if version >= 1.17
+    protected byte[] dataField:c;
+#else
     private final byte[] dataField:a;
+#endif
 
     public (NibbleArrayHandle) NibbleArray();
     public (NibbleArrayHandle) NibbleArray(byte[] data);
