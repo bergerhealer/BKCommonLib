@@ -116,7 +116,24 @@ class EntityLiving extends Entity {
     </code>
 
     public void resetAttributes() {
-#if version >= 1.16
+#if version >= 1.17
+        // Is only set in constructor, so we'll have to force it
+        // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
+        #require net.minecraft.world.entity.EntityLiving private final AttributeMapBase attributeMapField:attributes;
+        #require net.minecraft.world.entity.EntityLiving private final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
+        AttributeMapBase new_attributes = new AttributeMapBase(AttributeDefaults.a(instance.getEntityType()));
+        org.bukkit.craftbukkit.attribute.CraftAttributeMap new_craftAttributes = new org.bukkit.craftbukkit.attribute.CraftAttributeMap(new_attributes);
+        instance#attributeMapField = new_attributes;
+        instance#craftAttributes = new_craftAttributes;
+
+        // Item attributes need to be re-applied later, they are lost as part of this reset
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
+        #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;
+        NonNullList lastHandItemStacks = instance#lastHandItemStacks;
+        NonNullList lastArmorItemStack = instance#lastArmorItemStack;
+        lastHandItemStacks.clear();
+        lastArmorItemStack.clear();
+#elseif version >= 1.16
         // Is only set in constructor, so we'll have to force it
         // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
         #require net.minecraft.world.entity.EntityLiving private final AttributeMapBase attributeMapField:attributeMap;
@@ -175,15 +192,26 @@ class EntityLiving extends Entity {
     }
 #endif
 
-#if version >= 1.9
+#if version >= 1.17
+    public final (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> mobEffects:activeEffects;
+#elseif version >= 1.9
     public final (Map<MobEffectListHandle, MobEffectHandle>) Map<MobEffectList, MobEffect> mobEffects:effects;
 #else
     public final (Map<MobEffectListHandle, MobEffectHandle>) Map<Integer, MobEffect> mobEffects:effects;
 #endif
 
+#if version >= 1.17
+    public float lastDamage:lastHurt;
+#else
     public float lastDamage;
+#endif
 
-#if version >= 1.16.2
+#if version >= 1.17
+    protected unknown boolean jumping;
+    public float sideMovement:xxa;
+    public unknown float yya;
+    public float forwardMovement:zza;
+#elseif version >= 1.16.2
     protected unknown boolean jumping;
     public float sideMovement:aR;
     public unknown float aS;
@@ -248,7 +276,11 @@ class EntityLiving extends Entity {
     protected unknown float aZ;
 #endif
 
+#if version >= 1.17
+    public boolean updateEffects:effectsDirty;
+#else
     public boolean updateEffects;
+#endif
 
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
 

@@ -120,5 +120,9 @@ class EntityItemFrame extends Entity {
 }
 
 class EntityHanging extends Entity {
+#if version >= 1.17
+    public (IntVector3) BlockPosition blockPosition:pos;
+#else
     public (IntVector3) BlockPosition blockPosition;
+#endif
 }

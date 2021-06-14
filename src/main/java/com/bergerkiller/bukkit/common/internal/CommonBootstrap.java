@@ -27,6 +27,7 @@ import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.CompiledFieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -236,6 +237,9 @@ public class CommonBootstrap {
         }
         if (server instanceof CompiledMethodNameResolver) {
             Resolver.registerCompiledMethodResolver((CompiledMethodNameResolver) server);
+        }
+        if (server instanceof FieldAliasResolver) {
+            Resolver.registerFieldAliasResolver((FieldAliasResolver) server);
         }
     }
 

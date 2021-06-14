@@ -5,15 +5,15 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * API around the published mappings for minecraft server.
@@ -27,12 +27,18 @@ public class MojangMappings {
     public static class ClassMappings {
         public final String name;
         public final String name_obfuscated;
-        public final Map<String, String> fieldMappings;
+        public final BiMap<String, String> obfuscated_to_name;
+        public final BiMap<String, String> name_to_obfuscated;
 
         public ClassMappings(String name, String name_obfuscated) {
             this.name = name;
             this.name_obfuscated = name_obfuscated;
-            this.fieldMappings = new HashMap<>();
+            this.obfuscated_to_name = HashBiMap.create();
+            this.name_to_obfuscated = this.obfuscated_to_name.inverse();
+        }
+
+        public void addField(String obfuscatedName, String mojangName) {
+            this.obfuscated_to_name.put(obfuscatedName, mojangName);
         }
     }
 
@@ -173,7 +179,7 @@ public class MojangMappings {
                 {
                     Matcher m = fieldNamePattern.matcher(line);
                     if (m.matches()) {
-                        classMappings.fieldMappings.put(m.group(1), m.group(2));
+                        classMappings.addField(m.group(2), m.group(1));
                         continue;
                     }
                 }

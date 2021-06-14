@@ -1,6 +1,6 @@
 package net.minecraft.world.entity;
 
-import net.minecraft.server.NavigationAbstract;
+import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;

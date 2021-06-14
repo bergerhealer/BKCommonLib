@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
@@ -14,6 +15,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
-public class CraftBukkitServer extends CommonServerBase implements FieldNameResolver, ClassPathResolver {
+public class CraftBukkitServer extends CommonServerBase implements FieldNameResolver, FieldAliasResolver, ClassPathResolver {
     private static final String CB_ROOT = "org.bukkit.craftbukkit";
     private static final String NM_ROOT = "net.minecraft";
     private static final String NMS_ROOT = "net.minecraft.server";
@@ -185,13 +187,24 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
         if (HAS_MOJANG_MAPPINGS) {
             MojangMappings.ClassMappings mappings = mojangMappingsByBukkitClass.get(declaringClass.getName());
             if (mappings != null) {
-                System.out.println("REMAP " + declaringClass.getName() + " -> " + mappings.name + " FIELD " + fieldName 
-                        + " = " + mappings.fieldMappings.get(fieldName));
-                fieldName = mappings.fieldMappings.getOrDefault(fieldName, fieldName);
+                fieldName = mappings.name_to_obfuscated.getOrDefault(fieldName, fieldName);
             }
         }
 
         return fieldName;
+    }
+
+    @Override
+    public String resolveFieldAlias(Field field, String name) {
+        // Minecraft 1.17 and later require remapping, as all field names are obfuscated
+        if (HAS_MOJANG_MAPPINGS) {
+            MojangMappings.ClassMappings mappings = mojangMappingsByBukkitClass.get(field.getDeclaringClass().getName());
+            if (mappings != null) {
+                return mappings.obfuscated_to_name.getOrDefault(name, null);
+            }
+        }
+
+        return null;
     }
 
     private String identifyMinecraftVersion() throws VersionIdentificationFailureException {
