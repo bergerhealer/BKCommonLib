@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
@@ -75,9 +74,12 @@ public class CommonUtil {
     /**
      * When under test internal classes have to be loaded in a very specific order.
      * This function makes sure the server registers are initialized.
+     * 
+     * @deprecated moved to internal, use CommonBootstrap
      */
+    @Deprecated
     public static void bootstrap() {
-        Common.bootstrap();
+        CommonBootstrap.initCommonServerAssertCompatibility();
     }
 
     /**

@@ -36,11 +36,6 @@ public class UnknownServer extends CommonServerBase {
     }
 
     @Override
-    public boolean isCompatible() {
-        return false;
-    }
-
-    @Override
     public String getServerDescription() {
     	if (Bukkit.getServer() == null) {
     		return "NULL";
@@ -59,7 +54,10 @@ public class UnknownServer extends CommonServerBase {
     }
 
     @Override
-    public void postInit() {
+    public void postInit(PostInitEvent event) {
+        // It's not compatible at all because we don't know what server is used
+        event.signalIncompatible("Server software type could not be identified");
+
         // Hardcode the NMS and CB paths at compilation time
         // UnknownServer is only used during testing phase when no server is available, so it's fine
         if (CommonServerBase.SERVER_CLASS != null) {

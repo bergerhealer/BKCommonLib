@@ -15,8 +15,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -35,7 +35,7 @@ public class MojangIO {
      */
     public static File getCacheFolder() {
         File file;
-        if (Common.IS_TEST_MODE) {
+        if (CommonBootstrap.isTestMode()) {
             file = new File(System.getProperty("user.dir"));
         } else {
             file = CommonPlugin.getInstance().getDataFolder();

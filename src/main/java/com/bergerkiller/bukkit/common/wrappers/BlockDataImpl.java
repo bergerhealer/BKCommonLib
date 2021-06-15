@@ -17,11 +17,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.material.MaterialData;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.BlockFaceSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.CommonListener;
@@ -85,8 +85,10 @@ public class BlockDataImpl extends BlockData {
     private static final EnumSet<Material> BLOCK_UPDATE_STATE_BLACKLIST = EnumSet.noneOf(Material.class);
 
     static {
-        // Make sure templates are initialized first
-        Common.bootstrap();
+        // Block Data requires an initialized server to work properly, so initialize that now
+        // Doing this here makes it so that server identification and test server setup is done
+        // before templates are initialized. Easier to debug.
+        CommonBootstrap.initServer();
 
         // Retrieve
         Iterable<?> REGISTRY = BlockHandle.getRegistry();

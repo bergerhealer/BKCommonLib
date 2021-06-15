@@ -19,6 +19,7 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.resources.ResourceOverrides;
@@ -142,7 +143,7 @@ public class MapResourcePack {
 
         // Server-defined. Take over the options from the server.properties
         if (resourcePackPath != null && resourcePackPath.equalsIgnoreCase("server")) {
-            if (Common.IS_TEST_MODE) {
+            if (CommonBootstrap.isTestMode()) {
                 resourcePackPath = "vanilla";
             } else {
                 MinecraftServerHandle mcs = MinecraftServerHandle.instance();

@@ -1,11 +1,17 @@
 package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.templates.TemplateResolver;
 
 import java.io.File;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * Provides server-specific information and functionalities. Is used to identify
+ * what Minecraft server version is run on, among other metadata. Also provides
+ * the at-runtime remapping facilities requires to run on the server.
+ */
 public interface CommonServer {
 
     /**
@@ -19,8 +25,10 @@ public interface CommonServer {
      * Called after the {@link #init()} method successfully detected the server
      * and initialized the server. In here processing that depends on the
      * CommonServer instance being fully initialized can be continued.
+     * 
+     * @param event Context for initialization. See {@link PostInitEvent}.
      */
-    public void postInit();
+    public void postInit(PostInitEvent event);
 
     /**
      * Prepares this server for enabling of BKCommonLIb
@@ -65,13 +73,6 @@ public interface CommonServer {
      * @return server description
      */
     public String getServerDescription();
-
-    /**
-     * Checks whether BKCommonLib is compatible with this server
-     *
-     * @return True if compatible, False if not
-     */
-    public boolean isCompatible();
 
     /**
      * Gets the version of Minecraft the server supports
@@ -195,5 +196,61 @@ public interface CommonServer {
             return mc_version.substring(pre_idx + 4);
         }
         return null;
+    }
+
+    /**
+     * Event passed to {@link CommonServer#postInit(event)} that provides
+     * additional context with the template resolver, and a way to signal
+     * server compatibility.
+     */
+    public static class PostInitEvent {
+        private final TemplateResolver templateResolver;
+        private String incompatibleReason = null;
+
+        public PostInitEvent(TemplateResolver templateResolver) {
+            this.templateResolver = templateResolver;
+        }
+
+        /**
+         * If {@link #isCompatible()} returns false, this provides the
+         * reason for it.
+         *
+         * @return reason the server is not compatible, null if compatible
+         */
+        public String getIncompatibleReason() {
+            return incompatibleReason;
+        }
+
+        /**
+         * Whether the CommonServer implementation decided the current
+         * server is compatible, or not.
+         *
+         * @return True if compatible
+         */
+        public boolean isCompatible() {
+            return incompatibleReason == null;
+        }
+
+        /**
+         * Gets the template resolver instance which provides the required
+         * context to initialize templates. The resolver also provides the
+         * list of minecraft versions that the templates support.
+         *
+         * @return resolver
+         */
+        public TemplateResolver getResolver() {
+            return templateResolver;
+        }
+
+        /**
+         * Signal to the caller that the current server version is incompatible.
+         * This can be because of an unaccounted for deviation in the server makeup,
+         * or because the detected minecraft version is not supported.
+         *
+         * @param reason Reason the server is not compatible
+         */
+        public void signalIncompatible(String reason) {
+            incompatibleReason = reason;
+        }
     }
 }

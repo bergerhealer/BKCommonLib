@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8;
 import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
@@ -125,7 +126,7 @@ public class HandleConversion {
             if (CraftItemStackHandle.T.isAssignableFrom(itemStack)) {
                 raw_handle = CraftItemStackHandle.T.handle.get(itemStack);
             } else {
-                if (Common.IS_TEST_MODE) {
+                if (CommonBootstrap.isTestMode()) {
                     // Fallback under test - does not go into production!
                     ItemStackHandle handle = ItemStackHandle.newInstance(itemStack.getType());
                     handle.setAmountField(itemStack.getAmount());

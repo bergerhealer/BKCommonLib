@@ -7,6 +7,8 @@ import com.bergerkiller.generated.net.minecraft.resources.ResourceKeyHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 
 class ResourceKey {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
 #if version >= 1.16
     public (MinecraftKeyHandle) MinecraftKey getCategory() {
         #require net.minecraft.server.ResourceKey private final MinecraftKey category:b;

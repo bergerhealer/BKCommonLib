@@ -15,7 +15,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 class TestServerFactory_1_8 extends TestServerFactory {
 
     @Override
-    protected void init() {
+    protected boolean init() {
 
         //System.out.println("Detected server class under test: " + CommonServerBase.SERVER_CLASS);
 
@@ -161,12 +161,15 @@ class TestServerFactory_1_8 extends TestServerFactory {
                 m.setAccessible(true);
                 m.invoke(mc_server, serverDir, worldData);
             }
+            
+            return true;
         } catch (Throwable t) {
             System.err.println("Failed to initialize server under test");
             System.out.println("Detected server class under test: " + CommonServerBase.SERVER_CLASS);
             System.out.println("Detected NMS_ROOT: " + nms_root);
             System.out.println("Detected CB_ROOT: " + cb_root);
             t.printStackTrace();
+            return false;
         }
     }
 

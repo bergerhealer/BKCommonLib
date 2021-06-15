@@ -94,13 +94,12 @@ public class Common {
     /**
      * When under test internal classes have to be loaded in a very specific order.
      * This function makes sure the server registers are initialized.
+     * 
+     * @deprecated Moved to internal, use CommonBootstrap
      */
+    @Deprecated
     public static void bootstrap() {
-        // Nothing. The static block will be executed, where the magic happens.
-
-        if (!Common.IS_COMPATIBLE) {
-            throw new UnsupportedOperationException("Minecraft " + Common.MC_VERSION + " is not supported!");
-        }
+        CommonBootstrap.initCommonServerAssertCompatibility();
     }
 
     static {
@@ -116,7 +115,7 @@ public class Common {
         IS_SPIGOT_SERVER = CommonBootstrap.isSpigotServer();
         IS_PAPERSPIGOT_SERVER = SERVER instanceof SpigotServer && ((SpigotServer) SERVER).isPaperSpigot();
         IS_PURPUR_SERVER = SERVER instanceof PurpurServer;
-        IS_COMPATIBLE = SERVER.isCompatible();
+        IS_COMPATIBLE = CommonBootstrap.initCommonServerCheckCompatibility();
         TEMPLATE_RESOLVER = CommonBootstrap.initTemplates();
     }
 

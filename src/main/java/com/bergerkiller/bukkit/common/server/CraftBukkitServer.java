@@ -57,6 +57,12 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
      */
     private boolean HAS_MOJANG_MAPPINGS = false;
     /**
+     * Whether this is a Minecraft version before 1.17, where all of minecraft server's
+     * classes sat inside net.minecraft.server, with a package version. When true, all
+     * classes that refer to net.minecraft are remapped to nms.
+     */
+    private boolean REMAP_TO_NMS = false;
+    /**
      * Mojang mappings used to de-obfuscate the server at runtime.
      * Is downloaded / cached, if required.
      */
@@ -96,9 +102,15 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     }
 
     @Override
-    public void postInit() {
+    public void postInit(PostInitEvent event) {
         MC_VERSION = identifyMinecraftVersion();
         HAS_MOJANG_MAPPINGS = MountiplexUtil.evaluateText(MC_VERSION, ">=", "1.17");
+        REMAP_TO_NMS = MountiplexUtil.evaluateText(MC_VERSION, "<", "1.17");
+
+        // Check whether the server is at all compatible with the template definitions
+        if (!event.getResolver().isSupported(MC_VERSION)) {
+            event.signalIncompatible("Minecraft " + MC_VERSION + " is not supported!");
+        }
 
         // Initialize the mappings on Minecraft 1.17 and later
         if (HAS_MOJANG_MAPPINGS) {
@@ -152,7 +164,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
         // Remap net.minecraft to net.minecraft.server.<package_version> on pre-1.17
         // We cut the class name off the end. In case a class name is represented as
         // 'SomeName.SubClass' then we will correctly identify 'SomeName' as the main class.
-        if (!HAS_MOJANG_MAPPINGS && path.startsWith(NM_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
+        if (REMAP_TO_NMS && path.startsWith(NM_ROOT) && !path.startsWith(NMS_ROOT_VERSIONED)) {
             int index = path.length();
             String remapped = path;
             boolean isLastPart = true;
@@ -212,9 +224,9 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
             // Find getVersion() method using reflection
             Class<?> minecraftServerType;
             try {
-                minecraftServerType = MPLType.getClassByName(NMS_ROOT + ".MinecraftServer");
+                minecraftServerType = loadClass(NMS_ROOT + ".MinecraftServer");
             } catch (ClassNotFoundException ex) {
-                minecraftServerType = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".MinecraftServer");
+                minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
             }
 
             java.lang.reflect.Method getVersionMethod = getDeclaredMethod(minecraftServerType, "getVersion");
@@ -222,7 +234,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
             // This is easy when the server is already initialized
             if (Bukkit.getServer() != null) {
                 // Obtain MinecraftServer instance from server
-                Class<?> server = MPLType.getClassByName(CB_ROOT_VERSIONED + ".CraftServer");
+                Class<?> server = loadClass(CB_ROOT_VERSIONED + ".CraftServer");
 
                 // Standard CraftServer::getServer()
                 Object minecraftServerInstance;
@@ -246,16 +258,16 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
                     // This is at net.minecraft.MinecraftVersion for MC 1.17 and later
                     Class<?> minecraftVersionClass;
                     try {
-                        minecraftVersionClass = MPLType.getClassByName("net.minecraft.MinecraftVersion");
+                        minecraftVersionClass = loadClass("net.minecraft.MinecraftVersion");
                     } catch (ClassNotFoundException ex) {
-                        minecraftVersionClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".MinecraftVersion");
+                        minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
                     }
 
                     // Call the static method of MinecraftVersion to obtain the GameVersion instance
                     gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
                 } catch (ClassNotFoundException | NoSuchMethodException ex) {
                     // Older versions of Minecraft: use SharedConstants instead
-                    Class<?> sharedConstantsClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".SharedConstants");
+                    Class<?> sharedConstantsClass = loadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
                     gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
                     Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
                 }
@@ -272,9 +284,9 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
                 // Find DedicatedServer object, differs on 1.17 and later
                 Class<?> dedicatedServerClass;
                 try {
-                    dedicatedServerClass = MPLType.getClassByName("net.minecraft.server.dedicated.DedicatedServer");
+                    dedicatedServerClass = loadClass("net.minecraft.server.dedicated.DedicatedServer");
                 } catch (ClassNotFoundException ex2) {
-                    dedicatedServerClass = MPLType.getClassByName(NMS_ROOT_VERSIONED + ".DedicatedServer");
+                    dedicatedServerClass = loadClass(NMS_ROOT_VERSIONED + ".DedicatedServer");
                 }
 
                 // Create an instance of Minecraft Server without calling any constructors

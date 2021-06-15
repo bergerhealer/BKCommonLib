@@ -40,9 +40,9 @@ public class ArclightServer extends SpigotServer {
     }
 
     @Override
-    public void postInit() {
+    public void postInit(PostInitEvent event) {
         Resolver.setClassLoaderRemappingEnabled(true);
-        super.postInit();
+        super.postInit(event);
     }
 
     @Override

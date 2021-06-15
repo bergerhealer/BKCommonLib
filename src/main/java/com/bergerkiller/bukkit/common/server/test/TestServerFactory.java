@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
@@ -22,18 +23,29 @@ public abstract class TestServerFactory {
 
     public static void initTestServer() {
         if (CommonServerBase.SERVER_CLASS == null) {
-            throw new IllegalStateException("Unable to detect server type during test");
+            throw new UnsupportedOperationException("Unable to detect Bukkit server main class during test");
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+            factory = new TestServerFactory_1_17();
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
             factory = new TestServerFactory_1_16();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.14")) {
             factory = new TestServerFactory_1_14();
         } else {
             factory = new TestServerFactory_1_8();
         }
-        factory.init();
+        
+        boolean success;
+        try {
+            success = factory.init();
+        } catch (Throwable t) {
+            throw new UnsupportedOperationException("An error occurred while trying to initialize the test server", t);
+        }
+        if (!success) {
+            throw new UnsupportedOperationException("Test server could not be initialized properly, check your console");
+        }
 
         init_spigotConfig();
         System.gc();
@@ -42,7 +54,7 @@ public abstract class TestServerFactory {
     /**
      * Initializes the test server
      */
-    protected abstract void init();
+    protected abstract boolean init();
 
     private static void init_spigotConfig() {
         Class<?> spigotConfigType = CommonUtil.getClass("org.spigotmc.SpigotConfig");
@@ -56,12 +68,13 @@ public abstract class TestServerFactory {
     }
 
     protected static void setField(Object instance, Class<?> declaringClass, String name, Object value) {
+        String realName = Resolver.resolveFieldName(declaringClass, name);
         try {
-            Field field = declaringClass.getDeclaredField(name);
+            Field field = declaringClass.getDeclaredField(realName);
             field.setAccessible(true);
             field.set(instance, value);
         } catch (Throwable ex) {
-            throw new RuntimeException("Failed to set field " + name, ex);
+            throw new RuntimeException("Failed to set field " + fieldAliasStr(name, realName), ex);
         }
     }
 
@@ -70,13 +83,15 @@ public abstract class TestServerFactory {
         Class<?> t = instance.getClass();
         while (t != null && f == null) {
             try {
-                f = t.getDeclaredField(name);
+                String realName = Resolver.resolveFieldName(t, name);
+                f = t.getDeclaredField(realName);
                 f.setAccessible(true);
             } catch (Throwable ex) {}
             t = t.getSuperclass();
         }
         if (f == null) {
-            throw new RuntimeException("Field " + name + " not found in " + instance.getClass().getName());
+            String realName = Resolver.resolveFieldName(instance.getClass(), name);
+            throw new RuntimeException("Field " + fieldAliasStr(name, realName) + " not found in " + instance.getClass().getName());
         }
         try {
             f.set(instance, value);
@@ -86,15 +101,20 @@ public abstract class TestServerFactory {
     }
 
     protected static Object getStaticField(Class<?> type, String name) {
+        String realName = Resolver.resolveFieldName(type, name);
         try {
-            java.lang.reflect.Field f = type.getDeclaredField(name);
+            java.lang.reflect.Field f = type.getDeclaredField(realName);
             f.setAccessible(true);;
             return f.get(null);
         } catch (Throwable ex) {
-            throw new RuntimeException("Failed to get field " + name, ex);
+            throw new RuntimeException("Failed to get field " + fieldAliasStr(name, realName), ex);
         }
     }
 
+    private static String fieldAliasStr(String name, String realName) {
+        return name.equals(realName) ? name : (name + ":" + realName);
+    }
+    
     protected static Object createFromCode(Class<?> type, String code) {
         return compileCode(type, "public static Object create() {" + code + "}").invoke(null);
     }

@@ -13,11 +13,6 @@ public class SportBukkitServer extends CraftBukkitServer {
     }
 
     @Override
-    public void postInit() {
-        super.postInit();
-    }
-
-    @Override
     public String getServerName() {
         return "SportBukkit";
     }

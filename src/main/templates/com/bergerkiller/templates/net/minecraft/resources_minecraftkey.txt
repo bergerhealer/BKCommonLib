@@ -1,5 +1,7 @@
 package net.minecraft.resources;
 
+import net.minecraft.ResourceKeyInvalidException;
+
 import com.bergerkiller.bukkit.common.wrappers.ResourceKey;
 
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;

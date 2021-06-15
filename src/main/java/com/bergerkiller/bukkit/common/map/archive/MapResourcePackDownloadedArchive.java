@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -44,7 +45,7 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
         this.log = Logging.LOGGER_MAPDISPLAY;
 
         File pluginFolder;
-        if (Common.IS_TEST_MODE) {
+        if (CommonBootstrap.isTestMode()) {
             pluginFolder = new File(System.getProperty("user.dir"));
         } else {
             pluginFolder = CommonPlugin.getInstance().getDataFolder();

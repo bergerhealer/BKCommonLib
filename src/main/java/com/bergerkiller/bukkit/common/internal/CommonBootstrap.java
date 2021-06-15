@@ -21,6 +21,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.server.*;
+import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
 import com.bergerkiller.bukkit.common.server.test.TestServerFactory;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
@@ -44,7 +45,10 @@ public class CommonBootstrap {
     private static boolean _hasInitTestServer = false;
     private static boolean _isSpigotServer = false;
     private static CommonServer _commonServer = null;
+    private static boolean _isInitializingCommonServer = false;
     private static TemplateResolver _templateResolver = new TemplateResolver();
+    private static boolean _isCompatible = false;
+    private static String _incompatibleReason = null;
 
     /**
      * Checks if the Minecraft version matches a version condition
@@ -68,6 +72,32 @@ public class CommonBootstrap {
     }
 
     /**
+     * Calls {@link #initCommonServer()} to detect the common server implementation
+     * that is used, and returns whether that server is compatible or not. if an
+     * exception is preferred, use {@link #initCommonServerAssertCompatibility()}
+     * instead.
+     *
+     * @return True if compatible, False if not
+     */
+    public static boolean initCommonServerCheckCompatibility() {
+        initCommonServer();
+        return _isCompatible;
+    }
+
+    /**
+     * Calls {@link #initCommonServer()} to detect the common server implementation
+     * that is used, and then checks whether this version is compatible with this
+     * library. Throws an exception if it is not.
+     * 
+     * @throw UnsupportedOperationException If the server is not supported
+     */
+    public static void initCommonServerAssertCompatibility() {
+        if (!initCommonServerCheckCompatibility()) {
+            throw new UnsupportedOperationException(_incompatibleReason);
+        }
+    }
+
+    /**
      * Detects and returns the common server implementation that is used.
      * The result is cached.
      * 
@@ -75,51 +105,86 @@ public class CommonBootstrap {
      */
     public static CommonServer initCommonServer() {
         if (_commonServer == null) {
-            _commonServer = new UnknownServer();
-
-            // Get all available server types
-            if (isTestMode()) {
-                // Use our own logger to speed up initialization under test
-                initLog4j();
-
-                // Always Spigot server
-                CommonServer server = new SpigotServer();
-                server.init();
-                initServerResolvers(server);
-                server.postInit();
-                _commonServer = server;
-            } else {
-                // Autodetect most likely server type
-                List<CommonServer> servers = new ArrayList<>();
-                servers.add(new MohistServer());
-                servers.add(new MagmaServer());
-                servers.add(new ArclightServer());
-                servers.add(new ArclightServerLegacy());
-                servers.add(new CatServerServer());
-                servers.add(new Bukkit4FabricServer());
-                servers.add(new PurpurServer());
-                servers.add(new SpigotServer());
-                servers.add(new SportBukkitServer());
-                servers.add(new CraftBukkitServer());
-                servers.add(new UnknownServer());
-
-                // Use the first one that initializes correctly
-                for (CommonServer server : servers) {
-                    try {
-                        if (server.init()) {
-                            initServerResolvers(server);
-                            server.postInit();
-                            _commonServer = server;
-                            break;
-                        }
-                    } catch (Throwable t) {
-                        Logging.LOGGER.log(Level.SEVERE, "An error occurred during server detection:", t);
-                    }
-                }
+            if (_isInitializingCommonServer) {
+                throw new UnsupportedOperationException("CommonServer is already being initialized. Fix your code!");
             }
 
-            // Update
-            _isSpigotServer = (_commonServer instanceof SpigotServer);
+            // Get all available server types
+            _isInitializingCommonServer = true;
+            try {
+                CommonServer server = null;
+                if (isTestMode()) {
+                    // Use our own logger to speed up initialization under test
+                    initLog4j();
+
+                    // Always Spigot server
+                    server = new SpigotServer();
+                    if (!server.init()) {
+                        server = null;
+                    }
+                } else {
+                    // Autodetect most likely server type
+                    List<CommonServer> servers = new ArrayList<>();
+                    servers.add(new MohistServer());
+                    servers.add(new MagmaServer());
+                    servers.add(new ArclightServer());
+                    servers.add(new ArclightServerLegacy());
+                    servers.add(new CatServerServer());
+                    servers.add(new Bukkit4FabricServer());
+                    servers.add(new PurpurServer());
+                    servers.add(new SpigotServer());
+                    servers.add(new SportBukkitServer());
+                    servers.add(new CraftBukkitServer());
+
+                    // Use the first one that initializes correctly
+                    for (CommonServer potentialServer : servers) {
+                        try {
+                            if (potentialServer.init()) {
+                                server = potentialServer;
+                                break;
+                            }
+                        } catch (Throwable t) {
+                            Logging.LOGGER.log(Level.SEVERE, "An error occurred during server type detection:", t);
+                        }
+                    }
+                }
+
+                // Fallback if none are detected
+                if (server == null) {
+                    server = new UnknownServer();
+                    server.init();
+                }
+
+                // Fully initialize the server instance. This will go beyond detection,
+                // and will identify internal server classes and check for compatibility
+                PostInitEvent event = new PostInitEvent(_templateResolver);
+                try {
+                    initServerResolvers(server);
+                    server.postInit(event);
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "An error occurred during server bootstrapping:", t);
+                    if (event.isCompatible()) {
+                        event.signalIncompatible("Server bootstrapping failed: " + t.getMessage());
+                    }
+
+                    // Make sure 'something' is sort-of initialized at least
+                    // If for whatever reason it is here that it goes wrong, silently
+                    // suppress those errors. We don't care, we're already in a failure state!
+                    server = new UnknownServer();
+                    try {
+                        server.init();
+                        server.postInit(new PostInitEvent(_templateResolver));
+                    } catch (Throwable suppressed) {}
+                }
+
+                // Assign updated state
+                _commonServer = server;
+                _isCompatible = event.isCompatible();
+                _incompatibleReason = event.getIncompatibleReason();
+                _isSpigotServer = (_commonServer instanceof SpigotServer);
+            } finally {
+                _isInitializingCommonServer = false;
+            }
 
             // Make type and method information available for this server type
             // Templates should not be initialized during this time, bad things happen
@@ -129,16 +194,6 @@ public class CommonBootstrap {
             WARN_WHEN_INIT_TEMPLATES = oldWarnTemplates;
         }
         return _commonServer;
-    }
-
-    /**
-     * Gets the template engine without initializing it.
-     * Can be used to check if a minecraft version is supported.
-     * 
-     * @return template engine
-     */
-    public static TemplateResolver getTemplates() {
-        return _templateResolver;
     }
 
     /**
@@ -156,7 +211,9 @@ public class CommonBootstrap {
 
         // Retrieve the CommonServer instance (which initializes resolvers) and check if compatible
         // Don't initialize the templates if we are not compatible.
-        if (!initCommonServer().isCompatible()) {
+        if (!initCommonServerCheckCompatibility()) {
+            System.out.println("NOT COMPATIBLE WAT");
+            Thread.dumpStack();
             return _templateResolver;
         }
 
@@ -187,10 +244,19 @@ public class CommonBootstrap {
     /**
      * Ensures that {@link org.bukkit.Bukkit#getServer()} returns a valid non-null Server instance.
      * During normal execution this is guaranteed to be fine, but while running tests this is not
-     * the case.
+     * the case.<br>
+     * <br>
+     * Also checks the server is compatible before proceeding
      */
     public static void initServer() {
-        Common.bootstrap();
+        // Detects what server is being run on, the minecraft server version,
+        // and initializes the type converters for that platform. No templates
+        // are loaded, those are loaded when something actually requires it.
+        initCommonServerAssertCompatibility();
+
+        // If no server instance exists, this creates a dummy server instance
+        // and installs it into the server. This is purely so that testing
+        // against server classes can be done.
         if (!_hasInitTestServer && Bukkit.getServer() == null) {
             _hasInitTestServer = true;
 

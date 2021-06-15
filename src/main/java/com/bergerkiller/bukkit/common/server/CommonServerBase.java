@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
@@ -17,7 +16,8 @@ import java.util.Locale;
 import java.util.Map;
 
 public abstract class CommonServerBase implements CommonServer {
-    public static final Class<?> SERVER_CLASS = findServerClass();
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public static final Class<? extends Bukkit> SERVER_CLASS = (Class) findServerClass();
 
     private static final Class<?> findServerClass() {
         // On a live-running server, this method is all that will be needed
@@ -100,11 +100,6 @@ public abstract class CommonServerBase implements CommonServer {
         }
         // Unknown???
         return null;
-    }
-
-    @Override
-    public boolean isCompatible() {
-        return CommonBootstrap.getTemplates().isSupported(this.getMinecraftVersion());
     }
 
     @Override
