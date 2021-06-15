@@ -100,7 +100,7 @@ public class DuplexConversion {
     public static final DuplexConverter<Object[], ChunkSection[]> chunkSectionArray = pairArray(chunkSection);
     public static final DuplexConverter<Object[], MapCursor[]> mapCursorArray = pairArray(mapCursor);
 
-    public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag = new DuplexConverter<Object, CommonTag>(NBTBaseHandle.T.getType(), CommonTag.class) {
+    public static final DuplexConverter<Object, CommonTag> nbtBase_commonTag = new DuplexConverter<Object, CommonTag>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), CommonTag.class) {
         @Override
         public CommonTag convertInput(Object value) {
             return NBTBaseHandle.createHandleForData(value).toCommonTag();
@@ -111,7 +111,7 @@ public class DuplexConversion {
             return value.getRawHandle();
         }
     };
-    public static final DuplexConverter<Object, NBTBaseHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, NBTBaseHandle>(NBTBaseHandle.T.getType(), NBTBaseHandle.class) {
+    public static final DuplexConverter<Object, NBTBaseHandle> nbtBase_nbtBaseHandle = new DuplexConverter<Object, NBTBaseHandle>(CommonUtil.getClass("net.minecraft.nbt.NBTBase", false), NBTBaseHandle.class) {
         @Override
         public NBTBaseHandle convertInput(Object value) {
             return NBTBaseHandle.createHandleForData(value);
@@ -139,7 +139,7 @@ public class DuplexConversion {
     }
 
     private static final <T> T findByPath(String nmsClassName, Class<?> output) {
-        return find(CommonUtil.getClass(nmsClassName), output);
+        return find(CommonUtil.getClass(nmsClassName, false), output);
     }
 
     @SuppressWarnings("unchecked")

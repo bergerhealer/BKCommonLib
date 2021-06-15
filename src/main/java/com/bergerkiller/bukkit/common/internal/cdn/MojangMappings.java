@@ -150,8 +150,8 @@ public class MojangMappings {
         MojangMappings result = new MojangMappings();
         
         // Field mappings
-        // Regex: \s+[\w\._\-$]+\s([\w_\-$]+)\s->\s([\w_\-$]+)
-        Pattern fieldNamePattern = Pattern.compile("\\s+[\\w\\._\\-$]+\\s([\\w_\\-$]+)\\s->\\s([\\w_\\-$]+)");
+        // Regex: \s+[\[\]<>\w\._\-$]+\s([\w_\-$]+)\s->\s([\w_\-$]+)
+        Pattern fieldNamePattern = Pattern.compile("\\s+[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\s->\\s([\\w_\\-$]+)");
         try (BufferedReader br = new BufferedReader(new FileReader(mappingsFile))) {
             ClassMappings classMappings = null;
             for (String line; (line = br.readLine()) != null; ) {

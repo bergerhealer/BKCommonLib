@@ -13,7 +13,9 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 class EntityItem extends Entity {
-#if version >= 1.14
+#if version >= 1.17
+    public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM;
+#elseif version >= 1.14
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
 #elseif version >= 1.13
     public static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:b;

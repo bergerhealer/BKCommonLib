@@ -214,11 +214,11 @@ class TestServerFactory_1_17 extends TestServerFactory {
                 // Retrieve it, using get(). May throw if problems occur.
                 Object datapackresources = futureDPLoaded.get();
 
-                // Call i() on the result
+                // Call j() on the result - which calls bind() on the tags
                 // datapackresources.i();
                 {
                     Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
-                    datapackresourceType.getMethod("i").invoke(datapackresources);
+                    datapackresourceType.getMethod("j").invoke(datapackresources);
                 }
 
                 // Now set all these fields in the MinecraftServer instance

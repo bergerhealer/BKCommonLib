@@ -23,6 +23,8 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
  */
 @ClassHook.HookPackage("net.minecraft.server")
 @ClassHook.HookImport("org.bukkit.craftbukkit.entity.CraftHumanEntity")
+@ClassHook.HookImport("net.minecraft.world.item.ItemStack")
+@ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
 public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     private final Inventory inventory;
 

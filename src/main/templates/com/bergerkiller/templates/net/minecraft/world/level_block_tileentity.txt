@@ -3,6 +3,7 @@ package net.minecraft.world.level.block.entity;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.protocol.game.PacketPlayOutTileEntityData
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block
 import net.minecraft.world.level.block.state.IBlockData;

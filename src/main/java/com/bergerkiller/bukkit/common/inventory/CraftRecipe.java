@@ -49,13 +49,12 @@ public class CraftRecipe {
             create = true;
             for (ItemStack newitem : inputItemsList) {
                 if (ItemUtil.equalsIgnoreAmount(item, newitem)) {
-                    ItemUtil.addAmount(newitem, 1);
+                    ItemUtil.addAmount(newitem, item.getAmount());
                     create = false;
                     break;
                 }
             }
             if (create) {
-                item.setAmount(1);
                 inputItemsList.add(item);
             }
         }

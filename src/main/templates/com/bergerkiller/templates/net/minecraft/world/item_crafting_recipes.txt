@@ -1,8 +1,10 @@
 package net.minecraft.world.item.crafting;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemStack;
 
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 
@@ -92,7 +94,11 @@ optional class RecipeItemStack {
 #if version >= 1.13
         instance.buildChoices();
 #endif
+#if version >= 1.17
+        return instance.itemStacks;
+#else
         return instance.choices;
+#endif
     }
 
     <code>
@@ -143,11 +149,24 @@ class CraftingManager {
 #if version >= 1.13
         java.util.Iterator allRecipes = MinecraftServer.getServer().getCraftingManager().b().iterator();
         java.util.List filteredResult = new java.util.ArrayList();
+        boolean foundFireworksRecipe = false;
         while (allRecipes.hasNext()) {
             Object recipe = allRecipes.next();
             if (recipe instanceof FurnaceRecipe) {
                 continue;
             }
+
+            // Since Minecraft 1.17 the fireworks recipe exists twice
+            // One is shapeless, the other is complex
+            // Correct for this and only keep the complex one!
+  #if version >= 1.17
+            if (recipe instanceof RecipeFireworks) {
+                foundFireworksRecipe = true;
+            } else if (foundFireworksRecipe && ((IRecipe) recipe).getResult().getItem() == Items.FIREWORK_ROCKET) {
+                continue;
+            }
+  #endif
+
             filteredResult.add(recipe);
         }
         return filteredResult;

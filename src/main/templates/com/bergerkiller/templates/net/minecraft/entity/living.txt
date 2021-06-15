@@ -2,6 +2,7 @@ package net.minecraft.world.entity;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.NonNullList;
+import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.entity.ai.attributes.AttributeBase;
@@ -23,7 +24,15 @@ import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle
 
 class EntityLiving extends Entity {
 
-#if version >= 1.16.2
+#if version >= 1.17
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:DATA_LIVING_ENTITY_FLAGS;
+    public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:DATA_HEALTH_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:DATA_EFFECT_COLOR_ID;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_PARTICLES_HIDDEN:DATA_EFFECT_AMBIENCE_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_ARROWCOUNT:DATA_ARROW_COUNT_ID;
+    //TODO: DATA_STINGER_COUNT_ID data field was added
+    private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<Optional<BlockPosition>> DATA_BEDPOSITION:SLEEPING_POS_ID;
+#elseif version >= 1.16.2
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_LIVING_FLAGS:ag;
     public static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEALTH:HEALTH;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_PARTICLES_TIMER:f;

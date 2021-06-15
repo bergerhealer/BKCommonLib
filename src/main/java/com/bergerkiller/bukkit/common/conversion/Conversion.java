@@ -56,7 +56,7 @@ public class Conversion {
     public static final InputConverter<Object> toChunkHandle = getConverterToHandle("net.minecraft.world.level.chunk.Chunk");
     public static final InputConverter<Object> toItemStackHandle = getConverterToHandle("net.minecraft.world.item.ItemStack");
     public static final InputConverter<Object> toItemHandle = getConverterToHandle("net.minecraft.world.item.Item");
-    public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.world.level.block.TileEntity");
+    public static final InputConverter<Object> toTileEntityHandle = getConverterToHandle("net.minecraft.world.level.block.entity.TileEntity");
     public static final InputConverter<Object> toInventoryHandle = getConverterToHandle("net.minecraft.world.IInventory");
     public static final InputConverter<Object> toDataWatcherHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcher");
     public static final InputConverter<Object> toDataWatcherObjectHandle = getConverterToHandle("net.minecraft.network.syncher.DataWatcherObject");
@@ -66,7 +66,7 @@ public class Conversion {
     public static final InputConverter<Object> toGameModeHandle = getConverterToHandle("net.minecraft.world.level.EnumGamemode");
     public static final InputConverter<Object> toDifficultyHandle = getConverterToHandle("net.minecraft.world.EnumDifficulty");
     public static final InputConverter<Object> toPacketHandle = getConverterToHandle("net.minecraft.network.protocol.Packet");
-    public static final InputConverter<Object> toVec3DHandle = getConverterToHandle("net.minecraft.server.Vec3D");
+    public static final InputConverter<Object> toVec3DHandle = getConverterToHandle("net.minecraft.world.phys.Vec3D");
     public static final InputConverter<Object> toChunkCoordIntPairHandle = getConverterToHandle("net.minecraft.world.level.ChunkCoordIntPair");
     public static final InputConverter<Object> toBlockPositionHandle = getConverterToHandle("net.minecraft.core.BlockPosition");
     public static final InputConverter<Object> toPlayerAbilitiesHandle = getConverterToHandle("net.minecraft.world.entity.player.PlayerAbilities");
@@ -120,7 +120,7 @@ public class Conversion {
     public static final InputConverter<EquipmentSlot> toEquipmentSlot = getConverterTo(EquipmentSlot.class);
     // Arrays
     public static final InputConverter<ItemStack[]> toItemStackArr = getConverterTo(ItemStack[].class);
-    public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getClass("net.minecraft.world.item.ItemStack")));
+    public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getClass("net.minecraft.world.item.ItemStack", false)));
     public static final InputConverter<Object[]> toObjectArr = getConverterTo(Object[].class);
     public static final InputConverter<boolean[]> toBoolArr = getConverterTo(boolean[].class);
     public static final InputConverter<char[]> toCharArr = getConverterTo(char[].class);
@@ -142,7 +142,11 @@ public class Conversion {
 
     @SuppressWarnings("unchecked")
     private static InputConverter<Object> getConverterToHandle(String className) {
-        return (InputConverter<Object>) getConverterTo(CommonUtil.getClass(className, false));
+        Class<?> type = CommonUtil.getClass(className, false);
+        if (type == null) {
+            throw new IllegalArgumentException("Class does not exist for converter: " + className);
+        }
+        return (InputConverter<Object>) getConverterTo(type);
     }
 
     @SuppressWarnings("unchecked")

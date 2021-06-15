@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystalHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.monster.EntityShulkerHandle;
 
@@ -74,7 +75,7 @@ public class DataWatcherTest {
     }
 
     @Test
-    public void testShulker() {
+    public void testShulkerPeek() {
         if (!EntityShulkerHandle.T.isAvailable()) {
             return;
         }
@@ -86,10 +87,23 @@ public class DataWatcherTest {
         assertEquals((byte) 5, dataWatcher.get(EntityShulkerHandle.DATA_PEEK).byteValue());
 
         // DATA_AP (attached point)
-        dataWatcher.set(EntityShulkerHandle.DATA_AP, new IntVector3(5, 6, 7));
-        assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityShulkerHandle.DATA_AP));
+        //dataWatcher.set(EntityShulkerHandle.DATA_AP, new IntVector3(5, 6, 7));
+        //assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityShulkerHandle.DATA_AP));
     }
 
+    @Test
+    public void testEnderCrystalBeamTarget() {
+        if (!EntityEnderCrystalHandle.T.isAvailable()) {
+            return;
+        }
+
+        DataWatcher dataWatcher = new DataWatcher();
+
+        // DATA_BEAM_TARGET
+        dataWatcher.set(EntityEnderCrystalHandle.DATA_BEAM_TARGET, new IntVector3(5, 6, 7));
+        assertEquals(new IntVector3(5, 6, 7), dataWatcher.get(EntityEnderCrystalHandle.DATA_BEAM_TARGET));
+    }
+    
     private static void checkCustomNameOptional(Object raw) {
         if (raw == null) {
             System.err.println(EntityHandle.DATA_CUSTOM_NAME);

@@ -1,5 +1,6 @@
 package org.bukkit.craftbukkit.util;
 
+import net.minecraft.EnumChatFormat;
 import net.minecraft.network.chat.IChatBaseComponent;
 
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
@@ -122,7 +123,7 @@ class CraftChatMessage {
         StringBuilder out = new StringBuilder();
         java.util.Iterator iter = ((Iterable) component).iterator();
 
-        net.minecraft.server.EnumChatFormat prev_color_format = null;
+        EnumChatFormat prev_color_format = null;
         boolean prev_was_bold = false;
         boolean prev_was_italic = false;
         boolean prev_was_underlined = false;
@@ -146,12 +147,12 @@ class CraftChatMessage {
                 prev_was_underlined = false;
                 prev_was_strikeThrough = false;
                 prev_was_obfuscated = false;
-                out.append(net.minecraft.server.EnumChatFormat.RESET);
+                out.append(EnumChatFormat.RESET);
             }
 
             if (modi.getColor() != null) {
 #if version >= 1.16
-                net.minecraft.server.EnumChatFormat color_format = modi.getColor().format;
+                EnumChatFormat color_format = modi.getColor().format;
                 if (prev_color_format != color_format) {
                     prev_color_format = color_format;
                     out.append(color_format);
@@ -162,23 +163,23 @@ class CraftChatMessage {
             }
             if (modi.isBold() && !prev_was_bold) {
                 prev_was_bold = true;
-                out.append(net.minecraft.server.EnumChatFormat.BOLD);
+                out.append(EnumChatFormat.BOLD);
             }
             if (modi.isItalic() && !prev_was_italic) {
                 prev_was_italic = true;
-                out.append(net.minecraft.server.EnumChatFormat.ITALIC);
+                out.append(EnumChatFormat.ITALIC);
             }
             if (modi.isUnderlined() && !prev_was_underlined) {
                 prev_was_underlined = true;
-                out.append(net.minecraft.server.EnumChatFormat.UNDERLINE);
+                out.append(EnumChatFormat.UNDERLINE);
             }
             if (modi.isStrikethrough() && !prev_was_strikeThrough) {
                 prev_was_strikeThrough = true;
-                out.append(net.minecraft.server.EnumChatFormat.STRIKETHROUGH);
+                out.append(EnumChatFormat.STRIKETHROUGH);
             }
             if (modi.isRandom() && !prev_was_obfuscated) {
                 prev_was_obfuscated = true;
-                out.append(net.minecraft.server.EnumChatFormat.OBFUSCATED);
+                out.append(EnumChatFormat.OBFUSCATED);
             }
             out.append(c.getText());
         }

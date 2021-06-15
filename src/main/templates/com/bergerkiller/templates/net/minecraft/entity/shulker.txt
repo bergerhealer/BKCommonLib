@@ -11,21 +11,26 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 // Since MC 1.9
 optional class EntityShulker extends EntityInsentient {
-#if version >= 1.14
+#if version >= 1.17
+    protected static optional final (DataWatcher.Key<org.bukkit.block.BlockFace>) DataWatcherObject<EnumDirection> DATA_FACE_DIRECTION:DATA_ATTACH_FACE_ID;
+    protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PEEK:DATA_PEEK_ID;
+#elseif version >= 1.14
     protected static optional final (DataWatcher.Key<org.bukkit.block.BlockFace>) DataWatcherObject<EnumDirection> DATA_FACE_DIRECTION:b;
-    protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_AP:c;
+    //protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_AP:c;
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PEEK:d;
 #elseif version >= 1.13
     protected static optional final (DataWatcher.Key<org.bukkit.block.BlockFace>) DataWatcherObject<EnumDirection> DATA_FACE_DIRECTION:a;
-    protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_AP:b;
+    //protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_AP:b;
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PEEK:c;
 #else
     protected static optional final (DataWatcher.Key<org.bukkit.block.BlockFace>) DataWatcherObject<EnumDirection> DATA_FACE_DIRECTION:a;
-    protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<com.google.common.base.Optional<BlockPosition>> DATA_AP:b;
+    //protected static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<com.google.common.base.Optional<BlockPosition>> DATA_AP:b;
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_PEEK:c;
 #endif
 
-#if version >= 1.12
+#if version >= 1.17
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_COLOR:DATA_COLOR_ID;
+#elseif version >= 1.12
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_COLOR:COLOR;
 #elseif version >= 1.11.2
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_COLOR:bw;
@@ -38,7 +43,7 @@ optional class EntityShulker extends EntityInsentient {
 
     <code>
     public static final Key<org.bukkit.block.BlockFace> DATA_FACE_DIRECTION = Key.Type.DIRECTION.createKey(T.DATA_FACE_DIRECTION, -1);
-    public static final Key<IntVector3> DATA_AP = Key.Type.BLOCK_POSITION.createKey(T.DATA_AP, -1);
+    //public static final Key<IntVector3> DATA_AP = Key.Type.BLOCK_POSITION.createKey(T.DATA_AP, -1);
     public static final Key<Byte> DATA_PEEK = Key.Type.BYTE.createKey(T.DATA_PEEK, -1);
     public static final Key<Byte> DATA_COLOR = Key.Type.BYTE.createKey(T.DATA_COLOR, -1);
     </code>

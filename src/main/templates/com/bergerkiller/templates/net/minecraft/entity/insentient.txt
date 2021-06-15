@@ -1,5 +1,6 @@
 package net.minecraft.world.entity;
 
+import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.world.entity.ai.navigation.NavigationAbstract;
 
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -12,7 +13,9 @@ class EntityInsentient extends EntityLiving {
 
     public (Object) NavigationAbstract getNavigation();
 
-#if version >= 1.14
+#if version >= 1.17
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:DATA_MOB_FLAGS_ID;
+#elseif version >= 1.14
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:b;
 #elseif version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_INSENTIENT_FLAGS:a;

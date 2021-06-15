@@ -16,13 +16,16 @@ import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
+import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
 import com.bergerkiller.bukkit.common.server.test.TestServerFactory;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
@@ -212,8 +215,6 @@ public class CommonBootstrap {
         // Retrieve the CommonServer instance (which initializes resolvers) and check if compatible
         // Don't initialize the templates if we are not compatible.
         if (!initCommonServerCheckCompatibility()) {
-            System.out.println("NOT COMPATIBLE WAT");
-            Thread.dumpStack();
             return _templateResolver;
         }
 
@@ -526,6 +527,11 @@ public class CommonBootstrap {
         if (evaluateMCVersion("<=", "1.8.8")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
         }
+
+        // Initialize the 'Conversion' classes right after to catch errors happening here
+        CommonUtil.getClass(Conversion.class.getName(), true);
+        CommonUtil.getClass(PropertyConverter.class.getName(), true);
+        CommonUtil.getClass(DuplexConversion.class.getName(), true);
     }
 
     /**

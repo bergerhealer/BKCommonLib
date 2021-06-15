@@ -17,7 +17,8 @@ public class BlockDataSerializer_1_13 extends BlockDataSerializer {
 
     public BlockDataSerializer_1_13() {
         ClassResolver resolver = new ClassResolver();
-        resolver.setDeclaredClassName("net.minecraft.server.ArgumentBlock");
+        resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.ArgumentBlock");
+        resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static String serialize(IBlockData iblockdata) {\n" +
