@@ -80,6 +80,8 @@ class LongObjectHashMap {
 }
 
 class CraftMagicNumbers {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
     public static org.bukkit.Material getMaterialFromBlock:getMaterial((Object) net.minecraft.world.level.block.Block nmsBlock);
 
     public static org.bukkit.Material getMaterialFromItem:getMaterial((Object) net.minecraft.world.item.Item nmsItem);

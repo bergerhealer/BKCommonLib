@@ -8,12 +8,15 @@ import com.bergerkiller.generated.net.minecraft.world.item.CreativeModeTabHandle
 
 class Item {
     public static Iterable<?> getRegistry() {
+        // Must initialize the server to initialize the item-storing registries
+        com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
 #if version >= 1.14
-        #require net.minecraft.core.IRegistry public static final RegistryBlocks<Item> REGISTRY:ITEM;
+        #require net.minecraft.core.IRegistry public static final net.minecraft.core.RegistryBlocks<net.minecraft.world.item.Item> REGISTRY:ITEM;
 #elseif version >= 1.13.1
-        #require net.minecraft.core.IRegistry public static final IRegistry<Item> REGISTRY:ITEM;
+        #require net.minecraft.core.IRegistry public static final net.minecraft.core.IRegistry<net.minecraft.world.item.Item> REGISTRY:ITEM;
 #else
-        #require net.minecraft.world.item.Item public static final RegistryMaterials<MinecraftKey, Item> REGISTRY;
+        #require net.minecraft.world.item.Item public static final net.minecraft.core.RegistryMaterials<MinecraftKey, net.minecraft.world.item.Item> REGISTRY;
 #endif
         return #REGISTRY;
     }

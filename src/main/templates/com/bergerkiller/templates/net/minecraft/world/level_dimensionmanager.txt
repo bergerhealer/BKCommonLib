@@ -1,14 +1,17 @@
 package net.minecraft.world.level.dimension;
 
-import net.minecraft.core.IRegistryCustom;
+import net.minecraft.core.IRegistry;
+import net.minecraft.core.IRegistryCustom$Dimension;
 import net.minecraft.resources.MinecraftKey;
 import net.minecraft.resources.ResourceKey;
-
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.world.level.dimension.DimensionManager;
 
 import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 
 class DimensionManager {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
 #if version >= 1.14
     public boolean hasSkyLight();
 #else
@@ -20,17 +23,28 @@ class DimensionManager {
 #endif
 
 #if version >= 1.16
-  #if version >= 1.16.3
-    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension customRegistry;
+  #if version >= 1.17
+    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder;
+  #elseif version >= 1.16.3
+    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder:customRegistry;
   #else
-    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension customRegistry:f;
+    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder:f;
   #endif
+
+    #require net.minecraft.core.IRegistryCustom public static net.minecraft.core.IRegistry getDimensionTypeRegistry() {
+        MinecraftServer server = MinecraftServer.getServer();
+        IRegistryCustom$Dimension registry = server#registryHolder;
+  #if version >= 1.17
+        return registry.b(net.minecraft.core.IRegistry.DIMENSION_TYPE_REGISTRY);
+  #else
+        return registry.a();
+  #endif
+    }
 
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         // First, ask the dimension manager registry what the key is
-        MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server#customRegistry;
-        java.util.Optional key_opt = registry.a().c((Object) instance);
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
         if (key_opt.isPresent()) {
             return (ResourceKey) key_opt.get();
         }
@@ -47,16 +61,47 @@ class DimensionManager {
     }
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
-        MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server#customRegistry;
-        return (DimensionManager) registry.a().a(key);
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        return (DimensionManager) dimensionTypeRegistry.a(key);
     }
 
+  #if version >= 1.17
     // deprecated fallback
     public int getId() {
-        MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server#customRegistry;
-        java.util.Optional key_opt = registry.a().c((Object) instance);
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
+        if (key_opt.isPresent()) {
+            ResourceKey res_key = (ResourceKey) key_opt.get();
+            if (res_key == DimensionManager.OVERWORLD_LOCATION) {
+                return 0;
+            } else if (res_key == DimensionManager.NETHER_LOCATION) {
+                return -1;
+            } else if (res_key == DimensionManager.END_LOCATION) {
+                return 1;
+            }
+        }
+        return 0;
+    }
+
+    public static (DimensionManagerHandle) DimensionManager fromId(int id) {
+        ResourceKey res_key;
+        if (id == 0) {
+            res_key = DimensionManager.OVERWORLD_LOCATION;
+        } else if (id == -1) {
+            res_key = DimensionManager.NETHER_LOCATION;
+        } else if (id == 1) {
+            res_key = DimensionManager.END_LOCATION;
+        } else {
+            throw new IllegalArgumentException("Invalid dimension id " + id);
+        }
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        return (DimensionManager) dimensionTypeRegistry.a(res_key);
+    }
+  #else
+    // deprecated fallback
+    public int getId() {
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
             if (res_key == DimensionManager.OVERWORLD) {
@@ -81,10 +126,10 @@ class DimensionManager {
         } else {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }
-        MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server#customRegistry;
-        return (DimensionManager) registry.a().a(res_key);
+        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+        return (DimensionManager) dimensionTypeRegistry.a(res_key);
     }
+  #endif
 #else
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         ResourceKey category = (ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();

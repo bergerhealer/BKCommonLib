@@ -180,7 +180,9 @@ public class ItemMaterialTest {
                 .checkLegacy("DAYLIGHT_DETECTOR_INVERTED", true)
                 .checkNewAndLegacy("TRAPPED_CHEST", true)
                 .checkNewAndLegacy("REDSTONE_BLOCK", true)
-                .check("LECTERN", true); // since mc 1.14
+                .check("LECTERN", true) // since mc 1.14
+                .check("LIGHTNING_ROD", true) // since mc 1.17
+                .check("SCULK_SENSOR", true); // since mc 1.17
 
             if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 // TODO!
@@ -322,11 +324,6 @@ public class ItemMaterialTest {
         config.save();
     }
 
-    @Test
-    public void lol() {
-        
-    }
-    
     @Test
     public void testItemVariants() {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
