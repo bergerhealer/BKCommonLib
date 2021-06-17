@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common;
 
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
-import com.bergerkiller.bukkit.common.server.UnknownServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -114,12 +112,6 @@ public class ModuleLogger extends Logger {
     @Override
     public void log(LogRecord logRecord) {
         logRecord.setMessage(this.prefix + logRecord.getMessage());
-
-        // Filter stack trace. Only do so when the server was properly initialized
-        if (!(CommonBootstrap.initCommonServer() instanceof UnknownServer) && logRecord.getThrown() != null) {
-            logRecord.setThrown(StackTraceFilter.SERVER.filter(logRecord.getThrown()));
-        }
-
         super.log(logRecord);
     }
 

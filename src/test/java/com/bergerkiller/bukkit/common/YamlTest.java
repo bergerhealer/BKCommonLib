@@ -957,6 +957,16 @@ public class YamlTest {
     }
 
     @Test
+    public void testYamlSerializerWithIndent() {
+        YamlSerializer serializer = YamlSerializer.INSTANCE;
+        assertEquals("hello, world!\n", serializer.serialize("hello, world!", "", 1));
+        assertEquals("hello, world!\n", serializer.serialize("hello, world!", "", 1));
+        assertEquals("  hello, world!\n", serializer.serialize("hello, world!", "", 2));
+        assertEquals("    hello, world!\n", serializer.serialize("hello, world!", "", 3));
+        assertEquals("      hello, world!\n", serializer.serialize("hello, world!", "", 4));
+    }
+
+    @Test
     public void testYamlSerializer() {
         // Verify that the Serializer is able to serialize basic values and perform escaping rules
         YamlSerializer serializer = YamlSerializer.INSTANCE;

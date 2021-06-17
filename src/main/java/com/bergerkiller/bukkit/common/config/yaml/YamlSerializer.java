@@ -1,8 +1,8 @@
 package com.bergerkiller.bukkit.common.config.yaml;
 
 import java.io.IOException;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.Collections;
@@ -14,6 +14,7 @@ import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.emitter.Emitter;
 import org.yaml.snakeyaml.events.StreamEndEvent;
+import org.yaml.snakeyaml.events.StreamStartEvent;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.resolver.Resolver;
@@ -21,6 +22,9 @@ import org.yaml.snakeyaml.serializer.Serializer;
 
 import com.bergerkiller.bukkit.common.io.StringBuilderWriter;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
  * Helper class for serializing data to YAML-encoded text
@@ -33,13 +37,10 @@ public class YamlSerializer {
     private final YamlRepresenter representer;
     private final StringBuilder builder;
     private final StringBuilderWriter output;
+    private final FastMethod<Void> resetMethod;
     private Emitter emitter;
     private Serializer serializer;
-    private Field emitterStateField;
-    private Field emitterColumnField;
-    private Field emitterIndentField;
     private Object emitterStateStartValue;
-    private boolean reuseEmitter;
 
     /**
      * A singleton instance of the YamlSerializer. Is thread-safe.
@@ -62,43 +63,69 @@ public class YamlSerializer {
         representer.getPropertyUtils().setAllowReadOnlyProperties(dumperOptions.isAllowReadOnlyProperties());
         representer.setTimeZone(dumperOptions.getTimeZone());
         output = new StringBuilderWriter();
+        resetMethod = new FastMethod<Void>();
         builder = output.getBuilder();
-        reuseEmitter = false;
-        reset(0);
 
-        // Use Reflection to reset the state of the Emitter
-        // If this stops working in the future (library changes), a slower fallback will be used
+        // Initialize serializer for the first time.
+        emitter = new Emitter(output, dumperOptions);
+        serializer = new Serializer(emitter, resolver, dumperOptions, null);
+
+        // The open() method differs in implementation between SnakeYaml versions,
+        // and using it causes unpredictable behavior. We do our own predictable one.
+        // This makes sure the current state is set to "ExpectFirstDocumentStart"
         try {
-            // Instantiate an instance of ExpectFirstDocumentStart to reset the Emitter with
-            Class<?>[] emitterSubclasses = Emitter.class.getDeclaredClasses();
-            for (int i = 0;;i++) {
-                if (i >= emitterSubclasses.length) {
-                    throw new IllegalStateException("SnakeYAML Emitter class has no ExpectFirstDocumentStart subclass");
-                } else if (emitterSubclasses[i].getSimpleName().equals("ExpectFirstDocumentStart")) {
-                    Constructor<?> streamStartCtor = emitterSubclasses[i].getDeclaredConstructor(Emitter.class);
-                    streamStartCtor.setAccessible(true);
-                    emitterStateStartValue = streamStartCtor.newInstance(emitter);
-                    streamStartCtor.setAccessible(false);
-                    break;
-                }
+            Field emitterEventField = Emitter.class.getDeclaredField("event");
+            Field emitterStateField = Emitter.class.getDeclaredField("state");
+            Method expectMethod = emitterStateField.getType().getDeclaredMethod("expect");
+            Field serializerClosedField = Serializer.class.getDeclaredField("closed");
+            emitterEventField.setAccessible(true);
+            emitterStateField.setAccessible(true);
+            expectMethod.setAccessible(true);
+            serializerClosedField.setAccessible(true);
+
+            // emitter.event = new StreamStartEvent(null, null)
+            emitterEventField.set(emitter, new StreamStartEvent(null, null));
+
+            // emitter.stat.expect();
+            Object startState = emitterStateField.get(emitter);
+            expectMethod.invoke(startState);
+
+            // emitter.event = null;
+            emitterEventField.set(emitter, null);
+
+            // serializer.closed = Boolean.FALSE;
+            serializerClosedField.set(serializer, Boolean.FALSE);
+
+            // get current state, and verify it is ExpectFirstDocumentStart
+            emitterStateStartValue = emitterStateField.get(emitter);
+            if (emitterStateStartValue == null) {
+                throw new IllegalStateException("Emitter state is null");
+            } else if (!emitterStateStartValue.getClass().getSimpleName().equals("ExpectFirstDocumentStart")) {
+                throw new IllegalStateException("Emitter state after initialization is not ExpectFirstDocumentStart");
             }
 
-            // Obtain the Emitter state field
-            emitterStateField = Emitter.class.getDeclaredField("state");
-            emitterStateField.setAccessible(true);
-
-            // Obtain the Emitter column field
-            emitterColumnField = Emitter.class.getDeclaredField("column");
-            emitterColumnField.setAccessible(true);
-
-            // Obtain the Emitter indent field
-            emitterIndentField = Emitter.class.getDeclaredField("indent");
-            emitterIndentField.setAccessible(true);
-
-            // All good!
-            reuseEmitter = true;
+            // generate a method that will reset the emitter, so that no full re-initialization is needed
+            ClassResolver resolver = new ClassResolver();
+            resolver.addImport(Emitter.class.getName() + "State");
+            resolver.addImport(StreamEndEvent.class.getName());
+            resolver.setDeclaredClass(Emitter.class);
+            MethodDeclaration resetMethodDec = new MethodDeclaration(resolver,
+                    "public void reset(Object startState) {\n" +
+                    "  #require Emitter private (Object) EmitterState state;\n" +
+                    "  #require Emitter private int column;\n" +
+                    "  #require Emitter private Integer indent;\n" +
+                    "  instance.emit(new StreamEndEvent(null, null));\n" +
+                    "  instance#state = startState;\n" +
+                    "  instance#column = 0;\n" +
+                    "  instance#indent = null;\n" +
+                    "}");
+            if (!resetMethodDec.isResolved()) {
+                throw new IllegalStateException("Failed to resolve reset method: " + resetMethodDec);
+            }
+            resetMethod.init(resetMethodDec);
+            resetMethod.forceInitialization();
         } catch (Throwable t) {
-            t.printStackTrace();
+            throw new UnsupportedOperationException("This version of SnakeYAML is not supported", t);
         }
 
         // No-Op map. Always empty, never puts.
@@ -177,39 +204,6 @@ public class YamlSerializer {
         String str = this.output.toString();
         builder.setLength(0);
         return str;
-    }
-
-    private void reset(int indent) {
-        // Reset the emitter to its initial state of expecting a new document
-        // If this for whatever reason fails (library changes in the future?), use a slower fallback
-        if (reuseEmitter) {
-            try {
-                emitter.emit(new StreamEndEvent(null, null));
-                emitterStateField.set(emitter, emitterStateStartValue);
-                if (indent > 1) {
-                    int indentSpaces = dumperOptions.getIndent() * (indent - 1);
-                    emitterColumnField.setInt(emitter, indentSpaces);
-                    emitterIndentField.set(emitter, Integer.valueOf(indentSpaces - dumperOptions.getIndent()));
-                } else {
-                    emitterColumnField.setInt(emitter, 0);
-                    emitterIndentField.set(emitter, null);
-                }
-                return;
-            } catch (Throwable t) {
-                t.printStackTrace();
-                reuseEmitter = false;
-            }
-        }
-
-        // Slower fallback, also used during initialization
-        // The emitter will not do any indentation for us
-        emitter = new Emitter(output, dumperOptions);
-        serializer = new Serializer(emitter, resolver, dumperOptions, null);
-        try {
-            serializer.open();
-        } catch (IOException ex) {
-            // never happens, writer writes to a StringBuilder, what can go wrong?
-        }
     }
 
     /**
@@ -414,8 +408,12 @@ public class YamlSerializer {
     }
 
     private void appendNode(Node node, int indent, boolean indentFirstLine) {
-        // Reset the serializer
-        reset(indent);
+        // Reset the serializer, make sure quench anything written out to the builder
+        {
+            int oldTrailingLength = builder.length();
+            resetMethod.invoke(emitter, emitterStateStartValue);
+            builder.setLength(oldTrailingLength);
+        }
 
         // Serialize it using SnakeYaml
         int valueInitialOffset = builder.length();
@@ -430,7 +428,14 @@ public class YamlSerializer {
             // never happens, writer writes to a StringBuilder, what can go wrong?
         }
 
-        // Replace chat color codes (§c) with ampersand codes (&c) in the value YAML
+        // Ensure a single trailing newline
+        // This behavior differs per version of SnakeYaml
+        int newLength = builder.length();
+        if (newLength == 0 || builder.charAt(newLength - 1) != '\n') {
+            builder.append('\n');
+        }
+
+        // Replace chat color codes (ยงc) with ampersand codes (&c) in the value YAML
         // Also check whether an ampersand is going to accidentally turn into one
         // In that case, we must escape it (&&)
         for (int i = valueInitialOffset; i < builder.length()-1; i++) {
@@ -445,12 +450,7 @@ public class YamlSerializer {
         }
 
         // Further post-serialization operations
-        if (this.reuseEmitter) {
-            // Erase trailing spaces from indent
-            if (indent > 1) {
-                builder.setLength(builder.length() - 2*(indent-2));
-            }
-        } else if (indent > 1) {
+        if (indent > 1) {
             // Add indents after the fact for all but the first line
             String fullIndentStr = StringUtil.getFilledString(indentStr, indent - 1);
             int indentStart = Integer.MAX_VALUE; // skip first line
@@ -525,5 +525,4 @@ public class YamlSerializer {
 
         return true;
     }
-
 }
