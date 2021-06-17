@@ -74,6 +74,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKickDisconnectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutLoginHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
@@ -1112,7 +1113,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
 
-        public final FieldAccessor<Object> reason = nextField("private IChatBaseComponent a");
+        public final FieldAccessor<ChatText> reason = PacketPlayOutKickDisconnectHandle.T.reason.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutLogin extends NMSPacket {

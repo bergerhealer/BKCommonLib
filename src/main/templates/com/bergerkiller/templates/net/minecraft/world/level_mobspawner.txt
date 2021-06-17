@@ -37,6 +37,7 @@ class MobSpawnerAbstract {
     private int requiredPlayerRange;
     private int spawnRange;
 
+    //TODO: Since 1.17 changed to public void a(WorldServer worldserver, BlockPosition blockposition)
     public void onTick:c();
 
 #if version >= 1.13.1

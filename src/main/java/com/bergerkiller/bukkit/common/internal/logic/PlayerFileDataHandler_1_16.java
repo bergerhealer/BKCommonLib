@@ -7,12 +7,14 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
@@ -35,8 +37,10 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
 
+        String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
-        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType));
+        String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
+        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType));
     }
 
     @Override

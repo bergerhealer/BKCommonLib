@@ -11,11 +11,9 @@ import java.util.Map;
 
 public class CBCraftServer {
     public static final ClassTemplate<?> T = ClassTemplate.create("org.bukkit.craftbukkit.CraftServer")
-            .addImport("net.minecraft.server.MinecraftServer")
-            .addImport("net.minecraft.server.DedicatedPlayerList")
             .addImport("org.bukkit.World");
 
     public static final FieldAccessor<Map<String, World>> worlds = T.selectField("private final Map<String, World> worlds");
     public static final MethodAccessor<Object> getServer = CraftServerHandle.T.getServer.raw.toMethodAccessor();
-    public static final MethodAccessor<Object> getPlayerList = T.selectMethod("public DedicatedPlayerList getHandle()");
+    public static final MethodAccessor<Object> getPlayerList = CraftServerHandle.T.getPlayerList.raw.toMethodAccessor();
 }

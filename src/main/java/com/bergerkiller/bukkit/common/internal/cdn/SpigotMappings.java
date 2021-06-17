@@ -164,18 +164,38 @@ public class SpigotMappings {
         // Regex: ([\w\._\-/$]+)\s+([\w\._\-/$]+)
         Pattern classNamePattern = Pattern.compile("([\\w\\._\\-/$]+)\\s+([\\w\\._\\-/$]+)");
 
-        // Parse the mappings file
-        Map<String, String> mappings = new HashMap<>();
+        // Parse the bukkit - obfuscated mappings file
+        Map<String, String> obfuscatedToBukkit = new HashMap<>();
         try (BufferedReader br = new BufferedReader(new FileReader(mappingsFile))) {
             for (String line; (line = br.readLine()) != null; ) {
                 Matcher m = classNamePattern.matcher(line);
                 if (m.matches()) {
-                    String mojangFullName = mojang_class_mapping.get(m.group(1).replace('/', '.'));
+                    String obfuscatedName = m.group(1).replace('/', '.');
                     String bukkitFullName = m.group(2).replace('/', '.');
-                    if (mojangFullName != null) {
-                        mappings.put(bukkitFullName, mojangFullName);
+                    obfuscatedToBukkit.put(obfuscatedName, bukkitFullName);
+                }
+            }
+        }
+
+        // Go by all of Mojang's classes and if the class name was remapped on Bukkit,
+        // store the Bukkit name for those classes. Sometimes a subclass of a class isn't
+        // remapped, in which case we must perform remapping of this name ourselves.
+        Map<String, String> mappings = new HashMap<>();
+        for (MojangMappings.ClassMappings cl : mojangMappings.classes) {
+            String bukkitFullName = obfuscatedToBukkit.get(cl.name_obfuscated);
+            if (bukkitFullName == null) {
+                // See if this is a subclass of a class we do have mappings for, recursively
+                int subClassIndex = cl.name_obfuscated.length();
+                while ((subClassIndex = cl.name_obfuscated.lastIndexOf('$', subClassIndex - 1)) != -1) {
+                    bukkitFullName = obfuscatedToBukkit.get(cl.name_obfuscated.substring(0, subClassIndex));
+                    if (bukkitFullName != null) {
+                        bukkitFullName += cl.name_obfuscated.substring(subClassIndex);
+                        break;
                     }
                 }
+            }
+            if (bukkitFullName != null) {
+                mappings.put(bukkitFullName, cl.name);
             }
         }
 

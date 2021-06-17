@@ -32,7 +32,9 @@ class Item {
 
     public boolean usesDurability();
 
-#if version >= 1.14
+#if version >= 1.17
+    public String getInternalName:j((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#elseif version >= 1.14
     public String getInternalName:f((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #elseif version >= 1.13
     public String getInternalName:h((org.bukkit.inventory.ItemStack) ItemStack itemstack);

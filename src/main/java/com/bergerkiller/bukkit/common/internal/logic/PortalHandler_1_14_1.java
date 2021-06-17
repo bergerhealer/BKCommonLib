@@ -153,6 +153,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
 
     @Template.Optional
     @Template.Import("net.minecraft.core.BlockPosition")
+    @Template.Import("net.minecraft.core.BlockPosition$MutableBlockPosition")
     @Template.Import("net.minecraft.core.EnumDirection")
     @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
@@ -160,6 +161,8 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
     @Template.Import("net.minecraft.world.entity.Entity")
+    @Template.Import("net.minecraft.world.entity.Entity$RemovalReason")
+    @Template.Import("net.minecraft.world.level.block.Blocks")
     @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
     @Template.Import("net.minecraft.world.level.World")
@@ -169,17 +172,27 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
          *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
+         * #if version >= 1.17
+         *     player.isChangingDimension = true;
+         *     player.decouple();
+         *     player.getWorldServer().a(player, Entity$RemovalReason.CHANGED_DIMENSION);
+         *     if (!player.wonGame) {
+         *         player.wonGame = true;
+         *         player.connection.sendPacket(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
+         *     }
+         * #else
          *     player.worldChangeInvuln = true;
          *     player.decouple();
          *     player.getWorldServer().removePlayer(player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
-         * #if version >= 1.16
+         *   #if version >= 1.16
          *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.e, seenCredits ? 0.0F : 1.0F));
-         * #else
+         *   #else
          *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
-         * #endif
+         *   #endif
          *     }
+         * #endif
          * }
          */
         @Template.Generated("%SHOW_END_CREDITS%")
@@ -189,7 +202,9 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * <IS_MAIN_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
          *     World world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
-         * #if version >= 1.16
+         * #if version >= 1.17
+         *     return world.getDimensionKey() == World.END;
+         * #elseif version >= 1.16
          *     return world.getDimensionKey() == World.THE_END;
          * #else
          *     return world.getWorldProvider().getDimensionManager().getType() == DimensionManager.THE_END;
@@ -211,9 +226,11 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *         return null;
          *     }
          *     net.minecraft.BlockUtil$Rectangle result = (net.minecraft.BlockUtil$Rectangle) opt_result.get();
-         *     return startBlock.getWorld().getBlockAt(result.origin.getX(),
-         *                                             result.origin.getY(),
-         *                                             result.origin.getZ());
+         *   #if version >= 1.17
+         *     return startBlock.getWorld().getBlockAt(result.minCorner.getX(), result.minCorner.getY(), result.minCorner.getZ());
+         *   #else
+         *     return startBlock.getWorld().getBlockAt(result.origin.getX(), result.origin.getY(), result.origin.getZ());
+         *   #endif
          * #else
          *   #if version >= 1.15.2
          *     ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
@@ -284,7 +301,10 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         * #if version >= 1.16.2
+         * #if version >= 1.17
+         *     VillagePlace villageplace = world.A();
+         *     villageplace.a(blockposition, VillagePlaceType.NETHER_PORTAL);
+         * #elseif version >= 1.16.2
          *     VillagePlace villageplace = world.y();
          *     villageplace.a(blockposition, VillagePlaceType.v);
          * #elseif version >= 1.16
@@ -303,7 +323,9 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * <FIND_END_PLATFORM>
          * public static org.bukkit.block.Block findEndPlatform(org.bukkit.World bworld) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
-         * #if version >= 1.16
+         * #if version >= 1.17
+         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
+         * #elseif version >= 1.16
          *     BlockPosition platformPos = WorldServer.a;
          * #else
          *     BlockPosition platformPos = WorldProviderTheEnd.f;
@@ -339,7 +361,11 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * public static org.bukkit.block.Block createEndPlatform(org.bukkit.World bworld, Object entityInitiatorRaw) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     Entity entityInitiator = (Entity) entityInitiatorRaw;
-         * #if version >= 1.16
+         * 
+         * #if version >= 1.17
+         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
+         *     WorldServer.a(world, entityInitiator);
+         * #elseif version >= 1.16
          *     BlockPosition platformPos = WorldServer.a;
          *     WorldServer.a(world, entityInitiator);
          * #else

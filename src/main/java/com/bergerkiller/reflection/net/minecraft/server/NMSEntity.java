@@ -4,19 +4,15 @@ import java.util.Random;
 
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.MethodAccessor;
-import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 
@@ -258,14 +254,6 @@ public class NMSEntity {
     public static final MethodAccessor<Double> calculateDistance = EntityHandle.T.calculateDistance.toMethodAccessor();
 
     public static final MethodAccessor<Object> getBoundingBox = EntityHandle.T.getBoundingBox.raw.toMethodAccessor();
-
-    @SuppressWarnings({"rawtypes", "unchecked"})
-    private static final SafeConstructor entityItemConstr = new SafeConstructor(EntityItemHandle.T.getType(),
-            NMSWorld.T.getType(), double.class, double.class, double.class);
-
-    public static Item createEntityItem(World world, double x, double y, double z) {
-        return (Item) Conversion.toEntity.convert(entityItemConstr.newInstance(Conversion.toWorldHandle.convert(world), x, y, z));
-    }
 
     public static boolean isInWater(Object entityHandle, boolean update) {
         return update ? isInWaterUpdate.invoke(entityHandle) : isInWaterNoUpdate.invoke(entityHandle);

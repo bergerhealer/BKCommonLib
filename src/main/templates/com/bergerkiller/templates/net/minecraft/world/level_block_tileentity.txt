@@ -21,11 +21,11 @@ import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 class TileEntity {
 #if version >= 1.17
     protected (org.bukkit.World) World world_field:level;
-    protected (IntVector3) BlockPosition position_field:position;
 #else
     protected (org.bukkit.World) World world_field:world;
-    protected (IntVector3) BlockPosition position_field:worldPosition;
 #endif
+
+    protected (IntVector3) BlockPosition position_field:worldPosition;
 
     public (WorldHandle) World getWorld();
 

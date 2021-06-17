@@ -40,6 +40,7 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         ClassResolver resolver = new ClassResolver();
         resolver.setVariable("version", Common.MC_VERSION);
         resolver.addImport("net.minecraft.core.BlockPosition");
+        resolver.addImport("net.minecraft.core.BlockPosition$MutableBlockPosition");
         resolver.addImport("net.minecraft.core.EnumDirection");
         resolver.addImport("net.minecraft.core.EnumDirection$EnumAxis");
         resolver.addImport("net.minecraft.util.MathHelper");

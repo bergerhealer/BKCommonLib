@@ -15,7 +15,15 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.generated.net.minecraft.server.EntityItemFrameHandle;
 
 class EntityArmorStand extends EntityLiving {
-#if version >= 1.14
+#if version >= 1.17
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:DATA_CLIENT_FLAGS;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:DATA_HEAD_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:DATA_BODY_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_LEFT:DATA_LEFT_ARM_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_ARM_RIGHT:DATA_RIGHT_ARM_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_LEFT:DATA_LEFT_LEG_POSE;
+    public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_LEG_RIGHT:DATA_RIGHT_LEG_POSE;
+#elseif version >= 1.14
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ARMORSTAND_FLAGS:b;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_HEAD:c;
     public static optional final (DataWatcher.Key<org.bukkit.util.Vector>) DataWatcherObject<Vector3f> DATA_POSE_BODY:d;
@@ -67,7 +75,9 @@ class EntityArmorStand extends EntityLiving {
 
 
 class EntityItemFrame extends Entity {
-#if version >= 1.14
+#if version >= 1.17
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM;
+#elseif version >= 1.14
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:ITEM;
 #elseif version >= 1.13
     private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM:e;

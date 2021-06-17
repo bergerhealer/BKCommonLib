@@ -3,6 +3,8 @@ package net.minecraft.network.protocol.game;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundCategory;
 import net.minecraft.world.entity.ai.attributes.AttributeMapBase;
 import net.minecraft.world.entity.ai.attributes.AttributeModifiable;
@@ -11,11 +13,13 @@ import net.minecraft.world.EnumDifficulty;
 import net.minecraft.world.EnumHand;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.player.EnumChatVisibility;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.saveddata.maps.MapIcon;
+import net.minecraft.world.level.World;
 import net.minecraft.world.phys.Vec3D;
 
 import com.mojang.authlib.GameProfile;
@@ -1905,5 +1909,13 @@ class PacketPlayOutScoreboardObjective {
     private (ChatText) String displayName:b;
     private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
     private int action:d;
+#endif
+}
+
+class PacketPlayOutKickDisconnect {
+#if version >= 1.17
+  private (ChatText) IChatBaseComponent reason;
+#else
+  private (ChatText) IChatBaseComponent reason:a;
 #endif
 }

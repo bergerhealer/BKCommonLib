@@ -7,7 +7,9 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 class EntityBat extends EntityInsentient {
-#if version >= 1.14
+#if version >= 1.17
+    public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:DATA_ID_FLAGS;
+#elseif version >= 1.14
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:b;
 #elseif version >= 1.9
     public static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BAT_FLAGS:a;

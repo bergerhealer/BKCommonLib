@@ -15,11 +15,14 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * Lighting handler for Minecraft 1.14 and later. A new asynchronous lighting engine was introduced,
@@ -61,29 +64,50 @@ public class LightingHandler_1_14 implements LightingHandler {
             throw new IllegalStateException("LightEngineStorageArray class not found");
         }
 
-        this.light_layer_block = lightEngineType.getDeclaredField("a");
+        String light_layer_block_name, light_layer_sky_name, light_storage_name, light_storage_array_live_name;
+        String golden_ticket_name;
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+            light_layer_block_name = "blockEngine";
+            light_layer_sky_name = "skyEngine";
+            light_storage_name = "storage";
+            light_storage_array_live_name = "updatingSectionData";
+            golden_ticket_name = "MAX_CHUNK_DISTANCE";
+        } else {
+            light_layer_block_name = "a";
+            light_layer_sky_name = "b";
+            light_storage_name = "c";
+            light_storage_array_live_name = "f";
+            golden_ticket_name = "GOLDEN_TICKET";
+        }
+
+        this.light_layer_block = MPLType.getDeclaredField(lightEngineType,
+                Resolver.resolveFieldName(lightEngineType, light_layer_block_name));
         if (!lightEngineLayerType.isAssignableFrom(this.light_layer_block.getType())) {
             throw new IllegalStateException("LightEngine light_layer_block is not of type LightEngineLayer");
         }
 
-        this.light_layer_sky = lightEngineType.getDeclaredField("b");
+        this.light_layer_sky = MPLType.getDeclaredField(lightEngineType,
+                Resolver.resolveFieldName(lightEngineType, light_layer_sky_name));
         if (!lightEngineLayerType.isAssignableFrom(this.light_layer_sky.getType())) {
             throw new IllegalStateException("LightEngine light_layer_sky is not of type LightEngineLayer");
         }
 
-        this.light_storage = lightEngineLayerType.getDeclaredField("c");
+        this.light_storage = MPLType.getDeclaredField(lightEngineLayerType,
+                Resolver.resolveFieldName(lightEngineLayerType, light_storage_name));
         if (!lightEngineStorageType.isAssignableFrom(this.light_storage.getType())) {
             throw new IllegalStateException("LightEngineLayer light_storage field is not of type LightEngineStorage");
         }
 
-        this.light_storage_array_live = lightEngineStorageType.getDeclaredField("f");
+        this.light_storage_array_live = MPLType.getDeclaredField(lightEngineStorageType,
+                Resolver.resolveFieldName(lightEngineStorageType, light_storage_array_live_name));
         if (!lightEngineStorageArrayType.isAssignableFrom(this.light_storage_array_live.getType())) {
             throw new IllegalStateException("LightEngineStorage light_storage_array_live field is not of type LightEngineStorageArray");
         }
 
         // PlayerChunkMap.GOLDEN_TICKET
         {
-            Field f = PlayerChunkMapHandle.T.getType().getDeclaredField("GOLDEN_TICKET");
+            String name = Resolver.resolveFieldName(PlayerChunkMapHandle.T.getType(), golden_ticket_name);
+            Field f = PlayerChunkMapHandle.T.getType().getDeclaredField(name);
             final int golden_ticket_value = f.getInt(null);
             this.golden_ticket = () -> golden_ticket_value;
         }
@@ -320,12 +344,12 @@ public class LightingHandler_1_14 implements LightingHandler {
     @Template.Import("net.minecraft.server.MCUtil")
     @Template.Import("net.minecraft.core.SectionPosition")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.InstanceType("net.minecraft.server.LightEngineStorage")
+    @Template.InstanceType("net.minecraft.world.level.lighting.LightEngine")
     public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
          * <GET_LAYER_LIGHT_DATA>
-         * public static byte[] getLayerData(net.minecraft.server.LightEngineLayer layer, int cx, int cy, int cz) {
+         * public static byte[] getLayerData(LightEngineLayer layer, int cx, int cy, int cz) {
          *    if (layer == null) {
          *        return null;
          *    }
@@ -341,7 +365,7 @@ public class LightingHandler_1_14 implements LightingHandler {
 
         /*
          * <STORE_SKY_LIGHT_DATA>
-         * public static void storeSkyLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         * public static void storeSkyLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
          *     engine.a(net.minecraft.world.level.EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
          * }
@@ -351,7 +375,7 @@ public class LightingHandler_1_14 implements LightingHandler {
 
         /*
          * <STORE_BLOCK_LIGHT_DATA>
-         * public static void storeBlockLightData(net.minecraft.server.LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         * public static void storeBlockLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
          *     engine.a(net.minecraft.world.level.EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
          * }
@@ -361,7 +385,7 @@ public class LightingHandler_1_14 implements LightingHandler {
 
         /*
          * <SET_LIGHT_DATA_OR_STORE_NEW_OLD>
-         * public static void setLightDataOrStoreNew(net.minecraft.server.LightEngine engine, net.minecraft.server.LightEngineStorage lightEngineStorage, net.minecraft.server.LightEngineStorageArray lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
+         * public static void setLightDataOrStoreNew(LightEngine engine, LightEngineStorage lightEngineStorage, LightEngineStorageArray lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data_bytes) {
          *     long key = SectionPosition.b(cx, cy, cz);
          * 
          *     NibbleArray dataNibble = lightEngineStorageArray.c(key);
@@ -374,7 +398,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     }
          * 
          *     // Copy new section light data and mark for updating
-         * #if exists net.minecraft.server.NibbleArray public byte[] asBytesPoolSafe();
+         * #if exists net.minecraft.world.level.chunk.NibbleArray public byte[] asBytesPoolSafe();
          *     System.arraycopy(data_bytes, 0, dataNibble.asBytesPoolSafe(), 0, 2048);
          * #else
          *     System.arraycopy(data_bytes, 0, dataNibble.asBytes(), 0, 2048);
@@ -382,17 +406,21 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     lightEngineStorageArray.a(key, dataNibble);
          * 
          *     // Track the nibbles we have pushed in this set
-         *     #require net.minecraft.server.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet syncPendingSet:g;
-         *     it.unimi.dsi.fastutil.longs.LongSet syncPending = lightEngineStorage#syncPendingSet;
-         *     syncPending.add(key);
+         * #if version >= 1.17
+         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections;
+         * #else
+         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected final it.unimi.dsi.fastutil.longs.LongSet changedSections:g;
+         * #endif
+         *     it.unimi.dsi.fastutil.longs.LongSet changedSections = lightEngineStorage#changedSections;
+         *     changedSections.add(key);
          * 
          *     // When storing light data, make sure to refresh the top section where light data is stored
          *     // Otherwise it will send all-15 light levels for sky light mistakingly
          *     // notifyCubePresent(long) implementation is in LightEngineStorageSky
          * #if version >= 1.14.1
-         *     #require net.minecraft.server.LightEngineStorage protected void notifyCubePresent:k(long i);
+         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected void notifyCubePresent:k(long i);
          * #else
-         *     #require net.minecraft.server.LightEngineStorage protected void notifyCubePresent:j(long i);
+         *     #require net.minecraft.world.level.lighting.LightEngineStorage protected void notifyCubePresent:j(long i);
          * #endif
          *     lightEngineStorage#notifyCubePresent(key);
          * }
