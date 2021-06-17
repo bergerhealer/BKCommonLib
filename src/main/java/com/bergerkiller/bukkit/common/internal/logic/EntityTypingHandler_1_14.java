@@ -3,12 +3,14 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
 import java.util.Random;
+import java.util.logging.Level;
 
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_14;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -19,8 +21,11 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * Since Minecraft 1.14 it has become much harder to know what NMS Entity
@@ -63,12 +68,14 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {
+        String realName = Resolver.resolveFieldName(EntityTypesHandle.T.getType(), name);
+        String s = name.equals(realName) ? name : (name + ":" + realName);
         try {
-            java.lang.reflect.Field field = EntityTypesHandle.T.getType().getDeclaredField(name);
+            java.lang.reflect.Field field = MPLType.getDeclaredField(EntityTypesHandle.T.getType(), realName);
             if ((field.getModifiers() & Modifier.STATIC) == 0) {
-                throw new IllegalStateException("EntityTypes field " + name + " is not static");
+                throw new IllegalStateException("EntityTypes field " + s + " is not static");
             }
-            
+
             Object nmsEntityTypes;
             if ((field.getModifiers() & Modifier.PUBLIC) == 0) {
                 field.setAccessible(true);
@@ -85,7 +92,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
 
             this._cache.put(nmsEntityTypes, type);
         } catch (Throwable t) {
-            t.printStackTrace();
+            MountiplexUtil.LOGGER.log(Level.SEVERE, "Failed to find EntityTypes field " + s, t);
         }
     }
 
@@ -123,6 +130,7 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     @Template.Package("net.minecraft.server.level")
     @Template.Import("net.minecraft.world.entity.EntityTypes")
     @Template.Import("net.minecraft.world.level.storage.WorldDataServer")
+    @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.level.World")
     public static abstract class Handler extends Template.Class<Template.Handle> {
 
@@ -172,7 +180,17 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     worldserver#purpurConfig = purpurConfig;
          * #endif
          * 
-         * #if version >= 1.16
+         * #if version >= 1.17
+         *     // WorldDataMutable field
+         *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldDataMutable levelData;
+         *     worldserver#levelData = worldData;
+         * 
+         *     // WorldDataServer field (on some servers, it uses the WorldDataMutable field instead)
+         *   #if exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer serverLevelData;
+         *     #require net.minecraft.server.level.WorldServer public final net.minecraft.world.level.storage.WorldDataServer serverLevelData;
+         *     worldserver#serverLevelData = worldData;
+         *   #endif
+         * #elseif version >= 1.16
          *     // WorldDataMutable field
          *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldDataMutable worldData;
          *     worldserver#worldData = worldData;

@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
+import net.minecraft.world.level.saveddata.maps.MapIcon;
 import net.minecraft.world.phys.Vec3D;
 
 import com.mojang.authlib.GameProfile;
@@ -861,18 +862,18 @@ class PacketPlayOutMap extends Packet {
     // =============================
     private optional boolean track:MOVED;
     private optional boolean locked:MOVED;
-    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:MOVED;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:MOVED;
     private int xmin:MOVED;
     private int ymin:MOVED;
     private int width:MOVED;
     private int height:MOVED;
     private byte[] pixels:MOVED;
     // =============================
-    
+
 #elseif version >= 1.14
     private optional boolean track:c;
     private optional boolean locked:d;
-    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:e;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:e;
     private int xmin:f;
     private int ymin:g;
     private int width:h;
@@ -881,7 +882,7 @@ class PacketPlayOutMap extends Packet {
 #elseif version >= 1.9
     private optional boolean track:c;
     private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:d;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
     private int xmin:e;
     private int ymin:f;
     private int width:g;
@@ -890,7 +891,7 @@ class PacketPlayOutMap extends Packet {
 #else
     private optional boolean track:###;
     private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) net.minecraft.world.level.saveddata.maps.MapIcon[] cursors:c;
+    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
     private int xmin:d;
     private int ymin:e;
     private int width:f;

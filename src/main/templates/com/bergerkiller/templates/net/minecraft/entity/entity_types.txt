@@ -8,6 +8,7 @@ import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 
 class EntityTypes {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
 
     // 1.10.2 and before used a Map<String, Class> and Map<Class, String> to store name to entity class information
 #if version >= 1.11
@@ -57,7 +58,11 @@ class EntityTypes {
     }
 
     public optional int getTypeId() {
+  #if version >= 1.17
+        return IRegistry.ENTITY_TYPE.getId((Object) instance);
+  #else
         return IRegistry.ENTITY_TYPE.a((Object) instance);
+  #endif
     }
 #elseif version >= 1.13
     public optional (Class<?>) Class<? extends Entity> getEntityClassInst:c();
@@ -135,7 +140,9 @@ class EntityTypes {
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
-  #if version >= 1.13.1
+  #if version >= 1.17
+                return IRegistry.ENTITY_TYPE.getId((Object) type);
+  #elseif version >= 1.13.1
                 return IRegistry.ENTITY_TYPE.a((Object) type);
   #else
                 return EntityTypes.REGISTRY.a((Object) type);

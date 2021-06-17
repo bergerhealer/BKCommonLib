@@ -1,6 +1,7 @@
 package org.bukkit.craftbukkit.inventory;
 
 import net.minecraft.world.IInventory;
+import net.minecraft.world.inventory.InventoryMerchant;
 
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
@@ -48,10 +49,10 @@ class CraftInventoryBrewer {
 }
 
 class CraftInventoryMerchant {
-    public static org.bukkit.inventory.MerchantInventory createNew((Object) net.minecraft.server.InventoryMerchant nmsInventoryMerchant) {
+    public static org.bukkit.inventory.MerchantInventory createNew((Object) InventoryMerchant nmsInventoryMerchant) {
 #if version >= 1.14
         Object merchant = com.bergerkiller.generated.net.minecraft.world.inventory.InventoryMerchantHandle.T.merchant.get(nmsInventoryMerchant);
-        return new CraftInventoryMerchant((net.minecraft.server.IMerchant) merchant, nmsInventoryMerchant);
+        return new CraftInventoryMerchant((net.minecraft.world.item.trading.IMerchant) merchant, nmsInventoryMerchant);
 #else
         return new CraftInventoryMerchant(nmsInventoryMerchant);
 #endif

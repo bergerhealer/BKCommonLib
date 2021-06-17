@@ -154,6 +154,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Optional
     @Template.Import("net.minecraft.core.BlockPosition")
     @Template.Import("net.minecraft.core.EnumDirection")
+    @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
@@ -162,7 +163,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
     @Template.Import("net.minecraft.world.level.World")
-    @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
+    @Template.InstanceType("net.minecraft.world.level.portal.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
         /*
          * <SHOW_END_CREDITS>

@@ -22,7 +22,14 @@ class EntityBoat extends Entity {
 }
 
 class EntityMinecartAbstract extends Entity {
-#if version >= 1.14
+#if version >= 1.17
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:DATA_ID_HURT;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:DATA_ID_HURTDIR;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:DATA_ID_DAMAGE;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_TYPE:DATA_ID_DISPLAY_BLOCK;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BLOCK_OFFSET:DATA_ID_DISPLAY_OFFSET;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_BLOCK_VISIBLE:DATA_ID_CUSTOM_DISPLAY;
+#elseif version >= 1.14
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_FACTOR:b;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SHAKING_DIRECTION:c;
     private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHAKING_DAMAGE:d;

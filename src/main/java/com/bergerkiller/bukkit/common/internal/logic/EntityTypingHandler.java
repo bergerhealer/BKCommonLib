@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import org.bukkit.entity.Entity;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
@@ -11,6 +12,7 @@ public abstract class EntityTypingHandler {
     public static final EntityTypingHandler INSTANCE = createInstance();
 
     private static EntityTypingHandler createInstance() {
+        CommonBootstrap.initServer();
         try {
             if (Common.evaluateMCVersion(">=", "1.14")) {
                 return new EntityTypingHandler_1_14();

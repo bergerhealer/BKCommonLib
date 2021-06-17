@@ -36,13 +36,18 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         resolver.addImport("net.minecraft.server.level.ChunkProviderServer");
         resolver.addImport("net.minecraft.server.level.WorldServer");
         resolver.setDeclaredClassName("net.minecraft.world.level.chunk.storage.RegionFileCache");
+        resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         {
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "#if version >= 1.17\n" +
+                    "    PlayerChunkMap pcm = cps.chunkMap;\n" +
+                    "#else\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
+                    "#endif\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
                     "    return rfc.cache;\n" +
                     "}");

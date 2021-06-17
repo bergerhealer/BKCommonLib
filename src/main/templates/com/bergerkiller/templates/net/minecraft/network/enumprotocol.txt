@@ -1,6 +1,7 @@
 package net.minecraft.network;
 
 import com.google.common.collect.BiMap;
+import net.minecraft.network.protocol.EnumProtocolDirection;
 
 import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.EnumProtocolDirectionHandle;
