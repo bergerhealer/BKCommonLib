@@ -482,7 +482,6 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.0</version>
                 <configuration>
-                    <release>${jdk.version.release}</release>
                     <source>${jdk.version.release}</source>
                     <target>${jdk.version.release}</target>
                     <testSource>${jdk.version.test}</testSource>
