@@ -18,22 +18,40 @@ public abstract class PacketPlayOutEntityDestroyHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityDestroyHandle createNew(int[] entityIds) {
-        return T.constr_entityIds.newInstance(entityIds);
-    }
-
     /* ============================================================================== */
 
+    public static PacketPlayOutEntityDestroyHandle createNewSingle(int entityId) {
+        return T.createNewSingle.invoke(entityId);
+    }
+
+    public static PacketPlayOutEntityDestroyHandle createNewMultiple(int[] multipleEntityIds) {
+        return T.createNewMultiple.invoke(multipleEntityIds);
+    }
+
+    public abstract boolean canSupportMultipleEntityIds();
+    public abstract boolean hasMultipleEntityIds();
+    public abstract int getSingleEntityId();
     public abstract int[] getEntityIds();
-    public abstract void setEntityIds(int[] value);
+    public abstract void setSingleEntityId(int entityId);
+    public abstract void setMultpleEntityIds(int[] multipleEntityIds);
+
+    public static boolean canDestroyMultiple() {
+        return com.bergerkiller.bukkit.common.internal.CommonCapabilities.PACKET_DESTROY_MULTIPLE;
+    }
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityDestroyClass extends Template.Class<PacketPlayOutEntityDestroyHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityDestroyHandle> constr_entityIds = new Template.Constructor.Converted<PacketPlayOutEntityDestroyHandle>();
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityDestroyHandle> createNewSingle = new Template.StaticMethod.Converted<PacketPlayOutEntityDestroyHandle>();
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityDestroyHandle> createNewMultiple = new Template.StaticMethod.Converted<PacketPlayOutEntityDestroyHandle>();
 
-        public final Template.Field<int[]> entityIds = new Template.Field<int[]>();
+        public final Template.Method<Boolean> canSupportMultipleEntityIds = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> hasMultipleEntityIds = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getSingleEntityId = new Template.Method<Integer>();
+        public final Template.Method<int[]> getEntityIds = new Template.Method<int[]>();
+        public final Template.Method<Void> setSingleEntityId = new Template.Method<Void>();
+        public final Template.Method<Void> setMultpleEntityIds = new Template.Method<Void>();
 
     }
 

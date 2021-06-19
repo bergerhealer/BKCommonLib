@@ -67,6 +67,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCombatEventHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
@@ -852,30 +853,97 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityDestroy extends NMSPacket {
 
-        public final FieldAccessor<int[]> entityIds = getField("a", int[].class);
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int[].class);
+        /**
+         * <b>Warning: </b>Setting multiple entity id's
+         * is not supported on Minecraft 1.17 and later. Getting is always safe.
+         */
+        public final FieldAccessor<int[]> entityIds = new SafeDirectField<int[]>() {
+            @Override
+            public int[] get(Object instance) {
+                return PacketPlayOutEntityDestroyHandle.T.getEntityIds.invoke(instance);
+            }
 
-        public CommonPacket newInstance(int... entityIds) {
-            return constructor1.newInstance(entityIds);
+            @Override
+            public boolean set(Object instance, int[] value) {
+                PacketPlayOutEntityDestroyHandle.T.setMultpleEntityIds.invoke(instance, value);
+                return true;
+            }
+        };
+
+        /**
+         * <b>Warning: </b>Getting this field on Minecraft 1.16 and earlier may raise an
+         * exception if multiple entity id's are stored. Setting is always safe.</b>
+         */
+        public final FieldAccessor<Integer> entityId = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutEntityDestroyHandle.T.getSingleEntityId.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutEntityDestroyHandle.T.setSingleEntityId.invoke(instance, value);
+                return true;
+            }
+        };
+
+        /**
+         * Gets whether on this server version, destroying multiple entities at once
+         * is supported.
+         *
+         * @return True if multiple entity ids can be specified at once
+         */
+        public boolean canSupportMultipleEntityIds() {
+            return CommonCapabilities.PACKET_DESTROY_MULTIPLE;
         }
 
         /**
+         * Creates a new destroy packet for destroying a single entity
+         *
+         * @param entityId
+         * @return packet
+         */
+        public CommonPacket newInstanceSingle(int entityId) {
+            Object raw = PacketPlayOutEntityDestroyHandle.T.createNewSingle.raw.invoke(entityId);
+            return new CommonPacket(raw, PacketType.OUT_ENTITY_DESTROY);
+        }
+
+        /**
+         * <b>Warning: </b>Multiple entity id's only supported on Minecraft 1.16 and earlier!
+         *
+         * @param entityIds
+         * @return packet
+         */
+        public CommonPacket newInstanceMultiple(int... entityIds) {
+            Object raw = PacketPlayOutEntityDestroyHandle.T.createNewMultiple.raw.invoke(entityIds);
+            return new CommonPacket(raw, PacketType.OUT_ENTITY_DESTROY);
+        }
+
+        /**
+         * <b>Warning: </b>Multiple entity id's only supported on Minecraft 1.16 and earlier!<br>
+         * <br>
          * Creates a new instance with the entity Ids specified.
          * Note: input Collection will be copied.
          * 
          * @param entityIds
          * @return packet
          */
-        public CommonPacket newInstance(Collection<Integer> entityIds) {
-            return newInstance(Conversion.toIntArr.convert(entityIds));
+        public CommonPacket newInstanceMultiple(Collection<Integer> entityIds) {
+            return newInstanceMultiple(Conversion.toIntArr.convert(entityIds));
         }
 
-        public CommonPacket newInstance(org.bukkit.entity.Entity... entities) {
+        /**
+         * <b>Warning: </b>Multiple entity id's only supported on Minecraft 1.16 and earlier!
+         *
+         * @param entityIds
+         * @return packet
+         */
+        public CommonPacket newInstanceMultiple(org.bukkit.entity.Entity... entities) {
             int[] ids = new int[entities.length];
             for (int i = 0; i < ids.length; i++) {
                 ids[i] = entities[i].getEntityId();
             }
-            return newInstance(ids);
+            return newInstanceMultiple(ids);
         }
     }
 

@@ -48,11 +48,26 @@ public class CommonPlayerMeta {
      */
     public void syncRemoveQueue() {
         if (!this.removeQueue.isEmpty()) {
-            CommonPacket packet = PacketType.OUT_ENTITY_DESTROY.newInstance(this.removeQueue);
-            this.removeQueue.clear();
-            Player p = this.playerRef.get();
-            if (p != null) {
-                PacketUtil.sendPacket(p, packet);
+            if (PacketType.OUT_ENTITY_DESTROY.canSupportMultipleEntityIds()) {
+                CommonPacket packet = PacketType.OUT_ENTITY_DESTROY.newInstanceMultiple(this.removeQueue);
+                this.removeQueue.clear();
+                Player p = this.playerRef.get();
+                if (p != null) {
+                    PacketUtil.sendPacket(p, packet);
+                }
+            } else {
+                CommonPacket[] packets = new CommonPacket[this.removeQueue.size()];
+                int index = 0;
+                for (Integer id : this.removeQueue) {
+                    packets[index++] = PacketType.OUT_ENTITY_DESTROY.newInstanceSingle(id.intValue());
+                }
+                this.removeQueue.clear();
+                Player p = this.playerRef.get();
+                if (p != null) {
+                    for (CommonPacket packet : packets) {
+                        PacketUtil.sendPacket(p, packet);
+                    }
+                }
             }
         }
     }

@@ -204,4 +204,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.16.2 the spawn point has an angle component
      */
     public static final boolean PLAYER_SPAWN_HAS_ANGLE = CommonBootstrap.evaluateMCVersion(">=", "1.16.2");
+
+    /**
+     * Since Minecraft 1.17 the destroy packet uses just a single entity id.
+     * Earlier versions supported destroying multiple entities at once.
+     */
+    public static final boolean PACKET_DESTROY_MULTIPLE = CommonBootstrap.evaluateMCVersion("<", "1.17");
 }

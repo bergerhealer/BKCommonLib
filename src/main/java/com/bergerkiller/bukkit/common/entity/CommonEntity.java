@@ -144,7 +144,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         // We fire the destroy packet right away to prevent that.
         for (Player previousViewer : previousViewers) {
             if (PlayerUtil.getEntityRemoveQueue(previousViewer).remove((Object) this.entity.getEntityId())) {
-                CommonPacket destroyPacket = PacketType.OUT_ENTITY_DESTROY.newInstance(this.entity.getEntityId());
+                CommonPacket destroyPacket = PacketType.OUT_ENTITY_DESTROY.newInstanceSingle(this.entity.getEntityId());
                 PacketUtil.sendPacket(previousViewer, destroyPacket);
             }
         }

@@ -525,7 +525,7 @@ public class MapPlayerInput implements Tickable {
             _fakeMountShown = false;
 
             // Despawn the mount
-            PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstance(this._fakeMountId));
+            PacketUtil.sendPacket(player, PacketType.OUT_ENTITY_DESTROY.newInstanceSingle(this._fakeMountId));
 
             // Resend current player position to the player
             Location loc = this.player.getLocation();

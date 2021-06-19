@@ -524,7 +524,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         // If instant, do not send other destroy messages, if not, send one
         this.setRemoveNextTick(viewer, !instant);
         if (instant) {
-            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_DESTROY.newInstance(entity.getEntityId()));
+            PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_DESTROY.newInstanceSingle(entity.getEntityId()));
         }
     }
 

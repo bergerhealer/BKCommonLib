@@ -101,19 +101,30 @@ public class CommonPlayer extends CommonLivingEntity<Player> {
         if (ids.isEmpty()) {
             return;
         }
-        // Take care of more than 127 entities (multiple packets)
-        while (ids.size() >= 128) {
-            final int[] rawIds = new int[127];
-            Iterator<Integer> iter = ids.iterator();
-            for (int i = 0; i < rawIds.length; i++) {
-                rawIds[i] = iter.next().intValue();
-                iter.remove();
+
+        //TODO: This code probably isn't even used anymore on new minecraft versions
+        //      Probably worth conditionally disabling all of this...
+        if (PacketType.OUT_ENTITY_DESTROY.canSupportMultipleEntityIds()) {
+            // Take care of more than 127 entities (multiple packets)
+            while (ids.size() >= 128) {
+                final int[] rawIds = new int[127];
+                Iterator<Integer> iter = ids.iterator();
+                for (int i = 0; i < rawIds.length; i++) {
+                    rawIds[i] = iter.next().intValue();
+                    iter.remove();
+                }
+                sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstanceMultiple(rawIds));
             }
-            sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstance(rawIds));
+            // Remove any remaining entities
+            sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstanceMultiple(ids));
+            ids.clear();
+        } else {
+            // Send each id one by one
+            for (Integer id : ids) {
+                sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstanceSingle(id.intValue()));
+            }
+            ids.clear();
         }
-        // Remove any remaining entities
-        sendPacket(PacketType.OUT_ENTITY_DESTROY.newInstance(ids));
-        ids.clear();
     }
 
     /**

@@ -199,7 +199,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             if (entity.state == SpawnedEntity.State.SPAWNED) {
                 // Currently spawned, despawn it, track while it is spawned
                 entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
-                queuePacket(PacketPlayOutEntityDestroyHandle.createNew(new int[] {entityId}));
+                queuePacket(PacketPlayOutEntityDestroyHandle.createNewSingle(entityId));
             } else if (entity.state == SpawnedEntity.State.DESPAWNED) {
                 // Was despawned, let's keep it that way
                 entity.state = SpawnedEntity.State.DESPAWNED_BLOCKED;
@@ -276,8 +276,13 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             // Handle packets
             PacketType type = packet.getType();
             if (type == PacketType.OUT_ENTITY_DESTROY) {
-                for (int entityId : packet.read(PacketType.OUT_ENTITY_DESTROY.entityIds)) {
-                    handleDespawn(entityId);
+                PacketPlayOutEntityDestroyHandle dp = PacketPlayOutEntityDestroyHandle.createHandle(packet.getHandle());
+                if (dp.hasMultipleEntityIds()) {
+                    for (int entityId : dp.getEntityIds()) {
+                        handleDespawn(entityId);
+                    }
+                } else {
+                    handleDespawn(dp.getSingleEntityId());
                 }
             } else if (type == PacketType.OUT_RESPAWN) {
                 ResourceKey<DimensionType> dimension = packet.read(PacketType.OUT_RESPAWN.dimensionType);
@@ -395,7 +400,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
             // use a packet monitor we cannot do that. For a split second the Entity
             // might be visible.
             entity.state = SpawnedEntity.State.SUPPRESSED_INFLIGHT_BLOCKED;
-            queuePacket(PacketPlayOutEntityDestroyHandle.createNew(new int[] {entityId}));
+            queuePacket(PacketPlayOutEntityDestroyHandle.createNewSingle(entityId));
         } else {
             // Allow the spawn
             entity.state = SpawnedEntity.State.SPAWNED;
