@@ -44,6 +44,12 @@ public abstract class EntityHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract List<EntityHandle> getPassengers();
+    public abstract boolean isVehicle();
+    public abstract boolean isPassenger();
+    public abstract boolean hasPassengers();
+    public abstract void setPassengers(List<EntityHandle> passengers);
+    public abstract boolean isInSameVehicle(EntityHandle entity);
     public abstract double getLocX();
     public abstract double getLocY();
     public abstract double getLocZ();
@@ -51,7 +57,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocY(double y);
     public abstract void setLocZ(double z);
     public abstract void setLoc(double x, double y, double z);
-    public abstract WorldHandle getWorld();
     public abstract void setWorld(WorldHandle world);
     public abstract boolean isLastAndCurrentPositionDifferent();
     public abstract Vector getMot();
@@ -122,51 +127,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract ChatText getCustomName();
     public abstract void collide(EntityHandle entity);
     public abstract World getBukkitWorld();
+    public abstract WorldHandle getWorld();
     public abstract Entity getBukkitEntity();
-
-    public List<EntityHandle> getPassengers() {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
-            if (passengers == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return passengers;
-            }
-        } else {
-            EntityHandle passenger = T.opt_passenger.get(getRaw());
-            if (passenger == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return java.util.Arrays.asList(passenger);
-            }
-        }
-    }
-
-    public boolean hasPassengers() {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
-            return passengers != null && passengers.size() > 0;
-        } else {
-            return T.opt_passenger.get(getRaw()) != null;
-        }
-    }
-
-    public void setPassengers(List<EntityHandle> passengers) {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> entity_passengers = T.opt_passengers.get(getRaw());
-            if (entity_passengers == null) {
-                T.opt_passengers.set(getRaw(), passengers);
-            } else {
-                entity_passengers.clear();
-                entity_passengers.addAll(passengers);
-            }
-        } else if (passengers.size() == 0) {
-            T.opt_passenger.set(getRaw(), null);
-        } else {
-            T.opt_passenger.set(getRaw(), passengers.get(0));
-        }
-    }
-
 
     public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
         return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
@@ -208,23 +170,6 @@ public abstract class EntityHandle extends Template.Handle {
     }
 
 
-    public boolean isPassenger() {
-        if (T.isPassenger.isAvailable()) {
-            return T.isPassenger.invoke(getRaw());
-        } else {
-            return T.vehicle.raw.get(getRaw()) != null;
-        }
-    }
-
-    public boolean isVehicle() {
-        if (T.isVehicle.isAvailable()) {
-            return T.isVehicle.invoke(getRaw());
-        } else {
-            return T.opt_passenger.get(getRaw()) != null;
-        }
-    }
-
-
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
             return T.prop_getMaxFireTicks.invoke(getRaw());
@@ -241,18 +186,6 @@ public abstract class EntityHandle extends Template.Handle {
             return T.getDriverEntity.invoke(getRaw());
         } else {
             return null; // driver feature not a thing on this server
-        }
-    }
-
-
-    public boolean isInSameVehicle(EntityHandle entity) {
-        if (T.isInSameVehicle.isAvailable()) {
-            return T.isInSameVehicle.invoke(getRaw(), entity);
-        } else {
-            Object rawPassenger = T.opt_passenger.raw.get(this.getRaw());
-            Object rawVehicle = T.vehicle.raw.get(this.getRaw());
-            Object rawEntity = entity.getRaw();
-            return rawEntity == rawPassenger || rawEntity == rawVehicle;
         }
     }
 
@@ -351,10 +284,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Converted<EntityTrackerEntryHandle> tracker = new Template.Field.Converted<EntityTrackerEntryHandle>();
         public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Boolean preventBlockPlace = new Template.Field.Boolean();
-        @Template.Optional
-        public final Template.Field.Converted<List<EntityHandle>> opt_passengers = new Template.Field.Converted<List<EntityHandle>>();
-        @Template.Optional
-        public final Template.Field.Converted<EntityHandle> opt_passenger = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
         public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
         public final Template.Field.Double lastX = new Template.Field.Double();
@@ -399,6 +328,12 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Long move_SomeState = new Template.Field.Long();
         public final Template.Field.Boolean valid = new Template.Field.Boolean();
 
+        public final Template.Method.Converted<List<EntityHandle>> getPassengers = new Template.Method.Converted<List<EntityHandle>>();
+        public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> hasPassengers = new Template.Method<Boolean>();
+        public final Template.Method.Converted<Void> setPassengers = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
         public final Template.Method<Double> getLocX = new Template.Method<Double>();
         public final Template.Method<Double> getLocY = new Template.Method<Double>();
         public final Template.Method<Double> getLocZ = new Template.Method<Double>();
@@ -406,7 +341,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocY = new Template.Method<Void>();
         public final Template.Method<Void> setLocZ = new Template.Method<Void>();
         public final Template.Method<Void> setLoc = new Template.Method<Void>();
-        public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
         public final Template.Method<Vector> getMot = new Template.Method<Vector>();
@@ -460,10 +394,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
-        @Template.Optional
-        public final Template.Method<Boolean> isVehicle = new Template.Method<Boolean>();
-        @Template.Optional
-        public final Template.Method<Boolean> isPassenger = new Template.Method<Boolean>();
         public final Template.Method<Void> recalcPosition = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
         public final Template.Method<Void> setOnFire = new Template.Method<Void>();
@@ -477,8 +407,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
-        @Template.Optional
-        public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();
         public final Template.Method<UUID> getUniqueID = new Template.Method<UUID>();
@@ -497,6 +425,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();
         public final Template.Method<World> getBukkitWorld = new Template.Method<World>();
+        public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method<Entity> getBukkitEntity = new Template.Method<Entity>();
 
     }

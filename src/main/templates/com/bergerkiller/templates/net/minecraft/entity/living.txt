@@ -139,9 +139,9 @@ class EntityLiving extends Entity {
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastHandItemStacks;
         #require net.minecraft.world.entity.EntityLiving private final NonNullList<ItemStack> lastArmorItemStacks;
         NonNullList lastHandItemStacks = instance#lastHandItemStacks;
-        NonNullList lastArmorItemStack = instance#lastArmorItemStack;
+        NonNullList lastArmorItemStacks = instance#lastArmorItemStacks;
         lastHandItemStacks.clear();
-        lastArmorItemStack.clear();
+        lastArmorItemStacks.clear();
 #elseif version >= 1.16
         // Is only set in constructor, so we'll have to force it
         // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?

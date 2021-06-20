@@ -31,7 +31,3 @@ class PlayerList {
     }
 #endif
 }
-
-class net.minecraft.server.dedicated.DedicatedPlayerList extends net.minecraft.server.players.PlayerList {
-
-}

@@ -67,6 +67,7 @@
 #include /net/minecraft/server_level_worldserver.txt
 #include /net/minecraft/server_minecraftserver.txt
 #include /net/minecraft/server_playerlist.txt
+#include /net/minecraft/server_playerlist_dedicated.txt
 #include /net/minecraft/sounds.txt
 #include /net/minecraft/util_entityslice.txt
 #include /net/minecraft/util_inthashmap.txt

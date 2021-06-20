@@ -1,5 +1,8 @@
 package net.minecraft.server;
 
+import net.minecraft.server.dedicated.DedicatedServer;
+import net.minecraft.server.dedicated.PropertyManager;
+
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 
 class MinecraftServer {
@@ -11,8 +14,9 @@ class MinecraftServer {
 
     public String getProperty(String key, String defaultValue) {
         DedicatedServer dedicatedServer = (DedicatedServer) instance;
+        //PropertyManager
 #if version >= 1.14
-        return dedicatedServer.getDedicatedServerProperties().properties.getProperty(key, defaultValue);
+        return ((PropertyManager) dedicatedServer.getDedicatedServerProperties()).properties.getProperty(key, defaultValue);
 #else
         return dedicatedServer.getPropertyManager().properties.getProperty(key, defaultValue);
 #endif

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
 import net.minecraft.world.inventory.ContainerAnvil;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;

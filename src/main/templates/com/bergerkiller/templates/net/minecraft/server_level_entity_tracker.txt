@@ -224,8 +224,6 @@ class EntityTrackerEntry {
     }
 #endif
 
-#endif
-
 #if version >= 1.14
   #if version >= 1.17
     #require net.minecraft.server.level.PlayerChunkMap$EntityTracker private final net.minecraft.world.entity.Entity entity;

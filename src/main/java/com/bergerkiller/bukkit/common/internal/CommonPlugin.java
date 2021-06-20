@@ -99,6 +99,10 @@ public class CommonPlugin extends PluginBase {
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
 
+    public CommonPlugin() {
+        instance = this;
+    }
+
     public static boolean hasInstance() {
         return instance != null;
     }
@@ -438,7 +442,6 @@ public class CommonPlugin extends PluginBase {
 
     @Override
     public void onLoad() {
-        instance = this;
         if (!Common.IS_COMPATIBLE) {
             return;
         }

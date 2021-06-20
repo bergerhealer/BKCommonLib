@@ -67,24 +67,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean preventBlockPlace:k;
 #endif
 
-    /* ====== START OF PASSENGER AND VEHICLE LOGIC ====== */
-#if version >= 1.14
-    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
-    public optional (EntityHandle) Entity opt_passenger:###;
-    protected unknown int j;
-#elseif version >= 1.13
-    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
-    public optional (EntityHandle) Entity opt_passenger:###;
-    protected unknown int k;
-#elseif version >= 1.9
-    public optional final (List<EntityHandle>) List<Entity> opt_passengers:passengers;
-    public optional (EntityHandle) Entity opt_passenger:###;
-    protected unknown int j;
-#else
-    public optional final (List<EntityHandle>) List<Entity> opt_passengers:###;
-    public optional (EntityHandle) Entity opt_passenger:passenger;
-#endif
-
 #select version >=
 #case 1.13.1: private (EntityHandle) Entity vehicle;
 #case 1.13:   private (EntityHandle) Entity vehicle:ax;
@@ -94,51 +76,70 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   private (EntityHandle) Entity vehicle;
 #endselect
 
-    <code>
-    public List<EntityHandle> getPassengers() {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
-            if (passengers == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return passengers;
-            }
+    // Gets an unmodifiable List of the passengers of this entity
+    public (List<EntityHandle>) List<Entity> getPassengers() {
+#if version >= 1.17
+        if (instance.passengers == null) {
+            return java.util.Collections.emptyList();
         } else {
-            EntityHandle passenger = T.opt_passenger.get(getRaw());
-            if (passenger == null) {
-                return java.util.Collections.emptyList();
-            } else {
-                return java.util.Arrays.asList(passenger);
-            }
+            return instance.passengers; // ImmutableList<Entity>
         }
+#elseif version >= 1.9
+        if (instance.passengers == null) {
+            return java.util.Collections.emptyList();
+        } else {
+            return java.util.Collections.unmodifiableList(instance.passengers);
+        }
+#else
+        if (instance.passenger != null) {
+            return java.util.Collections.singletonList(instance.passenger);
+        } else {
+            return java.util.Collections.emptyList();
+        }
+#endif
     }
 
+#if version >= 1.9
+    public boolean isVehicle();
+    public boolean isPassenger();
     public boolean hasPassengers() {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> passengers = T.opt_passengers.get(getRaw());
-            return passengers != null && passengers.size() > 0;
-        } else {
-            return T.opt_passenger.get(getRaw()) != null;
+        return instance.passengers != null && !instance.passengers.isEmpty();
+    }
+#else
+    public boolean isVehicle() {
+        return instance.passenger != null;
+    }
+    public boolean isPassenger() {
+        return instance.vehicle != null;
+    }
+    public boolean hasPassengers() {
+        return instance.passenger != null;
+    }
+#endif
+
+    public void setPassengers((List<EntityHandle>) List<Entity> passengers) {
+#if version >= 1.17
+        instance.passengers = com.google.common.collect.ImmutableList.copyOf(passengers);
+#elseif version >= 1.9
+        if (instance.passengers == null) {
+            instance.passengers = new java.util.ArrayList();
         }
+        instance.passengers.clear();
+        instance.passengers.addAll(passengers);
+#else
+        instance.passenger = passengers.isEmpty() ? null : (Entity) passengers.get(0);
+#endif
     }
 
-    public void setPassengers(List<EntityHandle> passengers) {
-        if (T.opt_passengers.isAvailable()) {
-            List<EntityHandle> entity_passengers = T.opt_passengers.get(getRaw());
-            if (entity_passengers == null) {
-                T.opt_passengers.set(getRaw(), passengers);
-            } else {
-                entity_passengers.clear();
-                entity_passengers.addAll(passengers);
-            }
-        } else if (passengers.size() == 0) {
-            T.opt_passenger.set(getRaw(), null);
-        } else {
-            T.opt_passenger.set(getRaw(), passengers.get(0));
-        }
+#if version >= 1.15.2
+    public boolean isInSameVehicle:isSameVehicle((EntityHandle) Entity entity);
+#elseif version >= 1.9
+    public boolean isInSameVehicle:x((EntityHandle) Entity entity);
+#else
+    public boolean isInSameVehicle((EntityHandle) Entity entity) {
+        return entity == instance.passenger || entity == this.vehicle;
     }
-    </code>
-    /* ====== END OF PASSENGER AND VEHICLE LOGIC ====== */
+#endif
 
     //TODO: Was removed?
     public boolean ignoreChunkCheck:attachedToPlayer;
@@ -207,10 +208,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.locZ = z;
     }
 #endif
-
-    public (WorldHandle) World getWorld() {
-        return instance.world;
-    }
 
     <code>
     public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
@@ -1320,32 +1317,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #if version >= 1.9
-    public optional boolean isVehicle();
-    public optional boolean isPassenger();
     public void recalcPosition();
 #else
-    public optional boolean isVehicle:###();
-    public optional boolean isPassenger:###();
     private void recalcPosition();
 #endif
-
-    <code>
-    public boolean isPassenger() {
-        if (T.isPassenger.isAvailable()) {
-            return T.isPassenger.invoke(getRaw());
-        } else {
-            return T.vehicle.raw.get(getRaw()) != null;
-        }
-    }
-
-    public boolean isVehicle() {
-        if (T.isVehicle.isAvailable()) {
-            return T.isVehicle.invoke(getRaw());
-        } else {
-            return T.opt_passenger.get(getRaw()) != null;
-        }
-    }
-    </code>
 
     public boolean isBurning();
 
@@ -1440,26 +1415,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean isSneaking();
 
-#if version >= 1.15.2
-    public optional boolean isInSameVehicle:isSameVehicle((EntityHandle) Entity entity);
-#elseif version >= 1.9
-    public optional boolean isInSameVehicle:x((EntityHandle) Entity entity);
-#else
-    public optional boolean isInSameVehicle:###((EntityHandle) Entity entity);
-#endif
-    <code>
-    public boolean isInSameVehicle(EntityHandle entity) {
-        if (T.isInSameVehicle.isAvailable()) {
-            return T.isInSameVehicle.invoke(getRaw(), entity);
-        } else {
-            Object rawPassenger = T.opt_passenger.raw.get(this.getRaw());
-            Object rawVehicle = T.vehicle.raw.get(this.getRaw());
-            Object rawEntity = entity.getRaw();
-            return rawEntity == rawPassenger || rawEntity == rawVehicle;
-        }
-    }
-    </code>
-
     public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
 
     public int getId();
@@ -1525,6 +1480,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         return instance.level.getWorld();
 #else
         return instance.world.getWorld();
+#endif
+    }
+
+    public (WorldHandle) World getWorld() {
+#if version >= 1.17
+        return instance.level;
+#else
+        return instance.world;
 #endif
     }
 

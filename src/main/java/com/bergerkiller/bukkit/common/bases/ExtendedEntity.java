@@ -715,12 +715,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public boolean hasPlayerPassenger() {
-        List<EntityHandle> passengers = handle.getPassengers();
-        if (passengers != null) {
-            for (EntityHandle handle : passengers) {
-                if (EntityPlayerHandle.T.isAssignableFrom(handle.getRaw())) {
-                    return true;
-                }
+        for (EntityHandle handle : handle.getPassengers()) {
+            if (EntityPlayerHandle.T.isAssignableFrom(handle.getRaw())) {
+                return true;
             }
         }
         return false;
