@@ -78,7 +78,7 @@ class WorldServer extends World {
     }
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
-        return instance.getChunkProvider().playerChunkMap;
+        return instance.getChunkProvider()#playerChunkMap;
     }
 #else
     public Object getEntityTrackerHandle() {

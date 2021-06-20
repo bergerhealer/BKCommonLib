@@ -1,5 +1,6 @@
 package net.minecraft.server.level;
 
+import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.world.level.chunk.Chunk;
@@ -19,9 +20,16 @@ import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.world.ICubeWatcher;
 
 class PlayerChunk {
+#if version >= 1.17
+    #require net.minecraft.server.level.EntityPlayer public net.minecraft.server.network.PlayerConnection playerConnection:connection;
+#else
+    #require net.minecraft.server.level.EntityPlayer public net.minecraft.server.network.PlayerConnection playerConnection;
+#endif
 
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
-#if version >= 1.14
+#if version >= 1.17
+        return (PlayerChunkMap) instance.playerProvider;
+#elseif version >= 1.14
         return (PlayerChunkMap) instance.players;
 #elseif version >= 1.9
         #require net.minecraft.server.level.PlayerChunk private final PlayerChunkMap playerChunkMap;
@@ -105,8 +113,9 @@ class PlayerChunk {
         java.util.Iterator iter = players.iterator();
         while (iter.hasNext()) {
             EntityPlayer player = (EntityPlayer) iter.next();
-            if (player.playerConnection != null) {
-                player.playerConnection.sendPacket((net.minecraft.network.protocol.Packet) packet);
+            PlayerConnection connection = player#playerConnection;
+            if (connection != null) {
+                connection.sendPacket((net.minecraft.network.protocol.Packet) packet);
             }
         }
 
@@ -153,14 +162,19 @@ class PlayerChunk {
         net.minecraft.world.level.lighting.LightEngine lightEngine = instance#lightEngine;
 
         // Create a lighting update packet, similar to how it is done in PlayerChunk
+  #if version >= 1.17
+        PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, null, null, false);
+  #else
         PacketPlayOutLightUpdate packet = new PacketPlayOutLightUpdate(chunk.getPos(), lightEngine, 0x3FFFF, 0x3FFFF, false);
+  #endif
 
         // Send the packet to all players that can see this player chunk
         java.util.Iterator players_iter = players.iterator();
         while (players_iter.hasNext()) {
             EntityPlayer player = (EntityPlayer) players_iter.next();
-            if (player.playerConnection != null) {
-                player.playerConnection.sendPacket((net.minecraft.network.protocol.Packet) packet);
+            PlayerConnection connection = player#playerConnection;
+            if (connection != null) {
+                connection.sendPacket((net.minecraft.network.protocol.Packet) packet);
             }
         }
 
@@ -204,7 +218,11 @@ class PlayerChunk {
     }
 #endif
 
-#if version >= 1.14.3
+#if version >= 1.17
+    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+        return instance.playerProvider.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
+    }
+#elseif version >= 1.14.3
     public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
         return instance.players.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }

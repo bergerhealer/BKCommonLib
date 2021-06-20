@@ -7,6 +7,7 @@ import net.minecraft.world.level.chunk.ChunkSection;
 import net.minecraft.world.level.EnumSkyBlock;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.levelgen.HeightMap;
+import net.minecraft.world.level.levelgen.HeightMap$Type;
 import net.minecraft.world.level.World;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;

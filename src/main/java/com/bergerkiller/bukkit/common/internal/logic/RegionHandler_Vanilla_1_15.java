@@ -24,7 +24,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
- * Handles region-based operations from MC 1.14 onwards
+ * Handles region-based operations from MC 1.15 to MC 1.17
  */
 public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
     private final FastMethod<Object> findRegionFileCache = new FastMethod<Object>();
@@ -38,6 +38,8 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         resolver.addImport("net.minecraft.server.level.PlayerChunkMap");
         resolver.addImport("net.minecraft.server.level.ChunkProviderServer");
         resolver.addImport("net.minecraft.server.level.WorldServer");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.IChunkLoader");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.RegionFile");
         resolver.setDeclaredClassName("net.minecraft.world.level.chunk.storage.RegionFileCache");
         resolver.setVariable("version", Common.MC_VERSION);
 
@@ -46,37 +48,59 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         Class<?> t_RegionFileCache = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileCache");
         if (t_RegionFileCache.isAssignableFrom(PlayerChunkMapHandle.T.getType())) {
             // PaperMC
-            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "#if version >= 1.17\n" +
+                    "    PlayerChunkMap pcm = cps.chunkMap;\n" +
+                    "#else\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
+                    "#endif\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
+                    "#if version >= 1.17\n" +
+                    "    return rfc.regionCache;\n" +
+                    "#else\n" +
                     "    return rfc.cache;\n" +
-                    "}");
+                    "#endif\n" +
+                    "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
         } else {
             // Spigot/CraftBukkit/vanilla NMS
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "#if version >= 1.17\n" +
+                    "    PlayerChunkMap pcm = cps.chunkMap;\n" +
+                    "#else\n" +
                     "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
+                    "#endif\n" +
                     "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
-                    "#if exists net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    "#if exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
                     /*   Paperspigot compatible code  */
-                    "    #require net.minecraft.server.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
                     "    RegionFileCache rfc = icl#regionFileCache;\n" +
                     "#else\n" +
                     /*   Normal Spigot code */
-                    "    #require net.minecraft.server.IChunkLoader private final IOWorker ioworker:a;\n" +
-                    "    IOWorker ioworker = icl#ioworker;\n" +
-                    "  #if version >= 1.16\n" +
-                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:d;\n" +
+                    "  #if version >= 1.17\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;\n" +
                     "  #else\n" +
-                    "    #require net.minecraft.server.IOWorker private final RegionFileCache cache:e;\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;\n" +
+                    "  #endif\n" +
+                    "    IOWorker ioworker = icl#ioworker;\n" +
+                    "  #if version >= 1.17\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;\n" +
+                    "  #elseif version >= 1.16\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;\n" +
+                    "  #else\n" +
+                    "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;\n" +
                     "  #endif\n" +
                     "    RegionFileCache rfc = ioworker#cache;\n" +
                     "#endif\n" +
+                    "#if version >= 1.17\n" +
+                    "    return rfc.regionCache;\n" +
+                    "#else\n" +
                     "    return rfc.cache;\n" +
+                    "#endif\n" +
                     "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
         }

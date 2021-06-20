@@ -9,6 +9,8 @@ class RegionFile {
             instance.close();
         } catch (java.nio.channels.ClosedChannelException ex) {
             // Suppress
+        } catch (java.io.IOException ex) {
+            // Suppress
         }
     }
 #elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public void close()

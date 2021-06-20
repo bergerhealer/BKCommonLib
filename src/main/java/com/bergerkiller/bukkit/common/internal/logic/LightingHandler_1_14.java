@@ -129,7 +129,7 @@ public class LightingHandler_1_14 implements LightingHandler {
                 throw new IllegalStateException("LightEngineThreaded.Update has no PRE_UPDATE constant");
             }
             if (postUpdate == null) {
-                throw new IllegalStateException("LightEngineThreaded.Update has no POSTE_UPDATE constant");
+                throw new IllegalStateException("LightEngineThreaded.Update has no POST_UPDATE constant");
             }
             light_engine_pre_update = preUpdate;
             light_engine_post_update = postUpdate;
@@ -226,14 +226,7 @@ public class LightingHandler_1_14 implements LightingHandler {
             this.engine = LightEngineThreadedHandle.forWorld(world);
             this.tasks = new ArrayList<UpdateTask>();
             this.stage = new AtomicInteger(0);
-
-            try {
-                final IntSupplier priority = golden_ticket;
-                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_pre_update, (Runnable) this::preRun);
-                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_post_update, (Runnable) this::postRun);
-            } catch (Throwable t) {
-                throw new IllegalStateException("Failed to schedule updates", t);
-            }
+            schedule();
         }
 
         public void preRun() {
@@ -267,6 +260,32 @@ public class LightingHandler_1_14 implements LightingHandler {
                         }
                     }
                 });
+            } else if (stage.get() == 0) {
+                // Well this is bad! We got to run before the preRun() did.
+                // We will need to re-schedule this post update again, the pre-update is likely
+                // sitting in a queue waiting to be executed.
+                try {
+                    schedule();
+                } catch (IllegalStateException ex) {
+                    // If this for some reason fails, fail all the tasks with the exception
+                    if (stage.compareAndSet(1, 2)) {
+                        CommonUtil.nextTick(() -> {
+                            for (UpdateTask task : tasks) {
+                                task.future.completeExceptionally(ex);
+                            }
+                        });
+                    }
+                }
+            }
+        }
+
+        private void schedule() throws IllegalStateException {
+            try {
+                final IntSupplier priority = golden_ticket;
+                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_pre_update, (Runnable) this::preRun);
+                light_engine_schedule.invoke(engine.getRaw(), 0, 0, priority, light_engine_post_update, (Runnable) this::postRun);
+            } catch (Throwable t) {
+                throw new IllegalStateException("Failed to schedule updates", t);
             }
         }
     }
@@ -344,6 +363,7 @@ public class LightingHandler_1_14 implements LightingHandler {
     @Template.Import("net.minecraft.server.MCUtil")
     @Template.Import("net.minecraft.core.SectionPosition")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
+    @Template.Import("net.minecraft.world.level.EnumSkyBlock")
     @Template.InstanceType("net.minecraft.world.level.lighting.LightEngine")
     public static abstract class LightEngineHandle extends Template.Class<Template.Handle> {
 
@@ -367,7 +387,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_SKY_LIGHT_DATA>
          * public static void storeSkyLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *     engine.a(net.minecraft.world.level.EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
          * }
          */
         @Template.Generated("%STORE_SKY_LIGHT_DATA%")
@@ -377,7 +397,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_BLOCK_LIGHT_DATA>
          * public static void storeBlockLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *     engine.a(net.minecraft.world.level.EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
          * }
          */
         @Template.Generated("%STORE_BLOCK_LIGHT_DATA%")
@@ -392,7 +412,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     if (dataNibble == null) {
          *         // Missing, use engine to register and store a new section
          *         final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         *         final net.minecraft.world.level.EnumSkyBlock enumSky = skyLight ? net.minecraft.world.level.EnumSkyBlock.SKY : net.minecraft.world.level.EnumSkyBlock.BLOCK;
+         *         final EnumSkyBlock enumSky = skyLight ? EnumSkyBlock.SKY : EnumSkyBlock.BLOCK;
          *         engine.a(enumSky, pos, new NibbleArray(data_bytes), true);
          *         return;
          *     }
