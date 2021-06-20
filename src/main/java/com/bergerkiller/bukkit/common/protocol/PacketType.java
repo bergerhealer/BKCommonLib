@@ -190,7 +190,11 @@ public class PacketType extends ClassTemplate<Object> {
 
         // If not specified, find NMS Packet Class Type
         if (packetClass == null) {
-            packetClass = CommonUtil.getClass("net.minecraft.network.protocol.game." + this.name);
+            if (this.name.equals("Packet")) {
+                packetClass = CommonUtil.getClass("net.minecraft.network.protocol." + this.name);
+            } else {
+                packetClass = CommonUtil.getClass("net.minecraft.network.protocol.game." + this.name);
+            }
         }
 
         if (packetClass == null) {

@@ -19,15 +19,15 @@ public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityTeleportHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     public static final PacketPlayOutEntityTeleportHandle createNew(Entity entity) {
         return T.constr_entity.newInstance(entity);
     }
 
     /* ============================================================================== */
+
+    public static PacketPlayOutEntityTeleportHandle createNew() {
+        return T.createNew.invoke();
+    }
 
 
     @Override
@@ -95,7 +95,6 @@ public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityTeleportClass extends Template.Class<PacketPlayOutEntityTeleportHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle> constr = new Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle>();
         public final Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle> constr_entity = new Template.Constructor.Converted<PacketPlayOutEntityTeleportHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
@@ -116,6 +115,8 @@ public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Byte pitch_raw = new Template.Field.Byte();
         public final Template.Field.Boolean onGround = new Template.Field.Boolean();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityTeleportHandle>();
 
     }
 

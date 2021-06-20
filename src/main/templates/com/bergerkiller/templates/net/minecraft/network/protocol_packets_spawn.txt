@@ -412,7 +412,13 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private unknown List<DataWatcher.WatchableObject> dataWatcherItems:m;
 #endif
 
-    public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving();
+    public static (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving createNew() {
+#if version >= 1.17
+        return new PacketPlayOutSpawnEntityLiving(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutSpawnEntityLiving();
+#endif
+    }
 
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) EntityLiving entity);
 

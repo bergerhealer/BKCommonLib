@@ -2,6 +2,8 @@ package net.minecraft.network.protocol.game;
 
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.syncher.DataWatcher;
+import net.minecraft.network.syncher.DataWatcher.Item;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldServer;
@@ -18,7 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
-import net.minecraft.world.level.saveddata.maps.MapIcon;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.Vec3D;
 
@@ -44,7 +45,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle.ChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
@@ -607,7 +607,7 @@ class PacketPlayOutSetSlot extends Packet {
 #if version >= 1.17
     private int windowId:containerId;
     private int slot;
-    private (org.bukkit.inventory.ItemStack) ItemStack item:itemstack;
+    private (org.bukkit.inventory.ItemStack) ItemStack item:itemStack;
 #else
     private int windowId:a;
     private int slot:b;
@@ -964,98 +964,6 @@ class PacketPlayOutPlayerListHeaderFooter extends Packet {
 #endif
 }
 
-class PacketPlayOutMap extends Packet {
-#if version >= 1.17
-    private int itemId:mapId;
-    private byte scale;
-#else
-    private int itemId:a;
-    private byte scale:b;
-#endif
-
-#if version >= 1.17
-    //TODO: ITs all gone! :(
-    // =============================
-    private optional boolean track:MOVED;
-    private optional boolean locked:MOVED;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:MOVED;
-    private int xmin:MOVED;
-    private int ymin:MOVED;
-    private int width:MOVED;
-    private int height:MOVED;
-    private byte[] pixels:MOVED;
-    // =============================
-
-#elseif version >= 1.14
-    private optional boolean track:c;
-    private optional boolean locked:d;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:e;
-    private int xmin:f;
-    private int ymin:g;
-    private int width:h;
-    private int height:i;
-    private byte[] pixels:j;
-#elseif version >= 1.9
-    private optional boolean track:c;
-    private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:d;
-    private int xmin:e;
-    private int ymin:f;
-    private int width:g;
-    private int height:h;
-    private byte[] pixels:i;
-#else
-    private optional boolean track:###;
-    private optional boolean locked:###;
-    private (org.bukkit.map.MapCursor[]) MapIcon[] cursors:c;
-    private int xmin:d;
-    private int ymin:e;
-    private int width:f;
-    private int height:g;
-    private byte[] pixels:h;
-#endif
-
-    public (PacketPlayOutMapHandle) PacketPlayOutMap();
-
-#if version >= 1.14
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean locked:d;
-
-    public boolean isLocked() {
-        return instance#locked;
-    }
-
-    public void setLocked(boolean locked) {
-        instance#locked = locked;
-    }
-#else
-    public boolean isLocked() {
-        return false;
-    }
-
-    public void setLocked(boolean locked) {
-    }
-#endif
-
-#if version >= 1.9
-    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean track:c;
-
-    public boolean isTrack() {
-        return instance#track;
-    }
-
-    public void setTrack(boolean track) {
-        instance#track = track;
-    }
-#else
-    public boolean isTrack() {
-        return false;
-    }
-
-    public void setTrack(boolean track) {
-    }
-#endif
-}
-
 class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.17
     private int x;
@@ -1317,6 +1225,20 @@ optional class PacketPlayOutCustomSoundEffect extends Packet {
     </code>
 }
 
+class PacketPlayInSteerVehicle extends Packet {
+#if version >= 1.17
+    private final float sideways:xxa;
+    private final float forwards:zza;
+    private final boolean jump:isJumping;
+    private final boolean unmount:isShiftKeyDown;
+#else
+    private float sideways:a;
+    private float forwards:b;
+    private boolean jump:c;
+    private boolean unmount:d;
+#endif
+}
+
 class PacketPlayOutPosition extends Packet {
     private double x:a;
     private double y:b;
@@ -1370,7 +1292,9 @@ class PacketPlayOutPosition extends Packet {
 
     public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
         java.util.Set flags = com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allRelative();
-#if version >= 1.9
+#if version >= 1.17
+        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0, false);
+#elseif version >= 1.9
         return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
 #else
         return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags);
@@ -1385,7 +1309,9 @@ class PacketPlayOutPosition extends Packet {
 
     public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createAbsolute(double x, double y, double z, float yaw, float pitch) {
         java.util.Set flags = com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allAbsolute();
-#if version >= 1.9
+#if version >= 1.17
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0, false);
+#elseif version >= 1.9
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
 #else
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags);
@@ -1619,7 +1545,13 @@ optional class PacketPlayOutMount extends Packet {
     private int[] mountedEntityIds:b;
 #endif
 
-    public (PacketPlayOutMountHandle) PacketPlayOutMount();
+    public static (PacketPlayOutMountHandle) PacketPlayOutMount createNew() {
+#if version >= 1.17
+        return new PacketPlayOutMount(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutMount();
+#endif
+    }
 
     <code>
     public void addMountedEntityId(int entityId) {
@@ -1843,7 +1775,7 @@ class PacketPlayOutUpdateAttributes extends Packet {
 #if version >= 1.16
         // Internal code uses a Consumer for callbacks, so no need to create a proxy for that
         java.util.function.Consumer callback = com.bergerkiller.bukkit.common.utils.LogicUtil.noopConsumer();
-        AttributeModifiable attribute = new AttributeModifiable(GenericAttributes.MAX_HEALTH, callback);
+        AttributeModifiable attribute = new AttributeModifiable(net.minecraft.world.entity.ai.attributes.GenericAttributes.MAX_HEALTH, callback);
 #else
         // Internal code calls a callback on this instance, so we need a dummy one to catch that
         AttributeMapBase attributeMapBase = (AttributeMapBase) com.bergerkiller.bukkit.common.internal.proxy.DummyAttributeMapBase.INSTANCE;

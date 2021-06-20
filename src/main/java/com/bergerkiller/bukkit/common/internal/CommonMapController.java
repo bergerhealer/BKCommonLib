@@ -70,7 +70,6 @@ import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -83,6 +82,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
@@ -589,7 +589,7 @@ public class CommonMapController implements PacketListener, Listener {
     public synchronized void onPacketSend(PacketSendEvent event) {
         // Check if any virtual single maps are attached to this map
         if (event.getType() == PacketType.OUT_MAP) {    
-            int itemid = event.getPacket().read(PacketType.OUT_MAP.itemId);
+            int itemid = event.getPacket().read(PacketType.OUT_MAP.mapId);
             this.storeStaticMapId(itemid);
 
             // This used to be used to just cancel interfering plugins
@@ -694,14 +694,14 @@ public class CommonMapController implements PacketListener, Listener {
             Player p = event.getPlayer();
             MapPlayerInput input = playerInputs.get(p);
             if (input != null) {
-                CommonPacket packet = event.getPacket();
-                int dx = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.sideways));
-                int dy = (int) -Math.signum(packet.read(PacketType.IN_STEER_VEHICLE.forwards));
+                PacketPlayInSteerVehicleHandle packet = PacketPlayInSteerVehicleHandle.createHandle(event.getPacket().getHandle());
+                int dx = (int) -Math.signum(packet.getSideways());
+                int dy = (int) -Math.signum(packet.getForwards());
                 int dz = 0;
-                if (packet.read(PacketType.IN_STEER_VEHICLE.unmount)) {
+                if (packet.isUnmount()) {
                     dz -= 1;
                 }
-                if (packet.read(PacketType.IN_STEER_VEHICLE.jump)) {
+                if (packet.isJump()) {
                     dz += 1;
                 }
 

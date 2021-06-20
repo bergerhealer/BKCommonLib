@@ -72,11 +72,6 @@ public class MapDisplayTile {
 
         MapClip tileClip = (clip == null) ? null : clip.getArea(startX, startY, RESOLUTION, RESOLUTION);
         if (tileClip == null || tileClip.everything) {
-            mapUpdate.packet.setXmin(0);
-            mapUpdate.packet.setYmin(0);
-            mapUpdate.packet.setWidth(RESOLUTION);
-            mapUpdate.packet.setHeight(RESOLUTION);
-
             // Copy the full 128x128 tile area
             byte[] pixels = new byte[RESOLUTION * RESOLUTION];
             for (int y = 0; y < RESOLUTION; y++) {
@@ -84,7 +79,7 @@ public class MapDisplayTile {
                 srcPos += stride;
                 dstPos += RESOLUTION;
             }
-            mapUpdate.packet.setPixels(pixels);
+            mapUpdate.packet.setPixelData(0, 0, RESOLUTION, RESOLUTION, pixels);
             return mapUpdate;
         } else if (tileClip.dirty) {
             int w = tileClip.getWidth();
@@ -99,11 +94,7 @@ public class MapDisplayTile {
                 dstPos += w;
             }
 
-            mapUpdate.packet.setXmin(tileClip.getX());
-            mapUpdate.packet.setYmin(tileClip.getY());
-            mapUpdate.packet.setWidth(w);
-            mapUpdate.packet.setHeight(h);
-            mapUpdate.packet.setPixels(pixels);
+            mapUpdate.packet.setPixelData(tileClip.getX(), tileClip.getY(), w, h, pixels);
             return mapUpdate;
         } else {
             // No updates for this tile, only send if markers changed
@@ -115,22 +106,12 @@ public class MapDisplayTile {
      * A single update packet for a tile
      */
     public static final class Update implements Cloneable {
-        private static final byte[] NO_DATA = new byte[0];
         public final IntVector2 tile;
         public final PacketPlayOutMapHandle packet;
 
         public Update(IntVector2 tile, int mapId) {
             this.tile = tile;
-            this.packet = PacketPlayOutMapHandle.createNew();
-            this.packet.setItemId(mapId);
-            this.packet.setScale((byte) 1);
-            this.packet.setTrack(false);
-            this.packet.setLocked(false);
-            this.packet.setXmin(0);
-            this.packet.setYmin(0);
-            this.packet.setWidth(0);
-            this.packet.setHeight(0);
-            this.packet.setPixels(NO_DATA);
+            this.packet = PacketPlayOutMapHandle.createNew(); // Note: fully initializes a valid packet!
         }
 
         private Update(IntVector2 tile, PacketPlayOutMapHandle packet) {

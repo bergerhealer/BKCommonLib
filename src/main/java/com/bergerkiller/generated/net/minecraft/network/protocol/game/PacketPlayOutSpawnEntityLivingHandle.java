@@ -21,15 +21,15 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutSpawnEntityLivingHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     public static final PacketPlayOutSpawnEntityLivingHandle createNew(LivingEntity entity) {
         return T.constr_entity.newInstance(entity);
     }
 
     /* ============================================================================== */
+
+    public static PacketPlayOutSpawnEntityLivingHandle createNew() {
+        return T.createNew.invoke();
+    }
 
 
     public boolean hasDataWatcherSupport() {
@@ -180,7 +180,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutSpawnEntityLivingClass extends Template.Class<PacketPlayOutSpawnEntityLivingHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle> constr = new Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle>();
         public final Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle> constr_entity = new Template.Constructor.Converted<PacketPlayOutSpawnEntityLivingHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
@@ -213,6 +212,8 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         public final Template.Field.Byte headYaw_raw = new Template.Field.Byte();
         @Template.Optional
         public final Template.Field.Converted<DataWatcher> opt_dataWatcher = new Template.Field.Converted<DataWatcher>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutSpawnEntityLivingHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutSpawnEntityLivingHandle>();
 
     }
 

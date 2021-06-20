@@ -75,7 +75,7 @@ public class MojangMappings {
 
         // Just some legal garbage...
         Logging.LOGGER.warning("Since Minecraft 1.17 the server is obfuscated and requires the server mappings to interpret it correctly");
-        Logging.LOGGER.warning("BKCommonLib will now download Minecraft " + Common.MC_VERSION + " server mappings from Mojang's servers");
+        Logging.LOGGER.warning("BKCommonLib will now download Minecraft " + minecraftVersion + " server mappings from Mojang's servers");
         Logging.LOGGER.warning("The file will be installed in: " + mappingsFile.toString());
         Logging.LOGGER.warning("By downloading these files you further agree with Mojang's EULA.");
         Logging.LOGGER.warning("The EULA can be read here: https://account.mojang.com/documents/minecraft_eula");

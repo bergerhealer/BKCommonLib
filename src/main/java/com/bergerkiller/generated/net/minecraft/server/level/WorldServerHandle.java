@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataSer
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
-import java.util.Collection;
+import org.bukkit.entity.Entity;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -39,6 +39,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     }
 
     public abstract List<EntityPlayerHandle> getPlayers();
+    public abstract Entity getEntityByUUID(UUID entityUUID);
     public abstract EntityTracker getEntityTracker();
     public abstract Object getEntityTrackerHandle();
     public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
@@ -47,7 +48,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract WorldDataServerHandle getWorldData();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
-    public abstract Collection<EntityHandle> getEntities();
+    public abstract Iterable<EntityHandle> getEntities();
     public abstract void removeEntity(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
@@ -80,6 +81,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.StaticMethod.Converted<World> getByDimensionKey = new Template.StaticMethod.Converted<World>();
 
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
+        public final Template.Method.Converted<Entity> getEntityByUUID = new Template.Method.Converted<Entity>();
         public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();
         public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
         public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
@@ -92,7 +94,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();
-        public final Template.Method.Converted<Collection<EntityHandle>> getEntities = new Template.Method.Converted<Collection<EntityHandle>>();
+        public final Template.Method.Converted<Iterable<EntityHandle>> getEntities = new Template.Method.Converted<Iterable<EntityHandle>>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();

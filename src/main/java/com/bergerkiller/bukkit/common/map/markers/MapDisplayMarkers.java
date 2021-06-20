@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.bukkit.entity.Player;
-import org.bukkit.map.MapCursor;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
@@ -177,7 +176,7 @@ public class MapDisplayMarkers {
     public boolean addMarkersToUpdate(Player viewer, MapDisplayTile.Update mapUpdate) {
         MapDisplayMarkerTile tile = markersByTile.get(mapUpdate.tile);
         if (tile == null) {
-            mapUpdate.packet.setCursors(new MapCursor[0]);
+            mapUpdate.packet.setCursors(Collections.emptyList());
             return false;
         } else {
             APPLIER.apply(mapUpdate.packet.getRaw(), tile);

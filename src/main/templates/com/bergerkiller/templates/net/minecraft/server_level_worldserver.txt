@@ -4,6 +4,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.level.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkStatus;
 import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.ForcedChunk;
@@ -38,6 +39,16 @@ class WorldServer extends World {
     }
 #endif
 
+    public (org.bukkit.entity.Entity) Entity getEntityByUUID(UUID entityUUID) {
+#if version >= 1.17
+        return instance.getEntities().a(entityUUID);
+#else
+        #require net.minecraft.server.level.WorldServer private final Map<java.util.UUID, Entity> entitiesByUUID;
+        Map map = instance#entitiesByUUID;
+        return map.get((Object) entityUUID);
+#endif
+    }
+
     public com.bergerkiller.bukkit.common.wrappers.EntityTracker getEntityTracker() {
         Object handle = com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.T.getEntityTrackerHandle.invoke(instance);
 
@@ -52,17 +63,19 @@ class WorldServer extends World {
         return new com.bergerkiller.bukkit.common.wrappers.EntityTracker(handle);
     }
 
+    // PlayerChunkMap field of ChunkProviderServer
+#if version >= 1.17
+    #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap:chunkMap;
+#elseif version >= 1.14
+    #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+#endif
+
 #if version >= 1.14
     public Object getEntityTrackerHandle() {
-        return instance.getChunkProvider().playerChunkMap;
+        return instance.getChunkProvider()#playerChunkMap;
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-  #if version >= 1.17
-        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap:chunkMap;
-  #else
-        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
-  #endif
         instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
     }
 
@@ -167,11 +180,14 @@ class WorldServer extends World {
 
 #if version >= 1.14
         long key = ChunkCoordIntPair.pair(cx, cz);
+        PlayerChunkMap playerChunkMap = cps#playerChunkMap;
 
   #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
-        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.getVisibleChunk(key);
+        PlayerChunk chunk = (PlayerChunk) playerChunkMap.getVisibleChunk(key);
+  #elseif version >= 1.17
+        PlayerChunk chunk = (PlayerChunk) playerChunkMap.visibleChunkMap.get(key);
   #else
-        PlayerChunk chunk = (PlayerChunk) cps.playerChunkMap.visibleChunks.get(key);
+        PlayerChunk chunk = (PlayerChunk) playerChunkMap.visibleChunks.get(key);
   #endif
 
         if (chunk != null) {
@@ -206,7 +222,9 @@ class WorldServer extends World {
 #if exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
     public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
         ChunkMapDistance chunkDistanceManager;
-  #if exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
+  #if version >= 1.17
+        chunkDistanceManager = instance.getChunkProvider().chunkMap.distanceManager;
+  #elseif exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
         chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
   #else
         chunkDistanceManager = instance.getChunkProvider().playerChunkMap.u;
@@ -275,16 +293,20 @@ class WorldServer extends World {
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
 #endif
 
-#if version >= 1.14
-    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
+#if version >= 1.17
+    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
+        return instance.getEntities().a();
+    }
+#elseif version >= 1.14
+    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
         return instance.entitiesById.values();
     }
 #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
-    public (Collection<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
+    public (Iterable<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
         return ((World)instance).entityList;
     }
 #else
-    public (Collection<EntityHandle>) Collection<Entity> getEntities() {
+    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
         return ((World)instance).entityList;
     }
 #endif
@@ -303,7 +325,8 @@ class WorldServer extends World {
     public void saveLevel() {
         #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
         ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
-        cps.playerChunkMap#saveChunkMap(true);
+        PlayerChunkMap pcm = cps#playerChunkMap;
+        pcm#saveChunkMap(true);
     }
 #elseif version >= 1.13
     public void saveLevel() {

@@ -1,0 +1,248 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.level.saveddata.maps.MapIcon;
+import net.minecraft.world.level.saveddata.maps.WorldMap;
+import net.minecraft.world.level.saveddata.maps.WorldMap$PatchData;
+
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapHandle;
+
+class PacketPlayOutMap extends Packet {
+#if version >= 1.17
+    private int mapId;
+    private byte scale;
+#else
+    private int mapId:a;
+    private byte scale:b;
+#endif
+
+#if version >= 1.17
+    private final (List<org.bukkit.map.MapCursor>) List<MapIcon> cursors:decorations;
+#elseif version >= 1.14
+    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:e;
+#elseif version >= 1.9
+    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:d;
+#else
+    private (List<org.bukkit.map.MapCursor>) MapIcon[] cursors:c;
+#endif
+
+#if version >= 1.17
+    // Since 1.17 the region coordinates and pixel data are in a separate 'Patch' class
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private final net.minecraft.world.level.saveddata.maps.WorldMap$PatchData colorPatch;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap public net.minecraft.world.level.saveddata.maps.WorldMap$PatchData createPatchData() {
+        WorldMap$PatchData colorPatch;
+        colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            colorPatch = new WorldMap$PatchData(0, 0, 0, 0, new byte[0]);
+            instance#colorPatch = colorPatch;
+        }
+        return colorPatch;
+    }
+
+    // All fields inside the PatchData class
+    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int startX;
+    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int startY;
+    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int width;
+    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final int height;
+    #require net.minecraft.world.level.saveddata.maps.WorldMap$PatchData public final byte[] mapColors;
+
+    public int getStartX() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            return 0;
+        } else {
+            return colorPatch#startX;
+        }
+    }
+
+    public void setStartX(int startx) {
+        WorldMap$PatchData colorPatch = instance#createPatchData();
+        colorPatch#startX = startx;
+    }
+
+    public int getStartY() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            return 0;
+        } else {
+            return colorPatch#startY;
+        }
+    }
+
+    public void setStartY(int starty) {
+        WorldMap$PatchData colorPatch = instance#createPatchData();
+        colorPatch#startY = starty;
+    }
+
+    public int getWidth() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            return 0;
+        } else {
+            return colorPatch#width;
+        }
+    }
+
+    public void setWidth(int width) {
+        WorldMap$PatchData colorPatch = instance#createPatchData();
+        colorPatch#width = width;
+    }
+
+    public int getHeight() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            return 0;
+        } else {
+            return colorPatch#height;
+        }
+    }
+
+    public void setHeight(int height) {
+        WorldMap$PatchData colorPatch = instance#createPatchData();
+        colorPatch#height = height;
+    }
+
+    public byte[] getPixels() {
+        WorldMap$PatchData colorPatch = instance#colorPatch;
+        if (colorPatch == null) {
+            return null;
+        } else {
+            return colorPatch#mapColors;
+        }
+    }
+
+    public void setPixels(byte[] pixels) {
+        WorldMap$PatchData colorPatch = instance#createPatchData();
+        colorPatch#mapColors = pixels;
+    }
+
+    public void setPixelData(int startX, int startY, int width, int height, byte[] pixels) {
+        WorldMap$PatchData colorPatch = new WorldMap$PatchData(startX, startY, width, height, pixels);
+        instance#colorPatch = colorPatch;
+    }
+
+#else
+    // On Minecraft 1.16.5 and earlier all fields were in the packet itself
+  #if version >= 1.14
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:h;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:i;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:j;
+  #elseif version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:e;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:h;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:i;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int startx:d;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int starty:e;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int width:f;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private int height:g;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private byte[] pixels:h;
+  #endif
+
+    public int getStartX() {
+        return instance#starty;
+    }
+
+    public void setStartX(int starty) {
+        instance#starty = starty;
+    }
+
+    public int getStartY() {
+        return instance#starty;
+    }
+
+    public void setStartY(int starty) {
+        instance#starty = starty;
+    }
+
+    public int getWidth() {
+        return instance#width;
+    }
+
+    public void setWidth(int width) {
+        instance#width = width;
+    }
+
+    public int getHeight() {
+        return instance#height;
+    }
+
+    public void setHeight(int height) {
+        instance#height = height;
+    }
+
+    public byte[] getPixels() {
+        return instance#pixels;
+    }
+
+    public void setPixels(byte[] pixels) {
+        instance#pixels = pixels;
+    }
+
+    public void setPixelData(int startX, int startY, int width, int height, byte[] pixels) {
+        instance#startx = startX;
+        instance#starty = startY;
+        instance#width = width;
+        instance#height = height;
+        instance#pixels = pixels;
+    }
+#endif
+
+#if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private final boolean locked;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean locked:d;
+  #endif
+
+    public boolean isLocked() {
+        return instance#locked;
+    }
+
+    public void setLocked(boolean locked) {
+        instance#locked = locked;
+    }
+#else
+    public boolean isLocked() {
+        return false;
+    }
+
+    public void setLocked(boolean locked) {
+    }
+#endif
+
+#if version >= 1.9 && version < 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutMap private boolean track:c;
+
+    public boolean isTrack() {
+        return instance#track;
+    }
+
+    public void setTrack(boolean track) {
+        instance#track = track;
+    }
+#else
+    public boolean isTrack() {
+        return false;
+    }
+
+    public void setTrack(boolean track) {
+    }
+#endif
+
+    public static (PacketPlayOutMapHandle) PacketPlayOutMap createNew() {
+#if version >= 1.17
+        return new PacketPlayOutMap(0, (byte) 1, false, null, null);
+#elseif version >= 1.14
+        return new PacketPlayOutMap(0, (byte) 1, false, false, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
+#elseif version >= 1.9
+        return new PacketPlayOutMap(0, (byte) 1, false, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
+#else
+        return new PacketPlayOutMap(0, (byte) 1, java.util.Collections.emptyList(), null, 0, 0, 0, 0);
+#endif
+    }
+}

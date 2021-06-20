@@ -7,15 +7,9 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
-import java.util.Map;
-import java.util.UUID;
-
 @Deprecated
 public class NMSWorldServer extends NMSWorld {
     public static final ClassTemplate<?> T = ClassTemplate.create(WorldServerHandle.T.getType());
-
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public static final FieldAccessor<Map<UUID, Object>> entitiesByUUID = (FieldAccessor) WorldServerHandle.T.entitiesByUUID.raw.toFieldAccessor();
 
     public static final FieldAccessor<Object> chunkProviderServer = new SafeDirectField<Object>() {
         @Override

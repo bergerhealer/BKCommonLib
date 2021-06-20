@@ -23,6 +23,7 @@ import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -55,6 +56,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSettingsHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInTeleportAcceptHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle;
@@ -120,11 +122,15 @@ import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
 import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 public class NMSPacketClasses {
 
     public static class NMSPacket extends PacketType {
-        private SafeConstructor<CommonPacket> _constructor0 = null;
+        private FastMethod<CommonPacket> _constructor0 = null;
 
         protected NMSPacket(Class<?> packetClass) {
             super(packetClass);
@@ -141,9 +147,24 @@ public class NMSPacketClasses {
         @Override
         public CommonPacket newInstance() {
             if (this._constructor0 == null) {
-                this._constructor0 = getPacketConstructor();
+                ClassResolver resolver = new ClassResolver();
+                resolver.addImport(CommonPacket.class.getName());
+                resolver.setDeclaredClass(this.getType());
+                resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
+                MethodDeclaration mDec = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+                        "public static CommonPacket newInstance() {\n" +
+                        "#if version >= 1.17\n" +
+                        "    Object packet = new " + this.getType().getName() + "(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);\n" +
+                        "#else\n" +
+                        "    Object packet = new " + this.getType().getName() + "();\n" +
+                        "#endif\n" +
+                        "    return new CommonPacket(packet);\n" +
+                        "}", resolver));
+                this._constructor0 = new FastMethod<CommonPacket>();
+                this._constructor0.init(mDec);
+                this._constructor0.forceInitialization();
             }
-            return this._constructor0.newInstance();
+            return this._constructor0.invoke(null);
         }
     }
 
@@ -473,10 +494,10 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInSteerVehicle extends NMSPacket {
 
-        public final FieldAccessor<Float> sideways = nextField("private float a");
-        public final FieldAccessor<Float> forwards = nextFieldSignature("private float b");
-        public final FieldAccessor<Boolean> jump = nextFieldSignature("private boolean c");
-        public final FieldAccessor<Boolean> unmount = nextFieldSignature("private boolean d");
+        public final FieldAccessor<Float> sideways = PacketPlayInSteerVehicleHandle.T.sideways.toFieldAccessor();
+        public final FieldAccessor<Float> forwards = PacketPlayInSteerVehicleHandle.T.forwards.toFieldAccessor();
+        public final FieldAccessor<Boolean> jump = PacketPlayInSteerVehicleHandle.T.jump.toFieldAccessor();
+        public final FieldAccessor<Boolean> unmount = PacketPlayInSteerVehicleHandle.T.unmount.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInTabComplete extends NMSPacket {
@@ -1165,18 +1186,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutKeepAlive extends NMSPacket {
 
-        public final FieldAccessor<Long> key = new SafeDirectField<Long>() {
-            @Override
-            public Long get(Object instance) {
-                return Long.valueOf(PacketPlayOutKeepAliveHandle.createHandle(instance).getKey());
-            }
-
-            @Override
-            public boolean set(Object instance, Long value) {
-                PacketPlayOutKeepAliveHandle.createHandle(instance).setKey(value.longValue());
-                return true;
-            }
-        };
+        public final FieldAccessor<Long> key = FieldAccessor.wrapMethods(PacketPlayOutKeepAliveHandle.T.getKey, PacketPlayOutKeepAliveHandle.T.setKey);
     }
 
     public static class NMSPacketPlayOutKickDisconnect extends NMSPacket {
@@ -1192,100 +1202,22 @@ public class NMSPacketClasses {
         public final FieldAccessor<ResourceKey<DimensionType>> dimensionType = PacketPlayOutLoginHandle.T.dimensionType.toFieldAccessor();
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
         public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
-
-        public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {
-            @Override
-            public Difficulty get(Object instance) {
-                if (PacketPlayOutLoginHandle.T.difficulty.isAvailable()) {
-                    return  PacketPlayOutLoginHandle.T.difficulty.get(instance);
-                } else {
-                    return Difficulty.NORMAL;
-                }
-            }
-
-            @Override
-            public boolean set(Object instance, Difficulty value) {
-                if (PacketPlayOutLoginHandle.T.difficulty.isAvailable()) {
-                    PacketPlayOutLoginHandle.T.difficulty.set(instance, value);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
-        public final FieldAccessor<Integer> viewDistance = new SafeDirectField<Integer>() {
-            @Override
-            public Integer get(Object instance) {
-                if (PacketPlayOutLoginHandle.T.viewDistance.isAvailable()) {
-                    return PacketPlayOutLoginHandle.T.viewDistance.get(instance);
-                }
-                return 10;
-            }
-
-            @Override
-            public boolean set(Object instance, Integer value) {
-                if (PacketPlayOutLoginHandle.T.viewDistance.isAvailable()) {
-                    PacketPlayOutLoginHandle.T.viewDistance.set(instance, value);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
+        public final FieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor().ignoreInvalid(Difficulty.NORMAL);
+        public final FieldAccessor<Integer> viewDistance = PacketPlayOutLoginHandle.T.viewDistance.toFieldAccessor().ignoreInvalid(10);
     }
 
     public static class NMSPacketPlayOutMap extends NMSPacket {
 
-        public final FieldAccessor<Integer> itemId = PacketPlayOutMapHandle.T.itemId.toFieldAccessor();
+        public final FieldAccessor<Integer> mapId = PacketPlayOutMapHandle.T.mapId.toFieldAccessor();
         public final FieldAccessor<Byte> scale = PacketPlayOutMapHandle.T.scale.toFieldAccessor();
-        public final FieldAccessor<MapCursor[]> cursors = PacketPlayOutMapHandle.T.cursors.toFieldAccessor();
-        public final FieldAccessor<Integer> xmin = PacketPlayOutMapHandle.T.xmin.toFieldAccessor();
-        public final FieldAccessor<Integer> ymin = PacketPlayOutMapHandle.T.ymin.toFieldAccessor();
-        public final FieldAccessor<Integer> width = PacketPlayOutMapHandle.T.width.toFieldAccessor();
-        public final FieldAccessor<Integer> height = PacketPlayOutMapHandle.T.height.toFieldAccessor();
-        public final FieldAccessor<byte[]> pixels = PacketPlayOutMapHandle.T.pixels.toFieldAccessor();
-
-        public final FieldAccessor<Boolean> locked = new SafeDirectField<Boolean>() {
-            @Override
-            public Boolean get(Object instance) {
-                if (PacketPlayOutMapHandle.T.locked.isAvailable()) {
-                    return PacketPlayOutMapHandle.T.locked.get(instance);
-                } else {
-                    return false;
-                }
-            }
-
-            @Override
-            public boolean set(Object instance, Boolean value) {
-                if (PacketPlayOutMapHandle.T.locked.isAvailable()) {
-                    PacketPlayOutMapHandle.T.locked.set(instance, value);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
-
-        public final FieldAccessor<Boolean> track = new SafeDirectField<Boolean>() {
-            @Override
-            public Boolean get(Object instance) {
-                if (PacketPlayOutMapHandle.T.track.isAvailable()) {
-                    return PacketPlayOutMapHandle.T.track.get(instance);
-                } else {
-                    return true;
-                }
-            }
-
-            @Override
-            public boolean set(Object instance, Boolean value) {
-                if (PacketPlayOutMapHandle.T.track.isAvailable()) {
-                    PacketPlayOutMapHandle.T.track.set(instance, value);
-                    return true;
-                } else {
-                    return false;
-                }
-            }
-        };
+        public final FieldAccessor<List<MapCursor>> cursors = PacketPlayOutMapHandle.T.cursors.toFieldAccessor();
+        public final FieldAccessor<Integer> startX = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getStartX, PacketPlayOutMapHandle.T.setStartX);
+        public final FieldAccessor<Integer> startY = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getStartY, PacketPlayOutMapHandle.T.setStartY);
+        public final FieldAccessor<Integer> width = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getWidth, PacketPlayOutMapHandle.T.setWidth);
+        public final FieldAccessor<Integer> height = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getHeight, PacketPlayOutMapHandle.T.setHeight);
+        public final FieldAccessor<byte[]> pixels = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.getPixels, PacketPlayOutMapHandle.T.setPixels);
+        public final FieldAccessor<Boolean> locked = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.isLocked, PacketPlayOutMapHandle.T.setLocked);
+        public final FieldAccessor<Boolean> track = FieldAccessor.wrapMethods(PacketPlayOutMapHandle.T.isTrack, PacketPlayOutMapHandle.T.setTrack);
     }
 
     public static class NMSPacketPlayOutMapChunk extends NMSPacket {

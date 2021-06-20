@@ -12,6 +12,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHangingHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -39,16 +40,11 @@ public class EntityUtil extends EntityPropertyUtil {
      * Finds an Entity that has the given entity UUID from a world
      *
      * @param world to find the Entity
-     * @param uid of the Entity to find
+     * @param uuid of the Entity to find
      * @return the found Entity, or null if not found
      */
-    public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uid) {
-        for (org.bukkit.entity.Entity entity : WorldUtil.getEntities(world)) {
-            if (entity.getUniqueId().equals(uid)) {
-                return entity;
-            }
-        }
-        return null;
+    public static org.bukkit.entity.Entity getEntity(org.bukkit.World world, UUID uuid) {
+        return WorldServerHandle.fromBukkit(world).getEntityByUUID(uuid);
     }
 
     /**

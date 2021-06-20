@@ -30,8 +30,20 @@ optional class PacketPlayOutVehicleMove extends Packet {
 }
 
 class PacketPlayOutEntityTeleport extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+#else
     private int entityId:a;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
+    private optional double posX_1_10_2:x;
+    private optional double posY_1_10_2:y;
+    private optional double posZ_1_10_2:z;
+#elseif version >= 1.9
     private optional int posX_1_8_8:###;
     private optional int posY_1_8_8:###;
     private optional int posZ_1_8_8:###;
@@ -46,11 +58,24 @@ class PacketPlayOutEntityTeleport extends Packet {
     private optional double posY_1_10_2:###;
     private optional double posZ_1_10_2:###;
 #endif
+
+#if version >= 1.17
+    private optional byte yaw_raw:yRot;
+    private optional byte pitch_raw:xRot;
+    private boolean onGround;
+#else
     private optional byte yaw_raw:e;
     private optional byte pitch_raw:f;
     private boolean onGround:g;
+#endif
 
-    public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport();
+    public static (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport createNew() {
+#if version >= 1.17
+        return new PacketPlayOutEntityTeleport(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutEntityTeleport();
+#endif
+    }
 
     public (PacketPlayOutEntityTeleportHandle) PacketPlayOutEntityTeleport((org.bukkit.entity.Entity) Entity entity);
 

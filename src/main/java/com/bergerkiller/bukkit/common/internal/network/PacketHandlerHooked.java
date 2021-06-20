@@ -10,6 +10,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
@@ -42,7 +43,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
     @Override
     public boolean onEnable() {
         // Initialize all receiver methods
-        Class<?> packetType = PacketType.DEFAULT.getType();
+        Class<?> packetType = PacketHandle.T.getType();
         for (Method method : PlayerConnectionHandle.T.getType().getDeclaredMethods()) {
             if (method.getReturnType() != void.class || method.getParameterTypes().length != 1
                     || !Modifier.isPublic(method.getModifiers())) {

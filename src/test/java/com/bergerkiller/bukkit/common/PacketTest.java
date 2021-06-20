@@ -8,6 +8,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
 
 public class PacketTest {
 
@@ -41,5 +42,10 @@ public class PacketTest {
         id = EnumProtocolHandle.PLAY.getPacketIdOut(PacketPlayOutEntityDestroyHandle.T.getType());
         assertNotEquals(-1, id);
         assertEquals(PacketPlayOutEntityDestroyHandle.T.getType(), EnumProtocolHandle.PLAY.getPacketClassOut(id));
+    }
+
+    @Test
+    public void testPacketTeleportCreateNew() {
+        assertNotNull(PacketPlayOutEntityTeleportHandle.createNew());
     }
 }

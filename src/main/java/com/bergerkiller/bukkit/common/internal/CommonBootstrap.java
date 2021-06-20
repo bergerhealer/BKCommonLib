@@ -22,6 +22,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializerInit;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
 import com.bergerkiller.bukkit.common.server.test.TestServerFactory;
@@ -467,6 +468,7 @@ public class CommonBootstrap {
         // 1.17 mappings
         if (evaluateMCVersion(">=", "1.17")) {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
+            remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$b");
         }
 
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
@@ -519,6 +521,9 @@ public class CommonBootstrap {
                 });
             }
         }
+
+        // Initialize this one right away, as it's used in generated code
+        NullPacketDataSerializerInit.initialize();
 
         // Register converters
         Conversion.registerConverters(WrapperConversion.class);
