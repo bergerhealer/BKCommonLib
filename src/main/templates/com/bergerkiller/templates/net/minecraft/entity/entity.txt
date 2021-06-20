@@ -607,7 +607,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #select version >=
-#case 1.7:    #require net.minecraft.world.entity.Entity private float stepCounter:nextStep;
+#case 1.17:   #require net.minecraft.world.entity.Entity private float stepCounter:nextStep;
 #case 1.16.2: #require net.minecraft.world.entity.Entity private float stepCounter:am;
 #case 1.16:   #require net.minecraft.world.entity.Entity private float stepCounter:at;
 #case 1.14:   #require net.minecraft.world.entity.Entity private float stepCounter:av;

@@ -292,19 +292,19 @@ class WorldServer extends World {
 #endif
 
 #if version >= 1.17
-    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
+    public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities() {
         return instance.getEntities().a();
     }
 #elseif version >= 1.14
-    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
+    public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities() {
         return instance.entitiesById.values();
     }
 #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
-    public (Iterable<EntityHandle>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
+    public (Iterable<org.bukkit.entity.Entity>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
         return ((World)instance).entityList;
     }
 #else
-    public (Iterable<EntityHandle>) Iterable<Entity> getEntities() {
+    public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities() {
         return ((World)instance).entityList;
     }
 #endif

@@ -47,7 +47,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract WorldDataServerHandle getWorldData();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
-    public abstract Iterable<EntityHandle> getEntities();
+    public abstract Iterable<Entity> getEntities();
     public abstract void removeEntity(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
@@ -90,7 +90,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();
-        public final Template.Method.Converted<Iterable<EntityHandle>> getEntities = new Template.Method.Converted<Iterable<EntityHandle>>();
+        public final Template.Method.Converted<Iterable<Entity>> getEntities = new Template.Method.Converted<Iterable<Entity>>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();

@@ -309,11 +309,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     }
 
     private Class<?> loadClass(String name) throws ClassNotFoundException {
-        Class<?> type = Resolver.loadClass(name, false);
-        if (type == null) {
-            throw new ClassNotFoundException("Failed to load class " + name);
-        }
-        return type;
+        return MPLType.getClassByName(Resolver.resolveClassPath(name));
     }
 
     @Override

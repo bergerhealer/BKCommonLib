@@ -25,7 +25,11 @@ class TileEntity {
     protected (org.bukkit.World) World world_field:world;
 #endif
 
+#if version >= 1.17
     protected (IntVector3) BlockPosition position_field:worldPosition;
+#else
+    protected (IntVector3) BlockPosition position_field:position;
+#endif
 
     public (WorldHandle) World getWorld();
 

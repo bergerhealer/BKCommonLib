@@ -280,14 +280,15 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Gets a live collection (allows modification in the world) of entities on
-     * a given world
+     * Gets an iterable of entities for a given world.
+     * This class should only be used for performance reasons,
+     * it is not safe to do a lot of logic while iterating over it.
      *
      * @param world the entities are on
      * @return collection of entities on the world
      */
-    public static Collection<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
-        return DuplexConversion.entityCollection.convert(WorldServerHandle.T.getEntities.raw.invoke(HandleConversion.toWorldHandle(world)));
+    public static Iterable<org.bukkit.entity.Entity> getEntities(org.bukkit.World world) {
+        return WorldServerHandle.fromBukkit(world).getEntities();
     }
 
     /**

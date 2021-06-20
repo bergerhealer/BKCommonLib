@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import org.objectweb.asm.FieldVisitor;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
@@ -36,6 +37,11 @@ public class NullPacketDataSerializerInit {
             return;
         } else {
             is_initialized = true;
+        }
+
+        // Only used on 1.17 and later
+        if (CommonBootstrap.evaluateMCVersion("<", "1.17")) {
+            return;
         }
 
         // If class already exists, the library was probably reloaded. The generated class doesn't touch
