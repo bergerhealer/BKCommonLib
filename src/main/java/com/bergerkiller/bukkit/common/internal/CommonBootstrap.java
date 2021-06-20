@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.MC1_17_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
@@ -440,6 +441,7 @@ public class CommonBootstrap {
                 // Fixes hardcoded fastutil paths used in templates
                 for (String fastutilClass : new String[] {
                         "longs.Long2ObjectLinkedOpenHashMap",
+                        "ints.Int2ObjectMap",
                         "ints.Int2ObjectOpenHashMap",
                         "longs.Long2ObjectOpenHashMap",
                         "longs.Long2IntOpenHashMap",
@@ -531,6 +533,10 @@ public class CommonBootstrap {
         Conversion.registerConverters(NBTConversion.class);
         if (evaluateMCVersion("<=", "1.8.8")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
+        }
+        if (evaluateMCVersion(">=", "1.17")) {
+            MC1_17_Conversion.init();
+            Conversion.registerConverters(MC1_17_Conversion.class);
         }
 
         // Initialize the 'Conversion' classes right after to catch errors happening here

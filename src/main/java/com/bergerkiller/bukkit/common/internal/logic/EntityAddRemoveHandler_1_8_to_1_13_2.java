@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
@@ -30,7 +31,9 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 
@@ -41,6 +44,7 @@ import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
 public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
     private final Class<?> iWorldAccessType;
     private final SafeField<?> entitiesByIdField;
+    private final FastField<Map<UUID, Object>> entitiesByUUIDField = new FastField<Map<UUID, Object>>();
     private final FastField<List<Object>> entityListField;
     private final SafeField<List<Object>> accessListField;
     private final SafeField<Collection<Object>> entityRemoveQueue;
@@ -53,6 +57,18 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             this.entityListField.init(WorldHandle.T.getType().getDeclaredField("entityList"));
         } catch (Throwable t) {
             throw MountiplexUtil.uncheckedRethrow(t);
+        }
+
+        // EntitiesByUUID is a Map on MC 1.13.2 and before
+        try {
+            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesByUUID");
+            entitiesByUUIDField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
+            if (!Map.class.isAssignableFrom(entitiesByUUIDField.getType())) {
+                throw new IllegalStateException("Field not assignable to Map");
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesByUUID field: " + t.getMessage(), t);
+            entitiesByUUIDField.initUnavailable("entitiesByUUID");
         }
 
         if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
@@ -193,13 +209,13 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
         // *** Entities By UUID Map ***
         {
-            Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
-            EntityHandle storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
-            if (storedEntityHandle != null && storedEntityHandle.getRaw() != newEntity.getRaw()) {
+            Map<UUID, Object> entitiesByUUID = entitiesByUUIDField.get(worldHandle);
+            Object storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
+            if (storedEntityHandle != null && storedEntityHandle != newEntity.getRaw()) {
                 if (!oldEntity.getUniqueID().equals(newEntity.getUniqueID())) {
                     entitiesByUUID.remove(oldEntity.getUniqueID());
                 }
-                entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+                entitiesByUUID.put(newEntity.getUniqueID(), newEntity.getRaw());
             }
         }
 
@@ -216,8 +232,8 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         }
 
         // *** Entities By UUID Map ***
-        final Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
-        entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+        final Map<UUID, Object> entitiesByUUID =entitiesByUUIDField.get(worldHandle);
+        entitiesByUUID.put(newEntity.getUniqueID(), newEntity.getRaw());
 
         // *** Entities by Id Map ***
         IntHashMapHandle entitiesById = IntHashMapHandle.createHandle(this.entitiesByIdField.get(worldHandle));

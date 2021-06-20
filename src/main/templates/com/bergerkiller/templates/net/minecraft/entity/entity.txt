@@ -1521,11 +1521,19 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void collide((EntityHandle) Entity entity);
 
     public org.bukkit.World getBukkitWorld() {
+#if version >= 1.17
+        return instance.level.getWorld();
+#else
         return instance.world.getWorld();
+#endif
     }
 
     public org.bukkit.entity.Entity getBukkitEntity() {
+#if version >= 1.17
+        if (instance.level == null) {
+#else
         if (instance.world == null) {
+#endif
             // We need this to avoid NPE's for non-spawned entities!
             #require net.minecraft.world.entity.Entity protected org.bukkit.craftbukkit.entity.CraftEntity bukkitEntity;
             org.bukkit.entity.Entity entity = instance#bukkitEntity;

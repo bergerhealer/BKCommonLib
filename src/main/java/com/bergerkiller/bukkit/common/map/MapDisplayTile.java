@@ -112,6 +112,7 @@ public class MapDisplayTile {
         public Update(IntVector2 tile, int mapId) {
             this.tile = tile;
             this.packet = PacketPlayOutMapHandle.createNew(); // Note: fully initializes a valid packet!
+            this.packet.setMapId(mapId);
         }
 
         private Update(IntVector2 tile, PacketPlayOutMapHandle packet) {

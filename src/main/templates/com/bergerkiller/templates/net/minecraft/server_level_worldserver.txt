@@ -26,8 +26,6 @@ import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 
 class WorldServer extends World {
-    private final (Map<java.util.UUID, EntityHandle>) Map<java.util.UUID, Entity> entitiesByUUID;
-
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
 #if version >= 1.14

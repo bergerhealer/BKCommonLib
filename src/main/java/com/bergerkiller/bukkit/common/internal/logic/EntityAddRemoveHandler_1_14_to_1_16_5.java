@@ -33,25 +33,29 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is
  * to hook the 'entitiesByUUID' map, and override the methods that add/remove from it.
  */
-public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
+public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
     private final FastField<?> entitiesByIdField = new FastField<Object>();
+    private final FastField<Map<UUID, Object>> entitiesByUUIDField = new FastField<Map<UUID, Object>>();
     private final SafeField<Queue<Object>> entitiesToAddField;
     private final List<EntitiesByUUIDMapHook> hooks = new ArrayList<EntitiesByUUIDMapHook>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityIterationSetMethod = new FastMethod<Object>();
     private final FastMethod<Object> paperspigotSwapEntityInChunkEntityListMethod = new FastMethod<Object>();
 
-    //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
-    public EntityAddRemoveHandler_1_14() {
+    public EntityAddRemoveHandler_1_14_to_1_16_5() {
+        //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
         try {
-            entitiesByIdField.init(WorldServerHandle.T.getType().getDeclaredField("entitiesById"));
+            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesById");
+            entitiesByIdField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
             if (!IntHashMapHandle.T.isAssignableFrom(entitiesByIdField.getType())) {
                 throw new IllegalStateException("Field not assignable to IntHashmap");
             }
@@ -59,7 +63,23 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
             Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesById field: " + t.getMessage(), t);
             entitiesByIdField.initUnavailable("entitiesById");
         }
-        this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), "entitiesToAdd", Queue.class));
+
+        // EntitiesByUUID is a Map on MC 1.16.5 and before
+        try {
+            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesByUUID");
+            entitiesByUUIDField.init(MPLType.getDeclaredField(WorldServerHandle.T.getType(), fieldName));
+            if (!Map.class.isAssignableFrom(entitiesByUUIDField.getType())) {
+                throw new IllegalStateException("Field not assignable to Map");
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize WorldServer entitiesByUUID field: " + t.getMessage(), t);
+            entitiesByUUIDField.initUnavailable("entitiesByUUID");
+        }
+
+        {
+            String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesToAdd");
+            this.entitiesToAddField = CommonUtil.unsafeCast(SafeField.create(WorldServerHandle.T.getType(), fieldName, Queue.class));
+        }
 
         // Tuinity support: 'loadedEntities' field of WorldServer
         try {
@@ -124,13 +144,12 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void hook(World world) {
         Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
-        Map<UUID, Object> base = (Map<UUID, Object>) WorldServerHandle.T.entitiesByUUID.raw.get(nmsWorldHandle);
+        Map<UUID, Object> base = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (!(base instanceof EntitiesByUUIDMapHook)) {
             EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(world, base);
-            WorldServerHandle.T.entitiesByUUID.raw.set(nmsWorldHandle, hook);
+            this.entitiesByUUIDField.set(nmsWorldHandle, hook);
             hooks.add(hook);
         }
     }
@@ -138,9 +157,9 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
     @Override
     public void unhook(World world) {
         Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
-        Object value = WorldServerHandle.T.entitiesByUUID.raw.get(nmsWorldHandle);
+        Map<UUID, Object> value = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (value instanceof EntitiesByUUIDMapHook) {
-            WorldServerHandle.T.entitiesByUUID.raw.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
+            this.entitiesByUUIDField.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
             hooks.remove(value);
         }
     }
@@ -275,13 +294,13 @@ public class EntityAddRemoveHandler_1_14 extends EntityAddRemoveHandler {
 
         // *** Entities By UUID Map ***
         {
-            Map<UUID, EntityHandle> entitiesByUUID = WorldServerHandle.T.entitiesByUUID.get(worldHandle);
-            EntityHandle storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
-            if (storedEntityHandle != null && storedEntityHandle.getRaw() != newEntity.getRaw()) {
+            Map<UUID, Object> entitiesByUUID = this.entitiesByUUIDField.get(worldHandle);
+            Object storedEntityHandle = entitiesByUUID.get(oldEntity.getUniqueID());
+            if (storedEntityHandle != null && storedEntityHandle != newEntity.getRaw()) {
                 if (!oldEntity.getUniqueID().equals(newEntity.getUniqueID())) {
                     entitiesByUUID.remove(oldEntity.getUniqueID());
                 }
-                entitiesByUUID.put(newEntity.getUniqueID(), newEntity);
+                entitiesByUUID.put(newEntity.getUniqueID(), newEntity.getRaw());
             }
         }
 

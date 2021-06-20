@@ -9,8 +9,10 @@ public abstract class EntityAddRemoveHandler {
     public static final EntityAddRemoveHandler INSTANCE;
 
     static {
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            INSTANCE = new EntityAddRemoveHandler_1_14();
+        if (Common.evaluateMCVersion(">=", "1.17")) {
+            INSTANCE = new EntityAddRemoveHandler_1_17();
+        } else if (Common.evaluateMCVersion(">=", "1.14")) {
+            INSTANCE = new EntityAddRemoveHandler_1_14_to_1_16_5();
         } else {
             INSTANCE = new EntityAddRemoveHandler_1_8_to_1_13_2();
         }

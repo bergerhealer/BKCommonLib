@@ -14,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -67,14 +66,11 @@ public abstract class WorldServerHandle extends WorldHandle {
             WorldHandle.T.field_chunkProvider.set(getRaw(), chunkProviderServerHandle.getRaw());
         }
     }
-    public abstract Map<UUID, EntityHandle> getEntitiesByUUID();
-    public abstract void setEntitiesByUUID(Map<UUID, EntityHandle> value);
     /**
      * Stores class members for <b>net.minecraft.server.level.WorldServer</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldServerClass extends Template.Class<WorldServerHandle> {
-        public final Template.Field.Converted<Map<UUID, EntityHandle>> entitiesByUUID = new Template.Field.Converted<Map<UUID, EntityHandle>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkProviderServerHandle> field_chunkProviderServer = new Template.Field.Converted<ChunkProviderServerHandle>();
 

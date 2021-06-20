@@ -1,6 +1,7 @@
 package net.minecraft.server.level;
 
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -17,23 +18,30 @@ class EntityTracker {
     public final (org.bukkit.World) WorldServer world;
   #endif
 
+  #if version >= 1.17
+    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<PlayerChunkMap.EntityTracker> trackedEntities:entityMap;
+  #else
+    #require net.minecraft.server.level.EntityTracker public final it.unimi.dsi.fastutil.ints.Int2ObjectMap<PlayerChunkMap.EntityTracker> trackedEntities;
+  #endif
+
     public (Collection<com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle>) Collection<EntityTrackerEntry> getEntries() {
-        return instance.trackedEntities.values();
+        return instance#trackedEntities.values();
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry getEntry(int entityId) {
-        return (PlayerChunkMap$EntityTracker) instance.trackedEntities.get(entityId);
+        return (PlayerChunkMap$EntityTracker) instance#trackedEntities.get(entityId);
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
+       it.unimi.dsi.fastutil.ints.Int2ObjectMap trackedEntities = instance#trackedEntities;
         if (entry == null) {
-            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.remove(entityId);
-        } else if (instance.trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
-            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.put(entityId, entry);
+            return (PlayerChunkMap$EntityTracker) trackedEntities.remove(entityId);
+        } else if (trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
+            return (PlayerChunkMap$EntityTracker) trackedEntities.put(entityId, entry);
         } else {
             // ProtocolSupport (or other hooks): bypass put() callback handler to guarantee it is put
-            instance.trackedEntities.remove(entityId);
-            return (PlayerChunkMap$EntityTracker) instance.trackedEntities.putIfAbsent(entityId, entry);
+            trackedEntities.remove(entityId);
+            return (PlayerChunkMap$EntityTracker) trackedEntities.putIfAbsent(entityId, entry);
         }
     }
 
@@ -154,7 +162,26 @@ class EntityTrackerEntry {
     }
 #endif
 
-#if fieldexists net.minecraft.server.level.EntityTrackerEntry public Map<EntityPlayer, Boolean> trackedPlayerMap;
+#if version >= 1.17
+    // Stores a set of ServerPlayerConnection objects, requires <> EntityPlayer conversion
+
+    public (java.util.Collection<org.bukkit.entity.Player>) Set<ServerPlayerConnection> getViewers() {
+        return instance.seenBy;
+    }
+
+    public void clearViewers() {
+        instance.seenBy.clear();
+    }
+
+    public boolean addViewerToSet((org.bukkit.entity.Player) ServerPlayerConnection viewer) {
+        return instance.seenBy.add(viewer);
+    }
+
+    public boolean removeViewerFromSet((org.bukkit.entity.Player) ServerPlayerConnection viewer) {
+        return instance.seenBy.remove(viewer);
+    }
+
+#elseif fieldexists net.minecraft.server.level.EntityTrackerEntry public Map<EntityPlayer, Boolean> trackedPlayerMap;
     // Stored as a Map of players (Paperspigot)
 
     public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {

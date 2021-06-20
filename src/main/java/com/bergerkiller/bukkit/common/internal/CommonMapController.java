@@ -489,7 +489,8 @@ public class CommonMapController implements PacketListener, Listener {
             UUID mapUUID = tag.getUUID("mapDisplay");
             if (mapUUID != null) {
                 item = trimExtraData(item);
-                CommonMapUUIDStore.setItemMapId(item, getMapId(new MapUUID(mapUUID, tileX, tileY)));
+                int id = getMapId(new MapUUID(mapUUID, tileX, tileY));
+                CommonMapUUIDStore.setItemMapId(item, id);
                 return item;
             }
         }
@@ -679,6 +680,7 @@ public class CommonMapController implements PacketListener, Listener {
 
                     ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
                     CommonMapUUIDStore.setItemMapId(newMapItem, newMapId);
+
                     item = item.clone();
                     item.setValue(newMapItem, item.isChanged());
                     itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);

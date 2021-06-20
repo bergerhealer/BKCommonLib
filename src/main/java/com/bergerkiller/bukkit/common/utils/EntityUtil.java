@@ -12,7 +12,6 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHangingHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -99,14 +98,17 @@ public class EntityUtil extends EntityPropertyUtil {
      * Is near something?
      */
     public static boolean isNearChunk(org.bukkit.entity.Entity entity, final int cx, final int cz, final int chunkview) {
-        final int x = MathUtil.toChunk(getLocX(entity)) - cx;
-        final int z = MathUtil.toChunk(getLocZ(entity)) - cz;
+        //EntityHandle.T.getLocX.invoke(h(
+        EntityHandle handle = EntityHandle.fromBukkit(entity);
+        final int x = MathUtil.toChunk(handle.getLocX()) - cx;
+        final int z = MathUtil.toChunk(handle.getLocZ()) - cz;
         return Math.abs(x) <= chunkview && Math.abs(z) <= chunkview;
     }
 
     public static boolean isNearBlock(org.bukkit.entity.Entity entity, final int bx, final int bz, final int blockview) {
-        final int x = MathUtil.floor(getLocX(entity) - bx);
-        final int z = MathUtil.floor(getLocZ(entity) - bz);
+        EntityHandle handle = EntityHandle.fromBukkit(entity);
+        final int x = MathUtil.floor(handle.getLocX() - bx);
+        final int z = MathUtil.floor(handle.getLocZ() - bz);
         return Math.abs(x) <= blockview && Math.abs(z) <= blockview;
     }
 
