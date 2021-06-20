@@ -14,19 +14,9 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     protected boolean cancelled;
     protected EntityType entityType;
-    protected int minSpawnCount, maxSpawnCount;
     protected final Location spawnLocation = new Location(null, 0, 0, 0);
 
     protected CreaturePreSpawnEvent() {
-    }
-
-    /**
-     * Sets the Entity Type being spawned
-     *
-     * @param entityType to set to
-     */
-    public void setEntityType(EntityType entityType) {
-        this.entityType = entityType;
     }
 
     /**
@@ -36,42 +26,6 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
      */
     public EntityType getEntityType() {
         return this.entityType;
-    }
-
-    /**
-     * Gets the minimum amount of times the Entity is spawned
-     *
-     * @return spawn couny
-     */
-    public int getMinSpawnCount() {
-        return this.minSpawnCount;
-    }
-
-    /**
-     * Sets the minimum amount of times the Entity is spawned
-     *
-     * @param minSpawnCount to set to
-     */
-    public void setMinSpawnCount(int minSpawnCount) {
-        this.minSpawnCount = minSpawnCount;
-    }
-
-    /**
-     * Gets the maximum amount of times the Entity is spawned
-     *
-     * @return spawn couny
-     */
-    public int getMaxSpawnCount() {
-        return this.maxSpawnCount;
-    }
-
-    /**
-     * Sets the maximum amount of times the Entity is spawned
-     *
-     * @param maxSpawnCount to set to
-     */
-    public void setMaxSpawnCount(int maxSpawnCount) {
-        this.maxSpawnCount = maxSpawnCount;
     }
 
     /**

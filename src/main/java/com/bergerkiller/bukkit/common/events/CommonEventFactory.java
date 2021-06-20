@@ -1,15 +1,13 @@
 package com.bergerkiller.bukkit.common.events;
 
-import com.bergerkiller.bukkit.common.collections.InstanceBuffer;
-import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.biome.BiomeSettingsMobsHandle.SpawnRateHandle;
 import com.google.common.collect.Iterables;
 
+import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 
@@ -26,13 +24,6 @@ public class CommonEventFactory {
     private final EntityMoveEvent entityMoveEvent = new EntityMoveEvent();
     private final List<EntityHandle> entityMoveEntities = new LinkedList<EntityHandle>();
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
-
-    private final InstanceBuffer<SpawnRateHandle> creaturePreSpawnMobs = new InstanceBuffer<SpawnRateHandle>() {
-        @Override
-        public SpawnRateHandle createElement() {
-            return SpawnRateHandle.T.newHandleNull();
-        }
-    };
 
     // Concatenates all world entity lists into one long iterable
     @SuppressWarnings("unchecked")
@@ -85,63 +76,45 @@ public class CommonEventFactory {
     }
 
     /**
-     * Handles the spawning of creatures on the server
+     * Fires a CreaturePreSpawnEvent for one or more entities at/around a given block location
+     * on a world.
      *
-     * @param world
-     * @param x
-     * @param y
-     * @param z
-     * @param inputTypes to process and fire events for
-     * @return a list of mobs to spawn
+     * @param world World where the entity or group of entities are spawned
+     * @param x X-coordinate of the block near which is spawned
+     * @param y Y-coordinate of the block near which is spawned
+     * @param z Z-coordinate of the block near which is spawned
+     * @param entityType Type of entity being spawned
+     * @return True if spawning is allowed, False if it should be cancelled
      */
-    public List<SpawnRateHandle> handleCreaturePreSpawn(World world, int x, int y, int z, List<SpawnRateHandle> inputTypes) {
-        // Shortcuts
-        if (LogicUtil.nullOrEmpty(inputTypes) || !CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
-            return inputTypes;
-        }
+    public boolean handleCreaturePreSpawn(World world, int x, int y, int z, EntityType entityType) {
+        creaturePreSpawnEvent.cancelled = false;
+        creaturePreSpawnEvent.spawnLocation.setWorld(world);
+        creaturePreSpawnEvent.spawnLocation.setX(x);
+        creaturePreSpawnEvent.spawnLocation.setY(y);
+        creaturePreSpawnEvent.spawnLocation.setZ(z);
+        creaturePreSpawnEvent.spawnLocation.setYaw(0.0f);
+        creaturePreSpawnEvent.spawnLocation.setPitch(0.0f);
+        creaturePreSpawnEvent.entityType = entityType;
+        return !CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled();
+    }
 
-        // Start processing the elements
-        creaturePreSpawnMobs.clear();
-        for (SpawnRateHandle inputMeta : inputTypes) {
-            final EntityType oldEntityType = CommonEntityType.byNMSEntityClass(inputMeta.getEntityClass()).entityType;
-
-            // Set up the event
-            creaturePreSpawnEvent.cancelled = false;
-            creaturePreSpawnEvent.spawnLocation.setWorld(world);
-            creaturePreSpawnEvent.spawnLocation.setX(x);
-            creaturePreSpawnEvent.spawnLocation.setY(y);
-            creaturePreSpawnEvent.spawnLocation.setZ(z);
-            creaturePreSpawnEvent.spawnLocation.setYaw(0.0f);
-            creaturePreSpawnEvent.spawnLocation.setPitch(0.0f);
-            creaturePreSpawnEvent.entityType = oldEntityType;
-            creaturePreSpawnEvent.minSpawnCount = inputMeta.getMinSpawnCount();
-            creaturePreSpawnEvent.maxSpawnCount = inputMeta.getMaxSpawnCount();
-
-            // Raise it and handle spawn cancel
-            if (CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled() || (creaturePreSpawnEvent.minSpawnCount == 0 && creaturePreSpawnEvent.maxSpawnCount == 0)) {
-                continue;
-            }
-
-            // Handle a possibly changed entity type
-            final Class<?> entityClass;
-            if (oldEntityType == creaturePreSpawnEvent.entityType) {
-                entityClass = inputMeta.getEntityClass();
-            } else {
-                entityClass = CommonEntityType.byEntityType(creaturePreSpawnEvent.entityType).nmsType.getType();
-            }
-
-            // Unknown or unsupported Entity Type - ignore spawning
-            if (entityClass == null) {
-                continue;
-            }
-
-            // Add element to buffer
-            final SpawnRateHandle outputMeta = creaturePreSpawnMobs.add();
-            outputMeta.setEntityClass(entityClass);
-            outputMeta.setMinSpawnCount(creaturePreSpawnEvent.minSpawnCount);
-            outputMeta.setMaxSpawnCount(creaturePreSpawnEvent.maxSpawnCount);
-            outputMeta.setChance(inputMeta.getChance());
-        }
-        return creaturePreSpawnMobs;
+    /**
+     * Fires a CreaturePreSpawnEvent for one or more entities at/around a given location
+     * on a world.
+     *
+     * @param at The location near or at which is spawned
+     * @param entityType Type of entity being spawned
+     * @return True if spawning is allowed, False if it should be cancelled
+     */
+    public boolean handleCreaturePreSpawn(Location at, EntityType entityType) {
+        creaturePreSpawnEvent.cancelled = false;
+        creaturePreSpawnEvent.spawnLocation.setWorld(at.getWorld());
+        creaturePreSpawnEvent.spawnLocation.setX(at.getX());
+        creaturePreSpawnEvent.spawnLocation.setY(at.getY());
+        creaturePreSpawnEvent.spawnLocation.setZ(at.getZ());
+        creaturePreSpawnEvent.spawnLocation.setYaw(at.getYaw());
+        creaturePreSpawnEvent.spawnLocation.setPitch(at.getPitch());
+        creaturePreSpawnEvent.entityType = entityType;
+        return !CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled();
     }
 }

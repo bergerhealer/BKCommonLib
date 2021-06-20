@@ -19,9 +19,9 @@ import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
-import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
+import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
@@ -226,6 +226,7 @@ public class CommonPlugin extends PluginBase {
     }
 
     public void notifyWorldAdded(org.bukkit.World world) {
+        CreaturePreSpawnHandler.INSTANCE.onWorldEnabled(world);
         EntityAddRemoveHandler.INSTANCE.hook(world);
     }
 
@@ -461,16 +462,20 @@ public class CommonPlugin extends PluginBase {
     @Override
     public void disable() {
         // Erase all traces of BKCommonLib from this server
-        Collection<Entity> entities = new ArrayList<Entity>();
-        for (World world : WorldUtil.getWorlds()) {
-            // Unhook chunk providers
-            ChunkGeneratorHook.unhook(world);
-            // Unhook entities
-            entities.addAll(WorldUtil.getEntities(world));
-            for (Entity entity : entities) {
-                CommonEntity.clearControllers(entity);
+        {
+            Collection<Entity> entities = new ArrayList<Entity>();
+            for (World world : WorldUtil.getWorlds()) {
+                // Unhook potential hooks for this world
+                CreaturePreSpawnHandler.INSTANCE.onWorldDisabled(world);
+                // Unhook entities
+                for (Entity entity : WorldUtil.getEntities(world)) {
+                    entities.add(entity);
+                }
+                for (Entity entity : entities) {
+                    CommonEntity.clearControllers(entity);
+                }
+                entities.clear();
             }
-            entities.clear();
         }
 
         // Shut down any ongoing tasks for the portal handler
@@ -712,11 +717,6 @@ public class CommonPlugin extends PluginBase {
         });
 
         // Register listeners and hooks
-        if (CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
-            for (World world : WorldUtil.getWorlds()) {
-                ChunkGeneratorHook.hook(world);
-            }
-        }
         for (World world : WorldUtil.getWorlds()) {
             notifyWorldAdded(world);
         }
@@ -912,9 +912,7 @@ public class CommonPlugin extends PluginBase {
             if (hasHandlers != this._creaturePreSpawnEventHasHandlers) {
                 this._creaturePreSpawnEventHasHandlers = hasHandlers;
                 if (hasHandlers) {
-                    for (World world : WorldUtil.getWorlds()) {
-                        ChunkGeneratorHook.hook(world);
-                    }
+                    CreaturePreSpawnHandler.INSTANCE.onEventHasHandlers();
                 }
             }
         }

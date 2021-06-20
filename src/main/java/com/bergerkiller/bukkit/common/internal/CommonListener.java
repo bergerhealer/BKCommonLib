@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
-import com.bergerkiller.bukkit.common.internal.hooks.ChunkGeneratorHook;
+import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
@@ -86,9 +86,7 @@ public class CommonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onWorldInit(final WorldInitEvent event) {
-        if (CommonUtil.hasHandlers(CreaturePreSpawnEvent.getHandlerList())) {
-            ChunkGeneratorHook.hook(event.getWorld());
-        }
+        CreaturePreSpawnHandler.INSTANCE.onWorldEnabled(event.getWorld());
         registerDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
         CommonUtil.nextTick(() -> CommonPlugin.getInstance().notifyWorldAdded(event.getWorld()));
     }
