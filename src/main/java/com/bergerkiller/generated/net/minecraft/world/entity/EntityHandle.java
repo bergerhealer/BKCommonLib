@@ -414,13 +414,13 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> onPush = new Template.Method<Void>();
         public final Template.Method<Integer> getPortalCooldownMaximum = new Template.Method<Integer>();
         @Template.Optional
-        public final Template.Method.Converted<Boolean> onInteractBy_1_8_8 = new Template.Method.Converted<Boolean>();
-        @Template.Optional
-        public final Template.Method.Converted<Boolean> onInteractBy_1_9 = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<InteractionResult> onInteractBy_1_16 = new Template.Method.Converted<InteractionResult>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> onInteractBy_1_11_2 = new Template.Method.Converted<Boolean>();
         @Template.Optional
-        public final Template.Method.Converted<InteractionResult> onInteractBy_1_16 = new Template.Method.Converted<InteractionResult>();
+        public final Template.Method.Converted<Boolean> onInteractBy_1_9 = new Template.Method.Converted<Boolean>();
+        @Template.Optional
+        public final Template.Method.Converted<Boolean> onInteractBy_1_8_8 = new Template.Method.Converted<Boolean>();
         public final Template.Method<Boolean> hasCustomName = new Template.Method<Boolean>();
         public final Template.Method.Converted<ChatText> getCustomName = new Template.Method.Converted<ChatText>();
         public final Template.Method.Converted<Void> collide = new Template.Method.Converted<Void>();

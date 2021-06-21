@@ -160,6 +160,7 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.server.level.WorldServer")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceType")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.entity.Entity$RemovalReason")
     @Template.Import("net.minecraft.world.level.block.Blocks")

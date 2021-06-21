@@ -71,8 +71,6 @@ public abstract class PacketPlayInUseItemHandle extends PacketHandle {
         public final Template.Method<Void> setDeltaX = new Template.Method<Void>();
         public final Template.Method<Void> setDeltaY = new Template.Method<Void>();
         public final Template.Method<Void> setDeltaZ = new Template.Method<Void>();
-        @Template.Optional
-        public final Template.Method<Void> initMovingObject = new Template.Method<Void>();
 
     }
 

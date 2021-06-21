@@ -20,11 +20,11 @@ public abstract class PacketPlayOutOpenWindowHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutOpenWindowHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     /* ============================================================================== */
+
+    public static PacketPlayOutOpenWindowHandle createNew() {
+        return T.createNew.invoke();
+    }
 
     public abstract WindowType getWindowType();
     public abstract void setWindowType(WindowType windowType);
@@ -37,10 +37,10 @@ public abstract class PacketPlayOutOpenWindowHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutOpenWindowClass extends Template.Class<PacketPlayOutOpenWindowHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutOpenWindowHandle> constr = new Template.Constructor.Converted<PacketPlayOutOpenWindowHandle>();
-
         public final Template.Field.Integer windowId = new Template.Field.Integer();
         public final Template.Field.Converted<ChatText> windowTitle = new Template.Field.Converted<ChatText>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutOpenWindowHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutOpenWindowHandle>();
 
         public final Template.Method<WindowType> getWindowType = new Template.Method<WindowType>();
         public final Template.Method<Void> setWindowType = new Template.Method<Void>();

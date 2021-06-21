@@ -10,7 +10,9 @@ import net.minecraft.server.level.WorldServer;
 import net.minecraft.sounds.SoundEffect;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.item.EntityItem;
+import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.EnumHand;
+import net.minecraft.world.EnumInteractionResult;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.IBlockData;
@@ -1453,17 +1455,33 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   public int getPortalCooldownMaximum:ar();
 #endselect
 
-    // Since MC 1.8.8
-    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
-
-    // Since MC 1.9
-    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    // Since MC 1.16
+#if version >= 1.16
+    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#else
+    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#endif
 
     // Since MC 1.11.2
+#if version >= 1.11.2 && version < 1.16
     public optional boolean onInteractBy_1_11_2:b((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#else
+    public optional boolean onInteractBy_1_11_2:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#endif
 
-    // Since MC 1.16
-    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+    // Since MC 1.9
+#if version >= 1.9 && version < 1.11.2
+    public optional boolean onInteractBy_1_9:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#else
+    public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#endif
+
+    // Since MC 1.8.8
+#if version < 1.9
+    public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+#else
+    public optional boolean onInteractBy_1_8_8:###((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
+#endif
 
     public boolean hasCustomName();
 

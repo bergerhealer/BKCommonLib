@@ -10,6 +10,8 @@ import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawnHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityHandleHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 
 class PacketPlayOutSpawnEntity extends Packet {
@@ -74,7 +76,13 @@ class PacketPlayOutSpawnEntity extends Packet {
     private int extraData:k;
 #endif
 
-    public (PacketPlayOutSpawnEntityHandle) PacketPlayOutSpawnEntity();
+    public static (PacketPlayOutSpawnEntityHandle) PacketPlayOutSpawnEntity createNew() {
+#if version >= 1.17
+        return new PacketPlayOutSpawnEntity(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutSpawnEntity();
+#endif
+    }
 
     <code>
     @Override
@@ -229,9 +237,22 @@ class PacketPlayOutSpawnEntity extends Packet {
 }
 
 class PacketPlayOutNamedEntitySpawn extends Packet {
+#if version >= 1.17
+    private int entityId;
+    private UUID entityUUID:playerId;
+#else
     private int entityId:a;
     private UUID entityUUID:b;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
+    private optional double posX_1_10_2:x;
+    private optional double posY_1_10_2:y;
+    private optional double posZ_1_10_2:z;
+#elseif version >= 1.9
     private optional int posX_1_8_8:###;
     private optional int posY_1_8_8:###;
     private optional int posZ_1_8_8:###;
@@ -246,8 +267,14 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private optional double posY_1_10_2:###;
     private optional double posZ_1_10_2:###;
 #endif
+
+#if version >= 1.17
+    private optional byte yaw_raw:yRot;
+    private optional byte pitch_raw:xRot;
+#else
     private optional byte yaw_raw:f;
     private optional byte pitch_raw:g;
+#endif
 
 #if version >= 1.9
     private optional (org.bukkit.Material) int heldItem:###;
@@ -264,6 +291,14 @@ class PacketPlayOutNamedEntitySpawn extends Packet {
     private optional (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher opt_dataWatcher:i;
     private unknown List<DataWatcher.WatchableObject> dataWatcherItems:j;
 #endif
+
+    public static (PacketPlayOutNamedEntitySpawnHandle) PacketPlayOutNamedEntitySpawn createNew() {
+#if version >= 1.17
+        return new PacketPlayOutNamedEntitySpawn(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutNamedEntitySpawn();
+#endif
+    }
 
     <code>
     public boolean hasDataWatcherSupport() {
@@ -566,8 +601,20 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 }
 
 class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+#else
     private int entityId:a;
-#if version >= 1.9
+#endif
+
+#if version >= 1.17
+    private optional int posX_1_8_8:###;
+    private optional int posY_1_8_8:###;
+    private optional int posZ_1_8_8:###;
+    private optional double posX_1_10_2:x;
+    private optional double posY_1_10_2:y;
+    private optional double posZ_1_10_2:z;
+#elseif version >= 1.9
     private optional int posX_1_8_8:###;
     private optional int posY_1_8_8:###;
     private optional int posZ_1_8_8:###;
@@ -582,7 +629,12 @@ class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
     private optional double posY_1_10_2:###;
     private optional double posZ_1_10_2:###;
 #endif
+
+#if version >= 1.17
+    private int experience:value;
+#else
     private int experience:e;
+#endif
 
     <code>
     public double getPosX() {
@@ -612,20 +664,29 @@ class PacketPlayOutSpawnEntityExperienceOrb extends Packet {
 }
 
 class PacketPlayOutSpawnEntityPainting extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+#else
     private int entityId:a;
+#endif
 
-#if version >= 1.13
-    private optional UUID entityUUID:entityUUID:b;
+#if version >= 1.17
+    private optional UUID entityUUID:uuid;
+    private (IntVector3) BlockPosition position:pos;
+    private (BlockFace) EnumDirection facing:direction;
+    private (org.bukkit.Art) int art:motive;
+#elseif version >= 1.13
+    private optional UUID entityUUID:b;
     private (IntVector3) BlockPosition position:c;
     private (BlockFace) EnumDirection facing:d;
     private (org.bukkit.Art) int art:e;
 #elseif version >= 1.9
-    private optional UUID entityUUID:entityUUID:b;
+    private optional UUID entityUUID:b;
     private (IntVector3) BlockPosition position:c;
     private (BlockFace) EnumDirection facing:d;
     private (org.bukkit.Art) String art:e;
 #else
-    private optional UUID entityUUID:entityUUID:###;
+    private optional UUID entityUUID:###;
     private (IntVector3) BlockPosition position:b;
     private (BlockFace) EnumDirection facing:c;
     private (org.bukkit.Art) String art:d;

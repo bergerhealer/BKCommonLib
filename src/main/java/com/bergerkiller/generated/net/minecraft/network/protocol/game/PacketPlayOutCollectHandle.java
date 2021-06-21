@@ -32,7 +32,7 @@ public abstract class PacketPlayOutCollectHandle extends PacketHandle {
         public final Template.Field.Integer collectedItemId = new Template.Field.Integer();
         public final Template.Field.Integer collectorEntityId = new Template.Field.Integer();
         @Template.Optional
-        public final Template.Field.Integer unknown = new Template.Field.Integer();
+        public final Template.Field.Integer amount = new Template.Field.Integer();
 
     }
 

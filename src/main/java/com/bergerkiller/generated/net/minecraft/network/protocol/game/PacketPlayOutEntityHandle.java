@@ -95,11 +95,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return T.createHandle(handleInstance);
         }
 
-        public static final PacketPlayOutEntityLookHandle createNew() {
-            return T.constr.newInstance();
-        }
-
         /* ============================================================================== */
+
+        public static PacketPlayOutEntityLookHandle createNew() {
+            return T.createNew.invoke();
+        }
 
 
         @Override
@@ -120,7 +120,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class PacketPlayOutEntityLookClass extends Template.Class<PacketPlayOutEntityLookHandle> {
-            public final Template.Constructor.Converted<PacketPlayOutEntityLookHandle> constr = new Template.Constructor.Converted<PacketPlayOutEntityLookHandle>();
+            public final Template.StaticMethod.Converted<PacketPlayOutEntityLookHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityLookHandle>();
 
         }
 
@@ -142,11 +142,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return T.createHandle(handleInstance);
         }
 
-        public static final PacketPlayOutRelEntityMoveHandle createNew() {
-            return T.constr.newInstance();
-        }
-
         /* ============================================================================== */
+
+        public static PacketPlayOutRelEntityMoveHandle createNew() {
+            return T.createNew.invoke();
+        }
 
 
         @Override
@@ -168,7 +168,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class PacketPlayOutRelEntityMoveClass extends Template.Class<PacketPlayOutRelEntityMoveHandle> {
-            public final Template.Constructor.Converted<PacketPlayOutRelEntityMoveHandle> constr = new Template.Constructor.Converted<PacketPlayOutRelEntityMoveHandle>();
+            public final Template.StaticMethod.Converted<PacketPlayOutRelEntityMoveHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutRelEntityMoveHandle>();
 
         }
 
@@ -190,11 +190,11 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
             return T.createHandle(handleInstance);
         }
 
-        public static final PacketPlayOutRelEntityMoveLookHandle createNew() {
-            return T.constr.newInstance();
-        }
-
         /* ============================================================================== */
+
+        public static PacketPlayOutRelEntityMoveLookHandle createNew() {
+            return T.createNew.invoke();
+        }
 
 
         @Override
@@ -218,7 +218,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class PacketPlayOutRelEntityMoveLookClass extends Template.Class<PacketPlayOutRelEntityMoveLookHandle> {
-            public final Template.Constructor.Converted<PacketPlayOutRelEntityMoveLookHandle> constr = new Template.Constructor.Converted<PacketPlayOutRelEntityMoveLookHandle>();
+            public final Template.StaticMethod.Converted<PacketPlayOutRelEntityMoveLookHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutRelEntityMoveLookHandle>();
 
         }
 

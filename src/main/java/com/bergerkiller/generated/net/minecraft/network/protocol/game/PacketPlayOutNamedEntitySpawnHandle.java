@@ -23,6 +23,10 @@ public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutNamedEntitySpawnHandle createNew() {
+        return T.createNew.invoke();
+    }
+
 
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
@@ -133,6 +137,8 @@ public abstract class PacketPlayOutNamedEntitySpawnHandle extends PacketHandle {
         public final Template.Field.Converted<Material> heldItem = new Template.Field.Converted<Material>();
         @Template.Optional
         public final Template.Field.Converted<DataWatcher> opt_dataWatcher = new Template.Field.Converted<DataWatcher>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutNamedEntitySpawnHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutNamedEntitySpawnHandle>();
 
     }
 

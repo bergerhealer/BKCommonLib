@@ -13,20 +13,37 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 
 // Only >= MC 1.9
 optional class PacketPlayInVehicleMove extends Packet {
+#if version >= 1.17
+    private double posX:x;
+    private double posY:y;
+    private double posZ:z;
+    private float yaw:yRot;
+    private float pitch:xRot;
+#else
     private double posX:a;
     private double posY:b;
     private double posZ:c;
     private float yaw:d;
     private float pitch:e;
+#endif
+    
 }
 
 // Only >= MC 1.9
 optional class PacketPlayOutVehicleMove extends Packet {
+#if version >= 1.17
+    private double posX:x;
+    private double posY:y;
+    private double posZ:z;
+    private float yaw:yRot;
+    private float pitch:xRot;
+#else
     private double posX:a;
     private double posY:b;
     private double posZ:c;
     private float yaw:d;
     private float pitch:e;
+#endif
 }
 
 class PacketPlayOutEntityTeleport extends Packet {
@@ -141,15 +158,27 @@ class PacketPlayOutEntityTeleport extends Packet {
 
 // Only >= MC 1.9
 optional class PacketPlayInBoatMove {
-    private boolean rightPaddle:a;
-    private boolean leftPaddle:b;
+#if version >= 1.17
+    private boolean leftPaddle:left;
+    private boolean rightPaddle:right;
+#else
+    private boolean leftPaddle:a;
+    private boolean rightPaddle:b;
+#endif
 }
 
 class PacketPlayOutEntityVelocity extends Packet {
+#if version >= 1.17
+    private int entityId:id;
+    private int motX_raw:xa;
+    private int motY_raw:ya;
+    private int motZ_raw:za;
+#else
     private int entityId:a;
     private int motX_raw:b;
     private int motY_raw:c;
     private int motZ_raw:d;
+#endif
 
     public static (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity createNew(int entityId, double motX, double motY, double motZ) {
 #if version >= 1.14
@@ -194,17 +223,24 @@ class PacketPlayOutEntityVelocity extends Packet {
 }
 
 class PacketPlayOutEntity extends Packet {
+#if version >= 1.17
+    protected int entityId;
+    protected boolean onGround;
+#else
     protected int entityId:a;
     protected boolean onGround:g;
-    protected unknown boolean hasMovement:h;
-#if version >= 1.15
-    protected unknown boolean isRelative:i;
 #endif
 
 #if version >= 1.14
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dx:xa;
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dy:ya;
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dz:za;
+  #else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dx:b;
     #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dy:c;
     #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected short dz:d;
+  #endif
 
     public double getDeltaX() {
         return (double) instance#dx / 4096.0;
@@ -287,8 +323,13 @@ class PacketPlayOutEntity extends Packet {
     }
 #endif
 
+#if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte yaw:yRot;
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte pitch:xRot;
+#else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte yaw:e;
     #require net.minecraft.network.protocol.game.PacketPlayOutEntity protected byte pitch:f;
+#endif
 
     public float getYaw() {
         return (float) instance#yaw * 360.0f / 256.0f;   
@@ -341,7 +382,13 @@ class PacketPlayOutEntity extends Packet {
     </code>
 
     class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook();
+        public static (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook createNew() {
+#if version >= 1.17
+            return new PacketPlayOutEntity$PacketPlayOutEntityLook(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+            return new PacketPlayOutEntity$PacketPlayOutEntityLook();
+#endif
+        }
 
         <code>
         @Override
@@ -361,7 +408,13 @@ class PacketPlayOutEntity extends Packet {
     }
 
     class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove();
+        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveHandle createNew() {
+#if version >= 1.17
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveHandle(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveHandle();
+#endif
+        }
 
         <code>
         @Override
@@ -382,7 +435,13 @@ class PacketPlayOutEntity extends Packet {
     }
 
     class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
-        public (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook();
+        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook createNew() {
+#if version >= 1.17
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook();
+#endif
+        }
 
         <code>
         @Override
@@ -406,11 +465,25 @@ class PacketPlayOutEntity extends Packet {
 }
 
 class PacketPlayOutEntityHeadRotation extends Packet {
+#if version >= 1.17
+    private int entityId:entityId;
+#else
     private int entityId:a;
+#endif
 
-    public (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation();
+    public static optional (PacketPlayOutEntityHeadRotationHandle) PacketPlayOutEntityHeadRotation createNewEmpty() {
+#if version >= 1.17
+        return new PacketPlayOutEntityHeadRotation(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutEntityHeadRotation();
+#endif
+    }
 
     <code>
+    public static PacketPlayOutEntityHeadRotationHandle createNew() {
+        return T.createNewEmpty.invoke();
+    }
+
     public static PacketPlayOutEntityHeadRotationHandle createNew(int entityId, float headYaw) {
         PacketPlayOutEntityHeadRotationHandle packet = createNew();
         packet.setEntityId(entityId);
@@ -423,7 +496,11 @@ class PacketPlayOutEntityHeadRotation extends Packet {
         return new PacketPlayOutEntityHeadRotation(entity, (byte) com.bergerkiller.bukkit.common.utils.MathUtil.floor(headYaw * 256.0f / 360.0f));
     }
 
+#if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation private byte headYaw:yHeadRot;
+#else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation private byte headYaw:b;
+#endif
 
     public float getHeadYaw() {
         return (float) instance#headYaw * 360.0f / 256.0f;   

@@ -711,13 +711,13 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> collectedItemId = PacketPlayOutCollectHandle.T.collectedItemId.toFieldAccessor();
         public final FieldAccessor<Integer> collectorEntityId = PacketPlayOutCollectHandle.T.collectorEntityId.toFieldAccessor();
-        public final FieldAccessor<Integer> unknown1;
+        public final FieldAccessor<Integer> amount;
         
         public NMSPacketPlayOutCollect() {
-            if (PacketPlayOutCollectHandle.T.unknown.isAvailable()) {
-                this.unknown1 = PacketPlayOutCollectHandle.T.unknown.toFieldAccessor();
+            if (PacketPlayOutCollectHandle.T.amount.isAvailable()) {
+                this.amount = PacketPlayOutCollectHandle.T.amount.toFieldAccessor();
             } else {
-                this.unknown1 = null;
+                this.amount = null;
             }
         }
     }

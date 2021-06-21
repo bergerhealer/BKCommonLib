@@ -19,10 +19,6 @@ public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityHeadRotationHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     /* ============================================================================== */
 
     public static PacketPlayOutEntityHeadRotationHandle createNew(Entity entity, float headYaw) {
@@ -31,6 +27,10 @@ public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle
 
     public abstract float getHeadYaw();
     public abstract void setHeadYaw(float headYaw);
+
+    public static PacketPlayOutEntityHeadRotationHandle createNew() {
+        return T.createNewEmpty.invoke();
+    }
 
     public static PacketPlayOutEntityHeadRotationHandle createNew(int entityId, float headYaw) {
         PacketPlayOutEntityHeadRotationHandle packet = createNew();
@@ -45,10 +45,10 @@ public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityHeadRotationClass extends Template.Class<PacketPlayOutEntityHeadRotationHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityHeadRotationHandle> constr = new Template.Constructor.Converted<PacketPlayOutEntityHeadRotationHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
 
+        @Template.Optional
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityHeadRotationHandle> createNewEmpty = new Template.StaticMethod.Converted<PacketPlayOutEntityHeadRotationHandle>();
         public final Template.StaticMethod.Converted<PacketPlayOutEntityHeadRotationHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutEntityHeadRotationHandle>();
 
         public final Template.Method<Float> getHeadYaw = new Template.Method<Float>();

@@ -19,11 +19,11 @@ public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutRemoveEntityEffectHandle createNew() {
-        return T.constr.newInstance();
-    }
-
     /* ============================================================================== */
+
+    public static PacketPlayOutRemoveEntityEffectHandle createNew() {
+        return T.createNew.invoke();
+    }
 
 
     public static PacketPlayOutRemoveEntityEffectHandle createNew(int entityId, MobEffectListHandle mobEffectList) {
@@ -41,10 +41,10 @@ public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutRemoveEntityEffectClass extends Template.Class<PacketPlayOutRemoveEntityEffectHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle> constr = new Template.Constructor.Converted<PacketPlayOutRemoveEntityEffectHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         public final Template.Field.Converted<MobEffectListHandle> effectList = new Template.Field.Converted<MobEffectListHandle>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutRemoveEntityEffectHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutRemoveEntityEffectHandle>();
 
     }
 
