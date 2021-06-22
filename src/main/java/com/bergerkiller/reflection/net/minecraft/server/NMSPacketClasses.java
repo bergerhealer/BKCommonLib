@@ -44,7 +44,6 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InventoryClickType;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
@@ -533,11 +532,12 @@ public class NMSPacketClasses {
         }
     }
 
+    /**
+     * @deprecated Please use PacketPlayInUseEntityHandle instead for complete api support
+     */
+    @Deprecated
     public static class NMSPacketPlayInUseEntity extends NMSPacket {
-
         public final FieldAccessor<Integer> clickedEntityId = PacketPlayInUseEntityHandle.T.usedEntityId.toFieldAccessor();
-        public final TranslatorFieldAccessor<UseAction> useAction = PacketPlayInUseEntityHandle.T.action.toFieldAccessor();
-        public final TranslatorFieldAccessor<Vector> offset = PacketPlayInUseEntityHandle.T.offset.toFieldAccessor();
 
         /**
          * Sets the hand that interacted with the entity
@@ -547,9 +547,6 @@ public class NMSPacketClasses {
          * @param humanHand to set to
          */
         public final void setHand(CommonPacket packet, HumanEntity humanEntity, HumanHand humanHand) {
-            if (PacketPlayInUseEntityHandle.T.enumHand.isAvailable()) {
-                PacketPlayInUseEntityHandle.T.enumHand.set(packet.getHandle(), humanHand.toNMSEnumHand(humanEntity));
-            }
         }
 
         /**
@@ -560,12 +557,7 @@ public class NMSPacketClasses {
          * @return humanHand
          */
         public final HumanHand getHand(CommonPacket packet, HumanEntity humanEntity) {
-            if (PacketPlayInUseEntityHandle.T.enumHand.isAvailable()) {
-                Object enumHand = PacketPlayInUseEntityHandle.T.enumHand.get(packet.getHandle());
-                return HumanHand.fromNMSEnumHand(humanEntity, enumHand);
-            } else {
-                return HumanHand.RIGHT;
-            }
+            return PacketPlayInUseEntityHandle.createHandle(packet.getHandle()).getInteractHand(humanEntity);
         }
     }
 

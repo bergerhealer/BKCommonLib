@@ -12,7 +12,6 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion;
@@ -42,7 +41,6 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
@@ -286,11 +284,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.util.IntHashMap<T>")
     public static Object toRawIntHashMapHandle(IntHashMap<?> intHashMapWrapper) {
         return intHashMapWrapper.getRawHandle();
-    }
-
-    @ConverterMethod(output="net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction")
-    public static Object toEnumEntityUseActionHandle(UseAction action) {
-        return action.getHandle();
     }
 
     @ConverterMethod(output="net.minecraft.world.EnumDifficulty")

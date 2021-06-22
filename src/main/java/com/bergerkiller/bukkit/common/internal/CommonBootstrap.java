@@ -470,6 +470,7 @@ public class CommonBootstrap {
         // 1.17 mappings
         if (evaluateMCVersion(">=", "1.17")) {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$UseType", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction");
             remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$b");
         }
 

@@ -382,7 +382,7 @@ public class ChunkUtil {
      * @return collection of Block States (mutable)
      */
     public static Collection<BlockState> getBlockStates(org.bukkit.Chunk chunk) {
-        return ChunkHandle.T.getTileEntities.invoke(HandleConversion.toChunkHandle(chunk));
+        return ChunkHandle.fromBukkit(chunk).getTileEntities();
     }
 
     /**

@@ -1,5 +1,7 @@
 package net.minecraft.network.protocol.game;
 
+import net.minecraft.core.EnumDirection;
+import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
@@ -292,45 +294,177 @@ class PacketPlayOutScoreboardScore extends Packet {
 }
 
 class PacketPlayInUseEntity extends Packet {
+#if version >= 1.17
+    private int usedEntityId:entityId;
+#else
     private int usedEntityId:a;
-    private (UseAction) PacketPlayInUseEntity.EnumEntityUseAction action;
-    private (org.bukkit.util.Vector) Vec3D offset:c;
-#if version >= 1.9
-    private optional (Object) EnumHand enumHand:d;
-#else
-    private optional (Object) EnumHand enumHand:###;
-#endif
-#if version >= 1.16
-    private optional boolean sneaking:e;
-#else
-    private optional boolean sneaking:###;
 #endif
 
-    <code>
-    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.enumHand, humanEntity);
+    // Since 1.17 there is an immutable UseType class storing all the details of the packet
+    // It is incorrectly remapped to EnumEntityUseAction (!)
+#if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private final PacketPlayInUseEntity.UseType action;
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.UseType public abstract (Enum) net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.d private final readonly net.minecraft.world.EnumHand interactHand:hand;
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.EnumHand interactAtHand:hand;
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.e private final readonly net.minecraft.world.phys.Vec3D interactAtLocation:location;
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public String getActionName() {
+        return instance#action#getType().name();
     }
 
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.enumHand, humanEntity, hand);
+    public boolean isInteract() {
+        return instance#getActionName().equals("INTERACT");
     }
 
-    public boolean isSneaking() {
-        return T.sneaking.isAvailable() && T.sneaking.getBoolean(getRaw());
+    public boolean isInteractAt() {
+        return instance#getActionName().equals("INTERACT_AT");
     }
 
-    public void setSneaking(boolean sneaking) {
-        if (T.sneaking.isAvailable()) {
-            T.sneaking.setBoolean(getRaw(), sneaking);
+    public boolean isAttack() {
+        return instance#getActionName().equals("ATTACK");
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getInteractHand(org.bukkit.entity.HumanEntity humanEntity) {
+        EnumHand hand;
+        Object useAction = instance#action;
+        String name = useAction#getType().name();
+        if (name.equals("INTERACT")) {
+            hand = useAction#interactHand;
+        } else if (name.equals("INTERACT_AT")) {
+            hand = useAction#interactAtHand;
+        } else {
+            return null;
+        }
+
+        return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, hand);
+    }
+
+    public (org.bukkit.util.Vector) Vec3D getInteractAtPosition() {
+        Object useAction = instance#action;
+        if (useAction#getType().name().equals("INTERACT_AT")) {
+            return useAction#interactAtLocation;
+        } else {
+            return null;
         }
     }
-    </code>
 
-    class PacketPlayInUseEntity.EnumEntityUseAction {
-        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT;
-        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction ATTACK;
-        enum (EnumEntityUseActionHandle) PacketPlayInUseEntity.EnumEntityUseAction INTERACT_AT;
+    public void setAttack() {
+        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity static final PacketPlayInUseEntity.UseType ATTACK_ACTION;
+        instance#action = #ATTACK_ACTION;
     }
+
+    public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity.d d createUseTypeInteract:<init>(net.minecraft.world.EnumHand hand);
+        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
+        instance#action = #createUseTypeInteract(hand);
+    }
+#else
+  #if version >= 1.13
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:b();
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity public PacketPlayInUseEntity.EnumEntityUseAction getType:a();
+  #endif
+
+    public boolean isInteract() {
+        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
+    }
+
+    public boolean isInteractAt() {
+        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT_AT;
+    }
+
+    public boolean isAttack() {
+        return instance#getType() == PacketPlayInUseEntity$EnumEntityUseAction.ATTACK;
+    }
+
+    public com.bergerkiller.bukkit.common.wrappers.HumanHand getInteractHand(org.bukkit.entity.HumanEntity humanEntity) {
+  #if version >= 1.9
+    #if version >= 1.13
+        EnumHand hand = instance.c();
+    #else
+        EnumHand hand = instance.b();
+    #endif
+        return com.bergerkiller.bukkit.common.wrappers.HumanHand.fromNMSEnumHand(humanEntity, hand);
+  #else
+        PacketPlayInUseEntity$EnumEntityUseAction type = instance#getType();
+        if (type == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT || type == PacketPlayInUseEntity$EnumEntityUseAction.INTERACT_AT) {
+            return com.bergerkiller.bukkit.common.wrappers.HumanHand.RIGHT;
+        } else {
+            return null;
+        }
+  #endif
+    }
+
+    public (org.bukkit.util.Vector) Vec3D getInteractAtPosition() {
+  #select version >=
+  #case 1.13: return instance.d();
+  #case 1.9:  return instance.c();
+  #case else: return instance.b();
+  #endselect
+    }
+
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private PacketPlayInUseEntity.EnumEntityUseAction action;
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private net.minecraft.world.phys.Vec3D offset:c;
+  #if version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private net.minecraft.world.EnumHand hand:d;
+  #endif
+
+    public void setAttack() {
+        instance#action = PacketPlayInUseEntity$EnumEntityUseAction.ATTACK;
+        instance#offset = null;
+  #if version >= 1.9
+        instance#hand = null;
+  #endif
+    }
+
+    public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
+        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
+        instance#action = PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
+        instance#offset = null;
+  #if version >= 1.9
+        instance#hand = hand;
+  #endif
+    }
+#endif
+
+#if version >= 1.17
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+    public boolean isUsingSecondaryAction() {
+        return instance.b();
+    }
+
+    public void setUsingSecondaryAction(boolean using) {
+        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryAction;
+        instance#usingSecondaryAction = using;
+    }
+#elseif version >= 1.16
+    public static boolean hasSecondaryActionField() {
+        return true;
+    }
+
+    public boolean isUsingSecondaryAction() {
+        return instance.e();
+    }
+
+    public void setUsingSecondaryAction(boolean using) {
+        #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryOption:e;
+        instance#usingSecondaryOption = using;
+    }
+#else
+    public static boolean hasSecondaryActionField() {
+        return false;
+    }
+
+    public boolean isUsingSecondaryAction() {
+        return false;
+    }
+
+    public void setUsingSecondaryAction(boolean using) {
+    }
+#endif
 }
 
 class PacketPlayInBlockPlace extends Packet {
@@ -473,11 +607,11 @@ class PacketPlayInUseItem extends Packet {
 
 #if version >= 1.14
   #if version >= 1.17
-    #require net.minecraft.server.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:location;
-    #require net.minecraft.server.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:blockPos;
+    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:location;
+    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:blockPos;
   #else
-    #require net.minecraft.server.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:pos;
-    #require net.minecraft.server.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:c;
+    #require net.minecraft.world.phys.MovingObjectPosition protected final net.minecraft.world.phys.Vec3D position:pos;
+    #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:c;
   #endif
     public (IntVector3) BlockPosition getPosition() {
         if (instance.c() == null) return null;

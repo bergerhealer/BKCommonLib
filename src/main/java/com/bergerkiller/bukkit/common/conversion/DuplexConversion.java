@@ -39,7 +39,6 @@ import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
@@ -75,7 +74,6 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, BlockState> blockState = pair(toBlockState, toTileEntityHandle);
     public static final DuplexConverter<Object, Material> block = pair(toMaterial, toBlockHandle);
     public static final DuplexConverter<Object, Material> item = pair(toMaterial, toItemHandle);
-    public static final DuplexConverter<Object, UseAction> useAction = pair(toUseAction, toUseActionHandle);
     public static final DuplexConverter<Object, UUID> gameProfileId = pair(toGameProfileId, toGameProfileFromId);
     public static final DuplexConverter<Object, ScoreboardAction> scoreboardAction = pair(toScoreboardAction, toScoreboardActionHandle);
     public static final DuplexConverter<Object, BlockData> blockData = pair(toBlockData, toBlockDataHandle);

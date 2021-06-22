@@ -111,15 +111,21 @@ class Chunk {
     }
 
     public java.util.Collection<?> getRawTileEntities() {
+#if version >= 1.17
+        return instance.blockEntities.values();
+#else
         return instance.tileEntities.values();
+#endif
     }
 
+    <code>
     public java.util.Collection<org.bukkit.block.BlockState> getTileEntities() {
-        java.util.Collection tileEntities = instance.tileEntities.values();
+        java.util.Collection<?> tileEntities = getRawTileEntities();
         com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter chunkBlockStateConverter;
-        chunkBlockStateConverter = new com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter(instance.bukkitChunk);
+        chunkBlockStateConverter = new com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter(getBukkitChunk());
         return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
     }
+    </code>
 
 #if exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
     public final (List<Object>[]) net.minecraft.util.EntitySlice<Entity>[] entitySlices;

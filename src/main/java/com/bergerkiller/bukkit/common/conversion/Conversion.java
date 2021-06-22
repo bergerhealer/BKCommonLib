@@ -110,7 +110,6 @@ public class Conversion {
     public static final InputConverter<LongHashSet> toLongHashSet = getConverterTo(LongHashSet.class);
     public static final InputConverter<IntHashMap<Object>> toIntHashMap = CommonUtil.unsafeCast(getConverterTo(IntHashMap.class));
     public static final InputConverter<ScoreboardAction> toScoreboardAction = getConverterTo(ScoreboardAction.class);
-    public static final InputConverter<UseAction> toUseAction = getConverterTo(UseAction.class);
     public static final InputConverter<BlockData> toBlockData = getConverterTo(BlockData.class);
     public static final InputConverter<ChunkSection> toChunkSection = getConverterTo(ChunkSection.class);
     public static final InputConverter<PotionEffectType> toPotionEffectType = getConverterTo(PotionEffectType.class);

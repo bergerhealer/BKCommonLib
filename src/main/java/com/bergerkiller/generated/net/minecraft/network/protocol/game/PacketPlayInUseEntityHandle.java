@@ -1,8 +1,9 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.wrappers.UseAction;
+import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.util.Vector;
 
 /**
@@ -22,76 +23,39 @@ public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-
-    public com.bergerkiller.bukkit.common.wrappers.HumanHand getHand(org.bukkit.entity.HumanEntity humanEntity) {
-        return internalGetHand(T.enumHand, humanEntity);
+    public static boolean hasSecondaryActionField() {
+        return T.hasSecondaryActionField.invoker.invoke(null);
     }
 
-    public void setHand(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        internalSetHand(T.enumHand, humanEntity, hand);
-    }
-
-    public boolean isSneaking() {
-        return T.sneaking.isAvailable() && T.sneaking.getBoolean(getRaw());
-    }
-
-    public void setSneaking(boolean sneaking) {
-        if (T.sneaking.isAvailable()) {
-            T.sneaking.setBoolean(getRaw(), sneaking);
-        }
-    }
+    public abstract boolean isInteract();
+    public abstract boolean isInteractAt();
+    public abstract boolean isAttack();
+    public abstract HumanHand getInteractHand(HumanEntity humanEntity);
+    public abstract Vector getInteractAtPosition();
+    public abstract void setAttack();
+    public abstract void setInteract(HumanEntity humanEntity, HumanHand hand);
+    public abstract boolean isUsingSecondaryAction();
+    public abstract void setUsingSecondaryAction(boolean using);
     public abstract int getUsedEntityId();
     public abstract void setUsedEntityId(int value);
-    public abstract UseAction getAction();
-    public abstract void setAction(UseAction value);
-    public abstract Vector getOffset();
-    public abstract void setOffset(Vector value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInUseEntity</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayInUseEntityClass extends Template.Class<PacketPlayInUseEntityHandle> {
         public final Template.Field.Integer usedEntityId = new Template.Field.Integer();
-        public final Template.Field.Converted<UseAction> action = new Template.Field.Converted<UseAction>();
-        public final Template.Field.Converted<Vector> offset = new Template.Field.Converted<Vector>();
-        @Template.Optional
-        public final Template.Field.Converted<Object> enumHand = new Template.Field.Converted<Object>();
-        @Template.Optional
-        public final Template.Field.Boolean sneaking = new Template.Field.Boolean();
 
-    }
+        public final Template.StaticMethod<Boolean> hasSecondaryActionField = new Template.StaticMethod<Boolean>();
 
-
-    /**
-     * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction</b>.
-     * To access members without creating a handle type, use the static {@link #T} member.
-     * New handles can be created from raw instances using {@link #createHandle(Object)}.
-     */
-    @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction")
-    public abstract static class EnumEntityUseActionHandle extends Template.Handle {
-        /** @See {@link EnumEntityUseActionClass} */
-        public static final EnumEntityUseActionClass T = Template.Class.create(EnumEntityUseActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
-        public static final EnumEntityUseActionHandle INTERACT = T.INTERACT.getSafe();
-        public static final EnumEntityUseActionHandle ATTACK = T.ATTACK.getSafe();
-        public static final EnumEntityUseActionHandle INTERACT_AT = T.INTERACT_AT.getSafe();
-        /* ============================================================================== */
-
-        public static EnumEntityUseActionHandle createHandle(Object handleInstance) {
-            return T.createHandle(handleInstance);
-        }
-
-        /* ============================================================================== */
-
-        /**
-         * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayInUseEntity.EnumEntityUseAction</b>.
-         * Methods, fields, and constructors can be used without using Handle Objects.
-         */
-        public static final class EnumEntityUseActionClass extends Template.Class<EnumEntityUseActionHandle> {
-            public final Template.EnumConstant.Converted<EnumEntityUseActionHandle> INTERACT = new Template.EnumConstant.Converted<EnumEntityUseActionHandle>();
-            public final Template.EnumConstant.Converted<EnumEntityUseActionHandle> ATTACK = new Template.EnumConstant.Converted<EnumEntityUseActionHandle>();
-            public final Template.EnumConstant.Converted<EnumEntityUseActionHandle> INTERACT_AT = new Template.EnumConstant.Converted<EnumEntityUseActionHandle>();
-
-        }
+        public final Template.Method<Boolean> isInteract = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isInteractAt = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isAttack = new Template.Method<Boolean>();
+        public final Template.Method<HumanHand> getInteractHand = new Template.Method<HumanHand>();
+        public final Template.Method.Converted<Vector> getInteractAtPosition = new Template.Method.Converted<Vector>();
+        public final Template.Method<Void> setAttack = new Template.Method<Void>();
+        public final Template.Method<Void> setInteract = new Template.Method<Void>();
+        public final Template.Method<Boolean> isUsingSecondaryAction = new Template.Method<Boolean>();
+        public final Template.Method<Void> setUsingSecondaryAction = new Template.Method<Void>();
 
     }
 

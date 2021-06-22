@@ -127,7 +127,7 @@ public enum HumanHand {
      * @return HumanHand
      */
     public static HumanHand fromNMSEnumHand(HumanEntity humanEntity, Object nmsEnumHand) {
-        if (EnumHandHandle.T.isAvailable()) {
+        if (nmsEnumHand != null && EnumHandHandle.T.isAvailable()) {
             HumanHand hand = (nmsEnumHand == EnumHandHandle.OFF_HAND.getRaw()) ? LEFT : RIGHT;
             if (getMainHand(humanEntity) == LEFT) {
                 hand = (hand == RIGHT) ? LEFT : RIGHT;

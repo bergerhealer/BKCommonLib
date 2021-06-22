@@ -10,6 +10,7 @@ import net.minecraft.world.level.chunk.IChunkProvider;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.MovingObjectPosition;
+import net.minecraft.world.phys.MovingObjectPosition$EnumMovingObjectType;
 import net.minecraft.world.phys.Vec3D;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;

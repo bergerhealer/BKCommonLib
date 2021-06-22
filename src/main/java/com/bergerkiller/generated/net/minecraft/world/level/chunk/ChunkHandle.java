@@ -9,7 +9,6 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import org.bukkit.Chunk;
-import org.bukkit.block.BlockState;
 import java.util.Collection;
 import java.util.List;
 
@@ -36,7 +35,6 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract ChunkSection[] getSections();
     public abstract ChunkSection getSection(int cy);
     public abstract Collection<?> getRawTileEntities();
-    public abstract Collection<BlockState> getTileEntities();
     public abstract BlockData getBlockData(IntVector3 blockposition);
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
@@ -48,6 +46,14 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract boolean checkCanSave(boolean isNotAutosave);
     public abstract void markDirty();
     public abstract void markEntitiesDirty();
+
+    public java.util.Collection<org.bukkit.block.BlockState> getTileEntities() {
+        java.util.Collection<?> tileEntities = getRawTileEntities();
+        com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter chunkBlockStateConverter;
+        chunkBlockStateConverter = new com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateConverter(getBukkitChunk());
+        return new com.bergerkiller.mountiplex.conversion.util.ConvertingCollection(tileEntities, chunkBlockStateConverter);
+    }
+
 
     public static ChunkHandle fromBukkit(org.bukkit.Chunk chunk) {
         if (chunk != null) {
@@ -77,7 +83,6 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method.Converted<ChunkSection[]> getSections = new Template.Method.Converted<ChunkSection[]>();
         public final Template.Method.Converted<ChunkSection> getSection = new Template.Method.Converted<ChunkSection>();
         public final Template.Method<Collection<?>> getRawTileEntities = new Template.Method<Collection<?>>();
-        public final Template.Method<Collection<BlockState>> getTileEntities = new Template.Method<Collection<BlockState>>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> getBlockDataAtCoord = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> setBlockData = new Template.Method.Converted<BlockData>();
