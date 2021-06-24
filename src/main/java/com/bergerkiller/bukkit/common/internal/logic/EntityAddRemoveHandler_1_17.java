@@ -78,18 +78,18 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Override
-    public void hook(World world) {
+    protected void hook(World world) {
         Object sectionManager = entityManagerField.get(HandleConversion.toWorldHandle(world));
         Object callbacks = callbacksField.get(sectionManager);
         if (ClassInterceptor.get(callbacks, LevelCallbackInterceptor.class) == null) {
-            LevelCallbackInterceptor interceptor = new LevelCallbackInterceptor(callbacks, world);
+            LevelCallbackInterceptor interceptor = new LevelCallbackInterceptor(this, callbacks, world);
             callbacksField.set(sectionManager, interceptor.createInstance(levelCallbackType));
             hooks.add(interceptor);
         }
     }
 
     @Override
-    public void unhook(World world) {
+    protected void unhook(World world) {
         Object sectionManager = entityManagerField.get(HandleConversion.toWorldHandle(world));
         Object callbacks = callbacksField.get(sectionManager);
         LevelCallbackInterceptor interceptor = ClassInterceptor.get(callbacks, LevelCallbackInterceptor.class);
@@ -104,11 +104,13 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
      * class to be notified of entities being added or removed
      */
     public static class LevelCallbackInterceptor extends ClassInterceptor {
+        private final EntityAddRemoveHandler_1_17 handler;
         private final Object base;
         private final World world;
         private final Queue<org.bukkit.entity.Entity> pendingAddEvents = new LinkedList<org.bukkit.entity.Entity>();
 
-        public LevelCallbackInterceptor(Object base, World world) {
+        public LevelCallbackInterceptor(EntityAddRemoveHandler_1_17 handler, Object base, World world) {
+            this.handler = handler;
             this.base = base;
             this.world = world;
         }
@@ -167,12 +169,12 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
 
         public void onEntityRemoved(Entity entity) {
             pendingAddEvents.remove(entity);
-            CommonPlugin.getInstance().notifyRemoved(this.world, entity);
+            handler.notifyRemoved(world, entity);
         }
 
         public void onEntityAdded(Entity entity) {
-            CommonPlugin.getInstance().notifyAddedEarly(world, entity);
             pendingAddEvents.add(entity);
+            handler.notifyAddedEarly(world, entity);
         }
 
         public void processEvents() {

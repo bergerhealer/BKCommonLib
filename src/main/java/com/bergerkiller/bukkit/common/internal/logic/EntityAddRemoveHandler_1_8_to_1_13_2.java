@@ -108,7 +108,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
-    public void hook(World world) {
+    protected void hook(World world) {
         if (!this.accessListField.isValid()) {
             Logging.LOGGER_REFLECTION.warning("Failed to hook world " + world.getName()
                 + " with entity listener hook, Entity Add/Remove events will not work");
@@ -133,7 +133,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
-    public void unhook(World world) {
+    protected void unhook(World world) {
         if (!this.accessListField.isValid()) {
             return;
         }
@@ -183,14 +183,14 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         @HookMethod("public void onEntityAdded:a(Entity entity)")
         public void onEntityAdded(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            CommonPlugin.getInstance().notifyAddedEarly(world, bEntity);
+            handler.notifyAddedEarly(world, bEntity);
             CommonPlugin.getInstance().notifyAdded(world, bEntity);
         }
 
         @HookMethod("public void onEntityRemoved:b(Entity entity)")
         public void onEntityRemoved(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            CommonPlugin.getInstance().notifyRemoved(world, bEntity);
+            handler.notifyRemoved(world, bEntity);
 
             // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
             // Note: this is disabled on Paperspigot, because it caused a concurrent modification exception at runtime

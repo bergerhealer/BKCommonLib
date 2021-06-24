@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
@@ -1049,15 +1050,15 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Looks up an Entity by its Entity Id in a World.
-     * The Entity Id is not persistent!
+     * Looks up an Entity by its Entity Id in a World. This method is thread-safe,
+     * and can be called from places such as package listeners.
      * 
      * @param world
      * @param entityId
      * @return Entity by this entity Id, null if not found
      */
     public static Entity getEntityById(World world, int entityId) {
-        return WorldHandle.fromBukkit(world).getEntityById(entityId);
+        return EntityAddRemoveHandler.INSTANCE.getEntityById(world, entityId);
     }
 
     /**

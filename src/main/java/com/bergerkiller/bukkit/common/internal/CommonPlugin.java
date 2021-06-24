@@ -227,7 +227,7 @@ public class CommonPlugin extends PluginBase {
 
     public void notifyWorldAdded(org.bukkit.World world) {
         CreaturePreSpawnHandler.INSTANCE.onWorldEnabled(world);
-        EntityAddRemoveHandler.INSTANCE.hook(world);
+        EntityAddRemoveHandler.INSTANCE.onWorldEnabled(world);
     }
 
     /**
@@ -486,8 +486,9 @@ public class CommonPlugin extends PluginBase {
 
         // Disable listeners
         for (World world : Bukkit.getWorlds()) {
-            EntityAddRemoveHandler.INSTANCE.unhook(world);
+            EntityAddRemoveHandler.INSTANCE.onWorldDisabled(world);
         }
+        EntityAddRemoveHandler.INSTANCE.onDisabled();
         HandlerList.unregisterAll(listener);
         PacketUtil.removePacketListener(this.mapController);
 
@@ -659,6 +660,10 @@ public class CommonPlugin extends PluginBase {
 
         // Initialize NBT early
         NBTBaseHandle.T.forceInitialization();
+
+        // Initialize entity add/remove tracking handler
+        // Note: onWorldEnabled() is called for all the worlds later on
+        EntityAddRemoveHandler.INSTANCE.onEnabled(this);
 
         // Initialize vehicle mount manager
         vehicleMountManager = new CommonVehicleMountManager(this);

@@ -144,18 +144,18 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
     }
 
     @Override
-    public void hook(World world) {
+    protected void hook(World world) {
         Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
         Map<UUID, Object> base = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (!(base instanceof EntitiesByUUIDMapHook)) {
-            EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(world, base);
+            EntitiesByUUIDMapHook hook = new EntitiesByUUIDMapHook(this, world, base);
             this.entitiesByUUIDField.set(nmsWorldHandle, hook);
             hooks.add(hook);
         }
     }
 
     @Override
-    public void unhook(World world) {
+    protected void unhook(World world) {
         Object nmsWorldHandle = WorldHandle.fromBukkit(world).getRaw();
         Map<UUID, Object> value = this.entitiesByUUIDField.get(nmsWorldHandle);
         if (value instanceof EntitiesByUUIDMapHook) {
@@ -171,11 +171,13 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
      *       is not listened to!
      */
     private static final class EntitiesByUUIDMapHook implements Map<UUID, Object> {
+        private final EntityAddRemoveHandler_1_14_to_1_16_5 handler;
         private final World world;
         private final Map<UUID, Object> base;
         private final Queue<org.bukkit.entity.Entity> pendingAddEvents = new LinkedList<org.bukkit.entity.Entity>();
 
-        public EntitiesByUUIDMapHook(World world, Map<UUID, Object> base) {
+        public EntitiesByUUIDMapHook(EntityAddRemoveHandler_1_14_to_1_16_5 handler, World world, Map<UUID, Object> base) {
+            this.handler = handler;
             this.world = world;
             this.base = base;
         }
@@ -192,13 +194,13 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
 
         private void onAdded(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            CommonPlugin.getInstance().notifyAddedEarly(world, bEntity);
+            handler.notifyAddedEarly(world, bEntity);
             pendingAddEvents.add(bEntity);
         }
 
         private void onRemoved(Object entity) {
             org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            CommonPlugin.getInstance().notifyRemoved(this.world, bEntity);
+            handler.notifyRemoved(world, bEntity);
         }
 
         @Override

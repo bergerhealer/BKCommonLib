@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -93,12 +92,12 @@ public class CommonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     protected void onWorldLoad(WorldLoadEvent event) {
-        EntityAddRemoveHandler.INSTANCE.hook(event.getWorld());
+        EntityAddRemoveHandler.INSTANCE.onWorldEnabled(event.getWorld());
     }
 
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     protected void onWorldUnload(WorldUnloadEvent event) {
-        EntityAddRemoveHandler.INSTANCE.unhook(event.getWorld());
+        EntityAddRemoveHandler.INSTANCE.onWorldDisabled(event.getWorld());
         deregisterDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
     }
 

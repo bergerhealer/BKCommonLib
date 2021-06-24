@@ -246,6 +246,7 @@ class World extends IBlockAccess {
     public boolean isBurnArea:e((AxisAlignedBBHandle) AxisAlignedBB bounds);
 #endif
 
+    // Note: main thread use only! Otherwise, use EntityAddRemoveHandler.
 #if version >= 1.9
     public (org.bukkit.entity.Entity) Entity getEntityById:getEntity(int entityId);
 #else
