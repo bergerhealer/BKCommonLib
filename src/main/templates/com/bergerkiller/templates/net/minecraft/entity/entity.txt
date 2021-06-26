@@ -1,6 +1,7 @@
 package net.minecraft.world.entity;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.CrashReportSystemDetails;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.syncher.DataWatcherObject;
@@ -143,8 +144,22 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
-    //TODO: Was removed?
-    public boolean ignoreChunkCheck:attachedToPlayer;
+#if version >= 1.17
+    public boolean isIgnoreChunkCheck() {
+        return false; // Seems to have been removed completely with no replacement
+    }
+
+    public void setIgnoreChunkCheck(boolean ignore) {
+    }
+#else
+    public boolean isIgnoreChunkCheck() {
+        return instance.attachedToPlayer;
+    }
+
+    public void setIgnoreChunkCheck(boolean ignore) {
+        instance.attachedToPlayer = ignore;
+    }
+#endif
 
 #if version >= 1.17
     public double lastX:xo;
@@ -553,8 +568,146 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     //     private unknown boolean outsideWorldBorderField:g;
     // #endif
 
-    //TODO: is now private Entity.RemovalReason removalReason;
-    public boolean dead;
+#if version >= 1.17
+    #require net.minecraft.world.entity.Entity private Entity.RemovalReason removalReason;
+
+    // Marks the entity as removed, passively. Does not fire events.
+    // This is called when the old entity has been hot-swapped over.
+    public void setRemovedPassive() {
+        instance#removalReason = Entity$RemovalReason.DISCARDED;
+        instance.valid = false;
+    }
+
+    public void setDead(boolean dead) {
+        if (dead) {
+            Entity$RemovalReason reason = instance.getRemovalReason();
+            if (reason == null || !reason.a()) {
+                instance.a(Entity$RemovalReason.KILLED);
+            }
+        } else {
+            //TODO: Hmmm??
+            instance.unsetRemoved();
+        }
+    }
+
+    public boolean isDead() {
+        return instance.getRemovalReason().a();
+    }
+
+    public boolean isLoadedInWorld() {
+        return !instance.isRemoved();
+    }
+
+    public int getChunkX() {
+        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        return blockPosition.getX() >> 4;
+    }
+
+    public int getChunkY() {
+        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        return blockPosition.getY() >> 4;
+    }
+
+    public int getChunkZ() {
+        BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
+        return blockPosition.getZ() >> 4;
+    }
+
+    public optional void setLoadedInWorld_pre_1_17:###(boolean loaded);
+#else
+  #if version >= 1.13
+    #require net.minecraft.world.entity.Entity public boolean isLoaded:inChunk;
+    #if fieldexists net.minecraft.world.entity.Entity public int chunkX
+      #require net.minecraft.world.entity.Entity public int chunkX;
+      #require net.minecraft.world.entity.Entity public int chunkY;
+      #require net.minecraft.world.entity.Entity public int chunkZ;
+    #else
+      #require net.minecraft.world.entity.Entity public int chunkX:ae;
+      #require net.minecraft.world.entity.Entity public int chunkY:af;
+      #require net.minecraft.world.entity.Entity public int chunkZ:ag;
+    #endif
+  #elseif version >= 1.11
+    #require net.minecraft.world.entity.Entity public boolean isLoaded:aa;
+    #require net.minecraft.world.entity.Entity public int chunkX:ab;
+    #require net.minecraft.world.entity.Entity public int chunkY:ac;
+    #require net.minecraft.world.entity.Entity public int chunkZ:ad;
+  #elseif version >= 1.10.2
+    #require net.minecraft.world.entity.Entity public boolean isLoaded:ab;
+    #require net.minecraft.world.entity.Entity public int chunkX:ac;
+    #require net.minecraft.world.entity.Entity public int chunkY:ad;
+    #require net.minecraft.world.entity.Entity public int chunkZ:ae;
+  #elseif version >= 1.9
+    #require net.minecraft.world.entity.Entity public boolean isLoaded:aa;
+    #require net.minecraft.world.entity.Entity public int chunkX:ab;
+    #require net.minecraft.world.entity.Entity public int chunkY:ac;
+    #require net.minecraft.world.entity.Entity public int chunkZ:ad;
+  #else
+    #require net.minecraft.world.entity.Entity public boolean isLoaded:ad;
+    #require net.minecraft.world.entity.Entity public int chunkX:ae;
+    #require net.minecraft.world.entity.Entity public int chunkY:af;
+    #require net.minecraft.world.entity.Entity public int chunkZ:ag;
+  #endif
+
+  // #if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.world.level.chunk.Chunk chunk);
+  //   public void setChunkX(int value) {
+  //       instance.setCurrentChunk(null);
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
+  //   }
+  //   public void setChunkY(int value) {
+  //       instance.setCurrentChunk(null);
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
+  //   }
+  //   public void setChunkZ(int value) {
+  //       instance.setCurrentChunk(null);
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
+  //   }
+  // #else
+  //   public void setChunkX(int value) {
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
+  //   }
+  //   public void setChunkY(int value) {
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
+  //   }
+  //   public void setChunkZ(int value) {
+  //       com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
+  //   }
+  // #endif
+
+    // Marks the entity as removed, passively. Does not fire events.
+    // This is called when the old entity has been hot-swapped over.
+    public void setRemovedPassive() {
+        instance.dead = true;
+        instance.valid = false;
+    }
+
+    public void setDead(boolean dead) {
+        instance.dead = dead;
+    }
+
+    public boolean isDead() {
+        return instance.dead;
+    }
+
+    public boolean isLoadedInWorld() {
+        return instance#isLoaded;
+    }
+
+    public int getChunkX() {
+        return instance#chunkX;
+    }
+
+    public int getChunkY() {
+        return instance#chunkY;
+    }
+
+    public int getChunkZ() {
+        return instance#chunkZ;
+    }
+
+    public optional void setLoadedInWorld_pre_1_17(boolean loaded) {
+        instance#isLoaded = loaded;
+    }
+#endif
 
 #if version >= 1.14
     public float getWidth();
@@ -778,105 +931,33 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     </code>
 
 #if version >= 1.17
-    //TODO: chunkXYZ and isLoaded are gone, what to do with that?
-    public boolean isLoaded:inChunk;
-    public optional int chunkX;
-    public optional int chunkY;
-    public optional int chunkZ;
-
     public boolean positionChanged:hasImpulse;
-#elseif version >= 1.13
-    public boolean isLoaded:inChunk;
-  #if fieldexists net.minecraft.world.entity.Entity public int chunkX
-      public optional int chunkX;
-      public optional int chunkY;
-      public optional int chunkZ;
-  #else
-      public optional int chunkX:ae;
-      public optional int chunkY:af;
-      public optional int chunkZ:ag;
-  #endif
-    public boolean positionChanged:impulse;
-#elseif version >= 1.11
-    public boolean isLoaded:aa;
-    public optional int chunkX:ab;
-    public optional int chunkY:ac;
-    public optional int chunkZ:ad;
-    public unknown boolean ah;
-    public boolean positionChanged:impulse;
-#elseif version >= 1.10.2
-    public boolean isLoaded:ab;
-    public optional int chunkX:ac;
-    public optional int chunkY:ad;
-    public optional int chunkZ:ae;
-    public unknown boolean ai;
-    public boolean positionChanged:impulse;
 #elseif version >= 1.9
-    public boolean isLoaded:aa;
-    public optional int chunkX:ab;
-    public optional int chunkY:ac;
-    public optional int chunkZ:ad;
-    public unknown boolean ah;
     public boolean positionChanged:impulse;
-#elseif version >= 1.8.3
-    private unknown double ar;
-    private unknown double as;
-    public boolean isLoaded:ad;
-    public optional int chunkX:ae;
-    public optional int chunkY:af;
-    public optional int chunkZ:ag;
-    public unknown boolean ah;
-    public boolean positionChanged:ai;
 #else
-    private unknown double ap;
-    private unknown double aq;
-    public boolean isLoaded:ad;
-    public optional int chunkX:ae;
-    public optional int chunkY:af;
-    public optional int chunkZ:ag;
-    public unknown boolean ah;
     public boolean positionChanged:ai;
 #endif
-
-#if exists net.minecraft.world.entity.Entity public void setCurrentChunk(net.minecraft.world.level.chunk.Chunk chunk);
-    public void setChunkX(int value) {
-        instance.setCurrentChunk(null);
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
-    }
-    public void setChunkY(int value) {
-        instance.setCurrentChunk(null);
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
-    }
-    public void setChunkZ(int value) {
-        instance.setCurrentChunk(null);
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
-    }
-#else
-    public void setChunkX(int value) {
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.setInteger(instance, value);
-    }
-    public void setChunkY(int value) {
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkY.setInteger(instance, value);
-    }
-    public void setChunkZ(int value) {
-        com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.setInteger(instance, value);
-    }
-#endif
-
-    <code>
-    public int getChunkX() {
-        return T.chunkX.getInteger(getRaw());
-    }
-    public int getChunkY() {
-        return T.chunkY.getInteger(getRaw());
-    }
-    public int getChunkZ() {
-        return T.chunkZ.getInteger(getRaw());
-    }
-    </code>
 
 #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
     public (org.bukkit.Chunk) Chunk getCurrentChunk();
+#elseif version >= 1.17
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
+        net.minecraft.world.level.entity.EntityInLevelCallback callback = instance#levelCallback;
+        if (callback == net.minecraft.world.level.entity.EntityInLevelCallback.NULL) {
+            return null;
+        }
+
+        // Read the x/y/z long chunk coordinates from the entry
+        #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private long currentSectionKey;
+        long coordKey = callback#currentSectionKey;
+
+        // Convert to chunk x/z coordinates
+        int chunkX = SectionPosition.b(coordKey);
+        //int chunkY = SectionPosition.c(coordKey);
+        int chunkZ = SectionPosition.d(coordKey);
+        return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
+    }
 #elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
     public (org.bukkit.Chunk) Chunk getCurrentChunk() {
         if (!instance.inChunk) {
@@ -1124,7 +1205,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.17
     protected boolean hasMovementSound() {
         #require net.minecraft.world.entity.Entity protected Entity.MovementEmission getMovementEmission:aI();
-        Entity.MovementEmission entity_movementemission = instance#getMovementEmission();
+        Entity$MovementEmission entity_movementemission = instance#getMovementEmission();
         return entity_movementemission.c(); // sound only
     }
 #elseif version >= 1.9
@@ -1293,7 +1374,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
     // Only the Shulker and Boat entity appear to use this flag
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
-  #if version >= 1.16.4
+  #if version >= 1.17
+        return instance.bi() ? instance.getBoundingBox() : null;
+  #elseif version >= 1.16.4
         return instance.aZ() ? instance.getBoundingBox() : null;
   #else
         return instance.aY() ? instance.getBoundingBox() : null;
@@ -1318,10 +1401,16 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
 #endif
 
-#if version >= 1.9
-    public void recalcPosition();
+#if version >= 1.17
+    // Removed since 1.17, maybe because it was 'unsafe'. Calculates position using bounding box.
+    public void setPositionFromBoundingBox() {
+        AxisAlignedBB aabb = instance.getBoundingBox();
+        instance.setPositionRaw((aabb.minX + aabb.maxX) / 2.0, aabb.minY, (aabb.minZ + aabb.maxZ) / 2.0);
+    }
+#elseif version >= 1.9
+    public void setPositionFromBoundingBox:recalcPosition();
 #else
-    private void recalcPosition();
+    private void setPositionFromBoundingBox:recalcPosition();
 #endif
 
     public boolean isBurning();

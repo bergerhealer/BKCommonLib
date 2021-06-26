@@ -323,18 +323,6 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.getChunkZ();
     }
 
-    public void setChunkX(int value) {
-        this.handle.setChunkX(value);
-    }
-
-    public void setChunkY(int value) {
-        this.handle.setChunkY(value);
-    }
-
-    public void setChunkZ(int value) {
-        this.handle.setChunkZ(value);
-    }
-
     /**
      * Obtains the Entity head rotation angle, or 0.0 if this Entity has no
      * head.
@@ -489,7 +477,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @return True if loaded, False if not
      */
     public boolean isInLoadedChunk() {
-        return this.handle.isLoaded();
+        return this.handle.isLoadedInWorld();
     }
 
     public Random getRandom() {

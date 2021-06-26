@@ -393,6 +393,8 @@ class PlayerChunkMap {
     public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
   #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
         PlayerChunk chunk = instance.getVisibleChunk(ChunkCoordIntPair.pair(chunkX, chunkZ));
+  #elseif version >= 1.17
+        PlayerChunk chunk = (PlayerChunk) instance.visibleChunkMap.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
   #else
         PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
   #endif
@@ -403,7 +405,11 @@ class PlayerChunkMap {
 
         // Check Stream contains Player
         ChunkCoordIntPair chunkCoordinates = new ChunkCoordIntPair(chunkX, chunkZ);
+  #if version >= 1.17
+        java.util.stream.Stream players = chunk.playerProvider.a(chunkCoordinates, false);
+  #else
         java.util.stream.Stream players = chunk.players.a(chunkCoordinates, false);
+  #endif
         return players.anyMatch(java.util.function.Predicate.isEqual(entityplayer));
     }
 #else

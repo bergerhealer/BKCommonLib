@@ -256,7 +256,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
     public boolean savePassenger(Object tag) {
         Object handle = this.instance();
-        if (EntityHandle.T.dead.getBoolean(handle)) {
+        if (EntityHandle.T.isDead.invoke(handle)) {
             return false;
         }
 
@@ -270,7 +270,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     public boolean saveEntity(Object tag) {
         try {
             Object handle = this.instance();
-            if (EntityHandle.T.dead.getBoolean(handle)) {
+            if (EntityHandle.T.isDead.invoke(handle)) {
                 return false;
             }
             if (EntityHandle.T.vehicle.raw.get(handle) != null) {

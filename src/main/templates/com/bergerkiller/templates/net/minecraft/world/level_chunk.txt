@@ -1,6 +1,7 @@
 package net.minecraft.world.level.chunk;
 
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.SectionPosition;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.ChunkSection;
@@ -9,9 +10,12 @@ import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.levelgen.HeightMap;
 import net.minecraft.world.level.levelgen.HeightMap$Type;
 import net.minecraft.world.level.World;
+import net.minecraft.world.level.entity.EntitySection;
+import net.minecraft.world.level.entity.EntitySectionStorage;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.List2D;
 
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
@@ -127,11 +131,55 @@ class Chunk {
     }
     </code>
 
-#if exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
-    public final (List<Object>[]) net.minecraft.util.EntitySlice<Entity>[] entitySlices;
+    public (List<org.bukkit.entity.Entity>) List<Entity> getEntities() {
+#if version >= 1.17
+        // Acquire the EntitySectionStorage instance of the world this Chunk is on
+        #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+        #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final net.minecraft.world.level.entity.EntitySectionStorage sectionStorage;
+        EntitySectionStorage storage = instance.level#entityManager#sectionStorage;
+
+        // Acquire the sectionIds LongSet which allows for iterating a vertical slice of chunk sections
+        #require net.minecraft.world.level.entity.EntitySectionStorage private final it.unimi.dsi.fastutil.longs.LongSortedSet sectionIds;
+        it.unimi.dsi.fastutil.longs.LongSortedSet sectionIds = storage#sectionIds;
+
+        // Acquire the sections LongObjectHashMap which stores the actual entity slices
+        #require net.minecraft.world.level.entity.EntitySectionStorage private final it.unimi.dsi.fastutil.longs.Long2ObjectMap sections;
+        it.unimi.dsi.fastutil.longs.Long2ObjectMap sections = storage#sections;
+
+        // Iterate a subset of the sectionIds LongSet to find all vertical slices of this chunk storing entities
+        long sectionIdsStart = SectionPosition.b(instance.getPos().x, 0, instance.getPos().z);
+        long sectionIdsEnd = SectionPosition.b(instance.getPos().x, -1, instance.getPos().z);
+        it.unimi.dsi.fastutil.longs.LongBidirectionalIterator iterator = sectionIds.subSet(sectionIdsStart, sectionIdsEnd).iterator();
+        List sliceLists = new java.util.ArrayList();
+        while (iterator.hasNext()) {
+            long key = iterator.nextLong();
+            EntitySection section = (EntitySection) sections.get(key);
+            if (section != null && !section.a()) { // check not null or empty
+                // Retrieve the underlying storage
+                #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
+                net.minecraft.util.EntitySlice sectionSlice = section#storage;
+                sliceLists.add(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.cbEntitySliceToList(sectionSlice));
+            }
+        }
+
+        if (sliceLists.isEmpty()) {
+            return java.util.Collections.emptyList();
+        } else {
+            return new List2D(sliceLists);
+        }
+#elseif exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
+        net.minecraft.util.EntitySlice[] slices = instance.entitySlices;
+        int count = slices.length;
+        List[] lists = new List[count];
+        for (int i = 0; i < count; i++) {
+            lists[i] = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.cbEntitySliceToList(slices[i]);
+        }
+        return new List2D(lists);
 #else
-    public final (List<Object>[]) List<Entity>[] entitySlices;
+        return new List2D(instance.entitySlices);
 #endif
+    }
+
     public org.bukkit.Chunk bukkitChunk;
 
 #if version >= 1.13

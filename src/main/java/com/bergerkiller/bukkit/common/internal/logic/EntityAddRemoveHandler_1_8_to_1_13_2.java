@@ -27,7 +27,6 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.util.IntHashMapHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
@@ -48,6 +47,7 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     private final FastField<List<Object>> entityListField;
     private final SafeField<List<Object>> accessListField;
     private final SafeField<Collection<Object>> entityRemoveQueue;
+    private final ChunkEntitySliceHandler chunkEntitySliceHandler;
 
     public EntityAddRemoveHandler_1_8_to_1_13_2() {
         this.iWorldAccessType = CommonUtil.getClass("net.minecraft.world.level.IWorldAccess");
@@ -100,6 +100,10 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
                 this.entityRemoveQueue = new SafeField<Collection<Object>>(entityRemoveQueueField);
             }
         }
+
+        // Chunk EntitySlice[] field, used when entities need to be swapped, or when removing
+        // entities from a chunk/world
+        this.chunkEntitySliceHandler = new ChunkEntitySliceHandler();
     }
 
     @Override
@@ -144,60 +148,6 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
             while (iter.hasNext()) {
                 if (WorldListenerHook.get(iter.next(), WorldListenerHook.class) != null) {
                     iter.remove();
-                }
-            }
-        }
-    }
-
-    /**
-     * Handles all the method calls coming from a WorldListener instance that is hooked.
-     * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
-     */
-    @ClassHook.HookPackage("net.minecraft.server")
-    public static class WorldListenerHook extends ClassHook<WorldListenerHook> {
-        private final EntityAddRemoveHandler_1_8_to_1_13_2 handler;
-        private final World world;
-
-        public WorldListenerHook(EntityAddRemoveHandler_1_8_to_1_13_2 handler, World world) {
-            this.handler = handler;
-            this.world = world;
-        }
-
-        @Override
-        protected Invoker<?> getCallback(Method method) {
-            // First check if this method is hooked
-            Invoker<?> result = super.getCallback(method);
-            if (result != null) {
-                return result;
-            }
-
-            // Allow methods declared in Object through
-            if (method.getDeclaringClass().equals(Object.class)) {
-                return null;
-            }
-
-            // All others are ignored
-            return new NullInvoker<Object>(method.getReturnType());
-        }
-
-        @HookMethod("public void onEntityAdded:a(Entity entity)")
-        public void onEntityAdded(Object entity) {
-            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            handler.notifyAddedEarly(world, bEntity);
-            CommonPlugin.getInstance().notifyAdded(world, bEntity);
-        }
-
-        @HookMethod("public void onEntityRemoved:b(Entity entity)")
-        public void onEntityRemoved(Object entity) {
-            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
-            handler.notifyRemoved(world, bEntity);
-
-            // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
-            // Note: this is disabled on Paperspigot, because it caused a concurrent modification exception at runtime
-            if (this.handler.entityRemoveQueue.isValid() && !Common.IS_PAPERSPIGOT_SERVER) {
-                Collection<?> removeQueue = this.handler.entityRemoveQueue.get(HandleConversion.toWorldHandle(world));
-                if (removeQueue != null && removeQueue.contains(entity)) {
-                    CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
                 }
             }
         }
@@ -259,23 +209,74 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
 
         // *** Entity Current Chunk ***
         final int chunkX = newEntity.getChunkX();
-        final int chunkY = newEntity.getChunkY();
         final int chunkZ = newEntity.getChunkZ();
         Object chunkHandle = HandleConversion.toChunkHandle(WorldUtil.getChunk(newEntity.getWorld().getWorld(), chunkX, chunkZ));
         if (chunkHandle != null) {
-            final List<Object>[] entitySlices = ChunkHandle.T.entitySlices.get(chunkHandle);
-            if (!replaceInList(entitySlices[chunkY], newEntity)) {
-                for (int y = 0; y < entitySlices.length; y++) {
-                    if (y != chunkY && replaceInList(entitySlices[y], newEntity)) {
-                        break;
-                    }
-                }
-            }
+            this.chunkEntitySliceHandler.replace(chunkHandle, oldEntity, newEntity);
         }
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
         //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldInstance.getRaw());
+    }
+
+    @Override
+    public void moveToChunk(EntityHandle entity) {
+        this.chunkEntitySliceHandler.moveToChunk(entity);
+    }
+
+    /**
+     * Handles all the method calls coming from a WorldListener instance that is hooked.
+     * Most of it is ignored and discarded. We need it for Entity Add/Remove event handling.
+     */
+    @ClassHook.HookPackage("net.minecraft.server")
+    public static class WorldListenerHook extends ClassHook<WorldListenerHook> {
+        private final EntityAddRemoveHandler_1_8_to_1_13_2 handler;
+        private final World world;
+
+        public WorldListenerHook(EntityAddRemoveHandler_1_8_to_1_13_2 handler, World world) {
+            this.handler = handler;
+            this.world = world;
+        }
+
+        @Override
+        protected Invoker<?> getCallback(Method method) {
+            // First check if this method is hooked
+            Invoker<?> result = super.getCallback(method);
+            if (result != null) {
+                return result;
+            }
+
+            // Allow methods declared in Object through
+            if (method.getDeclaringClass().equals(Object.class)) {
+                return null;
+            }
+
+            // All others are ignored
+            return new NullInvoker<Object>(method.getReturnType());
+        }
+
+        @HookMethod("public void onEntityAdded:a(Entity entity)")
+        public void onEntityAdded(Object entity) {
+            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
+            handler.notifyAddedEarly(world, bEntity);
+            CommonPlugin.getInstance().notifyAdded(world, bEntity);
+        }
+
+        @HookMethod("public void onEntityRemoved:b(Entity entity)")
+        public void onEntityRemoved(Object entity) {
+            org.bukkit.entity.Entity bEntity = WrapperConversion.toEntity(entity);
+            handler.notifyRemoved(world, bEntity);
+
+            // Fire remove from server event right away when the entity was removed using the remove queue (chunk unload logic)
+            // Note: this is disabled on Paperspigot, because it caused a concurrent modification exception at runtime
+            if (this.handler.entityRemoveQueue.isValid() && !Common.IS_PAPERSPIGOT_SERVER) {
+                Collection<?> removeQueue = this.handler.entityRemoveQueue.get(HandleConversion.toWorldHandle(world));
+                if (removeQueue != null && removeQueue.contains(entity)) {
+                    CommonPlugin.getInstance().notifyRemovedFromServer(world, bEntity, true);
+                }
+            }
+        }
     }
 
     private static void replaceInEntityTracker(int entityId, EntityHandle newInstance) {
@@ -316,5 +317,4 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         }
         return false;
     }
-
 }

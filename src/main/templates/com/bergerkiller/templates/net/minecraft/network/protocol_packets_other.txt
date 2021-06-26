@@ -1645,7 +1645,7 @@ class PacketPlayOutAttachEntity extends Packet {
 
 #if version >= 1.9
     public boolean isLeash() {
-        return false;
+        return true;
     }
 
     public void setIsLeash(boolean isLeash) {

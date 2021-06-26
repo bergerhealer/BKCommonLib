@@ -440,15 +440,18 @@ public class CommonBootstrap {
 
                 // Fixes hardcoded fastutil paths used in templates
                 for (String fastutilClass : new String[] {
-                        "longs.Long2ObjectLinkedOpenHashMap",
                         "ints.Int2ObjectMap",
                         "ints.Int2ObjectOpenHashMap",
+                        "longs.Long2ObjectMap",
                         "longs.Long2ObjectOpenHashMap",
+                        "longs.Long2ObjectLinkedOpenHashMap",
                         "longs.Long2IntOpenHashMap",
                         "longs.LongIterator",
                         "longs.LongLinkedOpenHashSet",
                         "longs.LongOpenHashSet",
                         "longs.LongSet",
+                        "longs.LongSortedSet",
+                        "longs.LongBidirectionalIterator",
                         "objects.Object2IntMap",
                         "objects.ObjectCollection"
                 }) {

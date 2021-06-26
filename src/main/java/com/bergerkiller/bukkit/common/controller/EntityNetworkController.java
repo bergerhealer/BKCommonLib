@@ -490,7 +490,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             return false;
         }
         // The entity is in a chunk not seen by the viewer
-        if (!EntityHandle.T.ignoreChunkCheck.getBoolean(entity.getHandle())
+        if (!EntityHandle.T.isIgnoreChunkCheck.invoke(entity.getHandle())
                 && !PlayerUtil.isChunkVisible(viewer, entity.getChunkX(), entity.getChunkZ())) {
             return false;
         }

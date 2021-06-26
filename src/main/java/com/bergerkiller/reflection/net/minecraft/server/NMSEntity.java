@@ -27,7 +27,6 @@ public class NMSEntity {
 
     public static final FieldAccessor<Entity> bukkitEntity  = EntityHandle.T.bukkitEntityField.toFieldAccessor();
     public static final TranslatorFieldAccessor<Entity> vehicleField = EntityHandle.T.vehicle.raw.toFieldAccessor().translate(DuplexConversion.entity);
-    public static final FieldAccessor<Boolean> ignoreChunkCheck = EntityHandle.T.ignoreChunkCheck.toFieldAccessor();
     public static final TranslatorFieldAccessor<World>  world = new SafeDirectField<Object>() {
         @Override
         public Object get(Object instance) {
@@ -50,7 +49,6 @@ public class NMSEntity {
     public static final FieldAccessor<Object>  boundingBox = EntityHandle.T.boundingBoxField.raw.toFieldAccessor();
     public static final FieldAccessor<Boolean> onGround    = EntityHandle.T.onGround.toFieldAccessor();
     public static final FieldAccessor<Boolean> velocityChanged = EntityHandle.T.velocityChanged.toFieldAccessor();
-    public static final FieldAccessor<Boolean> dead = EntityHandle.T.dead.toFieldAccessor();
     public static final FieldAccessor<Float> fallDistance = EntityHandle.T.fallDistance.toFieldAccessor();
 
     @Deprecated
@@ -85,11 +83,6 @@ public class NMSEntity {
     public static final int DATA_FLAG_INVISIBLE = EntityHandle.DATA_FLAG_INVISIBLE;
     public static final int DATA_FLAG_GLOWING = EntityHandle.DATA_FLAG_GLOWING;
     public static final int DATA_FLAG_FLYING = EntityHandle.DATA_FLAG_FLYING;
-
-    public static final FieldAccessor<Boolean> isLoaded = EntityHandle.T.isLoaded.toFieldAccessor();
-    public static final FieldAccessor<Integer> chunkX = EntityHandle.T.chunkX.toFieldAccessor();
-    public static final FieldAccessor<Integer> chunkY = EntityHandle.T.chunkY.toFieldAccessor();
-    public static final FieldAccessor<Integer> chunkZ = EntityHandle.T.chunkZ.toFieldAccessor();
 
     public static final FieldAccessor<Boolean> positionChanged = EntityHandle.T.positionChanged.toFieldAccessor();
 

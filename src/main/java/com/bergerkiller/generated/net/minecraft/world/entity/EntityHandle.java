@@ -50,6 +50,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean hasPassengers();
     public abstract void setPassengers(List<EntityHandle> passengers);
     public abstract boolean isInSameVehicle(EntityHandle entity);
+    public abstract boolean isIgnoreChunkCheck();
+    public abstract void setIgnoreChunkCheck(boolean ignore);
     public abstract double getLocX();
     public abstract double getLocY();
     public abstract double getLocZ();
@@ -74,13 +76,17 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean isCollidingWithBlock();
     public abstract Vector getBlockCollisionMultiplier();
     public abstract void setNotCollidingWithBlock();
+    public abstract void setRemovedPassive();
+    public abstract void setDead(boolean dead);
+    public abstract boolean isDead();
+    public abstract boolean isLoadedInWorld();
+    public abstract int getChunkX();
+    public abstract int getChunkY();
+    public abstract int getChunkZ();
     public abstract float getWidth();
     public abstract float getHeight();
     public abstract void setStepCounter(float value);
     public abstract float getStepCounter();
-    public abstract void setChunkX(int value);
-    public abstract void setChunkY(int value);
-    public abstract void setChunkZ(int value);
     public abstract Chunk getCurrentChunk();
     public abstract void playStepSound(IntVector3 position, BlockData blockData);
     public abstract void setRotation(float yaw, float pitch);
@@ -108,7 +114,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setBoundingBox(AxisAlignedBBHandle axisalignedbb);
     public abstract AxisAlignedBBHandle getOtherBoundingBox();
     public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
-    public abstract void recalcPosition();
+    public abstract void setPositionFromBoundingBox();
     public abstract boolean isBurning();
     public abstract void setOnFire(int numSeconds);
     public abstract void saveToNBT(CommonTagCompound compound);
@@ -159,17 +165,6 @@ public abstract class EntityHandle extends Template.Handle {
     public static final int DATA_FLAG_FLYING = (1 << 7);
 
 
-    public int getChunkX() {
-        return T.chunkX.getInteger(getRaw());
-    }
-    public int getChunkY() {
-        return T.chunkY.getInteger(getRaw());
-    }
-    public int getChunkZ() {
-        return T.chunkZ.getInteger(getRaw());
-    }
-
-
     public int getMaxFireTicks() {
         if (T.prop_getMaxFireTicks.isAvailable()) {
             return T.prop_getMaxFireTicks.invoke(getRaw());
@@ -201,8 +196,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setPreventBlockPlace(boolean value);
     public abstract EntityHandle getVehicle();
     public abstract void setVehicle(EntityHandle value);
-    public abstract boolean isIgnoreChunkCheck();
-    public abstract void setIgnoreChunkCheck(boolean value);
     public abstract double getLastX();
     public abstract void setLastX(double value);
     public abstract double getLastY();
@@ -227,8 +220,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract boolean isVerticalMovementBlocked();
     public abstract boolean isVelocityChanged();
     public abstract void setVelocityChanged(boolean value);
-    public abstract boolean isDead();
-    public abstract void setDead(boolean value);
     public abstract float getWalkedDistanceXZ();
     public abstract void setWalkedDistanceXZ(float value);
     public abstract float getWalkedDistanceXYZ();
@@ -247,8 +238,6 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setFireTicks(int value);
     public abstract DataWatcher getDatawatcherField();
     public abstract void setDatawatcherField(DataWatcher value);
-    public abstract boolean isLoaded();
-    public abstract void setIsLoaded(boolean value);
     public abstract boolean isPositionChanged();
     public abstract void setPositionChanged(boolean value);
     public abstract int getPortalCooldown();
@@ -285,7 +274,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Integer idField = new Template.Field.Integer();
         public final Template.Field.Boolean preventBlockPlace = new Template.Field.Boolean();
         public final Template.Field.Converted<EntityHandle> vehicle = new Template.Field.Converted<EntityHandle>();
-        public final Template.Field.Boolean ignoreChunkCheck = new Template.Field.Boolean();
         public final Template.Field.Double lastX = new Template.Field.Double();
         public final Template.Field.Double lastY = new Template.Field.Double();
         public final Template.Field.Double lastZ = new Template.Field.Double();
@@ -300,7 +288,6 @@ public abstract class EntityHandle extends Template.Handle {
         @Template.Readonly
         public final Template.Field.Boolean verticalMovementBlocked = new Template.Field.Boolean();
         public final Template.Field.Boolean velocityChanged = new Template.Field.Boolean();
-        public final Template.Field.Boolean dead = new Template.Field.Boolean();
         public final Template.Field.Float walkedDistanceXZ = new Template.Field.Float();
         public final Template.Field.Float walkedDistanceXYZ = new Template.Field.Float();
         public final Template.Field.Float fallDistance = new Template.Field.Float();
@@ -312,13 +299,6 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Integer field_maxFireTicks = new Template.Field.Integer();
         public final Template.Field.Integer fireTicks = new Template.Field.Integer();
         public final Template.Field.Converted<DataWatcher> datawatcherField = new Template.Field.Converted<DataWatcher>();
-        public final Template.Field.Boolean isLoaded = new Template.Field.Boolean();
-        @Template.Optional
-        public final Template.Field.Integer chunkX = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer chunkY = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer chunkZ = new Template.Field.Integer();
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
@@ -334,6 +314,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> hasPassengers = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> setPassengers = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> isInSameVehicle = new Template.Method.Converted<Boolean>();
+        public final Template.Method<Boolean> isIgnoreChunkCheck = new Template.Method<Boolean>();
+        public final Template.Method<Void> setIgnoreChunkCheck = new Template.Method<Void>();
         public final Template.Method<Double> getLocX = new Template.Method<Double>();
         public final Template.Method<Double> getLocY = new Template.Method<Double>();
         public final Template.Method<Double> getLocZ = new Template.Method<Double>();
@@ -358,13 +340,19 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Boolean> isCollidingWithBlock = new Template.Method<Boolean>();
         public final Template.Method<Vector> getBlockCollisionMultiplier = new Template.Method<Vector>();
         public final Template.Method<Void> setNotCollidingWithBlock = new Template.Method<Void>();
+        public final Template.Method<Void> setRemovedPassive = new Template.Method<Void>();
+        public final Template.Method<Void> setDead = new Template.Method<Void>();
+        public final Template.Method<Boolean> isDead = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isLoadedInWorld = new Template.Method<Boolean>();
+        public final Template.Method<Integer> getChunkX = new Template.Method<Integer>();
+        public final Template.Method<Integer> getChunkY = new Template.Method<Integer>();
+        public final Template.Method<Integer> getChunkZ = new Template.Method<Integer>();
+        @Template.Optional
+        public final Template.Method<Void> setLoadedInWorld_pre_1_17 = new Template.Method<Void>();
         public final Template.Method<Float> getWidth = new Template.Method<Float>();
         public final Template.Method<Float> getHeight = new Template.Method<Float>();
         public final Template.Method<Void> setStepCounter = new Template.Method<Void>();
         public final Template.Method<Float> getStepCounter = new Template.Method<Float>();
-        public final Template.Method<Void> setChunkX = new Template.Method<Void>();
-        public final Template.Method<Void> setChunkY = new Template.Method<Void>();
-        public final Template.Method<Void> setChunkZ = new Template.Method<Void>();
         public final Template.Method.Converted<Chunk> getCurrentChunk = new Template.Method.Converted<Chunk>();
         public final Template.Method.Converted<Void> playStepSound = new Template.Method.Converted<Void>();
         public final Template.Method<Void> setRotation = new Template.Method<Void>();
@@ -394,7 +382,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
-        public final Template.Method<Void> recalcPosition = new Template.Method<Void>();
+        public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();
         public final Template.Method<Boolean> isBurning = new Template.Method<Boolean>();
         public final Template.Method<Void> setOnFire = new Template.Method<Void>();
         @Template.Optional

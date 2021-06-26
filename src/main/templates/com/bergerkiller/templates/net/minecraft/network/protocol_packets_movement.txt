@@ -384,7 +384,7 @@ class PacketPlayOutEntity extends Packet {
     class PacketPlayOutEntity.PacketPlayOutEntityLook extends PacketPlayOutEntity {
         public static (PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle) PacketPlayOutEntity.PacketPlayOutEntityLook createNew() {
 #if version >= 1.17
-            return new PacketPlayOutEntity$PacketPlayOutEntityLook(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return PacketPlayOutEntity$PacketPlayOutEntityLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
             return new PacketPlayOutEntity$PacketPlayOutEntityLook();
 #endif
@@ -408,11 +408,11 @@ class PacketPlayOutEntity extends Packet {
     }
 
     class PacketPlayOutEntity.PacketPlayOutRelEntityMove extends PacketPlayOutEntity {
-        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveHandle createNew() {
+        public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMove createNew() {
 #if version >= 1.17
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveHandle(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return PacketPlayOutEntity$PacketPlayOutRelEntityMove.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveHandle();
+            return new PacketPlayOutEntity$PacketPlayOutRelEntityMove();
 #endif
         }
 
@@ -437,7 +437,7 @@ class PacketPlayOutEntity extends Packet {
     class PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook extends PacketPlayOutEntity {
         public static (PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle) PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook createNew() {
 #if version >= 1.17
-            return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+            return PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook.b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
 #else
             return new PacketPlayOutEntity$PacketPlayOutRelEntityMoveLook();
 #endif

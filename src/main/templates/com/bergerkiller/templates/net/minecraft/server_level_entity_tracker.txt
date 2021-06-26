@@ -95,7 +95,9 @@ class EntityTracker {
 
 #endif
 
-#if version >= 1.14.1
+#if version >= 1.17
+    int trackingDistance:viewDistance;
+#elseif version >= 1.14.1
     private int trackingDistance:viewDistance;
 #elseif version >= 1.14
     private int trackingDistance:A;
@@ -135,7 +137,11 @@ class EntityTracker {
 // PlayerChunkMap.EntityTracker on 1.14 and later
 class EntityTrackerEntry {
 #if version >= 1.14
+  #if version >= 1.17
+    private final int trackingDistance:range;
+  #else
     private final int trackingDistance;
+  #endif
 
     public int getPlayerViewDistance() {
         #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:this$0;

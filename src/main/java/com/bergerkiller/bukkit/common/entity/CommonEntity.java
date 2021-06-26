@@ -381,9 +381,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // Reset entity state
-        newInstance.setDead(oldInstance.isDead());
-        oldInstance.setDead(true);
-        oldInstance.setValid(false);
+        oldInstance.setRemovedPassive();
         newInstance.setValid(true);
 
         // *** Bukkit Entity ***
@@ -467,36 +465,12 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * other logic.
      */
     public void doPostTick() {
-        final int oldcx = getChunkX();
-        final int oldcy = getChunkY();
-        final int oldcz = getChunkZ();
-        final int newcx = loc.x.chunk();
-        final int newcy = loc.y.chunk();
-        final int newcz = loc.z.chunk();
-        final org.bukkit.World world = getWorld();
-        final boolean changedChunks = oldcx != newcx || oldcy != newcy || oldcz != newcz;
-        boolean isLoaded = this.isInLoadedChunk();
-
-        // Handle chunk/slice movement
-        // Remove from the previous chunk
-        if (isLoaded && changedChunks) {
-            final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, oldcx, oldcz);
-            if (chunk != null) {
-                ChunkUtil.removeEntity(chunk, entity);
-            }
-        }
-        // Add to the new chunk
-        if (!isLoaded || changedChunks) {
-            final org.bukkit.Chunk chunk = WorldUtil.getChunk(world, newcx, newcz);
-            if (isLoaded = chunk != null) {
-                ChunkUtil.addEntity(chunk, entity);
-            }
-            this.handle.setIsLoaded(isLoaded);
-        }
+        // When required, move this entity to the right chunk it should be stored in
+        EntityAddRemoveHandler.INSTANCE.moveToChunk(handle);
 
         // Tick the passenger
         // Automatically regenerate the passenger list if a passenger is found to be unresponsive
-        if (isLoaded) {
+        if (this.isInLoadedChunk()) {
             List<org.bukkit.entity.Entity> updatedPassengers = null;
             for (org.bukkit.entity.Entity passenger : getPassengers()) {
                 if (!passenger.isDead() && passenger.getVehicle() == entity) {

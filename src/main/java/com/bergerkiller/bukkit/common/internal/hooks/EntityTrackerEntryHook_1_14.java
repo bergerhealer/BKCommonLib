@@ -15,6 +15,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
+@ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")
 @ClassHook.HookPackage("net.minecraft.server")
 public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHook_1_14> implements EntityTrackerEntryHook {
     private EntityNetworkController<?> controller;
@@ -91,6 +92,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         return object;
     }
 
+    @ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")
     @ClassHook.HookPackage("net.minecraft.server")
     public class StateHook extends ClassHook<StateHook> {
 

@@ -113,31 +113,19 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     }
 
     public static int getChunkX(Entity entity) {
-        return EntityHandle.T.chunkX.getInteger(h(entity));
-    }
-
-    public static void setChunkX(Entity entity, int chunkX) {
-        EntityHandle.T.chunkX.setInteger(h(entity), chunkX);
+        return EntityHandle.T.getChunkX.invoke(h(entity));
     }
 
     public static int getChunkY(Entity entity) {
-        return EntityHandle.T.chunkY.getInteger(h(entity));
-    }
-
-    public static void setChunkY(Entity entity, int chunkY) {
-        EntityHandle.T.chunkY.setInteger(h(entity), chunkY);
+        return EntityHandle.T.getChunkY.invoke(h(entity));
     }
 
     public static int getChunkZ(Entity entity) {
-        return EntityHandle.T.chunkZ.getInteger(h(entity));
-    }
-
-    public static void setChunkZ(Entity entity, int chunkZ) {
-        EntityHandle.T.chunkZ.setInteger(h(entity), chunkZ);
+        return EntityHandle.T.getChunkZ.invoke(h(entity));
     }
 
     public static void setDead(Entity entity, boolean dead) {
-        EntityHandle.T.dead.setBoolean(h(entity), dead);
+        EntityHandle.T.setDead.invoke(h(entity), dead);
     }
 
     /**

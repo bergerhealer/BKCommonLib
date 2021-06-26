@@ -159,7 +159,7 @@ public abstract class EntityMoveHandler {
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.startTiming(); // Spigot
         if (that.isNoclip()) {
             that.setBoundingBox(that.getBoundingBox().translate(d0, d1, d2));
-            that.recalcPosition();
+            that.setPositionFromBoundingBox();
         } else {
             // CraftBukkit start - Don't do anything if we aren't moving
             // We need to do that.regardless of whether or not we are moving thanks to portals
@@ -412,7 +412,7 @@ public abstract class EntityMoveHandler {
             world.method_profiler_end();
             world.method_profiler_begin("rest");
 
-            that.recalcPosition();
+            that.setPositionFromBoundingBox();
             that.setHorizontalMovementBlocked(d7 != d0 || d9 != d2);
             that.setVerticalMovementBlocked(d1 != d8); // CraftBukkit - decompile error
             that.setOnGround(that.isVerticalMovementBlocked() && d8 < 0.0);

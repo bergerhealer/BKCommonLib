@@ -228,7 +228,7 @@ class World extends IBlockAccess {
         java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
         while (iter.hasNext()) {
             IBlockData iblockdata1 = (IBlockData) iter.next();
-            if (iblockdata1.a((Tag) TagsBlock.FIRE) || iblockdata1.a(Blocks.LAVA)) {
+            if (iblockdata1.a((net.minecraft.tags.Tag) net.minecraft.tags.TagsBlock.FIRE) || iblockdata1.a(net.minecraft.world.level.block.Blocks.LAVA)) {
                 return true;
             }
         }
