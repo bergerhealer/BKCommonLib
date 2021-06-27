@@ -79,6 +79,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setRemovedPassive();
     public abstract void setDead(boolean dead);
     public abstract boolean isDead();
+    public abstract boolean isSavingAllowed();
     public abstract boolean isLoadedInWorld();
     public abstract int getChunkX();
     public abstract int getChunkY();
@@ -117,11 +118,10 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setPositionFromBoundingBox();
     public abstract boolean isBurning();
     public abstract void setOnFire(int numSeconds);
-    public abstract void saveToNBT(CommonTagCompound compound);
     public abstract void onTick();
     public abstract void loadFromNBT(CommonTagCompound compound);
-    public abstract boolean savePassenger(CommonTagCompound compound);
-    public abstract boolean saveEntity(CommonTagCompound compound);
+    public abstract boolean onEntitySave(CommonTagCompound compound);
+    public abstract void saveToNBT(CommonTagCompound compound);
     public abstract boolean isSneaking();
     public abstract void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails);
     public abstract int getId();
@@ -343,6 +343,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setRemovedPassive = new Template.Method<Void>();
         public final Template.Method<Void> setDead = new Template.Method<Void>();
         public final Template.Method<Boolean> isDead = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isSavingAllowed = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isLoadedInWorld = new Template.Method<Boolean>();
         public final Template.Method<Integer> getChunkX = new Template.Method<Integer>();
         public final Template.Method<Integer> getChunkY = new Template.Method<Integer>();
@@ -389,11 +390,10 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Integer> prop_getMaxFireTicks = new Template.Method<Integer>();
         @Template.Optional
         public final Template.Method.Converted<EntityHandle> getDriverEntity = new Template.Method.Converted<EntityHandle>();
-        public final Template.Method.Converted<Void> saveToNBT = new Template.Method.Converted<Void>();
         public final Template.Method<Void> onTick = new Template.Method<Void>();
         public final Template.Method.Converted<Void> loadFromNBT = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<Boolean> savePassenger = new Template.Method.Converted<Boolean>();
-        public final Template.Method.Converted<Boolean> saveEntity = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Boolean> onEntitySave = new Template.Method.Converted<Boolean>();
+        public final Template.Method.Converted<Void> saveToNBT = new Template.Method.Converted<Void>();
         public final Template.Method<Boolean> isSneaking = new Template.Method<Boolean>();
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getId = new Template.Method<Integer>();

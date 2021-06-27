@@ -64,10 +64,17 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
     }
 
     /**
-     * Called when this Entity dies (could be called more than one time)
+     * Called when this Entity dies (could be called more than one time).
+     * This is not called when the entity is despawned because chunks unload,
+     * or when the entity is teleported to another world. Overriding the method
+     * and not calling <pre>super.onDie(killed)</pre> allows the death to be cancelled.
+     * 
+     * @param killed Whether the entity was killed (true), or was destroyed
+     *        for another reason (item collect, re-spawned). Not used on
+     *        Minecraft 1.16.5 and before, where this will always be true.
      */
-    public void onDie() {
-        this.hook.base.die();
+    public void onDie(boolean killed) {
+        this.hook.onBaseDeath(killed);
     }
 
     /**

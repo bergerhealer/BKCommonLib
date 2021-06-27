@@ -455,7 +455,7 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 #endif
     }
 
-    public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) EntityLiving entity);
+    public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) net.minecraft.world.entity.EntityLiving entity);
 
     <code>
     public boolean hasDataWatcherSupport() {

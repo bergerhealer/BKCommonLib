@@ -591,7 +591,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public boolean isDead() {
-        return instance.getRemovalReason().a();
+        Entity$RemovalReason reason = instance.getRemovalReason();
+        return reason != null && reason.a();
+    }
+
+    public boolean isSavingAllowed() {
+        Entity$RemovalReason reason = instance.getRemovalReason();
+        return reason == null || reason.b();
     }
 
     public boolean isLoadedInWorld() {
@@ -686,6 +692,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean isDead() {
         return instance.dead;
+    }
+
+    public boolean isSavingAllowed() {
+        return !instance.dead;
     }
 
     public boolean isLoadedInWorld() {
@@ -1433,12 +1443,8 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #if version >= 1.14
     public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
-    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
-
 #elseif version >= 1.13
     public optional (EntityHandle) Entity getDriverEntity:bO();
-    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
-
 #elseif version >= 1.12
     #if pre
         // This was on the pre-release version
@@ -1447,24 +1453,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         // Official 1.12
         public optional (EntityHandle) Entity getDriverEntity:bE();
     #endif
-
-    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.10.2
     public optional (EntityHandle) Entity getDriverEntity:bw();
-
-    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9.4
     public optional (EntityHandle) Entity getDriverEntity:bu();
-
-    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9
     public optional (EntityHandle) Entity getDriverEntity:bt();
-
-    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #else
     public optional (EntityHandle) Entity getDriverEntity:###();
-
-    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #endif
 
     <code>
@@ -1493,16 +1489,22 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #if version >= 1.17
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
-    public boolean savePassenger:d((CommonTagCompound) NBTTagCompound compound);
+    public boolean onEntitySave:d((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.16
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
-    public boolean savePassenger:a_((CommonTagCompound) NBTTagCompound compound);
+    public boolean onEntitySave:a_((CommonTagCompound) NBTTagCompound compound);
 #else
     public void loadFromNBT:f((CommonTagCompound) NBTTagCompound compound);
-    public boolean savePassenger:c((CommonTagCompound) NBTTagCompound compound);
+    public boolean onEntitySave:c((CommonTagCompound) NBTTagCompound compound);
 #endif
 
-    public boolean saveEntity:d((CommonTagCompound) NBTTagCompound compound);
+#if version >= 1.12
+    public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.9.4
+    public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#else
+    public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
+#endif
 
     public boolean isSneaking();
 

@@ -3,6 +3,7 @@ package net.minecraft.server.level;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.network.protocol.game.PacketPlayOutLightUpdate;
 import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.ChunkCoordIntPair;
 
@@ -247,7 +248,7 @@ class PlayerChunk {
 #endif
 
 #if version >= 1.17
-    private final (IntVector2) ChunkCoordIntPair location:loc;
+    final (IntVector2) ChunkCoordIntPair location:pos;
 #else
     private final (IntVector2) ChunkCoordIntPair location;
 #endif

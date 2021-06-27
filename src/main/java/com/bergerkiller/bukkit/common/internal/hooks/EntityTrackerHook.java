@@ -17,6 +17,7 @@ public class EntityTrackerHook extends ClassHook<EntityTrackerHook> {
         this.original = original;
     }
 
+    // Note: if hooking fails, check the declaration in PlayerChunkMap! EntityTracker one isn't used!
     @HookMethod("protected void trackEntity:???(net.minecraft.world.entity.Entity entity)")
     public void track(Object nmsEntityHandle) {
         if (!ignoredEntities.contains(nmsEntityHandle)) {

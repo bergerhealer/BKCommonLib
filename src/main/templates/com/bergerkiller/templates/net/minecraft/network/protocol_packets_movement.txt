@@ -182,7 +182,7 @@ class PacketPlayOutEntityVelocity extends Packet {
 
     public static (PacketPlayOutEntityVelocityHandle) PacketPlayOutEntityVelocity createNew(int entityId, double motX, double motY, double motZ) {
 #if version >= 1.14
-        return new PacketPlayOutEntityVelocity(entityId, new Vec3D(motX, motY, motZ));
+        return new PacketPlayOutEntityVelocity(entityId, new net.minecraft.world.phys.Vec3D(motX, motY, motZ));
 #else
         return new PacketPlayOutEntityVelocity(entityId, motX, motY, motZ);
 #endif

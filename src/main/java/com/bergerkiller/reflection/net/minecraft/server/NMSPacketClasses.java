@@ -63,7 +63,11 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInWindowClickHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockActionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBossHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCombatEventHandle;
@@ -645,23 +649,23 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutBlockAction extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Integer> unknown1 = nextFieldSignature("private int b");
-        public final FieldAccessor<Integer> unknown2 = nextFieldSignature("private int c");
-        public final FieldAccessor<Material> type = nextFieldSignature("private Block d").translate(DuplexConversion.block);
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutBlockActionHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<Integer> b0 = PacketPlayOutBlockActionHandle.T.b0.toFieldAccessor();
+        public final FieldAccessor<Integer> b1 = PacketPlayOutBlockActionHandle.T.b1.toFieldAccessor();
+        public final FieldAccessor<Material> block = PacketPlayOutBlockActionHandle.T.block.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutBlockBreakAnimation extends NMSPacket {
 
-        public final FieldAccessor<Integer> unknown1 = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Integer> unknown2 = nextFieldSignature("private int c");
+        public final FieldAccessor<Integer> id = PacketPlayOutBlockBreakAnimationHandle.T.id.toFieldAccessor();
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutBlockBreakAnimationHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<Integer> progress = PacketPlayOutBlockBreakAnimationHandle.T.progress.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutBlockChange extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
-        public final TranslatorFieldAccessor<BlockData> blockData = nextFieldSignature("public IBlockData block").translate(DuplexConversion.blockData);
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutBlockChangeHandle.T.position.toFieldAccessor();
+        public final TranslatorFieldAccessor<BlockData> blockData = PacketPlayOutBlockChangeHandle.T.blockData.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutBoss extends NMSPacket {
@@ -678,7 +682,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCamera extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("public int a");
+        public final FieldAccessor<Integer> entityId = PacketPlayOutCameraHandle.T.entityId.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutChat extends NMSPacket {

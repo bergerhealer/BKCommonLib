@@ -179,7 +179,16 @@ public class MojangMappings {
                 {
                     Matcher m = fieldNamePattern.matcher(line);
                     if (m.matches()) {
-                        classMappings.addField(m.group(2), m.group(1));
+                        String obfuscatedName = m.group(2);
+                        String mojangName = m.group(1);
+
+                        // These types of obfuscation were not done in the server, and the
+                        // original variable name is kept.
+                        if (mojangName.startsWith("this$")) {
+                            continue;
+                        }
+
+                        classMappings.addField(obfuscatedName, mojangName);
                         continue;
                     }
                 }

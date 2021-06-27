@@ -721,17 +721,19 @@ class EntityTrackerEntryState {
 
 #if version >= 1.14
     public (CommonPacket) Packet<?> getSpawnPacket() {
-        #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity entity:tracker;
-        Entity entity = instance#entity;
-  #if version >= 1.16.2
-        return entity.P();
-  #elseif version >= 1.16
-        return entity.O();
-  #elseif version >= 1.15
-        return entity.L();
+  #if version >= 1.17
+        #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity entity;
   #else
-        return entity.N();
+        #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity entity:tracker;
   #endif
+        Entity entity = instance#entity;
+  #select version >=
+  #case 1.17:   return entity.getPacket();
+  #case 1.16.2: return entity.P();
+  #case 1.16:   return entity.O();
+  #case 1.15:   return entity.L();
+  #case else:   return entity.N();
+  #endselect
     }
 #elseif version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();

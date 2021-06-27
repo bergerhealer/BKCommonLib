@@ -210,4 +210,9 @@ public class CommonCapabilities {
      * Earlier versions supported destroying multiple entities at once.
      */
     public static final boolean PACKET_DESTROY_MULTIPLE = CommonBootstrap.evaluateMCVersion("<", "1.17");
+
+    /**
+     * Since Minecraft 1.17 entity removal comes with a reason, and there is not just a die() method.
+     */
+    public static final boolean ENTITY_REMOVE_WITH_REASON = CommonBootstrap.evaluateMCVersion(">=", "1.17");
 }

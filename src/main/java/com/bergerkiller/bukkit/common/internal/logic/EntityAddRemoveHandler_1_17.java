@@ -8,7 +8,6 @@ import java.util.ListIterator;
 import java.util.Queue;
 import java.util.logging.Level;
 
-import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
@@ -188,19 +187,6 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
         public void onEntityAdded(Entity entity) {
             pendingAddEvents.add(entity);
             handler.notifyAddedEarly(world, entity);
-            
-            if (DebugUtil.getBooleanValue("a", false)) {
-                CommonUtil.nextTick(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        // TODO Auto-generated method stub
-
-                        DebugUtil.logInstances(HandleConversion.toEntityHandle(entity));
-                    }
-                    
-                });
-            }
         }
 
         public void processEvents() {
@@ -228,7 +214,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
+        // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
     @Override

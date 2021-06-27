@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 
 import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.HumanEntity;
 
@@ -13,6 +14,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.bukkit.common.wrappers.MoveType;
@@ -25,6 +27,11 @@ import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 @ClassHook.HookPackage("net.minecraft.server")
+@ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
+@ClassHook.HookImport("net.minecraft.world.EnumHand")
+@ClassHook.HookImport("net.minecraft.world.EnumInteractionResult")
+@ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
+@ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityHook extends ClassHook<EntityHook> {
     private EntityController<?> controller = null;
     private Throwable stack = null;
@@ -72,26 +79,30 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @Deprecated
-    @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)", optional=true)
+    @HookMethodCondition("version <= 1.8.8")
+    @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)")
     public boolean onInteractBy_1_8_8(Object entityHuman) {
         return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT).isTruthy();
     }
 
     @Deprecated
-    @HookMethod(value="public boolean onInteractBy_1_9:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)", optional=true)
+    @HookMethodCondition("version >= 1.9 && version <= 1.11.1")
+    @HookMethod(value="public boolean onInteractBy_1_9:???(EntityHuman entityhuman, ItemStack itemstack, EnumHand enumhand)")
     public boolean onInteractBy_1_10_2(Object entityHuman, Object itemstack, Object enumHand) {
         return onInteractBy_1_11_2(entityHuman, enumHand);
     }
 
     @Deprecated
-    @HookMethod(value="public boolean onInteractBy_1_11_2:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
+    @HookMethodCondition("version >= 1.11.2 && version <= 1.15.2")
+    @HookMethod(value="public boolean onInteractBy_1_11_2:???(EntityHuman entityhuman, EnumHand enumhand)")
     public boolean onInteractBy_1_11_2(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
         return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).isTruthy();
     }
 
     @Deprecated
-    @HookMethod(value="public EnumInteractionResult onInteractBy_1_16:???(EntityHuman entityhuman, EnumHand enumhand)", optional=true)
+    @HookMethodCondition("version >= 1.16")
+    @HookMethod(value="public EnumInteractionResult onInteractBy_1_16:???(EntityHuman entityhuman, EnumHand enumhand)")
     public Object onInteractBy_1_16(Object entityHuman, Object enumHand) {
         HumanEntity humanEntity = (HumanEntity) WrapperConversion.toEntity(entityHuman);
         return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).getRawHandle();
@@ -110,7 +121,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public boolean damageEntity(DamageSource damagesource, float f)")
+    @HookMethod("public boolean damageEntity(net.minecraft.world.damagesource.DamageSource damagesource, float f)")
     public boolean onDamageEntity(Object damageSource, float damage) {
         try {
             if (checkController()) {
@@ -150,8 +161,8 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    // Minecraft 1.14 and later
-    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, Vec3D vec3d)", optional=true)
+    @HookMethodCondition("version >= 1.14")
+    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, net.minecraft.world.phys.Vec3D vec3d)")
     public void onMove_v3(Object enumMoveType, Object vec3d) {
         double dx = Vec3DHandle.T.x.getDouble(vec3d);
         double dy = Vec3DHandle.T.y.getDouble(vec3d);
@@ -159,8 +170,8 @@ public class EntityHook extends ClassHook<EntityHook> {
         this.onMove_v2(enumMoveType, dx, dy, dz);
     }
 
-    // Minecraft 1.11.2 and later
-    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, double d0, double d1, double d2)", optional=true)
+    @HookMethodCondition("version >= 1.11 && version <= 1.13.2")
+    @HookMethod(value="public void move(net.minecraft.world.entity.EnumMoveType enummovetype, double d0, double d1, double d2)")
     public void onMove_v2(Object enumMoveType, double dx, double dy, double dz) {
         try {
             if (checkController()) {
@@ -183,19 +194,74 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    // Beginning of time
-    @HookMethod(value="public void move(double d0, double d1, double d2)", optional=true)
+    @HookMethodCondition("version <= 1.10.2")
+    @HookMethod(value="public void move(double d0, double d1, double d2)")
     public void onMove_v1(double dx, double dy, double dz) {
         this.onMove_v2(MoveType.SELF.getHandle(), dx, dy, dz);
     }
 
+    private static final Object ENTTIY_REMOVE_REASON_KILLED;
+    private static final Object ENTTIY_REMOVE_REASON_DISCARDED;
+    static {
+        Object killed = null, discarded = null;
+        if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
+            Class<?> reasonClass = CommonUtil.getClass("net.minecraft.world.entity.Entity.RemovalReason");
+            if (reasonClass == null) {
+                Logging.LOGGER_REFLECTION.severe("Failed to find Entity.RemovalReason class");
+            } else {
+                Enum<?>[] values = (Enum<?>[]) reasonClass.getEnumConstants();
+                killed = Stream.of(values)
+                        .filter(n -> n.name().equals("KILLED"))
+                        .findFirst().orElse(null);
+                discarded = Stream.of(values)
+                        .filter(n -> n.name().equals("DISCARDED"))
+                        .findFirst().orElse(null);
+            }
+        }
+        ENTTIY_REMOVE_REASON_KILLED = killed;
+        ENTTIY_REMOVE_REASON_DISCARDED = discarded;
+    }
+
+    public void onBaseDeath(boolean killed) {
+        if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
+            if (killed) {
+                base.onEntityRemoved(ENTTIY_REMOVE_REASON_KILLED);
+            } else {
+                base.onEntityRemoved(ENTTIY_REMOVE_REASON_DISCARDED);
+            }
+        } else {
+            base.die();
+        }
+    }
+
+    @HookMethodCondition("version <= 1.16.5")
     @HookMethod("public void die()")
     public void die() {
         try {
             if (checkController()) {
-                controller.onDie();
+                controller.onDie(true);
             } else {
                 base.die();
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    @HookMethodCondition("version >= 1.17")
+    @HookMethod("public void a(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
+    public void onEntityRemoved(Object removalReason) {
+        try {
+            if (checkController()) {
+                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
+                    controller.onDie(true);
+                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
+                    controller.onDie(false);
+                } else {
+                    base.onEntityRemoved(removalReason);
+                }
+            } else {
+                base.onEntityRemoved(removalReason);
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -253,10 +319,10 @@ public class EntityHook extends ClassHook<EntityHook> {
         return LocaleLanguageHandle.INSTANCE().get("entity." + name + ".name");
     }
 
-    @HookMethod("public boolean savePassenger:???(NBTTagCompound nbttagcompound)")
-    public boolean savePassenger(Object tag) {
+    @HookMethod("public boolean onEntitySave:???(NBTTagCompound nbttagcompound)")
+    public boolean onEntitySave(Object tag) {
         Object handle = this.instance();
-        if (EntityHandle.T.isDead.invoke(handle)) {
+        if (!EntityHandle.T.isSavingAllowed.invoke(handle)) {
             return false;
         }
 
@@ -266,21 +332,19 @@ public class EntityHook extends ClassHook<EntityHook> {
         return true;
     }
 
-    @HookMethod("public boolean saveEntity:???(NBTTagCompound nbttagcompound)")
+    // This only has to be hooked on Minecraft 1.12.2 and before, where the implementation
+    // calls getSaveID() - which will cause incorrect data to be saved. On Minecraft 1.13
+    // and later, this is no longer needed, because it defers to onEntitySave() instead.
+    @HookMethodCondition("version <= 1.12.2")
+    @HookMethod("public boolean saveEntityIfNotPassenger:d(NBTTagCompound nbttagcompound)")
     public boolean saveEntity(Object tag) {
         try {
             Object handle = this.instance();
-            if (EntityHandle.T.isDead.invoke(handle)) {
+            if (EntityHandle.T.isPassenger.invoke(handle)) {
                 return false;
+            } else {
+                return this.onEntitySave(tag);
             }
-            if (EntityHandle.T.vehicle.raw.get(handle) != null) {
-                return false;
-            }
-
-            CommonTagCompound commonTag = CommonTagCompound.create(tag);
-            commonTag.putValue("id", getSavedName(this.instance()));
-            EntityHandle.T.saveToNBT.invoke(handle, commonTag);
-            return true;
         } catch (Throwable t) {
             t.printStackTrace();
             return false;
@@ -292,7 +356,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         return EntityTypesHandle.getEntityInternalName(EntityHook.findInstanceBaseType(instance));
     }
 
-    @HookMethod("public void collide(Entity entity)")
+    @HookMethod("public void collide(net.minecraft.world.entity.Entity entity)")
     public void collide(Object entity) {
         try {
             if (checkController()) {

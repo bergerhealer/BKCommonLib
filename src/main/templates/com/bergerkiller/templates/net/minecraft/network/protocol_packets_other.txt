@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.EnumChatVisibility;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.World;
@@ -2137,7 +2138,7 @@ class PacketPlayOutWorldParticles {
     private float speed:maxSpeed;
     private int count;
     private boolean longDistance:overrideLimiter;
-    private unknown ParticleParam particle;
+    private unknown net.minecraft.core.particles.ParticleParam particle;
 #elseif version >= 1.15
     #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_x:a;
     #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_y:b;
@@ -2237,5 +2238,49 @@ class PacketPlayOutKickDisconnect {
   private (ChatText) IChatBaseComponent reason;
 #else
   private (ChatText) IChatBaseComponent reason:a;
+#endif
+}
+
+class PacketPlayOutBlockChange {
+#if version >= 1.17
+    private final (IntVector3) BlockPosition position:pos;
+    public final (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:blockState;
+#else
+    private (IntVector3) BlockPosition position:a;
+    public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:block;
+#endif
+}
+
+class PacketPlayOutBlockBreakAnimation {
+#if version >= 1.17
+    private final int id;
+    private final (IntVector3) BlockPosition position:pos;
+    private final int progress;
+#else
+    private int id:a;
+    private (IntVector3) BlockPosition position:b;
+    private int progress:c;
+#endif
+}
+
+class PacketPlayOutBlockAction {
+#if version >= 1.17
+    private final (IntVector3) BlockPosition position:pos;
+    private final int b0;
+    private final int b1;
+    private final (org.bukkit.Material) net.minecraft.world.level.block.Block block;
+#else
+    private (IntVector3) BlockPosition position:a;
+    private int b0:b;
+    private int b1:c;
+    private (org.bukkit.Material) net.minecraft.world.level.block.Block block:d;
+#endif
+}
+
+class PacketPlayOutCamera {
+#if version >= 1.17
+    private final int entityId:cameraId;
+#else
+    public int entityId:a;
 #endif
 }

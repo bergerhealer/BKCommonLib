@@ -287,8 +287,12 @@ class Chunk {
 
     // this.someField = true in a(Entity) when entity is added
     // There is an accessor method which does the same, call that
+    // Since 1.17 entities aren't stored in the Chunk instance anymore,
+    // is the field still required at all?
     public void markEntitiesDirty() {
-#if version >= 1.14
+#if version >= 1.17
+        instance.markDirty(); // Not entirely correct, do we need this?
+#elseif version >= 1.14
         instance.d(true);
 #elseif version >= 1.13
         instance.f(true);
