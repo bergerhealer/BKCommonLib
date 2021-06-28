@@ -2284,3 +2284,11 @@ class PacketPlayOutCamera {
     public int entityId:a;
 #endif
 }
+
+class PacketPlayInHeldItemSlot {
+#if version >= 1.17
+    private final int itemInHandIndex:slot;
+#else
+    private int itemInHandIndex;
+#endif
+}

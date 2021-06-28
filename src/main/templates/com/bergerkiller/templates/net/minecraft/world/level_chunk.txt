@@ -28,13 +28,7 @@ import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.world.ICubeProviderServer;
 
 class Chunk {
-#if version >= 1.17
-    public final (WorldHandle) WorldServer world:level;
-#elseif version >= 1.16
-    public final (WorldHandle) WorldServer world;
-#else
-    public final (WorldHandle) World world;
-#endif
+    public (WorldHandle) World getWorld();
 
 #if version >= 1.14
     public int getLocX() {
@@ -136,7 +130,9 @@ class Chunk {
         // Acquire the EntitySectionStorage instance of the world this Chunk is on
         #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
         #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final net.minecraft.world.level.entity.EntitySectionStorage sectionStorage;
-        EntitySectionStorage storage = instance.level#entityManager#sectionStorage;
+        WorldServer world = (WorldServer) instance.getWorld();
+        net.minecraft.world.level.entity.PersistentEntitySectionManager entitySectionManager = world#entityManager;
+        EntitySectionStorage storage = entitySectionManager#sectionStorage;
 
         // Acquire the sectionIds LongSet which allows for iterating a vertical slice of chunk sections
         #require net.minecraft.world.level.entity.EntitySectionStorage private final it.unimi.dsi.fastutil.longs.LongSortedSet sectionIds;

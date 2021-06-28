@@ -18,8 +18,6 @@ public class NMSChunk {
     private static final MethodAccessor<Void> addEntities = ChunkHandle.T.addEntities.toMethodAccessor();
     private static final MethodAccessor<Boolean> needsSaving = ChunkHandle.T.checkCanSave.toMethodAccessor();
 
-    public static final TranslatorFieldAccessor<World> world = ChunkHandle.T.world.raw.toFieldAccessor().translate(DuplexConversion.world);
-
     public static final int XZ_MASK = 0xf;
     public static final int Y_MASK = 0xff;
 
@@ -58,7 +56,7 @@ public class NMSChunk {
     private static int getBrightness(Object chunkHandle, int x, int y, int z, EnumSkyBlockHandle mode) {
         if (y < 0) {
             return 0;
-        } else if (y >= ChunkHandle.T.world.get(chunkHandle).getWorld().getMaxHeight()) {
+        } else if (y >= ChunkHandle.T.getWorld.invoke(chunkHandle).getWorld().getMaxHeight()) {
             return mode.getBrightness();
         }
         return ChunkHandle.T.getBrightness.invoke(chunkHandle, mode.getRaw(), new IntVector3(x & XZ_MASK, y, z & XZ_MASK));

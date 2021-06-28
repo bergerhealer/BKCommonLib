@@ -51,6 +51,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBoatMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInHeldItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
@@ -445,7 +446,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInHeldItemSlot extends NMSPacket {
 
-        public final FieldAccessor<Integer> slot = nextField("private int itemInHandIndex");
+        public final FieldAccessor<Integer> slot = PacketPlayInHeldItemSlotHandle.T.itemInHandIndex.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInKeepAlive extends NMSPacket {

@@ -30,6 +30,7 @@ public abstract class ChunkHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract WorldHandle getWorld();
     public abstract int getLocX();
     public abstract int getLocZ();
     public abstract List<Integer> getLoadedSectionCoordinates();
@@ -64,8 +65,6 @@ public abstract class ChunkHandle extends Template.Handle {
             return null;
         }
     }
-    public abstract WorldHandle getWorld();
-    public abstract void setWorld(WorldHandle value);
     public abstract Chunk getBukkitChunk();
     public abstract void setBukkitChunk(Chunk value);
     /**
@@ -73,9 +72,9 @@ public abstract class ChunkHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
-        public final Template.Field.Converted<WorldHandle> world = new Template.Field.Converted<WorldHandle>();
         public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
 
+        public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method<Integer> getLocX = new Template.Method<Integer>();
         public final Template.Method<Integer> getLocZ = new Template.Method<Integer>();
         public final Template.Method<List<Integer>> getLoadedSectionCoordinates = new Template.Method<List<Integer>>();

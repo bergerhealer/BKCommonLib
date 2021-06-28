@@ -54,7 +54,11 @@ class World extends IBlockAccess {
 
     public (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld getWorld();
 
+#if exists net.minecraft.world.level.World public org.bukkit.craftbukkit.CraftServer getCraftServer();
+    public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer:getCraftServer();
+#else
     public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer();
+#endif
 
 #if forge_nms_obfuscated
     public (BlockData) IBlockData getBlockData:o((IntVector3) BlockPosition blockposition);
