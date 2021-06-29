@@ -71,12 +71,16 @@ class PacketPlayOutScoreboardTeam extends Packet {
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private final Optional<PacketPlayOutScoreboardTeam.b> parameters;
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam public PacketPlayOutScoreboardTeam.b getParameters() {
         Optional opt = instance#parameters;
-        return (PacketPlayOutScoreboardTeam$b) opt.orElse(null);
+        if (opt == null) {
+            return null;
+        } else {
+            return (PacketPlayOutScoreboardTeam$b) opt.orElse(null);
+        }
     }
     #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam public PacketPlayOutScoreboardTeam.b createParameters() {
         // Get existing
         Optional opt = instance#parameters;
-        if (opt.isPresent()) {
+        if (opt != null && opt.isPresent()) {
             return (PacketPlayOutScoreboardTeam$b) opt.get();
         }
 
