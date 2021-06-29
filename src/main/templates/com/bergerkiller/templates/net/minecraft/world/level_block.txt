@@ -98,7 +98,9 @@ class Block {
 
 #if version >= 1.14
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-  #if version >= 1.16
+  #if version >= 1.17
+        return instance.g(iblockdata, world, new BlockPosition(x, y, z));
+  #elseif version >= 1.16
         return instance.f(iblockdata, world, new BlockPosition(x, y, z));
   #elseif version >= 1.15
         return instance.l(iblockdata, world, new BlockPosition(x, y, z));
