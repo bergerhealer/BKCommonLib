@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutBlockChange</b>.
@@ -10,7 +11,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutBlockChange")
-public abstract class PacketPlayOutBlockChangeHandle extends Template.Handle {
+public abstract class PacketPlayOutBlockChangeHandle extends PacketHandle {
     /** @See {@link PacketPlayOutBlockChangeClass} */
     public static final PacketPlayOutBlockChangeClass T = Template.Class.create(PacketPlayOutBlockChangeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

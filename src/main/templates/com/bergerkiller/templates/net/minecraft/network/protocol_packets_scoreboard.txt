@@ -1,0 +1,359 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.EnumChatFormat;
+import net.minecraft.network.chat.ChatComponentText;
+import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.world.scores.criteria.IScoreboardCriteria;
+import net.minecraft.world.scores.criteria.IScoreboardCriteria.EnumScoreboardHealthDisplay;
+import net.minecraft.world.scores.ScoreboardTeamBase$EnumNameTagVisibility;
+import net.minecraft.world.scores.ScoreboardTeamBase$EnumTeamPush;
+
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle.EnumScoreboardActionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeamHandle;
+
+class PacketPlayOutScoreboardTeam extends Packet {
+    <code>
+    public static final int METHOD_ADD = 0;
+    public static final int METHOD_REMOVE = 1;
+    public static final int METHOD_CHANGE = 2;
+    public static final int METHOD_JOIN = 3;
+    public static final int METHOD_LEAVE = 4;
+    </code>
+
+#if version >= 1.17
+    private final int method;
+#endif
+
+#if version >= 1.17
+    private String name;
+#else
+    private String name:a;
+#endif
+
+#if version >= 1.17
+    private final Collection<String> players;
+    // method field moved to the top
+#elseif version >= 1.13
+    private final Collection<String> players:h;
+    private int method:i;
+#elseif version >= 1.9
+    private final Collection<String> players:h;
+    private int method:i;
+#else
+    private final Collection<String> players:g;
+    private int method:h;
+#endif
+
+    public static (PacketPlayOutScoreboardTeamHandle) PacketPlayOutScoreboardTeam createNew() {
+#if version >= 1.17
+        PacketPlayOutScoreboardTeam packet = new PacketPlayOutScoreboardTeam(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        PacketPlayOutScoreboardTeamHandle.T.players.set(packet, Collections.emptyList());
+        return packet;
+#else
+        return new PacketPlayOutScoreboardTeam();
+#endif
+    }
+
+#if version >= 1.17
+    // All properties grouped in a container class
+
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent displayName;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent prefix:playerPrefix;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final IChatBaseComponent suffix:playerSuffix;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final String visibility:nametagVisibility;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final String collisionRule;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final EnumChatFormat color;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam.b private final int teamOptionFlags:options;
+
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private final Optional<PacketPlayOutScoreboardTeam.b> parameters;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam public PacketPlayOutScoreboardTeam.b getParameters() {
+        Optional opt = instance#parameters;
+        return (PacketPlayOutScoreboardTeam$b) opt.orElse(null);
+    }
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam public PacketPlayOutScoreboardTeam.b createParameters() {
+        // Get existing
+        Optional opt = instance#parameters;
+        if (opt.isPresent()) {
+            return (PacketPlayOutScoreboardTeam$b) opt.get();
+        }
+
+        // Create new with default values
+        PacketPlayOutScoreboardTeam$b parameters = new PacketPlayOutScoreboardTeam$b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        parameters#displayName = ChatComponentText.EMPTY;
+        parameters#prefix = ChatComponentText.EMPTY;
+        parameters#suffix = ChatComponentText.EMPTY;
+        parameters#visibility = ScoreboardTeamBase$EnumNameTagVisibility.ALWAYS.name;
+        parameters#collisionRule = ScoreboardTeamBase$EnumTeamPush.ALWAYS.name;
+        parameters#color = EnumChatFormat.RESET;
+        parameters#teamOptionFlags = 0;
+
+        // Set and return
+        opt = Optional.of(parameters);
+        instance#parameters = opt;
+        return parameters;
+    }
+
+    public (ChatText) IChatBaseComponent getDisplayName() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return ChatComponentText.EMPTY;
+        } else {
+            return parameters#displayName;
+        }
+    }
+
+    public void setDisplayName((ChatText) IChatBaseComponent displayName) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#displayName = displayName;
+    }
+
+    public (ChatText) IChatBaseComponent getPrefix() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return ChatComponentText.EMPTY;
+        } else {
+            return parameters#prefix;
+        }
+    }
+
+    public void setPrefix((ChatText) IChatBaseComponent prefix) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#prefix = prefix;
+    }
+
+    public (ChatText) IChatBaseComponent getSuffix() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return ChatComponentText.EMPTY;
+        } else {
+            return parameters#suffix;
+        }
+    }
+
+    public void setSuffix((ChatText) IChatBaseComponent suffix) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#suffix = suffix;
+    }
+
+    public String getVisibility() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return ScoreboardTeamBase$EnumNameTagVisibility.ALWAYS.name;
+        } else {
+            return parameters#visibility;
+        }
+    }
+
+    public void setVisibility(String visibility) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#visibility = visibility;
+    }
+
+    public String getCollisionRule() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return ScoreboardTeamBase$EnumTeamPush.ALWAYS.name;
+        } else {
+            return parameters#collisionRule;
+        }
+    }
+
+    public void setCollisionRule(String rule) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#collisionRule = rule;
+    }
+
+    public (org.bukkit.ChatColor) EnumChatFormat getColor() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return EnumChatFormat.RESET;
+        } else {
+            return parameters#color;
+        }
+    }
+
+    public void setColor((org.bukkit.ChatColor) EnumChatFormat color) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#color = color;
+    }
+
+    public int getTeamOptionFlags() {
+        PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
+        if (parameters == null) {
+            return 0;
+        } else {
+            return parameters#teamOptionFlags;
+        }
+    }
+
+    public void setTeamOptionFlags(int teamOptionFlags) {
+        PacketPlayOutScoreboardTeam$b parameters = instance#createParameters();
+        parameters#teamOptionFlags = teamOptionFlags;
+    }
+#else
+    // Each property was a field inside the packet
+
+  #if version >= 1.13
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private net.minecraft.network.chat.IChatBaseComponent displayName:b;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private net.minecraft.network.chat.IChatBaseComponent prefix:c;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private net.minecraft.network.chat.IChatBaseComponent suffix:d;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private net.minecraft.EnumChatFormat color:g;
+
+    public (ChatText) IChatBaseComponent getDisplayName() {
+        return instance#displayName;
+    }
+
+    public void setDisplayName((ChatText) IChatBaseComponent displayName) {
+        instance#displayName = displayName;
+    }
+
+    public (ChatText) IChatBaseComponent getPrefix() {
+        return instance#prefix;
+    }
+
+    public void setPrefix((ChatText) IChatBaseComponent prefix) {
+        instance#prefix = prefix;
+    }
+
+    public (ChatText) IChatBaseComponent getSuffix() {
+        return instance#suffix;
+    }
+
+    public void setSuffix((ChatText) IChatBaseComponent suffix) {
+        instance#suffix = suffix;
+    }
+
+    public (org.bukkit.ChatColor) EnumChatFormat getColor() {
+        return instance#color;
+    }
+
+    public void setColor((org.bukkit.ChatColor) EnumChatFormat color) {
+        instance#color = color;
+    }
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private String displayName:b;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private String prefix:c;
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private String suffix:d;
+    #if version >= 1.9
+      #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private int color:g;
+    #else
+      #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private int color:f;
+    #endif
+
+    public (ChatText) String getDisplayName() {
+        return instance#displayName;
+    }
+
+    public void setDisplayName((ChatText) String displayName) {
+        instance#displayName = displayName;
+    }
+
+    public (ChatText) String getPrefix() {
+        return instance#prefix;
+    }
+
+    public void setPrefix((ChatText) String prefix) {
+        instance#prefix = prefix;
+    }
+
+    public (ChatText) String getSuffix() {
+        return instance#suffix;
+    }
+
+    public void setSuffix((ChatText) String suffix) {
+        instance#suffix = suffix;
+    }
+
+    public (org.bukkit.ChatColor) int getColor() {
+        return instance#color;
+    }
+
+    public void setColor((org.bukkit.ChatColor) int color) {
+        instance#color = color;
+    }
+  #endif
+
+  #if version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private String collisionRule:f;
+
+    public String getCollisionRule() {
+        return instance#collisionRule;
+    }
+
+    public void setCollisionRule(String rule) {
+        instance#collisionRule = rule;
+    }
+  #else
+    public String getCollisionRule() {
+        return "always";
+    }
+
+    public void setCollisionRule(String rule) {
+    }
+  #endif
+
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private String visibility:e;
+  #if version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private int teamOptionFlags:j;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam private int teamOptionFlags:i;
+  #endif
+
+    public String getVisibility() {
+        return instance#visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        instance#visibility = visibility;
+    }
+
+    public int getTeamOptionFlags() {
+        return instance#teamOptionFlags;
+    }
+
+    public void setTeamOptionFlags(int teamOptionFlags) {
+        instance#teamOptionFlags = teamOptionFlags;
+    }
+#endif
+}
+
+class PacketPlayOutScoreboardScore extends Packet {
+#if version >= 1.17
+    private String name:owner;
+    private String objName:objectiveName;
+    private int value:score;
+    private (com.bergerkiller.bukkit.common.wrappers.ScoreboardAction) PacketPlayOutScoreboardScore.EnumScoreboardAction action:method;
+#else
+    private String name:a;
+    private String objName:b;
+    private int value:c;
+    private (com.bergerkiller.bukkit.common.wrappers.ScoreboardAction) PacketPlayOutScoreboardScore.EnumScoreboardAction action:d;
+#endif
+
+    class PacketPlayOutScoreboardScore.EnumScoreboardAction {
+        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction CHANGE;
+        enum (EnumScoreboardActionHandle) PacketPlayOutScoreboardScore.EnumScoreboardAction REMOVE;
+    }
+}
+
+class PacketPlayOutScoreboardObjective extends Packet {
+#if version >= 1.17
+    private String name:objectiveName;
+    private (ChatText) IChatBaseComponent displayName;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:renderType;
+    private int action:method;
+#elseif version >= 1.13
+    private String name:a;
+    private (ChatText) IChatBaseComponent displayName:b;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
+    private int action:d;
+#else
+    private String name:a;
+    private (ChatText) String displayName:b;
+    private (Object) IScoreboardCriteria.EnumScoreboardHealthDisplay criteria:c;
+    private int action:d;
+#endif
+}

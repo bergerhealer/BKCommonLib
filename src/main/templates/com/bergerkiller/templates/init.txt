@@ -55,6 +55,7 @@
 #include /net/minecraft/network/protocol_packet_map.txt
 #include /net/minecraft/network/protocol_packets_movement.txt
 #include /net/minecraft/network/protocol_packets_other.txt
+#include /net/minecraft/network/protocol_packets_scoreboard.txt
 #include /net/minecraft/network/protocol_packets_spawn.txt
 #include /net/minecraft/network/server_playerconnection.txt
 #include /net/minecraft/nbt.txt

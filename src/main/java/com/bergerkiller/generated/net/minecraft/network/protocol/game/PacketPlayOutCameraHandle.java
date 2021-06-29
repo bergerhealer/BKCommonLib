@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutCamera</b>.
@@ -8,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutCamera")
-public abstract class PacketPlayOutCameraHandle extends Template.Handle {
+public abstract class PacketPlayOutCameraHandle extends PacketHandle {
     /** @See {@link PacketPlayOutCameraClass} */
     public static final PacketPlayOutCameraClass T = Template.Class.create(PacketPlayOutCameraClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

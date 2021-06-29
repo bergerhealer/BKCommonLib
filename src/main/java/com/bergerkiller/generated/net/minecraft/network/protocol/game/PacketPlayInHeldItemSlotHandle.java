@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayInHeldItemSlot</b>.
@@ -8,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInHeldItemSlot")
-public abstract class PacketPlayInHeldItemSlotHandle extends Template.Handle {
+public abstract class PacketPlayInHeldItemSlotHandle extends PacketHandle {
     /** @See {@link PacketPlayInHeldItemSlotClass} */
     public static final PacketPlayInHeldItemSlotClass T = Template.Class.create(PacketPlayInHeldItemSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

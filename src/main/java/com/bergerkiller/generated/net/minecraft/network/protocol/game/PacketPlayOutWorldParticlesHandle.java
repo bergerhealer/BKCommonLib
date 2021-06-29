@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutWorldParticles</b>.
@@ -8,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutWorldParticles")
-public abstract class PacketPlayOutWorldParticlesHandle extends Template.Handle {
+public abstract class PacketPlayOutWorldParticlesHandle extends PacketHandle {
     /** @See {@link PacketPlayOutWorldParticlesClass} */
     public static final PacketPlayOutWorldParticlesClass T = Template.Class.create(PacketPlayOutWorldParticlesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

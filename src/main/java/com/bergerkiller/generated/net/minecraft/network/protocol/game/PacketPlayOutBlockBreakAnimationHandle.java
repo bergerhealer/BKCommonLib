@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation</b>.
@@ -9,7 +10,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation")
-public abstract class PacketPlayOutBlockBreakAnimationHandle extends Template.Handle {
+public abstract class PacketPlayOutBlockBreakAnimationHandle extends PacketHandle {
     /** @See {@link PacketPlayOutBlockBreakAnimationClass} */
     public static final PacketPlayOutBlockBreakAnimationClass T = Template.Class.create(PacketPlayOutBlockBreakAnimationClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

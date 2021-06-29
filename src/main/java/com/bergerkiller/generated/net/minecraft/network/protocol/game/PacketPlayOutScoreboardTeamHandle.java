@@ -27,56 +27,57 @@ public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
+    public abstract ChatText getDisplayName();
+    public abstract void setDisplayName(ChatText displayName);
+    public abstract ChatText getPrefix();
+    public abstract void setPrefix(ChatText prefix);
+    public abstract ChatText getSuffix();
+    public abstract void setSuffix(ChatText suffix);
+    public abstract String getVisibility();
+    public abstract void setVisibility(String visibility);
+    public abstract String getCollisionRule();
+    public abstract void setCollisionRule(String rule);
+    public abstract ChatColor getColor();
+    public abstract void setColor(ChatColor color);
+    public abstract int getTeamOptionFlags();
+    public abstract void setTeamOptionFlags(int teamOptionFlags);
 
-    public void setCollisionRule(String rule) {
-        if (T.collisionRule.isAvailable()) {
-            T.collisionRule.set(getRaw(), rule);
-        }
-    }
-
-    public String getCollisionRule() {
-        if (T.collisionRule.isAvailable()) {
-            return T.collisionRule.get(getRaw());
-        } else {
-            return "always";
-        }
-    }
+    public static final int METHOD_ADD = 0;
+    public static final int METHOD_REMOVE = 1;
+    public static final int METHOD_CHANGE = 2;
+    public static final int METHOD_JOIN = 3;
+    public static final int METHOD_LEAVE = 4;
+    public abstract int getMethod();
+    public abstract void setMethod(int value);
     public abstract String getName();
     public abstract void setName(String value);
-    public abstract ChatText getDisplayName();
-    public abstract void setDisplayName(ChatText value);
-    public abstract ChatText getPrefix();
-    public abstract void setPrefix(ChatText value);
-    public abstract ChatText getSuffix();
-    public abstract void setSuffix(ChatText value);
-    public abstract String getVisibility();
-    public abstract void setVisibility(String value);
-    public abstract ChatColor getColor();
-    public abstract void setColor(ChatColor value);
     public abstract Collection<String> getPlayers();
     public abstract void setPlayers(Collection<String> value);
-    public abstract int getMode();
-    public abstract void setMode(int value);
-    public abstract int getFriendlyFire();
-    public abstract void setFriendlyFire(int value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutScoreboardTeamClass extends Template.Class<PacketPlayOutScoreboardTeamHandle> {
+        public final Template.Field.Integer method = new Template.Field.Integer();
         public final Template.Field<String> name = new Template.Field<String>();
-        public final Template.Field.Converted<ChatText> displayName = new Template.Field.Converted<ChatText>();
-        public final Template.Field.Converted<ChatText> prefix = new Template.Field.Converted<ChatText>();
-        public final Template.Field.Converted<ChatText> suffix = new Template.Field.Converted<ChatText>();
-        public final Template.Field<String> visibility = new Template.Field<String>();
-        @Template.Optional
-        public final Template.Field<String> collisionRule = new Template.Field<String>();
-        public final Template.Field.Converted<ChatColor> color = new Template.Field.Converted<ChatColor>();
         public final Template.Field<Collection<String>> players = new Template.Field<Collection<String>>();
-        public final Template.Field.Integer mode = new Template.Field.Integer();
-        public final Template.Field.Integer friendlyFire = new Template.Field.Integer();
 
         public final Template.StaticMethod.Converted<PacketPlayOutScoreboardTeamHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutScoreboardTeamHandle>();
+
+        public final Template.Method.Converted<ChatText> getDisplayName = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<Void> setDisplayName = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<ChatText> getPrefix = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<Void> setPrefix = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<ChatText> getSuffix = new Template.Method.Converted<ChatText>();
+        public final Template.Method.Converted<Void> setSuffix = new Template.Method.Converted<Void>();
+        public final Template.Method<String> getVisibility = new Template.Method<String>();
+        public final Template.Method<Void> setVisibility = new Template.Method<Void>();
+        public final Template.Method<String> getCollisionRule = new Template.Method<String>();
+        public final Template.Method<Void> setCollisionRule = new Template.Method<Void>();
+        public final Template.Method.Converted<ChatColor> getColor = new Template.Method.Converted<ChatColor>();
+        public final Template.Method.Converted<Void> setColor = new Template.Method.Converted<Void>();
+        public final Template.Method<Integer> getTeamOptionFlags = new Template.Method<Integer>();
+        public final Template.Method<Void> setTeamOptionFlags = new Template.Method<Void>();
 
     }
 

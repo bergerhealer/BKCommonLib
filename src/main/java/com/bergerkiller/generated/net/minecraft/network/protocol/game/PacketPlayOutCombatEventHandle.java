@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutCombatEvent</b>.
@@ -9,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent")
-public abstract class PacketPlayOutCombatEventHandle extends Template.Handle {
+public abstract class PacketPlayOutCombatEventHandle extends PacketHandle {
     /** @See {@link PacketPlayOutCombatEventClass} */
     public static final PacketPlayOutCombatEventClass T = Template.Class.create(PacketPlayOutCombatEventClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

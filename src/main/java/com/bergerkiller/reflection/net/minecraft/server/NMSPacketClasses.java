@@ -48,8 +48,10 @@ import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInArmAnimationHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBoatMoveHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInHeldItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInKeepAliveHandle;
@@ -104,6 +106,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPaintingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityWeatherHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUnloadChunkHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
@@ -215,11 +218,15 @@ public class NMSPacketClasses {
         }
     }
 
+    /**
+     * @deprecated Use {@link PacketPlayInBlockDigHandle} instead
+     */
+    @Deprecated
     public static class NMSPacketPlayInBlockDig extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Object> face = nextFieldSignature("private EnumDirection b");
-        public final FieldAccessor<Object> status = nextFieldSignature("private PacketPlayInBlockDig.EnumPlayerDigType c");
+        public final FieldAccessor<IntVector3> position = PacketPlayInBlockDigHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<BlockFace> direction = PacketPlayInBlockDigHandle.T.direction.toFieldAccessor();
+        public final FieldAccessor<PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle> status = PacketPlayInBlockDigHandle.T.digType.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInBlockPlace extends NMSPacket {
@@ -378,7 +385,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInChat extends NMSPacket {
 
-        public final FieldAccessor<String> message = nextField("private String a");
+        public final FieldAccessor<String> message = PacketPlayInChatHandle.T.message.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInClientCommand extends NMSPacket {
@@ -1547,19 +1554,28 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> value = PacketPlayOutScoreboardScoreHandle.T.value.toFieldAccessor();
         public final FieldAccessor<ScoreboardAction> action = PacketPlayOutScoreboardScoreHandle.T.action.toFieldAccessor();
     }
-    
+
+    /**
+     * @deprecated Please use {@link PacketPlayOutScoreboardTeamHandle} instead
+     */
+    @Deprecated
     public static class NMSPacketPlayOutScoreboardTeam extends NMSPacket {
 
+        public final FieldAccessor<Integer> method = PacketPlayOutScoreboardTeamHandle.T.method.toFieldAccessor();
         public final FieldAccessor<String> name = PacketPlayOutScoreboardTeamHandle.T.name.toFieldAccessor();
-        public final FieldAccessor<ChatText> displayName = PacketPlayOutScoreboardTeamHandle.T.displayName.toFieldAccessor();
-        public final FieldAccessor<ChatText> prefix = PacketPlayOutScoreboardTeamHandle.T.prefix.toFieldAccessor();
-        public final FieldAccessor<ChatText> suffix = PacketPlayOutScoreboardTeamHandle.T.suffix.toFieldAccessor();
-        public final FieldAccessor<String> visibility = PacketPlayOutScoreboardTeamHandle.T.visibility.toFieldAccessor();
-        public final FieldAccessor<String> collisionRule = PacketPlayOutScoreboardTeamHandle.T.collisionRule.toFieldAccessor().ignoreInvalid("");
-        public final FieldAccessor<ChatColor> color = PacketPlayOutScoreboardTeamHandle.T.color.toFieldAccessor();
+        public final FieldAccessor<ChatText> displayName = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getDisplayName, PacketPlayOutScoreboardTeamHandle.T.setDisplayName);
+        public final FieldAccessor<ChatText> prefix = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getPrefix, PacketPlayOutScoreboardTeamHandle.T.setPrefix);
+        public final FieldAccessor<ChatText> suffix = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getSuffix, PacketPlayOutScoreboardTeamHandle.T.setSuffix);
+        public final FieldAccessor<String> visibility = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getVisibility, PacketPlayOutScoreboardTeamHandle.T.setVisibility);
+        public final FieldAccessor<String> collisionRule = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getCollisionRule, PacketPlayOutScoreboardTeamHandle.T.setCollisionRule);
+        public final FieldAccessor<ChatColor> color = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getColor, PacketPlayOutScoreboardTeamHandle.T.setColor);
         public final FieldAccessor<Collection<String>> players = PacketPlayOutScoreboardTeamHandle.T.players.toFieldAccessor();
-        public final FieldAccessor<Integer> mode = PacketPlayOutScoreboardTeamHandle.T.mode.toFieldAccessor();
-        public final FieldAccessor<Integer> friendlyFire = PacketPlayOutScoreboardTeamHandle.T.friendlyFire.toFieldAccessor();
+        public final FieldAccessor<Integer> teamOptionFlags = FieldAccessor.wrapMethods(PacketPlayOutScoreboardTeamHandle.T.getTeamOptionFlags, PacketPlayOutScoreboardTeamHandle.T.setTeamOptionFlags);
+    
+        @Override
+        public CommonPacket newInstance() {
+            return PacketPlayOutScoreboardTeamHandle.createNew().toCommonPacket();
+        }
     }
 
     public static class NMSPacketPlayOutServerDifficulty extends NMSPacket {
@@ -1946,16 +1962,12 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutTileEntityData extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Integer> action = nextFieldSignature("private int b");
-        public final FieldAccessor<CommonTagCompound> data = nextFieldSignature("private NBTTagCompound c").translate(DuplexConversion.commonTagCompound);
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutTileEntityDataHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<Integer> action = PacketPlayOutTileEntityDataHandle.T.action.toFieldAccessor();
+        public final FieldAccessor<CommonTagCompound> data = PacketPlayOutTileEntityDataHandle.T.data.toFieldAccessor();
 
         public CommonPacket newInstance(IntVector3 blockPosition, int action, CommonTagCompound data) {
-            CommonPacket packet = this.newInstance();
-            packet.write(this.position, blockPosition);
-            packet.write(this.action, action);
-            packet.write(this.data, data);
-            return packet;
+            return PacketPlayOutTileEntityDataHandle.createNew(blockPosition, action, data).toCommonPacket();
         }
     }
 

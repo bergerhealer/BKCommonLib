@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective</b>.
@@ -9,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective")
-public abstract class PacketPlayOutScoreboardObjectiveHandle extends Template.Handle {
+public abstract class PacketPlayOutScoreboardObjectiveHandle extends PacketHandle {
     /** @See {@link PacketPlayOutScoreboardObjectiveClass} */
     public static final PacketPlayOutScoreboardObjectiveClass T = Template.Class.create(PacketPlayOutScoreboardObjectiveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */

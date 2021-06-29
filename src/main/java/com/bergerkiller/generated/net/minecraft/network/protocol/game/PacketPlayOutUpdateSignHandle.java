@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.World;
 
 /**
@@ -12,7 +13,7 @@ import org.bukkit.World;
  */
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutUpdateSign")
-public abstract class PacketPlayOutUpdateSignHandle extends Template.Handle {
+public abstract class PacketPlayOutUpdateSignHandle extends PacketHandle {
     /** @See {@link PacketPlayOutUpdateSignClass} */
     public static final PacketPlayOutUpdateSignClass T = Template.Class.create(PacketPlayOutUpdateSignClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
