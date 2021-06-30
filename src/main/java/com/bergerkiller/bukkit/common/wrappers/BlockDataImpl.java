@@ -633,7 +633,7 @@ public class BlockDataImpl extends BlockData {
 
     @Override
     public void stepOn(org.bukkit.World world, IntVector3 blockPosition, org.bukkit.entity.Entity entity) {
-        this.block.stepOn(world, blockPosition, entity);
+        this.block.stepOn(world, blockPosition, this.data, entity);
     }
 
     @Override

@@ -170,5 +170,11 @@ class TileEntityFurnace extends TileEntity {
 }
 
 class TileEntityHopper extends TileEntity {
-    public static boolean suckItems:a((Object) IHopper ihopper);
+#if version >= 1.17
+    public static boolean suckItems:a((org.bukkit.World) World world, (Object) IHopper ihopper);
+#else
+    public static boolean suckItems((org.bukkit.World) World world, (Object) IHopper ihopper) {
+        return TileEntityHopper.a(ihopper);
+    }
+#endif
 }

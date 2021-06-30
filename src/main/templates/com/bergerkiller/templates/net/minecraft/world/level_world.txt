@@ -213,7 +213,11 @@ class World extends IBlockAccess {
     public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #endif
 
+#if version >= 1.17
+    public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<T extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+#else
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+#endif
 
     public (List<EntityHandle>) List<Entity> getNearbyEntities:getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 

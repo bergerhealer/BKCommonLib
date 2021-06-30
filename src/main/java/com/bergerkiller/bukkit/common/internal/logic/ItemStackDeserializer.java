@@ -131,8 +131,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.16.5 to MC 1.16.4
         this.register(2584, NO_CONVERSION);
 
+        // From MC 1.17 to MC 1.16.5
+        this.register(2586, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_17.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 2586; // MC 1.16.5
+        this.max_version = 2724; // MC 1.17
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -391,5 +397,66 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "WARPED_WART_BLOCK",
                 "WEEPING_VINES", "WEEPING_VINES_PLANT",
                 "ZOGLIN_SPAWN_EGG", "ZOMBIFIED_PIGLIN_SPAWN_EGG"));
+
+        // All material names (Material enum) added Minecraft 1.16.5 -> 1.17
+        public static final Set<String> ADDED_MC_1_17 = new HashSet<String>(Arrays.asList(
+                "DEEPSLATE", "COBBLED_DEEPSLATE", "POLISHED_DEEPSLATE",
+                "CALCITE",  "TUFF", "DRIPSTONE_BLOCK", "ROOTED_DIRT",
+                "DEEPSLATE_COAL_ORE", "DEEPSLATE_IRON_ORE", "COPPER_ORE",
+                "DEEPSLATE_COPPER_ORE", "GOLD_ORE", "DEEPSLATE_GOLD_ORE",
+                "REDSTONE_ORE", "DEEPSLATE_REDSTONE_ORE", "EMERALD_ORE",
+                "DEEPSLATE_EMERALD_ORE", "LAPIS_ORE", "DEEPSLATE_LAPIS_ORE",
+                "DIAMOND_ORE", "DEEPSLATE_DIAMOND_ORE", "NETHER_GOLD_ORE",
+                "NETHER_QUARTZ_ORE", "ANCIENT_DEBRIS", "COAL_BLOCK",
+                "RAW_IRON_BLOCK", "RAW_COPPER_BLOCK", "RAW_GOLD_BLOCK",
+                "AMETHYST_BLOCK", "BUDDING_AMETHYST",
+                "IRON_BLOCK", "COPPER_BLOCK", "GOLD_BLOCK", "DIAMOND_BLOCK",
+                "NETHERITE_BLOCK", "EXPOSED_COPPER", "WEATHERED_COPPER",
+                "OXIDIZED_COPPER", "CUT_COPPER", "EXPOSED_CUT_COPPER",
+                "WEATHERED_CUT_COPPER", "OXIDIZED_CUT_COPPER", "CUT_COPPER_STAIRS",
+                "EXPOSED_CUT_COPPER_STAIRS", "WEATHERED_CUT_COPPER_STAIRS",
+                "OXIDIZED_CUT_COPPER_STAIRS", "CUT_COPPER_SLAB",
+                "EXPOSED_CUT_COPPER_SLAB", "WEATHERED_CUT_COPPER_SLAB",
+                "OXIDIZED_CUT_COPPER_SLAB", "WAXED_COPPER_BLOCK",
+                "WAXED_EXPOSED_COPPER", "WAXED_WEATHERED_COPPER",
+                "WAXED_OXIDIZED_COPPER", "WAXED_CUT_COPPER",
+                "WAXED_EXPOSED_CUT_COPPER", "WAXED_WEATHERED_CUT_COPPER",
+                "WAXED_OXIDIZED_CUT_COPPER", "WAXED_CUT_COPPER_STAIRS",
+                "WAXED_EXPOSED_CUT_COPPER_STAIRS", "WAXED_WEATHERED_CUT_COPPER_STAIRS",
+                "WAXED_OXIDIZED_CUT_COPPER_STAIRS", "WAXED_CUT_COPPER_SLAB",
+                "WAXED_EXPOSED_CUT_COPPER_SLAB", "WAXED_WEATHERED_CUT_COPPER_SLAB",
+                "WAXED_OXIDIZED_CUT_COPPER_SLAB", "AZALEA_LEAVES",
+                "FLOWERING_AZALEA_LEAVES", "TINTED_GLASS", "AZALEA",
+                "FLOWERING_AZALEA", "SPORE_BLOSSOM", "MOSS_CARPET",  "MOSS_BLOCK",
+                "HANGING_ROOTS", "BIG_DRIPLEAF", "SMALL_DRIPLEAF", "SMOOTH_BASALT",
+                "INFESTED_DEEPSLATE", "DEEPSLATE_BRICKS", "CRACKED_DEEPSLATE_BRICKS",
+                "DEEPSLATE_TILES", "CRACKED_DEEPSLATE_TILES", "CHISELED_DEEPSLATE",
+                "GLOW_LICHEN", "COBBLED_DEEPSLATE_WALL", "POLISHED_DEEPSLATE_WALL",
+                "DEEPSLATE_BRICK_WALL", "DEEPSLATE_TILE_WALL", "LIGHT", "DIRT_PATH",
+                "COBBLED_DEEPSLATE_STAIRS", "POLISHED_DEEPSLATE_STAIRS",
+                "DEEPSLATE_BRICK_STAIRS", "DEEPSLATE_TILE_STAIRS",
+                "COBBLED_DEEPSLATE_SLAB", "POLISHED_DEEPSLATE_SLAB",
+                "DEEPSLATE_BRICK_SLAB", "DEEPSLATE_TILE_SLAB",
+                "LIGHTNING_ROD", "SCULK_SENSOR", "POLISHED_BLACKSTONE_BUTTON",
+                "POLISHED_BLACKSTONE_PRESSURE_PLATE", "RAW_IRON", "RAW_GOLD",
+                "RAW_COPPER", "COPPER_INGOT", "AMETHYST_SHARD", "POWDER_SNOW_BUCKET",
+                "AXOLOTL_BUCKET", "BUNDLE", "SPYGLASS", "GLOW_INK_SAC",
+                "AXOLOTL_SPAWN_EGG", "GLOW_SQUID_SPAWN_EGG", "GOAT_SPAWN_EGG",
+                "GLOW_ITEM_FRAME", "GLOW_BERRIES", "CANDLE", "WHITE_CANDLE",
+                "ORANGE_CANDLE", "MAGENTA_CANDLE", "LIGHT_BLUE_CANDLE",
+                "YELLOW_CANDLE", "LIME_CANDLE", "PINK_CANDLE", "GRAY_CANDLE",
+                "LIGHT_GRAY_CANDLE", "CYAN_CANDLE", "PURPLE_CANDLE",
+                "BLUE_CANDLE", "BROWN_CANDLE", "GREEN_CANDLE", "RED_CANDLE",
+                "BLACK_CANDLE", "SMALL_AMETHYST_BUD", "MEDIUM_AMETHYST_BUD",
+                "LARGE_AMETHYST_BUD", "AMETHYST_CLUSTER", "POINTED_DRIPSTONE",
+                "WATER_CAULDRON", "LAVA_CAULDRON", "POWDER_SNOW_CAULDRON",
+                "CANDLE_CAKE", "WHITE_CANDLE_CAKE", "ORANGE_CANDLE_CAKE",
+                "MAGENTA_CANDLE_CAKE", "LIGHT_BLUE_CANDLE_CAKE", "YELLOW_CANDLE_CAKE",
+                "LIME_CANDLE_CAKE", "PINK_CANDLE_CAKE", "GRAY_CANDLE_CAKE",
+                "LIGHT_GRAY_CANDLE_CAKE", "CYAN_CANDLE_CAKE",
+                "PURPLE_CANDLE_CAKE", "BLUE_CANDLE_CAKE", "BROWN_CANDLE_CAKE",
+                "GREEN_CANDLE_CAKE", "RED_CANDLE_CAKE", "BLACK_CANDLE_CAKE",
+                "POWDER_SNOW", "CAVE_VINES", "CAVE_VINES_PLANT",
+                "BIG_DRIPLEAF_STEM",  "POTTED_AZALEA_BUSH", "POTTED_FLOWERING_AZALEA_BUSH"));
     }
 }

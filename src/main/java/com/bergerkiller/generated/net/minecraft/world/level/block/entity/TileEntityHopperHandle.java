@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.level.block.entity;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.World;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.block.entity.TileEntityHopper</b>.
@@ -19,8 +20,8 @@ public abstract class TileEntityHopperHandle extends TileEntityHandle {
 
     /* ============================================================================== */
 
-    public static boolean suckItems(Object ihopper) {
-        return T.suckItems.invoke(ihopper);
+    public static boolean suckItems(World world, Object ihopper) {
+        return T.suckItems.invoke(world, ihopper);
     }
 
     /**

@@ -359,10 +359,16 @@ class Block {
     }
 #endif
 
-#if version >= 1.9
-    public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
+#if version >= 1.17
+    public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, (org.bukkit.entity.Entity) Entity entity);
+#elseif version >= 1.9
+    public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, (org.bukkit.entity.Entity) Entity entity) {
+        return Block.stepOn(world, blockposition, entity);
+    }
 #else
-    public void stepOn:a((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (org.bukkit.entity.Entity) Entity entity);
+    public void stepOn((org.bukkit.World) World world, (IntVector3) BlockPosition blockposition, (IBlockDataHandle) IBlockData iblockdata, (org.bukkit.entity.Entity) Entity entity) {
+        return Block.a(world, blockposition, entity);
+    }
 #endif
 
     public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition) {

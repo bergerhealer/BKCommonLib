@@ -1,6 +1,5 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -82,6 +81,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityVelocityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKickDisconnectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutLoginHandle;
@@ -90,6 +90,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedEntitySpawnHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffectHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooterHandle;
@@ -124,7 +125,6 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
-import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
@@ -1150,32 +1150,25 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutExplosion extends NMSPacket {
 
-        public final FieldAccessor<Double> x = nextField("private double a");
-        public final FieldAccessor<Double> y = nextFieldSignature("private double b");
-        public final FieldAccessor<Double> z = nextFieldSignature("private double c");
-        public final FieldAccessor<Float> radius = nextFieldSignature("private float d");
-        public final FieldAccessor<List<Object>> blocks = nextFieldSignature("private List<BlockPosition> e");
-        public final FieldAccessor<Float> pushMotX = nextFieldSignature("private float f");
-        public final FieldAccessor<Float> pushMotY = nextFieldSignature("private float g");
-        public final FieldAccessor<Float> pushMotZ = nextFieldSignature("private float h");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(double.class, double.class, double.class, float.class, List.class, Vec3DHandle.T.getType());
+        public final FieldAccessor<Double> x = PacketPlayOutExplosionHandle.T.x.toFieldAccessor();
+        public final FieldAccessor<Double> y = PacketPlayOutExplosionHandle.T.y.toFieldAccessor();
+        public final FieldAccessor<Double> z = PacketPlayOutExplosionHandle.T.z.toFieldAccessor();
+        public final FieldAccessor<Float> power = PacketPlayOutExplosionHandle.T.power.toFieldAccessor();
+        public final FieldAccessor<List<IntVector3>> blocks = PacketPlayOutExplosionHandle.T.blocks.toFieldAccessor();
+        public final FieldAccessor<Float> knockbackX = PacketPlayOutExplosionHandle.T.knockbackX.toFieldAccessor();
+        public final FieldAccessor<Float> knockbackY = PacketPlayOutExplosionHandle.T.knockbackY.toFieldAccessor();
+        public final FieldAccessor<Float> knockbackZ = PacketPlayOutExplosionHandle.T.knockbackZ.toFieldAccessor();
 
-        @SuppressWarnings("unchecked")
         public CommonPacket newInstance(double x, double y, double z, float radius) {
-            return newInstance(x, y, z, radius, Collections.EMPTY_LIST);
+            return newInstance(x, y, z, radius, Collections.emptyList());
         }
 
         public CommonPacket newInstance(double x, double y, double z, float radius, List<IntVector3> blocks) {
             return newInstance(x, y, z, radius, blocks, null);
         }
 
-        public CommonPacket newInstance(double x, double y, double z, float radius, List<IntVector3> blocks, Vector pushedForce) {
-            Object vec = (pushedForce == null) ? null : Vec3DHandle.T.fromBukkitRaw.invoke(pushedForce);
-            List<Object> blocksHandles = new ArrayList<Object>(blocks.size());
-            for (IntVector3 block : blocks) {
-                blocksHandles.add(BlockPositionHandle.T.fromIntVector3Raw.invoke(block));
-            }
-            return constructor1.newInstance(x, y, z, radius, blocksHandles, vec);
+        public CommonPacket newInstance(double x, double y, double z, float power, List<IntVector3> blocks, Vector knockback) {
+            return PacketPlayOutExplosionHandle.createNew(x, y, z, power, blocks, knockback).toCommonPacket();
         }
     }
     
@@ -1433,7 +1426,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutOpenSignEditor extends NMSPacket {
 
-        public final FieldAccessor<IntVector3> signPosition = nextField("private BlockPosition a").translate(DuplexConversion.blockPosition);
+        public final FieldAccessor<IntVector3> signPosition = PacketPlayOutOpenSignEditorHandle.T.signPosition.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutOpenWindow extends NMSPacket {

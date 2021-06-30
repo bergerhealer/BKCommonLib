@@ -55,7 +55,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract boolean canSupportOnFace(IBlockDataHandle iblockdata, Block block, BlockFace direction);
     public abstract float getDamageResillience();
     public abstract void dropNaturally(IBlockDataHandle iblockdata, World world, IntVector3 blockposition, float yield, int chance);
-    public abstract void stepOn(World world, IntVector3 blockposition, Entity entity);
+    public abstract void stepOn(World world, IntVector3 blockposition, IBlockDataHandle iblockdata, Entity entity);
     public abstract IBlockDataHandle updateState(IBlockDataHandle iblockdata, World world, IntVector3 blockposition);
     public abstract AxisAlignedBBHandle getBoundingBox(IBlockDataHandle iblockdata, IBlockAccessHandle iblockaccess, IntVector3 blockposition);
     public abstract IBlockDataHandle getBlockData();

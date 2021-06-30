@@ -59,6 +59,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -2003,7 +2004,7 @@ class PacketPlayInWindowClick extends Packet {
     private int windowId:containerId;
     private int slot:slotNum;
     private int button:buttonNum;
-    private short action:d;
+    private short action:REMOVED;
     private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
 #else
     private int windowId:a;
@@ -2014,9 +2015,9 @@ class PacketPlayInWindowClick extends Packet {
 #endif
 
 #if version >= 1.17
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:clickType;
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.InventoryClickType mode:clickType;
 #elseif version >= 1.9
-    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) InventoryClickType mode:shift;
+    private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) net.minecraft.world.inventory.InventoryClickType mode:shift;
 #else
     private (com.bergerkiller.bukkit.common.wrappers.InventoryClickType) int mode:shift;
 #endif
@@ -2208,4 +2209,36 @@ class PacketPlayOutTileEntityData extends Packet {
 #endif
 
     public (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, int action, (CommonTagCompound) NBTTagCompound data);
+}
+
+class PacketPlayOutOpenSignEditor extends Packet {
+#if version >= 1.17
+    private final (IntVector3) BlockPosition signPosition:pos;
+#else
+    private (IntVector3) BlockPosition signPosition:a;
+#endif
+}
+
+class PacketPlayOutExplosion extends Packet {
+#if version >= 1.17
+    private final double x;
+    private final double y;
+    private final double z;
+    private final float power;
+    private final (List<IntVector3>) List<BlockPosition> blocks:toBlow;
+    private final float knockbackX;
+    private final float knockbackY;
+    private final float knockbackZ;
+#else
+    private double x:a;
+    private double y:b;
+    private double z:c;
+    private float power:d;
+    private (List<IntVector3>) List<BlockPosition> blocks:e;
+    private float knockbackX:f;
+    private float knockbackY:g;
+    private float knockbackZ:h;
+#endif
+
+    public (PacketPlayOutExplosionHandle) PacketPlayOutExplosion(double x, double y, double z, float power, (List<IntVector3>) List<BlockPosition> blocks, (org.bukkit.util.Vector) Vec3D knockback);
 }
