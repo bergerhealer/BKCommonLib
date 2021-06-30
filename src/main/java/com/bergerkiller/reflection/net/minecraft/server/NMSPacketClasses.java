@@ -64,6 +64,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseItemHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInWindowClickHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
@@ -75,6 +76,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCombatEventHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotationHandle;
@@ -119,12 +121,10 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle;
-import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
-import com.bergerkiller.generated.net.minecraft.world.entity.player.PlayerAbilitiesHandle;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeConstructor;
 import com.bergerkiller.mountiplex.reflection.SafeDirectField;
@@ -600,16 +600,15 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutAbilities extends NMSPacket {
 
-        public final FieldAccessor<Boolean> isInvulnerable = nextField("private boolean a");
-        public final FieldAccessor<Boolean> isFlying = nextFieldSignature("private boolean b");
-        public final FieldAccessor<Boolean> canFly = nextFieldSignature("private boolean c");
-        public final FieldAccessor<Boolean> canInstantlyBuild = nextFieldSignature("private boolean d");
-        public final FieldAccessor<Float> flySpeed = nextFieldSignature("private float e");
-        public final FieldAccessor<Float> walkSpeed = nextFieldSignature("private float f");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(PlayerAbilitiesHandle.T.getType());
+        public final FieldAccessor<Boolean> isInvulnerable = PacketPlayOutAbilitiesHandle.T.invulnerable.toFieldAccessor();
+        public final FieldAccessor<Boolean> isFlying = PacketPlayOutAbilitiesHandle.T.isFlying.toFieldAccessor();
+        public final FieldAccessor<Boolean> canFly = PacketPlayOutAbilitiesHandle.T.canFly.toFieldAccessor();
+        public final FieldAccessor<Boolean> canInstantlyBuild = PacketPlayOutAbilitiesHandle.T.instabuild.toFieldAccessor();
+        public final FieldAccessor<Float> flySpeed = PacketPlayOutAbilitiesHandle.T.flyingSpeed.toFieldAccessor();
+        public final FieldAccessor<Float> walkSpeed = PacketPlayOutAbilitiesHandle.T.walkingSpeed.toFieldAccessor();
 
         public CommonPacket newInstance(PlayerAbilities abilities) {
-            return constructor1.newInstance(abilities.getRawHandle());
+            return PacketPlayOutAbilitiesHandle.createNew(abilities).toCommonPacket();
         }
     }
 
@@ -974,19 +973,18 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutEntityEffect extends NMSPacket {
 
-        public final FieldAccessor<Integer> entityId = nextField("private int a");
-        public final FieldAccessor<Byte> effectId = nextFieldSignature("private byte b");
-        public final FieldAccessor<Byte> effectAmplifier = nextFieldSignature("private byte c");
-        public final FieldAccessor<Integer> effectDuration = nextFieldSignature("private int d");
-        public final FieldAccessor<Byte> effectFlags = nextFieldSignature("private byte e");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(int.class, MobEffectHandle.T.getType());
+        public final FieldAccessor<Integer> entityId = PacketPlayOutEntityEffectHandle.T.entityId.toFieldAccessor();
+        public final FieldAccessor<Byte> effectId = PacketPlayOutEntityEffectHandle.T.effectId.toFieldAccessor();
+        public final FieldAccessor<Byte> effectAmplifier = PacketPlayOutEntityEffectHandle.T.effectAmplifier.toFieldAccessor();
+        public final FieldAccessor<Integer> effectDuration = PacketPlayOutEntityEffectHandle.T.effectDurationTicks.toFieldAccessor();
+        public final FieldAccessor<Byte> effectFlags = PacketPlayOutEntityEffectHandle.T.flags.toFieldAccessor();
 
         public CommonPacket newInstance(int entityId, Object mobEffect) {
-            return constructor1.newInstance(entityId,  Conversion.toMobEffect.convert(mobEffect));
+            return new CommonPacket(PacketPlayOutEntityEffectHandle.T.constr_entityId_mobeffect.raw.newInstance(entityId, mobEffect));
         }
 
         public CommonPacket newInstance(int entityId, PotionEffect effect) {
-            return constructor1.newInstance(entityId, Conversion.toMobEffect.convert(effect));
+            return PacketPlayOutEntityEffectHandle.createNew(entityId, effect).toCommonPacket();
         }
     }
 
