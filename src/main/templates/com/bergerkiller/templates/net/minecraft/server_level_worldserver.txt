@@ -39,7 +39,7 @@ class WorldServer extends World {
 
     public (org.bukkit.entity.Entity) Entity getEntityByUUID(UUID entityUUID) {
 #if version >= 1.17
-        return instance.getEntities().a(entityUUID);
+        return (Entity) instance.getEntities().a(entityUUID);
 #else
         #require net.minecraft.server.level.WorldServer private final Map<java.util.UUID, Entity> entitiesByUUID;
         Map map = instance#entitiesByUUID;
