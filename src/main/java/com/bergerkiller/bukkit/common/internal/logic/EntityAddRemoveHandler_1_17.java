@@ -376,9 +376,19 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     }
          * 
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
+         *     EntityTickList tickList = world#entityTickList;
+         * 
+         * #if exists net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
+         *     // Tuinity
+         *     #require net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
+         *     com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = tickList#entities;
+         *     if (set.remove(oldEntity)) {
+         *         set.add(newEntity);
+         *     }
+         * #else
+         *     // Paper/Spigot
          *     #require net.minecraft.world.level.entity.EntityTickList private it.unimi.dsi.fastutil.ints.Int2ObjectMap<Entity> active;
          *     #require net.minecraft.world.level.entity.EntityTickList private it.unimi.dsi.fastutil.ints.Int2ObjectMap<Entity> passive;
-         *     EntityTickList tickList = world#entityTickList;
          *     it.unimi.dsi.fastutil.ints.Int2ObjectMap tickListActive = tickList#active;
          *     it.unimi.dsi.fastutil.ints.Int2ObjectMap tickListPassive = tickList#passive;
          *     if (tickListActive.get(entityId) == oldEntity) {
@@ -387,6 +397,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     if (tickListPassive.get(entityId) == oldEntity) {
          *         tickListPassive.put(entityId, newEntity);
          *     }
+         * #endif
          * }
          */
         @Template.Generated("%REPLACE_IN_WORLD_STORAGE%")

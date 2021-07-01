@@ -144,7 +144,11 @@ class EntityTrackerEntry {
   #endif
 
     public int getPlayerViewDistance() {
+  #if exists net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap this$0;
         #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:this$0;
+  #else
+        #require net.minecraft.server.level.EntityTrackerEntry final net.minecraft.server.level.PlayerChunkMap entityTracker:a;
+  #endif
   #if version >= 1.14.1
         #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:viewDistance;
   #else
