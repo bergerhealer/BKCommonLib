@@ -10,7 +10,6 @@ import org.bukkit.entity.Entity;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook_1_14;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;

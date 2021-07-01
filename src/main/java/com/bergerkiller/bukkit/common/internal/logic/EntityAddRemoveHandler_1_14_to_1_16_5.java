@@ -234,7 +234,7 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
-        //com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
+        // com.bergerkiller.bukkit.common.utils.DebugUtil.logInstances(oldEntity.getRaw());
     }
 
     @Override

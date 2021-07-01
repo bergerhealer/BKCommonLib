@@ -22,12 +22,10 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
-import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
-import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 public abstract class EntityAddRemoveHandler {
     public static final EntityAddRemoveHandler INSTANCE;
@@ -214,7 +212,7 @@ public abstract class EntityAddRemoveHandler {
     protected static class ChunkEntitySliceHandler {
         private final FastField<Object[]> chunkEntitySlicesField = new FastField<Object[]>();
         private final boolean chunkEntitySlicesFieldIsLists;
-        private final FastMethod<Object> paperspigotSwapEntityInChunkEntityListMethod = new FastMethod<Object>();
+        private final HandlerLogic logic;
 
         public ChunkEntitySliceHandler() {
             // Chunk EntitySlice[] field, used when entities need to be swapped, or when removing
@@ -237,25 +235,8 @@ public abstract class EntityAddRemoveHandler {
                 this.chunkEntitySlicesFieldIsLists = isLists;
             }
 
-            // Paperspigot support: 'entities' field of Chunk
-            try {
-                Class<?> entityListType = Class.forName("com.destroystokyo.paper.util.maplist.EntityList");
-                if (SafeField.contains(ChunkHandle.T.getType(), "entities", entityListType)) {
-                    ClassResolver resolver = new ClassResolver();
-
-                    resolver.setDeclaredClassName("net.minecraft.world.level.chunk.Chunk");
-                    resolver.addImport("net.minecraft.world.entity.Entity");
-                    paperspigotSwapEntityInChunkEntityListMethod.init(new MethodDeclaration(resolver,
-                            "public void swap(Entity oldEntity, Entity newEntity) {\n" +
-                            "    if (instance.entities.remove(oldEntity)) {\n" +
-                            "        if (newEntity != null) {\n" +
-                            "            instance.entities.add(newEntity);\n" +
-                            "        }\n" +
-                            "    }\n" +
-                            "}"
-                    ));
-                }
-            } catch (ClassNotFoundException ignore) {}
+            this.logic = Template.Class.create(HandlerLogic.class, Common.TEMPLATE_RESOLVER);
+            this.logic.forceInitialization();
         }
 
         /**
@@ -304,6 +285,12 @@ public abstract class EntityAddRemoveHandler {
         public boolean replace(Object chunkHandle, EntityHandle oldEntity, EntityHandle newEntity) {
             Object[] slices = this.chunkEntitySlicesField.get(chunkHandle);
             int chunkY = newEntity.getChunkY();
+            if (chunkY < 0) {
+                chunkY = 0;
+            } else if (chunkY >= slices.length) {
+                chunkY = slices.length - 1;
+            }
+
             boolean found = false;
             if (replaceInSlice(slices[chunkY], oldEntity, newEntity)) {
                 found = true;
@@ -316,10 +303,8 @@ public abstract class EntityAddRemoveHandler {
                 }
             }
 
-            if (paperspigotSwapEntityInChunkEntityListMethod.isAvailable()) {
-                Object newRaw = (newEntity == null) ? null : newEntity.getRaw();
-                paperspigotSwapEntityInChunkEntityListMethod.invoke(chunkHandle, oldEntity.getRaw(), newRaw);
-            }
+            // For changes in forks where entities are stored in more places
+            this.logic.replaceInChunkSpecial(chunkHandle, oldEntity.getRaw(), Handle.getRaw(newEntity));
 
             return found;
         }
@@ -353,6 +338,67 @@ public abstract class EntityAddRemoveHandler {
         private boolean replaceInSlice(Object slice, EntityHandle oldEntity, EntityHandle newEntity) {
             Object newRaw = (newEntity == null) ? null : newEntity.getRaw();
             return replaceInList(sliceToList(slice), oldEntity.getRaw(), newRaw);
+        }
+
+        @Template.Optional
+        @Template.Import("net.minecraft.server.level.WorldServer")
+        @Template.Import("net.minecraft.server.level.ChunkProviderServer")
+        @Template.Import("net.minecraft.world.entity.Entity")
+        @Template.Import("net.minecraft.util.EntitySlice")
+        @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
+        public static abstract class HandlerLogic extends Template.Class<Template.Handle> {
+
+            /*
+             * <REPLACE_IN_CHUNK_SPECIAL>
+             * public static void replaceInChunkSpecial(Chunk chunk, Entity oldEntity, Entity newEntity) {
+             *     // Paperspigot
+             * #if exists net.minecraft.world.level.chunk.Chunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
+             *     if (chunk.entities.remove(oldEntity)) {
+             *         if (newEntity != null) {
+             *             chunk.entities.add(newEntity);
+             *         }
+             *     }
+             * #endif
+             * 
+             *     // Tuinity
+             * #if exists net.minecraft.world.level.chunk.Chunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
+             *     #require net.minecraft.world.level.chunk.Chunk protected final com.tuinity.tuinity.world.ChunkEntitySlices entitySlicesManager;
+             *     com.tuinity.tuinity.world.ChunkEntitySlices slices = chunk#entitySlicesManager;
+             *     synchronized (slices) {
+             *         // Locate the old entity inside the "allEntities" slices to figure out if it is stored,
+             *         // and at what y-section it is stored. Looks between minSection and maxSection.
+             *         #require com.tuinity.tuinity.world.ChunkEntitySlices protected final (Object) ChunkEntitySlices.EntityCollectionBySection allEntities;
+             *         #require com.tuinity.tuinity.world.ChunkEntitySlices.EntityCollectionBySection protected final (Object[]) com.tuinity.tuinity.world.ChunkEntitySlices.BasicEntityList[] entitiesBySection;
+             *         Object allEntities = slices#allEntities;
+             *         Object[] sections = allEntities#entitiesBySection;
+             * 
+             *         #require com.tuinity.tuinity.world.ChunkEntitySlices.BasicEntityList public boolean has(E extends net.minecraft.world.entity.Entity entity);
+             *         boolean found = false;
+             *         int relIdxFound = 0;
+             *         for (int i = 0; i < sections.length; i++) {
+             *             Object section = sections[i];
+             *             if (section != null) {
+             *                 found = section#has(oldEntity);
+             *                 if (found) {
+             *                     relIdxFound = i;
+             *                     break;
+             *                 }
+             *             }
+             *         }
+             *         if (found) {
+             *             #require com.tuinity.tuinity.world.ChunkEntitySlices protected final int minSection;
+             *             int sectionIdx = relIdxFound + slices#minSection;
+             *             slices.removeEntity(oldEntity, sectionIdx);
+             *             if (newEntity != null) {
+             *                 slices.addEntity(newEntity, sectionIdx);
+             *             }
+             *         }
+             *     }
+             * #endif
+             * }
+             */
+            @Template.Generated("%REPLACE_IN_CHUNK_SPECIAL%")
+            public abstract void replaceInChunkSpecial(Object chunkHandle, Object oldEntity, Object newEntity);
         }
     }
 }
