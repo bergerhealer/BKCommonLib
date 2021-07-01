@@ -112,7 +112,7 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
 
         return handle.putEntry(entity.getEntityId(), entityTrackerEntry);
     }
-
+    
     /**
      * Gets the entity tracker entry of an entity
      *
@@ -131,6 +131,16 @@ public class EntityTracker extends BasicWrapper<EntityTrackerHandle> {
      */
     public EntityTrackerEntryHandle getEntry(int entityId) {
         return this.handle.getEntry(entityId);
+    }
+
+    /**
+     * Removes and gets the entity tracker entry of an entity Id
+     *
+     * @param entityId of the entity to remove the entry of
+     * @return entity tracker entry that was removed, or null if not found
+     */
+    public EntityTrackerEntryHandle removeEntry(int entityId) {
+        return this.handle.putEntry(entityId, null);
     }
 
     /**

@@ -104,13 +104,25 @@ public abstract class EntityAddRemoveHandler {
     public abstract void processEvents();
 
     /**
+     * Completely despawns an entity and removes it from a world
+     *
+     * @param entity
+     */
+    public final void removeEntity(EntityHandle entity) {
+        replace(entity, null);
+    }
+
+    /**
      * This should cover the full replacement of an entity in all internal mappings.
-     * This includes the chunk, world and network synchronization objects.
+     * This includes the chunk, world and network synchronization objects.<br>
+     * <br>
+     * To remove the entity and not replace it with anything new, specify a null
+     * newEntity.
      * 
      * @param oldInstance to replace
-     * @param newInstance to replace with
+     * @param newInstance to replace with, null to remove only
      */
-    public abstract void replace(World world, EntityHandle oldEntity, EntityHandle newEntity);
+    public abstract void replace(EntityHandle oldEntity, EntityHandle newEntity);
 
     /**
      * Checks what chunk and vertical chunk slice an entity is in, and moves

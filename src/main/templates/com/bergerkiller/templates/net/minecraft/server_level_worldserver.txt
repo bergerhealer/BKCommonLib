@@ -309,7 +309,13 @@ class WorldServer extends World {
     }
 #endif
 
+#if version >= 1.17
+    public void removeEntity((EntityHandle) Entity entity) {
+        entity.setRemoved(Entity$RemovalReason.DISCARDED);
+    }
+#else
     public void removeEntity((EntityHandle) Entity entity);
+#endif
 
 #if forge_nms_obfuscated
     public boolean addEntity:a((EntityHandle) Entity entity);

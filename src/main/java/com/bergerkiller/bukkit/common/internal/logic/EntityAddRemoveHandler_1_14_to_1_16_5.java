@@ -150,8 +150,17 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
     }
 
     @Override
-    public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
-        Object worldHandle = oldEntity.getWorld().getRaw();
+    public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
+        WorldServerHandle world = oldEntity.getWorldServer();
+        if (newEntity == null) {
+            if (world != null) {
+                world.removeEntity(oldEntity);
+                world.getEntityTracker().stopTracking(oldEntity.getBukkitEntity());
+            }
+            return; // Works fine, no need to clean up any more
+        }
+
+        Object worldHandle = world.getRaw();
 
         // *** Remove from the entities to add queue ***
         Queue<Object> entitiesToAdd = this.entitiesToAddField.get(oldEntity.getWorld().getRaw());

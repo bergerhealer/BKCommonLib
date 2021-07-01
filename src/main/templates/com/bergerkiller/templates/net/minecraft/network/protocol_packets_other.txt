@@ -2289,3 +2289,113 @@ class PacketPlayOutAbilities extends Packet {
 
     public (PacketPlayOutAbilitiesHandle) PacketPlayOutAbilities((com.bergerkiller.bukkit.common.wrappers.PlayerAbilities) net.minecraft.world.entity.player.PlayerAbilities abilities);
 }
+
+class PacketPlayOutWorldEvent extends Packet {
+#if version >= 1.17
+    private final int effectId:type;
+    private final (IntVector3) BlockPosition position:pos;
+    private final int data;
+    private final boolean globalEvent;
+#else
+    private int effectId:a;
+    private (IntVector3) BlockPosition position:b;
+    private int data:c;
+    private boolean globalEvent:d;
+#endif
+}
+
+class PacketPlayOutResourcePackSend extends Packet {
+#if version >= 1.17
+    private final String url;
+    private final String hash;
+#else
+    private String url:a;
+    private String hash:b;
+#endif
+
+#if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend private final boolean required;
+    #require net.minecraft.network.protocol.game.PacketPlayOutResourcePackSend private final IChatBaseComponent prompt;
+
+    public void setRequired(boolean required) {
+        instance#required = required;
+    }
+
+    public boolean isRequired() {
+        return instance#required;
+    }
+
+    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+        instance#prompt = prompt;
+    }
+
+    public (ChatText) IChatBaseComponent getPrompt() {
+        return instance#prompt;
+    }
+#else
+    public void setRequired(boolean required) {
+    }
+
+    public boolean isRequired() {
+        return false;
+    }
+
+    public void setPrompt((ChatText) IChatBaseComponent prompt) {
+    }
+
+    public (ChatText) IChatBaseComponent getPrompt() {
+        return null;
+    }
+#endif
+}
+
+class PacketPlayOutSpawnPosition extends Packet {
+#if version >= 1.17
+    public final (IntVector3) BlockPosition position:pos;
+#else
+    public (IntVector3) BlockPosition position;
+#endif
+
+#if version >= 1.16.2
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition private final float angle;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition private float angle:b;
+  #endif
+
+    public void setAngle(float angle) {
+        instance#angle = angle;
+    }
+
+    public float getAngle() {
+        return instance#angle;
+    }
+#else
+    public void setAngle(float angle) {
+    }
+
+    public float getAngle() {
+        return 0.0f;
+    }
+#endif
+}
+
+class PacketPlayInEntityAction extends Packet {
+#if version >= 1.17
+    private final int playerId:id;
+    private final (Object) PacketPlayInEntityAction.EnumPlayerAction action;
+    private final int data;
+#else
+    private int playerId:a;
+    private (Object) PacketPlayInEntityAction.EnumPlayerAction action:animation;
+    private int data:c;
+#endif
+}
+
+class PacketPlayInCloseWindow extends Packet {
+#if version >= 1.17
+    private final int windowId:containerId;
+#else
+    private int windowId:id;
+#endif
+}

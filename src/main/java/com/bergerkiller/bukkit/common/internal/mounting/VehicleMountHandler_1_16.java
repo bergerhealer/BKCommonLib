@@ -54,7 +54,7 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
                 this.remount_sync = _currentTick + 4;
             }
         } else if (packet.getType() == PacketType.IN_ENTITY_ACTION) {
-            String actionId = ((Enum<?>) packet.read(PacketType.IN_ENTITY_ACTION.actionId)).name();
+            String actionId = ((Enum<?>) packet.read(PacketType.IN_ENTITY_ACTION.action)).name();
             if (actionId.equals("PRESS_SHIFT_KEY")) {
                 if (!this._is_sneaking) {
                     this.remount_sync = _currentTick + 2;

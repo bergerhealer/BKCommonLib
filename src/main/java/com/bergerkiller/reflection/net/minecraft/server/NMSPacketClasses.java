@@ -51,6 +51,8 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBoatMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInChatHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInCloseWindowHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInEntityActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInHeldItemSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInKeepAliveHandle;
@@ -98,6 +100,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooterHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutResourcePackSendHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRespawnHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjectiveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutScoreboardScoreHandle;
@@ -109,6 +112,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPaintingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityWeatherHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUnloadChunkHandle;
@@ -116,6 +120,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateSignHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWindowItemsHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldEventHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
@@ -395,7 +400,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInCloseWindow extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextField("private int id");
+        public final FieldAccessor<Integer> windowId = PacketPlayInCloseWindowHandle.T.windowId.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInCustomPayload extends NMSPacket {
@@ -412,9 +417,9 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInEntityAction extends NMSPacket {
 
-        public final FieldAccessor<Integer> playerId = nextField("private int a");
-        public final FieldAccessor<Object> actionId = nextFieldSignature("private PacketPlayInEntityAction.EnumPlayerAction animation");
-        public final FieldAccessor<Integer> jumpBoost = nextFieldSignature("private int c");
+        public final FieldAccessor<Integer> playerId = PacketPlayInEntityActionHandle.T.playerId.toFieldAccessor();
+        public final FieldAccessor<Object> action = PacketPlayInEntityActionHandle.T.action.toFieldAccessor();
+        public final FieldAccessor<Integer> jumpBoost = PacketPlayInEntityActionHandle.T.data.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInFlying extends NMSPacket {
@@ -1491,10 +1496,14 @@ public class NMSPacketClasses {
         }
     }
 
+    /**
+     * @deprecated Use PacketPlayOutResourcePackSendHandle instead
+     */
+    @Deprecated
     public static class NMSPacketPlayOutResourcePackSend extends NMSPacket {
         
-        public final FieldAccessor<String> name = nextField("private String a");
-        public final FieldAccessor<String> hash = nextField("private String b");
+        public final FieldAccessor<String> name = PacketPlayOutResourcePackSendHandle.T.url.toFieldAccessor();
+        public final FieldAccessor<String> hash = PacketPlayOutResourcePackSendHandle.T.hash.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
@@ -1934,9 +1943,13 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> type = PacketPlayOutSpawnEntityWeatherHandle.T.type.toFieldAccessor();
     }
 
+    /**
+     * @deprecated Use {@link PacketPlayOutSpawnPositionHandle} instead
+     */
+    @Deprecated
     public static class NMSPacketPlayOutSpawnPosition extends NMSPacket {
 
-        public final TranslatorFieldAccessor<IntVector3> position = getField("position").translate(DuplexConversion.blockPosition);
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutSpawnPositionHandle.T.position.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutStatistic extends NMSPacket {
@@ -2055,6 +2068,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<List<ItemStack>> items = PacketPlayOutWindowItemsHandle.T.items.toFieldAccessor();
     }
 
+    // Removed since MC 1.17, there is little use for this packet so I'm getting rid of it.
+    /*
     public static class NMSPacketPlayOutWorldBorder extends NMSPacket {
 
         public final FieldAccessor<Object> action = nextField("private PacketPlayOutWorldBorder.EnumWorldBorderAction a");
@@ -2074,13 +2089,14 @@ public class NMSPacketClasses {
             return constructor1.newInstance(nmsWorldBorder, nmsEnumBorderAction);
         }
     }
+    */
 
     public static class NMSPacketPlayOutWorldEvent extends NMSPacket {
 
-        public final FieldAccessor<Integer> effectId = nextField("private int a");
-        public final TranslatorFieldAccessor<IntVector3> position = nextFieldSignature("private BlockPosition b").translate(DuplexConversion.blockPosition);
-        public final FieldAccessor<Integer> data = nextFieldSignature("private int c");
-        public final FieldAccessor<Boolean> noRelativeVolume = nextFieldSignature("private boolean d");
+        public final FieldAccessor<Integer> effectId = PacketPlayOutWorldEventHandle.T.effectId.toFieldAccessor();
+        public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutWorldEventHandle.T.position.toFieldAccessor();
+        public final FieldAccessor<Integer> data = PacketPlayOutWorldEventHandle.T.data.toFieldAccessor();
+        public final FieldAccessor<Boolean> noRelativeVolume = PacketPlayOutWorldEventHandle.T.globalEvent.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutWorldParticles extends NMSPacket {

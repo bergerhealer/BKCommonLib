@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_BaseImpl;
 import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_9_to_1_15_2;
 import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_16;
+import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_17;
 import com.bergerkiller.bukkit.common.internal.mounting.VehicleMountHandler_1_8_to_1_8_8;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -88,7 +89,10 @@ public class CommonVehicleMountManager {
         };
 
         // Factory for creating handlers for players
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+            this._handlerMaker = VehicleMountHandler_1_17::new;
+            this._listenedPackets = VehicleMountHandler_1_17.LISTENED_PACKETS;
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
             this._handlerMaker = VehicleMountHandler_1_16::new;
             this._listenedPackets = VehicleMountHandler_1_16.LISTENED_PACKETS;
         } else if (VehicleMountHandler_BaseImpl.SUPPORTS_MULTIPLE_PASSENGERS) {

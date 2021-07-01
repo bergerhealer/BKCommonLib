@@ -14,7 +14,6 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -35,7 +34,6 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.World;
 import org.bukkit.entity.*;
 import org.bukkit.event.player.PlayerTeleportEvent.TeleportCause;
 import org.bukkit.inventory.Inventory;
@@ -422,11 +420,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         }
 
         // *** Perform further replacement all over the place in the server ***
-        final World world = this.getWorld();
-        EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance);
+        EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance);
 
         // *** Repeat the replacement in the server the next tick to make sure nothing lingers ***
-        CommonUtil.nextTick(() -> EntityAddRemoveHandler.INSTANCE.replace(world, oldInstance, newInstance));
+        CommonUtil.nextTick(() -> EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance));
 
         // *** Make sure a controller is set when hooked ***
         if (this.isHooked()) {

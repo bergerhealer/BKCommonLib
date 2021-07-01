@@ -30,6 +30,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.ExtendedClassWriter;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
@@ -267,21 +268,39 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Override
-    public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
-        // *** EntityTrackerEntry ***
-        replaceInEntityTracker(oldEntity, oldEntity, newEntity);
-        if (oldEntity.getVehicle() != null) {
-            replaceInEntityTracker(oldEntity.getVehicle(), oldEntity, newEntity);
-        }
-        if (oldEntity.getPassengers() != null) {
-            for (EntityHandle passenger : oldEntity.getPassengers()) {
-                replaceInEntityTracker(passenger, oldEntity, newEntity);
+    public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
+        WorldServerHandle world = oldEntity.getWorldServer();
+        if (newEntity == null) {
+            if (world != null) {
+                world.removeEntity(oldEntity);
+                world.getEntityTracker().stopTracking(oldEntity.getBukkitEntity());
             }
         }
 
-        removeHandler.replaceInWorldStorage(HandleConversion.toWorldHandle(world), oldEntity.getRaw(), newEntity.getRaw());
-        removeHandler.replaceInSectionStorage(oldEntity.getRaw(), newEntity.getRaw());
-        removeHandler.replaceInChunkStorage(oldEntity.getRaw(), newEntity.getRaw());
+        // *** EntityTrackerEntry ***
+        if (newEntity == null) {
+            // If still tracked despite removal, wipe the tracker
+            world.getEntityTracker().removeEntry(oldEntity.getIdField());
+        } else {
+            // Replacement
+            replaceInEntityTracker(oldEntity, oldEntity, newEntity);
+            if (oldEntity.getVehicle() != null) {
+                replaceInEntityTracker(oldEntity.getVehicle(), oldEntity, newEntity);
+            }
+            if (oldEntity.getPassengers() != null) {
+                for (EntityHandle passenger : oldEntity.getPassengers()) {
+                    replaceInEntityTracker(passenger, oldEntity, newEntity);
+                }
+            }
+        }
+
+        Object newEntityRaw = Handle.getRaw(oldEntity);
+        if (world != null) {
+            removeHandler.replaceInWorldStorage(world.getRaw(), oldEntity.getRaw(), newEntityRaw);
+        }
+
+        removeHandler.replaceInSectionStorage(oldEntity.getRaw(), newEntityRaw);
+        removeHandler.replaceInChunkStorage(oldEntity.getRaw(), newEntityRaw);
 
         // See where the object is still referenced to check we aren't missing any places to replace
         // This is SLOW, do not ever have this enabled on a release version!
@@ -369,10 +388,18 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     Map byUUIDMap = entityLookup#byUUID;
          * 
          *     if (byIdMap.get(entityId) == oldEntity) {
-         *         byIdMap.put(entityId, newEntity);
+         *         if (newEntity == null) {
+         *             byIdMap.remove(entityId);
+         *         } else {
+         *             byIdMap.put(entityId, newEntity);
+         *         }
          *     }
          *     if (byUUIDMap.get(entityUUID) == oldEntity) {
-         *         byUUIDMap.put(entityUUID, newEntity);
+         *         if (newEntity == null) {
+         *             byUUIDMap.remove(entityUUID);
+         *         } else {
+         *             byUUIDMap.put(entityUUID, newEntity);
+         *         }
          *     }
          * 
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
@@ -383,7 +410,9 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     #require net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
          *     com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = tickList#entities;
          *     if (set.remove(oldEntity)) {
-         *         set.add(newEntity);
+         *         if (newEntity != null) {
+         *             set.add(newEntity);
+         *         }
          *     }
          * #else
          *     // Paper/Spigot
@@ -392,10 +421,18 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     it.unimi.dsi.fastutil.ints.Int2ObjectMap tickListActive = tickList#active;
          *     it.unimi.dsi.fastutil.ints.Int2ObjectMap tickListPassive = tickList#passive;
          *     if (tickListActive.get(entityId) == oldEntity) {
-         *         tickListActive.put(entityId, newEntity);
+         *         if (newEntity == null) {
+         *             tickListActive.remove(entityId);
+         *         } else {
+         *             tickListActive.put(entityId, newEntity);
+         *         }
          *     }
          *     if (tickListPassive.get(entityId) == oldEntity) {
-         *         tickListPassive.put(entityId, newEntity);
+         *         if (newEntity == null) {
+         *             tickListPassive.remove(entityId);
+         *         } else {
+         *             tickListPassive.put(entityId, newEntity);
+         *         }
          *     }
          * #endif
          * }
@@ -434,11 +471,16 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
          *     EntityInLevelCallback callback = oldEntity#levelCallback;
          *     if (callback != EntityInLevelCallback.NULL) {
-         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private final EntityAccess entity;
-         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private EntitySection currentSection;
-         *         if ( callback#entity == oldEntity ) {
-         *             callback#entity = newEntity;
+         *         if (newEntity == null) {
+         *             callback.a(Entity$RemovalReason.DISCARDED);
+         *         } else {
+         *             #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private final EntityAccess entity;
+         *             if ( callback#entity == oldEntity ) {
+         *                 callback#entity = newEntity;
+         *             }
          *         }
+         * 
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private EntitySection currentSection;
          *         EntitySection section = callback#currentSection;
          * 
          *         #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
@@ -447,7 +489,11 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *         java.util.ListIterator iter = sliceList.listIterator();
          *         while (iter.hasNext()) {
          *             if (iter.next() == oldEntity) {
-         *                 iter.set(newEntity);
+         *                 if (newEntity == null) {
+         *                     iter.remove();
+         *                 } else {
+         *                     iter.set(newEntity);
+         *                 }
          *             }
          *         }
          *     }

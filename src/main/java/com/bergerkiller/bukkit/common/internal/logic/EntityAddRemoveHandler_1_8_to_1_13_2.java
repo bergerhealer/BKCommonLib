@@ -154,8 +154,17 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
-    public void replace(World world, EntityHandle oldEntity, EntityHandle newEntity) {
-        Object worldHandle = oldEntity.getWorld().getRaw();
+    public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
+        WorldServerHandle world = oldEntity.getWorldServer();
+        if (newEntity == null) {
+            if (world != null) {
+                world.removeEntity(oldEntity);
+                world.getEntityTracker().stopTracking(oldEntity.getBukkitEntity());
+            }
+            return; // Works fine, no need to clean up any more
+        }
+
+        Object worldHandle = world.getRaw();
 
         // *** Entities By UUID Map ***
         {

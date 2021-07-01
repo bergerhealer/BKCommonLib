@@ -233,7 +233,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     </code>
 
     public void setWorld((WorldHandle) World world) {
+#if version >= 1.17
+        instance.level = world;
+#else
         instance.world = world;
+#endif
 #if version < 1.16
         if (world != null) {
   #if version >= 1.13.1
