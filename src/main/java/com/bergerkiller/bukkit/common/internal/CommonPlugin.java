@@ -566,6 +566,13 @@ public class CommonPlugin extends PluginBase {
             return;
         }
 
+        // Allow this to fail if there's big problems, as this is an optional requirement
+        try {
+            CommonBootstrap.preloadCriticalComponents();
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize some critical components", t);
+        }
+
         // Load configuration
         FileConfiguration config = new FileConfiguration(this);
         config.load();

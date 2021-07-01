@@ -28,6 +28,9 @@ import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
 import com.bergerkiller.bukkit.common.server.test.TestServerFactory;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagListHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
@@ -547,6 +550,28 @@ public class CommonBootstrap {
         CommonUtil.getClass(Conversion.class.getName(), true);
         CommonUtil.getClass(PropertyConverter.class.getName(), true);
         CommonUtil.getClass(DuplexConversion.class.getName(), true);
+    }
+
+    /**
+     * Some components of this library may end up being used while the library
+     * is (partially) disabled. To avoid errors trying to load classes while
+     * the jar file is closed, load these components.
+     */
+    public static void preloadCriticalComponents() {
+        NBTBaseHandle.NBTTagByteArrayHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagByteHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagDoubleHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagFloatHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagIntArrayHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagIntHandle.T.forceInitialization();
+        if (evaluateMCVersion(">=", "1.12")) {
+            NBTBaseHandle.NBTTagLongArrayHandle.T.forceInitialization();
+        }
+        NBTBaseHandle.NBTTagLongHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagShortHandle.T.forceInitialization();
+        NBTBaseHandle.NBTTagStringHandle.T.forceInitialization();
+        NBTTagCompoundHandle.T.forceInitialization();
+        NBTTagListHandle.T.forceInitialization();
     }
 
     /**
