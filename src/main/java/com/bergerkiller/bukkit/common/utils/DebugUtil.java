@@ -303,13 +303,35 @@ public class DebugUtil {
             try {
                 staticValue = staticField.get(null);
             } catch (Throwable tt) {}
+            if (staticValue == null) {
+                continue;
+            }
 
-            fieldStack.addLast(new StackElement(staticField));
+            fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(staticField, staticValue)));
             logInstances(staticValue, value, crossedValues, classFieldMapping, fieldStack);
             fieldStack.removeLast();
         }
 
         return localFields;
+    }
+
+    private static class FieldWithType {
+        public final Field field;
+        public final Class<?> valueType;
+
+        public FieldWithType(Field field, Class<?> valueType) {
+            this.field = field;
+            this.valueType = valueType;
+        }
+
+        public static Object wrapInfo(Field field, Object value) {
+            Class<?> type = value.getClass();
+            if (type != field.getType()) {
+                return new FieldWithType(field, value.getClass());
+            } else {
+                return field;
+            }
+        }
     }
 
     private static class StackElement {
@@ -347,6 +369,13 @@ public class DebugUtil {
                         Field f = (Field) el.info;
                         infoStr = Modifier.toString(f.getModifiers()) +
                                 " " + f.getType().getSimpleName() +
+                                " " + f.getName();
+                    } else if (el.info instanceof FieldWithType) {
+                        FieldWithType fwt = (FieldWithType) el.info;
+                        Field f = fwt.field;
+                        infoStr = Modifier.toString(f.getModifiers()) +
+                                " [" + fwt.valueType.getSimpleName() +
+                                "] " + f.getType().getSimpleName() +
                                 " " + f.getName();
                     } else {
                         infoStr = el.info.toString();
@@ -461,7 +490,7 @@ public class DebugUtil {
 
             // If top element, always go into it
             if (fieldStack.isEmpty()) {
-                fieldStack.addLast(new StackElement(localField));
+                fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
                 logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
                 fieldStack.removeLast();
                 continue;
@@ -477,7 +506,7 @@ public class DebugUtil {
                 last.index = old_index;
             } else {
                 // Not the same field
-                fieldStack.addLast(new StackElement(localField));
+                fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
                 logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
                 fieldStack.removeLast();
             }
