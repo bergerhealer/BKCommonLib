@@ -11,6 +11,8 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 class EntityEnderCrystal extends Entity {
     #if version >= 1.17
       private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_BEAM_TARGET;
+    #elseif version >= 1.14
+      private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_BEAM_TARGET:c;
     #elseif version >= 1.13
       private static optional final (DataWatcher.Key<IntVector3>) DataWatcherObject<java.util.Optional<BlockPosition>> DATA_BEAM_TARGET:b;
     #elseif version >= 1.9

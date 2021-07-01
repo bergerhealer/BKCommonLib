@@ -144,11 +144,11 @@ class PacketPlayOutMap extends Packet {
   #endif
 
     public int getStartX() {
-        return instance#starty;
+        return instance#startx;
     }
 
-    public void setStartX(int starty) {
-        instance#starty = starty;
+    public void setStartX(int startx) {
+        instance#startx = startx;
     }
 
     public int getStartY() {

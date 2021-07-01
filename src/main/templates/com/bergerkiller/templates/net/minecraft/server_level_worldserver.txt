@@ -43,7 +43,7 @@ class WorldServer extends World {
 #else
         #require net.minecraft.server.level.WorldServer private final Map<java.util.UUID, Entity> entitiesByUUID;
         Map map = instance#entitiesByUUID;
-        return map.get((Object) entityUUID);
+        return (Entity) map.get((Object) entityUUID);
 #endif
     }
 
