@@ -781,7 +781,7 @@ public class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
-        if (event.getEntityType() == EntityType.ITEM_FRAME) {
+        if (event.getEntity() instanceof ItemFrame) {
             EntityItemFrameHandle frameHandle = EntityItemFrameHandle.createHandle(HandleConversion.toEntityHandle(event.getEntity()));
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
             onAddItemFrame(frameHandle);
@@ -790,7 +790,7 @@ public class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityRemoved(EntityRemoveEvent event) {
-        if (event.getEntityType() == EntityType.ITEM_FRAME) {
+        if (event.getEntity() instanceof ItemFrame) {
             ItemFrame frame = (ItemFrame) event.getEntity();
             EntityItemFrameHandle frameHandle = EntityItemFrameHandle.fromBukkit(frame);
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).remove(frameHandle);
