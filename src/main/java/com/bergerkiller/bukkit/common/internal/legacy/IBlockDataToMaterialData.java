@@ -182,6 +182,8 @@ public class IBlockDataToMaterialData {
                        "BIRCH_BUTTON", "DARK_OAK_BUTTON", "OAK_BUTTON", "STONE_BUTTON")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.16"),
                        "CRIMSON_BUTTON", "WARPED_BUTTON", "POLISHED_BLACKSTONE_BUTTON")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.17"),
+                       "POLISHED_BLACKSTONE_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }
@@ -243,6 +245,8 @@ public class IBlockDataToMaterialData {
                        "BIRCH_PRESSURE_PLATE", "DARK_OAK_PRESSURE_PLATE")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.16"),
                        "CRIMSON_PRESSURE_PLATE", "WARPED_PRESSURE_PLATE", "POLISHED_BLACKSTONE_PRESSURE_PLATE")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.17"),
+                     "POLISHED_BLACKSTONE_PRESSURE_PLATE")
              .setDataValues(0, 1)
              .build();
         }

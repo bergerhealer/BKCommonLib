@@ -94,9 +94,17 @@ public class BlockDataTest {
 
     @Test
     public void testButtons() {
-        for (Material material : MaterialsByName.getAllByName("STONE_BUTTON", "ACACIA_BUTTON",
-                "BIRCH_BUTTON", "DARK_OAK_BUTTON", "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON"))
-        {
+        for (String buttonMaterialName : new String[] {
+                "STONE_BUTTON", "ACACIA_BUTTON", "BIRCH_BUTTON", "DARK_OAK_BUTTON",
+                "JUNGLE_BUTTON", "OAK_BUTTON", "SPRUCE_BUTTON",
+                "CRIMSON_BUTTON", "WARPED_BUTTON", "POLISHED_BLACKSTONE_BUTTON", // 1.16
+                "POLISHED_BLACKSTONE_BUTTON" // 1.17
+        }) {
+            Material material = MaterialUtil.getMaterial(buttonMaterialName);
+            if (material == null) {
+                continue;
+            }
+
             BlockData d = BlockData.fromMaterial(material);
 
             // Facing
