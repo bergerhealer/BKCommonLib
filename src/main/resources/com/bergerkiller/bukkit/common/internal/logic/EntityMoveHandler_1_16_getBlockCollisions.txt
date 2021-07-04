@@ -9,12 +9,12 @@
 // flag = always false
 
 public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
-    int i = MathHelper.floor(voxelshape.b(EnumDirection$EnumAxis.X)) - 1;
-    int j = MathHelper.f(voxelshape.c(EnumDirection$EnumAxis.X)) + 1;
-    int k = MathHelper.floor(voxelshape.b(EnumDirection$EnumAxis.Y)) - 1;
-    int l = MathHelper.f(voxelshape.c(EnumDirection$EnumAxis.Y)) + 1;
-    int i1 = MathHelper.floor(voxelshape.b(EnumDirection$EnumAxis.Z)) - 1;
-    int j1 = MathHelper.f(voxelshape.c(EnumDirection$EnumAxis.Z)) + 1;
+    int i = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.X)) - 1;
+    int j = MathUtil.floor(voxelshape.c(EnumDirection$EnumAxis.X)) + 1;
+    int k = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.Y)) - 1;
+    int l = MathUtil.floor(voxelshape.c(EnumDirection$EnumAxis.Y)) + 1;
+    int i1 = MathUtil.floor(voxelshape.b(EnumDirection$EnumAxis.Z)) - 1;
+    int j1 = MathUtil.floor(voxelshape.c(EnumDirection$EnumAxis.Z)) + 1;
     WorldBorder worldborder = this.getWorldBorder();
     VoxelShape voxelshape2 = VoxelShapes.a();
 

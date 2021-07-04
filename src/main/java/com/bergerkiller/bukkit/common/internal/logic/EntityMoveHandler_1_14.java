@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
@@ -50,6 +51,7 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
         resolver.addImport("net.minecraft.world.level.border.WorldBorder");
         resolver.addImport("net.minecraft.world.level.IBlockAccess");
+        resolver.addImport(MathUtil.class.getName());
         resolver.setDeclaredClassName("net.minecraft.world.level.World");
         try {
             String method_path;

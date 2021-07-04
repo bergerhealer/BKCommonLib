@@ -11,6 +11,7 @@ import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -51,6 +52,7 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
         resolver.addImport("net.minecraft.world.level.border.WorldBorder");
         resolver.addImport("net.minecraft.world.level.IBlockAccess");
+        resolver.addImport(MathUtil.class.getName());
         resolver.setDeclaredClassName("net.minecraft.world.level.World");
         try {
             String method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_13_getBlockCollisions.txt";
