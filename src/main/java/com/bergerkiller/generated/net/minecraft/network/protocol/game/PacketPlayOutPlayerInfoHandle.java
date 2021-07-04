@@ -60,11 +60,11 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
             return T.createHandle(handleInstance);
         }
 
-        public static final PlayerInfoDataHandle createNew(PacketPlayOutPlayerInfoHandle packet, GameProfileHandle profile, int ping, GameMode gameMode, ChatText listName) {
-            return T.constr_packet_profile_ping_gameMode_listName.newInstance(packet, profile, ping, gameMode, listName);
-        }
-
         /* ============================================================================== */
+
+        public static PlayerInfoDataHandle createNew(PacketPlayOutPlayerInfoHandle packet, GameProfileHandle profile, int ping, GameMode gameMode, ChatText listName) {
+            return T.createNew.invoke(packet, profile, ping, gameMode, listName);
+        }
 
         public abstract GameProfileHandle getProfile();
         public abstract int getPing();
@@ -75,7 +75,7 @@ public abstract class PacketPlayOutPlayerInfoHandle extends PacketHandle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class PlayerInfoDataClass extends Template.Class<PlayerInfoDataHandle> {
-            public final Template.Constructor.Converted<PlayerInfoDataHandle> constr_packet_profile_ping_gameMode_listName = new Template.Constructor.Converted<PlayerInfoDataHandle>();
+            public final Template.StaticMethod.Converted<PlayerInfoDataHandle> createNew = new Template.StaticMethod.Converted<PlayerInfoDataHandle>();
 
             public final Template.Method.Converted<GameProfileHandle> getProfile = new Template.Method.Converted<GameProfileHandle>();
             public final Template.Method<Integer> getPing = new Template.Method<Integer>();

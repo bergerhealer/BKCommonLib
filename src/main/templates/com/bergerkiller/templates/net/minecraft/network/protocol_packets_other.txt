@@ -78,14 +78,23 @@ class PacketPlayOutPlayerInfo extends Packet {
 
     public static (PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo createNew() {
 #if version >= 1.17
-        return new PacketPlayOutPlayerInfo(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+        #require net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo private final List entries;
+        PacketPlayOutPlayerInfo packet = (PacketPlayOutPlayerInfo) PacketPlayOutPlayerInfoHandle.T.newInstanceNull();
+        packet#entries = new java.util.ArrayList();
+        return packet;
 #else
         return new PacketPlayOutPlayerInfo();
 #endif
     }
 
     class PacketPlayOutPlayerInfo.PlayerInfoData {
-        public (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName);
+        public static (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData createNew((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName) {
+#if version >= 1.17
+            return new PacketPlayOutPlayerInfo$PlayerInfoData(profile, ping, gameMode, listName);
+#else
+            return new PacketPlayOutPlayerInfo$PlayerInfoData(packet, profile, ping, gameMode, listName);
+#endif
+        }
 
         public (GameProfileHandle) GameProfile getProfile:a();
         public int getPing:b();
@@ -1582,6 +1591,9 @@ class PacketPlayOutPosition extends Packet {
 }
 
 // Available >= MC 1.9
+// Too complicated since 1.17 to use properly, Im disabling it.
+// And we never added the proper api's/wrapper types for the fields anyway.
+/*
 optional class PacketPlayOutBoss extends Packet {
 #if version >= 1.17
     private UUID entityUUID:id;
@@ -1610,6 +1622,7 @@ optional class PacketPlayOutBoss extends Packet {
     private boolean unknown3:i;
 #endif
 }
+*/
 
 class PacketPlayOutAttachEntity extends Packet {
 #if version >= 1.17

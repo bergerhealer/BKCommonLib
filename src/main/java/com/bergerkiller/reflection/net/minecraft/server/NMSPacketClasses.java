@@ -71,7 +71,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBossHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
@@ -680,16 +679,8 @@ public class NMSPacketClasses {
         public final TranslatorFieldAccessor<BlockData> blockData = PacketPlayOutBlockChangeHandle.T.blockData.toFieldAccessor();
     }
 
+    @Deprecated
     public static class NMSPacketPlayOutBoss extends NMSPacket {
-        public final FieldAccessor<UUID> entityUUID = PacketPlayOutBossHandle.T.entityUUID.toFieldAccessor();
-        public final FieldAccessor<Object> action = PacketPlayOutBossHandle.T.action.toFieldAccessor();
-        public final FieldAccessor<Object> chat = PacketPlayOutBossHandle.T.chat.toFieldAccessor();
-        public final FieldAccessor<Float> progress = PacketPlayOutBossHandle.T.progress.toFieldAccessor();
-        public final FieldAccessor<Object> bossBarColor = PacketPlayOutBossHandle.T.bossBarColor.toFieldAccessor();
-        public final FieldAccessor<Object> bossBarStyle = PacketPlayOutBossHandle.T.bossBarStyle.toFieldAccessor();
-        public final FieldAccessor<Boolean> unknown1 = PacketPlayOutBossHandle.T.unknown1.toFieldAccessor();
-        public final FieldAccessor<Boolean> unknown2 = PacketPlayOutBossHandle.T.unknown2.toFieldAccessor();
-        public final FieldAccessor<Boolean> unknown3 = PacketPlayOutBossHandle.T.unknown3.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutCamera extends NMSPacket {
