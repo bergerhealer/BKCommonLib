@@ -1,23 +1,19 @@
 package net.minecraft.world.level;
 
+import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
 import net.minecraft.resources.MinecraftKey;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.World;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerDataHandle;
 
 class MobSpawnerAbstract {
     public int spawnDelay;
-
-#if version >= 1.17
-    private final (List<MobSpawnerDataHandle>) List<MobSpawnerData> mobs:spawnPotentials;
-    private (MobSpawnerDataHandle) MobSpawnerData spawnData:nextSpawnData;
-#else
-    private final (List<MobSpawnerDataHandle>) List<MobSpawnerData> mobs;
-    private (MobSpawnerDataHandle) MobSpawnerData spawnData;
-#endif
 
     private int minSpawnDelay;
     private int maxSpawnDelay;
@@ -37,10 +33,27 @@ class MobSpawnerAbstract {
     private int requiredPlayerRange;
     private int spawnRange;
 
-    //TODO: Since 1.17 changed to public void a(WorldServer worldserver, BlockPosition blockposition)
-    public void onTick:c();
+    public void onTick((org.bukkit.World) World world, (IntVector3) BlockPosition blockPosition) {
+#if version >= 1.17
+        if (world instanceof WorldServer) {
+            instance.a((WorldServer) world, blockPosition);
+        } else {
+            instance.a(world, blockPosition);
+        }
+#else
+        instance.c();
+#endif
+    }
 
-#if version >= 1.13.1
+#if version >= 1.17
+    public (MinecraftKeyHandle) MinecraftKey getMobName() {
+        // They added 2 params for debug uses
+        return instance.getMobName(null, null);
+    }
+    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
+        instance.setMobName((EntityTypes) IRegistry.ENTITY_TYPE.get(nameKey));
+    }
+#elseif version >= 1.13.1
     public (MinecraftKeyHandle) MinecraftKey getMobName();
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
         instance.setMobName((EntityTypes) IRegistry.ENTITY_TYPE.get(nameKey));
@@ -57,8 +70,4 @@ class MobSpawnerAbstract {
     public (MinecraftKeyHandle) String getMobName();
     public void setMobName((MinecraftKeyHandle) String nameKey);
 #endif
-}
-
-class MobSpawnerData {
-
 }

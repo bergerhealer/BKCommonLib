@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import com.bergerkiller.bukkit.common.controller.Tickable;
+import org.bukkit.block.Block;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.MobSpawnerAbstractHandle;
 
-public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> implements Tickable {
+public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> {
 
     public MobSpawner(Object mobSpawnerHandle) {
         setHandle(MobSpawnerAbstractHandle.createHandle(mobSpawnerHandle));
@@ -29,11 +31,11 @@ public class MobSpawner extends BasicWrapper<MobSpawnerAbstractHandle> implement
     }
 
     /**
-     * Performs the per-tick spawning logic
+     * Performs the per-tick spawning logic. The position should be set
+     * to the center block position around which should be spawned.
      */
-    @Override
-    public void onTick() {
-        handle.onTick();
+    public void performTickUpdate(Block position) {
+        handle.onTick(position.getWorld(), new IntVector3(position));
     }
 
     /**

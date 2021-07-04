@@ -1,9 +1,10 @@
 package com.bergerkiller.generated.net.minecraft.world.level;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import org.bukkit.World;
 import org.bukkit.entity.Entity;
-import java.util.List;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.MobSpawnerAbstract</b>.
@@ -22,15 +23,11 @@ public abstract class MobSpawnerAbstractHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract void onTick();
+    public abstract void onTick(World world, IntVector3 blockPosition);
     public abstract MinecraftKeyHandle getMobName();
     public abstract void setMobName(MinecraftKeyHandle nameKey);
     public abstract int getSpawnDelay();
     public abstract void setSpawnDelay(int value);
-    public abstract List<MobSpawnerDataHandle> getMobs();
-    public abstract void setMobs(List<MobSpawnerDataHandle> value);
-    public abstract MobSpawnerDataHandle getSpawnData();
-    public abstract void setSpawnData(MobSpawnerDataHandle value);
     public abstract int getMinSpawnDelay();
     public abstract void setMinSpawnDelay(int value);
     public abstract int getMaxSpawnDelay();
@@ -51,8 +48,6 @@ public abstract class MobSpawnerAbstractHandle extends Template.Handle {
      */
     public static final class MobSpawnerAbstractClass extends Template.Class<MobSpawnerAbstractHandle> {
         public final Template.Field.Integer spawnDelay = new Template.Field.Integer();
-        public final Template.Field.Converted<List<MobSpawnerDataHandle>> mobs = new Template.Field.Converted<List<MobSpawnerDataHandle>>();
-        public final Template.Field.Converted<MobSpawnerDataHandle> spawnData = new Template.Field.Converted<MobSpawnerDataHandle>();
         public final Template.Field.Integer minSpawnDelay = new Template.Field.Integer();
         public final Template.Field.Integer maxSpawnDelay = new Template.Field.Integer();
         public final Template.Field.Integer spawnCount = new Template.Field.Integer();
@@ -61,7 +56,7 @@ public abstract class MobSpawnerAbstractHandle extends Template.Handle {
         public final Template.Field.Integer requiredPlayerRange = new Template.Field.Integer();
         public final Template.Field.Integer spawnRange = new Template.Field.Integer();
 
-        public final Template.Method<Void> onTick = new Template.Method<Void>();
+        public final Template.Method.Converted<Void> onTick = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<MinecraftKeyHandle> getMobName = new Template.Method.Converted<MinecraftKeyHandle>();
         public final Template.Method.Converted<Void> setMobName = new Template.Method.Converted<Void>();
 
