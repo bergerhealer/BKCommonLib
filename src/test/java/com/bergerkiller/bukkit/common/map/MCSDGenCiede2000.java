@@ -92,6 +92,12 @@ public class MCSDGenCiede2000 extends MapColorSpaceData {
                    .addBaseColor(20, 180, 133);
         }
 
+        if (MountiplexUtil.evaluateText(minecraftVersion, ">=", "1.17")) {
+            builder.addBaseColor(100, 100, 100)
+                   .addBaseColor(216, 175, 147)
+                   .addBaseColor(127, 167, 150);
+        }
+
         this.entries = builder.build();
         if (this.entries.length > 256) {
             throw new IllegalArgumentException("More than 256 colors: " + this.entries.length);

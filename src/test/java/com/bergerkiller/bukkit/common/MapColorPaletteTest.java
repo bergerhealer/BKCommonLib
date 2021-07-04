@@ -33,10 +33,10 @@ public class MapColorPaletteTest {
     @Ignore
     @Test
     public void generateColorMap() {
-        String version = "1.16"; // Minecraft version to generate the data for
+        String version = "1.17"; // Minecraft version to generate the data for
         boolean regenerate_bubble_format = false; // Whether to regenerate the highly compressed bubble format file
         boolean debug_display = true; // Whether to display the final results in a debugging window
-        int max_iterations = 100000; // Sets compression versus compression time
+        int max_iterations = 2000000; // Sets compression versus compression time
 
         try {
             // First generate a flat format file that can be quickly read again

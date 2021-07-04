@@ -8,15 +8,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.io.BitInputStream;
 import com.bergerkiller.bukkit.common.io.BitOutputStream;
 import com.bergerkiller.bukkit.common.io.BitPacket;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * Encodes or decodes a 256x256 grid of booleans by walking down the connected lines and encoding them
@@ -274,12 +273,11 @@ public class MCSDWebbingCodec {
 
     public int calculateCompressedSize() {
         ByteArrayOutputStream bs = new ByteArrayOutputStream();
-        try {
-            BitOutputStream s = new BitOutputStream(CommonUtil.setCompressionLevel(new GZIPOutputStream(bs), Deflater.BEST_COMPRESSION));
+        try (BitOutputStream bitStream = new BitOutputStream(StreamUtil.createDeflaterOutputStreamWithCompressionLevel(bs, Deflater.BEST_COMPRESSION))) {
             for (int i = 0; i < this.packets_count; i++) {
-                s.writePacket(this.packets[i]);
+                bitStream.writePacket(this.packets[i]);
             }
-            s.close();
+            bitStream.close(); // Flushes all data that is pending
             return bs.size();
         } catch (IOException ex) {
             ex.printStackTrace();

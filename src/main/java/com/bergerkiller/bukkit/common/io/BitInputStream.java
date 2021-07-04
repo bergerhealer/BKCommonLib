@@ -69,10 +69,7 @@ public class BitInputStream extends InputStream {
             throw new IOException("Stream is closed");
         }
         while (this.bitbuff_len < nBits) {
-            int readByte = -1;
-            try {
-                readByte = this.input.read();
-            } catch (IOException ex) {}
+            int readByte = this.input.read();
             if (readByte == -1) {
                 this.eos = true;
                 return -1;

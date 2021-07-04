@@ -35,6 +35,7 @@ import org.bukkit.plugin.SimplePluginManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -45,8 +46,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
-import java.util.zip.Deflater;
-import java.util.zip.DeflaterOutputStream;
 import java.util.zip.ZipEntry;
 
 public class CommonUtil {
@@ -1076,25 +1075,6 @@ public class CommonUtil {
      */
     public static boolean isMethodOverrided(Class<?> baseClass, Class<?> type, String methodName, Class<?>... parameterTypes) {
         return new SafeMethod<Void>(baseClass, methodName, parameterTypes).isOverridedIn(type);
-    }
-
-    /**
-     * Sets the compression level of a deflater stream
-     * 
-     * @param stream to set the compression level of
-     * @param level to set to
-     * @return input stream
-     */
-    public static <T extends DeflaterOutputStream> T setCompressionLevel(T stream, int level) {
-        try {
-            Field defField = DeflaterOutputStream.class.getDeclaredField("def");
-            defField.setAccessible(true);
-            Deflater deflater = (Deflater) defField.get(stream);
-            deflater.setLevel(level);
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-        return stream;
     }
 
     /**

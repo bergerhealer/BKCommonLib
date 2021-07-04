@@ -5,6 +5,8 @@ import java.nio.channels.FileChannel;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.zip.Deflater;
+import java.util.zip.DeflaterOutputStream;
 
 import com.bergerkiller.bukkit.common.collections.UnmodifiableListCollector;
 
@@ -265,5 +267,18 @@ public class StreamUtil {
     @SuppressWarnings("unchecked")
     public static <T> Collector<T, ?, List<T>> toUnmodifiableList() {
         return UnmodifiableListCollector.INSTANCE;
+    }
+
+    /**
+     * Instantiates a new DeflaterOutputStream with the default settings for writing compressed data
+     * to an output stream. Sets a specific compression level
+     *
+     * @param stream Stream to write compressed data to
+     * @param deflaterCompressionLevel Level, see Deflater static constants
+     * @return new Deflater Output Stream
+     * @throws IOException
+     */
+    public static DeflaterOutputStream createDeflaterOutputStreamWithCompressionLevel(OutputStream stream, int deflaterCompressionLevel) throws IOException {
+        return new DeflaterOutputStream(stream, new Deflater(deflaterCompressionLevel), 512, false);
     }
 }

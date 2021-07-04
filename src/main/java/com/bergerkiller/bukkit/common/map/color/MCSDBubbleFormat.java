@@ -8,16 +8,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.zip.Deflater;
-import java.util.zip.GZIPInputStream;
-import java.util.zip.GZIPOutputStream;
+import java.util.zip.InflaterInputStream;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.io.BitInputStream;
 import com.bergerkiller.bukkit.common.io.BitOutputStream;
 import com.bergerkiller.bukkit.common.io.BitPacket;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
  * Stores all map color space information in a highly compressed bubble format.
@@ -59,7 +59,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
     }
 
     public void readFrom(InputStream stream) throws IOException {
-        BitInputStream bitStream = new BitInputStream(new GZIPInputStream(stream));
+        BitInputStream bitStream = new BitInputStream(new InflaterInputStream(stream));
         try {
             // Read all color RGB values
             for (int i = 0; i < 256; i++) {
@@ -120,8 +120,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
     }
 
     public void writeTo(OutputStream stream) throws IOException {
-        BitOutputStream bitStream = new BitOutputStream(CommonUtil.setCompressionLevel(new GZIPOutputStream(stream), Deflater.BEST_COMPRESSION));
-        try {
+        try (BitOutputStream bitStream = new BitOutputStream(StreamUtil.createDeflaterOutputStreamWithCompressionLevel(stream, Deflater.BEST_COMPRESSION))) {
 
             // Input colors will be used to correct errors in the color model
             // These are never written to and serve as a backup while writing
@@ -265,9 +264,16 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
 
             // Write cell information
             Logging.LOGGER_MAPDISPLAY.info("Writing bubble boundary information...");
-            for (int z = 0; z < 256; z++) {
-                writeSlice(z, bitStream);
-            }
+            IntStream.range(0, 256)
+                .mapToObj(z -> generateSlice(z))
+                .parallel()
+                .forEachOrdered(codec -> {
+                    try {
+                        codec.writePackets(bitStream);
+                    } catch (IOException ex) {
+                        ex.printStackTrace(); // Oh well.
+                    }
+                });
 
             // Write missing color information using bit encoding
             Logging.LOGGER_MAPDISPLAY.info("Correcting missing color information...");
@@ -300,8 +306,6 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
             for (BitPacket code : colorCodes) {
                 bitStream.writeBits(code.data, code.bits);
             }
-        } finally {
-            bitStream.close();
         }
     }
 
@@ -404,7 +408,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
         } while (hasChanges);
     }
 
-    private void writeSlice(int z, BitOutputStream stream) throws IOException {
+    private MCSDWebbingCodec generateSlice(int z) {
         // Split all found coordinates in edge points, intersections and lines
         // First optimize the order of rendering from the edge points
         // Then try to optimize the order of the remaining intersections
@@ -454,8 +458,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
         codec.processBest(edges, max_iterations);
         codec.processBest(intersects, max_iterations);
         codec.processBest(lines, max_iterations);
-
-        codec.writePackets(stream);
+        return codec;
     }
 
     @Override

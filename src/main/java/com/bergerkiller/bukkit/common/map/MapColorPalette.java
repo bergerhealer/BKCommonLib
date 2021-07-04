@@ -45,14 +45,14 @@ public class MapColorPalette {
             boolean success = false;
             MCSDBubbleFormat bubbleData = new MCSDBubbleFormat();
             try {
-                String bub_path = "/com/bergerkiller/bukkit/common/internal/resources/map/";
-                if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-                    bub_path += "map_1_16.bub";
-                } else if (CommonBootstrap.evaluateMCVersion(">=", "1.12")) {
-                    bub_path += "map_1_12.bub";
-                } else {
-                    bub_path += "map_1_8_8.bub";
+                String bub_path_postfix = "map_1_8_8.bub";
+                for (String ver : new String[] { "1.17", "1.16", "1.12" }) {
+                    if (CommonBootstrap.evaluateMCVersion(">=", ver)) {
+                        bub_path_postfix = "map_" + ver.replace('.', '_') + ".bub";
+                        break;
+                    }
                 }
+                String bub_path = "/com/bergerkiller/bukkit/common/internal/resources/map/" + bub_path_postfix;
                 InputStream input = MapColorPalette.class.getResourceAsStream(bub_path);
                 if (input == null) {
                     Logging.LOGGER_MAPDISPLAY.severe("Bubble data at " + bub_path + " not found!");
