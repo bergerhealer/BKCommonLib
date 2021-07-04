@@ -7,12 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.storage.loot.LootTableInfo;
+import net.minecraft.world.level.storage.loot.LootTableInfo$Builder;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParameters;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.AxisAlignedBB;
 import net.minecraft.world.phys.shapes.OperatorBoolean;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraft.world.phys.shapes.VoxelShapeCollision;
+import net.minecraft.world.phys.Vec3D;
 
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.bases.IntVector3
@@ -320,15 +322,24 @@ class Block {
     // Call that one. See Explosion.java for details
     public void dropNaturally((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) net.minecraft.server.level.WorldServer world, (IntVector3) BlockPosition blockposition, float yield, int chance) {
         Block block = iblockdata.getBlock();
-  #if version >= 1.16
+  #if version >= 1.17
+        ItemStack EMPTY_ITEM = ItemStack.EMPTY;
+  #elseif version >= 1.16
         ItemStack EMPTY_ITEM = ItemStack.b;
   #else
         ItemStack EMPTY_ITEM = ItemStack.a;
   #endif
 
-        net.minecraft.world.level.block.entity.TileEntity tileentity = block.isTileEntity() ? world.getTileEntity(blockposition) : null;
+        boolean isTileEntity;
+  #if version >= 1.17
+        isTileEntity = (block instanceof ITileEntity);
+  #else
+        isTileEntity = block.isTileEntity();
+  #endif
+
+        net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
-        loottableinfo_builder = loottableinfo_builder.a(world.random);
+        loottableinfo_builder = loottableinfo_builder.a(((World) world).random);
   #if version >= 1.16.2
         loottableinfo_builder.set(LootContextParameters.ORIGIN, Vec3D.a(blockposition));
   #else

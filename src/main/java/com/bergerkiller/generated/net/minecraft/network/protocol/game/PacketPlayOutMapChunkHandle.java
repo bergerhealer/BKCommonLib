@@ -87,8 +87,6 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
     public abstract void setX(int value);
     public abstract int getZ();
     public abstract void setZ(int value);
-    public abstract boolean isHasBiomeData();
-    public abstract void setHasBiomeData(boolean value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutMapChunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -106,7 +104,6 @@ public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
         public final Template.Field.Converted<List<CommonTagCompound>> tags = new Template.Field.Converted<List<CommonTagCompound>>();
         @Template.Optional
         public final Template.Field.Converted<ChunkMapHandle> chunkInfo = new Template.Field.Converted<ChunkMapHandle>();
-        public final Template.Field.Boolean hasBiomeData = new Template.Field.Boolean();
 
     }
 

@@ -61,7 +61,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutStatistic OUT_STATISTIC = new NMSPacketPlayOutStatistic();
     public static final NMSPacketPlayOutTabComplete OUT_TAB_COMPLETE = new NMSPacketPlayOutTabComplete();
     public static final NMSPacketPlayOutTileEntityData OUT_TILE_ENTITY_DATA = new NMSPacketPlayOutTileEntityData();
-    public static final NMSPacketPlayOutTitle OUT_TITLE = new NMSPacketPlayOutTitle();
+    //public static final NMSPacketPlayOutTitle OUT_TITLE = new NMSPacketPlayOutTitle();
     public static final NMSPacketPlayOutUpdateHealth OUT_UPDATE_HEALTH = new NMSPacketPlayOutUpdateHealth();
     public static final NMSPacketPlayOutUpdateTime OUT_UPDATE_TIME = new NMSPacketPlayOutUpdateTime();
     public static final NMSPacketPlayOutWorldEvent OUT_WORLD_EVENT = new NMSPacketPlayOutWorldEvent();
@@ -70,7 +70,6 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutBlockChange OUT_BLOCK_CHANGE = new NMSPacketPlayOutBlockChange();
     public static final NMSPacketPlayOutBoss OUT_BOSS = new NMSPacketPlayOutBoss();
     public static final NMSPacketPlayOutCamera OUT_CAMERA = new NMSPacketPlayOutCamera();
-    public static final NMSPacketPlayOutCombatEvent OUT_COMBAT_EVENT = new NMSPacketPlayOutCombatEvent();
     public static final NMSPacketPlayOutCustomSoundEffect OUT_CUSTOM_SOUND_EFFECT = new NMSPacketPlayOutCustomSoundEffect();
     public static final NMSPacketPlayOutResourcePackSend OUT_RESOURCE_PACK_SEND = new NMSPacketPlayOutResourcePackSend();
     public static final NMSPacketPlayOutServerDifficulty OUT_SERVER_DIFFICULTY = new NMSPacketPlayOutServerDifficulty();
@@ -86,10 +85,8 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutWindowData OUT_WINDOW_DATA = new NMSPacketPlayOutWindowData();
     public static final NMSPacketPlayOutOpenWindow OUT_WINDOW_OPEN = new NMSPacketPlayOutOpenWindow();
     public static final NMSPacketPlayOutSetSlot OUT_WINDOW_SET_SLOT = new NMSPacketPlayOutSetSlot();
-    public static final NMSPacketPlayOutTransaction OUT_WINDOW_TRANSACTION = new NMSPacketPlayOutTransaction();
     public static final NMSPacketPlayOutWindowItems OUT_WINDOW_ITEMS = new NMSPacketPlayOutWindowItems();
     /* Entity-related packets */
-    public static final NMSPacketPlayOutEntity OUT_ENTITY = new NMSPacketPlayOutEntity();
     public static final NMSPacketPlayOutSpawnEntity OUT_ENTITY_SPAWN = new NMSPacketPlayOutSpawnEntity();
     public static final NMSPacketPlayOutNamedEntitySpawn OUT_ENTITY_SPAWN_NAMED = new NMSPacketPlayOutNamedEntitySpawn();
     public static final NMSPacketPlayOutSpawnEntityExperienceOrb OUT_ENTITY_SPAWN_EXPORB = new NMSPacketPlayOutSpawnEntityExperienceOrb();
@@ -151,7 +148,6 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInCloseWindow IN_WINDOW_CLOSE = new NMSPacketPlayInCloseWindow();
     public static final NMSPacketPlayInEnchantItem IN_WINDOW_ENCHANT_ITEM = new NMSPacketPlayInEnchantItem();
     public static final NMSPacketPlayInResourcePackStatus IN_WINDOW_RESOURCEPACK_STATUS = new NMSPacketPlayInResourcePackStatus();
-    public static final NMSPacketPlayInTransaction IN_WINDOW_TRANSACTION = new NMSPacketPlayInTransaction();
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 
     private final String name;

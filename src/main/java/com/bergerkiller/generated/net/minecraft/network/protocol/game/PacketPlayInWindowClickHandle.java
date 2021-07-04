@@ -28,8 +28,6 @@ public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
     public abstract void setSlot(int value);
     public abstract int getButton();
     public abstract void setButton(int value);
-    public abstract short getAction();
-    public abstract void setAction(short value);
     public abstract ItemStack getItem();
     public abstract void setItem(ItemStack value);
     public abstract InventoryClickType getMode();
@@ -42,7 +40,6 @@ public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
         public final Template.Field.Integer windowId = new Template.Field.Integer();
         public final Template.Field.Integer slot = new Template.Field.Integer();
         public final Template.Field.Integer button = new Template.Field.Integer();
-        public final Template.Field.Short action = new Template.Field.Short();
         public final Template.Field.Converted<ItemStack> item = new Template.Field.Converted<ItemStack>();
         public final Template.Field.Converted<InventoryClickType> mode = new Template.Field.Converted<InventoryClickType>();
 

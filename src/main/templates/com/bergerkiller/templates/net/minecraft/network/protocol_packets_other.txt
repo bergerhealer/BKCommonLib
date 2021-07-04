@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.EnumChatVisibility;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.biome.BiomeManager;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
@@ -63,6 +64,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutExplosionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -728,6 +730,8 @@ class PacketPlayInBlockDig extends Packet {
     }
 }
 
+// Gone since 1.17, we don't use it, it's not worth the time to support this.
+/*
 class PacketPlayOutTitle extends Packet {
     private (PacketPlayOutTitleHandle.EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction action:a;
     private (ChatText) IChatBaseComponent title:b;
@@ -755,6 +759,7 @@ class PacketPlayOutTitle extends Packet {
         enum (EnumTitleActionHandle) PacketPlayOutTitle.EnumTitleAction RESET;
     }
 }
+*/
 
 class PacketPlayOutChat extends Packet {
 #if version >= 1.17
@@ -960,17 +965,20 @@ class PacketPlayOutLogin extends Packet {
 
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
         EnumGamemode mode = instance#previousGameMode;
+  #if version <= 1.16.5
         if (mode == EnumGamemode.NOT_SET) {
             return null;
-        } else {
-            return mode;
         }
+  #endif
+        return mode;
     }
 
     public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+  #if version <= 1.16.5
         if (gameMode == null) {
             gameMode = EnumGamemode.NOT_SET;
         }
+  #endif
         instance#previousGameMode = gameMode;
     }
 #else
@@ -1152,17 +1160,20 @@ class PacketPlayOutRespawn extends Packet {
 
     public (org.bukkit.GameMode) EnumGamemode getPreviousGameMode() {
         EnumGamemode mode = instance#previousGameMode;
+  #if version <= 1.16.5
         if (mode == EnumGamemode.NOT_SET) {
             return null;
-        } else {
-            return mode;
         }
+  #endif
+        return mode;
     }
 
     public void setPreviousGameMode((org.bukkit.GameMode) EnumGamemode gameMode) {
+  #if version <= 1.16.5
         if (gameMode == null) {
             gameMode = EnumGamemode.NOT_SET;
         }
+  #endif
         instance#previousGameMode = gameMode;
     }
 #else
@@ -1216,7 +1227,6 @@ class PacketPlayOutMapChunk extends Packet {
     private optional byte[] data:buffer;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:blockEntitiesTags;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private boolean hasBiomeData:h;
 #elseif version >= 1.15
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:d;
@@ -1228,35 +1238,35 @@ class PacketPlayOutMapChunk extends Packet {
     private optional byte[] data:f;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:g;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private boolean hasBiomeData:h;
+    private unknown boolean hasBiomeData:h;
 #elseif version >= 1.14
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:d;
     private optional byte[] data:e;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:f;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private boolean hasBiomeData:g;
+    private unknown boolean hasBiomeData:g;
 #elseif version >= 1.9.4
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private boolean hasBiomeData:f;
+    private unknown boolean hasBiomeData:f;
 #elseif version >= 1.9
     private optional int sectionsMask:c;
     private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:d;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private boolean hasBiomeData:e;
+    private unknown boolean hasBiomeData:e;
 #else
     private optional int sectionsMask:###;
     private optional (CommonTagCompound) NBTTagCompound metadata:###;
     private optional byte[] data:###;
     private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
     private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:c;
-    private boolean hasBiomeData:d;
+    private unknown boolean hasBiomeData:d;
 #endif
 
     <code>
@@ -1838,6 +1848,8 @@ optional class PacketPlayOutMount extends Packet {
     </code>
 }
 
+// Gone since 1.17, not worth keeping.
+/*
 class PacketPlayOutCombatEvent extends Packet {
     public (Object) PacketPlayOutCombatEvent.EnumCombatEventType eventType:a;
     public int entityId1:b;
@@ -1849,6 +1861,7 @@ class PacketPlayOutCombatEvent extends Packet {
     public (ChatText) String message:e;
 #endif
 }
+*/
 
 // Only >= MC 1.9
 optional class PacketPlayOutSetCooldown extends Packet {
@@ -2020,13 +2033,12 @@ class PacketPlayInWindowClick extends Packet {
     private int windowId:containerId;
     private int slot:slotNum;
     private int button:buttonNum;
-    private short action:REMOVED;
     private (org.bukkit.inventory.ItemStack) ItemStack item:carriedItem;
 #else
     private int windowId:a;
     private int slot;
     private int button;
-    private short action:d;
+    private unknown short action:d; //TODO: Do something with this?
     private (org.bukkit.inventory.ItemStack) ItemStack item;
 #endif
 
@@ -2411,4 +2423,24 @@ class PacketPlayInCloseWindow extends Packet {
 #else
     private int windowId:id;
 #endif
+}
+
+class PacketPlayInEnchantItem extends Packet {
+#if version >= 1.17
+    private final int windowId:containerId;
+    private final int buttonId;
+#else
+    private int windowId:a;
+    private int buttonId:b;
+#endif
+}
+
+class PacketPlayInSpectate extends Packet {
+#if version >= 1.17
+    private final UUID uuid;
+#else
+    private UUID uuid:a;
+#endif
+
+    public (PacketPlayInSpectateHandle) PacketPlayInSpectate(UUID uuid);
 }

@@ -1,5 +1,6 @@
 package net.minecraft.server.level;
 
+import net.minecraft.core.BlockPosition;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.EntityHuman;
@@ -11,6 +12,7 @@ import net.minecraft.world.level.ForcedChunk;
 import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.level.World;
+import net.minecraft.world.phys.Vec3D;
 
 import net.minecraft.server.MinecraftServer;
 
@@ -150,7 +152,11 @@ class WorldServer extends World {
     }
 #endif
 
-#if version >= 1.16
+#if version >= 1.17
+    public (WorldDataServerHandle) WorldDataServer getWorldData() {
+        return instance.serverLevelData;
+    }
+#elseif version >= 1.16
     public (WorldDataServerHandle) WorldDataServer getWorldData() {
         return instance.worldDataServer;
     }
@@ -311,7 +317,7 @@ class WorldServer extends World {
 
 #if version >= 1.17
     public void removeEntity((EntityHandle) Entity entity) {
-        entity.setRemoved(Entity$RemovalReason.DISCARDED);
+        entity.setRemoved(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
     }
 #else
     public void removeEntity((EntityHandle) Entity entity);

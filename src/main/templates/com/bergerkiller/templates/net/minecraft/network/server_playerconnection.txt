@@ -1,5 +1,8 @@
 package net.minecraft.server.network;
 
+import net.minecraft.network.protocol.game.PacketPlayOutPosition;
+import net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags;
+
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 
 class PlayerConnection {
@@ -109,8 +112,12 @@ class PlayerConnection {
 
     public void sendPos(double x, double y, double z) {
         java.util.HashSet flags = new java.util.HashSet();
-        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.X_ROT);
-        flags.add(PacketPlayOutPosition.EnumPlayerTeleportFlags.Y_ROT);
+        flags.add(PacketPlayOutPosition$EnumPlayerTeleportFlags.X_ROT);
+        flags.add(PacketPlayOutPosition$EnumPlayerTeleportFlags.Y_ROT);
+  #if version >= 1.17
+        instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
+  #else
         instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
+  #endif
     }
 }

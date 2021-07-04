@@ -248,7 +248,7 @@ class Chunk {
 
 #if version >= 1.14
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position) {
-        return instance.world.getBrightness(enumskyblock, position);
+        return instance.getWorld().getBrightness(enumskyblock, position);
     }
 #else
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);

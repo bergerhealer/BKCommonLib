@@ -45,13 +45,13 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBoatMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInCloseWindowHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInEnchantItemHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInEntityActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInHeldItemSlotHandle;
@@ -59,6 +59,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInResourcePackStatusHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSetCreativeSlotHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSettingsHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInTeleportAcceptHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUpdateSignHandle;
@@ -74,7 +75,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCombatEventHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
@@ -113,7 +113,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityWeatherHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUnloadChunkHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateSignHandle;
@@ -124,7 +123,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -410,8 +408,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInEnchantItem extends NMSPacket {
 
-        public final FieldAccessor<Integer> windowId = nextFieldSignature("private int a");
-        public final FieldAccessor<Integer> enchantment = nextField("private int b");
+        public final FieldAccessor<Integer> windowId = PacketPlayInEnchantItemHandle.T.windowId.toFieldAccessor();
+        public final FieldAccessor<Integer> buttonId = PacketPlayInEnchantItemHandle.T.buttonId.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInEntityAction extends NMSPacket {
@@ -498,12 +496,11 @@ public class NMSPacketClasses {
     }
 
     public static class NMSPacketPlayInSpectate extends NMSPacket {
-        
-        public final FieldAccessor<UUID> uuid = nextField("private UUID a");
-        private final SafeConstructor<CommonPacket> constructor1 = getPacketConstructor(UUID.class);
+
+        public final FieldAccessor<UUID> uuid = PacketPlayInSpectateHandle.T.uuid.toFieldAccessor();
 
         public CommonPacket newInstance(UUID uuid) {
-            return constructor1.newInstance(uuid);
+            return PacketPlayInSpectateHandle.createNew(uuid).toCommonPacket();
         }
     }
 
@@ -527,13 +524,23 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> teleportId = PacketPlayInTeleportAcceptHandle.T.teleportId.toFieldAccessor();
     }
 
+    // Gone since 1.17, won't bother supporting
+    /*
     public static class NMSPacketPlayInTransaction extends NMSPacket {
 
         public final FieldAccessor<Integer> windowId = nextField("private int a");
         public final FieldAccessor<Short> action = nextFieldSignature("private short b");
         public final FieldAccessor<Boolean> accepted = nextFieldSignature("private boolean c");
     }
-    
+
+    public static class NMSPacketPlayOutTransaction extends NMSPacket {
+
+        public final FieldAccessor<Integer> windowId = nextField("private int a");
+        public final FieldAccessor<Short> action = nextField("private short b");
+        public final FieldAccessor<Boolean> accepted = nextFieldSignature("private boolean c");
+    }
+    */
+
     public static class NMSPacketPlayInUpdateSign extends NMSPacket {
 
         public final FieldAccessor<IntVector3> position = PacketPlayInUpdateSignHandle.T.position.toFieldAccessor();
@@ -591,7 +598,6 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> windowId = PacketPlayInWindowClickHandle.T.windowId.toFieldAccessor();
         public final FieldAccessor<Integer> slot = PacketPlayInWindowClickHandle.T.slot.toFieldAccessor();
         public final FieldAccessor<Integer> button = PacketPlayInWindowClickHandle.T.button.toFieldAccessor();
-        public final FieldAccessor<Short> action = PacketPlayInWindowClickHandle.T.action.toFieldAccessor();
         public final FieldAccessor<ItemStack> item = PacketPlayInWindowClickHandle.T.item.toFieldAccessor();
         public final FieldAccessor<InventoryClickType> mode = PacketPlayInWindowClickHandle.T.mode.toFieldAccessor();
     }
@@ -721,6 +727,8 @@ public class NMSPacketClasses {
         }
     }
 
+    // Gone since 1.17, not worth keeping.
+    /*
     public static class NMSPacketPlayOutCombatEvent extends NMSPacket {
 
           public final FieldAccessor<Object> eventType = PacketPlayOutCombatEventHandle.T.eventType.toFieldAccessor();
@@ -729,6 +737,7 @@ public class NMSPacketClasses {
           public final FieldAccessor<Integer> tickDuration = PacketPlayOutCombatEventHandle.T.tickDuration.toFieldAccessor();
           public final FieldAccessor<ChatText> message = PacketPlayOutCombatEventHandle.T.message.toFieldAccessor();
     }
+    */
 
     public static class NMSPacketPlayOutCustomPayload extends NMSPacket {
 
@@ -1266,8 +1275,6 @@ public class NMSPacketClasses {
                 return false;
             }
         };
-
-        public final FieldAccessor<Boolean> hasBiomeData = PacketPlayOutMapChunkHandle.T.hasBiomeData.toFieldAccessor();
     }
     
     public static class NMSPacketPlayOutMount extends NMSPacket {
@@ -1966,6 +1973,7 @@ public class NMSPacketClasses {
         }
     }
 
+    /*
     public static class NMSPacketPlayOutTitle extends NMSPacket {
         public final FieldAccessor<PacketPlayOutTitleHandle.EnumTitleActionHandle> action = PacketPlayOutTitleHandle.T.action.toFieldAccessor();
         public final FieldAccessor<ChatText> chatComponent = PacketPlayOutTitleHandle.T.title.toFieldAccessor();
@@ -1997,13 +2005,7 @@ public class NMSPacketClasses {
             return constructor1.newInstance(enumTitleAction.getRaw(), iChatBaseComponent.getRaw(), fadeIn, stay, fadeOut);
         }
     }
-
-    public static class NMSPacketPlayOutTransaction extends NMSPacket {
-
-        public final FieldAccessor<Integer> windowId = nextField("private int a");
-        public final FieldAccessor<Short> action = nextField("private short b");
-        public final FieldAccessor<Boolean> accepted = nextFieldSignature("private boolean c");
-    }
+    */
 
     public static class NMSPacketPlayOutUnloadChunk extends NMSPacket {
 

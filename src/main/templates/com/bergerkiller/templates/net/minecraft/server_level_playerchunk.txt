@@ -102,8 +102,10 @@ class PlayerChunk {
         PlayerChunkHandle.T.resendAllLighting.invoke(instance);
 #endif
 
-        // Create a map chunk packet (version-specific code required)
-#if exists net.minecraft.network.protocol.game.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.world.level.chunk.Chunk chunk, int sectionsMask);
+        // Create a map chunk packet
+#if version >= 1.17
+        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk);
+#elseif exists net.minecraft.network.protocol.game.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.world.level.chunk.Chunk chunk, int sectionsMask);
         PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF);
 #else
         boolean flag = !WorldHandle.createHandle(chunk.getWorld()).getDimensionType().hasSkyLight();
@@ -283,9 +285,9 @@ class PlayerChunk {
         for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
             java.util.concurrent.CompletableFuture future;
   #if version >= 1.14.1
-            future = instance.getStatusFutureUnchecked((ChunkStatus) chunk_statuses.get(i));
+            future = instance.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
   #else
-            future = instance.a((ChunkStatus) chunk_statuses.get(i));
+            future = instance.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
   #endif
             if (!future.isCompletedExceptionally()) {
                 com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);

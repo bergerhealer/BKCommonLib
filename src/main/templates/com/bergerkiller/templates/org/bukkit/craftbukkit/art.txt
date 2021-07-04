@@ -22,7 +22,9 @@ class CraftArt {
     }
 
     public static int NotchToInternalId((Object) Paintings art) {
-#if version >= 1.13.1
+#if version >= 1.17
+        return net.minecraft.core.IRegistry.MOTIVE.getId(art);
+#elseif version >= 1.13.1
         return net.minecraft.core.IRegistry.MOTIVE.a(art);
 #elseif version >= 1.13
         return Paintings.a.a(art);
