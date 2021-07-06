@@ -23,7 +23,6 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.EntityType;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -886,10 +885,6 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     private boolean dispatchClickAction(Player player, ItemFrame itemFrame, Vector startPosition, Vector lookDirection, MapAction action) {
-        if (player.isSneaking()) {
-            return false; // do not click while sneaking to allow for normal block interaction
-        }
-
         MapDisplayInfo info = getInfo(itemFrame);
         if (info == null) {
             return false; // no map here
