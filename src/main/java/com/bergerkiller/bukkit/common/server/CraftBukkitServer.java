@@ -4,7 +4,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
-import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
@@ -104,8 +104,8 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     @Override
     public void postInit(PostInitEvent event) {
         MC_VERSION = identifyMinecraftVersion();
-        HAS_MOJANG_MAPPINGS = MountiplexUtil.evaluateText(MC_VERSION, ">=", "1.17");
-        REMAP_TO_NMS = MountiplexUtil.evaluateText(MC_VERSION, "<", "1.17");
+        HAS_MOJANG_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17");
+        REMAP_TO_NMS = TextValueSequence.evaluateText(MC_VERSION, "<", "1.17");
 
         // Check whether the server is at all compatible with the template definitions
         if (!event.getResolver().isSupported(MC_VERSION)) {

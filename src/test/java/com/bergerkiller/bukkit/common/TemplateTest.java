@@ -34,6 +34,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryS
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -334,7 +335,7 @@ public class TemplateTest {
         // Make sure all mappings for versions we need are present
         try {
             if (!mappings.assertMappings(Stream.of(Common.TEMPLATE_RESOLVER.getSupportedVersions())
-                    .filter(s -> MountiplexUtil.evaluateText(s, ">=", "1.17"))
+                    .filter(s -> TextValueSequence.evaluateText(s, ">=", "1.17"))
                     .toArray(String[]::new))
             ) {
                 return; // No changes

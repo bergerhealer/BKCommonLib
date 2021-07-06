@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
-import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 
 /**
  * This class is used to generate the RGB<>Color transformation mapping.
@@ -63,7 +63,7 @@ public class MCSDGenCiede2000 extends MapColorSpaceData {
                .addBaseColor(129, 86, 49)
                .addBaseColor(112, 2, 0);
 
-        if (MountiplexUtil.evaluateText(minecraftVersion, ">=", "1.12")) {
+        if (TextValueSequence.evaluateText(minecraftVersion, ">=", "1.12")) {
             builder.addBaseColor(209, 177, 161)
                    .addBaseColor(159, 82, 36)
                    .addBaseColor(149, 87, 108)
@@ -82,7 +82,7 @@ public class MCSDGenCiede2000 extends MapColorSpaceData {
                    .addBaseColor(37, 22, 16);
         }
 
-        if (MountiplexUtil.evaluateText(minecraftVersion, ">=", "1.16")) {
+        if (TextValueSequence.evaluateText(minecraftVersion, ">=", "1.16")) {
             builder.addBaseColor(189, 48, 49)
                    .addBaseColor(148, 63, 97)
                    .addBaseColor(92, 25, 29)
@@ -92,7 +92,7 @@ public class MCSDGenCiede2000 extends MapColorSpaceData {
                    .addBaseColor(20, 180, 133);
         }
 
-        if (MountiplexUtil.evaluateText(minecraftVersion, ">=", "1.17")) {
+        if (TextValueSequence.evaluateText(minecraftVersion, ">=", "1.17")) {
             builder.addBaseColor(100, 100, 100)
                    .addBaseColor(216, 175, 147)
                    .addBaseColor(127, 167, 150);

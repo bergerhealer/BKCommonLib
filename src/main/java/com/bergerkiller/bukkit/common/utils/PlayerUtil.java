@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -416,5 +417,37 @@ public class PlayerUtil extends EntityUtil {
      */
     public static void sendMessage(Player player, ChatText text) {
         EntityPlayerHandle.fromBukkit(player).sendMessage(text);
+    }
+
+    /**
+     * Gets the (maximum) game version of a player. Will use API's such as ViaVersion
+     * to detect the actual client game version.
+     *
+     * @param player The player to get the (maximum) game version of
+     * @return Game version string, e.g. "1.12.2"
+     */
+    public static String getGameVersion(Player player) {
+        if (CommonPlugin.hasInstance()) {
+            return CommonPlugin.getInstance().getGameVersionSupplier().getVersion(player);
+        } else {
+            return Common.MC_VERSION;
+        }
+    }
+
+    /**
+     * Evaluates a logical expression against the game version supported by a player.
+     * Will make use of API's such as ViaVersion to detect the actual game version of the player.
+     *
+     * @param player The player to check the game version of, left side of the operand
+     * @param operand to evaluate (>, >=, ==, etc.)
+     * @param rightSide value on the right side of the operand
+     * @return True if the evaluation succeeds, False if not
+     */
+    public static boolean evaluateGameVersion(Player player, String operand, String rightSide) {
+        if (CommonPlugin.hasInstance()) {
+            return CommonPlugin.getInstance().getGameVersionSupplier().evaluateVersion(player, operand, rightSide);
+        } else {
+            return Common.evaluateMCVersion(operand, rightSide);
+        }
     }
 }

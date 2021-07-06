@@ -23,6 +23,9 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_Vanilla;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_ViaVersion;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
@@ -93,6 +96,7 @@ public class CommonPlugin extends PluginBase {
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
+    private PlayerGameVersionSupplier gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
     private boolean isFrameTilingSupported = true;
     private boolean isMapDisplaysEnabled = true;
     private boolean teleportPlayersToSeat = true;
@@ -322,6 +326,15 @@ public class CommonPlugin extends PluginBase {
         return this.vehicleMountManager;
     }
 
+    /**
+     * Gets the player game version supplier
+     *
+     * @return game version supplier
+     */
+    public PlayerGameVersionSupplier getGameVersionSupplier() {
+        return this.gameVersionSupplier;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -433,6 +446,17 @@ public class CommonPlugin extends PluginBase {
         this.permissionHandler.updateDependency(plugin, pluginName, enabled);
         if (!this.updatePacketHandler()) {
             this.onCriticalFailure();
+        }
+
+        // ViaVersion detection
+        if (pluginName.equals("ViaVersion")) {
+            if (enabled) {
+                this.gameVersionSupplier = new PlayerGameVersionSupplier_ViaVersion();
+                log(Level.INFO, "ViaVersion detected, will use it to detect player game versions");
+            } else {
+                this.gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
+                log(Level.INFO, "ViaVersion was disabled, will no longer use it to detect player game versions");
+            }
         }
     }
 

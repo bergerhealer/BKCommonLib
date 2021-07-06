@@ -24,7 +24,7 @@
         <minecraft.version>1.17</minecraft.version>
         <minecraft.serverAPIVersion>1.16.5-R0.1-SNAPSHOT</minecraft.serverAPIVersion>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.42</mountiplex.version>
+        <mountiplex.version>2.43</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -43,12 +43,6 @@
     </profiles>
 
     <repositories>
-        <!-- Repo for access to Spigot API -->
-        <repository>
-            <id>spigot-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-
         <!-- Repo for the Mountiplex library -->
         <repository>
             <id>mg-repo</id>
@@ -71,6 +65,12 @@
         <repository>
             <id>aikar</id>
             <url>https://repo.aikar.co/nexus/content/repositories/aikar-release/</url>
+        </repository>
+
+        <!-- Repository for ViaVersion -->
+        <repository>
+            <id>viaversion-repo</id>
+            <url>https://repo.viaversion.com</url>
         </repository>
     </repositories>
 
@@ -114,6 +114,14 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.42.Final</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- ViaVersion API -->
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>3.2.1</version>
             <scope>provided</scope>
         </dependency>
 

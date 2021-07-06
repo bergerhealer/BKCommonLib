@@ -20,7 +20,7 @@ import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
-import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 
 /**
  * Communicates with hub.spigotmc.org to generate spigot <> mojang class
@@ -33,7 +33,7 @@ public class SpigotMappings {
     public final SortedMap<String, Map<String, String>> byVersion = new TreeMap<>((a, b) -> {
         if (a.equals(b)) {
             return 0;
-        } else if (MountiplexUtil.evaluateText(a, ">", b)) {
+        } else if (TextValueSequence.evaluateText(a, ">", b)) {
             return 1;
         } else {
             return -1;

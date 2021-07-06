@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.server;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
-import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 
 import org.bukkit.Bukkit;
@@ -114,7 +114,7 @@ public abstract class CommonServerBase implements CommonServer {
 
     @Override
     public boolean evaluateMCVersion(String operand, String version) {
-        return MountiplexUtil.evaluateText(this.getMinecraftVersion(), operand, version);
+        return TextValueSequence.evaluateText(this.getMinecraftVersion(), operand, version);
     }
 
     @Override

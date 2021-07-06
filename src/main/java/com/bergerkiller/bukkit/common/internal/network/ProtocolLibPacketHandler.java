@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
-import com.bergerkiller.mountiplex.MountiplexUtil;
+import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
@@ -309,7 +309,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         }
 
         // Bug exists on versions older than this
-        return MountiplexUtil.evaluateText(protocolLibVersion, "<", "4.5.1");
+        return TextValueSequence.evaluateText(protocolLibVersion, "<", "4.5.1");
     }
 
     private static com.comphenix.protocol.PacketType getPacketType(PacketType commonType) {
