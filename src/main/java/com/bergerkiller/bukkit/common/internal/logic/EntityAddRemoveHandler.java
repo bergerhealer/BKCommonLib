@@ -284,7 +284,7 @@ public abstract class EntityAddRemoveHandler {
          */
         public boolean replace(Object chunkHandle, EntityHandle oldEntity, EntityHandle newEntity) {
             Object[] slices = this.chunkEntitySlicesField.get(chunkHandle);
-            int chunkY = newEntity.getChunkY();
+            int chunkY = oldEntity.getChunkY();
             if (chunkY < 0) {
                 chunkY = 0;
             } else if (chunkY >= slices.length) {
