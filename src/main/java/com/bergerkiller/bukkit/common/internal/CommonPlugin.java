@@ -96,7 +96,7 @@ public class CommonPlugin extends PluginBase {
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
-    private PlayerGameVersionSupplier gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
+    private PlayerGameVersionSupplier gameVersionSupplier = null;
     private boolean isFrameTilingSupported = true;
     private boolean isMapDisplaysEnabled = true;
     private boolean teleportPlayersToSeat = true;
@@ -105,6 +105,7 @@ public class CommonPlugin extends PluginBase {
 
     public CommonPlugin() {
         instance = this;
+        gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
     }
 
     public static boolean hasInstance() {
