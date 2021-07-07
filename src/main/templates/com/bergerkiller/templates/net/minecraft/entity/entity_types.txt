@@ -174,7 +174,7 @@ class EntityTypes {
 #elseif version >= 1.9
 
     public static Class<?> getEntityClass(String internalEntityName) {
-        java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
+        java.util.Map map = com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
         return (Class) map.get(internalEntityName);
     }
 
@@ -183,7 +183,7 @@ class EntityTypes {
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-        java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeIdMap_1_8.get();
+        java.util.Map map = com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle.T.opt_typeIdMap_1_8.get();
         Integer id = (Integer) map.get(entityType);
         if (id != null) {
             return id.intValue();
@@ -195,17 +195,17 @@ class EntityTypes {
 #else
 
     public static Class<?> getEntityClass(String internalEntityName) {
-        java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
+        java.util.Map map = com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle.T.opt_nameTypeMap_1_10_2.get();
         return (Class) map.get(internalEntityName);
     }
 
     public static String getEntityInternalName(Class<?> entityType) {
-        java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeNameMap_1_10_2.get();
+        java.util.Map map = com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle.T.opt_typeNameMap_1_10_2.get();
         return (String) map.get(entityType);
     }
 
     public static int getEntityTypeId(Class<?> entityType) {
-        java.util.Map map = com.bergerkiller.generated.net.minecraft.server.EntityTypesHandle.T.opt_typeIdMap_1_8.get();
+        java.util.Map map = com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle.T.opt_typeIdMap_1_8.get();
         Integer id = (Integer) map.get(entityType);
         if (id != null) {
             return id.intValue();
