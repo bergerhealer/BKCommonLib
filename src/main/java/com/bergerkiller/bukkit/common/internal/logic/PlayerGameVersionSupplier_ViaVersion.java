@@ -40,7 +40,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
             if (initial && entries[i] != null) {
                 initial = false;
                 Arrays.fill(entries, 0, i, entries[i]);
-            } else if (entries[i] == null) {
+            } else if (!initial && entries[i] == null) {
                 entries[i] = entries[i - 1];
             }
         }
