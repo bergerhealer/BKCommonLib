@@ -30,6 +30,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
         // Store in mapping, ignore from before netty rewrite, those versions are cringe
         ProtocolVersion.getProtocols().stream()
             .map(Entry::new)
+            .filter(e -> e.protocolVersion >= 0) // Filter UNKNOWN
             .filter(e -> TextValueSequence.evaluate(e.minimum, ">=", TextValueSequence.parse("1.8")))
             .forEach(e -> entries[e.protocolVersion] = e);
 
