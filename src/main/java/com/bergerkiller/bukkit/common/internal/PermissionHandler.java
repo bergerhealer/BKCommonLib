@@ -47,6 +47,10 @@ public class PermissionHandler implements PermissionChecker {
             if (this.vaultEnabled) {
                 this.needsWildcardCheck.set();
             }
+        } else if (pluginName.equals("LuckPerms") && enabled) {
+            // LuckPerms handles *-logic for us, no need to do stuff ourselves
+            hasSuperWildcardSupport = true;
+            needsWildcardCheck.clear();
         }
     }
 
@@ -58,6 +62,12 @@ public class PermissionHandler implements PermissionChecker {
             // Bugfix for UPerms: hangs on retrieving the non-existent player profile name
             if (this.vaultPermission.getClass().getName().equals("me.TechsCode.UltraPermissions.hooks.pluginHooks.VaultPermissionHook")) {
                 this.hasSuperWildcardSupport = true; // Appears to support it
+                return this.hasSuperWildcardSupport;
+            }
+
+            // LuckPerms supports wildcards
+            if (this.vaultPermission.getClass().getName().equals("me.lucko.luckperms.bukkit.vault.LuckPermsVaultPermission")) {
+                this.hasSuperWildcardSupport = true;
                 return this.hasSuperWildcardSupport;
             }
 
