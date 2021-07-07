@@ -4,7 +4,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.NibbleArrayHan
 
 class NibbleArray {
 #if version >= 1.17
-    protected byte[] dataField:c;
+    protected byte[] dataField:data;
 #else
     private final byte[] dataField:a;
 #endif

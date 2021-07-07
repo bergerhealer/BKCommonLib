@@ -209,7 +209,7 @@ public class CommonCapabilities {
      * Since Minecraft 1.17 the destroy packet uses just a single entity id.
      * Earlier versions supported destroying multiple entities at once.
      */
-    public static final boolean PACKET_DESTROY_MULTIPLE = CommonBootstrap.evaluateMCVersion("<", "1.17");
+    public static final boolean PACKET_DESTROY_MULTIPLE = CommonBootstrap.evaluateMCVersion("<", "1.17") || CommonBootstrap.evaluateMCVersion(">=", "1.17.1");
 
     /**
      * Since Minecraft 1.17 entity removal comes with a reason, and there is not just a die() method.

@@ -27,6 +27,7 @@ class MinecraftServer {
     }
 
 #select version >=
+#case 1.17.1: public int getTicks:ah();
 #case 1.16.4: public int getTicks:ai();
 #case 1.16.2: public int getTicks:ah();
 #case 1.16:   public int getTicks:ag();

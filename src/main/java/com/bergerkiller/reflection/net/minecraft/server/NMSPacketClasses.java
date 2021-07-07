@@ -894,7 +894,7 @@ public class NMSPacketClasses {
 
             @Override
             public boolean set(Object instance, int[] value) {
-                PacketPlayOutEntityDestroyHandle.T.setMultpleEntityIds.invoke(instance, value);
+                PacketPlayOutEntityDestroyHandle.T.setMultipleEntityIds.invoke(instance, value);
                 return true;
             }
         };

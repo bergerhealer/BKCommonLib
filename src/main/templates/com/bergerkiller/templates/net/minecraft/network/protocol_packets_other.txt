@@ -30,6 +30,10 @@ import net.minecraft.world.phys.Vec3D;
 
 import com.mojang.authlib.GameProfile;
 
+import it.unimi.dsi.fastutil.ints.IntList;
+import it.unimi.dsi.fastutil.ints.IntLists;
+import it.unimi.dsi.fastutil.ints.IntArrayList;
+
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -114,7 +118,9 @@ class PacketPlayOutPlayerInfo extends Packet {
 }
 
 class PacketPlayOutEntityDestroy extends Packet {
-#if version >= 1.17
+#if version >= 1.17.1
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private it.unimi.dsi.fastutil.ints.IntList entityIds;
+#elseif version >= 1.17
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private final int entityId;
 #else
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy private int[] entityIds:a;
@@ -127,16 +133,14 @@ class PacketPlayOutEntityDestroy extends Packet {
     </code>
 
     public boolean canSupportMultipleEntityIds() {
-#if version >= 1.17
-        return false;
-#else
-        int[] ids = instance#entityIds;
-        return ids != null && ids.length > 1;
-#endif
+        return com.bergerkiller.bukkit.common.internal.CommonCapabilities.PACKET_DESTROY_MULTIPLE;
     }
 
     public boolean hasMultipleEntityIds() {
-#if version >= 1.17
+#if version >= 1.17.1
+        IntList ids = instance#entityIds;
+        return ids.size() > 1;
+#elseif version >= 1.17
         return false;
 #else
         int[] ids = instance#entityIds;
@@ -145,7 +149,17 @@ class PacketPlayOutEntityDestroy extends Packet {
     }
 
     public int getSingleEntityId() {
-#if version >= 1.17
+#if version >= 1.17.1
+        IntList ids = instance#entityIds;
+        int size = ids.size();
+        if (size == 0) {
+            return -1;
+        } else if (size == 1) {
+            return ids.getInt(0);
+        } else {
+            throw new UnsupportedOperationException("This destroy packet has more than one entity id");
+        }
+#elseif version >= 1.17
         return instance#entityId;
 #else
         int[] ids = instance#entityIds;
@@ -160,7 +174,12 @@ class PacketPlayOutEntityDestroy extends Packet {
     }
 
     public int[] getEntityIds() {
-#if version >= 1.17
+#if version >= 1.17.1
+        IntList ids = instance#entityIds;
+        int[] result = new int[ids.size()];
+        ids.getElements(0, result, 0, result.length);
+        return result;
+#elseif version >= 1.17
         int id = instance#entityId;
         if (id >= 0) {
             int[] ids = new int[1];
@@ -175,7 +194,17 @@ class PacketPlayOutEntityDestroy extends Packet {
     }
 
     public void setSingleEntityId(int entityId) {
-#if version >= 1.17
+#if version >= 1.17.1
+        int[] arr;
+        if (entityId >= 0) {
+            arr = new int[1];
+            arr[0] = entityId;
+        } else {
+            arr = new int[0];
+        }
+        IntList newIds = new IntArrayList(arr);
+        instance#entityIds = newIds;
+#elseif version >= 1.17
         instance#entityId = entityId;
 #else
         if (entityId >= 0) {
@@ -188,8 +217,11 @@ class PacketPlayOutEntityDestroy extends Packet {
 #endif
     }
 
-    public void setMultpleEntityIds(int[] multipleEntityIds) {
-#if version >= 1.17
+    public void setMultipleEntityIds(int[] multipleEntityIds) {
+#if version >= 1.17.1
+        IntList newIds = new IntArrayList(multipleEntityIds);
+        instance#entityIds = newIds;
+#elseif version >= 1.17
         if (multipleEntityIds == null || multipleEntityIds.length == 0) {
             instance#entityId = -1;
         } else if (multipleEntityIds.length == 1) {
@@ -203,7 +235,15 @@ class PacketPlayOutEntityDestroy extends Packet {
     }
 
     public static (PacketPlayOutEntityDestroyHandle) PacketPlayOutEntityDestroy createNewSingle(int entityId) {
-#if version >= 1.17
+#if version >= 1.17.1
+        if (entityId >= 0) {
+            int[] ids = new int[1];
+            ids[0] = entityId;
+            return new PacketPlayOutEntityDestroy(ids);
+        } else {
+            return new PacketPlayOutEntityDestroy(new int[0]);
+        }
+#elseif version >= 1.17
         return new PacketPlayOutEntityDestroy(entityId);
 #else
         if (entityId >= 0) {
@@ -217,7 +257,7 @@ class PacketPlayOutEntityDestroy extends Packet {
     }
 
     public static (PacketPlayOutEntityDestroyHandle) PacketPlayOutEntityDestroy createNewMultiple(int[] multipleEntityIds) {
-#if version >= 1.17
+#if version >= 1.17 && version < 1.17.1
         if (multipleEntityIds == null || multipleEntityIds.length == 0) {
             return new PacketPlayOutEntityDestroy(-1);
         } else if (multipleEntityIds.length == 1) {

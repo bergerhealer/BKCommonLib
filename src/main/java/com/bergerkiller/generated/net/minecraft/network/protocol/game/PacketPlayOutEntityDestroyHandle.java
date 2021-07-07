@@ -33,7 +33,7 @@ public abstract class PacketPlayOutEntityDestroyHandle extends PacketHandle {
     public abstract int getSingleEntityId();
     public abstract int[] getEntityIds();
     public abstract void setSingleEntityId(int entityId);
-    public abstract void setMultpleEntityIds(int[] multipleEntityIds);
+    public abstract void setMultipleEntityIds(int[] multipleEntityIds);
 
     public static boolean canDestroyMultiple() {
         return com.bergerkiller.bukkit.common.internal.CommonCapabilities.PACKET_DESTROY_MULTIPLE;
@@ -51,7 +51,7 @@ public abstract class PacketPlayOutEntityDestroyHandle extends PacketHandle {
         public final Template.Method<Integer> getSingleEntityId = new Template.Method<Integer>();
         public final Template.Method<int[]> getEntityIds = new Template.Method<int[]>();
         public final Template.Method<Void> setSingleEntityId = new Template.Method<Void>();
-        public final Template.Method<Void> setMultpleEntityIds = new Template.Method<Void>();
+        public final Template.Method<Void> setMultipleEntityIds = new Template.Method<Void>();
 
     }
 

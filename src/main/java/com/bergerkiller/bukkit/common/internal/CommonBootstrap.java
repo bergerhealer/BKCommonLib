@@ -445,6 +445,9 @@ public class CommonBootstrap {
                 for (String fastutilClass : new String[] {
                         "ints.Int2ObjectMap",
                         "ints.Int2ObjectOpenHashMap",
+                        "ints.IntList",
+                        "ints.IntLists",
+                        "ints.IntArrayList",
                         "longs.Long2ObjectMap",
                         "longs.Long2ObjectOpenHashMap",
                         "longs.Long2ObjectLinkedOpenHashMap",
