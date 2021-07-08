@@ -472,7 +472,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     EntityInLevelCallback callback = oldEntity#levelCallback;
          *     if (callback != EntityInLevelCallback.NULL) {
          *         if (newEntity == null) {
-         *             callback.a(Entity$RemovalReason.DISCARDED);
+         *             callback.a(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
          *         } else {
          *             #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private final EntityAccess entity;
          *             if ( callback#entity == oldEntity ) {
