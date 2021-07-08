@@ -75,7 +75,6 @@ public class NullPacketDataSerializerInit {
                             && !Modifier.isPrivate(modifiers)
                             && !Modifier.isFinal(modifiers);
                 })
-                .filter(ReflectionUtil.createDuplicateMethodFilter())
                 .forEach(m -> {
                     cw.visitMethodReturnConstant(m, BoxedType.getDefaultValue(m.getReturnType()));
                 });
