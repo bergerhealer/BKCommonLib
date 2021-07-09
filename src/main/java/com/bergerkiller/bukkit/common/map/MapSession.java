@@ -250,14 +250,14 @@ public class MapSession {
             }
 
             MapClip clip = this.clip.getArea(x, y, w, h);
-            if (!clip.dirty) {
+            if (!clip.isDirty()) {
                 // Clip was not dirty, so we can send packets right away
                 // Do so without affecting the clip of this owner, so do not use updateMap!
                 MapDisplayTile.Update update = tile.getTileUpdate(this.display, this.player, null);
                 if (update != null) {
                     sendUpdate(update);
                 }
-            } else if (!clip.everything) {
+            } else if (!clip.isEverythingDirty()) {
                 // Clip is dirty, so the display will send changes anyway
                 // Make sure that we then resent the entire tile
                 // No need to do this if the entire clip is already dirty

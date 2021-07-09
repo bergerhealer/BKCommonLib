@@ -71,7 +71,7 @@ public class MapDisplayTile {
         }
 
         MapClip tileClip = (clip == null) ? null : clip.getArea(startX, startY, RESOLUTION, RESOLUTION);
-        if (tileClip == null || tileClip.everything) {
+        if (tileClip == null || tileClip.isEverythingDirty()) {
             // Copy the full 128x128 tile area
             byte[] pixels = new byte[RESOLUTION * RESOLUTION];
             for (int y = 0; y < RESOLUTION; y++) {
@@ -81,7 +81,7 @@ public class MapDisplayTile {
             }
             mapUpdate.packet.setPixelData(0, 0, RESOLUTION, RESOLUTION, pixels);
             return mapUpdate;
-        } else if (tileClip.dirty) {
+        } else if (tileClip.isDirty()) {
             int w = tileClip.getWidth();
             int h = tileClip.getHeight();
             byte[] pixels = new byte[w * h];

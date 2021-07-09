@@ -369,7 +369,7 @@ public class MapDisplay implements MapDisplayEvents {
         this.refreshMapItem();
 
         // Synchronize the map information to the clients
-        if (this.clip.dirty) {
+        if (this.clip.isDirty()) {
             // For all viewers watching, send map texture updates
             // For players that are in-sync, we can re-use the same packet
             List<MapDisplayTile.Update> syncUpdates = null;
@@ -381,7 +381,7 @@ public class MapDisplay implements MapDisplayEvents {
                 }
 
                 // When viewers have individual dirty areas, they need their own update packets
-                if (owner.clip.dirty) {
+                if (owner.clip.isDirty()) {
                     owner.clip.markDirty(this.clip);
                     owner.updateMap(this.getUpdates(owner.clip, owner.player));
                     continue;
@@ -416,7 +416,7 @@ public class MapDisplay implements MapDisplayEvents {
             // Check all viewers to see if any of them have dirty areas that need to be refreshed
             // When players rejoin or change worlds, they may not know the map
             for (MapSession.Owner owner : this.session.onlineOwners) {
-                if (owner.viewing && owner.clip.dirty) {
+                if (owner.viewing && owner.clip.isDirty()) {
                     owner.updateMap(this.getUpdates(owner.clip, owner.player));
                 }
             }
@@ -1163,12 +1163,12 @@ public class MapDisplay implements MapDisplayEvents {
                 // Update the pixel buffer efficiently
                 Arrays.fill(this.buffer, color);
                 if (color == 0) {
-                    if (this.clip.dirty) {
+                    if (this.clip.isDirty()) {
                         this.map.clip.markDirty(this.clip);
                     }
 
                     // all pixel data in this layer cleared
-                    this.clip.dirty = false;
+                    this.clip.clearDirty();
                 } else {
                     // entire pixel area dirty
                     this.clip.markDirty(0, 0, this.getWidth(), this.getHeight());
@@ -1366,7 +1366,7 @@ public class MapDisplay implements MapDisplayEvents {
             while (layer.previous != null && remaining_pixels > 0) {
                 layer = layer.previous;
 
-                if (!layer.clip.dirty) {
+                if (!layer.clip.isDirty()) {
                     continue;
                 }
 

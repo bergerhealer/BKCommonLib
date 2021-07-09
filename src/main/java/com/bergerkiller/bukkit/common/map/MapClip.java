@@ -5,8 +5,8 @@ package com.bergerkiller.bukkit.common.map;
  */
 public class MapClip {
     public int dirty_x1, dirty_y1, dirty_x2, dirty_y2;
-    public boolean dirty;
-    public boolean everything;
+    private boolean dirty;
+    private boolean everything;
 
     public MapClip() {
         this.dirty_x1 = 0;
@@ -51,6 +51,26 @@ public class MapClip {
      */
     public final int getHeight() {
         return dirty_y2 - dirty_y1 + 1;
+    }
+
+    /**
+     * Gets whether this map clip is dirty. A dirty map clip means there
+     * is a rectangular area that was changed.
+     *
+     * @return True if dirty
+     */
+    public final boolean isDirty() {
+        return dirty;
+    }
+
+    /**
+     * Gets whether this map clip is set to everything, meaning the
+     * entire area unbounded by any rectangle needs to be refreshed.
+     *
+     * @return True if everything is dirty
+     */
+    public final boolean isEverythingDirty() {
+        return everything;
     }
 
     /**
@@ -105,6 +125,9 @@ public class MapClip {
      * @param h - height of the rectangle
      */
     public final void markDirty(int x, int y, int w, int h) {
+        if (w == 0 || h == 0) {
+            return;
+        }
         int x2 = x + w - 1;
         int y2 = y + h - 1;
         if (!this.dirty) {
@@ -183,7 +206,7 @@ public class MapClip {
         } else if (this.dirty_x1 <= x && this.dirty_y1 <= y && this.dirty_x2 >= (x+width) && this.dirty_y2 >= (y+height)) {
             // The area is inside a much larger area that is all dirty, so the entire clip area is dirty
             result.markEverythingDirty();
-        } else if (this.dirty_x1 > (x + width) || this.dirty_y1 > (y + height)) {
+        } else if (this.dirty_x1 >= (x + width) || this.dirty_y1 >= (y + height)) {
             // Dirty area is out of bounds (too far to the right)
             result.clearDirty();
         } else if (this.dirty_x2 < x || this.dirty_y2 < y) {
