@@ -32,6 +32,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityArmorStandHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
@@ -310,6 +311,19 @@ public class TemplateTest {
             assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_14.isBlockCollisionsMethodInitialized());
         } else if (Common.evaluateMCVersion(">=", "1.13")) {
             assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_13.isBlockCollisionsMethodInitialized());
+        }
+    }
+
+    @Test
+    public void testArmorStandDataWatcherFields() {
+        if (Common.evaluateMCVersion(">=", "1.9")) {
+            assertTrue(EntityArmorStandHandle.T.DATA_ARMORSTAND_FLAGS.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_ARM_LEFT.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_ARM_RIGHT.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_BODY.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_HEAD.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_LEFT.isAvailable());
+            assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_RIGHT.isAvailable());
         }
     }
 
