@@ -123,6 +123,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutEntityLookHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle.PacketPlayOutRelEntityMoveLookHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -984,8 +985,8 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> effectDuration = PacketPlayOutEntityEffectHandle.T.effectDurationTicks.toFieldAccessor();
         public final FieldAccessor<Byte> effectFlags = PacketPlayOutEntityEffectHandle.T.flags.toFieldAccessor();
 
-        public CommonPacket newInstance(int entityId, Object mobEffect) {
-            return new CommonPacket(PacketPlayOutEntityEffectHandle.T.constr_entityId_mobeffect.raw.newInstance(entityId, mobEffect));
+        public CommonPacket newInstance(int entityId, MobEffectHandle mobEffect) {
+            return new CommonPacket(PacketPlayOutEntityEffectHandle.T.constr_entityId_mobeffect.raw.newInstance(entityId, mobEffect.getRaw()));
         }
 
         public CommonPacket newInstance(int entityId, PotionEffect effect) {

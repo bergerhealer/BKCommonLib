@@ -669,7 +669,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
             // Entity Mob Effects
             for (MobEffectHandle effect : living.getEffects()) {
-                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect.getRaw()));
+                PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_EFFECT_ADD.newInstance(entity.getEntityId(), effect));
             }
         }
     }
