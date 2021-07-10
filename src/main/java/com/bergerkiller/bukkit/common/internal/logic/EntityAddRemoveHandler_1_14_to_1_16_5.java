@@ -13,6 +13,10 @@ import java.util.logging.Level;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkLoadEvent;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -122,10 +126,14 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
     }
 
     @Override
-    public void processEvents() {
-        for (EntitiesByUUIDMapHook hook : hooks) {
-            hook.processEvents();
-        }
+    public void onEnabled(CommonPlugin plugin) {
+        super.onEnabled(plugin);
+        plugin.register(new Listener() {
+            @EventHandler(priority = EventPriority.LOWEST)
+            public void onChunkLoad(ChunkLoadEvent event) {
+                notifyChunkEntitiesLoaded(event.getChunk());
+            }
+        });
     }
 
     @Override
@@ -146,6 +154,13 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
         if (value instanceof EntitiesByUUIDMapHook) {
             this.entitiesByUUIDField.set(nmsWorldHandle, ((EntitiesByUUIDMapHook) value).getBase());
             hooks.remove(value);
+        }
+    }
+
+    @Override
+    public void processEvents() {
+        for (EntitiesByUUIDMapHook hook : hooks) {
+            hook.processEvents();
         }
     }
 

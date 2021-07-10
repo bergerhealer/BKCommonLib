@@ -17,7 +17,9 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityByIdWorldMap;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -142,6 +144,11 @@ public abstract class EntityAddRemoveHandler {
     protected final void notifyAddedEarly(World world, Entity entity) {
         this.entitiesById.add(world, entity);
         this.plugin.notifyAddedEarly(world, entity);
+    }
+
+    protected final void notifyChunkEntitiesLoaded(Chunk chunk) {
+        this.processEvents();
+        CommonUtil.callEvent(new ChunkLoadEntitiesEvent(chunk));
     }
 
     private final class WorldEntityByIdSyncTask extends Task {

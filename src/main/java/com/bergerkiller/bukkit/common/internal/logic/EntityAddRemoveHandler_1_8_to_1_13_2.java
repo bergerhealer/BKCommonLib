@@ -11,6 +11,10 @@ import java.util.UUID;
 import java.util.logging.Level;
 
 import org.bukkit.World;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkLoadEvent;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
@@ -107,8 +111,14 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
-    public void processEvents() {
-        // Unused
+    public void onEnabled(CommonPlugin plugin) {
+        super.onEnabled(plugin);
+        plugin.register(new Listener() {
+            @EventHandler(priority = EventPriority.LOWEST)
+            public void onChunkLoad(ChunkLoadEvent event) {
+                notifyChunkEntitiesLoaded(event.getChunk());
+            }
+        });
     }
 
     @Override
@@ -151,6 +161,11 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
                 }
             }
         }
+    }
+
+    @Override
+    public void processEvents() {
+        // Unused
     }
 
     @Override

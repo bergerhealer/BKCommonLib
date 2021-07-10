@@ -36,7 +36,6 @@ import org.bukkit.event.server.PluginDisableEvent;
 import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.event.vehicle.VehicleEnterEvent;
 import org.bukkit.event.vehicle.VehicleExitEvent;
-import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.WorldInitEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
@@ -159,11 +158,6 @@ public class CommonListener implements Listener {
         // When block physics events occur while looking up the render options
         // for a block, log a warning of this (once).
         BLOCK_PHYSICS_FIRED = true;
-    }
-
-    @EventHandler(priority = EventPriority.LOWEST)
-    public void onChunkLoad(ChunkLoadEvent event) {
-        EntityAddRemoveHandler.INSTANCE.processEvents();
     }
 
     @EventHandler(priority = EventPriority.LOWEST)

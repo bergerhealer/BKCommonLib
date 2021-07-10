@@ -378,10 +378,6 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             throw new RuntimeException("Can not replace an entity with itself!");
         }
 
-        // Reset entity state
-        oldInstance.setRemovedPassive();
-        newInstance.setValid(true);
-
         // *** Bukkit Entity ***
         CraftEntityHandle craftEntity = CraftEntityHandle.createHandle(this.entity);
         craftEntity.setHandle(newInstance);
@@ -421,6 +417,10 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
         // *** Perform further replacement all over the place in the server ***
         EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance);
+
+        // *** Reset entity state ***
+        oldInstance.setRemovedPassive();
+        newInstance.setValid(true);
 
         // *** Repeat the replacement in the server the next tick to make sure nothing lingers ***
         CommonUtil.nextTick(() -> EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance));

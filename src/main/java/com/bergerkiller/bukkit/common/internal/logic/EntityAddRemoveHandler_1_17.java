@@ -9,6 +9,7 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.objectweb.asm.ClassWriter;
@@ -22,12 +23,14 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -46,6 +49,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     private final FastField<Object> callbacksField = new FastField<Object>();
     private final List<LevelCallbackHandler> hooks = new ArrayList<LevelCallbackHandler>();
     private final AddRemoveHandlerLogic removeHandler;
+    private final ChunkEntitiesLoadedHandler chunkEntitiesLoadedHandler;
     private final Class<?> levelCallbackHookType;
 
     public EntityAddRemoveHandler_1_17() {
@@ -81,114 +85,12 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             }
         } catch (Throwable t) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize PersistentEntitySectionManager callbacks field: " + t.getMessage(), t);
-            callbacksField.initUnavailable("callbacks");
+            callbacksField.initUnavailable("callbacks field not found");
         }
 
         this.removeHandler = Template.Class.create(AddRemoveHandlerLogic.class, Common.TEMPLATE_RESOLVER);
-
-        Class<?> hookType = null;
-        try {
-            Class<?> levelCallbackType = callbacksField.getType();
-            String levelCallbackDesc = MPLType.getDescriptor(levelCallbackType);
-            String bkcCallbackDesc = MPLType.getDescriptor(LevelCallbackHandler.class);
-
-            ExtendedClassWriter<Object> cw = ExtendedClassWriter.builder(levelCallbackType)
-                    .setFlags(ClassWriter.COMPUTE_MAXS)
-                    .setExactName(EntityAddRemoveHandler_1_17.class.getName() + "$Hook")
-                    .build();
-
-            FieldVisitor fv;
-            MethodVisitor mv;
-
-            // Add field with the base instance
-            {
-                fv = cw.visitField(ACC_PUBLIC | ACC_FINAL, "base", levelCallbackDesc, null, null);
-                fv.visitEnd();
-            }
-
-            // Add field with the callback instance
-            {
-                fv = cw.visitField(ACC_PUBLIC | ACC_FINAL, "callback", bkcCallbackDesc, null, null);
-                fv.visitEnd();
-            }
-
-            // Add constructor initializing the base instance and the callback handler instance
-            {
-                mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(" + levelCallbackDesc + bkcCallbackDesc + ")V", null, null);
-                mv.visitCode();
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, 1);
-                mv.visitFieldInsn(PUTFIELD, cw.getInternalName(), "base", levelCallbackDesc);
-                mv.visitVarInsn(ALOAD, 0);
-                mv.visitVarInsn(ALOAD, 2);
-                mv.visitFieldInsn(PUTFIELD, cw.getInternalName(), "callback", bkcCallbackDesc);
-                mv.visitInsn(RETURN);
-                mv.visitMaxs(0, 0);
-                mv.visitEnd();
-            }
-
-            // Override all methods defined by the interface that must be implemented
-            for (Method method : levelCallbackType.getMethods()) {
-                String name = MPLType.getName(method);
-                Class<?>[] params = method.getParameterTypes();
-                final String callbackMethodName;
-                if (name.equals("b") && params.length == 1 && params[0] == Object.class) {
-                    callbackMethodName = "onEntityAdded";
-                } else if (name.equals("a") && params.length == 1 && params[0] == Object.class) {
-                    callbackMethodName = "onEntityRemoved";
-                } else {
-                    callbackMethodName = null;
-                }
-
-                mv = cw.visitMethod(ACC_PUBLIC, MPLType.getName(method), MPLType.getMethodDescriptor(method), null, null);
-                mv.visitCode();
-                
-                if (callbackMethodName != null) {
-                    // Locate the Method instance in the callback class we're going to be calling
-                    // This shouldn't ever fail.
-                    Method callbackMethod = Stream.of(LevelCallbackHandler.class.getMethods())
-                            .filter(m -> m.getName().equals(callbackMethodName))
-                            .findFirst().get();
-
-                    // Call the base method, store any return value in a temporary value on the stack
-                    mv.visitVarInsn(ALOAD, 0);
-                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "base", levelCallbackDesc);
-                    int reg = MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
-                    ExtendedClassWriter.visitInvoke(mv, levelCallbackType, method);
-                    if (method.getReturnType() != void.class) {
-                        mv.visitVarInsn(MPLType.getOpcode(method.getReturnType(), ISTORE), reg);
-                    }
-
-                    // Then call our callback hook with the input arguments, discard return value
-                    mv.visitVarInsn(ALOAD, 0);
-                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "callback", bkcCallbackDesc);
-                    MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
-                    ExtendedClassWriter.visitInvoke(mv, LevelCallbackHandler.class, callbackMethod);
-
-                    // Finally, return the original return value of the base method (if any)
-                    if (method.getReturnType() != void.class) {
-                        mv.visitVarInsn(MPLType.getOpcode(method.getReturnType(), ILOAD), reg);
-                    }
-                } else {
-                    // Call base method directly
-                    mv.visitVarInsn(ALOAD, 0);
-                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "base", levelCallbackDesc);
-                    MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
-                    ExtendedClassWriter.visitInvoke(mv, levelCallbackType, method);
-                }
-                mv.visitInsn(MPLType.getOpcode(method.getReturnType(), IRETURN));
-                mv.visitMaxs(0, 0);
-                mv.visitEnd();
-            }
-
-            // Generate!
-            hookType = cw.generate();
-        } catch (Throwable t) {
-            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize level hook callback proxy class", t);
-        }
-        this.levelCallbackHookType = hookType;
+        this.chunkEntitiesLoadedHandler = new ChunkEntitiesLoadedUsingHookHandler(sectionManagerClass);
+        this.levelCallbackHookType = generateLevelCallbackHookType(callbacksField);
     }
 
     @Override
@@ -196,6 +98,12 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
         for (LevelCallbackHandler hook : hooks) {
             hook.processEvents();
         }
+    }
+
+    @Override
+    public void onEnabled(CommonPlugin plugin) {
+        super.onEnabled(plugin);
+        this.chunkEntitiesLoadedHandler.enable(this, plugin);
     }
 
     @Override
@@ -212,6 +120,8 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to instantiate a level hook callback", t);
             }
         }
+
+        this.chunkEntitiesLoadedHandler.hook(this, world, sectionManager);
     }
 
     @Override
@@ -231,6 +141,8 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
                 callbacksField.set(sectionManager, base);
             }
         }
+
+        this.chunkEntitiesLoadedHandler.unhook(this, world, sectionManager);
     }
 
     /**
@@ -294,7 +206,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             }
         }
 
-        Object newEntityRaw = Handle.getRaw(oldEntity);
+        Object newEntityRaw = Handle.getRaw(newEntity);
         if (world != null) {
             removeHandler.replaceInWorldStorage(world.getRaw(), oldEntity.getRaw(), newEntityRaw);
         }
@@ -358,6 +270,111 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             }
         }
         return false;
+    }
+
+    private static Class<?> generateLevelCallbackHookType(FastField<Object> callbacksField) {
+        try {
+            Class<?> levelCallbackType = callbacksField.getType();
+            String levelCallbackDesc = MPLType.getDescriptor(levelCallbackType);
+            String bkcCallbackDesc = MPLType.getDescriptor(LevelCallbackHandler.class);
+
+            ExtendedClassWriter<Object> cw = ExtendedClassWriter.builder(levelCallbackType)
+                    .setFlags(ClassWriter.COMPUTE_MAXS)
+                    .setExactName(EntityAddRemoveHandler_1_17.class.getName() + "$Hook")
+                    .build();
+
+            FieldVisitor fv;
+            MethodVisitor mv;
+
+            // Add field with the base instance
+            {
+                fv = cw.visitField(ACC_PUBLIC | ACC_FINAL, "base", levelCallbackDesc, null, null);
+                fv.visitEnd();
+            }
+
+            // Add field with the callback instance
+            {
+                fv = cw.visitField(ACC_PUBLIC | ACC_FINAL, "callback", bkcCallbackDesc, null, null);
+                fv.visitEnd();
+            }
+
+            // Add constructor initializing the base instance and the callback handler instance
+            {
+                mv = cw.visitMethod(ACC_PUBLIC, "<init>", "(" + levelCallbackDesc + bkcCallbackDesc + ")V", null, null);
+                mv.visitCode();
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitVarInsn(ALOAD, 1);
+                mv.visitFieldInsn(PUTFIELD, cw.getInternalName(), "base", levelCallbackDesc);
+                mv.visitVarInsn(ALOAD, 0);
+                mv.visitVarInsn(ALOAD, 2);
+                mv.visitFieldInsn(PUTFIELD, cw.getInternalName(), "callback", bkcCallbackDesc);
+                mv.visitInsn(RETURN);
+                mv.visitMaxs(0, 0);
+                mv.visitEnd();
+            }
+
+            // Override all methods defined by the interface that must be implemented
+            for (Method method : levelCallbackType.getMethods()) {
+                String name = MPLType.getName(method);
+                Class<?>[] params = method.getParameterTypes();
+                final String callbackMethodName;
+                if (name.equals("b") && params.length == 1 && params[0] == Object.class) {
+                    callbackMethodName = "onEntityAdded";
+                } else if (name.equals("a") && params.length == 1 && params[0] == Object.class) {
+                    callbackMethodName = "onEntityRemoved";
+                } else {
+                    callbackMethodName = null;
+                }
+
+                mv = cw.visitMethod(ACC_PUBLIC, MPLType.getName(method), MPLType.getMethodDescriptor(method), null, null);
+                mv.visitCode();
+
+                if (callbackMethodName != null) {
+                    // Locate the Method instance in the callback class we're going to be calling
+                    // This shouldn't ever fail.
+                    Method callbackMethod = Stream.of(LevelCallbackHandler.class.getMethods())
+                            .filter(m -> m.getName().equals(callbackMethodName))
+                            .findFirst().get();
+
+                    // Call the base method, store any return value in a temporary value on the stack
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "base", levelCallbackDesc);
+                    int reg = MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
+                    ExtendedClassWriter.visitInvoke(mv, levelCallbackType, method);
+                    if (method.getReturnType() != void.class) {
+                        mv.visitVarInsn(MPLType.getOpcode(method.getReturnType(), ISTORE), reg);
+                    }
+
+                    // Then call our callback hook with the input arguments, discard return value
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "callback", bkcCallbackDesc);
+                    MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
+                    ExtendedClassWriter.visitInvoke(mv, LevelCallbackHandler.class, callbackMethod);
+
+                    // Finally, return the original return value of the base method (if any)
+                    if (method.getReturnType() != void.class) {
+                        mv.visitVarInsn(MPLType.getOpcode(method.getReturnType(), ILOAD), reg);
+                    }
+                } else {
+                    // Call base method directly
+                    mv.visitVarInsn(ALOAD, 0);
+                    mv.visitFieldInsn(GETFIELD, cw.getInternalName(), "base", levelCallbackDesc);
+                    MPLType.visitVarILoad(mv, 1, method.getParameterTypes());
+                    ExtendedClassWriter.visitInvoke(mv, levelCallbackType, method);
+                }
+                mv.visitInsn(MPLType.getOpcode(method.getReturnType(), IRETURN));
+                mv.visitMaxs(0, 0);
+                mv.visitEnd();
+            }
+
+            // Generate!
+            return cw.generate();
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize level hook callback proxy class", t);
+            return null;
+        }
     }
 
     @Template.Optional
@@ -501,5 +518,111 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          */
         @Template.Generated("%REPLACE_IN_SECTION_STORAGE%")
         public abstract void replaceInSectionStorage(Object oldEntity, Object newEntity);
+    }
+
+    /**
+     * Handler for detecting when a chunk of entities is loaded
+     */
+    private static interface ChunkEntitiesLoadedHandler {
+        void enable(EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin);
+        void hook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager);
+        void unhook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager);
+    }
+
+    /**
+     * Injects itself into the chunkLoadStatuses Int2ObjectMap to listen for put events,
+     * to detect when a chunk has its entities loaded.
+     */
+    private static class ChunkEntitiesLoadedUsingHookHandler implements ChunkEntitiesLoadedHandler {
+        private final FastField<Object> chunkLoadStatusesField = new FastField<Object>();
+
+        public ChunkEntitiesLoadedUsingHookHandler(Class<?> sectionManagerClass) {
+            // Initialize the chunkLoadStatuses field of PersistentEntitySectionManager
+            try {
+                String fieldName = Resolver.resolveFieldName(sectionManagerClass, "chunkLoadStatuses");
+                chunkLoadStatusesField.init(sectionManagerClass.getDeclaredField(fieldName));
+                if (!CommonUtil.getClass("it.unimi.dsi.fastutil.longs.Long2ObjectMap").equals(chunkLoadStatusesField.getType())) {
+                    throw new IllegalStateException("Field not assignable to Long2ObjectMap");
+                }
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize PersistentEntitySectionManager chunkLoadStatuses field: " + t.getMessage(), t);
+                chunkLoadStatusesField.initUnavailable("chunkLoadStatuses field not found");
+            }
+        }
+
+        @Override
+        public void enable(EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin) {
+        }
+
+        @Override
+        public void hook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
+            Object chunkLoadStatuses = chunkLoadStatusesField.get(sectionManager);
+            if (ClassHook.get(chunkLoadStatuses, ChunkLoadStatusHook.class) == null) {
+                ChunkLoadStatusHook hook = new ChunkLoadStatusHook(handler, world);
+                chunkLoadStatusesField.set(sectionManager, hook.hook(chunkLoadStatuses));
+            }
+        }
+
+        @Override
+        public void unhook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
+            Object chunkLoadStatuses = chunkLoadStatusesField.get(sectionManager);
+            if (ClassHook.get(chunkLoadStatuses, ChunkLoadStatusHook.class) != null) {
+                chunkLoadStatusesField.set(sectionManager, ClassHook.unhook(chunkLoadStatuses));
+            }
+        }
+
+        /**
+         * Hooks the "chunkLoadStatuses" field in PersistentEntitySectionManager to listen
+         * for when a chunk is officially fully loaded with entities
+         */
+        public static class ChunkLoadStatusHook extends ClassHook<ChunkLoadStatusHook> {
+            private final EntityAddRemoveHandler_1_17 handler;
+            private final World world;
+
+            public ChunkLoadStatusHook(EntityAddRemoveHandler_1_17 handler, World world) {
+                this.handler = handler;
+                this.world = world;
+            }
+
+            @ClassHook.HookMethod("public V put(long key, V value)")
+            public void onPut(Object rawKey, Object value) {
+                base.onPut(rawKey, value);
+
+                if (value.toString().equals("LOADED")) {
+                    long key = ((Long) rawKey).longValue();
+                    int cx = (int) (key & 0xFFFFFFFFL);
+                    int cz = (int) (key >>> 32 & 0xFFFFFFFFL);
+                    Chunk chunk = WorldUtil.getChunk(world, cx, cz);
+                    if (chunk != null) {
+                        this.handler.notifyChunkEntitiesLoaded(chunk);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Listens for the newly added ChunkEntitiesLoaded event in Spigot/Paper to detect
+     * when entities are loaded
+     */
+    private static class ChunkEntitiesLoadedUsingEventHandler implements ChunkEntitiesLoadedHandler {
+
+        @Override
+        public void enable(EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void hook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
+            // TODO Auto-generated method stub
+            
+        }
+
+        @Override
+        public void unhook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
+            // TODO Auto-generated method stub
+            
+        }
     }
 }
