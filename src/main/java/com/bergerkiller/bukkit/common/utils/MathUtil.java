@@ -281,7 +281,8 @@ public class MathUtil {
      * @return ceiling value
      */
     public static int ceil(double value) {
-        return -floor(-value);
+        int i = (int) value;
+        return value > (double) i ? i + 1 : i;
     }
 
     /**
@@ -291,7 +292,8 @@ public class MathUtil {
      * @return ceiling value
      */
     public static int ceil(float value) {
-        return -floor(-value);
+        int i = (int) value;
+        return value > (float) i ? i + 1 : i;
     }
 
     /**
