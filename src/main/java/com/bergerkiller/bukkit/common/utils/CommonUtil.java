@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.StackTraceFilter;
+import com.bergerkiller.bukkit.common.bases.CheckedRunnable;
 import com.bergerkiller.bukkit.common.config.BasicConfiguration;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -35,7 +36,6 @@ import org.bukkit.plugin.SimplePluginManager;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
@@ -637,6 +637,48 @@ public class CommonUtil {
      */
     public static CompletableFuture<Void> runAsyncMainThread(Runnable runnable) {
         return CompletableFuture.runAsync(runnable, CommonNextTickExecutor.MAIN_THREAD);
+    }
+
+    /**
+     * Equivalent of {@link CompletableFuture#runAsync(Runnable)} but allows throwing of
+     * checked exceptions inside the method to be executed
+     *
+     * @param runnable
+     * @return completable future
+     */
+    public static CompletableFuture<Void> runCheckedAsync(CheckedRunnable runnable) {
+        //TODO: Technically should use some ForkJoinPool madness, but meh. Screw it.
+        final CompletableFuture<Void> future = new CompletableFuture<Void>();
+        CompletableFuture.runAsync(() -> {
+            try {
+                runnable.run();
+                future.complete(null);
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        });
+        return future;
+    }
+
+    /**
+     * Equivalent of {@link CompletableFuture#runAsync(Runnable, Executor)} but allows throwing of
+     * checked exceptions inside the method to be executed
+     *
+     * @param runnable
+     * @return completable future
+     */
+    public static CompletableFuture<Void> runCheckedAsync(CheckedRunnable runnable, Executor executor) {
+        //TODO: Technically should use some ForkJoinPool madness, but meh. Screw it.
+        final CompletableFuture<Void> future = new CompletableFuture<Void>();
+        CompletableFuture.runAsync(() -> {
+            try {
+                runnable.run();
+                future.complete(null);
+            } catch (Throwable t) {
+                future.completeExceptionally(t);
+            }
+        }, executor);
+        return future;
     }
 
     /**

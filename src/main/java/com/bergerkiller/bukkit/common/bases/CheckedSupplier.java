@@ -1,10 +1,11 @@
 package com.bergerkiller.bukkit.common.bases;
 
 /**
- * Supplier that can throw an exception
+ * Supplier that can throw a checked exception
  * 
  * @param <T>
  */
+@FunctionalInterface
 public interface CheckedSupplier<T> {
 
     /**
