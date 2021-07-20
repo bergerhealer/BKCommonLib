@@ -49,16 +49,16 @@
             <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
         </repository>
 
-        <!-- Repository for Vault API -->
+        <!-- Jitpack Repository for Vault API -->
         <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
         </repository>
 
         <!-- Repository for the ProtocolLib API -->
         <repository>
             <id>dmulloy2-repo</id>
-            <url>http://repo.dmulloy2.net/nexus/repository/releases/</url>
+            <url>https://repo.dmulloy2.net/nexus/repository/public</url>
         </repository>
 
         <!-- Repository for aikar's timings library -->
@@ -178,7 +178,7 @@
         <!-- Provided dependencies -->
         <!-- Vault hook -->
         <dependency>
-            <groupId>net.milkbowl.vault</groupId>
+            <groupId>com.github.MilkBowl</groupId>
             <artifactId>VaultAPI</artifactId>
             <version>1.7</version>
             <scope>provided</scope>
