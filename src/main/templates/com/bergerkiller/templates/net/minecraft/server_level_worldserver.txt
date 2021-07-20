@@ -35,7 +35,7 @@ class WorldServer extends World {
 #else
     // Note: is List<EntityHuman> on 1.13.2 and before, but only stores players, so this is safe.
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers() {
-        return ((World)instance).players;
+        return ((net.minecraft.world.level.World)instance).players;
     }
 #endif
 
@@ -307,11 +307,11 @@ class WorldServer extends World {
     }
 #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldEntityList entityList
     public (Iterable<org.bukkit.entity.Entity>) com.destroystokyo.paper.PaperWorldEntityList getEntities() {
-        return ((World)instance).entityList;
+        return ((net.minecraft.world.level.World)instance).entityList;
     }
 #else
     public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities() {
-        return ((World)instance).entityList;
+        return ((net.minecraft.world.level.World)instance).entityList;
     }
 #endif
 
@@ -375,7 +375,7 @@ class WorldServer extends World {
   #if version >= 1.13
         BlockPosition result = EntityHuman.getBed((IBlockAccess) instance, blockposition, alsoWhenDestroyed);
   #else
-        BlockPosition result = EntityHuman.getBed((World) instance, blockposition, alsoWhenDestroyed);
+        BlockPosition result = EntityHuman.getBed((net.minecraft.world.level.World) instance, blockposition, alsoWhenDestroyed);
   #endif
         if (result == null) {
             return null;

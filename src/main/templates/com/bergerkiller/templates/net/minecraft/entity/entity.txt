@@ -629,6 +629,28 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 
     public optional void setLoadedInWorld_pre_1_17:###(boolean loaded);
+
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
+    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+  #else
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
+        net.minecraft.world.level.entity.EntityInLevelCallback callback = instance#levelCallback;
+        if (callback == net.minecraft.world.level.entity.EntityInLevelCallback.NULL) {
+            return null;
+        }
+
+        // Read the x/y/z long chunk coordinates from the entry
+        #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private long currentSectionKey;
+        long coordKey = callback#currentSectionKey;
+
+        // Convert to chunk x/z coordinates
+        int chunkX = SectionPosition.b(coordKey);
+        //int chunkY = SectionPosition.c(coordKey);
+        int chunkZ = SectionPosition.d(coordKey);
+        return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
+    }
+  #endif
 #else
   #if version >= 1.13
     #require net.minecraft.world.entity.Entity public boolean isLoaded:inChunk;
@@ -726,6 +748,34 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public optional void setLoadedInWorld_pre_1_17(boolean loaded) {
         instance#isLoaded = loaded;
     }
+
+  #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
+    public (org.bukkit.Chunk) Chunk getCurrentChunk();
+  #elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        if (!instance.inChunk) {
+            return null;
+        }
+    #if version >= 1.16
+        return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+    #elseif exists net.minecraft.world.level.World public net.minecraft.world.level.chunk.Chunk getChunkIfLoaded(int x, int z);
+        return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
+    #else
+        return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
+    #endif
+    }
+  #else
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        boolean isLoaded = instance#isLoaded;
+        if (!isLoaded) {
+            return null;
+        }
+
+        int chunkX = instance#chunkX;
+        int chunkZ = instance#chunkZ;
+        return instance.world.getChunkIfLoaded(chunkX, chunkZ);
+    }
+  #endif
 #endif
 
 #if version >= 1.14
@@ -955,50 +1005,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean positionChanged:impulse;
 #else
     public boolean positionChanged:ai;
-#endif
-
-#if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
-    public (org.bukkit.Chunk) Chunk getCurrentChunk();
-#elseif version >= 1.17
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
-        #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
-        net.minecraft.world.level.entity.EntityInLevelCallback callback = instance#levelCallback;
-        if (callback == net.minecraft.world.level.entity.EntityInLevelCallback.NULL) {
-            return null;
-        }
-
-        // Read the x/y/z long chunk coordinates from the entry
-        #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private long currentSectionKey;
-        long coordKey = callback#currentSectionKey;
-
-        // Convert to chunk x/z coordinates
-        int chunkX = SectionPosition.b(coordKey);
-        //int chunkY = SectionPosition.c(coordKey);
-        int chunkZ = SectionPosition.d(coordKey);
-        return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
-    }
-#elseif version >= 1.13 && exists net.minecraft.world.entity.Entity public int chunkX;
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
-        if (!instance.inChunk) {
-            return null;
-        }
-  #if version >= 1.16
-        return ((WorldServer) instance.world).getChunkIfLoaded(instance.chunkX, instance.chunkZ);
-  #elseif exists net.minecraft.world.level.World public net.minecraft.world.level.chunk.Chunk getChunkIfLoaded(int x, int z);
-        return instance.world.getChunkIfLoaded(instance.chunkX, instance.chunkZ);
-  #else
-        return ((ChunkProviderServer) instance.world.getChunkProvider()).getChunkAt(instance.chunkX, instance.chunkZ, false);
-  #endif
-    }
-#else
-    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
-        if (!com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.isLoaded.getBoolean(instance)) {
-            return null;
-        }
-        int chunkX = com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkX.getInteger(instance);
-        int chunkZ = com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle.T.chunkZ.getInteger(instance);
-        return instance.world.getChunkIfLoaded(chunkX, chunkZ);
-    }
 #endif
 
     public int portalCooldown;

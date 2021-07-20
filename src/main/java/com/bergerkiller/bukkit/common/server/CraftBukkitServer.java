@@ -26,9 +26,10 @@ import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 
 public class CraftBukkitServer extends CommonServerBase implements FieldNameResolver, FieldAliasResolver, ClassPathResolver {
-    private static final String CB_ROOT = "org.bukkit.craftbukkit";
-    private static final String NM_ROOT = "net.minecraft";
-    private static final String NMS_ROOT = "net.minecraft.server";
+    private static final String PACKAGE_CB_ROOT = "org.bukkit.craftbukkit";
+    private static final String PACKAGE_NMS_ROOT = "net.minecraft.server";
+    private static final String CB_ROOT = "org.bukkit.craftbukkit.";
+    private static final String NM_ROOT = "net.minecraft.";
 
     /**
      * Defines the Package Version
@@ -84,17 +85,17 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
         if (!serverPath.startsWith(CB_ROOT)) {
             return false;
         }
-        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(CB_ROOT.length() + 1), ".");
+        PACKAGE_VERSION = StringUtil.getBefore(serverPath.substring(CB_ROOT.length()), ".");
 
         // Obtain the versioned roots
         if (PACKAGE_VERSION.isEmpty()) {
-            NMS_ROOT_VERSIONED = NMS_ROOT;
-            CB_ROOT_VERSIONED = CB_ROOT;
+            NMS_ROOT_VERSIONED = PACKAGE_NMS_ROOT;
+            CB_ROOT_VERSIONED = PACKAGE_CB_ROOT;
         } else {
-            NMS_ROOT_VERSIONED = NMS_ROOT + "." + PACKAGE_VERSION;
-            CB_ROOT_VERSIONED = CB_ROOT + "." + PACKAGE_VERSION;
+            NMS_ROOT_VERSIONED = PACKAGE_NMS_ROOT + "." + PACKAGE_VERSION;
+            CB_ROOT_VERSIONED = PACKAGE_CB_ROOT + "." + PACKAGE_VERSION;
         }
-        CB_ROOT_LIBS = CB_ROOT + ".libs";
+        CB_ROOT_LIBS = PACKAGE_CB_ROOT + ".libs";
 
         // Figure out the MC version from the server
         MC_VERSION = PACKAGE_VERSION;
@@ -158,7 +159,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
 
         // Remap org.bukkit.craftbukkit to the right package-versioned path
         if (path.startsWith(CB_ROOT) && !path.startsWith(CB_ROOT_VERSIONED) && !path.startsWith(CB_ROOT_LIBS)) {
-            path = CB_ROOT_VERSIONED + path.substring(CB_ROOT.length());
+            path = CB_ROOT_VERSIONED + path.substring(PACKAGE_CB_ROOT.length());
         }
 
         // Remap net.minecraft to net.minecraft.server.<package_version> on pre-1.17
@@ -224,7 +225,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
             // Find getVersion() method using reflection
             Class<?> minecraftServerType;
             try {
-                minecraftServerType = loadClass(NMS_ROOT + ".MinecraftServer");
+                minecraftServerType = loadClass(PACKAGE_NMS_ROOT + ".MinecraftServer");
             } catch (ClassNotFoundException ex) {
                 minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
             }
