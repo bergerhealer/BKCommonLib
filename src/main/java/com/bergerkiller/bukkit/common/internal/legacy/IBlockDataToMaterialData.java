@@ -543,7 +543,7 @@ public class IBlockDataToMaterialData {
         // Rails can be waterlogged since 1.17
         if (Common.evaluateMCVersion(">=", "1.17")) {
             // Standard rail - which supports curves
-            new RailMaterialDataBuilder<org.bukkit.material.Rails>("RAIL", true) {
+            new RailMaterialDataBuilder<org.bukkit.material.Rails>("RAIL") {
                 @Override
                 public org.bukkit.material.Rails create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                     return new org.bukkit.material.Rails(legacy_data_type, legacy_data_value);
@@ -551,22 +551,37 @@ public class IBlockDataToMaterialData {
             }.build();
 
             // Special types of rail that do not support curves
-            new RailMaterialDataBuilder<org.bukkit.material.DetectorRail>("DETECTOR_RAIL", false) {
+            new RailMaterialDataBuilder<org.bukkit.material.DetectorRail>("DETECTOR_RAIL") {
                 @Override
                 public org.bukkit.material.DetectorRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                     return new org.bukkit.material.DetectorRail(legacy_data_type, legacy_data_value);
                 }
+
+                @Override
+                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.DetectorRail rails) {
+                    return iblockdata.set("powered", rails.isPressed());
+                }
             }.build();
-            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("POWERED_RAIL", false) {
+            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("POWERED_RAIL") {
                 @Override
                 public org.bukkit.material.PoweredRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                     return new org.bukkit.material.PoweredRail(legacy_data_type, legacy_data_value);
                 }
+
+                @Override
+                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.PoweredRail rails) {
+                    return iblockdata.set("powered", rails.isPowered());
+                }
             }.build();
-            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("ACTIVATOR_RAIL", false) {
+            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("ACTIVATOR_RAIL") {
                 @Override
                 public org.bukkit.material.PoweredRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
                     return new org.bukkit.material.PoweredRail(legacy_data_type, legacy_data_value);
+                }
+
+                @Override
+                protected IBlockDataHandle apply(IBlockDataHandle iblockdata, org.bukkit.material.PoweredRail rails) {
+                    return iblockdata.set("powered", rails.isPowered());
                 }
             }.build();
         }
@@ -665,13 +680,17 @@ public class IBlockDataToMaterialData {
 
     private static abstract class RailMaterialDataBuilder<T extends org.bukkit.material.Rails> extends CustomMaterialDataBuilder<T> {
 
-        public RailMaterialDataBuilder(String materialName, boolean hasCurves) {
+        public RailMaterialDataBuilder(String materialName) {
             this.setTypes(materialName);
-            if (hasCurves) {
-                this.setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+            if (materialName.equals("RAIL")) {
+                this.setDataValues(0,1,2,3,4,5,6,7,8,9);
             } else {
                 this.setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13);
             }
+        }
+
+        protected IBlockDataHandle apply(IBlockDataHandle iblockdata, T rails) {
+            return iblockdata;
         }
 
         @Override
@@ -688,6 +707,7 @@ public class IBlockDataToMaterialData {
                 // Curves
                 base = iblockdata.set("shape", dir.getOppositeFace().name().toLowerCase(Locale.ENGLISH));
             }
+            base = apply(base, rails);
 
             //= iblockdata.set("rotation", sign.getData());
             return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
