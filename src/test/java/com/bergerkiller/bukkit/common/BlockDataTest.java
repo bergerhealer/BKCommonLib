@@ -130,6 +130,57 @@ public class BlockDataTest {
     }
 
     @Test
+    public void testWaterloggedRails() {
+        if (!Common.evaluateMCVersion(">=", "1.17")) {
+            return;
+        }
+
+        String[] shapes = new String[] {
+                "north_south", "east_west",
+                "ascending_east","ascending_west",
+                "ascending_north", "ascending_south",
+                "south_east", "south_west",
+                "north_west" ,"north_east"};
+        BlockFace[] directions = new BlockFace[] {
+                BlockFace.SOUTH, BlockFace.EAST,
+                BlockFace.EAST, BlockFace.WEST,
+                BlockFace.NORTH, BlockFace.SOUTH,
+                BlockFace.NORTH_WEST, BlockFace.NORTH_EAST,
+                BlockFace.SOUTH_EAST, BlockFace.SOUTH_WEST};
+
+        Material material;
+        BlockData d;
+        for (boolean waterlogged : new boolean[] { false, true }) {
+            material = MaterialUtil.getMaterial("RAIL");
+            d = BlockData.fromMaterial(material);
+            d = d.setState("waterlogged", waterlogged);
+
+            for (String railMaterialName : new String[] {
+                    "RAIL", "DETECTOR_RAIL", "POWERED_RAIL", "ACTIVATOR_RAIL"
+            }) {
+                material = MaterialUtil.getMaterial(railMaterialName);
+                d = BlockData.fromMaterial(material);
+                d = d.setState("waterlogged", waterlogged);
+
+                // Skip curve values for non-curvable rails
+                int shapeLim = railMaterialName.equals("RAIL") ? shapes.length : (shapes.length - 4);
+
+                // Check all possible shapes
+                for (int i = 0; i < shapeLim; i++) {
+                    d = d.setState("shape", shapes[i]);
+                    org.bukkit.material.Rails rail = (org.bukkit.material.Rails) d.getMaterialData();
+                    assertEquals("BlockData " + d + " expected direction = " + directions[i] +
+                            " but was " + rail.getDirection(), directions[i], rail.getDirection());
+                    boolean isSlope = shapes[i].contains("ascending");
+                    if (isSlope != rail.isOnSlope()) {
+                        fail("BlockData " + d + " expected isSlope = " + isSlope + " but was " + rail.isOnSlope());
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
     @SuppressWarnings("deprecation")
     public void testBlockData() {
         for (Material mat : getAllMaterials()) {

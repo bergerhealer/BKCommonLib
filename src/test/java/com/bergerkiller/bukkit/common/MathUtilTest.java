@@ -19,6 +19,18 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class MathUtilTest {
 
     @Test
+    public void lol() {
+        double a = 0.5;
+        double f = 1.0;
+        
+        double factor = a;
+        
+        factor = Math.max(0.0, 1.0 + f * (factor - 1.0));
+
+        System.out.println(factor);
+    }
+    
+    @Test
     public void testMatrixRotation() {
         Matrix4x4 transform = new Matrix4x4();
         transform.translateRotate(2.0, 3.0, 4.0, -12.0f, 34.0f);

@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -538,6 +539,37 @@ public class IBlockDataToMaterialData {
              .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
              .build();
         }
+
+        // Rails can be waterlogged since 1.17
+        if (Common.evaluateMCVersion(">=", "1.17")) {
+            // Standard rail - which supports curves
+            new RailMaterialDataBuilder<org.bukkit.material.Rails>("RAIL", true) {
+                @Override
+                public org.bukkit.material.Rails create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.Rails(legacy_data_type, legacy_data_value);
+                }
+            }.build();
+
+            // Special types of rail that do not support curves
+            new RailMaterialDataBuilder<org.bukkit.material.DetectorRail>("DETECTOR_RAIL", false) {
+                @Override
+                public org.bukkit.material.DetectorRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.DetectorRail(legacy_data_type, legacy_data_value);
+                }
+            }.build();
+            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("POWERED_RAIL", false) {
+                @Override
+                public org.bukkit.material.PoweredRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.PoweredRail(legacy_data_type, legacy_data_value);
+                }
+            }.build();
+            new RailMaterialDataBuilder<org.bukkit.material.PoweredRail>("ACTIVATOR_RAIL", false) {
+                @Override
+                public org.bukkit.material.PoweredRail create(Material material_type, Material legacy_data_type, byte legacy_data_value) {
+                    return new org.bukkit.material.PoweredRail(legacy_data_type, legacy_data_value);
+                }
+            }.build();
+        }
     }
 
     private static void storeMaterialDataGen(String legacyTypeName, int data_start, int data_end) {
@@ -628,6 +660,37 @@ public class IBlockDataToMaterialData {
         for (String typeName : typeNames) {
             Material type = MaterialsByName.getMaterial(typeName);
             if (type != null) materialdata_builders.put(type, builder);
+        }
+    }
+
+    private static abstract class RailMaterialDataBuilder<T extends org.bukkit.material.Rails> extends CustomMaterialDataBuilder<T> {
+
+        public RailMaterialDataBuilder(String materialName, boolean hasCurves) {
+            this.setTypes(materialName);
+            if (hasCurves) {
+                this.setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15);
+            } else {
+                this.setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13);
+            }
+        }
+
+        @Override
+        public List<IBlockDataHandle> createStates(IBlockDataHandle iblockdata, T rails) {
+            IBlockDataHandle base;
+            BlockFace dir = rails.getDirection();
+            if (rails.isOnSlope()) {
+                base = iblockdata.set("shape", "ascending_" + dir.name().toLowerCase(Locale.ENGLISH));
+            } else if (dir == BlockFace.NORTH || dir == BlockFace.SOUTH) {
+                base = iblockdata.set("shape", "north_south");
+            } else if (dir == BlockFace.EAST || dir == BlockFace.WEST) {
+                base = iblockdata.set("shape", "east_west");
+            } else {
+                // Curves
+                base = iblockdata.set("shape", dir.getOppositeFace().name().toLowerCase(Locale.ENGLISH));
+            }
+
+            //= iblockdata.set("rotation", sign.getData());
+            return Arrays.asList(base.set("waterlogged", false), base.set("waterlogged", true));
         }
     }
 
