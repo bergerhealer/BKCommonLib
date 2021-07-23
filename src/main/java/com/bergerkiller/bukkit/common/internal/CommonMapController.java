@@ -655,7 +655,7 @@ public class CommonMapController implements PacketListener, Listener {
                 return; // no information available or not an item frame
             }
 
-            // frameInfo.updateItem(); // Asynchronous access breaks things
+            frameInfo.updateItem(); // Asynchronous access breaks things, but not doing this results in blank maps on join
             if (frameInfo.lastMapUUID == null) {
                 return; // not a map
             }
