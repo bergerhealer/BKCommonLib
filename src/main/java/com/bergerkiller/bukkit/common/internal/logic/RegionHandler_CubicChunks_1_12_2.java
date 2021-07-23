@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -153,16 +154,39 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         BitSet chunks = new BitSet();
         Object worldHandle = HandleConversion.toWorldHandle(world);
         Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
-        for (Object regionProvider : handle.getRegionProviders(chunkProviderServer)) {
-            // Got to check all 8 16x16x16 areas inside this region
-            applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy,      base_cz);
-            applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy,      base_cz);
-            applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy,      base_cz+16);
-            applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy,      base_cz+16);
-            applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy + 16, base_cz);
-            applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy + 16, base_cz);
-            applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy + 16, base_cz+16);
-            applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy + 16, base_cz+16);
+        List<Object> regionProviderList = handle.getRegionProviders(chunkProviderServer);
+        if (regionProviderList != null) {
+            // Region format and we can efficiently query the chunks inside a region
+            for (Object regionProvider : regionProviderList) {
+                // Got to check all 8 16x16x16 areas inside this region
+                applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy,      base_cz);
+                applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy,      base_cz);
+                applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy,      base_cz+16);
+                applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy,      base_cz+16);
+                applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy + 16, base_cz);
+                applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy + 16, base_cz);
+                applyChunksToBitset(chunks, regionProvider, base_cx,    base_cy + 16, base_cz+16);
+                applyChunksToBitset(chunks, regionProvider, base_cx+16, base_cy + 16, base_cz+16);
+            }
+        } else {
+            // Fallback that depends heavily on the chunkExists API of a custom ICubicStorage provider
+            for (int rel_cz = 0; rel_cz < 32; rel_cz++) {
+                for (int rel_cx = 0; rel_cx < 32; rel_cx++) {
+                    int cx = base_cx + rel_cx;
+                    int cz = base_cz + rel_cz;
+                    boolean regionHasCubes = false;
+                    for (int rel_cy = 0; rel_cy < 32; rel_cy++) {
+                        if (handle.cubeExists(chunkProviderServer, cx, base_cy + rel_cy, cz)) {
+                            regionHasCubes = true;
+                            break;
+                        }
+                    }
+                    if (regionHasCubes) {
+                        int index = (rel_cz << 5) | rel_cx;
+                        chunks.set(index);
+                    }
+                }
+            }
         }
 
         return chunks;
@@ -279,6 +303,7 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.AsyncBatchingCubeIO")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.RegionCubeIO")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.RegionCubeStorage")
     @Template.Import("cubicchunks.regionlib.api.region.IRegionProvider")
     @Template.Import("cubicchunks.regionlib.impl.save.SaveSection3D")
     @Template.Import("cubicchunks.regionlib.impl.SaveCubeColumns")
@@ -349,9 +374,26 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
          * <GET_REGION_PROVIDERS>
          * public static List<Object> forRegion(io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal.Server provider) {
          *     ICubeIO cubeIO = provider.getCubeIO();
+         * 
+         * #if exists io.github.opencubicchunks.cubicchunks.api.world.storage.ICubicStorage
+         *     // ICubicStorage API
+         *     if (!(cubeIO instanceof AsyncBatchingCubeIO)) {
+         *         return null; // signal not supported
+         *     }
+         *     ICubicStorage storage = ((AsyncBatchingCubeIO) cubeIO).getStorage();
+         *     if (!(storage instanceof RegionCubeStorage)) {
+         *         return null; // signal not supported
+         *     }
+         *     RegionCubeStorage regionCubeStorage = (RegionCubeStorage) storage;
+         *     #require io.github.opencubicchunks.cubicchunks.core.server.chunkio.RegionCubeStorage private cubicchunks.regionlib.impl.SaveCubeColumns save;
+         *     SaveCubeColumns columns = regionCubeStorage#save;
+         * #else
+         *     // Legacy
          *     RegionCubeIO regionCubeIO = (RegionCubeIO) cubeIO;
          *     #require RegionCubeIO private SaveCubeColumns getSave();
          *     SaveCubeColumns columns = regionCubeIO#getSave();
+         * #endif
+         * 
          *     SaveSection3D saveSection = columns.getSaveSection3D();
          *     #require cubicchunks.regionlib.api.storage.SaveSection private final java.util.List<IRegionProvider> regionProviders;
          *     return saveSection#regionProviders;
@@ -416,5 +458,26 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
          */
         @Template.Generated("%COLUMN_EXISTS%")
         public abstract boolean columnExists(Object chunkProviderServer, int cx, int cz);
+
+        /*
+         * <CUBE_EXISTS>
+         * public static boolean columnExists(io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal.Server provider, int cx, int cy, int cz) {
+         * #if !exists io.github.opencubicchunks.cubicchunks.api.world.storage.ICubicStorage
+         *     return false;
+         * #elseif !exists io.github.opencubicchunks.cubicchunks.core.server.chunkio.AsyncBatchingCubeIO
+         *     return false;
+         * #else
+         *     ICubeIO cubeIO = provider.getCubeIO();
+         *     if (!(cubeIO instanceof AsyncBatchingCubeIO)) {
+         *         return false;
+         *     }
+         * 
+         *     ICubicStorage storage = ((AsyncBatchingCubeIO) cubeIO).getStorage();
+         *     return storage.cubeExists(new CubePos(cx, cy, cz));
+         * #endif
+         * }
+         */
+        @Template.Generated("%CUBE_EXISTS%")
+        public abstract boolean cubeExists(Object chunkProviderServer, int cx, int cy, int cz);
     }
 }
