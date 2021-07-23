@@ -63,9 +63,10 @@ class Chunk {
 
         java.util.ArrayList result = new java.util.ArrayList();
         ChunkSection[] sections = instance.getSections();
-        for (int y = 0; y < sections.length; y++) {
-            if (sections[y] != null) {
-                result.add(Integer.valueOf(y));
+        for (int i = 0; i < sections.length; i++) {
+            ChunkSection section = sections[i];
+            if (section != null) {
+                result.add(Integer.valueOf(section.getYPosition() >> 4));
             }
         }
         return result;
@@ -101,6 +102,9 @@ class Chunk {
 #endif
 
         ChunkSection[] sections = instance.getSections();
+#if version >= 1.17
+        cy = instance.getSectionIndexFromSectionY(cy);
+#endif
         if (cy >= 0 && cy < sections.length) {
             return sections[cy];
         } else {
