@@ -98,6 +98,7 @@ public class CommonMapController implements PacketListener, Listener {
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
     // Stores Map Displays, mapped by Map UUID
     private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
+    private final ImplicitlySharedSet<MapDisplayInfo> mapsValues = new ImplicitlySharedSet<MapDisplayInfo>();
     // Stores map items for a short time while a player is moving it around in creative mode
     private final HashMap<UUID, CachedMapItem> cachedMapItems = new HashMap<UUID, CachedMapItem>();
     // How long a cached item is kept around and tracked when in the creative player's control
@@ -210,7 +211,7 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public synchronized void resendMapData(Player player) {
         UUID playerUUID = player.getUniqueId();
-        for (MapDisplayInfo display : maps.values()) {
+        for (MapDisplayInfo display : mapsValues.cloneAsIterable()) {
             if (display.getViewStackByPlayerUUID(playerUUID) != null) {
                 for (MapSession session : display.getSessions()) {
                     for (MapSession.Owner owner : session.onlineOwners) {
@@ -241,6 +242,7 @@ public class CommonMapController implements PacketListener, Listener {
             if (info == null) {
                 info = new MapDisplayInfo(frameInfo.lastMapUUID.getUUID());
                 maps.put(frameInfo.lastMapUUID.getUUID(), info);
+                mapsValues.add(info);
             }
             return info;
         }
@@ -272,7 +274,11 @@ public class CommonMapController implements PacketListener, Listener {
         if (mapUUID == null) {
             return null;
         } else {
-            return maps.computeIfAbsent(mapUUID, MapDisplayInfo::new);
+            return maps.computeIfAbsent(mapUUID, uuid -> {
+                MapDisplayInfo info = new MapDisplayInfo(uuid);
+                mapsValues.add(info);
+                return info;
+            });
         }
     }
 
@@ -441,7 +447,7 @@ public class CommonMapController implements PacketListener, Listener {
                 }
             });
 
-            for (MapDisplayInfo map : new ArrayList<MapDisplayInfo>(this.maps.values())) {
+            for (MapDisplayInfo map : this.mapsValues.cloneAsIterable()) {
                 for (MapSession session : new ArrayList<MapSession>(map.getSessions())) {
                     session.display.setRunning(false);
                 }
@@ -649,7 +655,7 @@ public class CommonMapController implements PacketListener, Listener {
                 return; // no information available or not an item frame
             }
 
-            frameInfo.updateItem();
+            // frameInfo.updateItem(); // Asynchronous access breaks things
             if (frameInfo.lastMapUUID == null) {
                 return; // not a map
             }
@@ -753,7 +759,7 @@ public class CommonMapController implements PacketListener, Listener {
     protected synchronized void onPlayerJoin(PlayerJoinEvent event) {
         // Let everyone know we got a player over here!
         Player player = event.getPlayer();
-        for (MapDisplayInfo map : this.maps.values()) {
+        for (MapDisplayInfo map : this.mapsValues.cloneAsIterable()) {
             for (MapSession session : map.getSessions()) {
                 session.updatePlayerOnline(player);
             }
@@ -1024,7 +1030,10 @@ public class CommonMapController implements PacketListener, Listener {
             MapDisplayInfo displayInfo = maps.get(toRemove.getUUID());
             if (displayInfo != null) {
                 if (displayInfo.getSessions().isEmpty()) {
-                    maps.remove(toRemove.getUUID());
+                    MapDisplayInfo removed = maps.remove(toRemove.getUUID());
+                    if (removed != null) {
+                        mapsValues.remove(removed);
+                    }
                 } else {
                     continue; // still has an active session; cannot remove
                 }
@@ -1284,7 +1293,7 @@ public class CommonMapController implements PacketListener, Listener {
             }
 
             // Update the player viewers of all map displays
-            for (MapDisplayInfo map : maps.values()) {
+            for (MapDisplayInfo map : mapsValues.cloneAsIterable()) {
                 map.updateViewersAndResolution();
             }
 
