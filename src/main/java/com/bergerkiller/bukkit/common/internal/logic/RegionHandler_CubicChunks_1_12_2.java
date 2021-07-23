@@ -9,6 +9,7 @@ import java.util.BitSet;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -75,6 +76,21 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
 
     @Override
     public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        // First try using the ICubicStorage API, if available
+        {
+            Object worldHandle = HandleConversion.toWorldHandle(world);
+            Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+            final Set<IntVector3> regionIndices = new HashSet<>();
+            if (handle.forEachCube(chunkProviderServer, wrap(cubeCoordinate -> {
+                IntVector2 regionXZ = new IntVector2(cubeCoordinate.x >> 5, cubeCoordinate.z >> 5);
+                if (regionXZCoordinates.contains(regionXZ)) {
+                    regionIndices.add(regionXZ.toIntVector3(cubeCoordinate.y >> 5));
+                }
+            }))) {
+                return regionIndices;
+            }
+        }
+
         // Obtain the coordinates using the files stored on disk
         Set<IntVector3> regionIndices = getWorldRegionFileCoordinates(world, c -> {
             return regionXZCoordinates.contains(c.toIntVector2());
@@ -99,6 +115,19 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
 
     @Override
     public Set<IntVector3> getRegions3(World world) {
+        // First try using the ICubicStorage API, if available
+        {
+            Object worldHandle = HandleConversion.toWorldHandle(world);
+            Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+            final Set<IntVector3> regionIndices = new HashSet<>();
+            if (handle.forEachCube(chunkProviderServer, wrap(cubeCoordinate -> {
+                regionIndices.add(new IntVector3(cubeCoordinate.x >> 5, cubeCoordinate.y >> 5, cubeCoordinate.z >> 5));
+            }))) {
+                return regionIndices;
+            }
+        }
+
+        // Fallback for older CubicChunks versions
         // Obtain the coordinates using the files stored on disk
         Set<IntVector3> regionIndices = getWorldRegionFileCoordinates(world, c -> true);
 
@@ -172,12 +201,15 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
 
     @Override
     public boolean isChunkSaved(World world, int cx, int cz) {
-        return false;
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
+        return handle.columnExists(chunkProviderServer, cx, cz);
     }
 
     // Gets all region file coordinates stored on disk
+    // Note: as of newer version of CubicChunks this is not used, since storage could be different
     protected HashSet<IntVector3> getWorldRegionFileCoordinates(World world, Predicate<IntVector3> filter) {
-        Path regionPath = getRegionFolder(world).toPath();
+        Path regionPath = (new File(Common.SERVER.getWorldFolder(world.getName()), "region3d")).toPath();
         try {
             try (Stream<IntVector3> stream = Files.list(regionPath)
                     .parallel()
@@ -192,10 +224,6 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
             Logging.LOGGER.log(Level.SEVERE, "Failed to list region files of world " + world.getName(), e);
             return new HashSet<IntVector3>();
         }
-    }
-
-    protected File getRegionFolder(World world) {
-        return new File(Common.SERVER.getWorldFolder(world.getName()), "region3d");
     }
 
     protected IntVector3 getRegionFileCoordinates(String regionFileName) {
@@ -224,25 +252,38 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         return null;
     }
 
-    // Note: uses cubic chunks coordinate space (16x16x16 cubes per region)
-    protected File getRegionFile(World world, int ccrx, int ccry, int ccrz) {
-        File regionsFolder = getRegionFolder(world);
-        StringBuilder fileName = new StringBuilder();
-        fileName.append(ccrx).append('.').append(ccry).append('.').append(ccrz).append(".3dr");
-        return new File(regionsFolder, fileName.toString());
+    private CubePosConsumerAdapter wrap(Consumer<IntVector3> consumer) {
+        return new CubePosConsumerAdapter(consumer);
+    }
+
+    public final class CubePosConsumerAdapter implements Consumer<Object> {
+        private final Consumer<IntVector3> consumer;
+
+        private CubePosConsumerAdapter(Consumer<IntVector3> consumer) {
+            this.consumer = consumer;
+        }
+
+        @Override
+        public void accept(Object t) {
+            this.consumer.accept(handle.cubePosToIntVector3(t));
+        }
     }
 
     @Template.Optional
+    @Template.Import("io.github.opencubicchunks.cubicchunks.api.util.CubePos")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.IColumn")
     @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.ICube")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.api.world.storage.ICubicStorage")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.ICubeIO")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal")
+    @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.AsyncBatchingCubeIO")
     @Template.Import("io.github.opencubicchunks.cubicchunks.core.server.chunkio.RegionCubeIO")
     @Template.Import("cubicchunks.regionlib.api.region.IRegionProvider")
     @Template.Import("cubicchunks.regionlib.impl.save.SaveSection3D")
     @Template.Import("cubicchunks.regionlib.impl.SaveCubeColumns")
     @Template.Import("cubicchunks.regionlib.impl.EntryLocation3D")
+    @Template.Import("com.bergerkiller.bukkit.common.bases.IntVector3")
     @Template.InstanceType("net.minecraft.world.level.World")
     public static abstract class CubicChunksHandle extends Template.Class<Template.Handle> {
 
@@ -318,5 +359,62 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
          */
         @Template.Generated("%GET_REGION_PROVIDERS%")
         public abstract List<Object> getRegionProviders(Object chunkProviderServer);
+
+        /*
+         * <CUBEPOS_TO_INTVECTOR3>
+         * public static IntVector3 cubePosToIntVector3(CubePos pos) {
+         *     return new IntVector3(pos.getX(), pos.getY(), pos.getZ());
+         * }
+         */
+        @Template.Generated("%CUBEPOS_TO_INTVECTOR3%")
+        public abstract IntVector3 cubePosToIntVector3(Object pos);
+
+        /*
+         * <FOR_EACH_CUBE>
+         * public static boolean forEachCube(io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal.Server provider, java.util.function.Consumer callback) {
+         * #if !exists io.github.opencubicchunks.cubicchunks.api.world.storage.ICubicStorage
+         *     return false;
+         * #elseif !exists io.github.opencubicchunks.cubicchunks.core.server.chunkio.AsyncBatchingCubeIO
+         *     return false;
+         * #else
+         *     ICubeIO cubeIO = provider.getCubeIO();
+         *     if (!(cubeIO instanceof AsyncBatchingCubeIO)) {
+         *         return false;
+         *     }
+         * 
+         *     ICubicStorage storage = ((AsyncBatchingCubeIO) cubeIO).getStorage();
+         *     try {
+         *         storage.forEachCube(callback);
+         *         return true;
+         *     } catch (java.io.IOException ex) {
+         *         ex.printStackTrace();
+         *         return false;
+         *     }
+         * #endif
+         * }
+         */
+        @Template.Generated("%FOR_EACH_CUBE%")
+        public abstract boolean forEachCube(Object chunkProviderServer, CubePosConsumerAdapter callback);
+
+        /*
+         * <COLUMN_EXISTS>
+         * public static boolean columnExists(io.github.opencubicchunks.cubicchunks.core.world.ICubeProviderInternal.Server provider, int cx, int cz) {
+         * #if !exists io.github.opencubicchunks.cubicchunks.api.world.storage.ICubicStorage
+         *     return false;
+         * #elseif !exists io.github.opencubicchunks.cubicchunks.core.server.chunkio.AsyncBatchingCubeIO
+         *     return false;
+         * #else
+         *     ICubeIO cubeIO = provider.getCubeIO();
+         *     if (!(cubeIO instanceof AsyncBatchingCubeIO)) {
+         *         return false;
+         *     }
+         * 
+         *     ICubicStorage storage = ((AsyncBatchingCubeIO) cubeIO).getStorage();
+         *     return storage.columnExists(new net.minecraft.world.level.ChunkCoordIntPair(cx, cz));
+         * #endif
+         * }
+         */
+        @Template.Generated("%COLUMN_EXISTS%")
+        public abstract boolean columnExists(Object chunkProviderServer, int cx, int cz);
     }
 }
