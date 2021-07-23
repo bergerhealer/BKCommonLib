@@ -76,15 +76,24 @@ class World extends IBlockAccess {
             return BlockDataRegistry.fromBlockData(blockData);
         }
 
-        // Check within bounds of the chunk slices before performing any expensive calls
-        if (y >= 0 && y < 256) {
-            net.minecraft.world.level.chunk.ChunkSection section = instance.getChunkAt(x >> 4, z >> 4).getSections()[y >> 4];
+        // Get chunk of block and it's sections
+        net.minecraft.world.level.chunk.Chunk chunk = instance.getChunkAt(x >> 4, z >> 4);
+        net.minecraft.world.level.chunk.ChunkSection[] sections = chunk.getSections();
+
+        // Compute the section slice from the y-coordinate
+  #if version >= 1.17
+        int sectionIndex = chunk.getSectionIndex(y);
+  #else
+        int sectionIndex = y >> 4;
+  #endif
+        if (sectionIndex >= 0 && sectionIndex < sections.length) {
+            net.minecraft.world.level.chunk.ChunkSection section = sections[sectionIndex];
             if (section != null) {
-#if version >= 1.9
+  #if version >= 1.9
                 Object blockData = section.getBlocks().a(x & 0xF, y & 0xF, z & 0xF);
-#else
+  #else
                 Object blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
-#endif
+  #endif
                 return BlockDataRegistry.fromBlockData(blockData);
             }
         }
