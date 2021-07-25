@@ -13,10 +13,12 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -163,6 +165,12 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
         regionIndices.addAll(findCacheRegionFileCoordinates.invoke(null, regionFileCache));
 
+        // Figure out the minimum/maximum region y coordinate
+        // Since Minecraft 1.17 there can be more than one region (32 chunks) vertically
+        WorldHandle worldHandle = WorldHandle.fromBukkit(world);
+        int minRegionY = worldHandle.getMinBuildHeight() >> 9;
+        int maxRegionY = (worldHandle.getMaxBuildHeight()-1) >> 9;
+
         // Obtain the region coordinates from all files in regions folder
         File regionFolder = Common.SERVER.getWorldRegionFolder(world.getName());
         if (regionFolder != null) {
@@ -170,9 +178,11 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
             for (String regionFileName : regionFileNames) {
                 File file = new File(regionFolder, regionFileName);
                 if (file.isFile() && file.exists() && file.length() >= 4096) {
-                    IntVector3 coords = getRegionFileCoordinates(file);
-                    if (coords != null && !regionIndices.contains(coords)) {
-                        regionIndices.add(coords);
+                    IntVector2 coords = getRegionFileCoordinates(file);
+                    if (coords != null) {
+                        for (int ry = minRegionY; ry <= maxRegionY; ry++) {
+                            regionIndices.add(coords.toIntVector3(ry));
+                        }
                     }
                 }
             }
@@ -180,8 +190,10 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
 
         // Look at all loaded chunks of the world and add the regions they are inside of
         for (Chunk chunk : world.getLoadedChunks()) {
-            IntVector3 coords = new IntVector3(chunk.getX() >> 5, 0, chunk.getZ() >> 5);
-            regionIndices.add(coords);
+            IntVector2 coords = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
+            for (int ry = minRegionY; ry <= maxRegionY; ry++) {
+                regionIndices.add(coords.toIntVector3(ry));
+            }
         }
 
         return regionIndices;

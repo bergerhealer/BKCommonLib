@@ -119,7 +119,7 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
             for (String regionFileName : regionFileNames) {
                 File file = new File(regionFolder, regionFileName);
                 if (file.isFile() && file.exists() && file.length() >= 4096) {
-                    IntVector3 coords = getRegionFileCoordinates(file);
+                    IntVector3 coords = getRegionFileCoordinates(file).toIntVector3(0);
                     if (coords != null && !regionIndices.contains(coords)) {
                         regionIndices.add(coords);
                     }

@@ -9,6 +9,7 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 
 /**
  * Vanilla Minecraft region file behavior
@@ -21,14 +22,22 @@ public abstract class RegionHandlerVanilla extends RegionHandler {
 
     @Override
     public Set<IntVector3> getRegions3ForXZ(World world, Set<IntVector2> regionXZCoordinates) {
+        // Figure out the minimum/maximum region y coordinate
+        // Since Minecraft 1.17 there can be more than one region (32 chunks) vertically
+        WorldHandle worldHandle = WorldHandle.fromBukkit(world);
+        int minRegionY = worldHandle.getMinBuildHeight() >> 9;
+        int maxRegionY = (worldHandle.getMaxBuildHeight()-1) >> 9;
+
         Set<IntVector3> result = new HashSet<IntVector3>(regionXZCoordinates.size());
         for (IntVector2 coord : regionXZCoordinates) {
-            result.add(coord.toIntVector3(0));
+            for (int ry = minRegionY; ry <= maxRegionY; ry++) {
+                result.add(coord.toIntVector3(ry));
+            }
         }
         return result;
     }
 
-    protected IntVector3 getRegionFileCoordinates(File regionFile) {
+    protected IntVector2 getRegionFileCoordinates(File regionFile) {
         String regionFileName = regionFile.getName();
 
         // Parse r.0.0.mca
@@ -47,7 +56,7 @@ public abstract class RegionHandlerVanilla extends RegionHandler {
         try {
             int rx = Integer.parseInt(regionFileName.substring(2, coord_sep_idx));
             int rz = Integer.parseInt(regionFileName.substring(coord_sep_idx + 1, regionFileName.length() - 4));
-            return new IntVector3(rx, 0, rz);
+            return new IntVector2(rx, rz);
         } catch (Exception ex) {
         }
         return null;

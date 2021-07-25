@@ -53,6 +53,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
+    public abstract int getMinBuildHeight();
+    public abstract int getMaxBuildHeight();
 
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
@@ -129,6 +131,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         @Template.Optional
         public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
+        public final Template.Method<Integer> getMinBuildHeight = new Template.Method<Integer>();
+        public final Template.Method<Integer> getMaxBuildHeight = new Template.Method<Integer>();
 
     }
 

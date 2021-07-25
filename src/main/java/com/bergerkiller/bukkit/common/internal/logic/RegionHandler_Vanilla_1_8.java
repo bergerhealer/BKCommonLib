@@ -144,7 +144,7 @@ public class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
         // Parse all found files into the region x and z coordinates
         HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
         for (File file : regionFiles) {
-            IntVector3 coords = getRegionFileCoordinates(file);
+            IntVector3 coords = getRegionFileCoordinates(file).toIntVector3(0);
             if (coords != null) {
                 regionIndices.add(coords);
             }
