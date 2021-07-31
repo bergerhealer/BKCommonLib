@@ -7,7 +7,9 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 class EntityFishingHook extends Entity {
-    #if version >= 1.16.5
+    #if version >= 1.17
+      private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:DATA_HOOKED_ENTITY;
+    #elseif version >= 1.16.5
       private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:HOOKED_ENTITY;
     #elseif version >= 1.16
       private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_HOOKED_ENTITY_ID:e;
