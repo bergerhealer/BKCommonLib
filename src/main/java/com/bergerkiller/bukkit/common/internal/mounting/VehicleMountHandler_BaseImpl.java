@@ -446,7 +446,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         }
     }
 
-    private final void handleReset() {
+    private synchronized final void handleReset() {
         // Note: values() is a copy and if spawned entities changes, it is not affected
         for (SpawnedEntity entity : this._spawnedEntities.values()) {
             if (entity.vehicleMount != null) {
@@ -480,7 +480,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         }
     }
 
-    private final void tryRemoveFromTracking(SpawnedEntity entity) {
+    private synchronized final void tryRemoveFromTracking(SpawnedEntity entity) {
         if (entity.state == SpawnedEntity.State.DESPAWNED && entity.vehicleMount == null && entity.passengerMounts.isEmpty()) {
             this._spawnedEntities.remove(entity.id);
         }
@@ -494,7 +494,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      * @param create Whether to create an entry when the entity isn't spawned and no mounts are active
      * @return spawned entity
      */
-    protected final SpawnedEntity getSpawnedEntity(int entityId, boolean create) {
+    protected synchronized final SpawnedEntity getSpawnedEntity(int entityId, boolean create) {
         SpawnedEntity spawnedEntity = this._spawnedEntities.get(entityId);
         if (spawnedEntity == null && create && entityId >= 0) {
             spawnedEntity = new SpawnedEntity(entityId);
@@ -509,7 +509,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
      * @param entityId
      * @return True if spawned, False if not
      */
-    protected final boolean isSpawned(int entityId) {
+    protected synchronized final boolean isSpawned(int entityId) {
         SpawnedEntity spawnedEntity = this._spawnedEntities.get(entityId);
         return spawnedEntity != null && spawnedEntity.state.isSpawned();
     }
