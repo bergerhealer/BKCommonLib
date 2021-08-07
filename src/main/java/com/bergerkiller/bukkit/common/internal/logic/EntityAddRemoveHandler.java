@@ -104,6 +104,21 @@ public abstract class EntityAddRemoveHandler {
     public abstract void processEvents();
 
     /**
+     * Gets whether the entities inside the given chunk have been loaded already.
+     * The chunk may be loaded, but the entities may not yet, depending on the
+     * Minecraft version.<br>
+     * <br>
+     * If the chunk has no entities, but processing/loading of entities has
+     * finished, this method also returns true.
+     *
+     * @param world World the chunk is in
+     * @param cx X-coordinate of the chunk
+     * @param cz Z-coordinate of the chunk
+     * @return True if the entities of this chunk have been loaded
+     */
+    public abstract boolean isChunkEntitiesLoaded(World world, int cx, int cz);
+
+    /**
      * Completely despawns an entity and removes it from a world
      *
      * @param entity

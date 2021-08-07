@@ -101,6 +101,11 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Override
+    public boolean isChunkEntitiesLoaded(World world, int cx, int cz) {
+        return removeHandler.isChunkEntitiesLoaded(HandleConversion.toWorldHandle(world), cx, cz);
+    }
+
+    @Override
     public void onEnabled(CommonPlugin plugin) {
         super.onEnabled(plugin);
         this.chunkEntitiesLoadedHandler.enable(this, plugin);
@@ -383,8 +388,25 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     @Template.Import("net.minecraft.server.level.ChunkProviderServer")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.util.EntitySlice")
+    @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
     @Template.InstanceType("net.minecraft.world.level.entity.PersistentEntitySectionManager")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Template.Handle> {
+
+        /*
+         * <IS_CHUNK_ENTITIES_LOADED>
+         * public static boolean isChunkEntitiesLoaded(WorldServer world, int cx, int cz) {
+         * #if version >= 1.17.1
+         *     #require net.minecraft.server.level.WorldServer public final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+         * #else
+         *     #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
+         * #endif
+         *     PersistentEntitySectionManager manager = world#entityManager;
+         *     long key = ChunkCoordIntPair.pair(cx, cz);
+         *     return manager.a(key);
+         * }
+         */
+        @Template.Generated("%IS_CHUNK_ENTITIES_LOADED%")
+        public abstract boolean isChunkEntitiesLoaded(Object worldHandle, int cx, int cz);
 
         /*
          * <REPLACE_IN_WORLD_STORAGE>

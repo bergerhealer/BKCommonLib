@@ -279,6 +279,39 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets whether the entities inside the given chunk have been loaded already.
+     * The chunk may be loaded, but the entities may not yet, depending on the
+     * Minecraft version.<br>
+     * <br>
+     * If the chunk has no entities, but processing/loading of entities has
+     * finished, this method also returns true.
+     *
+     * @param chunk Chunk to check
+     * @return True if the entities of this chunk have been loaded
+     */
+    public static boolean isChunkEntitiesLoaded(org.bukkit.Chunk chunk) {
+        return EntityAddRemoveHandler.INSTANCE.isChunkEntitiesLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * Gets whether the entities inside the given chunk have been loaded already.
+     * The chunk may be loaded, but the entities may not yet, depending on the
+     * Minecraft version.<br>
+     * <br>
+     * If the chunk has no entities, but processing/loading of entities has
+     * finished, this method also returns true. If the chunk is not
+     * loaded yet, this method will return false.
+     *
+     * @param world World the chunk is in
+     * @param cx X-coordinate of the chunk
+     * @param cz Z-coordinate of the chunk
+     * @return True if the entities of this chunk have been loaded
+     */
+    public static boolean isChunkEntitiesLoaded(org.bukkit.World world, int cx, int cz) {
+        return EntityAddRemoveHandler.INSTANCE.isChunkEntitiesLoaded(world, cx, cz);
+    }
+
+    /**
      * Gets an iterable of entities for a given world.
      * This class should only be used for performance reasons,
      * it is not safe to do a lot of logic while iterating over it.
