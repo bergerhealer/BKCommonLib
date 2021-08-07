@@ -157,7 +157,9 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     public void addVariables(Map<String, String> variables) {
         super.addVariables(variables);
         variables.put("forge", "mohist");
-        variables.put("forge_nms_obfuscated", "true");
+        if (this.evaluateMCVersion("<=", "1.12.2")) {
+            variables.put("forge_nms_obfuscated", "true");
+        }
     }
 
     @Template.Optional
