@@ -697,7 +697,8 @@ public class MapResourcePack {
                 inputStream.close();
             }
         } catch (JsonSyntaxException ex) {
-            System.out.println("Failed to parse GSON for " + objectType.getSimpleName() + " at " + path + ": " + ex.getMessage());
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
+                    " at " + path + ": " + ex.getMessage());
         } catch (IOException ex) {
             ex.printStackTrace();
         }
