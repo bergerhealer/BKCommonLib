@@ -155,11 +155,8 @@ public class MapDisplay implements MapDisplayEvents {
         this.markers.clear();
         this.width = this.info.getDesiredWidth();
         this.height = this.info.getDesiredHeight();
-        this.zbuffer = new byte[this.width * this.height];
-        this.livebuffer = new byte[this.width * this.height];
-        this.layerStack = new Layer(this, this.width, this.height);
+        this.clearLayers();
         this.widgets.setBounds(0, 0, this.width, this.height);
-        this.clip.markEverythingDirty();
     }
 
     /**
@@ -942,6 +939,18 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Removes all created layers and all drawn content so that
+     * only transparent pixels remain. All layer options are reset.
+     * Markers are not reset. For that, use {@link #clearMarkers()}.
+     */
+    public void clearLayers() {
+        this.zbuffer = new byte[this.width * this.height];
+        this.livebuffer = new byte[this.width * this.height];
+        this.layerStack = new Layer(this, this.width, this.height);
+        this.clip.markEverythingDirty();
+    }
+
+    /**
      * Retrieves the base layer at z-index 0.
      * Note that if layers at negative z-index exist, this is not the background.
      * 
@@ -981,6 +990,19 @@ public class MapDisplay implements MapDisplayEvents {
             top = top.next;
         }
         return top;
+    }
+
+    /**
+     * Gets the bottom-most layer, all other layers sit on top of that layer.
+     *
+     * @return bottom layer
+     */
+    public final Layer getBottomLayer() {
+        Layer bottom = this.layerStack;
+        while (bottom.previous != null) {
+            bottom = bottom.previous;
+        }
+        return bottom;
     }
 
     /**
