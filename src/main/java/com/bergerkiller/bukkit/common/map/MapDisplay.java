@@ -1030,6 +1030,21 @@ public class MapDisplay implements MapDisplayEvents {
         }
     }
 
+    /**
+     * If this Map Display is currently running, will call {@link #onDetached()},
+     * reset the display canvas and start it again. This will effectively reset
+     * the display entirely.<br>
+     * <br>
+     * If only clearing the canvas is needed, use {@link #clearLayers()}
+     * instead.
+     */
+    public final void restartDisplay() {
+        if (isRunning()) {
+            handleStopRunning();
+            handleStartRunning();
+        }
+    }
+
     // Initializes the display state and calls onAttached() when done
     // Called from setRunning(true), and when restarting a display (resolution change)
     private void handleStartRunning() {
@@ -1540,12 +1555,20 @@ public class MapDisplay implements MapDisplayEvents {
         MapDisplayInfo mapInfo = CommonPlugin.getInstance().getMapController().getInfo(mapItem);
         if (mapInfo != null) {
             for (MapSession session : new ArrayList<MapSession>(mapInfo.getSessions())) {
-                MapDisplay display = session.display;
-                if (display.isRunning()) {
-                    display.handleStopRunning();
-                    display.handleStartRunning();
-                }
+                session.display.restartDisplay();
             }
+        }
+    }
+
+    /**
+     * Restarts (detaches and re-attaches) all map displays of the given map display implementation.
+     * This effectively resets the display, forcing a complete re-render and re-initialization.
+     *
+     * @param displayClass Map display class to find and restart
+     */
+    public static void restartDisplays(Class<? extends MapDisplay> displayClass) {
+        for (MapDisplay display : new ArrayList<MapDisplay>(MapDisplay.getAllDisplays(displayClass))) {
+            display.restartDisplay();
         }
     }
 
