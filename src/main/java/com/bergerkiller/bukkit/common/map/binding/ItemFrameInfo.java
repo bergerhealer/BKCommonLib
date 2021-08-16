@@ -80,15 +80,38 @@ public class ItemFrameInfo {
      * Follows an eye ray to see if it lands on this item frame. If it does,
      * returns the exact coordinates on the display shown on this item frame.
      * If there is no map display being displayed, or the eye isn't looking at
-     * this item frame, null is returned.
+     * this item frame, null is returned.<br>
+     * <br>
+     * Makes the method return null when not within bounds, and the
+     * <i>withinBounds</i> parameter is true.
      *
      * @param startPosition Start position of the eye ray
      * @param lookDirection Normalized direction vector of the eye ray
      * @param withinBounds Whether the position looked at must be within bounds of the item frame
      * @return Map Look Position, or null if the eye ray doesn't land on this
-     *         item frame, or this item frame isn't displaying a map display.
+     *         item frame, or this item frame isn't displaying a map display,
+     *         or withinBounds is true and it is not exactly within item frame bounds.
      */
     public MapLookPosition findLookPosition(Vector startPosition, Vector lookDirection, boolean withinBounds) {
+        MapLookPosition result = findLookPosition(startPosition, lookDirection);
+        return result != null && (!withinBounds || result.isWithinBounds()) ? result : null;
+    }
+
+    /**
+     * Follows an eye ray to see if it lands on this item frame. If it does,
+     * returns the exact coordinates on the display shown on this item frame.
+     * If there is no map display being displayed, or the eye isn't looking at
+     * this item frame, null is returned.<br>
+     * <br>
+     * Use {@link MapLookPosition#isWithinBounds()} to check whether the player is
+     * looking within bounds of this item frame, or not.
+     *
+     * @param startPosition Start position of the eye ray
+     * @param lookDirection Normalized direction vector of the eye ray
+     * @return Map Look Position, or null if the eye ray doesn't land on this
+     *         item frame, or this item frame isn't displaying a map display.
+     */
+    public MapLookPosition findLookPosition(Vector startPosition, Vector lookDirection) {
         // If it shows no display, don't bother checking
         if (this.lastMapUUID == null) {
             return null;
@@ -98,89 +121,78 @@ public class ItemFrameInfo {
         final double FRAME_OFFSET = 0.0625;
 
         // Compare facing with the eye ray to calculate the eye distance to the item frame
-        double distance;
+        final double distance;
+        boolean withinBounds = true;
         IntVector3 frameBlock = this.itemFrameHandle.getBlockPosition();
         BlockFace facing = this.itemFrameHandle.getFacing();
         switch (facing) {
         case NORTH:
             if (lookDirection.getZ() > 1e-10) {
                 distance = (frameBlock.z + 1.0 - FRAME_OFFSET - startPosition.getZ()) / lookDirection.getZ();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         case SOUTH:
             if (lookDirection.getZ() < -1e-10) {
                 distance = (frameBlock.z + FRAME_OFFSET - startPosition.getZ()) / lookDirection.getZ();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         case WEST:
             if (lookDirection.getX() > 1e-10) {
                 distance = (frameBlock.x + 1.0 - FRAME_OFFSET - startPosition.getX()) / lookDirection.getX();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         case EAST:
             if (lookDirection.getX() < -1e-10) {
                 distance = (frameBlock.x + FRAME_OFFSET - startPosition.getX()) / lookDirection.getX();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         case DOWN:
             if (lookDirection.getY() > 1e-10) {
                 distance = (frameBlock.y + 1.0 - FRAME_OFFSET - startPosition.getY()) / lookDirection.getY();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         case UP:
             if (lookDirection.getY() < -1e-10) {
                 distance = (frameBlock.y + FRAME_OFFSET - startPosition.getY()) / lookDirection.getY();
-                break;
-            } else if (!withinBounds) {
+            } else {
+                withinBounds = false;
                 distance = MathUtil.distance(frameBlock.x, frameBlock.y, frameBlock.z,
                         startPosition.getX(), startPosition.getY(), startPosition.getZ());
-                break;
-            } else {
-                return null;
             }
+            break;
         default:
-            return null;
+            throw new IllegalArgumentException("Invalid facing: " + facing);
         }
 
         // Add distance * lookDirection to startPosition and subtract item frame coordinates
         // to find the coordinates relative to the middle of the block that are looked at
-        double at_x = distance * lookDirection.getX() + startPosition.getX() - frameBlock.x - 0.5;
-        double at_y = distance * lookDirection.getY() + startPosition.getY() - frameBlock.y - 0.5;
-        double at_z = distance * lookDirection.getZ() + startPosition.getZ() - frameBlock.z - 0.5;
+        final double at_x = distance * lookDirection.getX() + startPosition.getX() - frameBlock.x - 0.5;
+        final double at_y = distance * lookDirection.getY() + startPosition.getY() - frameBlock.y - 0.5;
+        final double at_z = distance * lookDirection.getZ() + startPosition.getZ() - frameBlock.z - 0.5;
 
         // If outside range [-0.5 .. 0.5] then this item frame was not looked at
         if (withinBounds && (at_x < -0.5 || at_x > 0.5 || at_z < -0.5 || at_z > 0.5 || at_y < -0.5 || at_y > 0.5)) {
-            return null;
+            withinBounds = false;
         }
 
         // Convert x/y/z into x/y using facing information
@@ -211,7 +223,7 @@ public class ItemFrameInfo {
             map_y = 0.5 + at_z;
             break;
         default:
-            return null;
+            throw new IllegalArgumentException("Invalid facing: " + facing);
         }
 
         // Adjust the coordinates if a non-zero rotation is set
@@ -244,7 +256,7 @@ public class ItemFrameInfo {
         return new MapLookPosition(this,
                 MapDisplayTile.RESOLUTION * (map_x + this.lastMapUUID.getTileX()),
                 MapDisplayTile.RESOLUTION * (map_y + this.lastMapUUID.getTileY()),
-                distance);
+                distance, withinBounds);
     }
 
     /**

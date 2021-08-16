@@ -122,6 +122,11 @@ public class MapClickEvent extends Event implements Cancellable, IMapLookPositio
     }
 
     @Override
+    public boolean isWithinBounds() {
+        return this.position.isWithinBounds();
+    }
+
+    @Override
     public boolean isCancelled() {
         return this.cancelled;
     }

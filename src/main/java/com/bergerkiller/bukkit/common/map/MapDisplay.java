@@ -699,8 +699,8 @@ public class MapDisplay implements MapDisplayEvents {
     public MapLookPosition findLookPosition(World world, Vector startPosition, Vector lookDirection) {
         for (ItemFrameInfo itemFrame : this.info.getItemFrames()) {
             if (itemFrame.getWorld() == world) {
-                MapLookPosition position = itemFrame.findLookPosition(startPosition, lookDirection, true);
-                if (position != null) {
+                MapLookPosition position = itemFrame.findLookPosition(startPosition, lookDirection);
+                if (position != null && position.isWithinBounds()) {
                     return position;
                 }
             }

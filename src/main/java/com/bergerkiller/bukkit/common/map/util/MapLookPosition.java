@@ -13,12 +13,14 @@ public final class MapLookPosition implements IMapLookPosition {
     private final double px;
     private final double py;
     private final double distance;
+    private final boolean withinBounds;
 
-    public MapLookPosition(ItemFrameInfo itemFrame, double px, double py, double distance) {
+    public MapLookPosition(ItemFrameInfo itemFrame, double px, double py, double distance, boolean isWithinBounds) {
         this.itemFrame = itemFrame;
         this.px = px;
         this.py = py;
         this.distance = distance;
+        this.withinBounds = isWithinBounds;
     }
 
     @Override
@@ -54,6 +56,11 @@ public final class MapLookPosition implements IMapLookPosition {
     @Override
     public double getDistance() {
         return this.distance;
+    }
+
+    @Override
+    public boolean isWithinBounds() {
+        return this.withinBounds;
     }
 
     @Override

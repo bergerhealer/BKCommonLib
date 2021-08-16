@@ -890,73 +890,152 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private boolean dispatchClickAction(Player player, ItemFrame itemFrame, Vector startPosition, Vector lookDirection, MapAction action) {
+    // Used for findLookingAt
+    private static class LookAtSearchResult {
+        public final MapDisplay display;
+        public final MapLookPosition lookPosition;
+
+        public LookAtSearchResult(MapDisplay display, MapLookPosition lookPosition) {
+            this.display = display;
+            this.lookPosition = lookPosition;
+        }
+
+        /**
+         * Handles the click event for this looking-at information
+         *
+         * @param player
+         * @param action
+         * @return Event result, can check {@link MapClickEvent#isCancelled()}
+         */
+        public MapClickEvent click(Player player, MapAction action) {
+            // Fire event
+            MapClickEvent event = new MapClickEvent(player, this.lookPosition, this.display, action);
+            CommonUtil.callEvent(event);
+            if (!event.isCancelled()) {
+                if (action == MapAction.LEFT_CLICK) {
+                    event.getDisplay().onLeftClick(event);
+                    event.getDisplay().getRootWidget().onLeftClick(event);
+                } else {
+                    event.getDisplay().onRightClick(event);
+                    event.getDisplay().getRootWidget().onRightClick(event);
+                }
+            }
+            return event;
+        }
+    }
+
+    private LookAtSearchResult findLookingAt(Player player, ItemFrame itemFrame) {
+        Location eye = player.getEyeLocation();
+        return findLookingAt(player, itemFrame, eye.toVector(), eye.getDirection());
+    }
+
+    private LookAtSearchResult findLookingAt(Player player, ItemFrame itemFrame, Vector startPosition, Vector lookDirection) {
         MapDisplayInfo info = getInfo(itemFrame);
         if (info == null) {
-            return false; // no map here
+            return null; // no map here
         }
 
         // Find the Display this player is sees on this map
         MapDisplayInfo.ViewStack stack = info.getViewStackByPlayerUUID(player.getUniqueId());
         if (stack == null || stack.stack.isEmpty()) {
-            return false; // no visible display for this player
+            return null; // no visible display for this player
         }
 
         // Find the item frame metadata information
         ItemFrameInfo frameInfo = this.itemFrames.get(itemFrame.getEntityId());
         if (frameInfo == null) {
-            return false; // not tracked
+            return null; // not tracked
         }
 
         // Ask item frame to compute look-at information
-        MapLookPosition position = frameInfo.findLookPosition(startPosition, lookDirection, false);
+        MapLookPosition position = frameInfo.findLookPosition(startPosition, lookDirection);
         if (position == null) {
-            return false; // doesn't really happen (withinBounds = false), but just in case
+            return null; // doesn't really happen (withinBounds = false), but just in case
         }
 
         // Keep position within bounds of the display
+        // If very much out of bounds (>16 pixels) fail the looking-at check
+        // This loose-ness allows for smooth clicking between frames without failures
         MapDisplay display = stack.stack.getLast();
         double new_x = position.getDoubleX();
         double new_y = position.getDoubleY();
-        if (new_x < 0.0 || new_y < 0.0 || new_x >= display.getWidth() || new_y >= display.getHeight()) {
+        final double limit = 16.0;
+        if (new_x < -limit || new_y < -limit || new_x > (display.getWidth() + limit) || new_y >= (display.getHeight() + limit)) {
+            return null;
+        } else if (new_x < 0.0 || new_y < 0.0 || new_x >= display.getWidth() || new_y >= display.getHeight()) {
             new_x = MathUtil.clamp(new_x, 0.0, (double) display.getWidth() - 1e-10);
             new_y = MathUtil.clamp(new_y, 0.0, (double) display.getHeight() - 1e-10);
-            position = new MapLookPosition(position.getItemFrameInfo(), new_x, new_y, position.getDistance());
+            position = new MapLookPosition(position.getItemFrameInfo(), new_x, new_y, position.getDistance(), position.isWithinBounds());
         }
 
-        // Fire event
-        MapClickEvent event = new MapClickEvent(player, position, display, action);
-        CommonUtil.callEvent(event);
-        if (!event.isCancelled()) {
-            if (action == MapAction.LEFT_CLICK) {
-                event.getDisplay().onLeftClick(event);
-                event.getDisplay().getRootWidget().onLeftClick(event);
-            } else {
-                event.getDisplay().onRightClick(event);
-                event.getDisplay().getRootWidget().onRightClick(event);
-            }
-        }
-        return event.isCancelled();
+        return new LookAtSearchResult(display, position);
     }
 
+    // Returns true if base click was cancelled
+    private boolean dispatchClickAction(Player player, ItemFrame itemFrame, Vector startPosition, Vector lookDirection, MapAction action) {
+        LookAtSearchResult lookAt = findLookingAt(player, itemFrame, startPosition, lookDirection);
+        return lookAt != null && lookAt.click(player, action).isCancelled();
+    }
+
+    // Returns true if base click was cancelled
     private boolean dispatchClickActionApprox(Player player, ItemFrame itemFrame, MapAction action) {
         Location eye = player.getEyeLocation();
         return dispatchClickAction(player, itemFrame, eye.toVector(), eye.getDirection(), action);
     }
 
+    // Returns true if base click was cancelled
     private boolean dispatchClickActionFromBlock(Player player, Block clickedBlock, BlockFace clickedFace, MapAction action) {
-        double x = clickedBlock.getX() + 0.5 + (double) clickedFace.getModX() * 0.5;
-        double y = clickedBlock.getY() + 0.5 + (double) clickedFace.getModY() * 0.5;
-        double z = clickedBlock.getZ() + 0.5 + (double) clickedFace.getModZ() * 0.5;
+        Vector look = player.getEyeLocation().getDirection();
+        final double eps = 0.001;
+
+        double x1 = clickedBlock.getX() + 0.5 + (double) clickedFace.getModX() * 0.5;
+        double y1 = clickedBlock.getY() + 0.5 + (double) clickedFace.getModY() * 0.5;
+        double z1 = clickedBlock.getZ() + 0.5 + (double) clickedFace.getModZ() * 0.5;
+
+        // Based on look direction, expand the search radius to check for corner item frames
+        double x2 = x1, y2 = y1, z2 = z1;
+        if (look.getX() < 0.0) {
+            x2 += 1.0 + eps;
+            x1 -= eps;
+        } else {
+            x2 -= 1.0 + eps;
+            x1 += eps;
+        }
+        if (look.getY() < 0.0) {
+            y2 += 1.0 + eps;
+            y1 -= eps;
+        } else {
+            y2 -= 1.0 + eps;
+            y1 += eps;
+        }
+        if (look.getZ() < 0.0) {
+            z2 += 1.0 + eps;
+            z1 -= eps;
+        } else {
+            z2 -= 1.0 + eps;
+            z1 += eps;
+        }
+
+        LookAtSearchResult bestApprox = null;
         for (Entity e : WorldUtil.getEntities(clickedBlock.getWorld(), null, 
-                x - 0.01, y - 0.01, z - 0.01,
-                x + 0.01, y + 0.01, z + 0.01))
+                x1, y1, z1, x2, y2, z2))
         {
             if (e instanceof ItemFrame) {
-                return dispatchClickActionApprox(player, (ItemFrame) e, action);
+                LookAtSearchResult result = this.findLookingAt(player, (ItemFrame) e);
+                if (result != null) {
+                    // If within bounds, pick it right away!
+                    if (result.lookPosition.isWithinBounds()) {
+                        return result.click(player, action).isCancelled();
+                    }
+
+                    // Select the lowest distance result
+                    if (bestApprox == null || bestApprox.lookPosition.getDistance() > result.lookPosition.getDistance()) {
+                        bestApprox = result;
+                    }
+                }
             }
         }
-        return false;
+        return bestApprox != null && bestApprox.click(player, action).isCancelled();
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)

@@ -62,4 +62,16 @@ public interface IMapLookPosition {
      * @return distance
      */
     double getDistance();
+
+    /**
+     * Gets whether the result is within bounds of the item frame. This is the case
+     * when the player is clearly looking inside the bounds of the display, and
+     * is false when the player is looking near the edge or away from the display.
+     * Only really useful when querying the look position relative to a particular
+     * item frame. May be false for normal click events when players click near the
+     * edge of item frames, with the coordinates clamped in that case.
+     *
+     * @return True if the player looks exactly within an item frame's bounds
+     */
+    boolean isWithinBounds();
 }
