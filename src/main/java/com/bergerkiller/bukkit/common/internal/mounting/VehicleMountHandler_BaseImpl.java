@@ -285,7 +285,13 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                     handleDespawn(dp.getSingleEntityId());
                 }
             } else if (type == PacketType.OUT_RESPAWN) {
-                ResourceKey<DimensionType> dimension = packet.read(PacketType.OUT_RESPAWN.dimensionType);
+                ResourceKey<DimensionType> dimension;
+                try {
+                    dimension = packet.read(PacketType.OUT_RESPAWN.dimensionType);
+                } catch (IllegalArgumentException ex) {
+                    //Logging.LOGGER_NETWORK.log(Level.WARNING, "Failed to decide dimension from respawn packet", ex);
+                    dimension = null;
+                }
                 if (dimension != null && !dimension.equals(this._playerDimension)) {
                     this._playerDimension = dimension;
                     handleReset();
