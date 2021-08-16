@@ -986,4 +986,15 @@ public class LogicUtil {
     public static <T> Predicate<T> alwaysFalsePredicate() {
         return (Predicate<T>) _alwaysFalsePredicate;
     }
+
+    /**
+     * Creates a new supplier that returns a constant value
+     *
+     * @param <T> Type
+     * @param value Value the supplier should return
+     * @return Supplier returning value
+     */
+    public static <T> Supplier<T> constantSupplier(T value) {
+        return () -> value;
+    }
 }
