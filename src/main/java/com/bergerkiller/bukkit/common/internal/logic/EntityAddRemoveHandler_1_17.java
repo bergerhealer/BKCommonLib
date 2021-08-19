@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.logging.Level;
 import java.util.stream.Stream;
@@ -31,6 +33,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryS
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -581,7 +584,9 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             Object chunkLoadStatuses = chunkLoadStatusesField.get(sectionManager);
             if (ClassHook.get(chunkLoadStatuses, ChunkLoadStatusHook.class) == null) {
                 ChunkLoadStatusHook hook = new ChunkLoadStatusHook(handler, world);
-                chunkLoadStatusesField.set(sectionManager, hook.hook(chunkLoadStatuses));
+                Object hooked = hook.hook(chunkLoadStatuses);
+                swapValueRecursive(hooked, chunkLoadStatuses, hooked, 4);
+                chunkLoadStatusesField.set(sectionManager, hooked);
             }
         }
 
@@ -589,8 +594,49 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
         public void unhook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
             Object chunkLoadStatuses = chunkLoadStatusesField.get(sectionManager);
             if (ClassHook.get(chunkLoadStatuses, ChunkLoadStatusHook.class) != null) {
-                chunkLoadStatusesField.set(sectionManager, ClassHook.unhook(chunkLoadStatuses));
+                Object base = ClassHook.unhook(chunkLoadStatuses);
+                swapValueRecursive(base, chunkLoadStatuses, base, 4);
+                chunkLoadStatusesField.set(sectionManager, base);
             }
+        }
+
+        /**
+         * Performs a reflection deep inspection of a Class object, goes by all fields
+         * declared inside, and checks if any of those fields have a value matching
+         * the expected. If so, it is set to the replacement instead.
+         *
+         * @param start Start value in the recursive operation
+         * @param expected The value to find
+         * @param replacement Value to replace it with
+         * @param depthLimit Max recursive depth, to prevent stack overflow (self-referential objects and such)
+         */
+        private static void swapValueRecursive(Object start, Object expected, Object replacement, int depthLimit) {
+            if (depthLimit <= 0) {
+                return; // Protect against stack overflow
+            }
+            ReflectionUtil.getAllClasses(start.getClass())
+                .flatMap(c -> Stream.of(c.getDeclaredFields()))
+                .filter(f -> !Modifier.isStatic(f.getModifiers()))
+                .filter(f -> {
+                    Class<?> type = f.getType();
+                    return !type.isPrimitive() && !type.isArray();
+                })
+                .map(f -> {
+                    f.setAccessible(true);
+                    try {
+                        Object currentValue = f.get(start);
+                        if (currentValue == expected) {
+                            f.set(start, replacement);
+                        } else {
+                            return currentValue;
+                        }
+                    } catch (Throwable t) {}
+                    return null;
+                })
+                .filter(Objects::nonNull)
+                .forEachOrdered(object -> {
+                    swapValueRecursive(object, expected, replacement, depthLimit - 1);
+                });
         }
 
         /**

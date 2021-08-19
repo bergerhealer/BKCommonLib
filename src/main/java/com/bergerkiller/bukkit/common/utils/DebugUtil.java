@@ -255,6 +255,25 @@ public class DebugUtil {
      * <br><br>
      * All locations where the instance lives will be logged.
      * 
+     * @param startObject to start looking for member values to begin
+     * @param value to find
+     */
+    public static void logInstances(Object startObject, Object value) {
+        System.out.println("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
+        IdentityHashMap<Object, Boolean> crossedValues = new IdentityHashMap<Object, Boolean>();
+        HashMap<Class<?>, ArrayList<Field>> classFieldMapping = new HashMap<Class<?>, ArrayList<Field>>();
+        LinkedList<StackElement> fieldStack = new LinkedList<StackElement>();
+        fieldStack.addLast(new StackElement(startObject));
+        DebugUtil.logMemberInstances(startObject, value, crossedValues, classFieldMapping, fieldStack);
+        System.out.println("Search completed.");
+    }
+
+    /**
+     * Goes down the entirety of the class type specified to see where a particular instance of a variable is referenced.
+     * Note that this is very, very slow! It is here to verify correct replacement of hooks and the like.
+     * <br><br>
+     * All locations where the instance lives will be logged.
+     * 
      * @param startClass to start looking for static values to begin
      * @param value to find
      */
@@ -308,7 +327,7 @@ public class DebugUtil {
             }
 
             fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(staticField, staticValue)));
-            logInstances(staticValue, value, crossedValues, classFieldMapping, fieldStack);
+            logMemberInstances(staticValue, value, crossedValues, classFieldMapping, fieldStack);
             fieldStack.removeLast();
         }
 
@@ -346,12 +365,13 @@ public class DebugUtil {
         }
     }
 
-    private static void logInstances(Object current, Object value, IdentityHashMap<Object, Boolean> crossedValues, HashMap<Class<?>, ArrayList<Field>> classFieldMapping, LinkedList<StackElement> fieldStack) {
+    private static boolean logMemberInstances(Object current, Object value, IdentityHashMap<Object, Boolean> crossedValues, HashMap<Class<?>, ArrayList<Field>> classFieldMapping, LinkedList<StackElement> fieldStack) {
         // Ignore null
-        if (current == null) return;
+        if (current == null) return false;
 
         // Found it!
-        if (current == value) {
+        boolean found;
+        if (found = (current == value)) {
             // Log all the fields that still need logging, with indent
             String indent = "  ";
             StackElement last = fieldStack.getLast();
@@ -399,7 +419,7 @@ public class DebugUtil {
 
         // Check if not already discovered
         if (crossedValues.put(current, Boolean.valueOf(true)) != null) {
-            return;
+            return found;
         }
 
         // Discover the current class
@@ -414,14 +434,16 @@ public class DebugUtil {
             if (Map.class.isAssignableFrom(type)) {
                 for (Entry<?, ?> entry : ((Map<?, ?>) current).entrySet()) {
                     fieldStack.addLast(new StackElement("M{v=" + entry.getValue() + "}.key"));
-                    logInstances(entry.getKey(), value, crossedValues, classFieldMapping, fieldStack);
+                    found |= logMemberInstances(entry.getKey(), value, crossedValues, classFieldMapping, fieldStack);
                     fieldStack.removeLast();
 
                     fieldStack.addLast(new StackElement("M{k=" + entry.getKey() + "}.value"));
-                    logInstances(entry.getValue(), value, crossedValues, classFieldMapping, fieldStack);
+                    found |= logMemberInstances(entry.getValue(), value, crossedValues, classFieldMapping, fieldStack);
                     fieldStack.removeLast();
                 }
-                return;
+                if (found) {
+                    return true; // No need to check deeper, really
+                }
             }
         } catch (Throwable tt) {} // ignore errors, just try different means
 
@@ -436,11 +458,13 @@ public class DebugUtil {
                     Object currItem = iter.next();
                     int old_index = last.index;
                     last.index = (old_index == -1) ? idx : -2;
-                    logInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
+                    found |= logMemberInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
                     last.index = old_index;
                     idx++;
                 }
-                return;
+                if (found) {
+                    return true; // No need to check deeper, really
+                }
             }
         } catch (Throwable tt) {} // ignore errors, just try different means
 
@@ -450,10 +474,12 @@ public class DebugUtil {
                 Collection<?> coll = (Collection<?>) current;
                 fieldStack.addLast(new StackElement("C[?]"));
                 for (Object currItem : coll) {
-                    logInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
+                    found |= logMemberInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
                 }
                 fieldStack.removeLast();
-                return;
+                if (found) {
+                    return true; // No need to check deeper, really
+                }
             }
         } catch (Throwable tt) {} // ignore errors, just try different means
 
@@ -462,7 +488,7 @@ public class DebugUtil {
         if (type.isArray()) {
             // Skip primitive arrays entirely
             if (type.getComponentType().isPrimitive()) {
-                return;
+                return false;
             }
 
             StackElement last = fieldStack.getLast();
@@ -470,10 +496,10 @@ public class DebugUtil {
             for (int i = 0; i < arr.length; i++) {
                 int old_index = last.index;
                 last.index = (old_index == -1) ? i : -2;
-                logInstances(arr[i], value, crossedValues, classFieldMapping, fieldStack);
+                found |= logMemberInstances(arr[i], value, crossedValues, classFieldMapping, fieldStack);
                 last.index = old_index;
             }
-            return;
+            return found;
         }
 
         // Go by all fields in this instance
@@ -491,7 +517,7 @@ public class DebugUtil {
             // If top element, always go into it
             if (fieldStack.isEmpty()) {
                 fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
-                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
                 fieldStack.removeLast();
                 continue;
             }
@@ -502,15 +528,16 @@ public class DebugUtil {
                 // Same field, set recurse flag and move on without growing the stack
                 int old_index = last.index;
                 last.index = -2;
-                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
                 last.index = old_index;
             } else {
                 // Not the same field
                 fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
-                logInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
+                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
                 fieldStack.removeLast();
             }
         }
+        return found;
     }
 
     /**
