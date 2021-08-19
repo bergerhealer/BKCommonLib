@@ -615,6 +615,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
                 return; // Protect against stack overflow
             }
             ReflectionUtil.getAllClasses(start.getClass())
+                .filter(c -> c.getName().contains("it.unimi.dsi.fastutil"))
                 .flatMap(c -> Stream.of(c.getDeclaredFields()))
                 .filter(f -> !Modifier.isStatic(f.getModifiers()))
                 .filter(f -> {
