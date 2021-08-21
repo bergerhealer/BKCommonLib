@@ -387,7 +387,11 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_SKY_LIGHT_DATA>
          * public static void storeSkyLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         * #if version >= 1.16
          *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         * #else
+         *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes));
+         * #endif
          * }
          */
         @Template.Generated("%STORE_SKY_LIGHT_DATA%")
@@ -397,7 +401,11 @@ public class LightingHandler_1_14 implements LightingHandler {
          * <STORE_BLOCK_LIGHT_DATA>
          * public static void storeBlockLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
+         * #if version >= 1.16
          *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         * #else
+         *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes));
+         * #endif
          * }
          */
         @Template.Generated("%STORE_BLOCK_LIGHT_DATA%")
@@ -413,7 +421,11 @@ public class LightingHandler_1_14 implements LightingHandler {
          *         // Missing, use engine to register and store a new section
          *         final SectionPosition pos = SectionPosition.a(cx, cy, cz);
          *         final EnumSkyBlock enumSky = skyLight ? EnumSkyBlock.SKY : EnumSkyBlock.BLOCK;
+         * #if version >= 1.16
          *         engine.a(enumSky, pos, new NibbleArray(data_bytes), true);
+         * #else
+         *         engine.a(enumSky, pos, new NibbleArray(data_bytes));
+         * #endif
          *         return;
          *     }
          * 
@@ -445,7 +457,7 @@ public class LightingHandler_1_14 implements LightingHandler {
          *     lightEngineStorage#notifyCubePresent(key);
          * }
          */
-        @Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW_OLD%")
-        public abstract void setLightDataOrStoreNewOld(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
+        //@Template.Generated("%SET_LIGHT_DATA_OR_STORE_NEW_OLD%")
+        //public abstract void setLightDataOrStoreNewOld(Object lightEngine, Object lightEngineStorage, Object lightEngineStorageArray, boolean skyLight, int cx, int cy, int cz, byte[] data);
     }
 }
