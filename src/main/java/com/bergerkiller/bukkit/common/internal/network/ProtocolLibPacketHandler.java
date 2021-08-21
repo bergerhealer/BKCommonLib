@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
 import com.comphenix.protocol.injector.PlayerLoggedOutException;
@@ -67,11 +68,12 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public boolean onDisable() {
+        ProtocolManager protocolManager = getProtocolManager();
         for (CommonPacketMonitor monitor : this.monitors) {
-            ProtocolLibrary.getProtocolManager().removePacketListener(monitor);
+            protocolManager.removePacketListener(monitor);
         }
         for (CommonPacketListener listener : this.listeners) {
-            ProtocolLibrary.getProtocolManager().removePacketListener(listener);
+            protocolManager.removePacketListener(listener);
         }
         this.monitors.clear();
         this.listeners.clear();
@@ -97,7 +99,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         // Obtain all plugins that have a listener (ignore monitors)
         boolean outGoing = packetType.isOutGoing();
         com.comphenix.protocol.PacketType comType = getPacketType(packetType);
-        for (com.comphenix.protocol.events.PacketListener listener : ProtocolLibrary.getProtocolManager().getPacketListeners()) {
+        for (com.comphenix.protocol.events.PacketListener listener : getProtocolManager().getPacketListeners()) {
             final ListeningWhitelist whitelist;
             if (outGoing) {
                 whitelist = listener.getSendingWhitelist();
@@ -120,7 +122,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         type.preprocess(packet);
         PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
         try {
-            ProtocolLibrary.getProtocolManager().recieveClientPacket(player, toReceive);
+            getProtocolManager().recieveClientPacket(player, toReceive);
         } catch (PlayerLoggedOutException ex) {
             // Ignore
         } catch (Exception e) {
@@ -158,7 +160,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             // Silent - do not send it through listeners, only through monitors
             try {
                 final PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
-                ProtocolLibrary.getProtocolManager().sendServerPacket(player, toSend, null, false);
+                getProtocolManager().sendServerPacket(player, toSend, null, false);
             } catch (PlayerLoggedOutException ex) {
                 // Ignore
             } catch (LinkageError err) {
@@ -205,7 +207,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void removePacketListeners(Plugin plugin) {
-        ProtocolLibrary.getProtocolManager().removePacketListeners(plugin);
+        getProtocolManager().removePacketListeners(plugin);
 
         // Remove all listeners of this plugin
         Iterator<CommonPacketListener> list_iter = listeners.iterator();
@@ -230,7 +232,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         while (iter.hasNext()) {
             CommonPacketListener cpl = iter.next();
             if (cpl.listener == listener) {
-                ProtocolLibrary.getProtocolManager().removePacketListener(cpl);
+                getProtocolManager().removePacketListener(cpl);
                 iter.remove();
             }
         }
@@ -242,7 +244,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         while (iter.hasNext()) {
             CommonPacketMonitor cpm = iter.next();
             if (cpm.monitor == monitor) {
-                ProtocolLibrary.getProtocolManager().removePacketListener(cpm);
+                getProtocolManager().removePacketListener(cpm);
                 iter.remove();
             }
         }
@@ -251,14 +253,14 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     @Override
     public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
         CommonPacketListener commonListener = new CommonPacketListener(this, plugin, listener, types);
-        ProtocolLibrary.getProtocolManager().addPacketListener(commonListener);
+        getProtocolManager().addPacketListener(commonListener);
         this.listeners.add(commonListener);
     }
 
     @Override
     public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types) {
         CommonPacketMonitor commonMonitor = new CommonPacketMonitor(plugin, monitor, types);
-        ProtocolLibrary.getProtocolManager().addPacketListener(commonMonitor);
+        getProtocolManager().addPacketListener(commonMonitor);
         this.monitors.add(commonMonitor);
     }
 
@@ -318,6 +320,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     private static com.comphenix.protocol.PacketType getPacketType(Class<?> packetClass) {
         return PacketRegistry.getPacketType(packetClass);
+    }
+
+    private static ProtocolManager getProtocolManager() {
+        ProtocolManager manager = ProtocolLibrary.getProtocolManager();
+        if (manager == null) {
+            Logging.LOGGER.log(Level.SEVERE, "Unexpected NPE: ProtocolLibrary.getProtocolManager() is returning null!");
+            Logging.LOGGER.log(Level.SEVERE, "This is caused by other plugins shading in ProtocolLib. Please fix this!");
+            Logging.LOGGER.log(Level.SEVERE, "Please read: https://www.spigotmc.org/threads/protocollibrary-getprotocolmanager-returns-null.507594/#post-4171682");
+            throw new NullPointerException("ProtocolLibrary.getProtocolManager() is null");
+        }
+        return manager;
     }
 
     private static class CommonPacketMonitor extends CommonPacketAdapter {
