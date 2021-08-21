@@ -26,7 +26,7 @@ public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         findBlockByNameMethod.init(new MethodDeclaration(resolver,
                 "public static Object findBlockByName(net.minecraft.resources.MinecraftKey minecraftKey) {\n" +
-                "    return Block.REGISTRY.get((Object)net.minecraft.resources.minecraftKey);\n" +
+                "    return Block.REGISTRY.get((Object)minecraftKey);\n" +
                 "}"));
         createLegacyBlockDataMethod.init(new MethodDeclaration(resolver,
                 "public static IBlockData createLegacyBlockData(Block block, int legacyData) {\n" +
