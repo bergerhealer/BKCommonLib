@@ -140,7 +140,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean isInSameVehicle:x((EntityHandle) Entity entity);
 #else
     public boolean isInSameVehicle((EntityHandle) Entity entity) {
-        return entity == instance.passenger || entity == this.vehicle;
+        return entity == instance.passenger || entity == instance.vehicle;
     }
 #endif
 
