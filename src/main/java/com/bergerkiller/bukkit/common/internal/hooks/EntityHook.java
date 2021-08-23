@@ -30,6 +30,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
 @ClassHook.HookImport("net.minecraft.world.EnumHand")
 @ClassHook.HookImport("net.minecraft.world.EnumInteractionResult")
+@ClassHook.HookImport("net.minecraft.world.item.ItemStack")
 @ClassHook.HookImport("net.minecraft.nbt.NBTTagCompound")
 @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityHook extends ClassHook<EntityHook> {
