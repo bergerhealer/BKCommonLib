@@ -176,6 +176,8 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return (instance, args) -> input_state.blockData.getBlockRaw();
                 } else if (name.equals("getState")) {
                     return null; // allow the default implementation to be called
+                } else if (name.equals("getHandle")) {
+                    return (instance, args) -> proxy_nms_world;
                 } else if (name.equals("toString")) {
                     // This does a bunch of internal lookups we really do not want to see happen.
                     return (instance, args) -> {
