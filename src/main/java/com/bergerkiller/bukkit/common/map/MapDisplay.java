@@ -366,6 +366,45 @@ public class MapDisplay implements MapDisplayEvents {
         this.refreshMapItem();
 
         // Synchronize the map information to the clients
+        // If there are no changes, only send map details to new viewers
+        if (this.clip.isDirty()) {
+            this.flushCanvasChanges();
+        } else {
+            // Send full changes to new dirty viewers
+            if (session.hasNewViewers) {
+                for (MapSession.Owner owner : session.onlineOwners) {
+                    if (owner.isNewViewer()) {
+                        owner.updateMap(getUpdates(owner.clip, owner.player));
+                    }
+                }
+            }
+
+            // Check all viewers to see if any of them have dirty areas that need to be refreshed
+            // When players rejoin or change worlds, they may not know the map
+            for (MapSession.Owner owner : this.session.onlineOwners) {
+                if (owner.viewing && owner.clip.isDirty()) {
+                    owner.updateMap(this.getUpdates(owner.clip, owner.player));
+                }
+            }
+        }
+
+        // Check all tiles with markers on them and synchronize the changes to the players
+        // Previous map content changes may have already synchronized them, in which case
+        // the player was marked as synchronized for the tile affected.
+        // After this, all the 'is marker changed' logic is reset.
+        markers.synchronize(this.session);
+    }
+
+    /**
+     * Sends map update packets to all viewers for changes done to the display.
+     * Is called automatically after {@link #onTick()} every tick. This can be
+     * called multiple times in a single tick to send multiple partial updates.<br>
+     * <br>
+     * If different portions of the display change that are far apart with a large
+     * area inbetween that does not change, calling this method can reduce the amount
+     * of map data that needs to be synchronized.
+     */
+    public final void flushCanvasChanges() {
         if (this.clip.isDirty()) {
             // For all viewers watching, send map texture updates
             // For players that are in-sync, we can re-use the same packet
@@ -399,31 +438,7 @@ public class MapDisplay implements MapDisplayEvents {
 
             // Done updating, reset the dirty state
             this.clip.clearDirty();
-
-        } else {
-            // Send full changes to new dirty viewers
-            if (session.hasNewViewers) {
-                for (MapSession.Owner owner : session.onlineOwners) {
-                    if (owner.isNewViewer()) {
-                        owner.updateMap(getUpdates(owner.clip, owner.player));
-                    }
-                }
-            }
-
-            // Check all viewers to see if any of them have dirty areas that need to be refreshed
-            // When players rejoin or change worlds, they may not know the map
-            for (MapSession.Owner owner : this.session.onlineOwners) {
-                if (owner.viewing && owner.clip.isDirty()) {
-                    owner.updateMap(this.getUpdates(owner.clip, owner.player));
-                }
-            }
         }
-
-        // Check all tiles with markers on them and synchronize the changes to the players
-        // Previous map content changes may have already synchronized them, in which case
-        // the player was marked as synchronized for the tile affected.
-        // After this, all the 'is marker changed' logic is reset.
-        markers.synchronize(this.session);
     }
 
     private final void refreshMapItem() {
