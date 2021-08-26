@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.controller;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 /**

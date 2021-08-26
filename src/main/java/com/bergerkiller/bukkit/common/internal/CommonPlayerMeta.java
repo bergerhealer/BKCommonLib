@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.controller.EntityNetworkController;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -33,7 +33,7 @@ public class CommonPlayerMeta {
     protected CommonPlayerMeta(Player player) {
         this.playerRef = new WeakReference<Player>(player);
         if (EntityPlayerHandle.T.getRemoveQueue.isAvailable()) {
-            removeQueue = EntityPlayerHandle.T.getRemoveQueue.invoke(Conversion.toEntityHandle.convert(player));
+            removeQueue = EntityPlayerHandle.T.getRemoveQueue.invoke(HandleConversion.toEntityHandle(player));
         } else {
             removeQueue = new ArrayList<Integer>();
         }

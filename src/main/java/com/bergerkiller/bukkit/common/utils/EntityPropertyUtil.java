@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
@@ -174,7 +173,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      * @return human player abilities
      */
     public static PlayerAbilities getAbilities(HumanEntity human) {
-        return EntityHumanHandle.T.abilities.get(Conversion.toEntityHandle.convert(human));
+        return EntityHumanHandle.T.abilities.get(HandleConversion.toEntityHandle(human));
     }
 
     /**

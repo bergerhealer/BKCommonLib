@@ -110,7 +110,7 @@ public class CommonNMS {
     }
 
     public static Object getRawHandle(org.bukkit.entity.Entity e, Template.Class<?> type) {
-        return CommonUtil.tryCast(Conversion.toEntityHandle.convert(e), type.getType());
+        return CommonUtil.tryCast(HandleConversion.toEntityHandle(e), type.getType());
     }
 
     public static <T extends Template.Handle> T getHandle(org.bukkit.entity.Entity e, Template.Class<T> type) {

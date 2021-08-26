@@ -5,6 +5,8 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -275,7 +277,7 @@ public class CommonEntityType {
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntityFromHandle(Object handle) {
-        Entity e = Conversion.toEntity.convert(handle); // getBukkitEntity
+        Entity e = WrapperConversion.toEntity(handle); // getBukkitEntity
         return (CommonEntity<T>) createCommonEntity(e);
     }
 
@@ -348,7 +350,7 @@ public class CommonEntityType {
     }
 
     public static CommonEntityType byEntity(Entity entity) {
-        return byNMSEntity(Conversion.toEntityHandle.convert(entity));
+        return byNMSEntity(HandleConversion.toEntityHandle(entity));
     }
 
     public static CommonEntityType byNMSEntityClass(Class<?> entityClass) {

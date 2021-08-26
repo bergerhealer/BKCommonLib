@@ -41,6 +41,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
+import com.bergerkiller.mountiplex.conversion.Converter;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
@@ -48,25 +49,25 @@ public class DuplexConversion {
     @SuppressWarnings({"rawtypes"})
     public static final DuplexConverter NONE = DuplexConverter.createNull(TypeDeclaration.OBJECT);
 
-    public static final DuplexConverter<Object, Entity> entity = pair(toEntity, toEntityHandle);
-    public static final DuplexConverter<Object, Player> player = pair(toPlayer, toEntityPlayerHandle);
-    public static final DuplexConverter<Object[], ItemStack[]> itemStackArr = pair(toItemStackArr, toItemStackHandleArr);
-    public static final DuplexConverter<Object, World> world = pair(toWorld, toWorldHandle);
-    public static final DuplexConverter<Object, Chunk> chunk = pair(toChunk, toChunkHandle);
-    public static final DuplexConverter<Object, ItemStack> itemStack = pair(toItemStack, toItemStackHandle);
+    public static final DuplexConverter<Object, Entity> entity = findByPath("net.minecraft.world.entity.Entity", Entity.class);
+    public static final DuplexConverter<Object, Player> player = findByPath("net.minecraft.server.level.EntityPlayer", Player.class);
+    public static final DuplexConverter<Object[], ItemStack[]> itemStackArr = findByPath("net.minecraft.world.item.ItemStack[]", ItemStack[].class);
+    public static final DuplexConverter<Object, World> world = findByPath("net.minecraft.server.level.WorldServer", World.class);
+    public static final DuplexConverter<Object, Chunk> chunk = findByPath("net.minecraft.world.level.chunk.Chunk", Chunk.class);
+    public static final DuplexConverter<Object, ItemStack> itemStack = findByPath("net.minecraft.world.item.ItemStack", ItemStack.class);
     public static final DuplexConverter<Object, Inventory> inventory = pair(toInventory, toInventoryHandle);
     public static final DuplexConverter<Object, Difficulty> difficulty = pair(toDifficulty, toDifficultyHandle);
     public static final DuplexConverter<Object, GameMode> gameMode = pair(toGameMode, toGameModeHandle);
     public static final DuplexConverter<Object, DataWatcher> dataWatcher = pair(toDataWatcher, toDataWatcherHandle);
-    public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = pair(toDataWatcherKey, toDataWatcherObjectHandle);
-    public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = pair(toDataWatcherItem, toDataWatcherItemHandle);
+    public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = findByPath("net.minecraft.network.syncher.DataWatcherObject", DataWatcher.Key.class);
+    public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = findByPath("net.minecraft.network.syncher.DataWatcher.Item", DataWatcher.Item.class);
     public static final DuplexConverter<Object, CommonTag> commonTag = pair(toCommonTag, toNBTTagHandle);
     public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findByPath("net.minecraft.nbt.NBTTagCompound", CommonTagCompound.class);
     public static final DuplexConverter<Object, CommonTagList> commonTagList = findByPath("net.minecraft.nbt.NBTTagList", CommonTagList.class);
     public static final DuplexConverter<Integer, Object> paintingFacing = pair(toPaintingFacing, toPaintingFacingId);
-    public static final DuplexConverter<Object, IntVector3> blockPosition = pair(toIntVector3, toBlockPositionHandle);
-    public static final DuplexConverter<Object, IntVector2> chunkIntPair = pair(toIntVector2, toChunkCoordIntPairHandle);
-    public static final DuplexConverter<Object, Vector> vector = pair(toVector, toVec3DHandle);
+    public static final DuplexConverter<Object, IntVector3> blockPosition = findByPath("net.minecraft.core.BlockPosition", IntVector3.class);
+    public static final DuplexConverter<Object, IntVector2> chunkIntPair = findByPath("net.minecraft.world.level.ChunkCoordIntPair", IntVector2.class);
+    public static final DuplexConverter<Object, Vector> vector = findByPath("net.minecraft.world.phys.Vec3D", Vector.class);
     public static final DuplexConverter<Object, PlayerAbilities> playerAbilities = pair(toPlayerAbilities, toPlayerAbilitiesHandle);
     public static final DuplexConverter<Object, EntityTracker> entityTracker = pair(toEntityTracker, toEntityTrackerHandle);
     public static final DuplexConverter<Object, LongHashSet> longHashSet = pair(toLongHashSet, toLongHashSetHandle);
@@ -137,11 +138,25 @@ public class DuplexConversion {
     }
 
     private static final <T> T findByPath(String nmsClassName, Class<?> output) {
-        return find(CommonUtil.getClass(nmsClassName, false), output);
+        Class<?> type = CommonUtil.getClass(nmsClassName, false);
+        if (type == null) {
+            throw new IllegalStateException("Class does not exist for duplex converter: " + nmsClassName);
+        }
+        return find(type, output);
     }
 
     @SuppressWarnings("unchecked")
     private static final <T> T find(Class<?> input, Class<?> output) {
-        return (T) Conversion.findDuplex(input, output);
+        Converter<?, ?> conv = Conversion.find(input, output);
+        if (conv == null) {
+            throw new IllegalStateException("Failed to find converter from " + input + " to " + output);
+        }
+
+        Converter<?, ?> conv_rev = Conversion.find(output, input);
+        if (conv_rev == null) {
+            throw new IllegalStateException("Failed to find reverse converter from " + output + " to " + input);
+        }
+
+        return (T) pair(conv, conv_rev);
     }
 }

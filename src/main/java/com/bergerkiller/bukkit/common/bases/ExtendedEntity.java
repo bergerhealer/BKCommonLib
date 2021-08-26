@@ -27,7 +27,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.mutable.LocationAbstract;
 import com.bergerkiller.bukkit.common.bases.mutable.VectorAbstract;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
@@ -1006,7 +1006,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         for (EntityHandle oldPassenger : newPassengerHandles) {
             boolean found = false;
             for (org.bukkit.entity.Entity p : newPassengers) {
-                if (oldPassenger.getRaw() == Conversion.toEntityHandle.convert(p)) {
+                if (oldPassenger.getRaw() == HandleConversion.toEntityHandle(p)) {
                     found = true;
                     keptPassengers.add(p);
                     break;

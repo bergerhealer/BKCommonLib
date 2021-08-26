@@ -4,7 +4,6 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.WorldBlockStateCollection;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -632,8 +631,8 @@ public class WorldUtil extends ChunkUtil {
     public static List<org.bukkit.entity.Entity> getEntities(org.bukkit.World world, org.bukkit.entity.Entity ignore,
             double xmin, double ymin, double zmin, double xmax, double ymax, double zmax) {
 
-        Object worldHandle = Conversion.toWorldHandle.convert(world);
-        Object ignoreHandle = Conversion.toEntityHandle.convert(ignore);
+        Object worldHandle = HandleConversion.toWorldHandle(world);
+        Object ignoreHandle = (ignore == null) ? null : HandleConversion.toEntityHandle(ignore);
         Object axisAlignedBB = AxisAlignedBBHandle.T.constr_x1_y1_z1_x2_y2_z2.raw.newInstanceVA(xmin, ymin, zmin, xmax, ymax, zmax);
         List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, ignoreHandle, axisAlignedBB);
         return new ConvertingList<org.bukkit.entity.Entity>(entityHandles, DuplexConversion.entity);
@@ -649,8 +648,12 @@ public class WorldUtil extends ChunkUtil {
      * @return A (referenced) list of entities nearby
      */
     public static List<org.bukkit.entity.Entity> getNearbyEntities(org.bukkit.entity.Entity entity, double radX, double radY, double radZ) {
-        Object worldHandle = Conversion.toWorldHandle.convert(entity.getWorld());
-        Object entityHandle = Conversion.toEntityHandle.convert(entity);
+        if (entity == null) {
+            throw new IllegalArgumentException("Entity is null");
+        }
+
+        Object worldHandle = HandleConversion.toWorldHandle(entity.getWorld());
+        Object entityHandle = HandleConversion.toEntityHandle(entity);
         Object entityBounds = EntityHandle.T.getBoundingBox.raw.invoke(entityHandle);
         Object axisAlignedBB = AxisAlignedBBHandle.T.grow.raw.invoke(entityBounds, radX, radY, radZ);
         List<?> entityHandles = (List<?>) WorldHandle.T.getNearbyEntities.raw.invoke(worldHandle, entityHandle, axisAlignedBB);

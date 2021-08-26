@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
@@ -165,7 +164,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return block
      */
     public static Block getHangingBlock(Hanging entityHanging) {
-        IntVector3 pos = EntityHangingHandle.T.blockPosition.get(Conversion.toEntityHandle.convert(entityHanging));
+        IntVector3 pos = EntityHangingHandle.T.blockPosition.get(HandleConversion.toEntityHandle(entityHanging));
         return pos.toBlock(entityHanging.getWorld());
     }
 

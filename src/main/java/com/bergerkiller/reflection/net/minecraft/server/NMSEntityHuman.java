@@ -1,6 +1,6 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
@@ -31,6 +31,6 @@ public class NMSEntityHuman extends NMSEntityLiving {
     public static final FieldAccessor<GameProfileHandle> gameProfile = EntityHumanHandle.T.gameProfile.toFieldAccessor();
 
     public static boolean canInstaBuild(HumanEntity human) {
-        return abilities.get(Conversion.toEntityHandle.convert(human)).canInstantlyBuild();
+        return abilities.get(HandleConversion.toEntityHandle(human)).canInstantlyBuild();
     }
 }

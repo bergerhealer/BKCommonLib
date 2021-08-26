@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
@@ -85,7 +85,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
     public static class CommonChannelListener extends ChannelDuplexHandler {
 
         public static void bind(Player player) {
-            Object entityPlayer = Conversion.toEntityHandle.convert(player);
+            Object entityPlayer = HandleConversion.toEntityHandle(player);
             PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
             if (playerConnection == null) {
                 return; // already disconnected
@@ -103,7 +103,7 @@ public class CommonPacketHandler extends PacketHandlerHooked {
         }
 
         public static void unbind(Player player) {
-            Object entityPlayer = Conversion.toEntityHandle.convert(player);
+            Object entityPlayer = HandleConversion.toEntityHandle(player);
             PlayerConnectionHandle playerConnection = EntityPlayerHandle.T.playerConnection.get(entityPlayer);
             if (playerConnection == null) {
                 return; // already disconnected
