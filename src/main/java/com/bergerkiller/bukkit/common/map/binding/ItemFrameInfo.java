@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -41,6 +42,7 @@ public class ItemFrameInfo {
     public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
     public boolean needsItemRefresh; // UUID was changed and item in the item frame needs refreshing
     public boolean sentToPlayers; // players have received item information for this item frame
+    public boolean requiresFurtherLoading; // whether neighbouring chunks need loading before a map display can be initialized
     public MapDisplayInfo displayInfo;
 
     // These fields are used in updateItem() to speed up performance, due to how often it is called
@@ -65,6 +67,7 @@ public class ItemFrameInfo {
         this.displayInfo = null;
         this.needsItemRefresh = false;
         this.sentToPlayers = false;
+        this.requiresFurtherLoading = false;
     }
 
     /**
@@ -282,9 +285,7 @@ public class ItemFrameInfo {
      */
     public void updateItemAndViewers(LogicUtil.ItemSynchronizer<Player, Player> viewerSynchronizer) {
         // Refreshes cached information about this item frame's item
-        if (lastFrameItemUpdateNeeded) {
-            updateItem();
-        }
+        updateItem();
 
         // Update list of players for item frames showing maps
         if (lastMapUUID != null) {
@@ -316,29 +317,32 @@ public class ItemFrameInfo {
     }
 
     public void updateItem() {
-        // Reset flag
-        this.lastFrameItemUpdateNeeded = false;
+        // Recalculate UUID if the map changed/item became a map
+        if (checkItemChanged()) {
+            recalculateUUID();
+        }
+    }
 
+    private boolean checkItemChanged() {
         // Avoid expensive conversion and creation of CraftItemStack by detecting changes
         boolean raw_item_changed = false;
         Object raw_item = DataWatcher.Item.getRawValue(this.itemFrame_dw_item);
         raw_item = CommonNMS.unwrapDWROptional(raw_item); // May be needed
-        if (this.lastFrameRawItem != raw_item) {
+        if (this.lastFrameRawItem != raw_item || this.lastFrameItemUpdateNeeded) {
             this.lastFrameRawItem = raw_item;
             this.lastFrameItem = WrapperConversion.toItemStack(this.lastFrameRawItem);
             raw_item_changed = true;
         }
 
+        // Reset flag
+        this.lastFrameItemUpdateNeeded = false;
+
         // If the raw item has not changed, and the item is not a map, don't bother checking
         // The equality check for ItemStack is very slow, because of the deep NBT check that occurs
         // When the item in the item frame is not a map item, there is no use wasting time here
-        if (!raw_item_changed && lastMapUUID == null && !CommonMapUUIDStore.isMap(this.lastFrameItem)) {
-            return;
-        }
-
-        // Check item changed
-        if (LogicUtil.bothNullOrEqual(this.lastFrameItemUpdate, this.lastFrameItem)) {
-            return;
+        // Always passes the first time
+        if (!raw_item_changed || LogicUtil.bothNullOrEqual(this.lastFrameItemUpdate, this.lastFrameItem)) {
+            return false;
         }
 
         // Assign & clone so that changes can be detected
@@ -352,26 +356,90 @@ public class ItemFrameInfo {
         if (mapUUID == null) {
             // Map was removed
             this.sentToPlayers = false;
+            this.requiresFurtherLoading = false;
             if (lastMapUUID != null) {
                 remove();
             }
         } else if (lastMapUUID == null || !lastMapUUID.getUUID().equals(mapUUID)) {
             // Map UUID was changed, or neighbours need to be re-calculated
-            recalculateUUID();
+            return true;
+        }
+
+        // No map changes
+        return false;
+    }
+
+    public void onChunkDependencyLoaded() {
+        if (this.requiresFurtherLoading) {
+            this.recalculateUUID();
         }
     }
 
     void recalculateUUID() {
-        UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
-
         // Find out the tile information of this item frame
         // This is a slow and lengthy procedure; hopefully it does not happen too often
         // What we do is: we add all neighbours, then find the most top-left item frame
         // Subtracting coordinates will give us the tile x/y of this item frame
         IntVector3 itemFramePosition = itemFrameHandle.getBlockPosition();
         CommonMapController.ItemFrameCluster cluster = this.controller.findCluster(itemFrameHandle, itemFramePosition);
-        MapUUID newMapUUID;
 
+        // If not fully loaded, 'park' this item frame until surrounding chunks are loaded too
+        World world = this.getWorld();
+        boolean fullyLoaded = true;
+        for (CommonMapController.ItemFrameCluster.ChunkDependency dependency : cluster.chunk_dependencies) {
+            fullyLoaded &= this.controller.checkClusterChunkDependency(world, dependency);
+        }
+        if (!fullyLoaded) {
+            this.requiresFurtherLoading = true;
+            return;
+        }
+
+        // Calculate UUID of this item frame
+        this.recalculateUUIDInCluster(itemFramePosition, cluster);
+
+        // Cluster is fully loaded, check if there are any other item frames part of
+        // this cluster that were waiting to be further loaded. If so, load them in!
+        // This (slow) operation is only needed once when a previously partially loaded
+        // display is fully initialized. This won't run when displays are fully inside
+        // loaded chunks.
+        // By doing this here we make sure the display resolution is correct instantly,
+        // as otherwise there is a tick delay until these other item frames initialize.
+        if (cluster.hasMultipleTiles()) {
+            for (Entity entity : WorldUtil.getEntities(world, null,
+                    cluster.min_coord.x + 0.01,
+                    cluster.min_coord.y + 0.01,
+                    cluster.min_coord.z + 0.01,
+                    cluster.max_coord.x + 0.99,
+                    cluster.max_coord.y + 0.99,
+                    cluster.max_coord.z + 0.99))
+            {
+                if (!(entity instanceof ItemFrame)) {
+                    continue;
+                }
+                ItemFrameInfo itemFrame = this.controller.getItemFrame(entity.getEntityId());
+                if (itemFrame == null || itemFrame == this) {
+                    continue;
+                }
+                IntVector3 position = itemFrame.itemFrameHandle.getBlockPosition();
+                if (!cluster.coordinates.contains(position)) {
+                    continue;
+                }
+                if ((itemFrame.lastFrameItemUpdateNeeded && itemFrame.checkItemChanged()) || itemFrame.requiresFurtherLoading) {
+                    itemFrame.recalculateUUIDInCluster(position, cluster);
+                }
+            }
+        }
+    }
+
+    private void recalculateUUIDInCluster(IntVector3 itemFramePosition, CommonMapController.ItemFrameCluster cluster) {
+        this.requiresFurtherLoading = false;
+
+        UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
+        if (mapUUID == null) {
+            return;
+        }
+
+        MapUUID newMapUUID;
         if (cluster.hasMultipleTiles()) {
             int tileX = 0;
             int tileY = 0;
@@ -495,6 +563,7 @@ public class ItemFrameInfo {
             //}
             viewers.clear();
         }
+        this.requiresFurtherLoading = false;
         this.lastMapUUID = null;
     }
 

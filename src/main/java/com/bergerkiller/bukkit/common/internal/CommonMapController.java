@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
@@ -52,6 +53,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
 import com.bergerkiller.bukkit.common.events.EntityAddEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
@@ -71,6 +73,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
@@ -81,6 +84,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -91,6 +95,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 
 public class CommonMapController implements PacketListener, Listener {
+    // Whether this controller has been enabled
+    private boolean isEnabled = false;
+    // Whether tiling is supported. Disables findNeighbours() if false.
+    private boolean isFrameTilingSupported = true;
     // Stores cached thread-safe lists of item frames by cluster key
     private final Map<ItemFrameClusterKey, Set<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
     // Bi-directional mapping between map UUID and Map (durability) Id
@@ -113,19 +121,13 @@ public class CommonMapController implements PacketListener, Listener {
     private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
     // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
+    // Tracks chunks neighbouring item frame clusters that need to be loaded before clusters load in
+    private final HashMap<World, Map<IntVector2, Set<IntVector2>>> itemFrameClusterDependencies = new HashMap<>();
     // Tracks all maps that need to have their Map Ids re-synchronized (item slot / itemframe metadata updates)
     private SetMultimap<UUID, MapUUID> dirtyMapUUIDSet = HashMultimap.create(5, 100);
     private SetMultimap<UUID, MapUUID> dirtyMapUUIDSetTmp = HashMultimap.create(5, 100);
-    // Whether to automatically load neighbouring chunks when item frames are found on the edges
-    private boolean LOAD_BORDER_CHUNKS = false;
-    // Stores neighbouring chunks of chunk-bordering item frames that must be loaded in case they are part of a multi-display
-    private final ImplicitlySharedSet<PendingChunkLoad> neighbourChunkQueue = new ImplicitlySharedSet<PendingChunkLoad>();
     // Caches used while executing findNeighbours()
     private FindNeighboursCache findNeighboursCache = null;
-    // Whether this controller has been enabled
-    private boolean isEnabled = false;
-    // Whether tiling is supported. Disables findNeighbours() if false.
-    private boolean isFrameTilingSupported = true;
     // Neighbours of item frames to check for either x-aligned or z-aligned
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_X = {BlockFace.UP, BlockFace.DOWN, BlockFace.NORTH, BlockFace.SOUTH};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Y = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
@@ -185,6 +187,16 @@ public class CommonMapController implements PacketListener, Listener {
      */
     public Collection<ItemFrameInfo> getItemFrames() {
         return itemFrames.values();
+    }
+
+    /**
+     * Gets the item frame with the given entity id
+     *
+     * @param entityId
+     * @return item frame
+     */
+    public ItemFrameInfo getItemFrame(int entityId) {
+        return itemFrames.get(Integer.valueOf(entityId));
     }
 
     /**
@@ -655,7 +667,13 @@ public class CommonMapController implements PacketListener, Listener {
                 return; // no information available or not an item frame
             }
 
-            frameInfo.updateItem(); // Asynchronous access breaks things, but not doing this results in blank maps on join
+            // Sometimes the metadata packet is handled before we do routine updates
+            // If so, we can't do anything with it yet until the item frame is
+            // loaded on the main thread.
+            if (frameInfo.lastFrameItemUpdateNeeded || frameInfo.requiresFurtherLoading) {
+                frameInfo.sentToPlayers = true;
+                return; // not yet loaded, once it loads, resend the item details
+            }
             if (frameInfo.lastMapUUID == null) {
                 return; // not a map
             }
@@ -807,6 +825,11 @@ public class CommonMapController implements PacketListener, Listener {
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
+    protected synchronized void onChunkEntitiesLoaded(ChunkLoadEntitiesEvent event) {
+        onChunkEntitiesLoaded(event.getChunk());
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
         for (EntityItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
             onAddItemFrame(frame);
@@ -843,50 +866,72 @@ public class CommonMapController implements PacketListener, Listener {
             frameInfo.needsItemRefresh = true;
             frameInfo.sentToPlayers = true;
         }
+    }
 
-        // If frame tiling is disabled, then neighbouring chunks don't have to be loaded
-        // If the item frame does not store a map item, we don't have to load the neighbouring chunks
-        if (!this.LOAD_BORDER_CHUNKS || !this.isFrameTilingSupported || !frame.getItemIsMap()) {
-            return;
+    private void onChunkEntitiesLoaded(Chunk chunk) {
+        World world = chunk.getWorld();
+
+        Set<IntVector2> dependingChunks;
+        {
+            Map<IntVector2, Set<IntVector2>> dependencies = this.itemFrameClusterDependencies.get(world);
+            if (dependencies == null || (dependingChunks = dependencies.remove(new IntVector2(chunk))) == null) {
+                return;
+            }
         }
 
-        // Queue chunks left/right of this item frame for loading
-        // If the display crosses chunk boundaries, this ensures those are loaded
-        World world = frame.getBukkitWorld();
-        BlockFace facing = frame.getFacing();
-        if (FaceUtil.isAlongY(facing)) {
-            // Along Y, all chunks surrounding it touching the item frame should be loaded
-            IntVector3 pos = frame.getBlockPosition();
-            IntVector2 chunk = pos.toChunkCoordinates();
-            PendingChunkLoad chunk_neigh0 = new PendingChunkLoad(world, pos.add(1, 0, 0));
-            PendingChunkLoad chunk_neigh1 = new PendingChunkLoad(world, pos.add(0, 0, 1));
-            PendingChunkLoad chunk_neigh2 = new PendingChunkLoad(world, pos.add(-1, 0, 0));
-            PendingChunkLoad chunk_neigh3 = new PendingChunkLoad(world, pos.add(0, 0, -1));
-            if (chunk.x != chunk_neigh0.x || chunk.z != chunk_neigh0.z) {
-                neighbourChunkQueue.add(chunk_neigh0);
+        boolean wasClustersByWorldCacheEnabled = this.itemFrameClustersByWorldEnabled;
+        try {
+            this.itemFrameClustersByWorldEnabled = true;
+            for (IntVector2 depending : dependingChunks) {
+                // Check this depending chunk is still loaded with all entities inside
+                // If not, then when it loads the cluster will be revived then
+                if (!WorldUtil.isChunkEntitiesLoaded(world, depending.x, depending.z)) {
+                    continue;
+                }
+
+                // Go by all entities in this depending chunk to find the item frames
+                // Quicker than iterating all item frames on the world
+                for (Entity entity : ChunkUtil.getEntities(WorldUtil.getChunk(world, depending.x, depending.z))) {
+                    if (!(entity instanceof ItemFrame)) {
+                        continue;
+                    }
+
+                    // Recalculate UUID, this will re-discover the cluster
+                    // May also revive other item frames that were part of the same cluster
+                    // Note that if this chunk being loaded contained item frames part of the cluster,
+                    // the cluster is already revived. Entity add handling occurs prior.
+                    ItemFrameInfo frameInfo = this.itemFrames.get(entity.getEntityId());
+                    if (frameInfo != null) {
+                        frameInfo.onChunkDependencyLoaded();
+                    }
+                }
             }
-            if (chunk.x != chunk_neigh1.x || chunk.z != chunk_neigh1.z) {
-                neighbourChunkQueue.add(chunk_neigh1);
+        } finally {
+            this.itemFrameClustersByWorldEnabled = wasClustersByWorldCacheEnabled;
+            if (!wasClustersByWorldCacheEnabled) {
+                itemFrameClustersByWorld.clear();
             }
-            if (chunk.x != chunk_neigh2.x || chunk.z != chunk_neigh2.z) {
-                neighbourChunkQueue.add(chunk_neigh2);
-            }
-            if (chunk.x != chunk_neigh3.x || chunk.z != chunk_neigh3.z) {
-                neighbourChunkQueue.add(chunk_neigh3);
-            }
+        }
+    }
+
+    /**
+     * Checks whether an item frame cluster's chunk dependency has all item frames currently loaded.
+     * If not, returns false, and tracks this chunk for when it loads in the future.
+     *
+     * @param world World
+     * @param dependency Dependency
+     * @return True if the chunk dependency is loaded, False if it is not
+     */
+    public synchronized boolean checkClusterChunkDependency(World world, ItemFrameCluster.ChunkDependency dependency) {
+        if (!this.isFrameTilingSupported) {
+            return true; // No need to even check
+        } else if (WorldUtil.isChunkEntitiesLoaded(world, dependency.neighbour.x, dependency.neighbour.z)) {
+            return true;
         } else {
-            // Along X or Z, check chunks loaded in other two directions
-            BlockFace left_right = FaceUtil.rotate(facing, 2);
-            IntVector3 pos = frame.getBlockPosition();
-            IntVector2 chunk = pos.toChunkCoordinates();
-            PendingChunkLoad chunk_left = new PendingChunkLoad(world, pos.add(left_right));
-            PendingChunkLoad chunk_right = new PendingChunkLoad(world, pos.subtract(left_right));
-            if (chunk.x != chunk_left.x || chunk.z != chunk_left.z) {
-                neighbourChunkQueue.add(chunk_left);
-            }
-            if (chunk.x != chunk_right.x || chunk.z != chunk_right.z) {
-                neighbourChunkQueue.add(chunk_right);
-            }
+            Map<IntVector2, Set<IntVector2>> dependencies = this.itemFrameClusterDependencies.computeIfAbsent(world, unused -> new HashMap<>());
+            Set<IntVector2> dependingChunks = dependencies.computeIfAbsent(dependency.neighbour, unused -> new HashSet<>());
+            dependingChunks.add(dependency.self);
+            return false;
         }
     }
 
@@ -1335,39 +1380,26 @@ public class CommonMapController implements PacketListener, Listener {
 
         @Override
         public void run() {
-            // Load neighbouring chunks
-            if (LOAD_BORDER_CHUNKS) {
-                while (!neighbourChunkQueue.isEmpty()) {
-                    try (ImplicitlySharedSet<PendingChunkLoad> copy = neighbourChunkQueue.clone()) {
-                        // Load all the chunks
-                        for (PendingChunkLoad chunk : copy) {
-                            chunk.world.getChunkAt(chunk.x, chunk.z);
-                        }
-
-                        // Remove the chunks we have loaded
-                        neighbourChunkQueue.removeAll(copy);
-                    }
-                }
-            }
-
             // Enable the item frame cluster cache
             itemFrameClustersByWorldEnabled = true;
 
             // Iterate all tracked item frames and update them
-            Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
-            while (itemFrames_iter.hasNext()) {
-                info = itemFrames_iter.next();
-                if (info.handleRemoved()) {
-                    itemFrames_iter.remove();
-                    continue;
-                }
+            synchronized (CommonMapController.this) {
+                Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
+                while (itemFrames_iter.hasNext()) {
+                    info = itemFrames_iter.next();
+                    if (info.handleRemoved()) {
+                        itemFrames_iter.remove();
+                        continue;
+                    }
 
-                info.updateItemAndViewers(synchronizer);
+                    info.updateItemAndViewers(synchronizer);
 
-                // May find out it's removed during the update
-                if (info.handleRemoved()) {
-                    itemFrames_iter.remove();
-                    continue;
+                    // May find out it's removed during the update
+                    if (info.handleRemoved()) {
+                        itemFrames_iter.remove();
+                        continue;
+                    }
                 }
             }
 
@@ -1520,38 +1552,6 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private static class PendingChunkLoad {
-        public final World world;
-        public final int x;
-        public final int z;
-
-        public PendingChunkLoad(World world, IntVector3 pos) {
-            this.world = world;
-            this.x = pos.getChunkX();
-            this.z = pos.getChunkZ();
-        }
-
-        @Override
-        public int hashCode() {
-            int result = 1;
-            result = 31 * result + this.world.hashCode();
-            result = 31 * result + this.x;
-            result = 31 * result + this.z;
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (o instanceof PendingChunkLoad) {
-                PendingChunkLoad other = (PendingChunkLoad) o;
-                return this.world == other.world &&
-                       this.x == other.x &&
-                       this.z == other.z;
-            }
-            return false;
-        }
-    }
-
     /**
      * Finds a cluster of all connected item frames that an item frame is part of
      * 
@@ -1562,7 +1562,7 @@ public class CommonMapController implements PacketListener, Listener {
         UUID itemFrameMapUUID;
         if (!this.isFrameTilingSupported || (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) == null) {
             return new ItemFrameCluster(itemFrame.getFacing(),
-                    Collections.singletonList(itemFramePosition), 0); // no neighbours or tiling disabled
+                    Collections.singleton(itemFramePosition), 0); // no neighbours or tiling disabled
         }
 
         // Look up in cache first
@@ -1624,7 +1624,7 @@ public class CommonMapController implements PacketListener, Listener {
 
             // Make sure the neighbours result are a single contiguous blob
             // Islands (can not reach the input item frame) are removed
-            List<IntVector3> result = new ArrayList<IntVector3>(cache.cache.size());
+            Set<IntVector3> result = new HashSet<IntVector3>(cache.cache.size());
             result.add(itemFramePosition);
             cache.pendingList.add(itemFramePosition);
             do {
@@ -1794,17 +1794,22 @@ public class CommonMapController implements PacketListener, Listener {
     public static class ItemFrameCluster {
         // Facing of the display
         public final BlockFace facing;
-        // List of coordinates where item frames are stored
-        public final List<IntVector3> coordinates;
+        // Set of coordinates where item frames are stored
+        public final Set<IntVector3> coordinates;
         // Most common ItemFrame rotation used for the display
         public final int rotation;
         // Minimum/maximum coordinates and size of the item frame coordinates in this cluster
         public final IntVector3 min_coord, max_coord;
+        // Chunks that must be loaded in addition to this cluster, to make this cluster validly loaded
+        public final ChunkDependency[] chunk_dependencies;
         // Resolution in rotation/facing relative space (unused)
         // public final IntVector3 size;
         // public final IntVector2 resolution;
 
-        public ItemFrameCluster(BlockFace facing, List<IntVector3> coordinates, int rotation) {
+        // A temporary builder which we use to track what chunks need to be loaded to load a cluster
+        private static final ChunkDependencyBuilder BUILDER = new ChunkDependencyBuilder();
+
+        public ItemFrameCluster(BlockFace facing, Set<IntVector3> coordinates, int rotation) {
             this.facing = facing;
             this.coordinates = coordinates;
             this.rotation = rotation;
@@ -1827,7 +1832,15 @@ public class CommonMapController implements PacketListener, Listener {
                 min_coord = new IntVector3(min_x, min_y, min_z);
                 max_coord = new IntVector3(max_x, max_y, max_z);
             } else {
-                min_coord = max_coord = coordinates.get(0);
+                min_coord = max_coord = coordinates.iterator().next();
+            }
+
+            synchronized (BUILDER) {
+                try {
+                    this.chunk_dependencies = BUILDER.process(facing, coordinates);
+                } finally {
+                    BUILDER.reset();
+                }
             }
 
             // Compute resolution (unused)
@@ -1885,6 +1898,78 @@ public class CommonMapController implements PacketListener, Listener {
 
         public boolean hasMultipleTiles() {
             return coordinates.size() > 1;
+        }
+
+        private static final class ChunkDependencyBuilder {
+            private final LongHashSet covered = new LongHashSet();
+            private final List<ChunkDependency> dependencies = new ArrayList<ChunkDependency>();
+
+            public ChunkDependency[] process(BlockFace facing, Collection<IntVector3> coordinates) {
+                // Add all chunks definitely covered by item frames, and therefore loaded
+                // These are excluded as dependencies
+                for (IntVector3 coordinate : coordinates) {
+                    covered.add(coordinate.getChunkX(), coordinate.getChunkZ());
+                }
+
+                // Go by all coordinates and if they sit at a chunk border, check that chunk is loaded
+                // If it is not, add it as a dependency
+                if (!FaceUtil.isAlongX(facing)) {
+                    for (IntVector3 coordinate : coordinates) {
+                        if ((coordinate.x & 0xF) == 0x0) {
+                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), -1, 0);
+                        } else if ((coordinate.x & 0xF) == 0xF) {
+                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 1, 0);
+                        }
+                    }
+                }
+                if (!FaceUtil.isAlongZ(facing)) {
+                    for (IntVector3 coordinate : coordinates) {
+                        if ((coordinate.z & 0xF) == 0x0) {
+                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 0, -1);
+                        } else if ((coordinate.z & 0xF) == 0xF) {
+                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 0, 1);
+                        }
+                    }
+                }
+
+                // To array
+                return dependencies.toArray(new ChunkDependency[dependencies.size()]);
+            }
+
+            public void probe(int cx, int cz, int dx, int dz) {
+                int n_cx = cx + dx;
+                int n_cz = cz + dz;
+                if (covered.add(n_cx, n_cz)) {
+                    dependencies.add(new ChunkDependency(cx, cz, n_cx, n_cz));
+                }
+            }
+
+            public void reset() {
+                covered.clear();
+                dependencies.clear();
+            }
+        }
+
+        /**
+         * A chunk neighbouring this cluster that must be loaded before
+         * this cluster of item frames becomes active.
+         * Tracks the chunk that needs to be loaded, as well as the
+         * chunk the item frame is in that needs this neighbour.
+         */
+        public static final class ChunkDependency {
+            public static final ChunkDependency NONE = new ChunkDependency();
+            public final IntVector2 self;
+            public final IntVector2 neighbour;
+
+            private ChunkDependency() {
+                this.self = null;
+                this.neighbour = null;
+            }
+
+            public ChunkDependency(int cx, int cz, int n_cx, int n_cz) {
+                this.self = new IntVector2(cx, cz);
+                this.neighbour = this.self.add(n_cx, n_cz);
+            }
         }
     }
 
