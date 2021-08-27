@@ -1968,7 +1968,7 @@ public class CommonMapController implements PacketListener, Listener {
 
             public ChunkDependency(int cx, int cz, int n_cx, int n_cz) {
                 this.self = new IntVector2(cx, cz);
-                this.neighbour = this.self.add(n_cx, n_cz);
+                this.neighbour = new IntVector2(n_cx, n_cz);
             }
         }
     }
