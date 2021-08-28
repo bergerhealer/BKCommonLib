@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
 
 /**
@@ -120,8 +121,12 @@ public class ItemFrameInfo {
             return null;
         }
 
+        // Check whether the item frame is invisible. If so, a different offset is used.
+        boolean invisible = this.itemFrameHandle.getDataWatcher().getFlag(
+                EntityHandle.DATA_FLAGS, EntityHandle.DATA_FLAG_INVISIBLE);
+
         // Offset from block face to canvas
-        final double FRAME_OFFSET = 0.0625;
+        double FRAME_OFFSET = invisible ? 0.00625 : 0.0625;
 
         // Compare facing with the eye ray to calculate the eye distance to the item frame
         final double distance;
