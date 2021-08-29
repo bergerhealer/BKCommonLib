@@ -447,7 +447,16 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     #require net.minecraft.server.level.WorldServer final net.minecraft.world.level.entity.EntityTickList entityTickList;
          *     EntityTickList tickList = world#entityTickList;
          * 
-         * #if exists net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
+         * #if exists net.minecraft.world.level.entity.EntityTickList private final io.papermc.paper.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
+         *     // Tuinity was later ported to Paper with a new class package
+         *     #require net.minecraft.world.level.entity.EntityTickList private final io.papermc.paper.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
+         *     io.papermc.paper.util.maplist.IteratorSafeOrderedReferenceSet set = tickList#entities;
+         *     if (set.remove(oldEntity)) {
+         *         if (newEntity != null) {
+         *             set.add(newEntity);
+         *         }
+         *     }
+         * #elseif exists net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
          *     // Tuinity
          *     #require net.minecraft.world.level.entity.EntityTickList private final com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet<Entity> entities;
          *     com.tuinity.tuinity.util.maplist.IteratorSafeOrderedReferenceSet set = tickList#entities;

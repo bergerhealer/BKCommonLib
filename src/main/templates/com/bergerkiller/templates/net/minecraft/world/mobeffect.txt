@@ -45,5 +45,11 @@ class MobEffect {
 
 class MobEffectList {
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+
+#if exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
+    // Purpur 1.17.1+
+    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
+#else
     public static (MobEffectListHandle) MobEffectList fromId(int id);
+#endif
 }
