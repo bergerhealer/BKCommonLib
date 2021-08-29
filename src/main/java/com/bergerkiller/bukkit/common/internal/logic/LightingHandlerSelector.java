@@ -45,7 +45,7 @@ public final class LightingHandlerSelector implements LightingHandler {
         }
 
         // Tuinity StarLight engine check, then initialize
-        if (CommonUtil.getClass("com.tuinity.tuinity.chunk.light.SWMRNibbleArray") != null) {
+        if (CommonUtil.getClass("ca.spottedleaf.starlight.light.SWMRNibbleArray") != null) {
             starlight = new LightingHandler_1_16_4_StarLightEngine();
         } else {
             starlight = new LightingHandlerDisabled(null);

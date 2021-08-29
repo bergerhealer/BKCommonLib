@@ -521,6 +521,21 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
         }
 
+        // Tuinity Starlight was migrated into paper, but before that, it sat in its own namespace
+        if (evaluateMCVersion(">=", "1.17.1")) {
+            try {
+                MPLType.getClassByName("com.tuinity.tuinity.chunk.light.SWMRNibbleArray");
+
+                // Found, remap the paper namespace to here
+                for (String name : new String[] {
+                        "SWMRNibbleArray", "StarLightInterface", "StarLightEngine",
+                        "SkyStarLightEngine", "BlockStarLightEngine"
+                }) {
+                    remappings.put("ca.spottedleaf.starlight.light." + name, "com.tuinity.tuinity.chunk.light." + name);
+                }
+            } catch (ClassNotFoundException ex) {}
+        }
+
         // If remappings exist, add a resolver for them
         if (!remappings.isEmpty()) {
             if (server instanceof CraftBukkitServer) {

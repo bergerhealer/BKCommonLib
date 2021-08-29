@@ -6,9 +6,13 @@ import com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreaded
 optional class LightEngineThreaded {
 
     public void schedule(Runnable runnable) {
-#if exists net.minecraft.server.LightEngineThreaded
-        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> mailbox:b;
-        net.minecraft.util.thread.ThreadedMailbox mailbox = instance#mailbox;
+#if exists net.minecraft.server.level.LightEngineThreaded
+    #if exists net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
+        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
+    #else
+        #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox:b;
+    #endif
+        net.minecraft.util.thread.ThreadedMailbox mailbox = instance#taskMailbox;
         mailbox.a(runnable);
 #endif
     }

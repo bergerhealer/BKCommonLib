@@ -141,12 +141,13 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     @Template.Import("net.minecraft.core.SectionPosition")
     @Template.Import("net.minecraft.world.level.chunk.Chunk")
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
-    @Template.InstanceType("com.tuinity.tuinity.chunk.light.SWMRNibbleArray")
+    @Template.Import("net.minecraft.world.level.EnumSkyBlock")
+    @Template.InstanceType("ca.spottedleaf.starlight.light.SWMRNibbleArray")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
          * <GET_LAYER_DATA>
-         * public static byte[] getLayerData(net.minecraft.server.LightEngineLayer layer, int cx, int cy, int cz) {
+         * public static byte[] getLayerData(net.minecraft.world.level.lighting.LightEngineLayer layer, int cx, int cy, int cz) {
          *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
          *    if (array == null) {
          *        return null;
@@ -160,10 +161,10 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <IS_SUPPORTED>
          * public static boolean isSupported(net.minecraft.server.level.LightEngineThreaded lightEngineThreaded) {
-         * #if exists net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
-         *     #require net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.StarLightInterface theLightEngine;
+         * #if exists net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.starlight.light.StarLightInterface theLightEngine;
+         *     #require net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.starlight.light.StarLightInterface theLightEngine;
          * #else
-         *     #require net.minecraft.server.level.LightEngineThreaded protected final com.tuinity.tuinity.chunk.light.ThreadedStarLightEngine theLightEngine;
+         *     #require net.minecraft.server.level.LightEngineThreaded protected final ca.spottedleaf.starlight.light.ThreadedStarLightEngine theLightEngine;
          * #endif
          *     return lightEngineThreaded#theLightEngine != null;
          * }
@@ -180,7 +181,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
+         * #if exists ca.spottedleaf.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
          *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
@@ -206,7 +207,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         return null;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
+         * #if exists ca.spottedleaf.starlight.light.SWMRNibbleArray public net.minecraft.world.level.chunk.NibbleArray toVanillaNibble();
          *     NibbleArray nibble = swmr_nibble.toVanillaNibble();
          *     if (nibble == null) {
          *         return null;
@@ -236,18 +237,23 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         nibbles[cy] = nibble;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
+         * #if exists ca.spottedleaf.starlight.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
          * #else
          *     nibble.set(0, 0);
-         *     #require com.tuinity.tuinity.chunk.light.SWMRNibbleArray protected byte[] storageUpdating;
+         *     #require ca.spottedleaf.starlight.light.SWMRNibbleArray protected byte[] storageUpdating;
          *     byte[] updating = nibble#storageUpdating;
          *     System.arraycopy(data, 0, updating, 0, 2048);
          * #endif
          * 
          *     if (nibble.updateVisible()) {
-         *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.SKY, new SectionPosition(cx, cy-1, cz));
+         *         net.minecraft.world.level.chunk.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
+         *         SectionPosition position = SectionPosition.a(cx, cy-1, cz);
+         * #if exists net.minecraft.world.level.chunk.ILightAccess public abstract void markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock block, net.minecraft.core.SectionPosition pos);
+         *         lightAccess.markLightSectionDirty(EnumSkyBlock.SKY, position);
+         * #else
+         *         lightAccess.a(EnumSkyBlock.SKY, position);
+         * #endif
          *     }
          * }
          */
@@ -267,18 +273,23 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
          *         nibbles[cy] = nibble;
          *     }
          * 
-         * #if exists com.tuinity.tuinity.chunk.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
+         * #if exists ca.spottedleaf.starlight.light.SWMRNibbleArray public void copyFrom(final byte[] src, final int off);
          *     nibble.copyFrom(data, 0);
          * #else
          *     nibble.set(0, 0);
-         *     #require com.tuinity.tuinity.chunk.light.SWMRNibbleArray protected byte[] storageUpdating;
+         *     #require ca.spottedleaf.starlight.light.SWMRNibbleArray protected byte[] storageUpdating;
          *     byte[] updating = nibble#storageUpdating;
          *     System.arraycopy(data, 0, updating, 0, 2048);
          * #endif
          * 
          *     if (nibble.updateVisible()) {
-         *         net.minecraft.server.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
-         *         lightAccess.markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock.BLOCK, new SectionPosition(cx, cy-1, cz));
+         *         net.minecraft.world.level.chunk.ILightAccess lightAccess = chunk.getWorld().getChunkProvider();
+         *         SectionPosition position = SectionPosition.a(cx, cy-1, cz);
+         * #if exists net.minecraft.world.level.chunk.ILightAccess public abstract void markLightSectionDirty(net.minecraft.world.level.EnumSkyBlock block, net.minecraft.core.SectionPosition pos);
+         *         lightAccess.markLightSectionDirty(EnumSkyBlock.BLOCK, position);
+         * #else
+         *         lightAccess.a(EnumSkyBlock.BLOCK, position);
+         * #endif
          *     }
          * }
          */
