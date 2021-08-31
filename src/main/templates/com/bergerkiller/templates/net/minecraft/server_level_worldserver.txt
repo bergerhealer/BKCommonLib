@@ -177,7 +177,7 @@ class WorldServer extends World {
 #if version >= 1.13.2
         cps = (ChunkProviderServer) instance.getChunkProvider();
 #elseif version >= 1.9
-        cps = instance.getChunkProviderServer();
+        cps = (ChunkProviderServer) instance.getChunkProviderServer();
 #else
         cps = instance.chunkProviderServer;
 #endif
