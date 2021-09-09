@@ -486,6 +486,16 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *         }
          *     }
          * #endif
+         * 
+         *     // Tuinity, now in paper: entitySliceManager which stores entity lists by region index
+         * #if exists net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+         *     #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+         *     io.papermc.paper.world.EntitySliceManager entitySliceManager = world#entitySliceManager;
+         *     entitySliceManager.removeEntity(oldEntity);
+         *     if (newEntity != null) {
+         *         entitySliceManager.addEntity(newEntity);
+         *     }
+         * #endif
          * }
          */
         @Template.Generated("%REPLACE_IN_WORLD_STORAGE%")
