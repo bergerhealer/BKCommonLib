@@ -4,18 +4,21 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.AsyncTask;
+import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.ModuleLogger;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.SecureField;
 
 import org.bukkit.Bukkit;
@@ -259,13 +262,11 @@ public class DebugUtil {
      * @param value to find
      */
     public static void logInstances(Object startObject, Object value) {
-        System.out.println("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
-        IdentityHashMap<Object, Boolean> crossedValues = new IdentityHashMap<Object, Boolean>();
-        HashMap<Class<?>, ArrayList<Field>> classFieldMapping = new HashMap<Class<?>, ArrayList<Field>>();
-        LinkedList<StackElement> fieldStack = new LinkedList<StackElement>();
-        fieldStack.addLast(new StackElement(startObject));
-        DebugUtil.logMemberInstances(startObject, value, crossedValues, classFieldMapping, fieldStack);
-        System.out.println("Search completed.");
+        InstanceSearcher searcher = new InstanceSearcher(value);
+        searcher.logger.info("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
+        searcher.searchFrom(new StackElement(startObject));
+        searcher.run();
+        searcher.logger.info("Search completed.");
     }
 
     /**
@@ -278,60 +279,11 @@ public class DebugUtil {
      * @param value to find
      */
     public static void logInstances(Class<?> startClass, Object value) {
-        System.out.println("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
-        IdentityHashMap<Object, Boolean> crossedValues = new IdentityHashMap<Object, Boolean>();
-        HashMap<Class<?>, ArrayList<Field>> classFieldMapping = new HashMap<Class<?>, ArrayList<Field>>();
-        logInstancesInClass(startClass, value, crossedValues, classFieldMapping);
-        System.out.println("Search completed.");
-    }
-
-    private static ArrayList<Field> logInstancesInClass(Class<?> type, Object value, IdentityHashMap<Object, Boolean> crossedValues, HashMap<Class<?>, ArrayList<Field>> classFieldMapping) {
-        ArrayList<Field> staticFields = new ArrayList<Field>();
-        ArrayList<Field> localFields = new ArrayList<Field>();
-        Class<?> t = type;
-        do {
-            for (Field f : t.getDeclaredFields()) {
-                Class<?> f_type = f.getType();
-
-                // Ignore certain types of fields
-                if (f_type.isPrimitive()) continue;
-                if (Class.class.isAssignableFrom(f_type)) continue;
-
-                try {
-                    SecureField sf = new SecureField();
-                    sf.init(f);
-                    sf.read();
-                    
-                    if (Modifier.isStatic(f.getModifiers())) {
-                        staticFields.add(f);
-                    } else {
-                        localFields.add(f);
-                    }
-                } catch (RuntimeException ex) {
-                    
-                }
-            }
-        } while ((t = t.getSuperclass()) != null);
-
-        classFieldMapping.put(type, localFields);
-
-        LinkedList<StackElement> fieldStack = new LinkedList<StackElement>();
-        fieldStack.addLast(new StackElement(type));
-        for (Field staticField : staticFields) {
-            Object staticValue = null;
-            try {
-                staticValue = staticField.get(null);
-            } catch (Throwable tt) {}
-            if (staticValue == null) {
-                continue;
-            }
-
-            fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(staticField, staticValue)));
-            logMemberInstances(staticValue, value, crossedValues, classFieldMapping, fieldStack);
-            fieldStack.removeLast();
-        }
-
-        return localFields;
+        InstanceSearcher searcher = new InstanceSearcher(value);
+        searcher.logger.info("Searching for [" + value.getClass().getName() + "] " + value.toString() + ":");
+        searcher.searchFromClassFields(startClass);
+        searcher.run();
+        searcher.logger.info("Search completed.");
     }
 
     private static class FieldWithType {
@@ -353,193 +305,6 @@ public class DebugUtil {
         }
     }
 
-    private static class StackElement {
-        public final Object info;
-        public boolean logged;
-        public int index; // -1 = no index, -2 = recurse
-
-        public StackElement(Object info) {
-            this.info = info;
-            this.logged = false;
-            this.index = -1;
-        }
-    }
-
-    private static boolean logMemberInstances(Object current, Object value, IdentityHashMap<Object, Boolean> crossedValues, HashMap<Class<?>, ArrayList<Field>> classFieldMapping, LinkedList<StackElement> fieldStack) {
-        // Ignore null
-        if (current == null) return false;
-
-        // Found it!
-        boolean found;
-        if (found = (current == value)) {
-            // Log all the fields that still need logging, with indent
-            String indent = "  ";
-            StackElement last = fieldStack.getLast();
-            for (StackElement el : fieldStack) {
-                if (!el.logged) {
-                    el.logged = true;
-                    if (el.info instanceof Class) {
-                        System.out.println("[Static members of " + ((Class<?>) el.info).getSimpleName() + "]");
-                        indent = "  ";
-                        continue;
-                    }
-
-                    String infoStr;
-                    if (el.info instanceof Field) {
-                        Field f = (Field) el.info;
-                        infoStr = Modifier.toString(f.getModifiers()) +
-                                " " + f.getType().getSimpleName() +
-                                " " + f.getName();
-                    } else if (el.info instanceof FieldWithType) {
-                        FieldWithType fwt = (FieldWithType) el.info;
-                        Field f = fwt.field;
-                        infoStr = Modifier.toString(f.getModifiers()) +
-                                " [" + fwt.valueType.getSimpleName() +
-                                "] " + f.getType().getSimpleName() +
-                                " " + f.getName();
-                    } else {
-                        infoStr = el.info.toString();
-                    }
-                    if (el.index == -2) {
-                        infoStr += " [Recursive]";
-                    } else if (el.index != -1) {
-                        infoStr += " [" + el.index + "]";
-                    }
-                    if (last == el) {
-                        System.out.println(indent + "- " + infoStr + " <<< HERE");
-                    } else {
-                        System.out.println(indent + "- " + infoStr);
-                    }
-                }
-                indent += "  ";
-            }
-
-            // Continue searching, because the current value itself may also hold a reference somewhere!
-        }
-
-        // Check if not already discovered
-        if (crossedValues.put(current, Boolean.valueOf(true)) != null) {
-            return found;
-        }
-
-        // Discover the current class
-        final Class<?> type = current.getClass();
-        ArrayList<Field> localFields = classFieldMapping.get(type);
-        if (localFields == null) {
-            localFields = logInstancesInClass(type, value, crossedValues, classFieldMapping);
-        }
-
-        // Handle maps so we don't have to go all the way into the private members
-        try {
-            if (Map.class.isAssignableFrom(type)) {
-                for (Entry<?, ?> entry : ((Map<?, ?>) current).entrySet()) {
-                    fieldStack.addLast(new StackElement("M{v=" + entry.getValue() + "}.key"));
-                    found |= logMemberInstances(entry.getKey(), value, crossedValues, classFieldMapping, fieldStack);
-                    fieldStack.removeLast();
-
-                    fieldStack.addLast(new StackElement("M{k=" + entry.getKey() + "}.value"));
-                    found |= logMemberInstances(entry.getValue(), value, crossedValues, classFieldMapping, fieldStack);
-                    fieldStack.removeLast();
-                }
-                if (found) {
-                    return true; // No need to check deeper, really
-                }
-            }
-        } catch (Throwable tt) {} // ignore errors, just try different means
-
-        // Handle lists so we don't have to go all the way into the private members
-        try {
-            if (List.class.isAssignableFrom(type)) {
-                StackElement last = fieldStack.getLast();
-                List<?> list = (List<?>) current;
-                ListIterator<?> iter = list.listIterator();
-                int idx = 0;
-                while (iter.hasNext()) {
-                    Object currItem = iter.next();
-                    int old_index = last.index;
-                    last.index = (old_index == -1) ? idx : -2;
-                    found |= logMemberInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
-                    last.index = old_index;
-                    idx++;
-                }
-                if (found) {
-                    return true; // No need to check deeper, really
-                }
-            }
-        } catch (Throwable tt) {} // ignore errors, just try different means
-
-        // Handle generic collection types that don't specify an index
-        try {
-            if (Collection.class.isAssignableFrom(type)) {
-                Collection<?> coll = (Collection<?>) current;
-                fieldStack.addLast(new StackElement("C[?]"));
-                for (Object currItem : coll) {
-                    found |= logMemberInstances(currItem, value, crossedValues, classFieldMapping, fieldStack);
-                }
-                fieldStack.removeLast();
-                if (found) {
-                    return true; // No need to check deeper, really
-                }
-            }
-        } catch (Throwable tt) {} // ignore errors, just try different means
-
-        // If this is an array, go by all its elements
-        // Unknown collection types will also end up deep inside here
-        if (type.isArray()) {
-            // Skip primitive arrays entirely
-            if (type.getComponentType().isPrimitive()) {
-                return false;
-            }
-
-            StackElement last = fieldStack.getLast();
-            Object[] arr = (Object[]) current;
-            for (int i = 0; i < arr.length; i++) {
-                int old_index = last.index;
-                last.index = (old_index == -1) ? i : -2;
-                found |= logMemberInstances(arr[i], value, crossedValues, classFieldMapping, fieldStack);
-                last.index = old_index;
-            }
-            return found;
-        }
-
-        // Go by all fields in this instance
-        for (Field localField : localFields) {
-            Object fieldValue = null;
-            try {
-                fieldValue = localField.get(current);
-            } catch (Throwable tt) {}
-
-            // If null, just skip it's not going to store anything interesting
-            if (fieldValue == null) {
-                continue;
-            }
-
-            // If top element, always go into it
-            if (fieldStack.isEmpty()) {
-                fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
-                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
-                fieldStack.removeLast();
-                continue;
-            }
-
-            // If last in the stack is also this field, add a (Recurse) stack element and nothing more
-            StackElement last = fieldStack.getLast();
-            if (last.info == localField) {
-                // Same field, set recurse flag and move on without growing the stack
-                int old_index = last.index;
-                last.index = -2;
-                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
-                last.index = old_index;
-            } else {
-                // Not the same field
-                fieldStack.addLast(new StackElement(FieldWithType.wrapInfo(localField, fieldValue)));
-                found |= logMemberInstances(fieldValue, value, crossedValues, classFieldMapping, fieldStack);
-                fieldStack.removeLast();
-            }
-        }
-        return found;
-    }
-
     /**
      * Logs the stack trace of the current thread after a delay in milliseconds.
      * Can be used to debug application freezes.
@@ -553,11 +318,310 @@ public class DebugUtil {
             public void run() {
                 sleep(delay);
                 StackTraceElement[] stack = thread.getStackTrace();
-                System.err.println("Stack trace of thread " + thread.getName() + ":");
+                Logging.LOGGER_DEBUG.warning("Stack trace of thread " + thread.getName() + ":");
                 for (StackTraceElement element : stack) {
-                    System.err.println("  at " + element.toString());
+                    Logging.LOGGER_DEBUG.warning("  at " + element.toString());
                 }
             }
         }.start();
+    }
+
+    private static class StackElement {
+        public final StackElement parent;
+        public final Object value;
+        public final Object info;
+        public int index; // -1 = no index, -2 = recurse
+
+        public StackElement(Object value) {
+            this(value, value);
+        }
+
+        public StackElement(Object value, Object info) {
+            this(null, value, info);
+        }
+
+        private StackElement(StackElement parent, Object value, Object info) {
+            this.parent = parent;
+            this.value = value;
+            this.info = info;
+            this.index = -1;
+        }
+
+        public StackElement next(Object value, Object info) {
+            return new StackElement(this, value, info);
+        }
+    }
+
+    private static class StackTreeElement {
+        public final StackElement self;
+        public List<StackTreeElement> children;
+        public boolean valueIsHere;
+
+        public StackTreeElement(StackElement self) {
+            this.self = self;
+            this.children = Collections.emptyList();
+            this.valueIsHere = false;
+        }
+
+        public StackTreeElement next(StackElement child) {
+            for (StackTreeElement childTreeEl : children) {
+                if (childTreeEl.self == child) {
+                    return childTreeEl;
+                }
+            }
+
+            StackTreeElement newElement = new StackTreeElement(child);
+            if (this.children.isEmpty()) {
+                this.children = Collections.singletonList(newElement);
+            } else {
+                this.children = new ArrayList<StackTreeElement>(this.children);
+                this.children.add(newElement);
+            }
+            return newElement;
+        }
+
+        public void log(ModuleLogger logger, String indent) {
+            String nextIndent = "";
+            if (self != null) {
+                nextIndent = indent + "  ";
+                if (self.info instanceof Class) {
+                    logger.info("[Static members of " + ((Class<?>) self.info).getSimpleName() + "]");
+                } else {
+                    String infoStr;
+                    if (self.info instanceof Field) {
+                        Field f = (Field) self.info;
+                        infoStr = Modifier.toString(f.getModifiers()) +
+                                " " + f.getType().getSimpleName() +
+                                " " + f.getName();
+                    } else if (self.info instanceof FieldWithType) {
+                        FieldWithType fwt = (FieldWithType) self.info;
+                        Field f = fwt.field;
+                        infoStr = Modifier.toString(f.getModifiers()) +
+                                " [" + fwt.valueType.getSimpleName() +
+                                "] " + f.getType().getSimpleName() +
+                                " " + f.getName();
+                    } else {
+                        infoStr = self.info.toString();
+                    }
+                    if (self.index == -2) {
+                        infoStr += " [Recursive]";
+                    } else if (self.index != -1) {
+                        infoStr += " [" + self.index + "]";
+                    }
+                    if (valueIsHere) {
+                        logger.info(indent + "- " + infoStr + " <<< HERE");
+                    } else {
+                        logger.info(indent + "- " + infoStr);
+                    }
+                }
+            }
+            for (StackTreeElement child : children) {
+                child.log(logger, nextIndent);
+            }
+        }
+    }
+
+    private static class InstanceSearcher {
+        private final ModuleLogger logger = Logging.LOGGER_DEBUG;
+        private final IdentityHashMap<Object, Boolean> crossedValues = new IdentityHashMap<Object, Boolean>();
+        private final HashMap<Class<?>, ArrayList<Field>> classFieldMapping = new HashMap<Class<?>, ArrayList<Field>>();
+        private final Object valueToFind;
+        private final StackTreeElement resultTree = new StackTreeElement(null);
+        private List<StackElement> pending = new ArrayList<StackElement>();
+        private List<StackElement> pending_tmp = new ArrayList<StackElement>(); // swapped for safe iteration
+
+        public InstanceSearcher(Object valueToFind) {
+            this.valueToFind = valueToFind;
+        }
+
+        public void run() {
+            // While there's more stuff to search, search endlessly
+            while (!pending.isEmpty()) {
+                // Swap and reset pending
+                {
+                    List<StackElement> c = pending;
+                    pending = pending_tmp;
+                    pending_tmp = c;
+                }
+                pending.clear();
+
+                for (StackElement el : pending_tmp) {
+                    searchFrom(el);
+                }
+            }
+
+            // Print results if found
+            if (!resultTree.children.isEmpty()) {
+                resultTree.log(logger, "");
+            }
+        }
+
+        public ArrayList<Field> searchFromClassFields(Class<?> type) {
+            ArrayList<Field> staticFields = new ArrayList<Field>();
+            ArrayList<Field> localFields = new ArrayList<Field>();
+            Class<?> t = type;
+            do {
+                Field[] fields;
+                try {
+                    fields = t.getDeclaredFields();
+                } catch (Throwable err) {
+                    continue;
+                } // can happen when classes arent found
+
+                for (Field f : fields) {
+                    // Ignore certain types of fields
+                    if (!isInterestingType(f.getType())) {
+                        continue;
+                    }
+
+                    try {
+                        SecureField sf = new SecureField();
+                        sf.init(f);
+                        sf.read();
+                        
+                        if (Modifier.isStatic(f.getModifiers())) {
+                            staticFields.add(f);
+                        } else {
+                            localFields.add(f);
+                        }
+                    } catch (RuntimeException ex) {
+                        
+                    }
+                }
+            } while ((t = t.getSuperclass()) != null);
+
+            classFieldMapping.put(type, localFields);
+
+            // Discover from static fields declared inside this class type
+            final StackElement class_start_stack = new StackElement(type);
+            for (Field staticField : staticFields) {
+                Object staticValue = null;
+                try {
+                    staticValue = staticField.get(null);
+                } catch (Throwable tt) {}
+                if (staticValue == null) {
+                    continue;
+                }
+
+                pending.add(class_start_stack.next(staticValue, FieldWithType.wrapInfo(staticField, staticValue)));
+            }
+
+            return localFields;
+        }
+
+        public void searchFrom(StackElement current) {
+            if (current.value == valueToFind) {
+                // Compute the full stack that got us here
+                List<StackElement> stack = MountiplexUtil.iterateNullTerminated(current, s -> s.parent)
+                        .collect(Collectors.toCollection(ArrayList::new));
+                Collections.reverse(stack);
+
+                // Merge the stack with the result tree
+                StackTreeElement curr = resultTree;
+                for (StackElement el : stack) {
+                    curr = curr.next(el);
+                }
+                curr.valueIsHere = true;
+
+                // Continue searching, because the current value itself may also hold a reference somewhere!
+            }
+
+            // Check if not already discovered
+            if (crossedValues.put(current.value, Boolean.TRUE) != null) {
+                return;
+            }
+
+            // Discover the current class
+            final Class<?> type = current.value.getClass();
+            ArrayList<Field> localFields = classFieldMapping.get(type);
+            if (localFields == null) {
+                localFields = searchFromClassFields(type);
+            }
+
+            // Handle maps so we don't have to go all the way into the private members
+            try {
+                if (Map.class.isAssignableFrom(type)) {
+                    for (Entry<?, ?> entry : ((Map<?, ?>) current.value).entrySet()) {
+                        Object key = entry.getKey();
+                        Object value = entry.getValue();
+
+                        if (key != null && isInterestingType(key.getClass())) {
+                            pending.add(current.next(key, "M{v=" + value + "}.key"));
+                        }
+                        if (value != null && isInterestingType(value.getClass())) {
+                            pending.add(current.next(value, "M{k=" + key + "}.value"));
+                        }
+                    }
+                }
+            } catch (Throwable tt) {} // ignore errors, just try different means
+
+            // Handle lists so we don't have to go all the way into the private members
+            try {
+                if (List.class.isAssignableFrom(type)) {
+                    StackElement list_parent = (current.parent == null || current.index != -1) ? current : current.parent;
+                    int idx = 0;
+                    for (Object currItem : (List<?>) current.value) {
+                        if (currItem != null && isInterestingType(currItem.getClass())) {
+                            StackElement list_el = list_parent.next(currItem, current.info);
+                            list_el.index = idx;
+                            pending.add(list_el);
+                        }
+                        idx++;
+                    }
+                }
+            } catch (Throwable tt) {} // ignore errors, just try different means
+
+            // Handle generic collection types that don't specify an index
+            try {
+                if (Collection.class.isAssignableFrom(type) && !List.class.isAssignableFrom(type)) {
+                    for (Object currItem : (Collection<?>) current.value) {
+                        if (currItem != null && isInterestingType(currItem.getClass())) {
+                            pending.add(current.next(currItem, "C[?]"));
+                        }
+                    }
+                }
+            } catch (Throwable tt) {} // ignore errors, just try different means
+
+            // If this is an array, go by all its elements
+            // Unknown collection types will also end up deep inside here
+            if (type.isArray()) {
+                // Skip primitive arrays entirely
+                if (type.getComponentType().isPrimitive()) {
+                    return;
+                }
+
+                Object[] arr = (Object[]) current.value;
+                StackElement arr_parent = (current.parent == null || current.index != -1) ? current : current.parent;
+                for (int i = 0; i < arr.length; i++) {
+                    Object currItem = arr[i];
+                    if (currItem != null && isInterestingType(currItem.getClass())) {
+                        StackElement list_el = arr_parent.next(currItem, current.info);
+                        list_el.index = i;
+                        pending.add(list_el);
+                    }
+                }
+                return;
+            }
+
+            // Go by all fields in this instance
+            for (Field localField : localFields) {
+                Object fieldValue = null;
+                try {
+                    fieldValue = localField.get(current.value);
+                } catch (Throwable tt) {}
+
+                // If null, just skip it's not going to store anything interesting
+                if (fieldValue == null) {
+                    continue;
+                }
+
+                // Add next value
+                pending.add(current.next(fieldValue, FieldWithType.wrapInfo(localField, fieldValue)));
+            }
+        }
+    }
+
+    private static boolean isInterestingType(Class<?> type) {
+        return !type.isPrimitive() && type != String.class && !Number.class.isAssignableFrom(type);
     }
 }
