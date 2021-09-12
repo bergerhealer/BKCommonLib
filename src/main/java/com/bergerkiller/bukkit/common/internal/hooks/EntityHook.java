@@ -109,6 +109,15 @@ public class EntityHook extends ClassHook<EntityHook> {
         return onInteractBy(humanEntity, HumanHand.fromNMSEnumHand(humanEntity, enumHand)).getRawHandle();
     }
 
+    @HookMethodCondition("version >= 1.17")
+    @HookMethod("public boolean isAlwaysTicked:???();")
+    public boolean isAlwaysTicked() {
+        // Must always return true, otherwise problems happen trying to register a custom network
+        // controller. This way, no such problems will occur. This can be removed once we figure
+        // out a better way to do network synch stuff.
+        return true;
+    }
+
     public InteractionResult onInteractBy(HumanEntity humanEntity, HumanHand humanHand) {
         try {
             if (checkController()) {

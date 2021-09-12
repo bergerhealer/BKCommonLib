@@ -1593,6 +1593,16 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public optional boolean onInteractBy_1_8_8:###((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
 #endif
 
+    // Since MC 1.17 - whether the entity is always ticked even if no players are nearby
+    // Used by the persistent entity manager, setting visibility to TICKING
+#if version >= 1.17
+    public boolean isAlwaysTicked:dn();
+#else
+    public boolean isAlwaysTicked() {
+        return true;
+    }
+#endif
+
     public boolean hasCustomName();
 
 #if version >= 1.13
