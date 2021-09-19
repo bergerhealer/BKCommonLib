@@ -19,17 +19,32 @@ import java.util.logging.Logger;
 
 /**
  * A logger that is meant to log a given module of the server, for example that
- * of a Plugin
+ * of a Plugin. Is strapped up to also operate under test.
  */
 public class ModuleLogger extends Logger {
     private final String[] modulePath;
     private final String prefix;
     private final HashSet<String> logOnceSet = new HashSet<String>();
 
-    private static Logger createDefaultLogger() {
+    private static Logger createDefaultLogger(String[] modulePath) {
+        // First try to find a plugin by the name of the start of the module path
+        // We want to avoid using the root server logger if we can.
+        if (modulePath != null &&
+            modulePath.length > 0 &&
+            Bukkit.getServer() != null &&
+            Bukkit.getServer().getPluginManager() != null
+        ) {
+            Plugin plugin = Bukkit.getServer().getPluginManager().getPlugin(modulePath[0]);
+            if (plugin != null) {
+                return plugin.getLogger();
+            }
+        }
+
+        // If server is available, return the server's logger as a default
         if (Bukkit.getServer() != null && Bukkit.getLogger() != MountiplexUtil.LOGGER)
             return Bukkit.getLogger();
 
+        // Create some new logger to use (under test)
     	Logger log = Logger.getLogger("");
     	log.setUseParentHandlers(false);
     	CustomRecordFormatter formatter = new CustomRecordFormatter();
@@ -72,26 +87,32 @@ public class ModuleLogger extends Logger {
             return sb.toString();
         }
     }
-    
-    
-    public ModuleLogger(Plugin plugin, String... modulePath) {
-        this(LogicUtil.appendArray(new String[]{getPrefix(plugin)}, modulePath));
-    }
 
     public ModuleLogger(String... modulePath) {
-        this(createDefaultLogger(), modulePath);
+        this(createDefaultLogger(modulePath), modulePath);
+    }
+
+    public ModuleLogger(Plugin plugin, String... modulePath) {
+        this(plugin.getLogger(), LogicUtil.appendArray(new String[]{getPrefix(plugin)}, modulePath));
     }
 
     public ModuleLogger(Logger parent, String... modulePath) {
         super(StringUtil.join(".", modulePath), null);
         this.setParent(parent);
         this.setLevel(Level.ALL);
+        this.setUseParentHandlers(true);
         this.modulePath = modulePath;
+
+        // Note: disabled this, the server already logs the names...
+        this.prefix = "";
+
+        /*
         StringBuilder builder = new StringBuilder();
         for (String module : modulePath) {
             builder.append("[").append(module).append("] ");
         }
         this.prefix = builder.toString();
+        */
     }
 
     private static String getPrefix(Plugin plugin) {
