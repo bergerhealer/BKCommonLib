@@ -8,6 +8,8 @@ load: startup
 description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib, ViaVersion, LuckPerms]
 dev-url: ${project.url}
+preloader:
+  hastebinServer: https://paste.traincarts.net
 permissions:
   bkcommonlib.debug.variables:
     default: OP

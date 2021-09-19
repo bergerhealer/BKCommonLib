@@ -1152,4 +1152,55 @@ public class CommonUtil {
     public static String getServerProperty(String key, String defaultValue) {
         return MinecraftServerHandle.instance().getProperty(key, defaultValue);
     }
+
+    /**
+     * Handles all the logic Bukkit normally does when a plugin is disabled, except
+     * for disabling the plugin instance itself. This un-registers all listeners,
+     * tasks, etc. the plugin owns.
+     *
+     * @param plugin
+     */
+    public static void handlePostDisable(Plugin plugin) {
+        final org.bukkit.Server server = Bukkit.getServer();
+
+        try {
+            server.getScheduler().cancelTasks(plugin);
+        } catch (Throwable ex) {
+            server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while cancelling tasks for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+        }
+
+        try {
+            server.getServicesManager().unregisterAll(plugin);
+        } catch (Throwable ex) {
+            server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering services for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+        }
+
+        try {
+            HandlerList.unregisterAll(plugin);
+        } catch (Throwable ex) {
+            server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering events for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+        }
+
+        try {
+            server.getMessenger().unregisterIncomingPluginChannel(plugin);
+            server.getMessenger().unregisterOutgoingPluginChannel(plugin);
+        } catch (Throwable ex) {
+            server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while unregistering plugin channels for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+        }
+
+        // Since Bukkit/Server 1.14.4, use reflection to avoid trouble
+        java.lang.reflect.Method removePluginChunkTicketsMethod = null;
+        try {
+            removePluginChunkTicketsMethod = org.bukkit.World.class.getMethod("removePluginChunkTickets", Plugin.class);
+        } catch (NoSuchMethodException | SecurityException e) { /* ignore */ }
+        if (removePluginChunkTicketsMethod != null) {
+            try {
+                for (org.bukkit.World world : server.getWorlds()) {
+                    removePluginChunkTicketsMethod.invoke(world, plugin);
+                }
+            } catch (Throwable ex) {
+                server.getLogger().log(Level.SEVERE, "Error occurred (in the plugin loader) while removing chunk tickets for " + plugin.getDescription().getFullName() + " (Is it up to date?)", ex);
+            }
+        }
+    }
 }

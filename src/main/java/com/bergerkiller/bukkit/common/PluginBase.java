@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.config.yaml.YamlNodeAbstract;
 import com.bergerkiller.bukkit.common.internal.CommonClassManipulation;
+import com.bergerkiller.bukkit.common.internal.CommonDependencyStartupLogHandler;
 import com.bergerkiller.bukkit.common.internal.CommonMethods;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.io.ClassRewriter;
@@ -31,11 +32,15 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 /**
  * The extended javaPlugin base used to communicate with BKCommonLib<br><br>
@@ -45,13 +50,40 @@ import java.util.logging.Level;
  * localization.
  */
 public abstract class PluginBase extends JavaPlugin {
-
     private String disableMessage, enableMessage;
     private FileConfiguration permissionconfig, localizationconfig;
-    private final BasicConfiguration pluginYaml = new BasicConfiguration();
+    private final String pluginYamlText;
+    private final org.bukkit.configuration.file.YamlConfiguration pluginYaml = new org.bukkit.configuration.file.YamlConfiguration();
+    private BasicConfiguration pluginYamlBKCL = null; // Cached and re-used, instantiated on first use
+    private final CommonDependencyStartupLogHandler.PluginBaseHandler startupLogHandler;
     private boolean enabled = false;
     private boolean wasDisableRequested = false;
     private Metrics metrics;
+
+    public PluginBase() {
+        // Captures everything that is logged by this plugin instance since creation
+        this.startupLogHandler = CommonDependencyStartupLogHandler.bindSelf(this);
+
+        // Load plugin.yml configuration
+        String pluginYamlText = "";
+        try {
+            try (InputStream stream = getResource("plugin.yml")) {
+                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                for (int length; (length = stream.read(buffer)) != -1; ) {
+                    result.write(buffer, 0, length);
+                }
+                pluginYamlText = result.toString(StandardCharsets.UTF_8);
+            }
+            this.pluginYaml.loadFromString(pluginYamlText);
+        } catch (Exception ex) {
+            getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":", ex);
+        }
+        this.pluginYamlText = pluginYamlText;
+
+        // Set hastebin server to use when uploading error reports
+        this.startupLogHandler.setHastebinServer(this.pluginYaml.getString("preloader.hastebinServer", "https://hastebin.com"));
+    }
 
     /**
      * Gets the logger for a specific module in this Plugin
@@ -531,7 +563,7 @@ public abstract class PluginBase extends JavaPlugin {
     @SuppressWarnings("unchecked")
     public void handle(Throwable reason) {
         if (reason instanceof Exception) {
-            StackTraceFilter.SERVER.print(reason);
+            getLogger().log(Level.SEVERE, reason.getMessage(), reason);
         } else if (reason instanceof OutOfMemoryError) {
             log(Level.SEVERE, "The server is running out of memory! Do something!");
         } else {
@@ -662,20 +694,74 @@ public abstract class PluginBase extends JavaPlugin {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public final void onEnable() {
+        // Do this early so command perms work properly all the time
+        if (Bukkit.getPluginManager().getPermission(CommonDependencyStartupLogHandler.PERMISSION) == null) {
+            Permission permission = new Permission(
+                    CommonDependencyStartupLogHandler.PERMISSION,
+                    "Use the startuplog subcommand to view the startup log of plugins",
+                    PermissionDefault.OP);
+            Bukkit.getPluginManager().addPermission(permission);
+        }
+
+        // Check compatible with server
+        boolean compatible = false;
+        try {
+            compatible = Common.IS_COMPATIBLE;
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "An unexpected BKCommonLib initialization error occurred", t);
+            if (this instanceof CommonPlugin) {
+                onCriticalStartupFailure("Critical initialization error (unsupported server?)");
+                return;
+            }
+        }
+
         // Shortcut to avoid unneeded initialization: calling enable will result in BKCommonLib disabling
-        if (!Common.IS_COMPATIBLE && this instanceof CommonPlugin) {
-            this.enable();
+        // The enable() will, after logging details, call onCriticalStartupFailure()
+        if (!compatible && this instanceof CommonPlugin) {
+            try {
+                this.enable();
+            } catch (Throwable t) {
+                getLogger().log(Level.SEVERE, "An unexpected BKCommonLib initialization error occurred", t);
+                if (!startupLogHandler.hasCriticalStartupFailure()) {
+                    onCriticalStartupFailure("Critical initialization error (unsupported server?)");
+                }
+            }
             return;
         }
+
+        // If BKCommonLib is not compatible, don't bother enabling a dependency of it
+        if (!compatible) {
+            onCriticalStartupFailure("Installed BKCommonLib is not compatible with this server",
+                    Bukkit.getPluginManager().getPlugin("BKCommonLib"));
+            return;
+        }
+        if (!(this instanceof CommonPlugin) && !CommonPlugin.hasInstance()) {
+            onCriticalStartupFailure("BKCommonLib failed to enable, this plugin is disabled",
+                    Bukkit.getPluginManager().getPlugin("BKCommonLib"));
+            return;
+        }
+
         // First of all, check that all dependencies are properly enabled
-        for (String dep : LogicUtil.fixNull(getDescription().getDepend(), (List<String>) Collections.EMPTY_LIST)) {
-            if (!Bukkit.getPluginManager().isPluginEnabled(dep)) {
-                log(Level.SEVERE, "Could not enable '" + getName() + " v" + getVersion() + "' because dependency '" + dep + "' failed to enable!");
-                log(Level.SEVERE, "Perhaps the dependency has to be updated? Please check the log for any errors related to " + dep);
-                Bukkit.getPluginManager().disablePlugin(this);
-                return;
+        // Install a logger hook in all dependencies
+        {
+            // Load a full list of hard dependencies. These MUST be enabled to continue.
+            List<String> dependencies = LogicUtil.fixNull(getDescription().getDepend(), Collections.emptyList());
+
+            // Include all dependency's startup logs for the report of this plugin's logs
+            dependencies.stream()
+                .map(Bukkit.getPluginManager()::getPlugin)
+                .filter(Objects::nonNull)
+                .forEach(this.startupLogHandler::bindDependency);
+
+            // Fail enabling this plugin if a required dependency is not enabled
+            for (String dep : dependencies) {
+                if (!Bukkit.getPluginManager().isPluginEnabled(dep)) {
+                    log(Level.SEVERE, "Could not enable '" + getName() + " v" + getVersion() + "' because dependency '" + dep + "' failed to enable!");
+                    log(Level.SEVERE, "Perhaps the dependency has to be updated? Please check the log for any errors related to " + dep);
+                    onCriticalStartupFailure("Plugin dependency '" + dep + "' failed to enable", Bukkit.getPluginManager().getPlugin(dep));
+                    return;
+                }
             }
         }
 
@@ -683,7 +769,7 @@ public abstract class PluginBase extends JavaPlugin {
         if (this.getMinimumLibVersion() > Common.VERSION) {
             log(Level.SEVERE, "Requires a newer BKCommonLib version, please update BKCommonLib to the latest version!");
             log(Level.SEVERE, "Verify that there is only one BKCommonLib.jar in the plugins folder before retrying");
-            Bukkit.getPluginManager().disablePlugin(this);
+            onCriticalStartupFailure("Plugin requires a newer version of BKCommonLib");
             return;
         }
 
@@ -716,13 +802,6 @@ public abstract class PluginBase extends JavaPlugin {
         this.localizationconfig.addHeader("For colors, use the & character followed up by 0 - F");
         this.localizationconfig.addHeader("Need help with this file? Please visit:");
         this.localizationconfig.addHeader("https://wiki.traincarts.net/p/BKCommonLib/Localization");
-
-        // Load plugin.yml configuration
-        try {
-            this.pluginYaml.loadFromStream(getResource("plugin.yml"));
-        } catch (Exception ex) {
-        	Common.LOGGER.log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":");
-        }
 
         // Load all the commands for this Plugin
         Map<String, Map<String, Object>> commands = this.getDescription().getCommands();
@@ -764,7 +843,7 @@ public abstract class PluginBase extends JavaPlugin {
         // ==== Enabling ====
         try {
             // Metrics
-            if (this.pluginYaml.get("metrics", false)) {
+            if (this.pluginYaml.getBoolean("metrics", false)) {
                 // Send anonymous statistics to mcstats.org
                 try {
                     this.metrics = new Metrics(this);
@@ -776,10 +855,14 @@ public abstract class PluginBase extends JavaPlugin {
 
             this.wasDisableRequested = false;
             this.enable();
-            if (this.wasDisableRequested) {
+            if (this.hasCriticalStartupFailure() || this.wasDisableRequested) {
                 // Plugin was disabled again while enabling
                 return;
             }
+
+            // Disable startup logging next tick. This makes sure that stuff logged by this plugin
+            // while other plugins (depending on it) enable is still included in the history.
+            startupLogHandler.stopReadingLogNextTick();
 
             // Start Metrics if enabled
             if (metrics != null) {
@@ -789,9 +872,8 @@ public abstract class PluginBase extends JavaPlugin {
             // Done, this plugin is enabled
             this.enabled = true;
         } catch (Throwable t) {
-            log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled:");
-            handle(t);
-            Bukkit.getPluginManager().disablePlugin(this);
+            getLogger().log(Level.SEVERE, "An error occurred while enabling, the plugin will be disabled:", t);
+            onCriticalStartupFailure("An error occurred while enabling");
             return;
         }
 
@@ -815,21 +897,38 @@ public abstract class PluginBase extends JavaPlugin {
 
     @Override
     public final void onDisable() {
-        // are there any plugins that depend on me?
-        for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
-            if (plugin.isEnabled() && CommonUtil.isDepending(plugin, this)) {
-                Bukkit.getServer().getPluginManager().disablePlugin(plugin);
+        // Are there any plugins that depend on me?
+        // normally this will never be the case - we will not get here with those still enabled
+        // if they are, likely plugman is involved.
+        if (enabled) {
+            for (Plugin plugin : Bukkit.getServer().getPluginManager().getPlugins()) {
+                if (plugin.isEnabled() && CommonUtil.isDepending(plugin, this)) {
+                    Bukkit.getServer().getPluginManager().disablePlugin(plugin);
+                }
             }
         }
+
+        // Actual disabling logic.
+        this.softDisable(false);
+    }
+
+    /**
+     * Performs a soft disabling, disabling the plugin but leaving it capable of
+     * hosting event handlers / tasks.
+     * 
+     * @param sendDisableMessage Whether to force a disable message, if configured
+     */
+    private void softDisable(boolean forceDisableMessage) {
         this.wasDisableRequested = true;
-        boolean doDisableMessage = this.disableMessage != null;
+        boolean doDisableMessage = forceDisableMessage;
         if (this.enabled) {
+            doDisableMessage = this.disableMessage != null;
+
             // Try to disable the plugin
             try {
                 this.disable();
             } catch (Throwable t) {
-                log(Level.SEVERE, "An error occurred while disabling:");
-                StackTraceFilter.SERVER.print(t);
+                getLogger().log(Level.SEVERE, "An error occurred while disabling:", t);
                 doDisableMessage = false;
             }
             // Remove references to the plugin - it is disabled now
@@ -838,6 +937,7 @@ public abstract class PluginBase extends JavaPlugin {
                 CommonPlugin.getInstance().plugins.remove(this);
             }
         }
+
         // Disable Metrics if enabled
         if (metrics != null) {
             metrics.stop();
@@ -850,6 +950,101 @@ public abstract class PluginBase extends JavaPlugin {
         // If specified to do so, a disable message is shown
         if (doDisableMessage) {
             this.getLogger().log(Level.INFO, this.disableMessage);
+        }
+    }
+
+    /**
+     * Gets whether this plugin suffered a critical startup failure and had to be
+     * disabled.
+     *
+     * @return True if this plugin suffered a critical startup failure
+     */
+    public boolean hasCriticalStartupFailure() {
+        return startupLogHandler.hasCriticalStartupFailure();
+    }
+
+    /**
+     * Reports a critical failure because a dependency plugin failed to enable.
+     *
+     * @param reason Failure reason
+     * @param pluginCause Optional cause - if it has a critical failure, will be appended to reason
+     */
+    private void onCriticalStartupFailure(String reason, Plugin pluginCause) {
+        if (pluginCause != null && pluginCause instanceof PluginBase) {
+            CommonDependencyStartupLogHandler.PluginBaseHandler handler = ((PluginBase) pluginCause).startupLogHandler;
+            if (handler.hasCriticalStartupFailure()) {
+                onCriticalStartupFailure(reason + "\n" + pluginCause.getName() + ": " + handler.getCriticalStartupFailure());
+                return;
+            }
+        }
+
+        onCriticalStartupFailure(reason);
+    }
+
+    /**
+     * Call this method to put the plugin in a disabled state. Commands will be
+     * available to access a startup log or for operators to know about this.
+     *
+     * @param reason Reason for the critical startup failure
+     */
+    protected void onCriticalStartupFailure(String reason) {
+        // Figure out all commands the plugin would normally register
+        // Use plugin.yml for this, as well use a preloader commands section if set
+        // If truly no command is set, make one up (plugin name)
+        List<CommonDependencyStartupLogHandler.CriticalAltCommand> altCommands;
+        altCommands = this.getDescription().getCommands().keySet().stream()
+                .map(Bukkit::getPluginCommand)
+                .filter(Objects::nonNull)
+                .map(CommonDependencyStartupLogHandler.CriticalAltCommand::new)
+                .collect(Collectors.toCollection(ArrayList::new));
+        {
+            List<String> preloaderCommands = this.pluginYaml.getStringList("preloader.commands");
+            if (preloaderCommands != null && !preloaderCommands.isEmpty()) {
+                for (String preloaderCommand : preloaderCommands) {
+                    boolean found = false;
+                    for (CommonDependencyStartupLogHandler.CriticalAltCommand altCommand : altCommands) {
+                        if (altCommand.name.equalsIgnoreCase(preloaderCommand)) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) {
+                        altCommands.add(new CommonDependencyStartupLogHandler.CriticalAltCommand(preloaderCommand));
+                    }
+                }
+            }
+        }
+        if (altCommands.isEmpty()) {
+            altCommands.add(new CommonDependencyStartupLogHandler.CriticalAltCommand(
+                    getName().toLowerCase(Locale.ENGLISH)));
+        }
+
+        if (this instanceof CommonPlugin) {
+            // We are BKCommonLib - perform a soft disabling. This disables BKCommonLib's core logic,
+            // but keeps it enabled so that listeners/tasks can be safely registered.
+
+            // This means we execute onDisable ourselves, and have to then clean up
+            // all listeners/tasks that are left behind. Normally Bukkit does this for us.
+            this.softDisable(true);
+            CommonUtil.handlePostDisable(this);
+
+            // Now register commands declared by the plugin, and a command executor that
+            // simply explains the current situation.
+            startupLogHandler.criticalStartupFailure((CommonPlugin) this, reason, altCommands);
+            System.out.println("DID THE THING! " + getName() + " = " + isEnabled());
+        } else {
+            // Disable ourselves
+            System.out.println("DO THE DISABLE! " + getName());
+            Bukkit.getPluginManager().disablePlugin(this);
+
+            // Get CommonPlugin instance using the PluginManager, rather than getInstance()
+            // Even if BKCommonLib failed to be enabled fully, we can still register stuff to it
+            CommonPlugin commonPlugin = (CommonPlugin) Bukkit.getPluginManager().getPlugin("BKCommonLib");
+            if (commonPlugin != null && commonPlugin.isEnabled()) {
+                startupLogHandler.criticalStartupFailure(commonPlugin, reason, altCommands);
+            } else {
+                startupLogHandler.stopReadingLogNow();
+            }
         }
     }
 
@@ -869,6 +1064,22 @@ public abstract class PluginBase extends JavaPlugin {
         return true;
     }
 
+    /**
+     * Called when a command is postfixed with 'startuplog'. By default uploads the
+     * startup log of this plugin to Hastebin and makes it available through a hyperlink.
+     * If those commands should be handled by {@link #command(sender, cmd, arg)}, override
+     * this method and return false.
+     *
+     * @param sender
+     * @param command
+     * @param args
+     * @return True if the startup log command was handled
+     */
+    public boolean onStartupLogCommand(CommandSender sender, String command, String[] args) {
+        startupLogHandler.handleStartupLogCommand(sender);
+        return true;
+    }
+
     @Override
     public final boolean onCommand(CommandSender sender, org.bukkit.command.Command cmd, String command, String[] args) {
         try {
@@ -876,6 +1087,11 @@ public abstract class PluginBase extends JavaPlugin {
             // Default commands for all plugins
             if (fixedArgs.length >= 1 && LogicUtil.contains(fixedArgs[0].toLowerCase(Locale.ENGLISH), "version", "ver")) {
                 if (onVersionCommand(command, sender)) {
+                    return true;
+                }
+            }
+            if (fixedArgs.length >= 1 && fixedArgs[0].equalsIgnoreCase("startuplog")) {
+                if (onStartupLogCommand(sender, command, args)) {
                     return true;
                 }
             }
@@ -944,7 +1160,11 @@ public abstract class PluginBase extends JavaPlugin {
      * @return plugin.yml configuration
      */
     public final BasicConfiguration getPluginYaml() {
-        return this.pluginYaml;
+        if (pluginYamlBKCL == null) {
+            pluginYamlBKCL = new BasicConfiguration();
+            pluginYamlBKCL.loadFromString(pluginYamlText);
+        }
+        return this.pluginYamlBKCL;
     }
 
     /**
@@ -955,12 +1175,23 @@ public abstract class PluginBase extends JavaPlugin {
      * @return debugging version information
      */
     public final String getDebugVersion() {
-        String buildInfo = this.getPluginYaml().get("build", "");
+        String buildInfo = this.pluginYaml.getString("build", "");
         String debugVersion = this.getVersion();
         if (buildInfo.length() > 0) {
             debugVersion += " (build: " + buildInfo + ")";
         }
         return debugVersion;
+    }
+
+    /**
+     * Gets everything that was logged by this Plugin during the loading/enabling
+     * phase. Things logged after enabling are not included. Logs generated by
+     * dependencies of this plugin are also included.
+     *
+     * @return full startup log
+     */
+    public final String getDebugFullStartupLog() {
+        return this.startupLogHandler.getFullStartupLog();
     }
 
     public final void saveLocalization() {
@@ -984,5 +1215,4 @@ public abstract class PluginBase extends JavaPlugin {
      */
     public void updateDependency(Plugin plugin, String pluginName, boolean enabled) {
     }
-
 }

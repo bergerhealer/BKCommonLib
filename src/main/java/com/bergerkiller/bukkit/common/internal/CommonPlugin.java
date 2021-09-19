@@ -106,6 +106,7 @@ public class CommonPlugin extends PluginBase {
     public CommonPlugin() {
         instance = this;
         gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
+        MountiplexUtil.LOGGER = this.getLogger();
     }
 
     public static boolean hasInstance() {
@@ -374,13 +375,10 @@ public class CommonPlugin extends PluginBase {
         }
     }
 
-    /**
-     * Should be called when BKCommonLib is unable to continue running as it
-     * does
-     */
-    public void onCriticalFailure() {
+    @Override
+    protected void onCriticalStartupFailure(String reason) {
         log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
-        Bukkit.getPluginManager().disablePlugin(this);
+        super.onCriticalStartupFailure(reason);
     }
 
     /**
@@ -446,7 +444,8 @@ public class CommonPlugin extends PluginBase {
         this.mapController.updateDependency(plugin, pluginName, enabled);
         this.permissionHandler.updateDependency(plugin, pluginName, enabled);
         if (!this.updatePacketHandler()) {
-            this.onCriticalFailure();
+            this.onCriticalStartupFailure("Critical failure updating the packet handler");
+            return;
         }
 
         // ViaVersion detection
@@ -468,104 +467,24 @@ public class CommonPlugin extends PluginBase {
 
     @Override
     public void onLoad() {
-        if (!Common.IS_COMPATIBLE) {
-            return;
-        }
-
-        // Modify the BlockStateProxy class on MC <= 1.12.2, because BlockData does not exist there.
-        if (Common.evaluateMCVersion("<=", "1.12.2")) {
-            this.rewriteClass("com.bergerkiller.bukkit.common.proxies.BlockStateProxy", (plugin, name, classBytes) -> ASMUtil.removeClassMethods(classBytes, new HashSet<String>(Arrays.asList(
-                    "getBlockData()Lorg/bukkit/block/data/BlockData;",
-                    "setBlockData(Lorg/bukkit/block/data/BlockData;)V"
-            ))));
-        }
-
-        // Load the classes contained in this library
-        CommonClasses.init();
-    }
-
-    @Override
-    public void disable() {
-        // Erase all traces of BKCommonLib from this server
-        {
-            Collection<Entity> entities = new ArrayList<Entity>();
-            for (World world : WorldUtil.getWorlds()) {
-                // Unhook potential hooks for this world
-                CreaturePreSpawnHandler.INSTANCE.onWorldDisabled(world);
-                // Unhook entities
-                for (Entity entity : WorldUtil.getEntities(world)) {
-                    entities.add(entity);
-                }
-                for (Entity entity : entities) {
-                    CommonEntity.clearControllers(entity);
-                }
-                entities.clear();
+        try {
+            if (!Common.IS_COMPATIBLE) {
+                return;
             }
-        }
 
-        // Shut down any ongoing tasks for the portal handler
-        PortalHandler.INSTANCE.disable(this);
+            // Modify the BlockStateProxy class on MC <= 1.12.2, because BlockData does not exist there.
+            if (Common.evaluateMCVersion("<=", "1.12.2")) {
+                this.rewriteClass("com.bergerkiller.bukkit.common.proxies.BlockStateProxy", (plugin, name, classBytes) -> ASMUtil.removeClassMethods(classBytes, new HashSet<String>(Arrays.asList(
+                        "getBlockData()Lorg/bukkit/block/data/BlockData;",
+                        "setBlockData(Lorg/bukkit/block/data/BlockData;)V"
+                ))));
+            }
 
-        // Shut down map display controller
-        this.mapController.onDisable(this);
-
-        // Disable listeners
-        for (World world : Bukkit.getWorlds()) {
-            EntityAddRemoveHandler.INSTANCE.onWorldDisabled(world);
-        }
-        EntityAddRemoveHandler.INSTANCE.onDisabled();
-        HandlerList.unregisterAll(listener);
-        PacketUtil.removePacketListener(this.mapController);
-
-        // Disable Vehicle mount manager
-        this.vehicleMountManager.disable();
-        this.vehicleMountManager = null;
-
-        // Clear running tasks
-        for (Task task : startedTasks) {
-            task.stop();
-        }
-        startedTasks.clear();
-
-        // Disable the packet handlers
-        try {
-            packetHandler.onDisable();
+            // Load the classes contained in this library
+            CommonClasses.init();
         } catch (Throwable t) {
-            log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
-            t.printStackTrace();
+            getLogger().log(Level.SEVERE, "An error occurred while loading", t);
         }
-        packetHandler = null;
-
-        // Disable LookupEntityClassMap hook
-        try {
-            LookupEntityClassMap.unhook();
-        } catch (Throwable t) {
-            t.printStackTrace();
-        }
-
-        // Disable CommonForcedChunkManager
-        this.forcedChunkManager.disable(this);
-        this.forcedChunkManager = null;
-
-        // Shut down the chunk loader pool, allowing tasks to complete first
-        // Set to null to not allow new tasks to be queued
-        CommonChunkLoaderPool oldPool = chunkLoaderPool;
-        chunkLoaderPool = null;
-        oldPool.disable();
-
-        // Wait for pending FileConfiguration save() to complete
-        flushSaveOperations(null);
-
-        // Server-specific disabling occurs
-        Common.SERVER.disable(this);
-
-        // Run any pending tasks in the next tick executor right now, so they are not forgotten
-        // Disable the executor so that future attempts to queue tasks aren't handled by BKCommonLib
-        CommonNextTickExecutor.INSTANCE.setExecutorTask(null);
-
-        // Dereference
-        MountiplexUtil.unloadMountiplex();
-        instance = null;
     }
 
     @Override
@@ -581,13 +500,13 @@ public class CommonPlugin extends PluginBase {
             log(Level.SEVERE, "https://www.spigotmc.org/resources/bkcommonlib.39590/");
             log(Level.SEVERE, "Unstable development builds for MC " + Common.MC_VERSION + " may be found on our continuous integration server:");
             log(Level.SEVERE, "https://ci.mg-dev.eu/job/BKCommonLib/");
-            this.onCriticalFailure();
+            this.onCriticalStartupFailure("BKCommonLib is not compatible with " + Common.SERVER.getServerDetails());
             return;
         }
 
         // Set the packet handler to use before enabling further - it could fail!
         if (!this.updatePacketHandler()) {
-            this.onCriticalFailure();
+            this.onCriticalStartupFailure("Critical failure updating the packet handler");
             return;
         }
 
@@ -775,6 +694,90 @@ public class CommonPlugin extends PluginBase {
         if (version != Common.VERSION) {
             log(Level.SEVERE, "Common.VERSION needs to be updated to contain '" + version + "'!");
         }
+    }
+
+    @Override
+    public void disable() {
+        // Erase all traces of BKCommonLib from this server
+        {
+            Collection<Entity> entities = new ArrayList<Entity>();
+            for (World world : WorldUtil.getWorlds()) {
+                // Unhook potential hooks for this world
+                CreaturePreSpawnHandler.INSTANCE.onWorldDisabled(world);
+                // Unhook entities
+                for (Entity entity : WorldUtil.getEntities(world)) {
+                    entities.add(entity);
+                }
+                for (Entity entity : entities) {
+                    CommonEntity.clearControllers(entity);
+                }
+                entities.clear();
+            }
+        }
+
+        // Shut down any ongoing tasks for the portal handler
+        PortalHandler.INSTANCE.disable(this);
+
+        // Shut down map display controller
+        this.mapController.onDisable(this);
+
+        // Disable listeners
+        for (World world : Bukkit.getWorlds()) {
+            EntityAddRemoveHandler.INSTANCE.onWorldDisabled(world);
+        }
+        EntityAddRemoveHandler.INSTANCE.onDisabled();
+        HandlerList.unregisterAll(listener);
+        PacketUtil.removePacketListener(this.mapController);
+
+        // Disable Vehicle mount manager
+        this.vehicleMountManager.disable();
+        this.vehicleMountManager = null;
+
+        // Clear running tasks
+        for (Task task : startedTasks) {
+            task.stop();
+        }
+        startedTasks.clear();
+
+        // Disable the packet handlers
+        try {
+            packetHandler.onDisable();
+        } catch (Throwable t) {
+            log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
+            t.printStackTrace();
+        }
+        packetHandler = null;
+
+        // Disable LookupEntityClassMap hook
+        try {
+            LookupEntityClassMap.unhook();
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+
+        // Disable CommonForcedChunkManager
+        this.forcedChunkManager.disable(this);
+        this.forcedChunkManager = null;
+
+        // Shut down the chunk loader pool, allowing tasks to complete first
+        // Set to null to not allow new tasks to be queued
+        CommonChunkLoaderPool oldPool = chunkLoaderPool;
+        chunkLoaderPool = null;
+        oldPool.disable();
+
+        // Wait for pending FileConfiguration save() to complete
+        flushSaveOperations(null);
+
+        // Server-specific disabling occurs
+        Common.SERVER.disable(this);
+
+        // Run any pending tasks in the next tick executor right now, so they are not forgotten
+        // Disable the executor so that future attempts to queue tasks aren't handled by BKCommonLib
+        CommonNextTickExecutor.INSTANCE.setExecutorTask(null);
+
+        // Dereference
+        MountiplexUtil.unloadMountiplex();
+        instance = null;
     }
 
     @Override
