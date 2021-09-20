@@ -491,7 +491,18 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          * #if exists net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
          *     #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
          *     io.papermc.paper.world.EntitySliceManager entitySliceManager = world#entitySliceManager;
-         *     entitySliceManager.removeEntity(oldEntity);
+         * 
+         *     // Spigot bug: if chunk doesn't exist, error occurs
+         *     //entitySliceManager.removeEntity(oldEntity);
+         *     io.papermc.paper.world.ChunkEntitySlices slices = entitySliceManager.getChunk(oldEntity.sectionX, oldEntity.sectionZ);
+         *     if (slices != null) {
+         *         slices.removeEntity(oldEntity, oldEntity.sectionY);
+         *         if (slices.isEmpty()) {
+         *             entitySliceManager.removeChunk(oldEntity.sectionX, oldEntity.sectionZ);
+         *         }
+         *     }
+         * 
+         *     // Add new entity (might not be the same chunk)
          *     if (newEntity != null) {
          *         entitySliceManager.addEntity(newEntity);
          *     }
