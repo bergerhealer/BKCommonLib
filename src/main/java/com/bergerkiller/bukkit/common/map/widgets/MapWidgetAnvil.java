@@ -151,7 +151,7 @@ public class MapWidgetAnvil extends MapWidget {
 
             // Open windows for all viewing players
             for (Player player : this.display.getViewers()) {
-                final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow();
+                final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(null);
 
                 // Required for handling text changes < MC 1.9
                 if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {

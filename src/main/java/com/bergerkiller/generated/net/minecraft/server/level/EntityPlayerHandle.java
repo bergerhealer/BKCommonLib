@@ -37,7 +37,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract boolean hasSeenCredits();
     public abstract void setHasSeenCredits(boolean hasSeen);
     public abstract void sendMessage(ChatText ichatbasecomponent);
-    public abstract InventoryView openAnvilWindow();
+    public abstract InventoryView openAnvilWindow(ChatText titleText);
 
     public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
