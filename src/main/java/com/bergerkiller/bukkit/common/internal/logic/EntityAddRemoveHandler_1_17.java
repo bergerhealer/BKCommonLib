@@ -11,9 +11,16 @@ import java.util.Queue;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.event.Event;
+import org.bukkit.event.EventException;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.world.ChunkEvent;
+import org.bukkit.plugin.EventExecutor;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -92,8 +99,13 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
         }
 
         this.removeHandler = Template.Class.create(AddRemoveHandlerLogic.class, Common.TEMPLATE_RESOLVER);
-        this.chunkEntitiesLoadedHandler = new ChunkEntitiesLoadedUsingHookHandler(sectionManagerClass);
         this.levelCallbackHookType = generateLevelCallbackHookType(callbacksField);
+
+        if (CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent") != null) {
+            this.chunkEntitiesLoadedHandler = new ChunkEntitiesLoadedUsingEventHandler();
+        } else {
+            this.chunkEntitiesLoadedHandler = new ChunkEntitiesLoadedUsingHookHandler(sectionManagerClass);
+        }
     }
 
     @Override
@@ -704,24 +716,29 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
      * Listens for the newly added ChunkEntitiesLoaded event in Spigot/Paper to detect
      * when entities are loaded
      */
-    private static class ChunkEntitiesLoadedUsingEventHandler implements ChunkEntitiesLoadedHandler {
+    private static class ChunkEntitiesLoadedUsingEventHandler implements ChunkEntitiesLoadedHandler, Listener {
 
         @Override
-        public void enable(EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin) {
-            // TODO Auto-generated method stub
-            
+        public void enable(final EntityAddRemoveHandler_1_17 handler, CommonPlugin plugin) {
+            Class<? extends Event> eventType = CommonUtil.unsafeCast(CommonUtil.getClass("org.bukkit.event.world.EntitiesLoadEvent"));
+            Bukkit.getPluginManager().registerEvent(eventType, this, EventPriority.LOWEST, new EventExecutor() {
+                @Override
+                public void execute(Listener listener, Event event) throws EventException {
+                    onEntitiesLoaded(handler, (ChunkEvent) event);
+                }
+            }, plugin);
         }
 
         @Override
         public void hook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
-            // TODO Auto-generated method stub
-            
         }
 
         @Override
         public void unhook(EntityAddRemoveHandler_1_17 handler, World world, Object sectionManager) {
-            // TODO Auto-generated method stub
-            
+        }
+
+        private void onEntitiesLoaded(EntityAddRemoveHandler_1_17 handler, ChunkEvent event) {
+            handler.notifyChunkEntitiesLoaded(event.getChunk());
         }
     }
 }
