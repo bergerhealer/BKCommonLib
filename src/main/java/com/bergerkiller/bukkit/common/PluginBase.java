@@ -73,7 +73,7 @@ public abstract class PluginBase extends JavaPlugin {
                 for (int length; (length = stream.read(buffer)) != -1; ) {
                     result.write(buffer, 0, length);
                 }
-                pluginYamlText = result.toString(StandardCharsets.UTF_8);
+                pluginYamlText = new String(result.toByteArray(), StandardCharsets.UTF_8);
             }
             this.pluginYaml.loadFromString(pluginYamlText);
         } catch (Exception ex) {
