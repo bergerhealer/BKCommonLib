@@ -57,8 +57,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer", t);
         }
     }
 
@@ -74,8 +73,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
                     controller.removeViewer(viewer);
                 }
             } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer:");
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer", t);
             }
         }
     }
@@ -103,8 +101,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
             try {
                 controller.onTick();
             } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize", t);
             }
             handle.setTickCounter(handle.getTickCounter() + 1);
         }
@@ -124,8 +121,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
                     controller.addViewer(viewer);
                 }
             } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to add viewer:");
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to add viewer", t);
             }
         }
     }

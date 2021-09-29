@@ -43,8 +43,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         try {
             controller.onTick();
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to synchronize", t);
         }
         handle.setTickCounter(handle.getTickCounter() + 1);
     }
@@ -65,8 +64,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
                 }
             }
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hide for all viewers:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hide for all viewers", t);
         }
     }
 
@@ -75,8 +73,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer", t);
         }
     }
 
@@ -85,8 +82,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
         try {
             controller.removeViewer(Conversion.toPlayer.convert(entityplayer));
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to remove viewer", t);
         }
     }
 
@@ -102,8 +98,7 @@ public class EntityTrackerEntryHook_1_8_to_1_13_2 extends ClassHook<EntityTracke
                     controller.removeViewer(viewer);
                 }
             } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer:");
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer", t);
             }
         }
     }
