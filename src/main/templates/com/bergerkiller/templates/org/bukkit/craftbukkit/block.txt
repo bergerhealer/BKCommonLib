@@ -47,13 +47,17 @@ class CraftBlockState {
 
         if (instance instanceof CraftBlockEntityState) {
             CraftBlockEntityState entityState = (CraftBlockEntityState) instance;
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
             #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity tileEntity;
             #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final T extends TileEntity snapshot;
-            #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends TileEntity tileEntity);
-            entityState#tileEntityClass = tileEntity.getClass();
             entityState#tileEntity = tileEntity;
             entityState#snapshot = tileEntity;
+
+  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
+            entityState#tileEntityClass = tileEntity.getClass();
+  #endif
+
+            #require org.bukkit.craftbukkit.block.CraftBlockEntityState protected void load(T extends TileEntity tileEntity);
             entityState#load(tileEntity);
         }
     }
