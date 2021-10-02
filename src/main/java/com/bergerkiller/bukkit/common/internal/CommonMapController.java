@@ -1763,9 +1763,14 @@ public class CommonMapController implements PacketListener, Listener {
             return null;
         }
 
+        // If item has no metadata tag, there is no need to clone it
+        CommonTagCompound oldTag = ItemUtil.getMetaTag(item, false);
+        if (oldTag == null) {
+            return item;
+        }
+
         // Get rid of all custom metadata from the item
         // Only Minecraft items are interesting (because its the Minecraft client)
-        CommonTagCompound oldTag = ItemUtil.getMetaTag(item, false);
         CommonTagCompound newTag = new CommonTagCompound();
         final String[] nbt_filter = {
                 "ench", "display", "RepairCost",
