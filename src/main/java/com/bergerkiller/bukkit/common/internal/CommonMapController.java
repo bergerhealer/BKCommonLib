@@ -89,6 +89,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 import com.google.common.collect.HashMultimap;
@@ -314,6 +315,15 @@ public class CommonMapController implements PacketListener, Listener {
      * @param newItem the old item was changed into
      */
     public synchronized void updateMapItem(ItemStack oldItem, ItemStack newItem) {
+        if (oldItem == null) {
+            throw new IllegalArgumentException("oldItem is null");
+        } else if (!CraftItemStackHandle.T.isAssignableFrom(oldItem)) {
+            oldItem = ItemUtil.createItem(oldItem); // Ensure CraftItemStack
+        }
+        if (newItem != null && !CraftItemStackHandle.T.isAssignableFrom(newItem)) {
+            newItem = ItemUtil.createItem(newItem); // Ensure CraftItemStack
+        }
+
         boolean unchanged = isItemUnchanged(oldItem, newItem);
         UUID oldMapUUID = CommonMapUUIDStore.getMapUUID(oldItem);
         if (oldMapUUID != null) {
@@ -1766,6 +1776,12 @@ public class CommonMapController implements PacketListener, Listener {
         // If item has no metadata tag, there is no need to clone it
         CommonTagCompound oldTag = ItemUtil.getMetaTag(item, false);
         if (oldTag == null) {
+            // Make sure item is a CraftItemStack so we can access NBT properly
+            // If metadata tag is null, that's okay.
+            if (!CraftItemStackHandle.T.isAssignableFrom(item)) {
+                throw new IllegalArgumentException("Input item is no CraftItemStack");
+            }
+
             return item;
         }
 
