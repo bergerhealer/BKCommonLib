@@ -1,9 +1,11 @@
 package com.bergerkiller.bukkit.common;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 
 import org.bukkit.Material;
 
@@ -18,7 +20,9 @@ import java.util.HashSet;
  */
 public class MaterialTypeProperty extends MaterialBooleanProperty {
 
-    private Material[] allowedTypes;
+    private final Collection<Material> allowedTypes;
+    private final IntHashMap<Boolean> ordinals = new IntHashMap<Boolean>();
+    private final IntHashMap<Boolean> legacyOrdinals = new IntHashMap<Boolean>();
 
     /**
      * Initializes a new material type property containing all types from the
@@ -33,7 +37,8 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
                 elems.add(mat);
             }
         }
-        this.allowedTypes = elems.toArray(new Material[0]);
+        this.allowedTypes = Collections.unmodifiableList(Arrays.asList(elems.toArray(new Material[0])));
+        buildOrdinals();
     }
 
     /**
@@ -42,8 +47,8 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
      * @param allowedMaterials to set
      */
     public MaterialTypeProperty(Material... allowedMaterials) {
-        this.allowedTypes = new Material[allowedMaterials.length];
-        System.arraycopy(allowedMaterials, 0, this.allowedTypes, 0, allowedMaterials.length);
+        this.allowedTypes = Collections.unmodifiableList(Arrays.asList(allowedMaterials.clone()));
+        buildOrdinals();
     }
 
     /**
@@ -63,25 +68,38 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
                 mats.add(mat);
             }
         }
-        this.allowedTypes = LogicUtil.toArray(mats, Material.class);
+        this.allowedTypes = Collections.unmodifiableList(Arrays.asList(LogicUtil.toArray(mats, Material.class)));
+        buildOrdinals();
     }
 
-    @Override
-    public Boolean get(Material type) {
-        return MaterialUtil.isType(type, this.allowedTypes);
-    }
-
-    @Override
-    public Boolean get(BlockData blockData) {
-        if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            return get(blockData.getLegacyType()) || get(blockData.getType());
-        } else {
-            return super.get(blockData);
+    private void buildOrdinals() {
+        for (Material type : this.allowedTypes) {
+            if (CommonCapabilities.MATERIAL_ENUM_CHANGES && CommonLegacyMaterials.isLegacy(type)) {
+                legacyOrdinals.put(CommonLegacyMaterials.getOrdinal(type), Boolean.TRUE);
+            } else {
+                ordinals.put(CommonLegacyMaterials.getOrdinal(type), Boolean.TRUE);
+            }
         }
     }
 
     @Override
+    public Boolean get(Material type) {
+        if (CommonCapabilities.MATERIAL_ENUM_CHANGES && CommonLegacyMaterials.isLegacy(type)) {
+            return legacyOrdinals.contains(CommonLegacyMaterials.getOrdinal(type));
+        } else {
+            return ordinals.contains(CommonLegacyMaterials.getOrdinal(type));
+        }
+    }
+
+    @Override
+    public Boolean get(BlockData blockData) {
+        return ordinals.contains(CommonLegacyMaterials.getOrdinal(blockData.getType())) ||
+                ( CommonCapabilities.MATERIAL_ENUM_CHANGES &&
+                  legacyOrdinals.contains(CommonLegacyMaterials.getOrdinal(blockData.getLegacyType())) );
+    }
+
+    @Override
     public Collection<Material> getMaterials() {
-        return Collections.unmodifiableList(Arrays.asList(this.allowedTypes));
+        return allowedTypes;
     }
 }
