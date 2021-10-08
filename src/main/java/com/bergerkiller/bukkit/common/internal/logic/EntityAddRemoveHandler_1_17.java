@@ -123,6 +123,12 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Override
+    public boolean isChunkEntitiesLoaded(Chunk chunk) {
+        return removeHandler.isChunkEntitiesLoaded(HandleConversion.toWorldHandle(chunk.getWorld()),
+                chunk.getX(), chunk.getZ());
+    }
+
+    @Override
     public void onEnabled(CommonPlugin plugin) {
         super.onEnabled(plugin);
         this.chunkEntitiesLoadedHandler.enable(this, plugin);

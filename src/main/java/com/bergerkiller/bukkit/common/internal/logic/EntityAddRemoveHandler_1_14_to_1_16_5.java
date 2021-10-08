@@ -176,6 +176,11 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
     }
 
     @Override
+    public boolean isChunkEntitiesLoaded(Chunk chunk) {
+        return chunk.isLoaded();
+    }
+
+    @Override
     public void replace(EntityHandle oldEntity, EntityHandle newEntity) {
         WorldServerHandle world = oldEntity.getWorldServer();
         if (newEntity == null) {

@@ -289,7 +289,7 @@ public class WorldUtil extends ChunkUtil {
      * @return True if the entities of this chunk have been loaded
      */
     public static boolean isChunkEntitiesLoaded(org.bukkit.Chunk chunk) {
-        return EntityAddRemoveHandler.INSTANCE.isChunkEntitiesLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
+        return EntityAddRemoveHandler.INSTANCE.isChunkEntitiesLoaded(chunk);
     }
 
     /**

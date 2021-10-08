@@ -120,6 +120,19 @@ public abstract class EntityAddRemoveHandler {
     public abstract boolean isChunkEntitiesLoaded(World world, int cx, int cz);
 
     /**
+     * Gets whether the entities inside the given chunk have been loaded already.
+     * The chunk may be loaded, but the entities may not yet, depending on the
+     * Minecraft version.<br>
+     * <br>
+     * If the chunk has no entities, but processing/loading of entities has
+     * finished, this method also returns true.
+     *
+     * @param chunk Chunk to check
+     * @return True if entities in the chunk are loaded
+     */
+    public abstract boolean isChunkEntitiesLoaded(Chunk chunk);
+
+    /**
      * Completely despawns an entity and removes it from a world
      *
      * @param entity

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import org.bukkit.Chunk;
 import org.bukkit.World;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -177,6 +178,11 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     @Override
     public boolean isChunkEntitiesLoaded(World world, int cx, int cz) {
         return WorldUtil.isLoaded(world, cx, cz);
+    }
+
+    @Override
+    public boolean isChunkEntitiesLoaded(Chunk chunk) {
+        return chunk.isLoaded();
     }
 
     @Override
