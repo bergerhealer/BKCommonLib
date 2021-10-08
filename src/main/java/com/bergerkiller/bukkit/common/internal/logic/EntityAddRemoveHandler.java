@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityByIdWorldMap;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
+import com.bergerkiller.bukkit.common.events.ChunkUnloadEntitiesEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
@@ -164,6 +165,11 @@ public abstract class EntityAddRemoveHandler {
     protected final void notifyChunkEntitiesLoaded(Chunk chunk) {
         this.processEvents();
         CommonUtil.callEvent(new ChunkLoadEntitiesEvent(chunk));
+    }
+
+    protected final void notifyChunkEntitiesUnloaded(Chunk chunk) {
+        this.processEvents();
+        CommonUtil.callEvent(new ChunkUnloadEntitiesEvent(chunk));
     }
 
     private final class WorldEntityByIdSyncTask extends Task {

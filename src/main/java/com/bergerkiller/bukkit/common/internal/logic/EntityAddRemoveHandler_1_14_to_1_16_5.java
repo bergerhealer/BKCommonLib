@@ -17,6 +17,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -132,6 +133,11 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
             @EventHandler(priority = EventPriority.LOWEST)
             public void onChunkLoad(ChunkLoadEvent event) {
                 notifyChunkEntitiesLoaded(event.getChunk());
+            }
+
+            @EventHandler(priority = EventPriority.LOWEST)
+            public void onChunkUnload(ChunkUnloadEvent event) {
+                notifyChunkEntitiesUnloaded(event.getChunk());
             }
         });
     }
