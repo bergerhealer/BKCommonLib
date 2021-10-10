@@ -18,6 +18,7 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -144,7 +145,11 @@ public class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
         // Parse all found files into the region x and z coordinates
         HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
         for (File file : regionFiles) {
-            IntVector3 coords = getRegionFileCoordinates(file).toIntVector3(0);
+            IntVector2 regionFileCoordinates = getRegionFileCoordinates(file);
+            if (regionFileCoordinates == null) {
+                continue;
+            }
+            IntVector3 coords = regionFileCoordinates.toIntVector3(0);
             if (coords != null) {
                 regionIndices.add(coords);
             }
