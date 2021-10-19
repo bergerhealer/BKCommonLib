@@ -316,6 +316,23 @@ public final class MapTexture extends MapCanvas {
     }
 
     /**
+     * Re-sizes an input canvas to create a new resolution image, performing resampling
+     * to average out the map pixel colors. Up-sizing has no special color smoothening done
+     * to it.
+     *
+     * @param input Input canvas to resize
+     * @param newWidth New resolution width
+     * @param newHeight New resolution height
+     * @return new MapTexture with the resized contents
+     */
+    public static MapTexture resize(MapCanvas input, int newWidth, int newHeight) {
+        MapTexture result = MapTexture.createEmpty(newWidth, newHeight);
+        MapColorPalette.resample(input.getBuffer(), input.getWidth(), input.getHeight(),
+                                 newWidth, newHeight, result.getBuffer());
+        return result;
+    }
+
+    /**
      * Exception thrown when loading a texture failed
      */
     public static final class TextureLoadException extends RuntimeException {

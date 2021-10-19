@@ -307,6 +307,91 @@ public class MapColorPalette {
     }
 
     /**
+     * Copies the input byte array of map color pixel data to the output array,
+     * performing a pixel-wise average pixel operation to down-sample.
+     * Upsampling (increasing resolution) isn't supported, and will instead result
+     * in a simple color fill of the output pixels.
+     *
+     * @param input Input byte array of map pixel colors
+     * @param inputWidth Input image resolution width
+     * @param inputHeight Input image resolution height
+     * @param outputWidth Output image resolution width
+     * @param outputHeight Output image resolution height
+     * @param output Output buffer to write the updated colors to
+     */
+    public static void resample(byte[] input, int inputWidth, int inputHeight, int outputWidth, int outputHeight, byte[] output) {
+        // Unique case
+        if (inputWidth == outputWidth && inputHeight == outputHeight) {
+            System.arraycopy(input, 0, output, 0, inputWidth * inputHeight);
+            return;
+        }
+
+        int pixelStepX = inputWidth / outputWidth;
+        int pixelStepY = inputHeight / outputHeight;
+        int pixelStepBlock = pixelStepX * pixelStepY;
+        int pixelStepBlockHalf = pixelStepBlock / 2;
+        int inputLineOffset = inputWidth - pixelStepX;
+
+        // I'll get down to implementing these cases when I'm feeling less ill
+        if (inputWidth < outputWidth || inputHeight < outputHeight) {
+            throw new UnsupportedOperationException("Upsampling not yet supported :(");
+        } else if ((outputWidth * pixelStepX) != inputWidth) {
+            throw new UnsupportedOperationException("Cannot downsample with a non-integer width scale");
+        } else if ((outputHeight * pixelStepY) != inputHeight) {
+            throw new UnsupportedOperationException("Cannot downsample with a non-integer height scale");
+        }
+
+        int outputLength = outputWidth * outputHeight;
+        int inputStartIndex = 0;
+        int input_px = 0;
+        int input_py = 0;
+        for (int i = 0; i < outputLength; i++) {
+            // Collect average RGB pixel value
+            // Also count how many pixels are transparent
+            // If over 50% is transparent, make it a transparent pixel
+            int numTransparent = 0;
+            int r = 0;
+            int g = 0;
+            int b = 0;
+            int inputIndex = inputStartIndex;
+            for (int dy = 0; dy < pixelStepY; dy++) {
+                for (int dx = 0; dx < pixelStepX; dx++) {
+                    byte pixel = input[inputIndex++];
+                    if (isTransparent(pixel)) {
+                        numTransparent++;
+                    } else {
+                        Color c = MapColorPalette.getRealColor(pixel);
+                        r += c.getRed();
+                        g += c.getGreen();
+                        b += c.getBlue();
+                    }
+                }
+                inputIndex += inputLineOffset;
+            }
+            if (numTransparent >= pixelStepBlockHalf) {
+                output[i] = COLOR_TRANSPARENT;
+            } else {
+                int fact = pixelStepBlock - numTransparent;
+                r /= fact;
+                g /= fact;
+                b /= fact;
+                output[i] = getColor((byte) r, (byte) g, (byte) b);
+            }
+
+            // Next pixel of the input
+            inputStartIndex += pixelStepX;
+
+            // Next pixel
+            input_px += pixelStepX;
+            if (input_px >= inputWidth) {
+                input_px = 0;
+                input_py += pixelStepY;
+                inputStartIndex += (pixelStepY - 1) * inputWidth;
+            }
+        }
+    }
+
+    /**
      * Gets the index into one of the palette remap arrays
      * 
      * @param color_a first color
