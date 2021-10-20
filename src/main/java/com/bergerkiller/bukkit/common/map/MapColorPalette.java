@@ -2,8 +2,13 @@ package com.bergerkiller.bukkit.common.map;
 
 import java.awt.Color;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.awt.image.IndexColorModel;
+import java.awt.image.Raster;
+import java.awt.image.WritableRaster;
 import java.io.InputStream;
 import java.util.Arrays;
 
@@ -308,86 +313,116 @@ public class MapColorPalette {
 
     /**
      * Copies the input byte array of map color pixel data to the output array,
-     * performing a pixel-wise average pixel operation to down-sample.
-     * Upsampling (increasing resolution) isn't supported, and will instead result
-     * in a simple color fill of the output pixels.
+     * performing an image resize operation with bilinear interpolation. For performance
+     * it is recommended to scale down an integer resolution amount. For example: 
+     * 128x64 -> 64x32.<br>
+     * <br>
+     * If no faster method is possible, will use a slow method involving Graphics2D.
      *
      * @param input Input byte array of map pixel colors
      * @param inputWidth Input image resolution width
      * @param inputHeight Input image resolution height
+     * @param output Output buffer to write the updated colors to
      * @param outputWidth Output image resolution width
      * @param outputHeight Output image resolution height
-     * @param output Output buffer to write the updated colors to
      */
-    public static void resample(byte[] input, int inputWidth, int inputHeight, int outputWidth, int outputHeight, byte[] output) {
+    public static void resizeCopy(byte[] input, int inputWidth, int inputHeight, byte[] output, int outputWidth, int outputHeight) {
         // Unique case
         if (inputWidth == outputWidth && inputHeight == outputHeight) {
             System.arraycopy(input, 0, output, 0, inputWidth * inputHeight);
             return;
         }
 
+        // Optimized code when down-sizing an integer amount
+        int outputLength = outputWidth * outputHeight;
         int pixelStepX = inputWidth / outputWidth;
         int pixelStepY = inputHeight / outputHeight;
-        int pixelStepBlock = pixelStepX * pixelStepY;
-        int pixelStepBlockHalf = pixelStepBlock / 2;
-        int inputLineOffset = inputWidth - pixelStepX;
+        if ((outputWidth * pixelStepX) == inputWidth && (outputHeight * pixelStepY) == inputHeight) {
+            int pixelStepBlock = pixelStepX * pixelStepY;
+            int pixelStepBlockHalf = pixelStepBlock / 2;
+            int inputLineOffset = inputWidth - pixelStepX;
+            int inputLineStep = (pixelStepY - 1) * inputWidth;
+            int inputStartIndex = 0;
+            int inputLineEndIndex = inputWidth;
+            for (int i = 0; i < outputLength; i++) {
+                // Collect average RGB pixel value
+                // Also count how many pixels are transparent
+                // If over 50% is transparent, make it a transparent pixel
+                int numTransparent = 0;
+                int r = 0;
+                int g = 0;
+                int b = 0;
+                int inputIndex = inputStartIndex;
+                for (int dy = 0; dy < pixelStepY; dy++) {
+                    for (int dx = 0; dx < pixelStepX; dx++) {
+                        byte pixel = input[inputIndex++];
+                        if (isTransparent(pixel)) {
+                            numTransparent++;
+                        } else {
+                            Color c = MapColorPalette.getRealColor(pixel);
+                            r += c.getRed();
+                            g += c.getGreen();
+                            b += c.getBlue();
+                        }
+                    }
+                    inputIndex += inputLineOffset;
+                }
+                if (numTransparent >= pixelStepBlockHalf) {
+                    output[i] = COLOR_TRANSPARENT;
+                } else {
+                    int fact = pixelStepBlock - numTransparent;
+                    r /= fact;
+                    g /= fact;
+                    b /= fact;
+                    output[i] = COLOR_MAP_DATA.get(r, g, b);
+                }
 
-        // I'll get down to implementing these cases when I'm feeling less ill
-        if (inputWidth < outputWidth || inputHeight < outputHeight) {
-            throw new UnsupportedOperationException("Upsampling not yet supported :(");
-        } else if ((outputWidth * pixelStepX) != inputWidth) {
-            throw new UnsupportedOperationException("Cannot downsample with a non-integer width scale");
-        } else if ((outputHeight * pixelStepY) != inputHeight) {
-            throw new UnsupportedOperationException("Cannot downsample with a non-integer height scale");
+                // Next pixel of the input, and then next line
+                inputStartIndex += pixelStepX;
+                if (inputStartIndex >= inputLineEndIndex) {
+                    inputStartIndex += inputLineStep;
+                    inputLineEndIndex = inputStartIndex + inputWidth;
+                }
+            }
+            return;
         }
 
-        int outputLength = outputWidth * outputHeight;
-        int inputStartIndex = 0;
-        int input_px = 0;
-        int input_py = 0;
+        // Default fallback code just uses Graphics2D
+
+        // Create an indexed BufferedImage for the input
+        BufferedImage inputImage;
+        {
+            java.awt.image.DataBufferByte data = new java.awt.image.DataBufferByte(input, input.length);
+            WritableRaster raster = Raster.createInterleavedRaster(data, inputWidth, inputHeight, inputWidth, 1, new int[] {0}, null);
+            inputImage = new BufferedImage(MapColorPalette.getIndexColorModel(), raster, false, null);
+        }
+
+        // When scaling down, we must use getScaledInstance because bilinear interpolation looks awful
+        // When scaling up, we must use the bilinear interpolation affine operation for best results
+        // Sadly there is no solution that covers best of both worlds :(
+        BufferedImage outputImage = new BufferedImage(outputWidth, outputHeight, BufferedImage.TYPE_INT_ARGB);
+        if (outputLength > (inputWidth * inputHeight)) {
+            // Scaling up
+            AffineTransform at = new AffineTransform();
+            at.scale((double) outputWidth / (double) inputWidth, (double) outputHeight/ (double) inputHeight);
+            AffineTransformOp scaleOp = new AffineTransformOp(at, AffineTransformOp.TYPE_BILINEAR);
+            outputImage = scaleOp.filter(inputImage, outputImage);
+        } else {
+            // Scaling down. Note that performance is very poor, but quality is good.
+            Image tmp = inputImage.getScaledInstance(outputWidth, outputHeight, Image.SCALE_AREA_AVERAGING);
+
+            // Convert to BufferedImage
+            java.awt.Graphics2D graphics2D = outputImage.createGraphics();
+            graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
+            graphics2D.drawImage(tmp, 0, 0, outputWidth, outputHeight, null);
+            graphics2D.dispose();
+        }
+
+        // Convert back to map colors
+        int[] intPixels = ((java.awt.image.DataBufferInt) outputImage.getRaster().getDataBuffer()).getData();
+        ColorConverterType converterType = ColorConverterType.ARGB;
         for (int i = 0; i < outputLength; i++) {
-            // Collect average RGB pixel value
-            // Also count how many pixels are transparent
-            // If over 50% is transparent, make it a transparent pixel
-            int numTransparent = 0;
-            int r = 0;
-            int g = 0;
-            int b = 0;
-            int inputIndex = inputStartIndex;
-            for (int dy = 0; dy < pixelStepY; dy++) {
-                for (int dx = 0; dx < pixelStepX; dx++) {
-                    byte pixel = input[inputIndex++];
-                    if (isTransparent(pixel)) {
-                        numTransparent++;
-                    } else {
-                        Color c = MapColorPalette.getRealColor(pixel);
-                        r += c.getRed();
-                        g += c.getGreen();
-                        b += c.getBlue();
-                    }
-                }
-                inputIndex += inputLineOffset;
-            }
-            if (numTransparent >= pixelStepBlockHalf) {
-                output[i] = COLOR_TRANSPARENT;
-            } else {
-                int fact = pixelStepBlock - numTransparent;
-                r /= fact;
-                g /= fact;
-                b /= fact;
-                output[i] = getColor((byte) r, (byte) g, (byte) b);
-            }
-
-            // Next pixel of the input
-            inputStartIndex += pixelStepX;
-
-            // Next pixel
-            input_px += pixelStepX;
-            if (input_px >= inputWidth) {
-                input_px = 0;
-                input_py += pixelStepY;
-                inputStartIndex += (pixelStepY - 1) * inputWidth;
-            }
+            output[i] = converterType.convert(intPixels[i]);
         }
     }
 

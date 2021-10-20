@@ -316,9 +316,9 @@ public final class MapTexture extends MapCanvas {
     }
 
     /**
-     * Re-sizes an input canvas to create a new resolution image, performing resampling
-     * to average out the map pixel colors. Up-sizing has no special color smoothening done
-     * to it.
+     * Re-sizes an input canvas to create a new resolution image. The resized image
+     * is created using bilinear interpolation. For improved performance down-size
+     * the image an integer amount. For example: 128x64 -> 64x32.
      *
      * @param input Input canvas to resize
      * @param newWidth New resolution width
@@ -327,8 +327,8 @@ public final class MapTexture extends MapCanvas {
      */
     public static MapTexture resize(MapCanvas input, int newWidth, int newHeight) {
         MapTexture result = MapTexture.createEmpty(newWidth, newHeight);
-        MapColorPalette.resample(input.getBuffer(), input.getWidth(), input.getHeight(),
-                                 newWidth, newHeight, result.getBuffer());
+        MapColorPalette.resizeCopy(input.getBuffer(), input.getWidth(), input.getHeight(),
+                                   result.getBuffer(), newWidth, newHeight);
         return result;
     }
 
