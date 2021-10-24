@@ -23,7 +23,8 @@ public class Common {
             "Common:Yaml:ChangeListeners",
             "Common:Yaml:CloneAndSetToWithFixes",
             "Common:IPermissionEnum",
-            "Common:FishingHookFixes1.16"
+            "Common:FishingHookFixes1.16",
+            "Common:Chunk:FutureProvider"
     ).collect(Collectors.toSet());
 
     /**

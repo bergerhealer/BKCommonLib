@@ -3,8 +3,6 @@ package com.bergerkiller.bukkit.common.utils;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunk;
 import com.bergerkiller.bukkit.common.collections.FilteredCollection;
-import com.bergerkiller.bukkit.common.collections.List2D;
-import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -16,7 +14,6 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkSectionHandle;
-import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -26,7 +23,6 @@ import org.bukkit.entity.Player;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
