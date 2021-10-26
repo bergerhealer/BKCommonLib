@@ -18,6 +18,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
@@ -40,7 +41,7 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
         {
-            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
                     "#if version >= 1.17\n" +
@@ -50,22 +51,22 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
                     "#endif\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
                     "    return rfc.cache;\n" +
-                    "}");
+                    "}", resolver));
             findRegionFileCache.init(findRegionFileCacheMethod);
         }
 
         // Initialize runtime generated method to obtain the RegionFile instances of a World
         {
-            MethodDeclaration findCacheRegionFileInstancesMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findCacheRegionFileInstancesMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static Collection<RegionFile> findWorldRegionFileInstances(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache) {\n" +
                     "    return cache.values();\n" +
-                    "}");
+                    "}", resolver));
             findCacheRegionFileInstances.init(findCacheRegionFileInstancesMethod);
         }
 
         // Initialize method to obtain all the region coordinates of regions loaded
         {
-            MethodDeclaration findCacheRegionFileCoordinatesMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findCacheRegionFileCoordinatesMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static Collection<com.bergerkiller.bukkit.common.bases.IntVector3> " +
                     "findWorldRegionFileInstances(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache) {\n" +
                     "    it.unimi.dsi.fastutil.longs.LongSet coordSet;\n" +
@@ -81,17 +82,17 @@ public class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
                     "        result.add(new com.bergerkiller.bukkit.common.bases.IntVector3(coord_x, 0, coord_z));\n" +
                     "    }\n" +
                     "    return result;\n" +
-                    "}");
+                    "}", resolver));
             findCacheRegionFileCoordinates.init(findCacheRegionFileCoordinatesMethod);
         }
 
         // Initialize method to obtain a RegionFile instance at a given region x/z from the cache
         {
-            MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
                     "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
                     "    return (RegionFile) cache.get(coord);\n" +
-                    "}");
+                    "}", resolver));
             findRegionFileAt.init(findRegionFileAtMethod);
         }
     }

@@ -109,16 +109,16 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
 
         // Initialize runtime generated method to obtain the RegionFile instances of a World
         {
-            MethodDeclaration findCacheRegionFileInstancesMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findCacheRegionFileInstancesMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static Collection<RegionFile> findWorldRegionFileInstances(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache) {\n" +
                     "    return cache.values();\n" +
-                    "}");
+                    "}", resolver));
             findCacheRegionFileInstances.init(findCacheRegionFileInstancesMethod);
         }
 
         // Initialize method to obtain all the region coordinates of regions loaded
         {
-            MethodDeclaration findCacheRegionFileCoordinatesMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findCacheRegionFileCoordinatesMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static Collection<com.bergerkiller.bukkit.common.bases.IntVector3> " +
                     "findWorldRegionFileInstances(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache) {\n" +
                     "    it.unimi.dsi.fastutil.longs.LongSet coordSet;\n" +
@@ -134,17 +134,17 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
                     "        result.add(new com.bergerkiller.bukkit.common.bases.IntVector3(coord_x, 0, coord_z));\n" +
                     "    }\n" +
                     "    return result;\n" +
-                    "}");
+                    "}", resolver));
             findCacheRegionFileCoordinates.init(findCacheRegionFileCoordinatesMethod);
         }
 
         // Initialize method to obtain a RegionFile instance at a given region x/z from the cache
         {
-            MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver,
+            MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
                     "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
                     "    return (RegionFile) cache.get(coord);\n" +
-                    "}");
+                    "}", resolver));
             findRegionFileAt.init(findRegionFileAtMethod);
         }
     }
