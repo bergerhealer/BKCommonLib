@@ -75,7 +75,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
                         for (Entry e = chain.first; e != null; e = e.next) {
                             if (e.world == event.getWorld()) {
                                 chain.remove(e);
-                                e.future.cancel(true);
+                                cancelFast(e.future);
                             }
                         }
                     }
@@ -101,7 +101,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
 
             @Override
             public void onCancelled(ChunkStateTracker tracker) {
-                future.cancel(true);
+                cancelFast(future);
             }
 
             @Override
@@ -156,7 +156,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         // If this world is unloading, don't register anything and cancel right away
         // For unload events, complete them (world is unloaded after all)
         if (world == currentlyUnloadingWorld) {
-            future.cancel(true);
+            cancelFast(future);
             return future;
         }
 
@@ -664,7 +664,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
                         cancelled = true;
                         trackers.forEach(ChunkLoadedTrackerSingleImpl::cancel);
                         fireCancelled();
-                        mainChunkUnloadFuture.cancel(true);
+                        cancelFast(mainChunkUnloadFuture);
                     }
                 });
             }
@@ -846,7 +846,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
                 provider.execute(() -> {
                     if (!cancelled) {
                         cancelled = true;
-                        currentFuture.cancel(true);
+                        cancelFast(currentFuture);
                         fireCancelled();
                     }
                 });
@@ -877,5 +877,10 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         public boolean isLoaded() {
             return loaded;
         }
+    }
+
+    private static void cancelFast(CompletableFuture<?> completableFuture) {
+        //completableFuture.cancel(false);
+        completableFuture.completeExceptionally(FutureCancelledException.INSTANCE);
     }
 }

@@ -496,4 +496,23 @@ public interface ChunkFutureProvider {
             return list;
         }
     }
+
+    /**
+     * Completable Futures are completed exceptionally with this exception when the constraints for the
+     * future have stopped to be met. It does not contain a stack trace for improved performance
+     * over using {@link CompletableFuture#cancel(boolean)}. Instead of using <i>cancel(true)</i>
+     * users can use this exception class to cancel the operation.
+     */
+    public static class FutureCancelledException extends CompletionException {
+        /**
+         * Static singleton instance of this exception, to avoid overhead of construction
+         */
+        public static final FutureCancelledException INSTANCE = new FutureCancelledException();
+        private static final long serialVersionUID = 7273969366281170690L;
+
+        @Override
+        public Throwable fillInStackTrace() {
+            return this;
+        }
+    }
 }
