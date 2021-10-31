@@ -1031,10 +1031,8 @@ public abstract class PluginBase extends JavaPlugin {
             // Now register commands declared by the plugin, and a command executor that
             // simply explains the current situation.
             startupLogHandler.criticalStartupFailure((CommonPlugin) this, reason, altCommands);
-            System.out.println("DID THE THING! " + getName() + " = " + isEnabled());
         } else {
             // Disable ourselves
-            System.out.println("DO THE DISABLE! " + getName());
             Bukkit.getPluginManager().disablePlugin(this);
 
             // Get CommonPlugin instance using the PluginManager, rather than getInstance()
