@@ -65,21 +65,7 @@ public abstract class PluginBase extends JavaPlugin {
         this.startupLogHandler = CommonDependencyStartupLogHandler.bindSelf(this);
 
         // Load plugin.yml configuration
-        String pluginYamlText = "";
-        try {
-            try (InputStream stream = getResource("plugin.yml")) {
-                ByteArrayOutputStream result = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                for (int length; (length = stream.read(buffer)) != -1; ) {
-                    result.write(buffer, 0, length);
-                }
-                pluginYamlText = new String(result.toByteArray(), StandardCharsets.UTF_8);
-            }
-            this.pluginYaml.loadFromString(pluginYamlText);
-        } catch (Exception ex) {
-            getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + getName() + ":", ex);
-        }
-        this.pluginYamlText = pluginYamlText;
+        this.pluginYamlText = readPluginYamlContent(this, this.pluginYaml);
 
         // Set hastebin server to use when uploading error reports
         this.startupLogHandler.setHastebinServer(this.pluginYaml.getString("preloader.hastebinServer", "https://hastebin.com"));
@@ -756,7 +742,7 @@ public abstract class PluginBase extends JavaPlugin {
 
             // Fail enabling this plugin if a required dependency is not enabled
             for (String dep : dependencies) {
-                if (!Bukkit.getPluginManager().isPluginEnabled(dep)) {
+                if (!isPluginEnabledCheckPreloader(dep)) {
                     log(Level.SEVERE, "Could not enable '" + getName() + " v" + getVersion() + "' because dependency '" + dep + "' failed to enable!");
                     log(Level.SEVERE, "Perhaps the dependency has to be updated? Please check the log for any errors related to " + dep);
                     onCriticalStartupFailure("Plugin dependency '" + dep + "' failed to enable", Bukkit.getPluginManager().getPlugin(dep));
@@ -912,6 +898,29 @@ public abstract class PluginBase extends JavaPlugin {
         this.softDisable(false);
     }
 
+    private boolean isPluginEnabledCheckPreloader(String pluginName) {
+        Plugin plugin = Bukkit.getPluginManager().getPlugin(pluginName);
+        if (plugin == null || !plugin.isEnabled()) {
+            return false;
+        }
+
+        // Plugin might be a 'Preloader' instance. Check if a preloader section is
+        // included in the plugin's plugin.yml and, if so, check if this plugin main class
+        // matches the main defined there. If any of this is not true, then the plugin
+        // is in preloader state (loading failed), and didn't (actuallly) enable!
+        if (plugin instanceof JavaPlugin && plugin.getClass().getSimpleName().equals("Preloader")) {
+            org.bukkit.configuration.file.YamlConfiguration depPluginYaml = new org.bukkit.configuration.file.YamlConfiguration();
+            if (!readPluginYamlContent((JavaPlugin) plugin, depPluginYaml).isEmpty()) {
+                String depExpectedMain = depPluginYaml.getString("preloader.main", "");
+                if (!depExpectedMain.isEmpty() && !depExpectedMain.equals(plugin.getClass().getName())) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
+    }
+
     /**
      * Performs a soft disabling, disabling the plugin but leaving it capable of
      * hosting event handlers / tasks.
@@ -1044,6 +1053,25 @@ public abstract class PluginBase extends JavaPlugin {
                 startupLogHandler.stopReadingLogNow();
             }
         }
+    }
+
+    private String readPluginYamlContent(JavaPlugin plugin, org.bukkit.configuration.file.YamlConfiguration config) {
+        try {
+            String yamlText;
+            try (InputStream stream = plugin.getResource("plugin.yml")) {
+                ByteArrayOutputStream result = new ByteArrayOutputStream();
+                byte[] buffer = new byte[1024];
+                for (int length; (length = stream.read(buffer)) != -1; ) {
+                    result.write(buffer, 0, length);
+                }
+                yamlText = new String(result.toByteArray(), StandardCharsets.UTF_8);
+            }
+            config.loadFromString(yamlText);
+            return yamlText;
+        } catch (Exception ex) {
+            getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + plugin.getName() + ":", ex);
+        }
+        return "";
     }
 
     /**
