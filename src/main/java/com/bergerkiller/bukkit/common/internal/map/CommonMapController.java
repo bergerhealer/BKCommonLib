@@ -49,6 +49,7 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.FastTrackedUpdateSet;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
@@ -114,6 +115,8 @@ public final class CommonMapController implements PacketListener, Listener {
     // Tracks all item frames loaded on the server
     // Note: we are not using an IntHashMap because we need to iterate over the values, which is too slow with IntHashMap
     protected final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
+    // Tracks what item frames require a refresh of the item inside (resending of metadata)
+    public final FastTrackedUpdateSet<ItemFrameInfo> itemFramesThatNeedItemRefresh = new FastTrackedUpdateSet<ItemFrameInfo>();
     // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks chunks neighbouring item frame clusters that need to be loaded before clusters load in
@@ -821,6 +824,7 @@ public final class CommonMapController implements PacketListener, Listener {
             ItemFrameInfo info = itemFrames.get(frame.getEntityId());
             if (info != null) {
                 info.removed = true;
+                info.needsItemRefresh.set(false);
             }
         }
     }
@@ -864,7 +868,7 @@ public final class CommonMapController implements PacketListener, Listener {
         ItemFrameInfo frameInfo = new ItemFrameInfo(this, frame);
         itemFrames.put(entityId, frameInfo);
         if (itemFrameMetaMisses.remove(entityId)) {
-            frameInfo.needsItemRefresh = true;
+            frameInfo.needsItemRefresh.set(true);
             frameInfo.sentToPlayers = true;
         }
     }

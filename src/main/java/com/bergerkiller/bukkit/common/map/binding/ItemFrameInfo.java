@@ -13,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.collections.FastTrackedUpdateSet;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
@@ -42,7 +43,6 @@ public class ItemFrameInfo {
     public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
     public MapUUID preReloadMapUUID; // Map UUID known from before a reload, and if encountered again, will avoid resending the item (popping)
     public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
-    public boolean needsItemRefresh; // UUID was changed and item in the item frame needs refreshing
     public boolean sentToPlayers; // players have received item information for this item frame
     public boolean requiresFurtherLoading; // whether neighbouring chunks need loading before a map display can be initialized
     public MapDisplayInfo displayInfo;
@@ -57,6 +57,9 @@ public class ItemFrameInfo {
     private EntityTrackerEntryStateHandle entityTrackerEntryState = null; // Entity tracker entry state for resetting tick timer
     private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
+    // Tracks whether an item refresh needs to be done
+    public final FastTrackedUpdateSet.Tracker<ItemFrameInfo> needsItemRefresh;
+
     public ItemFrameInfo(CommonMapController controller, EntityItemFrameHandle itemFrame) {
         this.controller = controller;
         this.itemFrame = (ItemFrame) itemFrame.getBukkitEntity();
@@ -67,7 +70,7 @@ public class ItemFrameInfo {
         this.lastMapUUID = null;
         this.preReloadMapUUID = null;
         this.displayInfo = null;
-        this.needsItemRefresh = false;
+        this.needsItemRefresh = controller.itemFramesThatNeedItemRefresh.track(this);
         this.sentToPlayers = false;
         this.requiresFurtherLoading = false;
     }
@@ -301,6 +304,7 @@ public class ItemFrameInfo {
                 // Item Frame isn't tracked on the server, so no players can view it
                 if (entry == null) {
                     this.removed = true;
+                    this.needsItemRefresh.set(false);
                     return;
                 }
 
@@ -522,7 +526,7 @@ public class ItemFrameInfo {
             // Map item UUID changed entirely. Remove the previous and add the new.
             remove();
             lastMapUUID = newMapUUID;
-            needsItemRefresh = sentToPlayers && !newMapUUID.equals(preReloadMapUUID);
+            needsItemRefresh.set(sentToPlayers && !newMapUUID.equals(preReloadMapUUID));
             preReloadMapUUID = null;
             add();
         } else if (newMapUUID.equals(lastMapUUID)) {
@@ -537,7 +541,7 @@ public class ItemFrameInfo {
             int oldTileX = lastMapUUID.getTileX();
             int oldTileY = lastMapUUID.getTileY();
             lastMapUUID = newMapUUID;
-            needsItemRefresh = sentToPlayers;
+            needsItemRefresh.set(sentToPlayers);
             preReloadMapUUID = null;
 
             // If the previous coordinates are now no longer used, remove the tile
@@ -546,7 +550,7 @@ public class ItemFrameInfo {
             // Tile coordinates changed, but we had no previous display info
             // Strange.
             lastMapUUID = newMapUUID;
-            needsItemRefresh = sentToPlayers;
+            needsItemRefresh.set(sentToPlayers);
             preReloadMapUUID = null;
         }
     }

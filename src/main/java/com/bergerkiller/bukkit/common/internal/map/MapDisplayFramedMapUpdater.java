@@ -71,14 +71,12 @@ class MapDisplayFramedMapUpdater extends Task {
             map.updateViewersAndResolution();
         }
 
-        for (ItemFrameInfo info : controller.itemFrames.values()) {
-            // Resend Item Frame item (metadata) when the UUID changes
-            // UUID can change when the relative tile displayed changes
-            // This happens when a new item frame is placed left/above a display
-            if (info.needsItemRefresh) {
-                info.needsItemRefresh = false;
-                info.itemFrameHandle.refreshItem();
-            }
+        // Resend Item Frame item (metadata) when the UUID changes
+        // UUID can change when the relative tile displayed changes
+        // This happens when a new item frame is placed left/above a display
+        // Protective iterator for that rare somehow-chance that refreshItem() causes changes
+        for (ItemFrameInfo info : controller.itemFramesThatNeedItemRefresh.iterateAndClear()) {
+            info.itemFrameHandle.refreshItem();
         }
 
         // Disable cache again and wipe
