@@ -12,7 +12,7 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;

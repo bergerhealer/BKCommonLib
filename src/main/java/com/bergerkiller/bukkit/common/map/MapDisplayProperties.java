@@ -6,8 +6,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.map.util.ItemStackMapDisplayProperties;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;

@@ -27,6 +27,7 @@ import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_Vanilla;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_ViaVersion;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
 import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;

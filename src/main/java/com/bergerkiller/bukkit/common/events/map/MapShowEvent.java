@@ -9,9 +9,9 @@ import org.bukkit.event.HandlerList;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import com.bergerkiller.bukkit.common.internal.CommonMapController;
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;

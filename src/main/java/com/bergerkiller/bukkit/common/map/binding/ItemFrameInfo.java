@@ -14,9 +14,10 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
-import com.bergerkiller.bukkit.common.internal.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
+import com.bergerkiller.bukkit.common.internal.map.ItemFrameCluster;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
@@ -386,12 +387,12 @@ public class ItemFrameInfo {
         // What we do is: we add all neighbours, then find the most top-left item frame
         // Subtracting coordinates will give us the tile x/y of this item frame
         IntVector3 itemFramePosition = itemFrameHandle.getBlockPosition();
-        CommonMapController.ItemFrameCluster cluster = this.controller.findCluster(itemFrameHandle, itemFramePosition);
+        ItemFrameCluster cluster = this.controller.findCluster(itemFrameHandle, itemFramePosition);
 
         // If not fully loaded, 'park' this item frame until surrounding chunks are loaded too
         World world = this.getWorld();
         boolean fullyLoaded = true;
-        for (CommonMapController.ItemFrameCluster.ChunkDependency dependency : cluster.chunk_dependencies) {
+        for (ItemFrameCluster.ChunkDependency dependency : cluster.chunk_dependencies) {
             fullyLoaded &= this.controller.checkClusterChunkDependency(world, dependency);
         }
         if (!fullyLoaded) {
@@ -436,7 +437,7 @@ public class ItemFrameInfo {
         }
     }
 
-    private void recalculateUUIDInCluster(IntVector3 itemFramePosition, CommonMapController.ItemFrameCluster cluster) {
+    private void recalculateUUIDInCluster(IntVector3 itemFramePosition, ItemFrameCluster cluster) {
         this.requiresFurtherLoading = false;
 
         UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();

@@ -1,10 +1,12 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.map;
 
 import java.util.UUID;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 

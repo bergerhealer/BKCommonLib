@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.map;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -8,11 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
@@ -59,11 +57,12 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.events.map.MapAction;
-import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonMapReloadFile;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayProperties;
-import com.bergerkiller.bukkit.common.map.MapDisplayTile;
 import com.bergerkiller.bukkit.common.map.MapSession;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
@@ -82,9 +81,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
-import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -95,31 +92,28 @@ import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 
-public class CommonMapController implements PacketListener, Listener {
+public final class CommonMapController implements PacketListener, Listener {
     // Whether this controller has been enabled
     private boolean isEnabled = false;
     // Whether tiling is supported. Disables findNeighbours() if false.
     private boolean isFrameTilingSupported = true;
     // Stores cached thread-safe lists of item frames by cluster key
-    private final Map<ItemFrameClusterKey, Set<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
+    protected final Map<ItemFrameClusterKey, Set<EntityItemFrameHandle> > itemFrameEntities = new HashMap<>();
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
     // Stores Map Displays, mapped by Map UUID
-    private final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
-    private final ImplicitlySharedSet<MapDisplayInfo> mapsValues = new ImplicitlySharedSet<MapDisplayInfo>();
+    protected final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
+    protected final ImplicitlySharedSet<MapDisplayInfo> mapsValues = new ImplicitlySharedSet<MapDisplayInfo>();
     // Stores map items for a short time while a player is moving it around in creative mode
-    private final HashMap<UUID, CachedMapItem> cachedMapItems = new HashMap<UUID, CachedMapItem>();
-    // How long a cached item is kept around and tracked when in the creative player's control
-    private static final int CACHED_ITEM_MAX_LIFE = 20*60*10; // 10 minutes
-    private static final int CACHED_ITEM_CLEAN_INTERVAL = 60; //60 ticks
+    protected final HashMap<UUID, CreativeDraggedMapItem> creativeDraggedMapItems = new HashMap<UUID, CreativeDraggedMapItem>();
     // Stores Map Displays by their Type information
     private final OutputTypeMap<MapDisplay> displays = new OutputTypeMap<MapDisplay>();
     // Stores player map input (through Vehicle Steer packets)
-    private final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
+    protected final HashMap<Player, MapPlayerInput> playerInputs = new HashMap<Player, MapPlayerInput>();
     // Tracks all item frames loaded on the server
     // Note: we are not using an IntHashMap because we need to iterate over the values, which is too slow with IntHashMap
-    private final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
+    protected final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
     // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks chunks neighbouring item frame clusters that need to be loaded before clusters load in
@@ -134,14 +128,10 @@ public class CommonMapController implements PacketListener, Listener {
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Y = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST};
     private static final BlockFace[] NEIGHBOUR_AXIS_ALONG_Z = {BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST};
     // Item frame clusters previously computed, is short-lived
-    private final Map<World, Map<IntVector3, ItemFrameCluster>> itemFrameClustersByWorld = new IdentityHashMap<>();
+    protected final Map<World, Map<IntVector3, ItemFrameCluster>> itemFrameClustersByWorld = new IdentityHashMap<>();
     // Whether the short-lived cache is used (only used during the update cycle)
-    private boolean itemFrameClustersByWorldEnabled = false;
-    // This counter is incremented every time a new map Id is added to the mapping
-    // Every 1000 map ids we do a cleanup to free up slots for maps that no longer exist on the server
-    // This is required, otherwise we can run out of the 32K map Ids we have available given enough uptime
-    private static final int GENERATION_COUNTER_CLEANUP_INTERVAL = 1000;
-    private int idGenerationCounter = 0;
+    protected boolean itemFrameClustersByWorldEnabled = false;
+    protected int idGenerationCounter = 0;
 
     /**
      * These packet types are listened to handle the virtualized Map Display API
@@ -381,11 +371,12 @@ public class CommonMapController implements PacketListener, Listener {
      * @param startedTasks
      */
     public void onEnable(CommonPlugin plugin, List<Task> startedTasks) {
-        startedTasks.add(new HeldMapUpdater(plugin).start(1, 1));
-        startedTasks.add(new FramedMapUpdater(plugin).start(1, 1));
-        startedTasks.add(new ItemMapIdUpdater(plugin).start(1, 1));
-        startedTasks.add(new MapInputUpdater(plugin).start(1, 1));
-        startedTasks.add(new CachedMapItemCleaner(plugin).start(100, CACHED_ITEM_CLEAN_INTERVAL));
+        startedTasks.add(new MapDisplayHeldMapUpdater(plugin, this).start(1, 1));
+        startedTasks.add(new MapDisplayFramedMapUpdater(plugin, this).start(1, 1));
+        startedTasks.add(new MapDisplayItemMapIdUpdater(plugin, this).start(1, 1));
+        startedTasks.add(new MapDisplayInputUpdater(plugin, this).start(1, 1));
+        startedTasks.add(new MapDisplayCreativeDraggedMapItemCleaner(plugin, this)
+                .start(100, CreativeDraggedMapItem.CACHED_ITEM_CLEAN_INTERVAL));
         startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
 
         this.isFrameTilingSupported = plugin.isFrameTilingSupported();
@@ -756,9 +747,9 @@ public class CommonMapController implements PacketListener, Listener {
                 // For this we also have the map item cache, which is filled with data the moment a player picks up an item
                 // This data is kept around for 10 minutes (unlikely a player will hold onto it for that long...)
                 ItemStack originalMapItem = null;
-                CachedMapItem cachedItem = this.cachedMapItems.get(mapUUID);
+                CreativeDraggedMapItem cachedItem = this.creativeDraggedMapItems.get(mapUUID);
                 if (cachedItem != null) {
-                    cachedItem.life = CACHED_ITEM_MAX_LIFE;
+                    cachedItem.life = CreativeDraggedMapItem.CACHED_ITEM_MAX_LIFE;
                     originalMapItem = cachedItem.item;
                 } else {
                     for (ItemStack oldItem : event.getPlayer().getInventory()) {
@@ -858,7 +849,7 @@ public class CommonMapController implements PacketListener, Listener {
         if (event.getResult() != Result.DENY) {
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(event.getCurrentItem());
             if (mapUUID != null) {
-                this.cachedMapItems.put(mapUUID, new CachedMapItem(event.getCurrentItem().clone()));
+                this.creativeDraggedMapItems.put(mapUUID, new CreativeDraggedMapItem(event.getCurrentItem().clone()));
             }
         }
     }
@@ -945,38 +936,12 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    // Used for findLookingAt
-    private static class LookAtSearchResult {
-        public final MapDisplay display;
-        public final MapLookPosition lookPosition;
-
-        public LookAtSearchResult(MapDisplay display, MapLookPosition lookPosition) {
-            this.display = display;
-            this.lookPosition = lookPosition;
-        }
-
-        /**
-         * Handles the click event for this looking-at information
-         *
-         * @param player
-         * @param action
-         * @return Event result, can check {@link MapClickEvent#isCancelled()}
-         */
-        public MapClickEvent click(Player player, MapAction action) {
-            // Fire event
-            MapClickEvent event = new MapClickEvent(player, this.lookPosition, this.display, action);
-            CommonUtil.callEvent(event);
-            if (!event.isCancelled()) {
-                if (action == MapAction.LEFT_CLICK) {
-                    event.getDisplay().onLeftClick(event);
-                    event.getDisplay().getRootWidget().onLeftClick(event);
-                } else {
-                    event.getDisplay().onRightClick(event);
-                    event.getDisplay().getRootWidget().onRightClick(event);
-                }
-            }
-            return event;
-        }
+    protected SetMultimap<UUID, MapUUID> swapDirtyMapUUIDs() {
+        final SetMultimap<UUID, MapUUID> dirtyMaps;
+        dirtyMaps = dirtyMapUUIDSet;
+        dirtyMapUUIDSet = dirtyMapUUIDSetTmp;
+        dirtyMapUUIDSetTmp = dirtyMaps;
+        return dirtyMaps;
     }
 
     private LookAtSearchResult findLookingAt(Player player, ItemFrame itemFrame) {
@@ -1156,7 +1121,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private synchronized void cleanupUnusedUUIDs(Set<MapUUID> existingMapUUIDs) {
+    protected synchronized void cleanupUnusedUUIDs(Set<MapUUID> existingMapUUIDs) {
         HashSet<MapUUID> idsToRemove = new HashSet<MapUUID>(mapIdByUUID.keySet());
         idsToRemove.removeAll(existingMapUUIDs);
         for (MapUUID toRemove : idsToRemove) {
@@ -1184,7 +1149,7 @@ public class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    private synchronized void handleMapShowEvent(MapShowEvent event) {
+    protected synchronized void handleMapShowEvent(MapShowEvent event) {
         // Check if there are other map displays that should be shown to the player automatically
         // This uses the 'isGlobal()' property of the display
         MapDisplayInfo info = CommonMapController.this.getInfo(event.getMapUUID());
@@ -1225,7 +1190,7 @@ public class CommonMapController implements PacketListener, Listener {
      * 
      * @param itemFrame to get the map UUID from
      */
-    private MapUUID getItemFrameMapUUID(EntityItemFrameHandle itemFrame) {
+    protected MapUUID getItemFrameMapUUID(EntityItemFrameHandle itemFrame) {
         if (itemFrame == null) {
             return null;
         } else {
@@ -1235,295 +1200,6 @@ public class CommonMapController implements PacketListener, Listener {
             } else {
                 info.updateItem();
                 return info.lastMapUUID;
-            }
-        }
-    }
-
-    public class ItemMapIdUpdater extends Task {
-
-        public ItemMapIdUpdater(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            synchronized (CommonMapController.this) {
-                updateMapIds();
-            }
-        }
-
-        public void updateMapIds() {
-            // Remove non-existing maps from the internal mapping
-            if (idGenerationCounter > GENERATION_COUNTER_CLEANUP_INTERVAL) {
-                idGenerationCounter = 0;
-
-                // Find all map UUIDs that exist on the server
-                HashSet<MapUUID> validUUIDs = new HashSet<MapUUID>();
-                for (Set<EntityItemFrameHandle> itemFrameSet : itemFrameEntities.values()) {
-                    for (EntityItemFrameHandle itemFrame : itemFrameSet) {
-                        MapUUID mapUUID = getItemFrameMapUUID(itemFrame);
-                        if (mapUUID != null) {
-                            validUUIDs.add(mapUUID);
-                        }
-                    }
-                }
-
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerInventory inv = player.getInventory();
-                    for (int i = 0; i < inv.getSize(); i++) {
-                        ItemStack item = inv.getItem(i);
-                        UUID mapUUID = CommonMapUUIDStore.getMapUUID(item);
-                        if (mapUUID != null) {
-                            validUUIDs.add(new MapUUID(mapUUID));
-                        }
-                    }
-                }
-
-                // Perform the cleanup (synchronized access required!)
-                cleanupUnusedUUIDs(validUUIDs);
-            }
-
-            // Refresh items known to clients when Map Ids are re-assigned
-            // Swap around the tmp and main set every tick
-            final SetMultimap<UUID, MapUUID> dirtyMaps;
-            dirtyMaps = dirtyMapUUIDSet;
-            dirtyMapUUIDSet = dirtyMapUUIDSetTmp;
-            dirtyMapUUIDSetTmp = dirtyMaps;
-            if (!dirtyMaps.isEmpty()) {
-                // Refresh all player inventories that contain this map
-                // This will result in new SetItemSlot packets being sent, refreshing the map Id
-                for (Player player : Bukkit.getOnlinePlayers()) {
-                    PlayerInventory inv = player.getInventory();
-                    for (int i = 0; i < inv.getSize(); i++) {
-                        ItemStack item = inv.getItem(i);
-                        UUID uuid = CommonMapUUIDStore.getMapUUID(item);
-                        if (dirtyMaps.containsKey(uuid)) {
-                            inv.setItem(i, item.clone());
-                        }
-                    }
-                }
-
-                // Refresh all item frames that display this map
-                // This will result in a new EntityMetadata packets being sent, refreshing the map Id
-                // After updating all item frames, resend the maps
-                dirtyMaps.keySet().stream()
-                    .map(maps::get)
-                    .filter(Objects::nonNull)
-                    .forEach(info -> {
-                        // Refresh item of all affected item frames
-                        // This re-sends metadata packets
-                        final Set<MapUUID> mapUUIDs = dirtyMaps.get(info.getUniqueId());
-                        for (ItemFrameInfo itemFrameInfo : info.getItemFrames()) {
-                            if (mapUUIDs.contains(itemFrameInfo.lastMapUUID)) {
-                                itemFrameInfo.itemFrameHandle.refreshItem();
-                            }
-                        }
-
-                        // Resend map data for all affected tiles
-                        for (MapSession session : info.getSessions()) {
-                            for (MapDisplayTile tile : session.tiles) {
-                                if (mapUUIDs.contains(tile.getMapTileUUID())) {
-                                    session.onlineOwners.forEach(o -> o.sendDirtyTile(tile));
-                                }
-                            }
-                        }
-                    });
-
-                // Done processing, wipe
-                dirtyMaps.clear();
-            }
-        }
-    }
-
-    /**
-     * Refreshes the input state of maps every tick, when input is intercepted
-     */
-    public class MapInputUpdater extends Task {
-
-        public MapInputUpdater(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            Iterator<Map.Entry<Player, MapPlayerInput>> iter = playerInputs.entrySet().iterator();
-            while (iter.hasNext()) {
-                Map.Entry<Player, MapPlayerInput> entry = iter.next();
-                if (entry.getKey().isOnline()) {
-                    entry.getValue().onTick();
-                } else {
-                    entry.getValue().onDisconnected();
-                    iter.remove();
-                }
-            }
-        }
-    }
-
-    /**
-     * Updates the players viewing item frames and fires events for them
-     */
-    public class FramedMapUpdater extends Task {
-
-        private ItemFrameInfo info = null;
-        private final LogicUtil.ItemSynchronizer<Player, Player> synchronizer = new LogicUtil.ItemSynchronizer<Player, Player>() {
-            @Override
-            public boolean isItem(Player item, Player value) {
-                return item == value;
-            }
-
-            @Override
-            public Player onAdded(Player player) {
-                handleMapShowEvent(new MapShowEvent(player, info.itemFrame));
-                return player;
-            }
-
-            @Override
-            public void onRemoved(Player player) {
-                //TODO!!!
-                //CommonUtil.callEvent(new HideFramedMapEvent(player, info.itemFrame));
-            }
-        };
-
-        public FramedMapUpdater(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            // Enable the item frame cluster cache
-            itemFrameClustersByWorldEnabled = true;
-
-            // Iterate all tracked item frames and update them
-            synchronized (CommonMapController.this) {
-                Iterator<ItemFrameInfo> itemFrames_iter = itemFrames.values().iterator();
-                while (itemFrames_iter.hasNext()) {
-                    info = itemFrames_iter.next();
-                    if (info.handleRemoved()) {
-                        itemFrames_iter.remove();
-                        continue;
-                    }
-
-                    info.updateItemAndViewers(synchronizer);
-
-                    // May find out it's removed during the update
-                    if (info.handleRemoved()) {
-                        itemFrames_iter.remove();
-                        continue;
-                    }
-                }
-            }
-
-            // Update the player viewers of all map displays
-            for (MapDisplayInfo map : mapsValues.cloneAsIterable()) {
-                map.updateViewersAndResolution();
-            }
-
-            for (ItemFrameInfo info : itemFrames.values()) {
-                // Resend Item Frame item (metadata) when the UUID changes
-                // UUID can change when the relative tile displayed changes
-                // This happens when a new item frame is placed left/above a display
-                if (info.needsItemRefresh) {
-                    info.needsItemRefresh = false;
-                    info.itemFrameHandle.refreshItem();
-                }
-            }
-
-            // Disable cache again and wipe
-            itemFrameClustersByWorldEnabled = false;
-            itemFrameClustersByWorld.clear();
-        }
-    }
-
-    /**
-     * Continuously checks if a map item is being held by a player
-     */
-    public class HeldMapUpdater extends Task implements LogicUtil.ItemSynchronizer<Player, HeldMapUpdater.MapViewEntry> {
-        private final List<MapViewEntry> entries = new LinkedList<MapViewEntry>();
-
-        public HeldMapUpdater(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            LogicUtil.synchronizeList(entries, CommonUtil.getOnlinePlayers(), this);
-            for (MapViewEntry entry : entries) {
-                entry.update();
-            }
-        }
-
-        @Override
-        public boolean isItem(MapViewEntry entry, Player player) {
-            return entry.player == player;
-        }
-
-        @Override
-        public MapViewEntry onAdded(Player player) {
-            return new MapViewEntry(player);
-        }
-
-        @Override
-        public void onRemoved(MapViewEntry entry) {
-        }
-
-        private class MapViewEntry {
-            public final Player player;
-            public ItemStack lastLeftHand = null;
-            public ItemStack lastRightHand = null;
-
-            public MapViewEntry(Player player) {
-                this.player = player;
-            }
-
-            public void update() {
-                ItemStack currLeftHand = PlayerUtil.getItemInHand(this.player, HumanHand.LEFT);
-                ItemStack currRightHand = PlayerUtil.getItemInHand(this.player, HumanHand.RIGHT);
-
-                if (CommonMapUUIDStore.isMap(currLeftHand) 
-                        && !mapEquals(currLeftHand, lastLeftHand) 
-                        && !mapEquals(currLeftHand, lastRightHand)) {
-                    // Left hand now has a map! We did not swap hands, either.
-                    handleMapShowEvent(new MapShowEvent(player, HumanHand.LEFT, currLeftHand));
-                }
-                if (CommonMapUUIDStore.isMap(currRightHand) 
-                        && !mapEquals(currRightHand, lastRightHand) 
-                        && !mapEquals(currRightHand, lastLeftHand)) {
-                    // Right hand now has a map! We did not swap hands, either.
-                    handleMapShowEvent(new MapShowEvent(player, HumanHand.RIGHT, currRightHand));
-                }
-
-                lastLeftHand = currLeftHand;
-                lastRightHand = currRightHand;
-            }
-
-            private final boolean mapEquals(ItemStack item1, ItemStack item2) {
-                UUID mapUUID1 = CommonMapUUIDStore.getMapUUID(item1);
-                UUID mapUUID2 = CommonMapUUIDStore.getMapUUID(item2);
-                return mapUUID1 != null && mapUUID2 != null && mapUUID1.equals(mapUUID2);
-            }
-        }
-    }
-
-    /**
-     * Removes map items from the cache when they have been in there for too long
-     */
-    public class CachedMapItemCleaner extends Task {
-
-        public CachedMapItemCleaner(JavaPlugin plugin) {
-            super(plugin);
-        }
-
-        @Override
-        public void run() {
-            synchronized (CommonMapController.this) {
-                if (!CommonMapController.this.cachedMapItems.isEmpty()) {
-                    Iterator<CachedMapItem> iter = CommonMapController.this.cachedMapItems.values().iterator();
-                    while (iter.hasNext()) {
-                        if ((iter.next().life -= CACHED_ITEM_CLEAN_INTERVAL) <= 0) {
-                            iter.remove();
-                        }
-                    }
-                }
             }
         }
     }
@@ -1545,20 +1221,6 @@ public class CommonMapController implements PacketListener, Listener {
                     initItemFrameSetOfWorld(world);
                 }
             }
-        }
-    }
-
-    /**
-     * An item that sits around in memory while players in creative mode are moving the item around.
-     * 
-     */
-    private static class CachedMapItem {
-        public int life;
-        public final ItemStack item;
-
-        public CachedMapItem(ItemStack item) {
-            this.item = item;
-            this.life = CACHED_ITEM_MAX_LIFE;
         }
     }
 
@@ -1807,223 +1469,5 @@ public class CommonMapController implements PacketListener, Listener {
         item = ItemUtil.cloneItem(item);
         ItemUtil.setMetaTag(item, newTag);
         return item;
-    }
-
-    /**
-     * Group of item frames that are connected together and face the same way
-     */
-    public static class ItemFrameCluster {
-        // Facing of the display
-        public final BlockFace facing;
-        // Set of coordinates where item frames are stored
-        public final Set<IntVector3> coordinates;
-        // Most common ItemFrame rotation used for the display
-        public final int rotation;
-        // Minimum/maximum coordinates and size of the item frame coordinates in this cluster
-        public final IntVector3 min_coord, max_coord;
-        // Chunks that must be loaded in addition to this cluster, to make this cluster validly loaded
-        public final ChunkDependency[] chunk_dependencies;
-        // Resolution in rotation/facing relative space (unused)
-        // public final IntVector3 size;
-        // public final IntVector2 resolution;
-
-        // A temporary builder which we use to track what chunks need to be loaded to load a cluster
-        private static final ChunkDependencyBuilder BUILDER = new ChunkDependencyBuilder();
-
-        public ItemFrameCluster(BlockFace facing, Set<IntVector3> coordinates, int rotation) {
-            this.facing = facing;
-            this.coordinates = coordinates;
-            this.rotation = rotation;
-
-            if (hasMultipleTiles()) {
-                // Compute minimum/maximum x and z coordinates
-                Iterator<IntVector3> iter = coordinates.iterator();
-                IntVector3 coord = iter.next();
-                int min_x, max_x, min_y, max_y, min_z, max_z;
-                min_x = max_x = coord.x; min_y = max_y = coord.y; min_z = max_z = coord.z;
-                while (iter.hasNext()) {
-                    coord = iter.next();
-                    if (coord.x < min_x) min_x = coord.x;
-                    if (coord.y < min_y) min_y = coord.y;
-                    if (coord.z < min_z) min_z = coord.z;
-                    if (coord.x > max_x) max_x = coord.x;
-                    if (coord.y > max_y) max_y = coord.y;
-                    if (coord.z > max_z) max_z = coord.z;
-                }
-                min_coord = new IntVector3(min_x, min_y, min_z);
-                max_coord = new IntVector3(max_x, max_y, max_z);
-            } else {
-                min_coord = max_coord = coordinates.iterator().next();
-            }
-
-            synchronized (BUILDER) {
-                try {
-                    this.chunk_dependencies = BUILDER.process(facing, coordinates);
-                } finally {
-                    BUILDER.reset();
-                }
-            }
-
-            // Compute resolution (unused)
-            /*
-            if (hasMultipleTiles()) {
-                size = max_coord.subtract(min_coord);
-                if (facing.getModY() > 0) {
-                    // Vertical pointing up
-                    // We use rotation of the item frame to decide which side is up
-                    switch (rotation) {
-                    case 90:
-                    case 270:
-                        resolution = new IntVector2(size.z+1, size.x+1);
-                        break;
-                    case 180:
-                    default:
-                        resolution = new IntVector2(size.x+1, size.z+1);
-                        break;
-                    }
-                } else if (facing.getModY() < 0) {
-                    // Vertical pointing down
-                    // We use rotation of the item frame to decide which side is up
-                    switch (rotation) {
-                    case 90:
-                    case 270:
-                        resolution = new IntVector2(size.z+1, size.x+1);
-                        break;
-                    case 180:
-                    default:
-                        resolution = new IntVector2(size.x+1, size.z+1);
-                        break;
-                    }
-                } else {
-                    // On the wall
-                    switch (facing) {
-                    case NORTH:
-                    case SOUTH:
-                        resolution = new IntVector2(size.x+1, size.y+1);
-                        break;
-                    case EAST:
-                    case WEST:
-                        resolution = new IntVector2(size.z+1, size.y+1);
-                        break;
-                    default:
-                        resolution = new IntVector2(1, 1);
-                        break;
-                    }
-                }
-            } else {
-                resolution = new IntVector2(1, 1);
-                size = IntVector3.ZERO;
-            }
-            */
-        }
-
-        public boolean hasMultipleTiles() {
-            return coordinates.size() > 1;
-        }
-
-        private static final class ChunkDependencyBuilder {
-            private final LongHashSet covered = new LongHashSet();
-            private final List<ChunkDependency> dependencies = new ArrayList<ChunkDependency>();
-
-            public ChunkDependency[] process(BlockFace facing, Collection<IntVector3> coordinates) {
-                // Add all chunks definitely covered by item frames, and therefore loaded
-                // These are excluded as dependencies
-                for (IntVector3 coordinate : coordinates) {
-                    covered.add(coordinate.getChunkX(), coordinate.getChunkZ());
-                }
-
-                // Go by all coordinates and if they sit at a chunk border, check that chunk is loaded
-                // If it is not, add it as a dependency
-                if (!FaceUtil.isAlongX(facing)) {
-                    for (IntVector3 coordinate : coordinates) {
-                        if ((coordinate.x & 0xF) == 0x0) {
-                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), -1, 0);
-                        } else if ((coordinate.x & 0xF) == 0xF) {
-                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 1, 0);
-                        }
-                    }
-                }
-                if (!FaceUtil.isAlongZ(facing)) {
-                    for (IntVector3 coordinate : coordinates) {
-                        if ((coordinate.z & 0xF) == 0x0) {
-                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 0, -1);
-                        } else if ((coordinate.z & 0xF) == 0xF) {
-                            probe(coordinate.getChunkX(), coordinate.getChunkZ(), 0, 1);
-                        }
-                    }
-                }
-
-                // To array
-                return dependencies.toArray(new ChunkDependency[dependencies.size()]);
-            }
-
-            public void probe(int cx, int cz, int dx, int dz) {
-                int n_cx = cx + dx;
-                int n_cz = cz + dz;
-                if (covered.add(n_cx, n_cz)) {
-                    dependencies.add(new ChunkDependency(cx, cz, n_cx, n_cz));
-                }
-            }
-
-            public void reset() {
-                covered.clear();
-                dependencies.clear();
-            }
-        }
-
-        /**
-         * A chunk neighbouring this cluster that must be loaded before
-         * this cluster of item frames becomes active.
-         * Tracks the chunk that needs to be loaded, as well as the
-         * chunk the item frame is in that needs this neighbour.
-         */
-        public static final class ChunkDependency {
-            public static final ChunkDependency NONE = new ChunkDependency();
-            public final IntVector2 self;
-            public final IntVector2 neighbour;
-
-            private ChunkDependency() {
-                this.self = null;
-                this.neighbour = null;
-            }
-
-            public ChunkDependency(int cx, int cz, int n_cx, int n_cz) {
-                this.self = new IntVector2(cx, cz);
-                this.neighbour = new IntVector2(n_cx, n_cz);
-            }
-        }
-    }
-
-    /**
-     * When clustering item frames (finding neighbours), this key is used
-     * to store a mapping of what item frames exist on the server
-     */
-    private static class ItemFrameClusterKey {
-        public final World world;
-        public final BlockFace facing;
-        public final int coordinate;
-
-        public ItemFrameClusterKey(EntityItemFrameHandle itemFrame) {
-            this(itemFrame.getBukkitWorld(), itemFrame.getFacing(), itemFrame.getBlockPosition());
-        }
-
-        public ItemFrameClusterKey(World world, BlockFace facing, IntVector3 coordinates) {
-            this.world = world;
-            this.facing = facing;
-            this.coordinate = facing.getModX()*coordinates.x +
-                              facing.getModY()*coordinates.y +
-                              facing.getModZ()*coordinates.z;
-        }
-
-        @Override
-        public int hashCode() {
-            return this.coordinate + (facing.ordinal()<<6);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            ItemFrameClusterKey other = (ItemFrameClusterKey) o;
-            return other.coordinate == this.coordinate && (other.world == this.world || other.world.equals(this.world)) && other.facing == this.facing;
-        }
     }
 }

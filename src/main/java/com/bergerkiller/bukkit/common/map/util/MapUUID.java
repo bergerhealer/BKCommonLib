@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import java.util.UUID;
 
-import com.bergerkiller.bukkit.common.internal.CommonMapUUIDStore;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
 
 /**
  * Uniquely identifies a Map tile of a map display
