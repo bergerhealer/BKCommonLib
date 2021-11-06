@@ -41,10 +41,11 @@ public class CommonMapUUIDStore {
      * Gets the Map Id stored inside a Map Item
      * 
      * @param item to get it for (must be a CraftItemStack, can not be null)
-     * @return map Id
+     * @return map Id, or -1 if this is not a map item
      */
     public static int getItemMapId(ItemStack item) {
-        return ItemStackHandle.T.getMapId.invoke(CraftItemStackHandle.T.handle.raw.get(item)).intValue();
+        Object nmsHandle = CraftItemStackHandle.T.handle.raw.get(item);
+        return (nmsHandle == null) ? -1 : ItemStackHandle.T.getMapId.invoke(nmsHandle).intValue();
     }
 
     /**

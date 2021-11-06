@@ -71,6 +71,7 @@ import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
+import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
@@ -374,6 +375,9 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param startedTasks
      */
     public void onEnable(CommonPlugin plugin, List<Task> startedTasks) {
+        plugin.register((Listener) this);
+        plugin.register((PacketListener) this, PACKET_TYPES);
+
         startedTasks.add(new MapDisplayHeldMapUpdater(plugin, this).start(1, 1));
         startedTasks.add(new MapDisplayFramedMapUpdater(plugin, this).start(1, 1));
         startedTasks.add(new MapDisplayItemMapIdUpdater(plugin, this).start(1, 1));
@@ -393,9 +397,14 @@ public final class CommonMapController implements PacketListener, Listener {
             }
         }
 
-        // For all item frames we know right now, assume players have seen them already (if reloading)
+        // For all item frames with maps we know right now, assume players have seen them already (if reloading)
+        // This ensures updated map details are refreshed during the item update discovery
         if (CommonUtil.getServerTicks() > 0) {
-            this.itemFrames.values().forEach(info -> info.sentToPlayers = true);
+            this.getItemFrames().forEach(info -> {
+                if (CommonMapUUIDStore.isMap(getItemFrameItem(info.itemFrame))) {
+                    info.sentMapInfoToPlayers = true;
+                }
+            });
         }
 
         // If this is a reload, that means players have already been watching maps potentially
@@ -517,7 +526,10 @@ public final class CommonMapController implements PacketListener, Listener {
         }
 
         // Static map Id MUST be enforced
-        storeStaticMapId(CommonMapUUIDStore.getItemMapId(item));
+        int mapId = CommonMapUUIDStore.getItemMapId(item);
+        if (mapId != -1) {
+            storeStaticMapId(mapId);
+        }
         return null;
     }
 
@@ -655,18 +667,11 @@ public final class CommonMapController implements PacketListener, Listener {
             int entityId = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.entityId);
             ItemFrameInfo frameInfo = this.itemFrames.get(entityId);
             if (frameInfo == null) {
-                // Verify the Item Frame DATA_ITEM key is inside the metadata of this packet
-                // If this is the case, then this is metadata for an item frame and not a different entity
-                // When that happens then a metadata packet was sent before the entity add event for it fired
+                // When map metadata is sent before the ItemFrame is loaded, then a metadata packet
+                // was sent before the entity add event for it fired.
                 // To prevent glitches, track that in the itemFrameMetaMisses set
-                List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
-                if (items != null) {
-                    for (DataWatcher.Item<Object> item : items) {
-                        if (EntityItemFrameHandle.DATA_ITEM.equals(item.getKey())) {
-                            itemFrameMetaMisses.add(entityId);
-                            break;
-                        }
-                    }
+                if (hasMapItemInMetadata(event.getPacket())) {
+                    itemFrameMetaMisses.add(entityId);
                 }
                 return; // no information available or not an item frame
             }
@@ -674,16 +679,22 @@ public final class CommonMapController implements PacketListener, Listener {
             // Sometimes the metadata packet is handled before we do routine updates
             // If so, we can't do anything with it yet until the item frame is
             // loaded on the main thread.
-            if (frameInfo.lastFrameItemUpdateNeeded || frameInfo.requiresFurtherLoading) {
-                frameInfo.sentToPlayers = true;
-                return; // not yet loaded, once it loads, resend the item details
+            if (frameInfo.lastFrameItemUpdateNeeded ||
+                frameInfo.requiresFurtherLoading ||
+                frameInfo.lastMapUUID == null
+            ) {
+                // Map item metadata is sent, once the frame itself loads in, we must resend the item
+                if (hasMapItemInMetadata(event.getPacket())) {
+                    frameInfo.sentMapInfoToPlayers = true;
+                }
+
+                return; // not yet loaded or not a map
             }
-            if (frameInfo.lastMapUUID == null) {
-                return; // not a map
-            }
-            frameInfo.sentToPlayers = true;
+
+            // Presumed to contain a map item, so mark it that players have received it
             int staticMapId = CommonMapUUIDStore.getStaticMapId(frameInfo.lastMapUUID.getUUID());
             if (staticMapId != -1) {
+                frameInfo.sentMapInfoToPlayers = true;
                 this.storeStaticMapId(staticMapId);
                 return; // static Id, not dynamic, no re-assignment
             }
@@ -700,20 +711,50 @@ public final class CommonMapController implements PacketListener, Listener {
                         continue;
                     }
 
+                    // Check item is actually a map item and do some logic
                     ItemStack metaItem = item.getValue();
-                    if (metaItem == null || CommonMapUUIDStore.getItemMapId(metaItem) == newMapId) {
-                        continue;
+                    int oldMapId;
+                    if (metaItem == null || (oldMapId = CommonMapUUIDStore.getItemMapId(metaItem)) == -1) {
+                        break;
                     }
 
-                    ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
-                    CommonMapUUIDStore.setItemMapId(newMapItem, newMapId);
+                    // Map information is sent, if the map id we use differs, update it
+                    frameInfo.sentMapInfoToPlayers = true;
+                    if (oldMapId != newMapId) {
+                        ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
+                        CommonMapUUIDStore.setItemMapId(newMapItem, newMapId);
 
-                    item = item.clone();
-                    item.setValue(newMapItem, item.isChanged());
-                    itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);
+                        item = item.clone();
+                        item.setValue(newMapItem, item.isChanged());
+                        itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);
+                    }
+
+                    break;
                 }
             }
         }
+    }
+
+    /**
+     * Checks that an Entity Metadata packet has the item metadata of an item frame,
+     * and that the ItemStack item is of a Map.
+     *
+     * @param entityMetadataPacket
+     * @return True if the metadata packet sends an ItemFrame Map Item
+     */
+    private static boolean hasMapItemInMetadata(CommonPacket entityMetadataPacket) {
+        // Verify the Item Frame DATA_ITEM key is inside the metadata of this packet
+        // If this is the case, then this is metadata for an item frame and not a different entity
+        List<DataWatcher.Item<Object>> items =entityMetadataPacket.read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
+        if (items != null) {
+            for (DataWatcher.Item<Object> dw_item : items) {
+                DataWatcher.Item<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
+                if (item != null) {
+                    return CommonMapUUIDStore.isMap(item.getValue());
+                }
+            }
+        }
+        return false;
     }
 
     @Override
@@ -869,7 +910,7 @@ public final class CommonMapController implements PacketListener, Listener {
         itemFrames.put(entityId, frameInfo);
         if (itemFrameMetaMisses.remove(entityId)) {
             frameInfo.needsItemRefresh.set(true);
-            frameInfo.sentToPlayers = true;
+            frameInfo.sentMapInfoToPlayers = true;
         }
     }
 

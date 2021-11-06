@@ -43,7 +43,7 @@ public class ItemFrameInfo {
     public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
     public MapUUID preReloadMapUUID; // Map UUID known from before a reload, and if encountered again, will avoid resending the item (popping)
     public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
-    public boolean sentToPlayers; // players have received item information for this item frame
+    public boolean sentMapInfoToPlayers; // players have received map item information for this item frame
     public boolean requiresFurtherLoading; // whether neighbouring chunks need loading before a map display can be initialized
     public MapDisplayInfo displayInfo;
 
@@ -71,7 +71,7 @@ public class ItemFrameInfo {
         this.preReloadMapUUID = null;
         this.displayInfo = null;
         this.needsItemRefresh = controller.itemFramesThatNeedItemRefresh.track(this);
-        this.sentToPlayers = false;
+        this.sentMapInfoToPlayers = false;
         this.requiresFurtherLoading = false;
     }
 
@@ -365,7 +365,7 @@ public class ItemFrameInfo {
         UUID mapUUID = CommonMapUUIDStore.getMapUUID(this.lastFrameItemUpdate);
         if (mapUUID == null) {
             // Map was removed
-            this.sentToPlayers = false;
+            this.sentMapInfoToPlayers = false;
             this.requiresFurtherLoading = false;
             if (lastMapUUID != null) {
                 remove();
@@ -526,7 +526,7 @@ public class ItemFrameInfo {
             // Map item UUID changed entirely. Remove the previous and add the new.
             remove();
             lastMapUUID = newMapUUID;
-            needsItemRefresh.set(sentToPlayers && !newMapUUID.equals(preReloadMapUUID));
+            needsItemRefresh.set(sentMapInfoToPlayers && !newMapUUID.equals(preReloadMapUUID));
             preReloadMapUUID = null;
             add();
         } else if (newMapUUID.equals(lastMapUUID)) {
@@ -541,7 +541,7 @@ public class ItemFrameInfo {
             int oldTileX = lastMapUUID.getTileX();
             int oldTileY = lastMapUUID.getTileY();
             lastMapUUID = newMapUUID;
-            needsItemRefresh.set(sentToPlayers);
+            needsItemRefresh.set(sentMapInfoToPlayers);
             preReloadMapUUID = null;
 
             // If the previous coordinates are now no longer used, remove the tile
@@ -550,7 +550,7 @@ public class ItemFrameInfo {
             // Tile coordinates changed, but we had no previous display info
             // Strange.
             lastMapUUID = newMapUUID;
-            needsItemRefresh.set(sentToPlayers);
+            needsItemRefresh.set(sentMapInfoToPlayers);
             preReloadMapUUID = null;
         }
     }

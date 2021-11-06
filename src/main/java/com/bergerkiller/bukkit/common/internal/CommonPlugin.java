@@ -651,8 +651,6 @@ public class CommonPlugin extends PluginBase {
 
         mapController = new CommonMapController();
         if (this.isMapDisplaysEnabled) {
-            register(mapController);
-            PacketUtil.addPacketListener(this, mapController, CommonMapController.PACKET_TYPES);
             mapController.onEnable(this, startedTasks);
         }
 
