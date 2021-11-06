@@ -97,6 +97,8 @@ import com.google.common.collect.SetMultimap;
 public final class CommonMapController implements PacketListener, Listener {
     // Whether this controller has been enabled
     private boolean isEnabled = false;
+    // Whether map displays shown on item frames is enabled
+    private boolean isFrameDisplaysEnabled = true;
     // Whether tiling is supported. Disables findNeighbours() if false.
     private boolean isFrameTilingSupported = true;
     // Stores cached thread-safe lists of item frames by cluster key
@@ -387,13 +389,16 @@ public final class CommonMapController implements PacketListener, Listener {
         startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
 
         this.isFrameTilingSupported = plugin.isFrameTilingSupported();
+        this.isFrameDisplaysEnabled = plugin.isFrameDisplaysEnabled();
 
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
         // No actual initialization is done yet, this happens next tick cycle!
-        for (World world : Bukkit.getWorlds()) {
-            for (EntityItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
-                onAddItemFrame(itemFrame);
+        if (this.isFrameDisplaysEnabled) {
+            for (World world : Bukkit.getWorlds()) {
+                for (EntityItemFrameHandle itemFrame : initItemFrameSetOfWorld(world)) {
+                    onAddItemFrame(itemFrame);
+                }
             }
         }
 
@@ -849,7 +854,7 @@ public final class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onEntityAdded(EntityAddEvent event) {
-        if (event.getEntity() instanceof ItemFrame) {
+        if (this.isFrameDisplaysEnabled && event.getEntity() instanceof ItemFrame) {
             EntityItemFrameHandle frameHandle = EntityItemFrameHandle.createHandle(HandleConversion.toEntityHandle(event.getEntity()));
             getItemFrameEntities(new ItemFrameClusterKey(frameHandle)).add(frameHandle);
             onAddItemFrame(frameHandle);
@@ -877,8 +882,10 @@ public final class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected synchronized void onWorldLoad(WorldLoadEvent event) {
-        for (EntityItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
-            onAddItemFrame(frame);
+        if (this.isFrameDisplaysEnabled) {
+            for (EntityItemFrameHandle frame : initItemFrameSetOfWorld(event.getWorld())) {
+                onAddItemFrame(frame);
+            }
         }
     }
 

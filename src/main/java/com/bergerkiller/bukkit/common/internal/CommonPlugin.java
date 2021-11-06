@@ -99,6 +99,7 @@ public class CommonPlugin extends PluginBase {
     private CommonVehicleMountManager vehicleMountManager = null;
     private PlayerGameVersionSupplier gameVersionSupplier = null;
     private boolean isFrameTilingSupported = true;
+    private boolean isFrameDisplaysEnabled = true;
     private boolean isMapDisplaysEnabled = true;
     private boolean teleportPlayersToSeat = true;
     private boolean forceSynchronousSaving = false;
@@ -131,6 +132,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isFrameTilingSupported() {
         return isFrameTilingSupported;
+    }
+
+    public boolean isFrameDisplaysEnabled() {
+        return isFrameDisplaysEnabled;
     }
 
     public boolean isMapDisplaysEnabled() {
@@ -525,14 +530,21 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("Normally you should not have to make changes to this file");
         config.addHeader("Unused components of the library can be disabled to improve performance");
         config.addHeader("By default all components and features are enabled");
-        config.setHeader("enableItemFrameTiling", "\nWhether multiple item frames next to each other can merge to show one large display");
-        config.addHeader("enableItemFrameTiling", "This allows Map Displays to be displayed on multiple item frames at a larger resolution");
-        config.addHeader("enableItemFrameTiling", "The tiling detection logic poses some overhead on the server, and if unused, can be disabled");
-        this.isFrameTilingSupported = config.get("enableItemFrameTiling", true);
         config.setHeader("enableMapDisplays", "\nWhether the Map Display engine is enabled, running in the background to refresh and render maps");
         config.addHeader("enableMapDisplays", "When enabled, the map item tracking may impose a slight overhead");
         config.addHeader("enableMapDisplays", "If no plugin is using map displays, then this can be safely disabled to improve performance");
         this.isMapDisplaysEnabled = config.get("enableMapDisplays", true);
+        config.setHeader("enableItemFrameDisplays", "\nWhether all item frames on the server are tracked to see if they display a map display.");
+        config.addHeader("enableItemFrameDisplays", "This allows for map displays to be displayed on item frames and interacted with.");
+        config.addHeader("enableItemFrameDisplays", "If 'enableItemFrameTiling' is also true, then this allows for multi-item frame displays.");
+        config.addHeader("enableItemFrameDisplays", "Tracking the existence of all item frames on the server can pose an overhead, as");
+        config.addHeader("enableItemFrameDisplays", "shown under the 'MapDisplayFramedMapUpdater' task. Turning this off can help performance.");
+        config.addHeader("enableItemFrameDisplays", "If 'enableMapDisplays' is true then player-held maps will continue working fine.");
+        this.isFrameDisplaysEnabled = config.get("enableItemFrameDisplays", true);
+        config.setHeader("enableItemFrameTiling", "\nWhether multiple item frames next to each other can merge to show one large display");
+        config.addHeader("enableItemFrameTiling", "This allows Map Displays to be displayed on multiple item frames at a larger resolution");
+        config.addHeader("enableItemFrameTiling", "The tiling detection logic poses some overhead on the server, and if unused, can be disabled");
+        this.isFrameTilingSupported = config.get("enableItemFrameTiling", true);
         config.setHeader("teleportPlayersToSeat", "\nWhether to teleport players to their supposed seat while they hold the sneak button");
         config.addHeader("teleportPlayersToSeat", "This is used on Minecraft 1.16 and later to make sure players stay near their seat,");
         config.addHeader("teleportPlayersToSeat", "when exiting the seat was cancelled.");
