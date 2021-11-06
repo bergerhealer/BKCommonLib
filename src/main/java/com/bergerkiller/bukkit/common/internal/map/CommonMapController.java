@@ -668,7 +668,7 @@ public final class CommonMapController implements PacketListener, Listener {
         }
  
         // Correct the ItemStack displayed in Item Frames
-        if (event.getType() == PacketType.OUT_ENTITY_METADATA) {
+        if (this.isFrameDisplaysEnabled && event.getType() == PacketType.OUT_ENTITY_METADATA) {
             int entityId = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.entityId);
             ItemFrameInfo frameInfo = this.itemFrames.get(entityId);
             if (frameInfo == null) {
@@ -1057,6 +1057,10 @@ public final class CommonMapController implements PacketListener, Listener {
 
     // Returns true if base click was cancelled
     private boolean dispatchClickActionFromBlock(Player player, Block clickedBlock, BlockFace clickedFace, MapAction action) {
+        if (!this.isFrameDisplaysEnabled) {
+            return false;
+        }
+
         Vector look = player.getEyeLocation().getDirection();
         final double eps = 0.001;
 
@@ -1112,7 +1116,7 @@ public final class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     protected void onEntityLeftClick(EntityDamageByEntityEvent event) {
-        if (!(event.getEntity() instanceof ItemFrame) || !(event.getDamager() instanceof Player)) {
+        if (!this.isFrameDisplaysEnabled || !(event.getEntity() instanceof ItemFrame) || !(event.getDamager() instanceof Player)) {
             return;
         }
         event.setCancelled(dispatchClickActionApprox(
@@ -1125,14 +1129,14 @@ public final class CommonMapController implements PacketListener, Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onEntityRightClickAt(PlayerInteractAtEntityEvent event) {
-        if (event.getRightClicked() instanceof ItemFrame) {
+        if (!this.isFrameDisplaysEnabled || event.getRightClicked() instanceof ItemFrame) {
             lastClickOffset = event.getClickedPosition();
         }
     }
 
     @EventHandler(priority = EventPriority.LOWEST)
     protected void onEntityRightClick(PlayerInteractEntityEvent event) {
-        if (!(event.getRightClicked() instanceof ItemFrame)) {
+        if (!this.isFrameDisplaysEnabled || !(event.getRightClicked() instanceof ItemFrame)) {
             return;
         }
         ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
