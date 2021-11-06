@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.map;
 
-import java.util.Iterator;
-
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -15,8 +13,18 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Updates the players viewing item frames and fires events for them
  */
 class MapDisplayFramedMapUpdater extends Task {
+    /**
+     * How many item frames are polled each tick that had no events or significant
+     * changes happen to them. 99.99% of the time the item inside of it has not
+     * changed, but if plugins changed it through code, this will catch those
+     * and refresh.
+     */
+    public static final int NUM_IDLE_FRAMES_POLLED_PER_TICK = 50;
+
     private final CommonMapController controller;
-    private ItemFrameInfo info = null;
+    private ItemFrameInfo currentFrameInfo;
+    private ItemFrameInfo.UpdateEntry firstEntryUpdated = null;
+    private ItemFrameInfo.UpdateEntry lastEntryUpdated = null;
     private final LogicUtil.ItemSynchronizer<Player, Player> synchronizer = new LogicUtil.ItemSynchronizer<Player, Player>() {
         @Override
         public boolean isItem(Player item, Player value) {
@@ -25,7 +33,7 @@ class MapDisplayFramedMapUpdater extends Task {
 
         @Override
         public Player onAdded(Player player) {
-            controller.handleMapShowEvent(new MapShowEvent(player, info.itemFrame));
+            controller.handleMapShowEvent(new MapShowEvent(player, currentFrameInfo.itemFrame));
             return player;
         }
 
@@ -43,44 +51,96 @@ class MapDisplayFramedMapUpdater extends Task {
 
     @Override
     public void run() {
-        // Enable the item frame cluster cache
+        // Enable the item frame cluster cache while performing these operations
         controller.itemFrameClustersByWorldEnabled = true;
+        try {
+            synchronized (controller) {
+                updateItemFrameItemAndViewers();
+                controller.mapsWithItemFrameResolutionChanges.forEachAndClear(MapDisplayInfo::updateItemFrameResolution);
+                controller.mapsWithItemFrameViewerChanges.forEachAndClear(MapDisplayInfo::updateItemFrameViewers);
+                controller.itemFramesThatNeedItemRefresh.forEachAndClear(c -> c.itemFrameHandle.refreshItem());
+            }
+        } finally {
+            // Disable cache again and wipe
+            controller.itemFrameClustersByWorldEnabled = false;
+            controller.itemFrameClustersByWorld.clear();
+        }
+    }
 
+    private void updateItemFrameItemAndViewers() {
         // Iterate all tracked item frames and update them
-        synchronized (controller) {
-            Iterator<ItemFrameInfo> itemFrames_iter = controller.itemFrames.values().iterator();
-            while (itemFrames_iter.hasNext()) {
-                info = itemFrames_iter.next();
-                if (info.handleRemoved()) {
-                    itemFrames_iter.remove();
-                    continue;
-                }
+        ItemFrameInfo.UpdateEntry entry = controller.itemFrameUpdateList.first();
 
-                info.updateItemAndViewers(synchronizer);
+        try {
+            // In the beginning are all prioritized entries - process those first
+            // Avoids unneeded if-checks later.
+            while (entry != null && entry.prioritized) {
+                entry.prioritized = false;
+                updateItemAndViewers(entry);
+                entry = entry.next;
+            }
 
-                // May find out it's removed during the update
-                if (info.handleRemoved()) {
-                    itemFrames_iter.remove();
-                    continue;
-                }
+            // Process up to the limit more non-prioritized entries
+            int numNonPrioritized = 0;
+            while (entry != null && ++numNonPrioritized <= NUM_IDLE_FRAMES_POLLED_PER_TICK) {
+                updateItemAndViewers(entry);
+                entry = entry.next;
+            }
+
+            // Any remaining entries all we update are the viewers and whether it got removed
+            // These unfortunately must be tracked every tick to stay up to date
+            // In future, this is in need of improvement!
+            while (entry != null) {
+                updateViewersPassive(entry);
+                entry = entry.next;
+            }
+
+            // If an entry was updated, move everything from start to there to the end of the chain
+            // If there are very little entries then the end is already at the end and nothing happens
+            if (firstEntryUpdated != null) {
+                controller.itemFrameUpdateList.moveRangeToEnd(firstEntryUpdated, lastEntryUpdated);
+            }
+        } finally {
+            // Clean up
+            firstEntryUpdated = null;
+            lastEntryUpdated = null;
+            currentFrameInfo = null;
+        }
+    }
+
+    private void updateViewersPassive(ItemFrameInfo.UpdateEntry entry) {
+        if (!entry.info.handleRemoved()) {
+            currentFrameInfo = entry.info;
+            entry.info.updateViewers(synchronizer);
+            if (!entry.info.handleRemoved()) {
+                return;
             }
         }
 
-        // Update the player viewers of all map displays
-        for (MapDisplayInfo map : controller.mapsValues.cloneAsIterable()) {
-            map.updateViewersAndResolution();
+        // Is removed, so remove it.
+        remove(entry);
+    }
+
+    private void updateItemAndViewers(ItemFrameInfo.UpdateEntry entry) {
+        if (!entry.info.handleRemoved()) {
+            currentFrameInfo = entry.info;
+            entry.info.updateItem();
+            entry.info.updateViewers(synchronizer);
+            if (!entry.info.handleRemoved()) {
+                lastEntryUpdated = entry;
+                if (firstEntryUpdated == null) {
+                    firstEntryUpdated = entry;
+                }
+                return;
+            }
         }
 
-        // Resend Item Frame item (metadata) when the UUID changes
-        // UUID can change when the relative tile displayed changes
-        // This happens when a new item frame is placed left/above a display
-        // Protective iterator for that rare somehow-chance that refreshItem() causes changes
-        for (ItemFrameInfo info : controller.itemFramesThatNeedItemRefresh.iterateAndClear()) {
-            info.itemFrameHandle.refreshItem();
-        }
+        // Is removed, so remove it.
+        remove(entry);
+    }
 
-        // Disable cache again and wipe
-        controller.itemFrameClustersByWorldEnabled = false;
-        controller.itemFrameClustersByWorld.clear();
+    private void remove(ItemFrameInfo.UpdateEntry entry) {
+        controller.itemFrameUpdateList.remove(entry);
+        controller.itemFrames.remove(entry.info.itemFrameHandle.getId());
     }
 }

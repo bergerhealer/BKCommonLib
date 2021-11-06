@@ -59,6 +59,8 @@ public class ItemFrameInfo {
 
     // Tracks whether an item refresh needs to be done
     public final FastTrackedUpdateSet.Tracker<ItemFrameInfo> needsItemRefresh;
+    // Tracker object for updating this item frame
+    public final UpdateEntry updateEntry = new UpdateEntry(this);
 
     public ItemFrameInfo(CommonMapController controller, EntityItemFrameHandle itemFrame) {
         this.controller = controller;
@@ -287,15 +289,22 @@ public class ItemFrameInfo {
     }
 
     /**
-     * Updates the item if possibly changed, then synchronizes the viewers that view this item frame.
+     * Checks if the item in the ItemFrame changed, and handles this change if so.
+     */
+    public void updateItem() {
+        // Recalculate UUID if the map changed/item became a map
+        if (checkItemChanged()) {
+            recalculateUUID();
+        }
+    }
+
+    /**
+     * Synchronizes the viewers that view this item frame.
      * For every viewer that is added or removed, the synchronizer callbacks are called.
      *
      * @param viewerSynchronizer Synchronizer to call callbacks of
      */
-    public void updateItemAndViewers(LogicUtil.ItemSynchronizer<Player, Player> viewerSynchronizer) {
-        // Refreshes cached information about this item frame's item
-        updateItem();
-
+    public void updateViewers(LogicUtil.ItemSynchronizer<Player, Player> viewerSynchronizer) {
         // Update list of players for item frames showing maps
         if (lastMapUUID != null) {
             if (entityTrackerEntryState == null) {
@@ -315,7 +324,7 @@ public class ItemFrameInfo {
             boolean changes = LogicUtil.synchronizeUnordered(viewers, entityTrackerViewers, viewerSynchronizer);
 
             if (changes && displayInfo != null) {
-                displayInfo.hasFrameViewerChanges = true;
+                displayInfo.hasFrameViewerChanges.set(true);
             }
 
             // Reset tick counter to 1 so that the normal WorldMap refreshing never occurs
@@ -323,13 +332,6 @@ public class ItemFrameInfo {
             if (!lastMapUUID.isStaticUUID()) {
                 entityTrackerEntryState.setTickCounter(1);
             }
-        }
-    }
-
-    public void updateItem() {
-        // Recalculate UUID if the map changed/item became a map
-        if (checkItemChanged()) {
-            recalculateUUID();
         }
     }
 
@@ -558,11 +560,11 @@ public class ItemFrameInfo {
     private void remove() {
         if (displayInfo != null) {
             displayInfo.itemFrames.remove(this);
-            displayInfo.hasFrameViewerChanges = true;
+            displayInfo.hasFrameViewerChanges.set(true);
             displayInfo.refreshResolution();
             displayInfo.removeTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
             if (!displayInfo.itemFrames.isEmpty()) {
-                displayInfo.refreshItemFramesRequest = true;
+                displayInfo.hasFrameResolutionChanges.set(true);
             }
             displayInfo = null;
         }
@@ -581,9 +583,30 @@ public class ItemFrameInfo {
         if (this.displayInfo == null && this.lastMapUUID != null) {
             this.displayInfo = this.controller.getInfo(this.lastMapUUID.getUUID());
             this.displayInfo.itemFrames.add(this);
-            displayInfo.refreshItemFramesRequest = true;
+            displayInfo.hasFrameResolutionChanges.set(true);
             displayInfo.refreshResolution();
             displayInfo.addTileIfMissing(this.lastMapUUID.getTileX(), this.lastMapUUID.getTileY());
+        }
+    }
+
+    /**
+     * Forms a linked list of all item frame entries
+     * on the server. Each entry represents a single
+     * item frame being updated.
+     */
+    public static final class UpdateEntry {
+        public final ItemFrameInfo info;
+        public boolean added;
+        public boolean prioritized;
+        public UpdateEntry prev;
+        public UpdateEntry next;
+
+        private UpdateEntry(ItemFrameInfo info) {
+            this.info = info;
+            this.added = false;
+            this.prioritized = false;
+            this.prev = null;
+            this.next = null;
         }
     }
 }

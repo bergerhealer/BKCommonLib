@@ -12,6 +12,8 @@ import java.util.UUID;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.collections.FastTrackedUpdateSet;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.map.CommonMapUUIDStore;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.map.MapDisplayTile;
@@ -32,8 +34,8 @@ public class MapDisplayInfo {
     // can see this map on the item frames
     final ArrayList<ItemFrameInfo> itemFrames = new ArrayList<ItemFrameInfo>();
     private final LinkedHashSet<Player> frameViewers = new LinkedHashSet<Player>();
-    boolean hasFrameViewerChanges = true;
-    boolean refreshItemFramesRequest = false;
+    final FastTrackedUpdateSet.Tracker<MapDisplayInfo> hasFrameViewerChanges;
+    final FastTrackedUpdateSet.Tracker<MapDisplayInfo> hasFrameResolutionChanges;
     private int desiredWidth, desiredHeight;
 
     // A list of all active running displays bound to this map
@@ -42,10 +44,12 @@ public class MapDisplayInfo {
     // Maps the display view stack by player
     private final HashMap<UUID, ViewStack> views = new HashMap<UUID, ViewStack>();
 
-    public MapDisplayInfo(UUID uuid) {
+    public MapDisplayInfo(CommonMapController controller, UUID uuid) {
         this.uuid = uuid;
         this.desiredWidth = 128;
         this.desiredHeight = 128;
+        this.hasFrameViewerChanges = controller.mapsWithItemFrameViewerChanges.track(this);
+        this.hasFrameResolutionChanges = controller.mapsWithItemFrameResolutionChanges.track(this);
     }
 
     /**
@@ -179,35 +183,35 @@ public class MapDisplayInfo {
     }
 
     /**
-     * Updates the viewers viewing this map display, if there were
-     * pending viewer changes. Then, if resolution changed,
-     * refreshes the resolution of the display.
+     * Called when the map display information is removed from the server after a
+     * periodic cleanup determined it no longer is in use.
      */
-    public void updateViewersAndResolution() {
-        if (hasFrameViewerChanges) {
-            hasFrameViewerChanges = false;
+    public void onRemoved() {
+        hasFrameResolutionChanges.untrack();
+        hasFrameViewerChanges.untrack();
+    }
 
-            // Recalculate the list of players that can see an item frame
-            frameViewers.clear();
-            for (ItemFrameInfo itemFrame : itemFrames) {
-                frameViewers.addAll(itemFrame.viewers);
-            }
-
-            // Synchronize this list with the 'global' viewer
-            //if (map.globalFramedDisplay != null) {
-                //map.globalFramedDisplay.setViewers(map.frameViewers);
-            //}
+    /**
+     * Updates the set of players that view this map display based on the item frame
+     * viewers.
+     */
+    public void updateItemFrameViewers() {
+        // Recalculate the list of players that can see an item frame
+        frameViewers.clear();
+        for (ItemFrameInfo itemFrame : itemFrames) {
+            frameViewers.addAll(itemFrame.viewers);
         }
+    }
 
-        // Refresh all item frames' items showing this map
-        // It is possible their UUID changed as a result of the new tiling
-        if (refreshItemFramesRequest) {
-            for (int i = itemFrames.size()-1; i >= 0; i--) {
-                itemFrames.get(i).recalculateUUID();
-            }
-            refreshResolution();
-            refreshItemFramesRequest = false;
+    /**
+     * Recalculates the Map UUID's of items inside item frames showing this map
+     * to update the tile coordinates after a resolution change.
+     */
+    public void updateItemFrameResolution() {
+        for (int i = itemFrames.size()-1; i >= 0; i--) {
+            itemFrames.get(i).recalculateUUID();
         }
+        refreshResolution();
     }
 
     /**
@@ -241,7 +245,7 @@ public class MapDisplayInfo {
         if (new_width != this.desiredWidth || new_height != this.desiredHeight) {
             this.desiredWidth = new_width;
             this.desiredHeight = new_height;
-            this.refreshItemFramesRequest = true;
+            this.hasFrameResolutionChanges.set(true);
             for (MapSession session : this.sessions) {
                 if (session.refreshResolutionRequested) {
                     continue;

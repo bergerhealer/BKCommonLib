@@ -120,6 +120,11 @@ public final class CommonMapController implements PacketListener, Listener {
     protected final Map<Integer, ItemFrameInfo> itemFrames = new HashMap<>();
     // Tracks what item frames require a refresh of the item inside (resending of metadata)
     public final FastTrackedUpdateSet<ItemFrameInfo> itemFramesThatNeedItemRefresh = new FastTrackedUpdateSet<ItemFrameInfo>();
+    // Tracks what item frames require a refresh of the item inside (resending of metadata)
+    public final FastTrackedUpdateSet<MapDisplayInfo> mapsWithItemFrameViewerChanges = new FastTrackedUpdateSet<MapDisplayInfo>();
+    public final FastTrackedUpdateSet<MapDisplayInfo> mapsWithItemFrameResolutionChanges = new FastTrackedUpdateSet<MapDisplayInfo>();
+    // Tracks what item frames need to have it's item change detection / viewers updated
+    protected final ItemFrameUpdateList itemFrameUpdateList = new ItemFrameUpdateList();
     // Tracks entity id's for which item metadata was sent before itemFrameInfo was available
     private final Set<Integer> itemFrameMetaMisses = new HashSet<>();
     // Tracks chunks neighbouring item frame clusters that need to be loaded before clusters load in
@@ -197,6 +202,19 @@ public final class CommonMapController implements PacketListener, Listener {
     }
 
     /**
+     * Prioritizes an ItemFrame for updating the item inside. This can
+     * be called when the item inside is changed.
+     *
+     * @param entityId Item Frame Entity Id
+     */
+    public synchronized void updateItemFrame(int entityId) {
+        ItemFrameInfo info = getItemFrame(entityId);
+        if (info != null) {
+            this.itemFrameUpdateList.prioritize(info.updateEntry);
+        }
+    }
+
+    /**
      * Gets the Player Input controller for a certain player
      * 
      * @param player
@@ -249,7 +267,7 @@ public final class CommonMapController implements PacketListener, Listener {
             }
             MapDisplayInfo info = maps.get(frameInfo.lastMapUUID.getUUID());
             if (info == null) {
-                info = new MapDisplayInfo(frameInfo.lastMapUUID.getUUID());
+                info = new MapDisplayInfo(this, frameInfo.lastMapUUID.getUUID());
                 maps.put(frameInfo.lastMapUUID.getUUID(), info);
                 mapsValues.add(info);
             }
@@ -284,7 +302,7 @@ public final class CommonMapController implements PacketListener, Listener {
             return null;
         } else {
             return maps.computeIfAbsent(mapUUID, uuid -> {
-                MapDisplayInfo info = new MapDisplayInfo(uuid);
+                MapDisplayInfo info = new MapDisplayInfo(this, uuid);
                 mapsValues.add(info);
                 return info;
             });
@@ -349,6 +367,7 @@ public final class CommonMapController implements PacketListener, Listener {
                     } else {
                         // When changed, set it normally so the item is refreshed
                         itemFrameInfo.itemFrameHandle.setItem(newItem);
+                        this.itemFrameUpdateList.prioritize(itemFrameInfo.updateEntry);
                     }
                 }
             }
@@ -377,19 +396,30 @@ public final class CommonMapController implements PacketListener, Listener {
      * @param startedTasks
      */
     public void onEnable(CommonPlugin plugin, List<Task> startedTasks) {
+        this.isFrameTilingSupported = plugin.isFrameTilingSupported();
+        this.isFrameDisplaysEnabled = plugin.isFrameDisplaysEnabled();
+
         plugin.register((Listener) this);
         plugin.register((PacketListener) this, PACKET_TYPES);
+        plugin.register(new MapDisplayItemChangeListener(this));
 
         startedTasks.add(new MapDisplayHeldMapUpdater(plugin, this).start(1, 1));
-        startedTasks.add(new MapDisplayFramedMapUpdater(plugin, this).start(1, 1));
         startedTasks.add(new MapDisplayItemMapIdUpdater(plugin, this).start(1, 1));
         startedTasks.add(new MapDisplayInputUpdater(plugin, this).start(1, 1));
         startedTasks.add(new MapDisplayCreativeDraggedMapItemCleaner(plugin, this)
                 .start(100, CreativeDraggedMapItem.CACHED_ITEM_CLEAN_INTERVAL));
-        startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
 
-        this.isFrameTilingSupported = plugin.isFrameTilingSupported();
-        this.isFrameDisplaysEnabled = plugin.isFrameDisplaysEnabled();
+        // These tasks only run when map displays on item frames are enabled
+        if (this.isFrameDisplaysEnabled) {
+            startedTasks.add(new MapDisplayFramedMapUpdater(plugin, this).start(1, 1));
+            startedTasks.add(new ByWorldItemFrameSetRefresher(plugin).start(1200, 1200)); // every minute
+        }
+
+        // Whether this sort of stuff is relevant at all, in case it's set from somewhere
+        // Avoids a memory leak
+        this.mapsWithItemFrameResolutionChanges.setEnabled(this.isFrameDisplaysEnabled && this.isFrameTilingSupported);
+        this.mapsWithItemFrameViewerChanges.setEnabled(this.isFrameDisplaysEnabled);
+        this.itemFramesThatNeedItemRefresh.setEnabled(this.isFrameDisplaysEnabled);
 
         // Discover all item frames that exist at plugin load, in already loaded worlds and chunks
         // This is only relevant during /reload, since at server start no world is loaded yet
@@ -915,6 +945,7 @@ public final class CommonMapController implements PacketListener, Listener {
         // Add Item Frame Info
         ItemFrameInfo frameInfo = new ItemFrameInfo(this, frame);
         itemFrames.put(entityId, frameInfo);
+        itemFrameUpdateList.add(frameInfo.updateEntry);
         if (itemFrameMetaMisses.remove(entityId)) {
             frameInfo.needsItemRefresh.set(true);
             frameInfo.sentMapInfoToPlayers = true;
@@ -1188,6 +1219,7 @@ public final class CommonMapController implements PacketListener, Listener {
                     MapDisplayInfo removed = maps.remove(toRemove.getUUID());
                     if (removed != null) {
                         mapsValues.remove(removed);
+                        removed.onRemoved();
                     }
                 } else {
                     continue; // still has an active session; cannot remove
@@ -1222,15 +1254,17 @@ public final class CommonMapController implements PacketListener, Listener {
 
         // When defined in the NBT of the item, construct the Map Display automatically
         // Do not do this when one was already assigned (global, or during event handling)
+        // We initialize the display the next tick using the plugin owner's task to avoid
+        // BKCommonLib showing up in timings when onAttached() is slow.
         MapDisplayProperties properties = MapDisplayProperties.of(event.getMapItem());
         if (!hasDisplay && !event.hasDisplay() && properties != null) {
             Class<? extends MapDisplay> displayClass = properties.getMapDisplayClass();
             if (displayClass != null) {
                 Plugin plugin = properties.getPlugin();
-                if (plugin != null) {
+                if (plugin instanceof JavaPlugin) {
                     try {
                         MapDisplay display = displayClass.newInstance();
-                        event.setDisplay((JavaPlugin) plugin, display);;
+                        event.setDisplay((JavaPlugin) plugin, display);
                     } catch (InstantiationException | IllegalAccessException e) {
                         e.printStackTrace();
                     }
