@@ -5,6 +5,7 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.function.Consumer;
 
 /**
  * Stores a simple List of values to be updated, but uses a small
@@ -23,10 +24,38 @@ import java.util.NoSuchElementException;
 public final class FastTrackedUpdateSet<E> {
     private final List<Tracker<E>> trackers = new ArrayList<Tracker<E>>();
     private final Iterable<E> iterable;
+    private boolean enabled;
 
     public FastTrackedUpdateSet() {
         final TrackerIterator iter = new TrackerIterator();
         this.iterable = () -> iter;
+        this.enabled = true;
+    }
+
+    /**
+     * Gets whether this update set is enabled
+     *
+     * @return True if enabled
+     */
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
+    /**
+     * Sets whether this update set is enabled. If it is not enabled, then
+     * trackers are never added when they change state. This avoids a memory
+     * leak if the set is never read out.<br>
+     * <br>
+     * All previously created Tracker objects become invalid when this is called,
+     * and should not be used again.
+     *
+     * @param enabled
+     */
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        if (!enabled) {
+            clear();
+        }
     }
 
     /**
@@ -36,7 +65,7 @@ public final class FastTrackedUpdateSet<E> {
      * @return new Tracker
      */
     public Tracker<E> track(E value) {
-        return new Tracker<E>(this, value);
+        return new Tracker<E>(this, value, this.enabled);
     }
 
     /**
@@ -59,6 +88,17 @@ public final class FastTrackedUpdateSet<E> {
     }
 
     /**
+     * Iterates all values positively added tothis set, calling the supplier
+     * consumer with them, and when done iterating, clears it.
+     *
+     * @param action
+     * @see {@link #iterateAndClear()}
+     */
+    public void forEachAndClear(Consumer<? super E> action) {
+        this.iterable.forEach(action);
+    }
+
+    /**
      * Clears all tracked values so no more updates are set
      */
     public void clear() {
@@ -72,14 +112,16 @@ public final class FastTrackedUpdateSet<E> {
     public static final class Tracker<E> {
         private final FastTrackedUpdateSet<E> owner;
         private final E value;
+        private boolean tracked;
         private boolean addedToList;
         private boolean isSet;
 
-        private Tracker(FastTrackedUpdateSet<E> owner, E value) {
+        private Tracker(FastTrackedUpdateSet<E> owner, E value, boolean tracked) {
             this.owner = owner;
             this.value = value;
             this.addedToList = false;
             this.isSet = false;
+            this.tracked = tracked;
         }
 
         /**
@@ -107,10 +149,25 @@ public final class FastTrackedUpdateSet<E> {
          * @param added Whether to add this tracker object
          */
         public void set(boolean added) {
+            if (!this.tracked) {
+                return;
+            }
             this.isSet = added;
             if (added && !this.addedToList) {
+                this.addedToList = true;
                 this.owner.trackers.add(this);
             }
+        }
+
+        /**
+         * Untracks this Tracker and sets it to false. Future set
+         * calls will not do anything anymore and leave state on false.
+         * This effectively ensures this tracker will never again be added
+         * to the update set for iteration.
+         */
+        public void untrack() {
+            this.tracked = false;
+            this.isSet = false;
         }
     }
 
