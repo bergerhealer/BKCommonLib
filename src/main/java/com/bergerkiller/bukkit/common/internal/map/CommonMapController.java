@@ -89,6 +89,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.OutputTypeMap;
 import com.google.common.collect.HashMultimap;
@@ -152,6 +153,12 @@ public final class CommonMapController implements PacketListener, Listener {
             PacketType.OUT_WINDOW_ITEMS, PacketType.OUT_WINDOW_SET_SLOT,
             PacketType.OUT_ENTITY_METADATA, PacketType.IN_SET_CREATIVE_SLOT
     };
+
+    /**
+     * Accesses the initialize() function of MapDisplay
+     */
+    public static final MapDisplayInitializeFunction MAP_DISPLAY_INIT_FUNC = SafeField.get(
+            MapDisplay.class, "INIT_FUNCTION", MapDisplayInitializeFunction.class);
 
     /**
      * Gets all registered Map Displays of a particular type
@@ -1559,5 +1566,14 @@ public final class CommonMapController implements PacketListener, Listener {
         item = ItemUtil.cloneItem(item);
         ItemUtil.setMetaTag(item, newTag);
         return item;
+    }
+
+    /**
+     * Initializes a Map Display. This interface provides access to the internals
+     * of the display, so that others using MapDisplay don't see the initialize() function.
+     */
+    @FunctionalInterface
+    public static interface MapDisplayInitializeFunction {
+        void initialize(MapDisplay display, JavaPlugin plugin, ItemStack mapItem);
     }
 }

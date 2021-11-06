@@ -135,7 +135,7 @@ public class MapShowEvent extends Event {
      */
     public void setDisplay(JavaPlugin plugin, MapDisplay display) {
         display.addOwner(this.player);
-        display.initialize(plugin, this.mapItem);
+        CommonMapController.MAP_DISPLAY_INIT_FUNC.initialize(display, plugin, this.mapItem);
     }
 
     @Override

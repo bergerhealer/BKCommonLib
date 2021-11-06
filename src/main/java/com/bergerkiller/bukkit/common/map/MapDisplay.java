@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
 import com.bergerkiller.bukkit.common.events.map.MapKeyEvent;
 import com.bergerkiller.bukkit.common.events.map.MapStatusEvent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
@@ -81,6 +82,12 @@ public class MapDisplay implements MapDisplayEvents {
     private final MapDisplayMarkers markers = new MapDisplayMarkers();
 
     /**
+     * Used by CommonMapController to initialize map displays
+     */
+    @SuppressWarnings("unused")
+    private static final CommonMapController.MapDisplayInitializeFunction INIT_FUNCTION = MapDisplay::initialize;
+
+    /**
      * Properties of this Map Display. Can be used to store information about
      * this map display persistently in the map item itself.
      */
@@ -126,7 +133,7 @@ public class MapDisplay implements MapDisplayEvents {
      * @param plugin owner
      * @param mapItem on which map is displayed
      */
-    public void initialize(JavaPlugin plugin, ItemStack mapItem) {
+    private void initialize(JavaPlugin plugin, ItemStack mapItem) {
         if (plugin == null) {
             throw new IllegalArgumentException("Plugin can not be null");
         }
