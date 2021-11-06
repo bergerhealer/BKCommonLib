@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -65,6 +66,7 @@ public class MapDisplay implements MapDisplayEvents {
     private byte[] zbuffer = null;
     private byte[] livebuffer = null;
     private Layer layerStack;
+    private boolean _isOnAttachedCalled = false;
     private boolean _updateWhenNotViewing = true;
     private boolean _receiveInputWhenHolding = false;
     private boolean _global = true;
@@ -323,6 +325,12 @@ public class MapDisplay implements MapDisplayEvents {
             return;
         }
 
+        // Initialize (attach) the map for the first time
+        if (!this._isOnAttachedCalled) {
+            this._isOnAttachedCalled = true;
+            this.callOnAttached();
+        }
+
         // Update session. This will update the viewers, and update interception modes.
         if (!this.session.update()) {
             this.setRunning(false);
@@ -342,6 +350,8 @@ public class MapDisplay implements MapDisplayEvents {
                 // Re-initialize the display
                 this.handleStopRunning();
                 this.handleStartRunning();
+                this._isOnAttachedCalled = true;
+                this.callOnAttached();
 
                 // Continue updating as normal (running = true)
             }
@@ -1029,7 +1039,7 @@ public class MapDisplay implements MapDisplayEvents {
     public final void setRunning(boolean running) {
         if (running) {
             if (this.plugin != null && this.updateTaskId == -1) {
-                this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, this::update, 1, 1);
+                this.updateTaskId = Bukkit.getScheduler().scheduleSyncRepeatingTask(this.plugin, new UpdateTask(), 1, 1);
                 CommonPlugin.getInstance().getMapController().getDisplays().add(getClass(), this);
                 this.handleStartRunning();
             }
@@ -1069,7 +1079,9 @@ public class MapDisplay implements MapDisplayEvents {
         }
 
         this.session.initOwners();
-        this.onAttached();
+
+        // During the next update tick, call onAttached first
+        this._isOnAttachedCalled = false;
     }
 
     // Tears down the display state and calls onDetached() before
@@ -1081,7 +1093,14 @@ public class MapDisplay implements MapDisplayEvents {
         }
 
         // Handle onDetached
-        this.onDetached();
+        if (this._isOnAttachedCalled) {
+            this._isOnAttachedCalled = false;
+            try {
+                this.onDetached();
+            } catch (Throwable t) {
+                this.plugin.getLogger().log(Level.SEVERE, "An error occurred during MapDisplay onDetached", t);
+            }
+        }
         this.widgets.clearWidgets();
         this.widgets.handleDetach();
         this.refreshMapItem();
@@ -1089,6 +1108,14 @@ public class MapDisplay implements MapDisplayEvents {
         // Remove session
         if (this.info != null) {
             this.info.removeSession(this.session);
+        }
+    }
+
+    private void callOnAttached() {
+        try {
+            this.onAttached();
+        } catch (Throwable t) {
+            this.plugin.getLogger().log(Level.SEVERE, "An error occurred during MapDisplay onAttached", t);
         }
     }
 
@@ -1736,5 +1763,16 @@ public class MapDisplay implements MapDisplayEvents {
             }
         }
         return null;
+    }
+
+    /**
+     * UpdateTask that simply calls update(). Is used over a lambda so
+     * that it shows up in timings better.
+     */
+    private final class UpdateTask implements Runnable {
+        @Override
+        public void run() {
+            update();
+        }
     }
 }
