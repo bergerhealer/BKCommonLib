@@ -12,6 +12,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -50,6 +52,36 @@ public class LogicUtil {
         public void onRemoved(Object item) {
         }
     };
+
+    private static final ExceptionallyAsyncHandler _exceptionallyAsyncHandler;
+    static {
+        ExceptionallyAsyncHandler handler;
+        try {
+            CompletableFuture.class.getMethod("exceptionallyAsync", Function.class);
+            handler = new ExceptionallyAsyncHandler() {
+                @Override
+                public <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> future,
+                                                                   Function<Throwable, ? extends T> fn,
+                                                                   Executor executor
+                ) {
+                    return future.exceptionallyAsync(fn, executor);
+                }
+            };
+        } catch (NoSuchMethodException ex) {
+            handler = new ExceptionallyAsyncHandler() {
+                @Override
+                public <T> CompletableFuture<T> exceptionallyAsync(final CompletableFuture<T> future,
+                                                                   final Function<Throwable, ? extends T> fn,
+                                                                   final Executor executor
+                ) {
+                    return future.handleAsync((r, t) -> {
+                        return (t == null) ? r : fn.apply(t);
+                    }, executor);
+                }
+            };
+        }
+        _exceptionallyAsyncHandler = handler;
+    }
 
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
@@ -996,5 +1028,28 @@ public class LogicUtil {
      */
     public static <T> Supplier<T> constantSupplier(T value) {
         return () -> value;
+    }
+
+    /**
+     * Generic implementation of CompletableFuture's exceptionallyAsync. Since JDK12 simply calls the
+     * function of the CompletableFuture, but for older JDK's provides a fallback implementation.
+     *
+     * @param <T>
+     * @param future CompletableFuture
+     * @param fn Callback function when an exception occurs
+     * @param executor Executor to use to call the callback function
+     * @return CompletableFuture
+     */
+    public static <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> future,
+                                                              Function<Throwable, ? extends T> fn,
+                                                              Executor executor
+    ) {
+        return _exceptionallyAsyncHandler.exceptionallyAsync(future, fn, executor);
+    }
+
+    private static interface ExceptionallyAsyncHandler {
+        <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> future,
+                                                    Function<Throwable, ? extends T> fn,
+                                                    Executor executor);
     }
 }

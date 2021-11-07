@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
 import com.bergerkiller.bukkit.common.events.ChunkUnloadEntitiesEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -118,7 +119,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         // When future is cancelled by the user we want to cancel the tracker too
         // Also cancels when internally cancelled (main chunk unloads), but that's fine.
         if (!future.isDone()) {
-            future.exceptionallyAsync(t -> {
+            LogicUtil.exceptionallyAsync(future, t -> {
                 if (t instanceof CompletionException) {
                     tracker.cancel();
                 }
@@ -545,7 +546,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         }
 
         public void removeWhenFutureCancelled() {
-            future.exceptionallyAsync(err -> {
+            LogicUtil.exceptionallyAsync(future, err -> {
                 if (err instanceof CompletionException) {
                     chain.remove(Entry.this);
                 }

@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -171,5 +174,39 @@ public class LogicUtilTest {
         list.add("world");
         ArrayList<String> list_clone = LogicUtil.clone(list);
         assertEquals(list, list_clone);
+    }
+
+    @Test
+    public void testExceptionallyAsync() throws InterruptedException, ExecutionException {
+        Executor executor = r -> {
+            Thread t = new Thread(r, "asynchandler");
+            t.start();
+        };
+
+        // Verify exceptions work
+        {
+            CompletableFuture<String> future = new CompletableFuture<String>();
+            CompletableFuture<String> nextFuture = LogicUtil.exceptionallyAsync(future, t -> {
+                assertTrue(t instanceof IllegalArgumentException);
+                assertEquals("asynchandler", Thread.currentThread().getName());
+                return "result";
+            }, executor);
+            future.completeExceptionally(new IllegalArgumentException());
+            assertEquals("result", nextFuture.get());
+        }
+
+        // Verify non-exceptions work
+        {
+            CompletableFuture<String> future = new CompletableFuture<String>();
+            CompletableFuture<String> nextFuture = LogicUtil.exceptionallyAsync(future, t -> {
+                throw new IllegalStateException("Should never get here");
+            }, executor);
+            nextFuture = nextFuture.thenApply(s -> {
+                assertEquals("asynchandler", Thread.currentThread().getName());
+                return s;
+            });
+            future.complete("hello, world!");
+            assertEquals("hello, world!", nextFuture.get());
+        }
     }
 }
