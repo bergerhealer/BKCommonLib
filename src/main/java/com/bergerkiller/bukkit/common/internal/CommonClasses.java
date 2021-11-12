@@ -37,6 +37,8 @@ class CommonClasses {
         loadCommon("entity.CommonEntityType", "collections.CollectionBasics");
         loadCommon("scoreboards.CommonScoreboard", "scoreboards.CommonTeam");
         loadCommon("protocol.PacketType");
+        loadCommon("internal.CommonDisabledEntity");
+        loadCommon("wrappers.DataWatcher");
     }
 
     private static void loadLogic(String... classNames) {
