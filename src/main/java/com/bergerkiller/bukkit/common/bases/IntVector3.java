@@ -5,6 +5,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.util.Vector;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -175,6 +176,15 @@ public class IntVector3 implements Comparable<IntVector3> {
     }
 
     /**
+     * Gets the position Vector of the middle of 'the' block
+     *
+     * @return block middle position Vector
+     */
+    public Vector midVector() {
+        return new Vector(midX(), midY(), midZ());
+    }
+
+    /**
      * Gets the X-coordinate of the middle of 'the' block
      *
      * @return block middle X
@@ -218,5 +228,62 @@ public class IntVector3 implements Comparable<IntVector3> {
         stream.writeInt(this.x);
         stream.writeInt(this.y);
         stream.writeInt(this.z);
+    }
+
+    /**
+     * Creates an IntVector3 with the specified x/y/z coordinates
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @param z Z-coordinate
+     * @return new IntVector3
+     */
+    public static IntVector3 of(int x, int y, int z) {
+        return new IntVector3(x, y, z);
+    }
+
+    /**
+     * Creates an IntVector3 with the coordinates of a Block
+     *
+     * @param block Block to get the coordinates of
+     * @return new IntVector3
+     */
+    public static IntVector3 coordinatesOf(Block block) {
+        return new IntVector3(block.getX(), block.getY(), block.getZ());
+    }
+
+    /**
+     * Creates an IntVector3 of the Block coordinates of the specified
+     * double x/y/z position coordinates
+     *
+     * @param x X-coordinate
+     * @param y Y-coordinate
+     * @param z Z-coordinate
+     * @return new IntVector3
+     */
+    public static IntVector3 blockOf(double x, double y, double z) {
+        return new IntVector3(MathUtil.floor(x), MathUtil.floor(y), MathUtil.floor(z));
+    }
+
+    /**
+     * Creates an IntVector3 of the Block coordinates of the specified
+     * Vector position
+     *
+     * @param position Position Vector
+     * @return new IntVector3
+     */
+    public static IntVector3 blockOf(Vector position) {
+        return new IntVector3(position.getBlockX(), position.getBlockY(), position.getBlockZ());
+    }
+
+    /**
+     * Creates an IntVector3 of the Block coordinates of the specified
+     * Location position
+     *
+     * @param position Position Location
+     * @return new IntVector3
+     */
+    public static IntVector3 blockOf(Location location) {
+        return new IntVector3(location.getBlockX(), location.getBlockY(), location.getBlockZ());
     }
 }
