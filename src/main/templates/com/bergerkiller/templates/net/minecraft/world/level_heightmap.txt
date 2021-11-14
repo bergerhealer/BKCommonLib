@@ -102,6 +102,11 @@ class HeightMap {
                     }
                 }
 
+  #if version >= 1.17
+                // Adjust for world height offset
+                y -= ichunkaccess.getMinBuildHeight();
+  #endif
+
                 // Store the value
   #if exists net.minecraft.world.level.levelgen.HeightMap private final char[] heightmap;
                 // Tuinity

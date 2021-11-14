@@ -44,8 +44,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
             return null;
         }
         try {
-            // Note: StarLight uses offset for below-bedrock light buffers, hence + 1
-            return handle.getBlockLightData(HandleConversion.toChunkHandle(chunk), cy + 1);
+            return handle.getBlockLightData(HandleConversion.toChunkHandle(chunk), cy);
         } catch (Throwable ex) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
             return null;
@@ -60,8 +59,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
             return null;
         }
         try {
-            // Note: StarLight uses offset for below-bedrock light buffers, hence + 1
-            return handle.getSkyLightData(HandleConversion.toChunkHandle(chunk), cy + 1);
+            return handle.getSkyLightData(HandleConversion.toChunkHandle(chunk), cy);
         } catch (Throwable ex) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to read sky light of [" + cx + "/" + cy + "/" + cz + "]", ex);
             return null;
@@ -75,7 +73,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         scheduleUpdate(world, () -> {
             try {
-                handle.setSkyLightData(HandleConversion.toChunkHandle(chunk), cx, cy + 1, cz, data);
+                handle.setSkyLightData(HandleConversion.toChunkHandle(chunk), cx, cy, cz, data);
                 future.complete(null);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
@@ -92,7 +90,7 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
 
         scheduleUpdate(world, () -> {
             try {
-                handle.setBlockLightData(HandleConversion.toChunkHandle(chunk), cx, cy + 1, cz, data);
+                handle.setBlockLightData(HandleConversion.toChunkHandle(chunk), cx, cy, cz, data);
                 future.complete(null);
             } catch (Throwable t) {
                 future.completeExceptionally(t);
@@ -143,6 +141,18 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
     @Template.Import("net.minecraft.world.level.chunk.NibbleArray")
     @Template.Import("net.minecraft.world.level.EnumSkyBlock")
     @Template.InstanceType("ca.spottedleaf.starlight.light.SWMRNibbleArray")
+    /*
+     * <GET_HEIGHT_OFFSET>
+     * public static int getHeightOffset(Chunk chunk) {
+     *     // Note: StarLight uses offset for below-bedrock light buffers, hence + 1
+     * #if version >= 1.17
+     *     return 1 - chunk.getMinSection();
+     * #else
+     *     return 1;
+     * #endif
+     * }
+     */
+    @Template.Require(declaring="net.minecraft.world.level.chunk.Chunk", value="%GET_HEIGHT_OFFSET%")
     public static abstract class StarLightEngineHandle extends Template.Class<Template.Handle> {
 
         /*
@@ -175,6 +185,8 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <GET_SKYLIGHT_DATA>
          * public static byte[] getSkyLightData(Chunk chunk, int cy) {
+         *     cy += #getHeightOffset(chunk);
+         * 
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
          *     SWMRNibbleArray swmr_nibble;
          *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
@@ -201,6 +213,8 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <GET_BLOCKLIGHT_DATA>
          * public static byte[] getBlockLightData(Chunk chunk, int cy) {
+         *     cy += #getHeightOffset(chunk);
+         * 
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
          *     SWMRNibbleArray swmr_nibble;
          *     if (cy < 0 || cy >= nibbles.length || (swmr_nibble = nibbles[cy]) == null) {
@@ -227,6 +241,8 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <SET_SKYLIGHT_DATA>
          * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         *     cy += #getHeightOffset(chunk);
+         * 
          *     SWMRNibbleArray[] nibbles = chunk.getSkyNibbles();
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;
@@ -263,6 +279,8 @@ public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
         /*
          * <SET_BLOCKLIGHT_DATA>
          * public static void setSkyLightData(Chunk chunk, int cx, int cy, int cz, byte[] data) {
+         *     cy += #getHeightOffset(chunk);
+         * 
          *     SWMRNibbleArray[] nibbles = chunk.getBlockNibbles();
          *     if (cy < 0 || cy >= nibbles.length) {
          *         return null;
