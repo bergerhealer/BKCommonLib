@@ -2,4 +2,12 @@ package org.bukkit;
 
 class World {
     public optional void playSound(Location loc, String sound, float volume, float pitch);
+
+#if version >= 1.17
+    public int getMinHeight();
+#else
+    public int getMinHeight() {
+        return 0;
+    }
+#endif
 }

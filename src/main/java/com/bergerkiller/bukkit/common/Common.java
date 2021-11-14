@@ -24,7 +24,9 @@ public class Common {
             "Common:Yaml:CloneAndSetToWithFixes",
             "Common:IPermissionEnum",
             "Common:FishingHookFixes1.16",
-            "Common:Chunk:FutureProvider"
+            "Common:Chunk:FutureProvider",
+            "Common:IntCuboid",
+            "Common:WorldBlockBorder"
     ).collect(Collectors.toSet());
 
     /**

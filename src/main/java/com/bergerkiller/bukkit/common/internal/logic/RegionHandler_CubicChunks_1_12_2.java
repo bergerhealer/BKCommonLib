@@ -23,7 +23,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -228,6 +227,16 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         Object worldHandle = HandleConversion.toWorldHandle(world);
         Object chunkProviderServer = WorldServerHandle.T.getChunkProviderServer.raw.invoke(worldHandle);
         return handle.columnExists(chunkProviderServer, cx, cz);
+    }
+
+    @Override
+    public int getMinHeight(World world) {
+        return Integer.MIN_VALUE;
+    }
+
+    @Override
+    public int getMaxHeight(World world) {
+        return Integer.MAX_VALUE;
     }
 
     // Gets all region file coordinates stored on disk

@@ -110,4 +110,24 @@ public abstract class RegionHandler implements LazyInitializedObject {
      * @return True if the chunk is saved and can be loaded
      */
     public abstract boolean isChunkSaved(World world, int cx, int cz);
+
+    /**
+     * Gets the minimum Block X-coordinates possible on a world
+     *
+     * @param world
+     * @return World minimum height
+     */
+    public int getMinHeight(World world) {
+        return 0;
+    }
+
+    /**
+     * Gets the maximum Block Y-coordinates possible on a world
+     *
+     * @param world
+     * @return World maximum height
+     */
+    public int getMaxHeight(World world) {
+        return world.getMaxHeight();
+    }
 }

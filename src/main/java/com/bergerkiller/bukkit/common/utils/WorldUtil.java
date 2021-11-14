@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.utils;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.bases.IntCuboid;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.WorldBlockStateCollection;
@@ -38,6 +39,7 @@ import org.bukkit.Location;
 import org.bukkit.Server;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
+import org.bukkit.WorldBorder;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
@@ -51,10 +53,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.concurrent.CompletableFuture;
 
 public class WorldUtil extends ChunkUtil {
     private static final Template.Method<Object> getBlockData_raw = CraftBlockHandle.T.getBlockData.raw;
+    private static final WeakHashMap<World, CachedWorldBlockBorder> worldBorderCache = new WeakHashMap<>();
 
     /** The number of chunks on each axis of a single region (32) */
     public static final int CHUNKS_PER_REGION_AXIS = 32;
@@ -1305,5 +1309,70 @@ public class WorldUtil extends ChunkUtil {
      */
     public static CompletableFuture<Void> setSectionBlockLightAsync(World world, int cx, int cy, int cz, byte[] data) {
         return LightingHandler.instance().setSectionBlockLightAsync(world, cx, cy, cz, data);
+    }
+
+    /**
+     * Gets the IntCuboid Block border of a world. This covers the configured world border of the
+     * world for the x/z coordinates, and the minimum/maximum height limits for the y-coordinate.<br>
+     * <br>
+     * On worlds with infinite height, such as CubicChunks, the y range might be Integer.MIN_VALUE
+     * or Integer.MAX_VALUE. Similarly, if no world border exists at all, the x/z ranges will be
+     * set to such values.
+     *
+     * @param world World to get the block border of
+     * @return World block border
+     */
+    public static IntCuboid getBlockBorder(World world) {
+        return worldBorderCache.compute(world, (w, c) -> {
+            // If absent, create a new one
+            if (c == null) {
+                return CachedWorldBlockBorder.create(world);
+            }
+
+            // Check the WorldBorder fields are still the same
+            // If not, re-create, and use min/max from cache (doesn't change)
+            WorldBorder border = world.getWorldBorder();
+            Location center = border.getCenter();
+            double size = border.getSize();
+            if (c.center.equals(center) && c.size == size) {
+                return c; // Unchanged
+            }
+
+            // Recreate with new border details
+            return c.withNewBorder(center, size);
+        }).border;
+    }
+
+    private static final class CachedWorldBlockBorder {
+        public final Location center;
+        public final double size;
+        public final IntCuboid border;
+
+        private CachedWorldBlockBorder(Location center, double size, IntCuboid border) {
+            this.center = center;
+            this.size = size;
+            this.border = border;
+        }
+
+        public CachedWorldBlockBorder withNewBorder(Location center, double size) {
+            return new CachedWorldBlockBorder(center, size,
+                    toBorder(center, size, border.min.y, border.max.y));
+        }
+
+        public static CachedWorldBlockBorder create(World world) {
+            WorldBorder border = world.getWorldBorder();
+            Location center = border.getCenter();
+            double size = border.getSize();
+            int minY = RegionHandler.INSTANCE.getMinHeight(world);
+            int maxY = RegionHandler.INSTANCE.getMaxHeight(world);
+            return new CachedWorldBlockBorder(center, size, toBorder(center, size, minY, maxY));
+        }
+
+        private static IntCuboid toBorder(Location center, double size, int minY, int maxY) {
+            double hsize = 0.5 * size;
+            IntVector3 min = IntVector3.blockOf(center.getX() - hsize, minY, center.getZ() - hsize);
+            IntVector3 max = IntVector3.blockOf(center.getZ() + hsize + 1, maxY, center.getZ() + hsize + 1);
+            return IntCuboid.create(min, max);
+        }
     }
 }

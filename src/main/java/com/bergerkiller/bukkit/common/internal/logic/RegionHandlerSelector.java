@@ -21,7 +21,9 @@ public final class RegionHandlerSelector extends RegionHandler {
 
     public RegionHandlerSelector() {
         // Vanilla fallback
-        if (Common.evaluateMCVersion(">=", "1.15")) {
+        if (Common.evaluateMCVersion(">=", "1.17")) {
+            fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_17::new, RegionHandlerDisabled::new);
+        } else if (Common.evaluateMCVersion(">=", "1.15")) {
             fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_15::new, RegionHandlerDisabled::new);
         } else if (Common.evaluateMCVersion(">=", "1.14")) {
             fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_14::new, RegionHandlerDisabled::new);
