@@ -156,6 +156,18 @@ public abstract class MapDisplayProperties {
      * Gets the value of a property
      * 
      * @param key Key of the property
+     * @param type of value to get
+     * @param defaultValue to return on failure (can be null)
+     * @return value at the key, defaultValue if not found
+     */
+    public <T> T get(String key, Class<T> type, T defaultValue) {
+        return getMetadata().getValue(key, type, defaultValue);
+    }
+
+    /**
+     * Gets the value of a property
+     * 
+     * @param key Key of the property
      * @param defaultValue to return on failure (can not be null)
      * @return value at the key, defaultValue if not found
      */
