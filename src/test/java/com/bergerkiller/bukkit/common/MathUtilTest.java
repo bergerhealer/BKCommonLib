@@ -19,18 +19,6 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class MathUtilTest {
 
     @Test
-    public void lol() {
-        double a = 0.5;
-        double f = 1.0;
-        
-        double factor = a;
-        
-        factor = Math.max(0.0, 1.0 + f * (factor - 1.0));
-
-        System.out.println(factor);
-    }
-    
-    @Test
     public void testMatrixRotation() {
         Matrix4x4 transform = new Matrix4x4();
         transform.translateRotate(2.0, 3.0, 4.0, -12.0f, 34.0f);
@@ -367,6 +355,16 @@ public class MathUtilTest {
             Quaternion q = Quaternion.fromLookDirection(dir, up);
             dir.normalize();
             testVectorsEqual(dir, q.forwardVector());
+        }
+
+        // Check for fallback angle when dir == up for various directions
+        for (Vector d : new Vector[] {
+                new Vector(0, 1, 0), new Vector(0, -1, 0),
+                new Vector(1, 0, 0), new Vector(-1, 0, 0),
+                new Vector(0, 0, 1), new Vector(0, 0, -1)
+        }) {
+            testQuaternionsEqual(Quaternion.fromLookDirection(d),
+                    Quaternion.fromLookDirection(d, d));
         }
     }
 
