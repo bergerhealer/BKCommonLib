@@ -824,7 +824,7 @@ public class CommonUtil {
     }
 
     /**
-     * Fully loads (clint) the class and all superclasses
+     * Fully loads (clinit) the class and all superclasses
      * 
      * @param type to load
      */
