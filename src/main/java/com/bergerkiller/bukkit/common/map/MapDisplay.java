@@ -91,7 +91,7 @@ public class MapDisplay implements MapDisplayEvents {
      * Properties of this Map Display. Can be used to store information about
      * this map display persistently in the map item itself.
      */
-    protected final MapDisplayProperties properties = new MapDisplayProperties() {
+    public final MapDisplayProperties properties = new MapDisplayProperties() {
         @Override
         public ItemStack getMapItem() {
             return MapDisplay.this.getMapItem();
