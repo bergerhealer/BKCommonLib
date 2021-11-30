@@ -119,7 +119,7 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
             MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(MC_VERSION);
 
             // Retrieve Bukkit-Mojang class name mappings
-            // We need this to properly remap the mojang field names later
+            // We need this to properly remap the mojang field and method names later
             SpigotMappings spigotMappings = new SpigotMappings();
             String classMappingsFile = "/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat";
             try {

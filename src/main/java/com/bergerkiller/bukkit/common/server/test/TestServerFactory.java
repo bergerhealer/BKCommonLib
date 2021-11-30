@@ -27,7 +27,9 @@ public abstract class TestServerFactory {
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+            factory = new TestServerFactory_1_18();
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
             factory = new TestServerFactory_1_17();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
             factory = new TestServerFactory_1_16();
@@ -36,7 +38,7 @@ public abstract class TestServerFactory {
         } else {
             factory = new TestServerFactory_1_8();
         }
-        
+
         boolean success;
         try {
             success = factory.init();

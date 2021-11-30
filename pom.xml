@@ -6,7 +6,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.17.1-v5</version>
+    <version>1.18-v1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -18,13 +18,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.number>NO-CI</project.build.number>
         <jdk.version.release>8</jdk.version.release>
-        <jdk.version.test>16</jdk.version.test>
+        <jdk.version.test>17</jdk.version.test>
 
         <!-- Library versions -->
         <minecraft.version>1.17.1</minecraft.version>
         <minecraft.serverAPIVersion>1.16.5-R0.1-SNAPSHOT</minecraft.serverAPIVersion>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.54</mountiplex.version>
+        <mountiplex.version>2.55</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 

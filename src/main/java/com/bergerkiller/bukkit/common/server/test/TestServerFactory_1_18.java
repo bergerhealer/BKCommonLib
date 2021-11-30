@@ -15,7 +15,7 @@ import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 
-class TestServerFactory_1_17 extends TestServerFactory {
+class TestServerFactory_1_18 extends TestServerFactory {
 
     @Override
     protected boolean init() {
