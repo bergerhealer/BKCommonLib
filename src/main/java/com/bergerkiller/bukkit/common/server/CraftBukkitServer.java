@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
@@ -9,6 +10,7 @@ import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
-public class CraftBukkitServer extends CommonServerBase implements FieldNameResolver, FieldAliasResolver, ClassPathResolver {
+public class CraftBukkitServer extends CommonServerBase implements MethodNameResolver, FieldNameResolver, FieldAliasResolver, ClassPathResolver {
     private static final String PACKAGE_CB_ROOT = "org.bukkit.craftbukkit";
     private static final String PACKAGE_NMS_ROOT = "net.minecraft.server";
     private static final String CB_ROOT = "org.bukkit.craftbukkit.";
@@ -56,7 +58,12 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
      * were no longer inside the net.minecraft.server package. Instead Mojang's mappings
      * are required to de-obfuscate field names.
      */
-    private boolean HAS_MOJANG_MAPPINGS = false;
+    private boolean HAS_MOJANG_FIELD_MAPPINGS = false;
+    /**
+     * Whether this is a Minecraft version after 1.18, where as well all the method names
+     * inside the net.minecraft package are obfuscated.
+     */
+    private boolean HAS_MOJANG_METHOD_MAPPINGS = false;
     /**
      * Whether this is a Minecraft version before 1.17, where all of minecraft server's
      * classes sat inside net.minecraft.server, with a package version. When true, all
@@ -64,10 +71,16 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
      */
     private boolean REMAP_TO_NMS = false;
     /**
-     * Mojang mappings used to de-obfuscate the server at runtime.
-     * Is downloaded / cached, if required.
+     * Mojang/Spigot class, field and method name remapper used to remap mojang's names
+     * to obfuscated names as used in the server jar at runtime. Only used on Minecraft
+     * 1.17 and later.
      */
-    private Map<String, MojangMappings.ClassMappings> mojangMappingsByBukkitClass = null;
+    private MojangSpigotRemapper mojangSpigotRemapper = null;
+    /**
+     * Whether currently the mojang/spigot remapper is being initialized. Acts as a flag
+     * to avoid using template-based remappings.
+     */
+    private boolean isInitializingMojangSpigotRemapper = false;
     /**
      * Defines class name remappings to perform right after the version info is included in the class path
      */
@@ -105,7 +118,8 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     @Override
     public void postInit(PostInitEvent event) {
         MC_VERSION = identifyMinecraftVersion();
-        HAS_MOJANG_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17");
+        HAS_MOJANG_FIELD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17");
+        HAS_MOJANG_METHOD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.18");
         REMAP_TO_NMS = TextValueSequence.evaluateText(MC_VERSION, "<", "1.17");
 
         // Check whether the server is at all compatible with the template definitions
@@ -114,44 +128,48 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
         }
 
         // Initialize the mappings on Minecraft 1.17 and later
-        if (HAS_MOJANG_MAPPINGS) {
-            // We require mojang's mappings
-            MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(MC_VERSION);
-
-            // Retrieve Bukkit-Mojang class name mappings
-            // We need this to properly remap the mojang field and method names later
-            SpigotMappings spigotMappings = new SpigotMappings();
-            String classMappingsFile = "/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat";
+        if (HAS_MOJANG_FIELD_MAPPINGS || HAS_MOJANG_METHOD_MAPPINGS) {
             try {
-                try (InputStream in = CraftBukkitServer.class.getResourceAsStream(classMappingsFile)) {
-                    spigotMappings.read(in);
-                }
-            } catch (IOException ex) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings (corrupted jar?)", ex);
+                isInitializingMojangSpigotRemapper = true;
+                mojangSpigotRemapper = MojangSpigotRemapper.load(MC_VERSION, this::resolveClassPathEarly);
+            } finally {
+                isInitializingMojangSpigotRemapper = false;
             }
-
-            // Read the required mappings, or downloads it if missing for some weird reason
-            if (!spigotMappings.byVersion.containsKey(MC_VERSION)) {
-                Logging.LOGGER.log(Level.WARNING, "[Developer] Class mappings file has no mappings for this Minecraft version. Build problem?");
-                try {
-                    spigotMappings.downloadMappings(mojangMappings, MC_VERSION);
-                } catch (IOException ex) {
-                    throw new IllegalStateException("Failed to download Bukkit-Mojang class name mappings");
-                }
-            }
-
-            // Apply spigot's mapping to mojang's mappings (got to reverse keys and values)
-            final Map<String, String> classMappings = spigotMappings.byVersion.get(MC_VERSION)
-                    .entrySet().stream().collect(Collectors.toMap(
-                            Map.Entry::getValue, Map.Entry::getKey));
-            mojangMappingsByBukkitClass = mojangMappings.classes.stream().collect(Collectors.toMap(
-                    v -> classMappings.getOrDefault(v.name, v.name),
-                    Function.identity()));
         }
+    }
+
+    /**
+     * Can be overrided by forks of CraftBukkit to properly find class names before this
+     * server is initialized. This is called on Minecraft 1.17 and later when initializing
+     * the remapper for mojang mappings. It is never called after.<br>
+     * <br>
+     * This method should perform any required remappings to find the true, actual, class
+     * name. It should do so without using the mojang remapper, since it will not yet be
+     * initialized.<br>
+     * <br>
+     * Only class names will be provided that are known spigot class names,
+     * no user- or template-provided class names are sent this way.
+     *
+     * @param path
+     * @return Remapped class path for use by resolver, same as path if not remapped
+     */
+    protected String resolveClassPathEarly(String path) {
+        // Call the normal resolveClassPath(). We're assuming that no dangerous
+        // things will be happening. For this purpose we're using a flag to avoid
+        // any special remappings that could throw it out of balance.
+        //
+        // If this does cause trouble a server implementation can override this
+        // and execute alternative instructions.
+        return resolveClassPath(path);
     }
 
     @Override
     public String resolveClassPath(String path) {
+        // Don't do anything at all here when initializing the mojang remapper
+        if (isInitializingMojangSpigotRemapper) {
+            return path;
+        }
+
         // Perform remappings first, so that they can be relocated
         // to the right (versioned) package after. That way there is
         // no need to track versions in the remapped paths.
@@ -197,11 +215,8 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     @Override
     public String resolveFieldName(Class<?> declaringClass, String fieldName) {
         // Minecraft 1.17 and later require remapping, as all field names are obfuscated
-        if (HAS_MOJANG_MAPPINGS) {
-            MojangMappings.ClassMappings mappings = mojangMappingsByBukkitClass.get(declaringClass.getName());
-            if (mappings != null) {
-                fieldName = mappings.name_to_obfuscated.getOrDefault(fieldName, fieldName);
-            }
+        if (HAS_MOJANG_FIELD_MAPPINGS) {
+            fieldName = mojangSpigotRemapper.remapFieldName(declaringClass, fieldName, fieldName);
         }
 
         return fieldName;
@@ -210,14 +225,21 @@ public class CraftBukkitServer extends CommonServerBase implements FieldNameReso
     @Override
     public String resolveFieldAlias(Field field, String name) {
         // Minecraft 1.17 and later require remapping, as all field names are obfuscated
-        if (HAS_MOJANG_MAPPINGS) {
-            MojangMappings.ClassMappings mappings = mojangMappingsByBukkitClass.get(field.getDeclaringClass().getName());
-            if (mappings != null) {
-                return mappings.obfuscated_to_name.getOrDefault(name, null);
-            }
+        if (HAS_MOJANG_FIELD_MAPPINGS) {
+            return mojangSpigotRemapper.remapFieldName(field.getDeclaringClass(), name, null);
         }
 
         return null;
+    }
+
+    @Override
+    public String resolveMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes) {
+        // Minecraft 1.18 and later require remapping, as all method names are obfuscated
+        if (HAS_MOJANG_METHOD_MAPPINGS) {
+            return mojangSpigotRemapper.remapMethodName(declaringClass, methodName, parameterTypes, methodName);
+        }
+
+        return methodName;
     }
 
     private String identifyMinecraftVersion() throws VersionIdentificationFailureException {

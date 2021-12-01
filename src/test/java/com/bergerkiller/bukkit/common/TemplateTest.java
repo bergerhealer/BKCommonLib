@@ -13,11 +13,13 @@ import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import org.bukkit.ChatColor;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
@@ -330,6 +332,49 @@ public class TemplateTest {
     @Test
     public void testMapDisplayMarkerApplier() {
         MapDisplayMarkers.APPLIER.forceInitialization();
+    }
+
+    @Test
+    @Ignore
+    public void testMojangSpigotRemapper() throws Throwable {
+        MojangSpigotRemapper remapper = MojangSpigotRemapper.load("1.17.1", p -> p);
+ 
+        Class<?> pathFinderTargetCondition = Class.forName("net.minecraft.world.entity.ai.targeting.PathfinderTargetCondition",
+                false, TemplateTest.class.getClassLoader());
+
+        // Base
+        {
+            Class<?> entityLivingType = Class.forName("net.minecraft.world.entity.EntityLiving",
+                    false, TemplateTest.class.getClassLoader());
+
+            String remapped = remapper.remapMethodName(entityLivingType, "canAttack", new Class<?>[] {
+                entityLivingType, pathFinderTargetCondition
+            }, "BAD");
+
+            System.out.println("LivingEntity canAttack -> " + remapped);
+        }
+
+        // Test works recursive as well
+        {
+            Class<?> entityCreeperType = Class.forName("net.minecraft.world.entity.monster.EntityCreeper",
+                    false, TemplateTest.class.getClassLoader());
+
+            String remapped = remapper.remapMethodName(entityCreeperType, "canAttack", new Class<?>[] {
+                entityCreeperType, pathFinderTargetCondition
+            }, "BAD");
+
+            System.out.println("Creeper canAttack -> " + remapped);
+        }
+
+        // Field check
+        {
+            Class<?> entityLivingType = Class.forName("net.minecraft.world.entity.EntityLiving",
+                    false, TemplateTest.class.getClassLoader());
+
+            String remapped = remapper.remapFieldName(entityLivingType, "SPEED_MODIFIER_POWDER_SNOW_UUID", "BAD");
+
+            System.out.println("LivingEntity SPEED_MOD -> " + remapped);
+        }
     }
 
     @Test

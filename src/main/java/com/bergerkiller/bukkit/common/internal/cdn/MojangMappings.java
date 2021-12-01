@@ -5,12 +5,13 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -24,21 +25,84 @@ public class MojangMappings {
     /**
      * The mappings of a single class
      */
-    public static class ClassMappings {
-        public final String name;
-        public final String name_obfuscated;
-        public final BiMap<String, String> obfuscated_to_name;
-        public final BiMap<String, String> name_to_obfuscated;
+    public static class ClassMappings extends ClassSignature {
+        public final BiMap<String, String> fields_obfuscated_to_name;
+        public final BiMap<String, String> fields_name_to_obfuscated;
+        public final Map<String, MethodSignature> methods_by_obfuscated;
+        public final Map<String, MethodSignature> methods_by_name;
 
         public ClassMappings(String name, String name_obfuscated) {
-            this.name = name;
-            this.name_obfuscated = name_obfuscated;
-            this.obfuscated_to_name = HashBiMap.create();
-            this.name_to_obfuscated = this.obfuscated_to_name.inverse();
+            super(name, name_obfuscated);
+            this.fields_obfuscated_to_name = HashBiMap.create();
+            this.fields_name_to_obfuscated = this.fields_obfuscated_to_name.inverse();
+            this.methods_by_obfuscated = new HashMap<>();
+            this.methods_by_name = new HashMap<>();
         }
 
         public void addField(String obfuscatedName, String mojangName) {
-            this.obfuscated_to_name.put(obfuscatedName, mojangName);
+            this.fields_obfuscated_to_name.put(obfuscatedName, mojangName);
+        }
+
+        public void addMethod(String obfuscatedName, String mojangName, List<ClassSignature> parameterTypes) {
+            MethodSignature sig = new MethodSignature(this, mojangName, obfuscatedName, parameterTypes);
+            this.methods_by_obfuscated.put(sig.name_obfuscated, sig);
+            this.methods_by_name.put(sig.name, sig);
+        }
+    }
+
+    /**
+     * Class signature, providing both the original de-obfuscated name as well
+     * as the obfuscated name. The obfuscated name may be exactly the same as
+     * the un-obfuscated name, if the class happens to not be remapped.
+     */
+    public static class ClassSignature {
+        public final String name;
+        public final String name_obfuscated;
+
+        public ClassSignature(String name, String name_obfuscated) {
+            this.name = name;
+            this.name_obfuscated = name_obfuscated;
+        }
+
+        @Override
+        public String toString() {
+            return this.name + ":" + this.name_obfuscated;
+        }
+    }
+
+    /**
+     * Method signature that uniquely identifies the name and arguments of a method
+     */
+    public static class MethodSignature {
+        public final ClassMappings declaring;
+        public final String name;
+        public final String name_obfuscated;
+        public final List<ClassSignature> parameters;
+
+        public MethodSignature(ClassMappings declaring, String name, String name_obfuscated, List<ClassSignature> parameters) {
+            this.declaring = declaring;
+            this.name = name;
+            this.name_obfuscated = name_obfuscated;
+            this.parameters = parameters;
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder str = new StringBuilder();
+            str.append("<").append(declaring.toString()).append("> ");
+            str.append(name).append(":").append(name_obfuscated);
+            str.append(" (");
+            boolean first = true;
+            for (ClassSignature param : parameters) {
+                if (first) {
+                    first = false;
+                } else {
+                    str.append(", ");
+                }
+                str.append(param.toString());
+            }
+            str.append(")");
+            return str.toString();
         }
     }
 
@@ -147,57 +211,9 @@ public class MojangMappings {
      * @throws IOException - If reading the file failed
      */
     private static MojangMappings readMappings(File mappingsFile) throws IOException {
-        MojangMappings result = new MojangMappings();
-        
-        // Field mappings
-        // Regex: \s+[\[\]<>\w\._\-$]+\s([\w_\-$]+)\s->\s([\w_\-$]+)
-        Pattern fieldNamePattern = Pattern.compile("\\s+[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\s->\\s([\\w_\\-$]+)");
         try (BufferedReader br = new BufferedReader(new FileReader(mappingsFile))) {
-            ClassMappings classMappings = null;
-            for (String line; (line = br.readLine()) != null; ) {
-                // Skip comments
-                if (line.startsWith("#")) {
-                    continue;
-                }
-
-                // Start of new classes
-                if (line.endsWith(":") && !line.startsWith(" ")) {
-                    int nameEnd = line.indexOf(" -> ");
-                    if (nameEnd <= 0 || nameEnd >= (line.length()-4)) {
-                        classMappings = null;
-                    } else {
-                        classMappings = new ClassMappings(line.substring(0, nameEnd),
-                                                          line.substring(nameEnd+4, line.length()-1));
-                        result.classes.add(classMappings);
-                    }
-                }
-                if (classMappings == null || !line.startsWith("    ")) {
-                    continue; // Weird? Oh well.
-                }
-
-                // Parse members of class
-                {
-                    Matcher m = fieldNamePattern.matcher(line);
-                    if (m.matches()) {
-                        String obfuscatedName = m.group(2);
-                        String mojangName = m.group(1);
-
-                        // These types of obfuscation were not done in the server, and the
-                        // original variable name is kept.
-                        if (mojangName.startsWith("this$")) {
-                            continue;
-                        }
-
-                        classMappings.addField(obfuscatedName, mojangName);
-                        continue;
-                    }
-                }
-
-                //TODO: Method names?
-            }
+            return (new ProGuardParser()).parse(br);
         }
-
-        return result;
     }
 
     /**
@@ -217,5 +233,141 @@ public class MojangMappings {
 
     private static String getMappingFile(String minecraftVersion) {
         return minecraftVersion + "_server_mappings.txt";
+    }
+
+    /**
+     * Parses the proguard-formatted mappings file into a MojangMappings instance
+     */
+    private static class ProGuardParser {
+        // Regex: \s+[\[\]<>\w\._\-$]+\s([\w_\-$]+)\s->\s([\w_\-$]+)
+        private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("\\s+[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\s->\\s([\\w_\\-$]+)");
+        // Regex: \s+(\d+:\d+:)?[\[\]<>\w\._\-$]+\s([\w_\-$]+)\(([\[\]<>\w\._\-,$]*)\)\s->\s([\w_\-$]+)
+        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile("\\s+(\\d+:\\d+:)?[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\(([\\[\\]<>\\w\\._\\-,$]*)\\)\\s->\\s([\\w_\\-$]+)");
+
+        private final MojangMappings result = new MojangMappings();
+        private final Map<String, ClassSignature> mappingsByDeobfName = new HashMap<>();
+
+        public MojangMappings parse(java.io.BufferedReader reader) throws IOException {
+            ClassMappings currClassMappings = null;
+            List<PendingMethod> pendingMethods = new ArrayList<>();
+            for (String line; (line = reader.readLine()) != null; ) {
+                // Skip comments
+                if (line.startsWith("#")) {
+                    continue;
+                }
+
+                // Start of new classes
+                if (line.endsWith(":") && !line.startsWith(" ")) {
+                    int nameEnd = line.indexOf(" -> ");
+                    if (nameEnd <= 0 || nameEnd >= (line.length()-4)) {
+                        currClassMappings = null;
+                    } else {
+                        currClassMappings = new ClassMappings(line.substring(0, nameEnd),
+                                                          line.substring(nameEnd+4, line.length()-1));
+                        mappingsByDeobfName.put(currClassMappings.name, currClassMappings);
+
+                        // Don't add these - that's weird
+                        if (isValidClass(currClassMappings.name)) {
+                            result.classes.add(currClassMappings);
+                        }
+                    }
+                }
+                if (currClassMappings == null || !line.startsWith("    ")) {
+                    continue; // Weird? Oh well.
+                }
+
+                // Parse members of class
+                {
+                    Matcher m = FIELD_NAME_PATTERN.matcher(line);
+                    if (m.matches()) {
+                        processField(currClassMappings, m);
+                        continue;
+                    }
+                }
+                {
+                    Matcher m = METHOD_NAME_PATTERN.matcher(line);
+                    if (m.matches()) {
+                        pendingMethods.add(new PendingMethod(currClassMappings, m));
+                        continue;
+                    }
+                }
+
+                // Debug missing matches (we don't care about [static] constructors)
+                // if (!line.contains("<init>") && !line.contains("<clinit>")) {
+                //     System.out.println("Missed: " + line);
+                // }
+            }
+
+            // After having parsed the entire file and knowing what class name remappings exist,
+            // process all the methods. The argument type remapping logic depends on this.
+            pendingMethods.forEach(this::processMethod);
+
+            return result;
+        }
+
+        private static boolean isValidClass(String className) {
+            return !className.endsWith(".package-info");
+        }
+
+        private void processField(ClassMappings classMappings, Matcher m) {
+            String obfuscatedName = m.group(2);
+            String mojangName = m.group(1);
+
+            // These types of obfuscation were not done in the server, and the
+            // original variable name is kept.
+            if (mojangName.startsWith("this$")) {
+                return;
+            }
+
+            classMappings.addField(obfuscatedName, mojangName);
+        }
+
+        private void processMethod(PendingMethod method) {
+            // Translate the argument types if they refer to obfuscated names
+            List<ClassSignature> params = new ArrayList<ClassSignature>(method.paramStrings.length);
+            for (String paramString : method.paramStrings) {
+                // Eliminate array declarations from name
+                String classNameBare = paramString;
+                String postfix = "";
+                while (classNameBare.endsWith("[]")) {
+                    classNameBare = classNameBare.substring(0, classNameBare.length() - 2);
+                    postfix += "[]";
+                }
+
+                // Find an existing remapping signature if it exists, if not, create one (cache)
+                ClassSignature argSig = this.mappingsByDeobfName.computeIfAbsent(classNameBare,
+                        c -> new ClassSignature(c, c));
+
+                // Array postfixes don't happen often enough to warrant caching and re-using signatures
+                if (!postfix.isEmpty()) {
+                    argSig = new ClassSignature(argSig.name + postfix, argSig.name_obfuscated + postfix);
+                }
+
+                params.add(argSig);
+            }
+
+            // Add
+            method.classMappings.addMethod(method.obfuscatedName, method.mojangName, params);
+        }
+
+        private static final class PendingMethod {
+            public final ClassMappings classMappings;
+            public final String obfuscatedName;
+            public final String mojangName;
+            public final String[] paramStrings;
+
+            public PendingMethod(ClassMappings classMappings, Matcher m) {
+                this.classMappings = classMappings;
+                this.obfuscatedName = m.group(4);
+                this.mojangName = m.group(2);
+
+                String fullArgsStr = m.group(3);
+                if (fullArgsStr.isEmpty()) {
+                    this.paramStrings = new String[0];
+                } else {
+                    this.paramStrings = fullArgsStr.split(",", -1);
+                }
+            }
+        }
     }
 }
