@@ -1,29 +1,16 @@
 package com.bergerkiller.bukkit.common.server;
 
-import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
-import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
-import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
-import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
-import com.bergerkiller.mountiplex.reflection.util.asm.ASMUtil;
-import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 
@@ -117,7 +104,14 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
 
     @Override
     public void postInit(PostInitEvent event) {
-        MC_VERSION = identifyMinecraftVersion();
+        try {
+            MC_VERSION = (new MinecraftVersionDiscovery(PACKAGE_VERSION)).detect();
+        } catch (VersionIdentificationFailureException e) {
+            throw e; // rethrow, don't wrap
+        } catch (Throwable t) {
+            throw new VersionIdentificationFailureException(t);
+        }
+
         HAS_MOJANG_FIELD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.17");
         HAS_MOJANG_METHOD_MAPPINGS = TextValueSequence.evaluateText(MC_VERSION, ">=", "1.18");
         REMAP_TO_NMS = TextValueSequence.evaluateText(MC_VERSION, "<", "1.17");
@@ -242,99 +236,6 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
         return methodName;
     }
 
-    private String identifyMinecraftVersion() throws VersionIdentificationFailureException {
-        try {
-            // Find getVersion() method using reflection
-            Class<?> minecraftServerType;
-            try {
-                minecraftServerType = loadClass(PACKAGE_NMS_ROOT + ".MinecraftServer");
-            } catch (ClassNotFoundException ex) {
-                minecraftServerType = loadClass(NMS_ROOT_VERSIONED + ".MinecraftServer");
-            }
-
-            java.lang.reflect.Method getVersionMethod = getDeclaredMethod(minecraftServerType, "getVersion");
-
-            // This is easy when the server is already initialized
-            if (Bukkit.getServer() != null) {
-                // Obtain MinecraftServer instance from server
-                Class<?> server = loadClass(CB_ROOT_VERSIONED + ".CraftServer");
-
-                // Standard CraftServer::getServer()
-                Object minecraftServerInstance;
-                try {
-                    java.lang.reflect.Method getServerMethod = getDeclaredMethod(server, "getServer");
-                    minecraftServerInstance = getServerMethod.invoke(Bukkit.getServer());
-                    return (String) getVersionMethod.invoke(minecraftServerInstance);
-                } catch (NoSuchMethodException ex) {}
-
-                throw new VersionIdentificationFailureException("Server has no MinecraftServer instance");
-            }
-
-            // If MinecraftVersion class exists, we can use the static a() method to retrieve it
-            // Alternative is using SharedConstants, but it initializes a whole lot extra and is therefore slow
-            // Both of these methods work since MC 1.14
-            try {
-                Object gameVersion = null;
-
-                try {
-                    // Try to identify the MinecraftVersion class
-                    // This is at net.minecraft.MinecraftVersion for MC 1.17 and later
-                    Class<?> minecraftVersionClass;
-                    try {
-                        minecraftVersionClass = loadClass("net.minecraft.MinecraftVersion");
-                    } catch (ClassNotFoundException ex) {
-                        minecraftVersionClass = loadClass(NMS_ROOT_VERSIONED + ".MinecraftVersion");
-                    }
-
-                    // Call the static method of MinecraftVersion to obtain the GameVersion instance
-                    gameVersion = minecraftVersionClass.getDeclaredMethod("a").invoke(null);
-                } catch (ClassNotFoundException | NoSuchMethodException ex) {
-                    // Older versions of Minecraft: use SharedConstants instead
-                    Class<?> sharedConstantsClass = loadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
-                    gameVersion = sharedConstantsClass.getDeclaredMethod("a").invoke(null);
-                    Logging.LOGGER.warning("Failed to find Minecraft Version using MinecraftVersion.class, used SharedConstants instead");
-                }
-                return gameVersion.getClass().getMethod("getName").invoke(gameVersion).toString();
-
-            } catch (ClassNotFoundException | NoSuchMethodException ex) {
-                // No server instance is available, fastest way is to inspect the bytecode using ASM
-                // Creating an instance, even without calling constructors, takes a long while to initialize
-                String fromASM = ASMUtil.findStringConstantReturnedByMethod(getVersionMethod);
-                if (fromASM != null) {
-                    return fromASM;
-                }
-
-                // Find DedicatedServer object, differs on 1.17 and later
-                Class<?> dedicatedServerClass;
-                try {
-                    dedicatedServerClass = loadClass("net.minecraft.server.dedicated.DedicatedServer");
-                } catch (ClassNotFoundException ex2) {
-                    dedicatedServerClass = loadClass(NMS_ROOT_VERSIONED + ".DedicatedServer");
-                }
-
-                // Create an instance of Minecraft Server without calling any constructors
-                // This is a bit slower, but works as a reliable fallback
-                Logging.LOGGER.warning("Failed to find Minecraft Version using ASM, falling back to slower null-constructing");
-                ClassTemplate<?> nms_server_tpl = ClassTemplate.create(dedicatedServerClass);
-                Object minecraftServerInstance = nms_server_tpl.newInstanceNull();
-                return (String) getVersionMethod.invoke(minecraftServerInstance);
-            }
-        } catch (VersionIdentificationFailureException e) {
-            throw e; // rethrow, don't wrap
-        } catch (Throwable t) {
-            throw new VersionIdentificationFailureException(t);
-        }
-    }
-
-    private Method getDeclaredMethod(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        methodName = Resolver.resolveMethodName(declaringClass, methodName, parameterTypes);
-        return MPLType.getDeclaredMethod(declaringClass, methodName, parameterTypes);
-    }
-
-    private Class<?> loadClass(String name) throws ClassNotFoundException {
-        return MPLType.getClassByName(Resolver.resolveClassPath(name));
-    }
-
     @Override
     public String getMinecraftVersion() {
         return MC_VERSION;
@@ -374,20 +275,5 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
      */
     public void setEarlyRemappings(Map<String, String> remappings) {
         this.remappings = remappings;
-    }
-
-    /**
-     * Exception thrown when the minecraft version of the server could not be identified
-     */
-    public static final class VersionIdentificationFailureException extends RuntimeException {
-        private static final long serialVersionUID = -3513069083904231139L;
-
-        public VersionIdentificationFailureException(String reason) {
-            super("Failed to identify the Minecraft version of the server: " + reason);
-        }
-
-        public VersionIdentificationFailureException(Throwable cause) {
-            super("Failed to identify the Minecraft version of the server", cause);
-        }
     }
 }
