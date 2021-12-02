@@ -22,9 +22,8 @@
 
         <!-- Library versions -->
         <minecraft.version>1.18</minecraft.version>
-        <minecraft.serverAPIVersion>1.16.5-R0.1-SNAPSHOT</minecraft.serverAPIVersion>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.55</mountiplex.version>
+        <mountiplex.version>2.56</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -90,6 +89,8 @@
             <artifactId>spigot-api</artifactId>
             <version>${minecraft.serverVersion}</version>
             <scope>provided</scope>
+
+            <!--
             <exclusions>
                 <exclusion>
                     <groupId>commons-lang</groupId>
@@ -108,6 +109,7 @@
                     <artifactId>bungeecord-chat</artifactId>
                 </exclusion>
             </exclusions>
+            -->
         </dependency>
         <!-- We also depend on netty for the network logic, which is available in public repo -->
         <dependency>

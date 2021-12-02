@@ -38,6 +38,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.CompiledFieldNameResolver
 import com.bergerkiller.mountiplex.reflection.resolver.CompiledMethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
@@ -312,6 +313,9 @@ public class CommonBootstrap {
         }
         if (server instanceof FieldAliasResolver) {
             Resolver.registerFieldAliasResolver((FieldAliasResolver) server);
+        }
+        if (server instanceof MethodAliasResolver) {
+            Resolver.registerMethodAliasResolver((MethodAliasResolver) server);
         }
     }
 

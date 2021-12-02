@@ -12,12 +12,14 @@ import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.junit.Ignore;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
@@ -42,6 +44,12 @@ import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 public class TemplateTest {
+
+    @Test
+    public void testTestServerInitialized() {
+        CommonBootstrap.initServer();
+        assertNotNull(Bukkit.getServer());
+    }
 
     @Test
     public void testTemplate() {
@@ -352,6 +360,13 @@ public class TemplateTest {
             }, "BAD");
 
             System.out.println("LivingEntity canAttack -> " + remapped);
+
+            // Reverse it
+            String original = remapper.remapMethodNameReverse(entityLivingType, remapped, new Class<?>[] {
+                entityLivingType, pathFinderTargetCondition
+            }, "BAD");
+
+            assertEquals("canAttack", original);
         }
 
         // Test works recursive as well
@@ -364,6 +379,13 @@ public class TemplateTest {
             }, "BAD");
 
             System.out.println("Creeper canAttack -> " + remapped);
+
+            // Reverse it
+            String original = remapper.remapMethodNameReverse(entityCreeperType, remapped, new Class<?>[] {
+                entityCreeperType, pathFinderTargetCondition
+            }, "BAD");
+
+            assertEquals("canAttack", original);
         }
 
         // Field check
@@ -374,6 +396,11 @@ public class TemplateTest {
             String remapped = remapper.remapFieldName(entityLivingType, "SPEED_MODIFIER_POWDER_SNOW_UUID", "BAD");
 
             System.out.println("LivingEntity SPEED_MOD -> " + remapped);
+
+            // Reverse it
+            String original = remapper.remapFieldNameReverse(entityLivingType, remapped, "BAD");
+
+            assertEquals("SPEED_MODIFIER_POWDER_SNOW_UUID", original);
         }
     }
 

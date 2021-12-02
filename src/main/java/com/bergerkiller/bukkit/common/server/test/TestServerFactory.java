@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -39,24 +40,37 @@ public abstract class TestServerFactory {
             factory = new TestServerFactory_1_8();
         }
 
-        boolean success;
+        ServerEnvironment env = new ServerEnvironment();
         try {
-            success = factory.init();
+            env.CB_ROOT = factory.detectCBRoot();
+            env.NMS_ROOT = factory.detectNMSRoot();
+            factory.init(env);
         } catch (Throwable t) {
+            Logging.LOGGER.severe("Failed to initialize server under test");
+            Logging.LOGGER.severe("Detected server class under test: " + CommonServerBase.SERVER_CLASS);
+            Logging.LOGGER.severe("Detected CB_ROOT: " + env.CB_ROOT);
+            Logging.LOGGER.severe("Detected NMS_ROOT: " + env.NMS_ROOT);
             throw new UnsupportedOperationException("An error occurred while trying to initialize the test server", t);
-        }
-        if (!success) {
-            throw new UnsupportedOperationException("Test server could not be initialized properly, check your console");
         }
 
         init_spigotConfig();
         System.gc();
     }
 
+    protected String detectCBRoot() throws Throwable {
+        return getPackagePath(CommonServerBase.SERVER_CLASS);
+    }
+
+    protected String detectNMSRoot() throws Throwable {
+        return "net.minecraft.server";
+    }
+
     /**
      * Initializes the test server
+     *
+     * @param env Server environment details detected so far
      */
-    protected abstract boolean init();
+    protected abstract void init(ServerEnvironment env) throws Throwable;
 
     private static void init_spigotConfig() {
         Class<?> spigotConfigType = CommonUtil.getClass("org.spigotmc.SpigotConfig");
@@ -209,5 +223,10 @@ public abstract class TestServerFactory {
         public void save(String file) {
             // Denied.
         }
+    }
+
+    protected static final class ServerEnvironment {
+        public String CB_ROOT = "FAIL";
+        public String NMS_ROOT = "FAIL";
     }
 }

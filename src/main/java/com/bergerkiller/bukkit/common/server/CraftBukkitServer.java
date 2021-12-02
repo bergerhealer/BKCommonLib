@@ -6,15 +6,19 @@ import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.MethodAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.Map;
 
 import org.bukkit.Bukkit;
 
-public class CraftBukkitServer extends CommonServerBase implements MethodNameResolver, FieldNameResolver, FieldAliasResolver, ClassPathResolver {
+public class CraftBukkitServer extends CommonServerBase implements MethodNameResolver, FieldNameResolver,
+        FieldAliasResolver, MethodAliasResolver, ClassPathResolver
+{
     private static final String PACKAGE_CB_ROOT = "org.bukkit.craftbukkit";
     private static final String PACKAGE_NMS_ROOT = "net.minecraft.server";
     private static final String CB_ROOT = "org.bukkit.craftbukkit.";
@@ -220,10 +224,10 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     public String resolveFieldAlias(Field field, String name) {
         // Minecraft 1.17 and later require remapping, as all field names are obfuscated
         if (HAS_MOJANG_FIELD_MAPPINGS) {
-            return mojangSpigotRemapper.remapFieldName(field.getDeclaringClass(), name, null);
+            return mojangSpigotRemapper.remapFieldNameReverse(field.getDeclaringClass(), name, null);
         }
 
-        return null;
+        return null; // Try fallbacks
     }
 
     @Override
@@ -234,6 +238,16 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
         }
 
         return methodName;
+    }
+
+    @Override
+    public String resolveMethodAlias(Method method, String name) {
+        // Minecraft 1.18 and later require remapping, as all method names are obfuscated
+        if (HAS_MOJANG_METHOD_MAPPINGS) {
+            return mojangSpigotRemapper.remapMethodNameReverse(method.getDeclaringClass(), name, method.getParameterTypes(), null);
+        }
+
+        return null; // Try fallbacks
     }
 
     @Override

@@ -52,7 +52,7 @@ class MinecraftVersionDiscovery {
 
         if (typeMinecraftServer != null) {
             try {
-                getVersionMethod = getDeclaredMethod(typeMinecraftServer, "getVersion");
+                getVersionMethod = Resolver.resolveAndGetDeclaredMethod(typeMinecraftServer, "getVersion");
                 if (!getVersionMethod.getReturnType().equals(String.class)) {
                     getVersionMethod = null; // Invalid return type
                 }
@@ -206,7 +206,7 @@ class MinecraftVersionDiscovery {
         java.lang.reflect.Method getServerMethod = null;
         for (Class<?> c = typeCraftServer; c != Object.class; c = c.getSuperclass()) {
             try {
-                getServerMethod = getDeclaredMethod(c, "getServer");
+                getServerMethod = Resolver.resolveAndGetDeclaredMethod(c, "getServer");
             } catch (NoSuchMethodException ex) { /* not found */ }
         }
         if (getServerMethod == null) {
@@ -238,7 +238,7 @@ class MinecraftVersionDiscovery {
     private String getGameVersionName(Object gameVersion) throws VersionIdentificationFailureException {
         Method getNameMethod = null;
         try {
-            getNameMethod = getDeclaredMethod(this.typeGameVersion, "getName");
+            getNameMethod = Resolver.resolveAndGetDeclaredMethod(this.typeGameVersion, "getName");
             if (!getNameMethod.getReturnType().equals(String.class)) {
                 getNameMethod = null;
             }
@@ -266,10 +266,5 @@ class MinecraftVersionDiscovery {
 
     private static Class<?> loadClass(String name) throws ClassNotFoundException {
         return MPLType.getClassByName(Resolver.resolveClassPath(name));
-    }
-
-    private static Method getDeclaredMethod(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) throws NoSuchMethodException {
-        methodName = Resolver.resolveMethodName(declaringClass, methodName, parameterTypes);
-        return MPLType.getDeclaredMethod(declaringClass, methodName, parameterTypes);
     }
 }

@@ -16,6 +16,7 @@ import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
+import com.google.common.collect.BiMap;
 import com.google.common.collect.LinkedListMultimap;
 import com.google.common.collect.ListMultimap;
 
@@ -38,12 +39,35 @@ public class MojangSpigotRemapper {
      * @param declaringClass Class where the field is declared
      * @param fieldName Mojang-mapped field name
      * @param defaultName Default field name to return if not remapped
-     * @return Remapped field name, or the input fieldName if not found
+     * @return Remapped field name, or the input defaultName if not found
      */
     public String remapFieldName(Class<?> declaringClass, String fieldName, String defaultName) {
         // Ask all remappers for this field. The declaring class is asked first, of course.
         for (ClassRemapper remapper : remappersFor(declaringClass)) {
-            String remapped = remapper.fieldMappings.get(fieldName);
+            String remapped = remapper.fields_name_to_obfuscated.get(fieldName);
+            if (remapped != null) {
+                return remapped;
+            }
+        }
+
+        // Not found
+        return defaultName;
+    }
+
+    /**
+     * Checks what the de-obfuscated Mojang field name is, provided an obfuscated field name.
+     * If the field is defined in a superclass of the specified declaring class, then the
+     * field will still be found and remapped. That is, this method works recursively.
+     *
+     * @param declaringClass Class where the field is declared
+     * @param fieldName Obfuscated field name
+     * @param defaultName Default field name to return if not remapped
+     * @return Mojang reverse-remapped field name, or the input defaultName if not found
+     */
+    public String remapFieldNameReverse(Class<?> declaringClass, String fieldName, String defaultName) {
+        // Ask all remappers for this field. The declaring class is asked first, of course.
+        for (ClassRemapper remapper : remappersFor(declaringClass)) {
+            String remapped = remapper.fields_obfuscated_to_name.get(fieldName);
             if (remapped != null) {
                 return remapped;
             }
@@ -63,14 +87,39 @@ public class MojangSpigotRemapper {
      * @param methodName Mojang-mapped method name
      * @param parameterTypes Parameter argument types for the method
      * @param defaultName Default method name to return if not remapped
-     * @return Remapped method name, or the input methodName if not found
+     * @return Remapped method name, or the input defaultName if not found
      */
     public String remapMethodName(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes, String defaultName) {
         // Ask all remappers for this method. The declaring class is asked first, of course.
         for (ClassRemapper remapper : remappersFor(declaringClass)) {
-            for (MethodDetails method : remapper.methodsByName.get(methodName)) {
+            for (MethodDetails method : remapper.methods_by_name.get(methodName)) {
                 if (method.canAcceptParameters(parameterTypes)) {
                     return method.name_obfuscated;
+                }
+            }
+        }
+
+        // Not found
+        return defaultName;
+    }
+
+    /**
+     * Checks what the de-obfuscated Mojang method name is, provided an obfuscated method name.
+     * If the method is defined in a superclass of the specified declaring class, then the
+     * field will still be found and remapped. That is, this method works recursively.
+     *
+     * @param declaringClass Class where the method is declared
+     * @param methodName Obfuscated method name
+     * @param parameterTypes Parameter argument types for the method
+     * @param defaultName Default method name to return if not remapped
+     * @return Mojang reverse-remapped method name, or the input defaultName if not found
+     */
+    public String remapMethodNameReverse(Class<?> declaringClass, String methodName, Class<?>[] parameterTypes, String defaultName) {
+        // Ask all remappers for this method. The declaring class is asked first, of course.
+        for (ClassRemapper remapper : remappersFor(declaringClass)) {
+            for (MethodDetails method : remapper.methods_by_obfuscated.get(methodName)) {
+                if (method.canAcceptParameters(parameterTypes)) {
+                    return method.name;
                 }
             }
         }
@@ -189,11 +238,15 @@ public class MojangSpigotRemapper {
 
     private static class ClassRemapper {
         public final Class<?> type;
-        public final Map<String, String> fieldMappings = new HashMap<>();
-        public final ListMultimap<String, MethodDetails> methodsByName = LinkedListMultimap.create(64);
+        public final BiMap<String, String> fields_obfuscated_to_name;
+        public final BiMap<String, String> fields_name_to_obfuscated;
+        public final ListMultimap<String, MethodDetails> methods_by_name = LinkedListMultimap.create(64);
+        public final ListMultimap<String, MethodDetails> methods_by_obfuscated = LinkedListMultimap.create(64);
 
-        public ClassRemapper(Class<?> type) {
+        private ClassRemapper(MojangMappings.ClassMappings mappings, Class<?> type) {
             this.type = type;
+            this.fields_name_to_obfuscated = mappings.fields_name_to_obfuscated;
+            this.fields_obfuscated_to_name = mappings.fields_obfuscated_to_name;
         }
 
         public ClassRemapper[] recurse(Map<Class<?>, ClassRemapper> allRemappers) {
@@ -206,12 +259,12 @@ public class MojangSpigotRemapper {
         public static ClassRemapper create(MojangMappings.ClassMappings mappings, RemappedClassResolver resolver) {
             Class<?> type = resolver.resolve(mappings.name);
             if (type != null) {
-                ClassRemapper remapper = new ClassRemapper(type);
-                remapper.fieldMappings.putAll(mappings.fields_name_to_obfuscated);
+                ClassRemapper remapper = new ClassRemapper(mappings, type);
                 for (MojangMappings.MethodSignature sig : mappings.methods_by_name.values()) {
                     MethodDetails details = MethodDetails.create(sig, resolver);
                     if (details != null) {
-                        remapper.methodsByName.put(details.name, details);
+                        remapper.methods_by_name.put(details.name, details);
+                        remapper.methods_by_obfuscated.put(details.name_obfuscated, details);
                     }
                 }
                 return remapper;
