@@ -36,15 +36,25 @@ class DamageSource {
     // Now uses EntityFireballFireball but no clue what that is?
     //public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
 
+#if version >= 1.18
+    public static (DamageSourceHandle) DamageSource thrownHit:thrown((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
+#else
     public static (DamageSourceHandle) DamageSource thrownHit:projectile((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
+#endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public static (DamageSourceHandle) DamageSource magicHit:indirectMagic((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
+#elseif version >= 1.13
     public static (DamageSourceHandle) DamageSource magicHit:c((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
 #else
     public static (DamageSourceHandle) DamageSource magicHit:b((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
 #endif
 
+#if version >= 1.18
+    public static (DamageSourceHandle) DamageSource thorns((org.bukkit.entity.Entity) Entity entity);
+#else
     public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
+#endif
 
     /* Get damage source by translationIndex key */
     <code>

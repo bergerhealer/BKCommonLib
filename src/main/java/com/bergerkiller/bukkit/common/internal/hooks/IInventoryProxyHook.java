@@ -172,8 +172,8 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return true;
     }
 
-    @HookMethod(value="public abstract boolean someFunction2:???()", optional=true)
-    public boolean someFunction2() {
+    @HookMethod(value="public abstract boolean isNotEmptyOpt:???()", optional=true)
+    public boolean isNotEmpty() {
         return true;
     }
 }

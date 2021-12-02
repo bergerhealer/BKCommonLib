@@ -1,7 +1,6 @@
 package com.bergerkiller.generated.net.minecraft.world.level.biome;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.generated.net.minecraft.util.WeightedRandomHandle.WeightedRandomChoiceHandle;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.biome.BiomeSettingsMobs</b>.
@@ -34,7 +33,7 @@ public abstract class BiomeSettingsMobsHandle extends Template.Handle {
      * New handles can be created from raw instances using {@link #createHandle(Object)}.
      */
     @Template.InstanceType("net.minecraft.world.level.biome.BiomeSettingsMobs.SpawnRate")
-    public abstract static class SpawnRateHandle extends WeightedRandomChoiceHandle {
+    public abstract static class SpawnRateHandle extends Template.Handle {
         /** @See {@link SpawnRateClass} */
         public static final SpawnRateClass T = Template.Class.create(SpawnRateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
@@ -49,6 +48,7 @@ public abstract class BiomeSettingsMobsHandle extends Template.Handle {
 
         /* ============================================================================== */
 
+        public abstract int getWeight();
         public abstract java.lang.Class<?> getEntityClass();
         public abstract void setEntityClass(java.lang.Class<?> value);
         public abstract int getMinSpawnCount();
@@ -65,6 +65,8 @@ public abstract class BiomeSettingsMobsHandle extends Template.Handle {
             public final Template.Field.Converted<java.lang.Class<?>> entityClass = new Template.Field.Converted<java.lang.Class<?>>();
             public final Template.Field.Integer minSpawnCount = new Template.Field.Integer();
             public final Template.Field.Integer maxSpawnCount = new Template.Field.Integer();
+
+            public final Template.Method<Integer> getWeight = new Template.Method<Integer>();
 
         }
 

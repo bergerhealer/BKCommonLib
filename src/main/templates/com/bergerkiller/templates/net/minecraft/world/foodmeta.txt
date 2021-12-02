@@ -5,7 +5,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 class FoodMetaData {
+#if version >= 1.18
+    public void loadFromNBT:readAdditionalSaveData((CommonTagCompound) NBTTagCompound compound)
+    public void saveToNBT:addAdditionalSaveData((CommonTagCompound) NBTTagCompound compound)
+#else
     public void loadFromNBT:a((CommonTagCompound) NBTTagCompound compound)
-
     public void saveToNBT:b((CommonTagCompound) NBTTagCompound compound)
+#endif
 }

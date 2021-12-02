@@ -29,14 +29,6 @@ class ItemStack {
     private int amountField:count;
     private (com.bergerkiller.bukkit.common.nbt.CommonTagCompound) NBTTagCompound tagField:tag;
 
-    public (org.bukkit.Material) Item getTypeField:getItem();
-
-#if version >= 1.13
-    private optional int durabilityField:###;
-#else
-    private optional int durabilityField:damage;
-#endif
-
     <code>
     public static final ItemStackHandle EMPTY_ITEM;
     static {
@@ -51,6 +43,9 @@ class ItemStack {
 
     // available since MC 1.11
     public optional boolean isEmpty();
+
+    public (Object) Item getItem();
+    public (org.bukkit.Material) Item getTypeField:getItem();
 
     // Create an ItemStack with the given material type, and initial amount 1
     public static (ItemStackHandle) ItemStack newInstance(org.bukkit.Material type) {
@@ -88,9 +83,11 @@ class ItemStack {
 #endif
     }
 
-    public (Object) Item getItem();
 
-#if version >= 1.13
+#if version >= 1.18
+    public (ChatText) IChatBaseComponent getName:getHoverName();
+    public (void) ItemStack setName:setHoverName((ChatText) IChatBaseComponent name);
+#elseif version >= 1.13
     public (ChatText) IChatBaseComponent getName();
     public (void) ItemStack setName:a((ChatText) IChatBaseComponent name);
 #else
@@ -103,33 +100,42 @@ class ItemStack {
     #endif
 #endif
 
-
-#if version >= 1.13
-    public optional void setDamage_1_13:setDamage(int durability);
+#if version >= 1.18
+    public int getDurability:getDamageValue();
+#elseif version >= 1.13
+    public int getDurability:getDamage();
 #else
-    public optional void setDamage_1_13:###(int durability);
+    public int getDurability:getData();
 #endif
 
-    <code>
     public void setDurability(int durability) {
-        if (T.setDamage_1_13.isAvailable()) {
-            // Only set when durability > 0 or a tag exists
-            // This prevents creating a NBT tag for storing durability 0
-            if (durability > 0 || getTag() != null) {
-                T.setDamage_1_13.invoke(getRaw(), durability);
-            }
-        } else {
-            T.durabilityField.setInteger(getRaw(), durability);
+#if version >= 1.13
+        // Only set when durability > 0 or a tag exists
+        // This prevents creating a NBT tag for storing durability 0
+        if (durability > 0 || instance.getTag() != null) {
+  #if version >= 1.18
+            instance.setDamageValue(durability);
+  #else
+            instance.setDamage(durability);
+  #endif
         }
+#else
+        #require net.minecraft.world.item.ItemStack private int durabilityField:damage;
+        instance#durabilityField = durability;
+#endif
     }
-    </code>
 
-
+#if version >= 1.18
+    public int getRepairCost:getBaseRepairCost();
+    public boolean hasName:hasCustomHoverName();
+    public (ItemStackHandle) ItemStack cloneItemStack:copy();
+#else
     public int getRepairCost();
+    public boolean hasName();
+    public (ItemStackHandle) ItemStack cloneItemStack();
+#endif
 
     public void setRepairCost(int cost);
-
-    public boolean hasName();
 
     public boolean hasTag();
 
@@ -137,13 +143,13 @@ class ItemStack {
 
     public (CommonTagCompound) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 
-#if version >= 1.8.8
+#if version >= 1.18
+    public (ItemStackHandle) ItemStack cloneAndSubtract:split(int n);
+#elseif version >= 1.8.8
     public (ItemStackHandle) ItemStack cloneAndSubtract(int n);
 #else
     public (ItemStackHandle) ItemStack cloneAndSubtract:a(int n);
 #endif
-
-    public (ItemStackHandle) ItemStack cloneItemStack();
 
     public org.bukkit.inventory.ItemStack toBukkit() {
         return org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
@@ -159,7 +165,9 @@ class ItemStack {
         if (!(mapId instanceof NBTNumber)) {
             return -1;
         }
-  #if version >= 1.13.2
+  #if version >= 1.18
+        return ((NBTNumber) mapId).getAsInt();
+  #elseif version >= 1.13.2
         return ((NBTNumber) mapId).asInt();
   #else
         return ((NBTNumber) mapId).e();
@@ -170,7 +178,9 @@ class ItemStack {
     }
 
     public void setMapId(int mapId) {
-#if version >= 1.13
+#if version >= 1.18
+        instance.getOrCreateTag().putInt("map", mapId);
+#elseif version >= 1.13
         instance.getOrCreateTag().setInt("map", mapId);
 #else
         instance.setData(mapId);
@@ -195,7 +205,10 @@ class ItemStack {
                 NBTBase mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
                 if (mapDisplayUUIDLeast instanceof NBTTagLong) {
                     long mostBits, leastBits;
-#if version >= 1.13.2
+#if version >= 1.18
+                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).getAsLong();
+                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).getAsLong();
+#elseif version >= 1.13.2
                     mostBits = ((NBTTagLong) mapDisplayUUIDMost).asLong();
                     leastBits = ((NBTTagLong) mapDisplayUUIDLeast).asLong();
 #elseif version >= 1.10.2
@@ -213,7 +226,9 @@ class ItemStack {
             if (!(mapId instanceof NBTNumber)) {
                 return null;
             }
-  #if version >= 1.13.2
+  #if version >= 1.18
+            fallbackMapId = ((NBTNumber) mapId).getAsLong();
+  #elseif version >= 1.13.2
             fallbackMapId = ((NBTNumber) mapId).asLong();
   #else
             fallbackMapId = ((NBTNumber) mapId).d();

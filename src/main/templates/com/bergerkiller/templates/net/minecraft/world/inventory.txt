@@ -6,15 +6,20 @@ import net.minecraft.world.entity.player.EntityHuman;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 
 interface IInventory {
-    public abstract int getSize();
     public abstract (ItemStackHandle) ItemStack getItem(int index);
     public abstract void setItem(int paramInt, (ItemStackHandle) ItemStack paramItemStack);
 
+#if version >= 1.18
+    public abstract int getSize:getContainerSize();
+    public abstract void update:setChanged();
+    public abstract boolean canOpen:stillValid((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
+    public abstract boolean canStoreItem:canPlaceItem(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#else
+    public abstract int getSize();
     public abstract void update();
-
     public abstract boolean canOpen:a((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
-
     public abstract boolean canStoreItem:b(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#endif
 
 #if version >= 1.14
     // Removed
@@ -37,17 +42,30 @@ interface IInventory {
 
 #if version >= 1.11
     public abstract (List<ItemStackHandle>) List<ItemStack> getContents();
-    public abstract void clear();
 #else
     public abstract (List<ItemStackHandle>) ItemStack[] getContents();
+#endif
+
+#if version >= 1.18
+    public abstract void clear:clearContent();
+#elseif version >= 1.11
+    public abstract void clear();
+#else
     public abstract void clear:l();
 #endif
 
-#if version >= 1.12
-    public optional abstract boolean someFunction2:x_();
+#if version >= 1.15.2
+    // isNotEmpty() was removed, and now just isEmpty() is used instead
+    public optional abstract boolean isNotEmptyOpt:###();
+#elseif version >= 1.14
+    public optional abstract boolean isNotEmptyOpt:isNotEmpty();
+#elseif version >= 1.13
+    public optional abstract boolean isNotEmptyOpt:P_();
+#elseif version >= 1.12
+    public optional abstract boolean isNotEmptyOpt:x_();
 #elseif version >= 1.11
-    public optional abstract boolean someFunction2:w_();
+    public optional abstract boolean isNotEmptyOpt:w_();
 #else
-    public optional abstract boolean someFunction2:###();
+    public optional abstract boolean isNotEmptyOpt:###();
 #endif
 }

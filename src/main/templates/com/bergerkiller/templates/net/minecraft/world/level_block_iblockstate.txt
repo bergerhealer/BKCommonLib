@@ -7,9 +7,15 @@ interface IBlockState {
     public abstract String getKeyToken:a();
 #endif
 
+#if version >= 1.18
+    public abstract String getValueToken:getName(Comparable value);
+#else
     public abstract String getValueToken:a(Comparable value);
+#endif
 
-#if version >= 1.14.4
+#if version >= 1.18
+    public abstract java.util.Collection getValues:getPossibleValues();
+#elseif version >= 1.14.4
     public abstract java.util.Collection getValues();
 #elseif version >= 1.13
     public abstract java.util.Collection getValues:d();

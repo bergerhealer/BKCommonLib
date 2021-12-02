@@ -23,9 +23,9 @@ public abstract class IInventoryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract int getSize();
     public abstract ItemStackHandle getItem(int index);
     public abstract void setItem(int paramInt, ItemStackHandle paramItemStack);
+    public abstract int getSize();
     public abstract void update();
     public abstract boolean canOpen(HumanEntity paramEntityHuman);
     public abstract boolean canStoreItem(int index, ItemStack itemstack);
@@ -36,9 +36,9 @@ public abstract class IInventoryHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IInventoryClass extends Template.Class<IInventoryHandle> {
-        public final Template.Method<Integer> getSize = new Template.Method<Integer>();
         public final Template.Method.Converted<ItemStackHandle> getItem = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();
+        public final Template.Method<Integer> getSize = new Template.Method<Integer>();
         public final Template.Method<Void> update = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> canOpen = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> canStoreItem = new Template.Method.Converted<Boolean>();
@@ -51,7 +51,7 @@ public abstract class IInventoryHandle extends Template.Handle {
         public final Template.Method.Converted<List<ItemStackHandle>> getContents = new Template.Method.Converted<List<ItemStackHandle>>();
         public final Template.Method<Void> clear = new Template.Method<Void>();
         @Template.Optional
-        public final Template.Method<Boolean> someFunction2 = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isNotEmptyOpt = new Template.Method<Boolean>();
 
     }
 

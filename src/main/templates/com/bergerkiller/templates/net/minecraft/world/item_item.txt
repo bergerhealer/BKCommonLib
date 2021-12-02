@@ -28,29 +28,33 @@ class Item {
 
     public int getMaxStackSize();
 
-    public int getMaxDurability();
-
-    public boolean usesDurability();
-
-#if version >= 1.17
-    public String getInternalName:j((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.14
-    public String getInternalName:f((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.13
-    public String getInternalName:h((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.11
-    public String getInternalName:a((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.9
-    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.8.6
-    public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
-#elseif version >= 1.8.5
-    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#if version >= 1.18
+    public int getMaxDurability:getMaxDamage();
+    public boolean usesDurability:canBeDepleted();
 #else
-    public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+    public int getMaxDurability();
+    public boolean usesDurability();
 #endif
 
-#if version >= 1.12.1
+#select version >=
+#case 1.18:   public String getInternalName:getDescriptionId((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.17:   public String getInternalName:j((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.14:   public String getInternalName:f((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.13:   public String getInternalName:h((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.11:   public String getInternalName:a((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.9:    public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.8.6:  public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case 1.8.5:  public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
+#endselect
+
+#if version >= 1.18
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants((CreativeModeTabHandle) CreativeModeTab creativemodetab) {
+        NonNullList result = NonNullList.create();
+        instance.fillItemCategory(creativemodetab, result);
+        return result;
+    }
+#elseif version >= 1.12.1
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants((CreativeModeTabHandle) CreativeModeTab creativemodetab) {
         NonNullList result = NonNullList.a();
         instance.a(creativemodetab, result);
@@ -67,5 +71,9 @@ class Item {
 }
 
 class CreativeModeTab {
+#if version >= 1.17
+    public static final (CreativeModeTabHandle) CreativeModeTab SEARCH:TAB_SEARCH;
+#else
     public static final (CreativeModeTabHandle) CreativeModeTab SEARCH:g;
+#endif
 }
