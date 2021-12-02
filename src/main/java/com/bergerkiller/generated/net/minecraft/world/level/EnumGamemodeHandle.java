@@ -24,15 +24,14 @@ public abstract class EnumGamemodeHandle extends Template.Handle {
     }
 
     public abstract int getId();
-    public abstract void setId(int value);
     /**
      * Stores class members for <b>net.minecraft.world.level.EnumGamemode</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumGamemodeClass extends Template.Class<EnumGamemodeHandle> {
-        public final Template.Field.Integer id = new Template.Field.Integer();
-
         public final Template.StaticMethod.Converted<EnumGamemodeHandle> getById = new Template.StaticMethod.Converted<EnumGamemodeHandle>();
+
+        public final Template.Method<Integer> getId = new Template.Method<Integer>();
 
     }
 

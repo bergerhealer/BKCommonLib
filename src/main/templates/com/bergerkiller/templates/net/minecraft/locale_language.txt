@@ -11,5 +11,9 @@ class LocaleLanguage {
     private static final (LocaleLanguageHandle) LocaleLanguage INSTANCE:c;
 #endif
 
+#if version >= 1.18
+    public abstract String get:getOrDefault(String s);
+#else
     public synchronized String get:a(String s);
+#endif
 }

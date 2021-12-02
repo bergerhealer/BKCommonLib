@@ -4,7 +4,11 @@ import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 class EnumChatFormat {
     enum (EnumChatFormatHandle) EnumChatFormat RESET;
 
+#if version >= 1.18
+    public int getId();
+#else
     public int getId:b();
+#endif
 
     <code>
     public static final Object[] RAW_VALUES = T.getType().getEnumConstants();
@@ -44,9 +48,13 @@ import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumHandHandle;
 
 class EnumDifficulty {
+#if version >= 1.18
+    public int getId();
+    public static (EnumDifficultyHandle) EnumDifficulty getById:byId(int id);
+#else
     public int getId:a();
-
     public static (EnumDifficultyHandle) EnumDifficulty getById(int id);
+#endif
 }
 
 // Since MC 1.9
@@ -60,16 +68,24 @@ import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
 class EnumGamemode {
-    int id:f;
+    int getId();
 
+#if version >= 1.18
+    public static (EnumGamemodeHandle) EnumGamemode getById:byId(int id);
+#else
     public static (EnumGamemodeHandle) EnumGamemode getById(int id);
+#endif
 }
 
 class EnumSkyBlock {
     enum (EnumSkyBlockHandle) EnumSkyBlock SKY;
     enum (EnumSkyBlockHandle) EnumSkyBlock BLOCK;
 
-    public final int brightness:c;
+#if version >= 1.17
+    public final readonly int brightness:surrounding;
+#else
+    public final readonly int brightness:c;
+#endif
 
     <code>
     public int ordinal() {

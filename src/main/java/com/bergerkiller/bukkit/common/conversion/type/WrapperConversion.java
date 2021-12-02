@@ -281,7 +281,7 @@ public class WrapperConversion {
     @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.world.level.EnumGamemode")
     public static org.bukkit.GameMode toGameMode(Object nmsEnumGamemodeHandle) {
-        return org.bukkit.GameMode.getByValue(EnumGamemodeHandle.T.id.get(nmsEnumGamemodeHandle));
+        return org.bukkit.GameMode.getByValue(EnumGamemodeHandle.createHandle(nmsEnumGamemodeHandle).getId());
     }
 
     @SuppressWarnings("deprecation")

@@ -15,10 +15,15 @@ class ResourceKey {
         return instance#category;
     }
 
+  #if version >= 1.18
+    public (MinecraftKeyHandle) MinecraftKey getName:location();
+    public static (ResourceKeyHandle) ResourceKey create((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
+    public static (ResourceKeyHandle) ResourceKey createCategory:createRegistryKey((MinecraftKeyHandle) MinecraftKey categoryName);
+  #else
     public (MinecraftKeyHandle) MinecraftKey getName:a();
-
     public static (ResourceKeyHandle) ResourceKey create:a((ResourceKeyHandle) ResourceKey category, (MinecraftKeyHandle) MinecraftKey name);
     public static (ResourceKeyHandle) ResourceKey createCategory:a((MinecraftKeyHandle) MinecraftKey categoryName);
+  #endif
 #else
     public (MinecraftKeyHandle) MinecraftKey getCategory() {
         return (net.minecraft.resources.MinecraftKey) instance.category;

@@ -17,7 +17,7 @@ class RegistryMaterials {
 
 #if version >= 1.13.1
     public V get((Object) MinecraftKey key);
-    public (Object) MinecraftKey getKey:getKey(V value);
+    public (Object) MinecraftKey getKey(V value);
 #elseif version >= 1.9
     public V get((Object) K key);
     public (Object) K getKey:b(V value);

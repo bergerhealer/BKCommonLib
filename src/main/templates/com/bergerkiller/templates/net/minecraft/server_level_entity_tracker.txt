@@ -33,7 +33,7 @@ class EntityTracker {
     }
 
     public (EntityTrackerEntryHandle) EntityTrackerEntry putEntry(int entityId, (EntityTrackerEntryHandle) EntityTrackerEntry entry) {
-       it.unimi.dsi.fastutil.ints.Int2ObjectMap trackedEntities = instance#trackedEntities;
+        it.unimi.dsi.fastutil.ints.Int2ObjectMap trackedEntities = instance#trackedEntities;
         if (entry == null) {
             return (PlayerChunkMap$EntityTracker) trackedEntities.remove(entityId);
         } else if (trackedEntities.getClass() == it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap.class) {
@@ -107,7 +107,9 @@ class EntityTracker {
     private int trackingDistance:e;
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    protected void sendPacketToEntity:broadcastAndSend((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
+#elseif version >= 1.14
     protected void sendPacketToEntity:broadcastIncludingSelf((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
 #elseif version >= 1.9
     public void sendPacketToEntity((org.bukkit.entity.Entity) Entity entity, (CommonPacket) Packet<?> packet);
@@ -263,8 +265,13 @@ class EntityTrackerEntry {
         entry#trackerEntryEntity = entity;
     }
 
+  #if version >= 1.18
+    public void scanPlayers:updatePlayers((List<org.bukkit.entity.Player>) List<EntityPlayer> playerList);
+    public void removeViewer:removePlayer((org.bukkit.entity.Player) EntityPlayer player);
+  #else
     public void scanPlayers:track((List<org.bukkit.entity.Player>) List<EntityPlayer> playerList);
     public void removeViewer:clear((org.bukkit.entity.Player) EntityPlayer player);
+  #endif
 #else
     #require net.minecraft.server.level.EntityTrackerEntry private final net.minecraft.world.entity.Entity entity:tracker;
 
@@ -287,7 +294,12 @@ class EntityTrackerEntry {
 #endif
 
     public void updatePlayer((org.bukkit.entity.Player) EntityPlayer player);
+
+#if version >= 1.18
+    public void hideForAll:broadcastRemoved();
+#else
     public void hideForAll:a();
+#endif
 
     // These got moved to the State class, but proxy them here to keep depending plugins compatible
     <code>
@@ -732,6 +744,7 @@ class EntityTrackerEntryState {
   #endif
         Entity entity = instance#entity;
   #select version >=
+  #case 1.18:   return entity.getAddEntityPacket();
   #case 1.17:   return entity.getPacket();
   #case 1.16.2: return entity.P();
   #case 1.16:   return entity.O();
@@ -745,7 +758,9 @@ class EntityTrackerEntryState {
     private (CommonPacket) Packet getSpawnPacket:c();
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public void onTick:sendChanges();
+#elseif version >= 1.14
     public void onTick:a();
 #else
     public void onTick() {

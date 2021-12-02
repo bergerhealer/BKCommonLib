@@ -5,9 +5,13 @@ import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
 
 class CrashReport {
+#if version >= 1.18
+    public static (CrashReportHandle) CrashReport create:forThrowable(Throwable throwable, String message);
+    public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:addCategory(String message);
+#else
     public static (CrashReportHandle) CrashReport create:a(Throwable throwable, String message);
-
     public (CrashReportSystemDetailsHandle) CrashReportSystemDetails getSystemDetails:a(String message);
+#endif
 }
 
 class CrashReportSystemDetails {

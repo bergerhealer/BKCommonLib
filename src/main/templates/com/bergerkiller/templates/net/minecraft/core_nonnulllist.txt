@@ -1,5 +1,9 @@
 package net.minecraft.core;
 
 optional class NonNullList {
+#if version >= 1.18
+    public static (List<?>) NonNullList<E> create();
+#else
     public static (List<?>) NonNullList<E> create:a();
+#endif
 }

@@ -20,7 +20,11 @@ class ChunkProviderServer {
     public final (WorldServerHandle) WorldServer world;
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
+        return (Chunk) instance.getChunk(cx, cz, ChunkStatus.FULL, true);
+    }
+#elseif version >= 1.14
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
         return (Chunk) instance.getChunkAt(cx, cz, ChunkStatus.FULL, true);
     }
@@ -81,7 +85,11 @@ class ChunkProviderServer {
     }
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        instance.chunkMap.save(chunk);
+    }
+#elseif version >= 1.17
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
         instance.chunkMap.saveChunk(chunk);
     }
@@ -100,7 +108,9 @@ class ChunkProviderServer {
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public void markBlockDirty:blockChanged((BlockPositionHandle) BlockPosition blockPosition);
+#elseif version >= 1.14
     public void markBlockDirty:flagDirty((BlockPositionHandle) BlockPosition blockPosition);
 #else
     public void markBlockDirty((BlockPositionHandle) BlockPosition blockPosition) {
