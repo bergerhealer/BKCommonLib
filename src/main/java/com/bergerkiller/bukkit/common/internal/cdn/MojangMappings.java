@@ -5,9 +5,12 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +23,57 @@ import com.google.common.collect.HashBiMap;
  * API around the published mappings for minecraft server.
  */
 public class MojangMappings {
-    public final List<ClassMappings> classes = new ArrayList<>();
+    private final Map<String, ClassMappings> classesByName = new HashMap<>();
+
+    /**
+     * Gets a Collection of all classes there are mappings for
+     *
+     * @return class mappings
+     */
+    public Collection<ClassMappings> classes() {
+        return classesByName.values();
+    }
+
+    /**
+     * Gets class mapping information for a class name, if mappings exist
+     * for that class
+     *
+     * @param name Class name
+     * @return Class mappings for this class, or null if absent
+     */
+    public ClassMappings forClassIfExists(String name) {
+        return classesByName.get(name);
+    }
+
+    /**
+     * Translates all the Mojang class names to alternative class names, for all classes
+     * and method definitions inside these mappings. Beware that all class names are
+     * translated. This includes class names that aren't part of mojangs mappings,
+     * but are arguments or return types of methods.
+     *
+     * @param translatorFunction Function that translates to the right class name
+     * @return Translated mappings
+     */
+    public MojangMappings translateClassNames(Function<String, String> translatorFunction) {
+        // Start by translating all the class mappings
+        MojangMappings translated = new MojangMappings();
+        ClassSignatureCache signatureCache = new ClassSignatureCache(translatorFunction);
+        for (ClassMappings mappings : this.classesByName.values()) {
+            ClassMappings translatedMappings = new ClassMappings(mappings, translatorFunction);
+            translated.classesByName.put(translatedMappings.name, translatedMappings);
+            signatureCache.put(mappings.name, translatedMappings);
+        }
+
+        // Translate the types inside the method signatures next
+        for (ClassMappings mappings : translated.classesByName.values()) {
+            ListIterator<MethodSignature> iter = mappings.methods.listIterator();
+            while (iter.hasNext()) {
+                iter.set(iter.next().translate(mappings, signatureCache));
+            }
+        }
+
+        return translated;
+    }
 
     /**
      * The mappings of a single class
@@ -29,6 +82,17 @@ public class MojangMappings {
         public final BiMap<String, String> fields_obfuscated_to_name;
         public final BiMap<String, String> fields_name_to_obfuscated;
         public final List<MethodSignature> methods;
+
+        public ClassMappings(ClassMappings original, Function<String, String> translatorFunction) {
+            super(translatorFunction.apply(original.name), original.name_obfuscated);
+
+            // These don't change
+            this.fields_obfuscated_to_name = original.fields_obfuscated_to_name;
+            this.fields_name_to_obfuscated = original.fields_name_to_obfuscated;
+
+            // Method must be remapped, but do that later on when all class mappings are initialized
+            this.methods = new ArrayList<MethodSignature>(original.methods);
+        }
 
         public ClassMappings(String name, String name_obfuscated) {
             super(name, name_obfuscated);
@@ -86,6 +150,16 @@ public class MojangMappings {
             this.name_obfuscated = name_obfuscated;
             this.returnType = returnType;
             this.parameterTypes = parameterTypes;
+        }
+
+        public MethodSignature translate(ClassMappings declaring, ClassSignatureCache signatureCache) {
+            List<ClassSignature> tParameterTypes = new ArrayList<ClassSignature>(this.parameterTypes.size());
+            for (ClassSignature paramType : this.parameterTypes) {
+                tParameterTypes.add(signatureCache.get(paramType.name));
+            }
+            return new MethodSignature(declaring, this.name, this.name_obfuscated,
+                    signatureCache.get(this.returnType.name),
+                    tParameterTypes);
         }
 
         @Override
@@ -239,6 +313,71 @@ public class MojangMappings {
     }
 
     /**
+     * Stores ClassSignature by class name in a cache to avoid creating too many of them
+     */
+    private static class ClassSignatureCache {
+        private final Map<String, ClassSignature> cache = new HashMap<>();
+        private final Function<String, String> nameTranslator;
+
+        public ClassSignatureCache() {
+            this.nameTranslator = Function.identity();
+        }
+
+        public ClassSignatureCache(Function<String, String> nameTranslator) {
+            this.nameTranslator = nameTranslator;
+        }
+
+        /**
+         * Puts a value in the cache so it is not generated lazily. No translation
+         * is appleid.
+         *
+         * @param name Name (should be before translation)
+         * @param sig Signature
+         */
+        public void put(String name, ClassSignature sig) {
+            cache.put(name, sig);
+        }
+
+        /**
+         * Gets the class signature with a provided name.
+         * The name is translated
+         *
+         * @param name Name (should be before translation)
+         * @return Signature
+         */
+        public ClassSignature get(String name) {
+            // Note: cannot use computeIfAbsent because compute() also puts potentially
+            ClassSignature sig = cache.get(name);
+            if (sig == null) {
+                sig = this.compute(name);
+                cache.put(name, sig);
+            }
+            return sig;
+        }
+
+        private ClassSignature compute(String name) {
+            // Eliminate array declarations from name
+            boolean changed = false;
+            String classNameBare = name;
+            String postfix = "";
+            while (classNameBare.endsWith("[]")) {
+                classNameBare = classNameBare.substring(0, classNameBare.length() - 2);
+                postfix += "[]";
+                changed = true;
+            }
+
+            // If changed, check cache a second time, otherwise, generate
+            if (changed) {
+                ClassSignature sig = get(classNameBare);
+                return new ClassSignature(sig.name + postfix, sig.name_obfuscated + postfix);
+            } else {
+                String translated = this.nameTranslator.apply(classNameBare);
+                return new ClassSignature(translated, translated);
+            }
+        }
+    }
+
+    /**
      * Parses the proguard-formatted mappings file into a MojangMappings instance
      */
     private static class ProGuardParser {
@@ -248,7 +387,7 @@ public class MojangMappings {
         private static final Pattern METHOD_NAME_PATTERN = Pattern.compile("\\s+(\\d+:\\d+:)?([\\[\\]<>\\w\\._\\-$]+)\\s([\\w_\\-$]+)\\(([\\[\\]<>\\w\\._\\-,$]*)\\)\\s->\\s([\\w_\\-$]+)");
 
         private final MojangMappings result = new MojangMappings();
-        private final Map<String, ClassSignature> mappingsByDeobfName = new HashMap<>();
+        private final ClassSignatureCache classSigCache = new ClassSignatureCache();
 
         public MojangMappings parse(java.io.BufferedReader reader) throws IOException {
             ClassMappings currClassMappings = null;
@@ -267,11 +406,11 @@ public class MojangMappings {
                     } else {
                         currClassMappings = new ClassMappings(line.substring(0, nameEnd),
                                                           line.substring(nameEnd+4, line.length()-1));
-                        mappingsByDeobfName.put(currClassMappings.name, currClassMappings);
+                        classSigCache.put(currClassMappings.name, currClassMappings);
 
                         // Don't add these - that's weird
                         if (isValidClass(currClassMappings.name)) {
-                            result.classes.add(currClassMappings);
+                            result.classesByName.put(currClassMappings.name, currClassMappings);
                         }
                     }
                 }
@@ -327,37 +466,16 @@ public class MojangMappings {
 
         private void processMethod(PendingMethod method) {
             // Translate the return type if it refers to an obfuscated name
-            ClassSignature returnType = translateTypeName(method.returnTypeName);
+            ClassSignature returnType = this.classSigCache.get(method.returnTypeName);
 
             // Translate the argument types if they refer to obfuscated names
             List<ClassSignature> params = new ArrayList<ClassSignature>(method.paramTypeNames.length);
             for (String paramTypeName : method.paramTypeNames) {
-                params.add(translateTypeName(paramTypeName));
+                params.add(this.classSigCache.get(paramTypeName));
             }
 
             // Add
             method.classMappings.addMethod(method.obfuscatedName, method.mojangName, returnType, params);
-        }
-
-        private ClassSignature translateTypeName(String name) {
-            // Eliminate array declarations from name
-            String classNameBare = name;
-            String postfix = "";
-            while (classNameBare.endsWith("[]")) {
-                classNameBare = classNameBare.substring(0, classNameBare.length() - 2);
-                postfix += "[]";
-            }
-
-            // Find an existing remapping signature if it exists, if not, create one (cache)
-            ClassSignature argSig = this.mappingsByDeobfName.computeIfAbsent(classNameBare,
-                    c -> new ClassSignature(c, c));
-
-            // Array postfixes don't happen often enough to warrant caching and re-using signatures
-            if (!postfix.isEmpty()) {
-                argSig = new ClassSignature(argSig.name + postfix, argSig.name_obfuscated + postfix);
-            }
-
-            return argSig;
         }
 
         private static final class PendingMethod {

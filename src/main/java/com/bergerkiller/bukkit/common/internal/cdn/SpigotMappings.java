@@ -190,7 +190,7 @@ public class SpigotMappings {
         // store the Bukkit name for those classes. Sometimes a subclass of a class isn't
         // remapped, in which case we must perform remapping of this name ourselves.
         ClassMappings mappings = new ClassMappings();
-        for (MojangMappings.ClassMappings cl : mojangMappings.classes) {
+        for (MojangMappings.ClassMappings cl : mojangMappings.classes()) {
             String bukkitFullName = obfuscatedToBukkit.get(cl.name_obfuscated);
             if (bukkitFullName == null) {
                 // See if this is a subclass of a class we do have mappings for, recursively

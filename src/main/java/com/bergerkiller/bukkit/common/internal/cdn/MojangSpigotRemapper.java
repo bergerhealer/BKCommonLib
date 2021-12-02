@@ -141,38 +141,42 @@ public class MojangSpigotRemapper {
      * @param minecraftVersion Minecraft version for which to remap
      */
     protected void loadMappings(
-            MojangMappings mojangMappings,
-            SpigotMappings spigotMappings,
-            ClassPathResolver classPathResolver,
-            String minecraftVersion
+            final MojangMappings mojangMappings,
+            final SpigotMappings spigotMappings,
+            final ClassPathResolver classPathResolver,
+            final String minecraftVersion
     ) {
         // Reset
         remappersByDeclaringClassName.clear();
         recurseRemappersByDeclaringClassName.clear();
 
-        // Load the spigot<>mojang class mappings and verify they exist
-        SpigotMappings.ClassMappings spigotClassMappings = spigotMappings.byVersion.get(minecraftVersion);
-        if (spigotClassMappings == null) {
-            throw new IllegalArgumentException("Spigot class name mappings not available for Minecraft " + minecraftVersion);
+        // Generate mappings of all methods/fields/classes, using spigot's class naming structure
+        MojangMappings mappings;
+        {
+            // Load the spigot<>mojang class mappings and verify they exist
+            SpigotMappings.ClassMappings spigotClassMappings = spigotMappings.byVersion.get(minecraftVersion);
+            if (spigotClassMappings == null) {
+                throw new IllegalArgumentException("Spigot class name mappings not available for Minecraft " + minecraftVersion);
+            }
+
+            // Translate Mojang's mappings to Spigot's class mappings
+            mappings = mojangMappings.translateClassNames(spigotClassMappings::toSpigot);
         }
 
         // Start by resolving all classes we have remappings for - essential for later
         RemappedClassResolver resolver = new RemappedClassResolver(classPathResolver);
-        for (MojangMappings.ClassMappings mappings : mojangMappings.classes) {
-            // Remap using spigot<>mojang class name remappings
-            String spigotClassName = spigotClassMappings.toSpigot(mappings.name);
-
+        for (MojangMappings.ClassMappings classMappings : mappings.classes()) {
             // Find the class, then store if found
-            Class<?> resolvedClass = resolver.tryFindClass(spigotClassName);
+            Class<?> resolvedClass = resolver.tryFindClass(classMappings.name);
             if (resolvedClass != null) {
-                resolver.store(mappings.name, resolvedClass);
+                resolver.store(classMappings.name, resolvedClass);
             }
         }
 
         // All that taken care of, actually parse the full mojang mappings and translate using resolver
         // After this the resolver is no longer used and only still-valid remappings are kept
-        for (MojangMappings.ClassMappings mappings : mojangMappings.classes) {
-            ClassRemapper remapper = ClassRemapper.create(mappings, resolver);
+        for (MojangMappings.ClassMappings classMappings : mappings.classes()) {
+            ClassRemapper remapper = ClassRemapper.create(classMappings, resolver);
             if (remapper != null) {
                 remappersByDeclaringClassName.put(remapper.type, remapper);
             }
