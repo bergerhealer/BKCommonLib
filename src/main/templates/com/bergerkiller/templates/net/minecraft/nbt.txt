@@ -15,8 +15,15 @@ import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagIntArray
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagLongArrayHandle;
 
 class NBTBase {
+#if version >= 1.18
+    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getId();
+    public abstract byte getTypeId:getId();
+    public abstract (Object) NBTBase raw_clone:copy();
+#else
+    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getTypeId();
     public abstract byte getTypeId();
     public abstract (Object) NBTBase raw_clone:clone();
+#endif
 
     public static NBTBaseHandle createHandle(Object instance) {
         if (!(instance instanceof NBTBase)) {
@@ -165,14 +172,18 @@ class NBTBase {
     </code>
 
     class NBTTagString extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create:valueOf(String data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create:a(String data);
 #else
         public static (NBTBaseHandle.NBTTagStringHandle) NBTTagString create(String data) { return new NBTTagString(data); }
 #endif
 
         // Overrides getData() in NBTBase
-#if version >= 1.13.2
+#if version >= 1.18
+        public String getData:getAsString();
+#elseif version >= 1.13.2
         public String getData:asString();
 #elseif version >= 1.13
         public String getData:b_();
@@ -194,12 +205,16 @@ class NBTBase {
     }
 
     class NBTTagByte extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create:valueOf(byte data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create:a(byte data);
 #else
         public static (NBTBaseHandle.NBTTagByteHandle) NBTTagByte create(byte data) { return new NBTTagByte(data); }
 #endif
-#if version >= 1.13.2
+#if version >= 1.18
+        public byte getByteData:getAsByte();
+#elseif version >= 1.13.2
         public byte getByteData:asByte();
 #elseif version >= 1.10.2
         public byte getByteData:g();
@@ -220,12 +235,16 @@ class NBTBase {
     }
 
     class NBTTagShort extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create:valueOf(short data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create:a(short data);
 #else
         public static (NBTBaseHandle.NBTTagShortHandle) NBTTagShort create(short data) { return new NBTTagShort(data); }
 #endif
-#if version >= 1.13.2
+#if version >= 1.18
+        public short getShortData:getAsShort();
+#elseif version >= 1.13.2
         public short getShortData:asShort();
 #elseif version >= 1.10.2
         public short getShortData:f();
@@ -247,12 +266,16 @@ class NBTBase {
     }
 
     class NBTTagInt extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create:valueOf(int data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create:a(int data);
 #else
         public static (NBTBaseHandle.NBTTagIntHandle) NBTTagInt create(int data) { return new NBTTagInt(data); }
 #endif
-#if version >= 1.13.2
+#if version >= 1.18
+        public int getIntegerData:getAsInt();
+#elseif version >= 1.13.2
         public int getIntegerData:asInt();
 #elseif version >= 1.10.2
         public int getIntegerData:e();
@@ -273,12 +296,16 @@ class NBTBase {
     }
 
     class NBTTagLong extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create:valueOf(long data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create:a(long data);
 #else
         public static (NBTBaseHandle.NBTTagLongHandle) NBTTagLong create(long data) { return new NBTTagLong(data); }
 #endif
-#if version >= 1.13.2
+#if version >= 1.18
+        public long getLongData:getAsLong();
+#elseif version >= 1.13.2
         public long getLongData:asLong();
 #elseif version >= 1.10.2
         public long getLongData:d();
@@ -299,12 +326,16 @@ class NBTBase {
     }
 
     class NBTTagFloat extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create:valueOf(float data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create:a(float data);
 #else
         public static (NBTBaseHandle.NBTTagFloatHandle) NBTTagFloat create(float data) { return new NBTTagFloat(data); }
 #endif
-#if version >= 1.13.2
+#if version >= 1.18
+        public float getFloatData:getAsFloat();
+#elseif version >= 1.13.2
         public float getFloatData:asFloat();
 #elseif version >= 1.10.2
         public float getFloatData:i();
@@ -325,13 +356,17 @@ class NBTBase {
     }
 
     class NBTTagDouble extends NBTBase {
-#if version >= 1.15
+#if version >= 1.18
+        public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create:valueOf(double data);
+#elseif version >= 1.15
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create:a(double data);
 #else
         public static (NBTBaseHandle.NBTTagDoubleHandle) NBTTagDouble create(double data) { return new NBTTagDouble(data); }
 #endif
 
-#if forge_nms_obfuscated
+#if version >= 1.18
+        public double getDoubleData:getAsDouble();
+#elseif forge_nms_obfuscated
         public double getDoubleData:h();
 #elseif version >= 1.11
         public double getDoubleData:asDouble();
@@ -355,7 +390,9 @@ class NBTBase {
 
     class NBTTagByteArray extends NBTBase {
         public static (NBTBaseHandle.NBTTagByteArrayHandle) NBTTagByteArray create(byte[] data) { return new NBTTagByteArray(data); }
-#if version >= 1.14
+#if version >= 1.18
+        public byte[] getData:getAsByteArray();
+#elseif version >= 1.14
         public byte[] getData:getBytes();
 #else
         public byte[] getData:c();
@@ -370,7 +407,9 @@ class NBTBase {
 
     class NBTTagIntArray extends NBTBase {
         public static (NBTBaseHandle.NBTTagIntArrayHandle) NBTTagIntArray create(int[] data) { return new NBTTagIntArray(data); }
-#if version >= 1.14
+#if version >= 1.18
+        public int[] getData:getAsIntArray();
+#elseif version >= 1.14
         public int[] getData:getInts();
 #elseif version >= 1.10.2
         public int[] getData:d();
@@ -388,7 +427,9 @@ class NBTBase {
     // Since MC 1.12
     optional class NBTTagLongArray extends NBTBase {
         public static (NBTBaseHandle.NBTTagLongArrayHandle) NBTTagLongArray create(long[] data) { return new NBTTagLongArray(data); }
-#if version >= 1.14
+#if version >= 1.18
+        public long[] getData:getAsLongArray();
+#elseif version >= 1.14
         public long[] getData:getLongs();
 #elseif version >= 1.13
         public long[] getData:d();
@@ -446,13 +487,17 @@ class NBTTagList extends NBTBase {
 
     public int size();
 
-#if forge_nms_obfuscated
+#if version >= 1.18
+    public boolean isEmpty();
+#elseif forge_nms_obfuscated
     public boolean isEmpty:b_();
 #else
     public boolean isEmpty();
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public (byte) byte getElementTypeId:getElementType();
+#elseif version >= 1.17
     public (byte) byte getElementTypeId:e();
 #elseif version >= 1.16
     public (byte) byte getElementTypeId:d_();
@@ -500,9 +545,9 @@ class NBTTagList extends NBTBase {
 
     public (NBTBaseHandle) NBTBase set_at(int index, (NBTBaseHandle) NBTBase nbt_value) {
         byte list_type = instance#type;
-        if (list_type != 0 && list_type != nbt_value.getTypeId()) {
+        if (list_type != 0 && list_type != nbt_value#getTagTypeId()) {
             throw new UnsupportedOperationException("Trying to set tag of type " +
-                nbt_value.getTypeId() + " in list of " + list_type);
+                nbt_value#getTagTypeId() + " in list of " + list_type);
         }
   #if version >= 1.13
         NBTBase old_value = instance.get(index);
@@ -513,17 +558,21 @@ class NBTTagList extends NBTBase {
   #else
         NBTBase old_value = instance.g(index);
   #endif
+  #if version >= 1.18
+        instance.setTag(index, nbt_value);
+  #else
         instance.a(index, nbt_value);
+  #endif
         return old_value;
     }
 
     public void add_at(int index, (NBTBaseHandle) NBTBase value) {
         byte list_type = instance#type;
         if (list_type == 0) {
-            instance#type = value.getTypeId();
-        } else if (list_type != value.getTypeId()) {
+            instance#type = value#getTagTypeId();
+        } else if (list_type != value#getTagTypeId()) {
             throw new UnsupportedOperationException("Trying to add tag of type " +
-                value.getTypeId() + " to list of " + list_type);
+                value#getTagTypeId() + " to list of " + list_type);
         }
         java.util.List list = instance#list;
         list.add(index, value);
@@ -536,7 +585,13 @@ class NBTTagList extends NBTBase {
   #else
         NBTBase removed = instance.a(index);
   #endif
+  #if version >= 1.18
         if (instance.isEmpty()) {
+  #elseif forge_nms_obfuscated
+        if (instance.b_()) {
+  #else
+        if (instance.isEmpty()) {
+  #endif
             instance#type = (byte) 0;
         }
         return removed;
@@ -547,14 +602,14 @@ class NBTTagList extends NBTBase {
         if (!instance.add(value)) {
             byte list_type = instance#type;
             throw new UnsupportedOperationException("Trying to add tag of type " +
-                value.getTypeId() + " to list of " + list_type);
+                value#getTagTypeId() + " to list of " + list_type);
         }
         return true;
   #else
         byte list_type = instance#type;
         if (list_type != 0 && list_type != value.getTypeId()) {
             throw new UnsupportedOperationException("Trying to add tag of type " +
-                value.getTypeId() + " to list of " + list_type);
+                value#getTagTypeId() + " to list of " + list_type);
         }
         instance.add(value);
         return true;
@@ -628,13 +683,17 @@ class NBTTagCompound extends NBTBase {
     }
     </code>
 
-#if forge_nms_obfuscated
+#if version >= 1.18
+    public boolean isEmpty();
+#elseif forge_nms_obfuscated
     public boolean isEmpty:b_();
 #else
     public boolean isEmpty();
 #endif
 
-#if version >= 1.15
+#if version >= 1.18
+    public int size();
+#elseif version >= 1.15
     public int size:e();
 #elseif version >= 1.9
     public int size:d();
@@ -644,7 +703,9 @@ class NBTTagCompound extends NBTBase {
     }
 #endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public Set<String> getKeys:getAllKeys();
+#elseif version >= 1.13
     public Set<String> getKeys();
 #else
     public Set<String> getKeys:c();
@@ -652,7 +713,9 @@ class NBTTagCompound extends NBTBase {
 
     public void remove(String key);
 
-#if version >= 1.14
+#if version >= 1.18
+    public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value);
+#elseif version >= 1.14
     public (NBTBaseHandle) NBTBase put:set(String key, (NBTBaseHandle) NBTBase value);
 #else
     public (NBTBaseHandle) NBTBase put(String key, (NBTBaseHandle) NBTBase value) {
@@ -663,7 +726,12 @@ class NBTTagCompound extends NBTBase {
 #endif
 
     public (NBTBaseHandle) NBTBase get(String key);
+
+#if version >= 1.18
+    public boolean containsKey:contains(String key);
+#else
     public boolean containsKey:hasKey(String key);
+#endif
 
     public static (NBTBaseHandle) NBTBase fromMojangson(String mojangson) {
         try {
@@ -711,6 +779,24 @@ class NBTTagCompound extends NBTBase {
 }
 
 class NBTCompressedStreamTools {
+#if version >= 1.18
+    // Uncompressed tag
+    public static void uncompressed_writeTag:writeUnnamedTag((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);
+    public static (NBTBaseHandle) NBTBase uncompressed_readTag(java.io.DataInput datainput) {
+        #require net.minecraft.nbt.NBTCompressedStreamTools private static NBTBase readUnnamedTag(java.io.DataInput datainput, int i, NBTReadLimiter nbtreadlimiter);
+        return #readUnnamedTag(datainput, 0, NBTReadLimiter.a);
+    }
+
+    // Uncompressed tag compound
+    public static void uncompressed_writeTagCompound:write((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.DataOutput dataoutput);
+    public static (NBTTagCompoundHandle) NBTTagCompound uncompressed_readTagCompound(java.io.DataInput datainput) {
+        return NBTCompressedStreamTools.read(datainput, NBTReadLimiter.a);
+    }
+
+    // Compressed tag compound
+    public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound:readCompressed(java.io.InputStream inputstream);
+    public static void compressed_writeTagCompound:writeCompressed((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.OutputStream outputstream);
+#else
     // Uncompressed tag
     private static void uncompressed_writeTag:a((NBTBaseHandle) NBTBase nbtbase, java.io.DataOutput dataoutput);
     public static (NBTBaseHandle) NBTBase uncompressed_readTag(java.io.DataInput datainput) {
@@ -727,4 +813,5 @@ class NBTCompressedStreamTools {
     // Compressed tag compound
     public static (NBTTagCompoundHandle) NBTTagCompound compressed_readTagCompound:a(java.io.InputStream inputstream);
     public static void compressed_writeTagCompound:a((NBTTagCompoundHandle) NBTTagCompound nbttagcompound, java.io.OutputStream outputstream);
+#endif
 }

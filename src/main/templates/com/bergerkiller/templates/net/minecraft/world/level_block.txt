@@ -46,7 +46,9 @@ class Block {
     public static final rawtype (Iterable) net.minecraft.util.RegistryID<IBlockData> REGISTRY_ID:d;
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata);
+#elseif version >= 1.14
     public (SoundEffectTypeHandle) SoundEffectType getSoundType:getStepSound((IBlockDataHandle) IBlockData iblockdata);
 #elseif version >= 1.11
     public (SoundEffectTypeHandle) SoundEffectType getSoundType((IBlockDataHandle) IBlockData iblockdata) {
@@ -62,13 +64,16 @@ class Block {
     }
 #endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public void entityHitVertical:updateEntityAfterFallOn((WorldHandle) IBlockAccess world, (EntityHandle) Entity entity);
+#elseif version >= 1.13
     public void entityHitVertical:a((WorldHandle) IBlockAccess world, (EntityHandle) Entity entity);
 #else
     public void entityHitVertical:a((WorldHandle) World world, (EntityHandle) Entity entity);
 #endif
 
 #select version >=
+#case 1.18: public String getTitle:getDescriptionId();
 #case 1.17: public String getTitle:h();
 #case 1.16: public String getTitle:i();
 #case 1.15: public String getTitle:k();
@@ -84,7 +89,10 @@ class Block {
 #endselect
 
     public boolean isFaceOpaque((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z, (org.bukkit.block.BlockFace) EnumDirection direction) {
-  #if version >= 1.16
+  #if version >= 1.18
+        // Note: uses this.p(), which is protected. More efficient to just call the method on the iblockdata
+        return iblockdata.isFaceSturdy((IBlockAccess)world, new BlockPosition(x, y, z), direction);
+  #elseif version >= 1.16
         // Note: uses this.p(), which is protected. More efficient to just call the method on the iblockdata
         return iblockdata.d((IBlockAccess)world, new BlockPosition(x, y, z), direction);
   #elseif version >= 1.14
@@ -98,7 +106,30 @@ class Block {
   #endif
     }
 
-#if version >= 1.14
+#if version >= 1.18
+    public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        return instance.getLightBlock(iblockdata, world, new BlockPosition(x, y, z));
+    }
+
+    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata) {
+        return iblockdata.getLightEmission();
+    }
+
+    public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        //TODO: This has been broken for quite a while it seems. By chance it works (most redstone conductors are solid...)
+        //      What to do with this mess?
+        return iblockdata.isRedstoneConductor(world, new BlockPosition(x, y, z));
+    }
+
+    public boolean isOccluding((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block) {
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        //TODO: See above
+        return iblockdata.isRedstoneConductor(iblockaccess, blockposition);
+    }
+
+    public boolean isPowerSource:isSignalSource((IBlockDataHandle) IBlockData iblockdata);
+#elseif version >= 1.14
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
   #if version >= 1.17
         return instance.g(iblockdata, world, new BlockPosition(x, y, z));
@@ -206,7 +237,13 @@ class Block {
     }
 #endif
 
-#if version >= 1.16.2
+#if version >= 1.18
+    public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
+        IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
+        BlockPosition blockposition = block.getPosition();
+        return iblockaccess.getBlockState(blockposition).isFaceSturdy(iblockaccess, blockposition, direction, EnumBlockSupport.RIGID);
+    }
+#elseif version >= 1.16.2
     public boolean canSupportOnFace((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.block.Block) org.bukkit.craftbukkit.block.CraftBlock block, (org.bukkit.block.BlockFace) EnumDirection direction) {
         IBlockAccess iblockaccess = block.getCraftWorld().getHandle();
         BlockPosition blockposition = block.getPosition();
@@ -303,7 +340,9 @@ class Block {
     }
 #endif
 
-#if version >= 1.13.1
+#if version >= 1.18
+    public float getDamageResillience:getExplosionResistance();
+#elseif version >= 1.13.1
     public float getDamageResillience:getDurability();
 #elseif version >= 1.13
     #if pre <= 7
@@ -337,26 +376,42 @@ class Block {
         isTileEntity = block.isTileEntity();
   #endif
 
+  #if version >= 1.18
+        net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getBlockEntity(blockposition) : null;
+        LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
+        loottableinfo_builder = loottableinfo_builder.withRandom(((World) world).random);
+        loottableinfo_builder.withParameter(LootContextParameters.ORIGIN, Vec3D.atCenterOf(blockposition));
+        loottableinfo_builder.withParameter(LootContextParameters.TOOL, EMPTY_ITEM);
+        loottableinfo_builder.withOptionalParameter(LootContextParameters.BLOCK_ENTITY, tileentity);
+        loottableinfo_builder.withParameter(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
+        java.util.Iterator items_iter = iblockdata.getDrops(loottableinfo_builder).iterator();
+        while (items_iter.hasNext()) {
+            ItemStack item = (ItemStack) items_iter.next();
+            Block.popResource(world, blockposition, item);
+        }
+        iblockdata.spawnAfterBreak(world, blockposition, EMPTY_ITEM);
+  #else
         net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(((World) world).random);
-  #if version >= 1.16.2
+    #if version >= 1.16.2
         loottableinfo_builder.set(LootContextParameters.ORIGIN, Vec3D.a(blockposition));
-  #else
+    #else
         loottableinfo_builder.set(LootContextParameters.POSITION, blockposition);
-  #endif
+    #endif
         loottableinfo_builder.set(LootContextParameters.TOOL, EMPTY_ITEM);
         loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
         loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
-  #if version >= 1.15
+    #if version >= 1.15
         java.util.Iterator items_iter = iblockdata.a(loottableinfo_builder).iterator();
         while (items_iter.hasNext()) {
             ItemStack item = (ItemStack) items_iter.next();
             Block.a(world, blockposition, item);
         }
         iblockdata.dropNaturally(world, blockposition, EMPTY_ITEM);
-  #else
+    #else
         Block.b(iblockdata, loottableinfo_builder);
+    #endif
   #endif
     }
 #elseif version >= 1.13
@@ -383,7 +438,9 @@ class Block {
 #endif
 
     public (IBlockDataHandle) IBlockData updateState((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, (IntVector3) BlockPosition blockposition) {
-#if version >= 1.13
+#if version >= 1.18
+        return Block.updateFromNeighbourShapes(iblockdata, (net.minecraft.world.level.GeneratorAccess) world, blockposition);
+#elseif version >= 1.13
         return Block.b(iblockdata, (net.minecraft.world.level.GeneratorAccess) world, blockposition);
 #else
         return instance.updateState(iblockdata, (IBlockAccess) world, blockposition);
@@ -392,7 +449,9 @@ class Block {
 
 #if version >= 1.13
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox((IBlockDataHandle) IBlockData iblockdata, (IBlockAccessHandle) IBlockAccess iblockaccess, (IntVector3) BlockPosition blockposition) {
-  #if version >= 1.16
+  #if version >= 1.18
+        VoxelShape shape = instance.getVisualShape(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.empty());
+  #elseif version >= 1.16
         VoxelShape shape = instance.b(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.a());
   #elseif version >= 1.14
         VoxelShape shape = instance.a(iblockdata, iblockaccess, blockposition, VoxelShapeCollision.a());
@@ -406,7 +465,9 @@ class Block {
   #endif
             return null;
         } else {
-  #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
+  #if version >= 1.18
+            return shape.bounds();
+  #elseif methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox();
             return shape.getBoundingBox();
   #else
             return shape.a();
@@ -429,10 +490,19 @@ class Block {
     }
 #endif
 
+#if version >= 1.18
+    public final (IBlockDataHandle) IBlockData getBlockData:defaultBlockState();
+#else
     public final (IBlockDataHandle) IBlockData getBlockData();
+#endif
 
+#if version >= 1.18
+    public static (IBlockDataHandle) IBlockData getByCombinedId:stateById(int combinedId);
+    public static int getCombinedId:getId((IBlockDataHandle) IBlockData iblockdata);
+#else
     public static (IBlockDataHandle) IBlockData getByCombinedId(int combinedId);
     public static int getCombinedId((IBlockDataHandle) IBlockData iblockdata);
+#endif
 }
 
 class BlockCobbleWall {

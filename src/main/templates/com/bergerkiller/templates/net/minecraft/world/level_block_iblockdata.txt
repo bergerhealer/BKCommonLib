@@ -48,7 +48,9 @@ interface IBlockData {
     </code>
 
     // World access require check
-#if version >= 1.16
+#if version >= 1.18
+    #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:hasDynamicShape();
+#elseif version >= 1.16
     #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:o();
 #elseif version >= 1.15
     #require net.minecraft.world.level.block.Block public boolean isWorldAccessRequired:q();
@@ -64,7 +66,9 @@ interface IBlockData {
         // This flag is set to true by default for all blocks
         // Blocks that pass light through at all times, have it set to false
         // Examples are: doors, trapdoors
-  #if version >= 1.16
+  #if version >= 1.18
+        if (!instance.canOcclude()) {
+  #elseif version >= 1.16
         if (!instance.l()) {
   #else
         if (!instance.o()) {
@@ -87,7 +91,26 @@ interface IBlockData {
         // Query all 6 faces and produce a mask
         int mask = 0;
         IBlockAccess emptyBlockAccess = net.minecraft.world.level.BlockAccessAir.INSTANCE;
-  #if version >= 1.14.4
+  #if version >= 1.18
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
+        }
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.EAST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_EAST;
+        }
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.SOUTH)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_SOUTH;
+        }
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.WEST)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_WEST;
+        }
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.UP)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_UP;
+        }
+        if (instance.isFaceSturdy(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.DOWN)) {
+            mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_DOWN;
+        }
+  #elseif version >= 1.14.4
         if (instance.d(emptyBlockAccess, BlockPosition.ZERO, EnumDirection.NORTH)) {
             mask |= com.bergerkiller.bukkit.common.collections.BlockFaceSet.MASK_NORTH;
         }
@@ -132,7 +155,11 @@ interface IBlockData {
         // When this happens, it would make transparent blocks block all light
         // We obviously don't want that!
         if (mask == com.bergerkiller.bukkit.common.collections.BlockFaceSet.ALL.mask()) {
+  #if version >= 1.18
+            int opacity = instance.getLightBlock(emptyBlockAccess, BlockPosition.ZERO);
+  #else
             int opacity = instance.b(emptyBlockAccess, BlockPosition.ZERO);
+  #endif
             if (opacity < 15) {
                 mask = 0;
             }
@@ -158,7 +185,11 @@ interface IBlockData {
         if (worldAccessRequired) {
             return -1;
         } else {
+  #if version >= 1.18
+            return instance.getLightBlock((IBlockAccess) net.minecraft.world.level.BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+  #else
             return instance.b((IBlockAccess) net.minecraft.world.level.BlockAccessAir.INSTANCE, BlockPosition.ZERO);
+  #endif
         }
     }
 #elseif version >= 1.13
@@ -179,7 +210,9 @@ interface IBlockData {
 #endif
 
     public boolean isBuildable() {
-#if version >= 1.9
+#if version >= 1.18
+        return instance.getMaterial().isReplaceable();
+#elseif version >= 1.9
         return instance.getMaterial().isBuildable();
 #else
         return instance.getBlock().getMaterial().isBuildable();
@@ -188,7 +221,11 @@ interface IBlockData {
 
     public Object get((IBlockStateHandle) IBlockState state) {
         if (state != null) {
+#if version >= 1.18
+            return instance.getValue(state);
+#else
             return instance.get(state);
+#endif
         } else {
             return null;
         }
@@ -196,20 +233,27 @@ interface IBlockData {
 
     public (IBlockDataHandle) IBlockData set((IBlockStateHandle) IBlockState state, Object value) {
         if (state != null) {
-#if version >= 1.16
+#if version >= 1.18
+            Class type = state.getValueClass();
+#elseif version >= 1.16
             Class type = state.getType();
 #else
             Class type = state.b();
 #endif
             Object converted = com.bergerkiller.bukkit.common.conversion.Conversion.convert(value, type, null);
             if (converted != null) {
+#if version >= 1.18
+                return (IBlockData) instance.setValue(state, (Comparable) converted);
+#else
                 return (IBlockData) instance.set(state, (Comparable) converted);
+#endif
             }
         }
         return instance;
     }
 
 #select version >=
+#case 1.18: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getValues();
 #case 1.17: public abstract (Map<IBlockStateHandle, Comparable<?>>) ImmutableMap<IBlockState<?>, Comparable<?>> getStates:getStateMap();
 #case 1.13.2
   #if methodexists net.minecraft.world.level.block.state.IBlockDataHolder public abstract com.google.common.collect.ImmutableMap<IBlockState<?>, Comparable<?>> getStateMap();

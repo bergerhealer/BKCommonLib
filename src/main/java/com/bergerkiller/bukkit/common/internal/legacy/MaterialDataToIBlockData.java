@@ -39,7 +39,22 @@ public class MaterialDataToIBlockData {
             ClassResolver resolver = new ClassResolver();
             resolver.setDeclaredClass(CommonUtil.getClass("org.bukkit.craftbukkit.util.CraftMagicNumbers"));
             resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
-            if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
+            if (Common.evaluateMCVersion(">=", "1.18")) {
+                craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+                        "public static net.minecraft.world.level.block.state.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
+                        "    org.bukkit.Material legacy_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(materialdata.getItemType());\n" +
+                        "    net.minecraft.world.level.block.state.IBlockData result = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacyData(legacy_type, materialdata.getData());\n" +
+                        "    if (result == net.minecraft.world.level.block.Blocks.AIR.defaultBlockState()) {\n" +
+                        "        org.bukkit.Material type = org.bukkit.craftbukkit.legacy.CraftLegacy.fromLegacy(materialdata.getItemType());\n" +
+                        "        net.minecraft.world.level.block.Block block = CraftMagicNumbers.getBlock(type);\n" +
+                        "        if (block != null) {\n" +
+                        "            result = block.defaultBlockState();\n" +
+                        "        }\n" +
+                        "    }\n" +
+                        "    return result;\n" +
+                        "}"
+                )));
+            } else if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
                 craftBukkitgetIBlockData.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                         "public static net.minecraft.world.level.block.state.IBlockData getIBlockData(org.bukkit.material.MaterialData materialdata) {\n" +
                         "    org.bukkit.Material legacy_type = org.bukkit.craftbukkit.legacy.CraftLegacy.toLegacy(materialdata.getItemType());\n" +
