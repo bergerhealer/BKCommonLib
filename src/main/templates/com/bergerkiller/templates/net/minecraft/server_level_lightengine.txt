@@ -7,17 +7,26 @@ optional class LightEngineThreaded {
 
     public void schedule(Runnable runnable) {
 #if exists net.minecraft.server.level.LightEngineThreaded
-    #if exists net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
+  #if exists net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
         #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox;
-    #else
+  #else
         #require net.minecraft.server.level.LightEngineThreaded private final net.minecraft.util.thread.ThreadedMailbox<Runnable> taskMailbox:b;
-    #endif
+  #endif
         net.minecraft.util.thread.ThreadedMailbox mailbox = instance#taskMailbox;
+  #if version >= 1.18
+        mailbox.tell(runnable);
+  #else
         mailbox.a(runnable);
+  #endif
 #endif
     }
 
     public static LightEngineThreadedHandle forWorld((org.bukkit.World) net.minecraft.world.level.World world) {
-        return com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle.createHandle(((ChunkProviderServer) world.getChunkProvider()).getLightEngine());
+#if version >= 1.18
+        LightEngineThreaded engine = ((ChunkProviderServer) world.getChunkSource()).getLightEngine();
+#else
+        LightEngineThreaded engine = ((ChunkProviderServer) world.getChunkProvider()).getLightEngine();
+#endif
+        return com.bergerkiller.generated.net.minecraft.server.level.LightEngineThreadedHandle.createHandle(engine);
     }
 }

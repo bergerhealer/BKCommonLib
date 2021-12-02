@@ -30,7 +30,9 @@ import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataSer
 class WorldServer extends World {
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
-#if version >= 1.14
+#if version >= 1.18
+    public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers:players();
+#elseif version >= 1.14
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers();
 #else
     // Note: is List<EntityHuman> on 1.13.2 and before, but only stores players, so this is safe.
@@ -40,7 +42,9 @@ class WorldServer extends World {
 #endif
 
     public (org.bukkit.entity.Entity) Entity getEntityByUUID(UUID entityUUID) {
-#if version >= 1.17
+#if version >= 1.18
+        return (Entity) instance.getEntities().get(entityUUID);
+#elseif version >= 1.17
         return (Entity) instance.getEntities().a(entityUUID);
 #else
         #require net.minecraft.server.level.WorldServer private final Map<java.util.UUID, Entity> entitiesByUUID;
@@ -70,7 +74,19 @@ class WorldServer extends World {
     #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public Object getEntityTrackerHandle() {
+        return instance.getChunkSource()#playerChunkMap;
+    }
+
+    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+        instance.getChunkSource()#playerChunkMap = entityTrackerHandle;
+    }
+
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return instance.getChunkSource()#playerChunkMap;
+    }
+#elseif version >= 1.14
     public Object getEntityTrackerHandle() {
         return instance.getChunkProvider()#playerChunkMap;
     }
@@ -94,7 +110,13 @@ class WorldServer extends World {
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 #endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey:dimension();
+
+    public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
+        return MinecraftServer.getServer().getLevel(key);
+    }
+#elseif version >= 1.16
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey();
 
     public static (org.bukkit.World) WorldServer getByDimensionKey((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> key) {
@@ -165,7 +187,9 @@ class WorldServer extends World {
 #endif
 
     public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
-#if version >= 1.9
+#if version >= 1.18
+        return (ChunkProviderServer) instance.getChunkSource();
+#elseif version >= 1.9
         return (ChunkProviderServer) instance.getChunkProvider();
 #else
         return instance.chunkProviderServer;
@@ -174,7 +198,9 @@ class WorldServer extends World {
 
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {
         ChunkProviderServer cps;
-#if version >= 1.13.2
+#if version >= 1.18
+        return (ChunkProviderServer) instance.getChunkSource();
+#elseif version >= 1.13.2
         cps = (ChunkProviderServer) instance.getChunkProvider();
 #elseif version >= 1.9
         cps = (ChunkProviderServer) instance.getChunkProviderServer();
@@ -183,10 +209,16 @@ class WorldServer extends World {
 #endif
 
 #if version >= 1.14
+  #if version >= 1.18
+        long key = ChunkCoordIntPair.asLong(cx, cz);
+  #else
         long key = ChunkCoordIntPair.pair(cx, cz);
+  #endif
         PlayerChunkMap playerChunkMap = cps#playerChunkMap;
 
-  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
+  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunkIfPresent(long key);
+        PlayerChunk chunk = (PlayerChunk) playerChunkMap.getVisibleChunkIfPresent(key);
+  #elseif exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
         PlayerChunk chunk = (PlayerChunk) playerChunkMap.getVisibleChunk(key);
   #elseif version >= 1.17
         PlayerChunk chunk = (PlayerChunk) playerChunkMap.visibleChunkMap.get(key);
@@ -195,18 +227,20 @@ class WorldServer extends World {
   #endif
 
         if (chunk != null) {
-#if exists net.minecraft.server.level.PlayerChunk public Chunk getFullChunk()
+  #if exists net.minecraft.server.level.PlayerChunk public Chunk getFullChunk()
             return chunk.getFullChunk();
-#else
-            java.util.concurrent.CompletableFuture statusFuture;
-  #if exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.ChunkStatus chunkstatus)
-            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
   #else
+            java.util.concurrent.CompletableFuture statusFuture;
+    #if version >= 1.18
+            statusFuture = chunk.getFutureIfPresentUnchecked(ChunkStatus.FULL);
+    #elseif exists net.minecraft.server.level.PlayerChunk public java.util.concurrent.CompletableFuture getStatusFutureUnchecked(net.minecraft.world.level.chunk.ChunkStatus chunkstatus)
+            statusFuture = chunk.getStatusFutureUnchecked(ChunkStatus.FULL);
+    #else
             statusFuture = chunk.a(ChunkStatus.FULL);
-  #endif
+    #endif
             com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) statusFuture.getNow(null);
             return either == null ? null : (Chunk) either.left().orElse(null);
-#endif
+  #endif
         }
         return null;
 
@@ -226,7 +260,9 @@ class WorldServer extends World {
 #if exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
     public optional void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
         ChunkMapDistance chunkDistanceManager;
-  #if version >= 1.17
+  #if version >= 1.18
+        chunkDistanceManager = instance.getChunkSource().chunkMap.distanceManager;
+  #elseif version >= 1.17
         chunkDistanceManager = instance.getChunkProvider().chunkMap.distanceManager;
   #elseif exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
         chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
@@ -273,7 +309,14 @@ class WorldServer extends World {
     public optional void setForceLoadedAsync:###(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded);
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        return (ForcedChunk) instance.getDataStorage().get(
+            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+    }
+#elseif version >= 1.14
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         return (ForcedChunk) instance.getWorldPersistentData().a(
             com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
@@ -297,7 +340,9 @@ class WorldServer extends World {
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities:getAllEntities();
+#elseif version >= 1.17
     public (Iterable<org.bukkit.entity.Entity>) Iterable<Entity> getEntities() {
         return instance.getEntities().a();
     }
@@ -323,7 +368,10 @@ class WorldServer extends World {
     public void removeEntity((EntityHandle) Entity entity);
 #endif
 
-#if forge_nms_obfuscated
+#if version >= 1.18
+    public boolean addEntity:addFreshEntity((EntityHandle) Entity entity);
+    public (MinecraftServerHandle) MinecraftServer getMinecraftServer:getServer();
+#elseif forge_nms_obfuscated
     public boolean addEntity:a((EntityHandle) Entity entity);
     public (MinecraftServerHandle) MinecraftServer getMinecraftServer:u();
 #else
@@ -331,7 +379,14 @@ class WorldServer extends World {
     public (MinecraftServerHandle) MinecraftServer getMinecraftServer();
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public void saveLevel() {
+        #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:saveAllChunks(boolean flag);
+        ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkSource();
+        PlayerChunkMap pcm = cps#playerChunkMap;
+        pcm#saveChunkMap(true);
+    }
+#elseif version >= 1.14
     public void saveLevel() {
         #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
         ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
@@ -358,7 +413,9 @@ class WorldServer extends World {
 
 #if version >= 1.14
         // Optional<Vec3D>
-  #if version >= 1.16.2
+  #if version >= 1.18
+        java.util.Optional result = EntityHuman.findRespawnPositionAndUseSpawnBlock(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
+  #elseif version >= 1.16.2
         java.util.Optional result = EntityHuman.getBed(instance, blockposition, respawnPoint.getAngle(), alsoWhenDestroyed, ignoreRespawnAnchorUses);
   #elseif version >= 1.16
         java.util.Optional result = EntityHuman.getBed(instance, blockposition, alsoWhenDestroyed, ignoreRespawnAnchorUses);
@@ -369,7 +426,11 @@ class WorldServer extends World {
         if (vec3d == null) {
             return null;
         } else {
+  #if version >= 1.18
+            return new org.bukkit.Location(respawnPoint.getWorld(), vec3d.x(), vec3d.y(), vec3d.z());
+  #else
             return new org.bukkit.Location(respawnPoint.getWorld(), vec3d.getX(), vec3d.getY(), vec3d.getZ());
+  #endif
         }
 #else
   #if version >= 1.13

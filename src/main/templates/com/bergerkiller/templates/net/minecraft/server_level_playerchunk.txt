@@ -129,7 +129,11 @@ class PlayerChunk {
     // Since Minecraft 1.16 the sending of lighting is broken and nothing gets updated
     // We must send the light update packet ourselves
     public boolean resendAllLighting() {
+  #if version >= 1.18
+        Chunk chunk = instance.getFullChunk();
+  #else
         Chunk chunk = instance.getChunk();
+  #endif
         if (chunk == null) {
             return false;
         }
@@ -177,7 +181,11 @@ class PlayerChunk {
             EntityPlayer player = (EntityPlayer) players_iter.next();
             PlayerConnection connection = player#playerConnection;
             if (connection != null) {
+  #if version >= 1.18
+                connection.send((net.minecraft.network.protocol.Packet) packet);
+  #else
                 connection.sendPacket((net.minecraft.network.protocol.Packet) packet);
+  #endif
             }
         }
 
@@ -221,7 +229,11 @@ class PlayerChunk {
     }
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+        return instance.playerProvider.getPlayers(instance.getPos(), false).collect(java.util.stream.Collectors.toList());
+    }
+#elseif version >= 1.17
     public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
         return instance.playerProvider.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }
@@ -284,7 +296,9 @@ class PlayerChunk {
         java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
         for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
             java.util.concurrent.CompletableFuture future;
-  #if version >= 1.14.1
+  #if version >= 1.18
+            future = instance.getFutureIfPresentUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+  #elseif version >= 1.14.1
             future = instance.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
   #else
             future = instance.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
@@ -305,7 +319,9 @@ class PlayerChunk {
     public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14:###();
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunk();
+#elseif version >= 1.14
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getChunk();
 #elseif version >= 1.9
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded() {
@@ -368,14 +384,27 @@ class PlayerChunkMap {
     //    private boolean shouldUnload:a(int i, int j, int k, int l, int i1);
 
 #if version >= 1.14
+  #if version >= 1.18
+    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunkIfPresent(long i);
+    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunkIfPresent(long i);
+
     public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
-        #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunk(long i);
+        return (PlayerChunk) instance#getVisibleChunk_1_14(ChunkCoordIntPair.asLong(x, z));
+    }
+    public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
+        return (PlayerChunk) instance#getUpdatingChunk_1_14(ChunkCoordIntPair.asLong(x, z));
+    }
+  #else
+    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getVisibleChunk_1_14:getVisibleChunk(long i);
+    #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunk(long i);
+
+    public (PlayerChunkHandle) PlayerChunk getVisibleChunk(int x, int z) {
         return (PlayerChunk) instance#getVisibleChunk_1_14(ChunkCoordIntPair.pair(x, z));
     }
     public (PlayerChunkHandle) PlayerChunk getUpdatingChunk(int x, int z) {
-        #require net.minecraft.server.level.PlayerChunkMap protected (Object) PlayerChunk getUpdatingChunk_1_14:getUpdatingChunk(long i);
         return (PlayerChunk) instance#getUpdatingChunk_1_14(ChunkCoordIntPair.pair(x, z));
     }
+  #endif
 #elseif version >= 1.9.4
     public (PlayerChunkHandle) PlayerChunk getVisibleChunk:getChunk(int x, int z);
     public (PlayerChunkHandle) PlayerChunk getUpdatingChunk:getChunk(int x, int z);
@@ -394,21 +423,35 @@ class PlayerChunkMap {
 
 #if version >= 1.14
     public boolean isChunkEntered((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ) {
-  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
-        PlayerChunk chunk = instance.getVisibleChunk(ChunkCoordIntPair.pair(chunkX, chunkZ));
-  #elseif version >= 1.17
-        PlayerChunk chunk = (PlayerChunk) instance.visibleChunkMap.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
+  #if version >= 1.18
+        long key = ChunkCoordIntPair.asLong(chunkX, chunkZ);
   #else
-        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(ChunkCoordIntPair.pair(chunkX, chunkZ));
+        long key = ChunkCoordIntPair.pair(chunkX, chunkZ);
   #endif
 
+  #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunkIfPresent(long key);
+        PlayerChunk chunk = instance.getVisibleChunkIfPresent(key);
+  #elseif exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunk(long key);
+        PlayerChunk chunk = instance.getVisibleChunk(key);
+  #elseif version >= 1.17
+        PlayerChunk chunk = (PlayerChunk) instance.visibleChunkMap.get(key);
+  #else
+        PlayerChunk chunk = (PlayerChunk) instance.visibleChunks.get(key);
+  #endif
+
+  #if version >= 1.18
+        if (chunk == null || chunk.getFullChunk() == null) {
+  #else
         if (chunk == null || chunk.getChunk() == null) {
+  #endif
             return false;
         }
 
         // Check Stream contains Player
         ChunkCoordIntPair chunkCoordinates = new ChunkCoordIntPair(chunkX, chunkZ);
-  #if version >= 1.17
+  #if version >= 1.18
+        java.util.stream.Stream players = chunk.playerProvider.getPlayers(chunkCoordinates, false);
+  #elseif version >= 1.17
         java.util.stream.Stream players = chunk.playerProvider.a(chunkCoordinates, false);
   #else
         java.util.stream.Stream players = chunk.players.a(chunkCoordinates, false);

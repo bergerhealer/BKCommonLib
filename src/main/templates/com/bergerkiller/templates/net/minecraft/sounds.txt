@@ -10,14 +10,22 @@ import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 
 optional class SoundCategory {
+#if version >= 1.18
+    public String getName();
+#else
     public String getName:a();
+#endif
 
 #if version >= 1.13
     public static (SoundCategoryHandle) SoundCategory byName(String name) {
         SoundCategory[] categories = SoundCategory.values();
         for (int i = 0; i < categories.length; i++) {
             SoundCategory cat = categories[i];
+  #if version >= 1.18
+            if (cat.getName().equals(name)) {
+  #else
             if (cat.a().equals(name)) {
+  #endif
                 return cat;
             }
         }

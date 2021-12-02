@@ -9,11 +9,19 @@ class PlayerList {
 
     protected int maxPlayers;
 
+#if version >= 1.18
+    public void savePlayers:saveAll();
+    protected void savePlayerFile:save((org.bukkit.entity.Player) EntityPlayer entityplayer);
+#else
     public void savePlayers();
-
     protected void savePlayerFile((org.bukkit.entity.Player) EntityPlayer entityplayer);
+#endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
+        instance.broadcast(null, x, y, z, radius, world.getDimensionKey(), packet);
+    }
+#elseif version >= 1.16
     public void sendRawPacketNearby((org.bukkit.World) WorldServer world, double x, double y, double z, double radius, (Object) Packet<?> packet) {
         instance.sendPacketNearby(null, x, y, z, radius, world.getDimensionKey(), packet);
     }

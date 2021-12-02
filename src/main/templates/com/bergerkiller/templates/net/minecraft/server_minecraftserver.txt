@@ -15,7 +15,9 @@ class MinecraftServer {
     public String getProperty(String key, String defaultValue) {
         DedicatedServer dedicatedServer = (DedicatedServer) instance;
         //PropertyManager
-#if version >= 1.14
+#if version >= 1.18
+        return ((PropertyManager) dedicatedServer.getProperties()).properties.getProperty(key, defaultValue);
+#elseif version >= 1.14
         return ((PropertyManager) dedicatedServer.getDedicatedServerProperties()).properties.getProperty(key, defaultValue);
 #else
         return dedicatedServer.getPropertyManager().properties.getProperty(key, defaultValue);
@@ -27,6 +29,7 @@ class MinecraftServer {
     }
 
 #select version >=
+#case 1.18:   public int getTicks:getTickCount();
 #case 1.17.1: public int getTicks:ah();
 #case 1.16.4: public int getTicks:ai();
 #case 1.16.2: public int getTicks:ah();
@@ -43,7 +46,9 @@ class MinecraftServer {
 #case else:   public int getTicks:ar();
 #endselect
 
-#if forge
+#if version >= 1.18
+    public boolean isMainThread:isSameThread();
+#elseif forge
     public boolean isMainThread() {
         return Thread.currentThread() == com.bergerkiller.bukkit.common.utils.CommonUtil.MAIN_THREAD;
     }
