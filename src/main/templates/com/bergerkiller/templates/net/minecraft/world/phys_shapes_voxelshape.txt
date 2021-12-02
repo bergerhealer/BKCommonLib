@@ -10,7 +10,46 @@ import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxi
 
 class VoxelShape {
 
-#if version >= 1.13
+#if version >= 1.18
+    public static (VoxelShapeHandle) VoxelShape empty() {
+        return VoxelShapes.empty();
+    }
+
+    public static (Object) VoxelShape createRawFromAABB((Object) List<AxisAlignedBB> handles) {
+        if (handles.isEmpty()) {
+            return VoxelShapes.empty();
+        } else {
+            VoxelShape shape = null;
+            java.util.Iterator iter = handles.iterator();
+            while (iter.hasNext()) {
+                AxisAlignedBB aabb = (AxisAlignedBB) iter.next();
+                VoxelShape aabb_shape = VoxelShapes.create(aabb);
+                if (shape == null) {
+                    shape = aabb_shape;
+                } else {
+                    shape = VoxelShapes.or(shape, aabb_shape); // OR
+                }
+            }
+            return shape;
+        }
+    }
+
+    public static (VoxelShapeHandle) VoxelShape fromAABB((AxisAlignedBBHandle) AxisAlignedBB aabb) {
+        return VoxelShapes.create(aabb);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape mergeOnlyFirst((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        return VoxelShapes.join(a, b, OperatorBoolean.ONLY_FIRST);
+    }
+
+    public static (VoxelShapeHandle) VoxelShape merge((VoxelShapeHandle) VoxelShape a, (VoxelShapeHandle) VoxelShape b) {
+        return VoxelShapes.or(a, b);
+    }
+
+    public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:bounds();
+    public boolean isEmpty();
+
+#elseif version >= 1.13
     public static (VoxelShapeHandle) VoxelShape empty() {
         return VoxelShapes.a();
     }
@@ -46,17 +85,17 @@ class VoxelShape {
         return VoxelShapes.a(a, b);
     }
 
-#if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox()
+  #if methodexists net.minecraft.world.phys.shapes.VoxelShape public net.minecraft.world.phys.AxisAlignedBB getBoundingBox()
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
-#else
+  #else
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox:a();
-#endif
+  #endif
 
-#if version >= 1.13.2
+  #if version >= 1.13.2
     public boolean isEmpty();
-#else
+  #else
     public boolean isEmpty:b();
-#endif
+  #endif
 
 #else
     public static (VoxelShapeHandle) VoxelShape empty() {
@@ -103,8 +142,9 @@ class VoxelShape {
 #endif
 
     public static double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> voxels, double coordinate) {
-
-#if version >= 1.13.1
+#if version >= 1.18
+        return VoxelShapes.collide(axis, boundingBox, voxels, coordinate);
+#elseif version >= 1.13.1
         // Official API as of 1.13.1
         return VoxelShapes.a(axis, boundingBox, voxels, coordinate);
 #elseif version >= 1.13
@@ -120,6 +160,7 @@ class VoxelShape {
             }
         }
         return coordinate;
+
 #else
         // Custom implementation for 1.12.2 and before (fallback)
         // Our custom proxy type accepts AxisAlignedBBHandle for performance reasons, really

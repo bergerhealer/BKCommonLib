@@ -7,15 +7,23 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.DataPaletteBlockHandle;
 
 class ChunkSection {
-#if version >= 1.14
+#if version >= 1.18
+    public boolean isEmpty:hasOnlyAir();
+#elseif version >= 1.14
     public boolean isEmpty:c();
 #else
     public boolean isEmpty:a();
 #endif
 
+#if version >= 1.18
+    public int getYPosition:bottomBlockY();
+#else
     public int getYPosition();
+#endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getStates();
+#elseif version >= 1.13
     public (DataPaletteBlockHandle) DataPaletteBlock<IBlockData> getBlockPalette:getBlocks();
 #elseif version >= 1.9
     public (DataPaletteBlockHandle) DataPaletteBlock getBlockPalette:getBlocks();
@@ -25,15 +33,25 @@ class ChunkSection {
     public (DataPaletteBlockHandle) char[] getBlockPalette:getIdArray();
 #endif
 
+#if version >= 1.18
+    public (BlockData) IBlockData getBlockData:getBlockState(int x, int y, int z);
+#else
     public (BlockData) IBlockData getBlockData:getType(int x, int y, int z);
+#endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public (void) IBlockData setBlockData:setBlockState(int x, int y, int z, (BlockData) IBlockData data);
+#elseif version >= 1.14
     public (void) IBlockData setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
 #else
     public void setBlockData:setType(int x, int y, int z, (BlockData) IBlockData data);
 #endif
 
     public void setBlockDataAtBlock(org.bukkit.block.Block block, (BlockData) IBlockData data) {
+#if version >= 1.18
+        instance.setBlockState(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
+#else
         instance.setType(block.getX() & 0xf, block.getY() & 0xf, block.getZ() & 0xf, data);
+#endif
     }
 }

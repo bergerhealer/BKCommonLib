@@ -5,7 +5,14 @@ import net.minecraft.world.level.block.state.IBlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 
 class DataPaletteBlock {
-#if version >= 1.13
+#if version >= 1.18
+    public (BlockData) IBlockData getBlockData(int x, int y, int z) {
+        return (IBlockData) instance.get(x, y, z);
+    }
+    public void setBlockData(int x, int y, int z, (BlockData) IBlockData data) {
+        instance.getAndSet(x, y, z, data);
+    }
+#elseif version >= 1.13
     public (BlockData) IBlockData getBlockData(int x, int y, int z) {
         return (IBlockData) instance.a(x, y, z);
     }

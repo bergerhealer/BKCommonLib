@@ -28,7 +28,13 @@ import io.github.opencubicchunks.cubicchunks.api.world.ICube;
 import io.github.opencubicchunks.cubicchunks.api.world.ICubeProviderServer;
 
 class Chunk {
+#if version >= 1.18
+    #require public World getChunkWorld:getLevel();
+    public (WorldHandle) World getWorld:getLevel();
+#else
+    #require public World getChunkWorld:getWorld();
     public (WorldHandle) World getWorld();
+#endif
 
 #if version >= 1.14
     public int getLocX() {
@@ -50,7 +56,7 @@ class Chunk {
 
     public java.util.List<Integer> getLoadedSectionCoordinates() {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance.getWorld();
+        World world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
             java.util.ArrayList result = new java.util.ArrayList();
             java.util.Iterator cubes_iter = instance.getLoadedCubes().iterator();
@@ -66,7 +72,11 @@ class Chunk {
         for (int i = 0; i < sections.length; i++) {
             ChunkSection section = sections[i];
             if (section != null) {
+#if version >= 1.18
+                result.add(Integer.valueOf(section.bottomBlockY() >> 4));
+#else
                 result.add(Integer.valueOf(section.getYPosition() >> 4));
+#endif
             }
         }
         return result;
@@ -74,7 +84,7 @@ class Chunk {
 
     public (com.bergerkiller.bukkit.common.wrappers.ChunkSection[]) ChunkSection[] getSections() {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance.getWorld();
+        World world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
             ChunkSection[] sections = new ChunkSection[16];
             for (int cy = 0; cy < 16; cy++) {
@@ -89,7 +99,7 @@ class Chunk {
 
     public (com.bergerkiller.bukkit.common.wrappers.ChunkSection) ChunkSection getSection(int cy) {
 #if exists io.github.opencubicchunks.cubicchunks.api.world.ICube
-        World world = instance.getWorld();
+        World world = instance#getChunkWorld();
         if (world instanceof ICubicWorld && ((ICubicWorld) world).isCubicWorld()) {
             ICubeProviderServer provider = (ICubeProviderServer) ((ICubicWorld) world).getCubeCache();
             ICube cube = provider.getCube(instance.locX, cy, instance.locZ, ICubeProviderServer.Requirement.LOAD);
@@ -134,7 +144,7 @@ class Chunk {
         // Acquire the EntitySectionStorage instance of the world this Chunk is on
         #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
         #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final net.minecraft.world.level.entity.EntitySectionStorage sectionStorage;
-        WorldServer world = (WorldServer) instance.getWorld();
+        WorldServer world = (WorldServer) instance#getChunkWorld();
         net.minecraft.world.level.entity.PersistentEntitySectionManager entitySectionManager = world#entityManager;
         EntitySectionStorage storage = entitySectionManager#sectionStorage;
 
@@ -147,14 +157,23 @@ class Chunk {
         it.unimi.dsi.fastutil.longs.Long2ObjectMap sections = storage#sections;
 
         // Iterate a subset of the sectionIds LongSet to find all vertical slices of this chunk storing entities
+  #if version >= 1.18
+        long sectionIdsStart = SectionPosition.asLong(instance.getPos().x, 0, instance.getPos().z);
+        long sectionIdsEnd = SectionPosition.asLong(instance.getPos().x, -1, instance.getPos().z);
+  #else
         long sectionIdsStart = SectionPosition.b(instance.getPos().x, 0, instance.getPos().z);
         long sectionIdsEnd = SectionPosition.b(instance.getPos().x, -1, instance.getPos().z);
+  #endif
         it.unimi.dsi.fastutil.longs.LongBidirectionalIterator iterator = sectionIds.subSet(sectionIdsStart, sectionIdsEnd).iterator();
         List sliceLists = new java.util.ArrayList();
         while (iterator.hasNext()) {
             long key = iterator.nextLong();
             EntitySection section = (EntitySection) sections.get(key);
+  #if version >= 1.18
+            if (section != null && !section.isEmpty()) { // check not null or empty
+  #else
             if (section != null && !section.a()) { // check not null or empty
+  #endif
                 // Retrieve the underlying storage
                 #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
                 net.minecraft.util.EntitySlice sectionSlice = section#storage;
@@ -182,13 +201,19 @@ class Chunk {
 
     public org.bukkit.Chunk bukkitChunk;
 
-#if version >= 1.13
+#if version >= 1.18
+    public (BlockData) IBlockData getBlockData:getBlockState((IntVector3) BlockPosition blockposition);
+#elseif version >= 1.13
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
 #else
     public (BlockData) IBlockData getBlockData((IntVector3) BlockPosition blockposition);
 #endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
+        return instance.getBlockState(new BlockPosition(x, y, z));
+    }
+#elseif version >= 1.16
     public (BlockData) IBlockData getBlockDataAtCoord(int x, int y, int z) {
         return instance.getType(new BlockPosition(x, y, z));
     }
@@ -214,7 +239,9 @@ class Chunk {
 
     // Since MC 1.13 updateFlags are used (See World.java setTypeAndData)
     public (BlockData) IBlockData setBlockData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags) {
-#if version >= 1.13.2
+#if version >= 1.18
+        return instance.setBlockState(blockposition, iblockdata, (updateFlags & 64) != 0);
+#elseif version >= 1.13.2
         return instance.setType(blockposition, iblockdata, (updateFlags & 64) != 0);
 #elseif version >= 1.13
         return instance.a(blockposition, iblockdata, (updateFlags & 64) != 0);
@@ -223,7 +250,12 @@ class Chunk {
 #endif
     }
 
+#if version >= 1.18
+    // Note: Deprecated, does nothing it seems
+    public void addEntity((EntityHandle) Entity entity);
+#else
     public void addEntity:a((EntityHandle) Entity entity);
+#endif
 
 #if version >= 1.14
     public (com.bergerkiller.bukkit.common.wrappers.HeightMap) HeightMap getLightHeightMap(boolean initialize) {
@@ -252,13 +284,16 @@ class Chunk {
 
 #if version >= 1.14
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position) {
-        return instance.getWorld().getBrightness(enumskyblock, position);
+        World world = instance#getChunkWorld();
+        return world.getBrightness(enumskyblock, position);
     }
 #else
     public int getBrightness((EnumSkyBlockHandle) EnumSkyBlock enumskyblock, (IntVector3) BlockPosition position);
 #endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public int getTopSliceY:getHighestSectionPosition();
+#elseif version >= 1.13
     public int getTopSliceY:b();
 #else
     public int getTopSliceY:g();
@@ -267,9 +302,17 @@ class Chunk {
     // MC 1.13: byte[] -> BiomeBase[] -> (1.16.2) BiomeSettingsMobs[]
     // public byte[] getBiomeIndex();
 
+#if version >= 1.18
+    public void addEntities:runPostLoad();
+#else
     public void addEntities();
+#endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public boolean checkCanSave:c(boolean isNotAutosave) {
+        return instance.isUnsaved();
+    }
+#elseif version >= 1.14
     public boolean checkCanSave:c(boolean isNotAutosave) {
         return instance.isNeedsSaving();
     }
@@ -279,7 +322,11 @@ class Chunk {
     public boolean checkCanSave:a(boolean isNotAutosave);
 #endif
 
-#if version >= 1.12
+#if version >= 1.18
+    public void markDirty() {
+        instance.setUnsaved(true);
+    }
+#elseif version >= 1.12
     public void markDirty();
 #else
     public void markDirty:e();
@@ -290,15 +337,13 @@ class Chunk {
     // Since 1.17 entities aren't stored in the Chunk instance anymore,
     // is the field still required at all?
     public void markEntitiesDirty() {
-#if version >= 1.17
-        instance.markDirty(); // Not entirely correct, do we need this?
-#elseif version >= 1.14
-        instance.d(true);
-#elseif version >= 1.13
-        instance.f(true);
-#else
-        instance.g(true);
-#endif
+#select version >=
+#case 1.18:   instance.setUnsaved(true); // Not entirely correct, do we need this?
+#case 1.17:   instance.markDirty(); // Not entirely correct, do we need this?
+#case 1.14:   instance.d(true);
+#case 1.13:   instance.f(true);
+#case else:   instance.g(true);
+#endselect
     }
 
     <code>

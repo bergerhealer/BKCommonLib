@@ -406,7 +406,7 @@ public class BlockUtil extends MaterialUtil {
      * @param updateSelf whether the block itself is updated. With false, only surrounding blocks are notified.
      */
     public static void applyPhysics(org.bukkit.block.Block block, Material callerType, boolean updateSelf) {
-        WorldServerHandle.fromBukkit(block.getWorld()).applyPhysics(new IntVector3(block), BlockData.fromMaterial(callerType), updateSelf);
+        WorldServerHandle.fromBukkit(block.getWorld()).applyBlockPhysics(new IntVector3(block), BlockData.fromMaterial(callerType), updateSelf);
     }
 
     /**

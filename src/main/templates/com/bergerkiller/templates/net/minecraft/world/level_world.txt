@@ -32,7 +32,9 @@ class World extends IBlockAccess {
     public boolean keepSpawnInMemory;
 
     public void method_profiler_begin(String label) {
-#if version >= 1.14
+#if version >= 1.18
+        instance.getProfiler().push(label);
+#elseif version >= 1.14
         instance.getMethodProfiler().enter(label);
 #elseif exists net.minecraft.util.profiling.MethodProfiler public void enter(String label)
         instance.methodProfiler.enter(label);
@@ -42,7 +44,9 @@ class World extends IBlockAccess {
     }
 
     public void method_profiler_end() {
-#if version >= 1.14
+#if version >= 1.18
+        instance.getProfiler().pop();
+#elseif version >= 1.14
         instance.getMethodProfiler().exit();
 #elseif exists net.minecraft.util.profiling.MethodProfiler public void exit()
         instance.methodProfiler.exit();
@@ -61,7 +65,9 @@ class World extends IBlockAccess {
     public (org.bukkit.Server) org.bukkit.craftbukkit.CraftServer getServer();
 #endif
 
-#if forge_nms_obfuscated
+#if version >= 1.18
+    public (BlockData) IBlockData getBlockData:getBlockState((IntVector3) BlockPosition blockposition);
+#elseif forge_nms_obfuscated
     public (BlockData) IBlockData getBlockData:o((IntVector3) BlockPosition blockposition);
 #else
     public (BlockData) IBlockData getBlockData:getType((IntVector3) BlockPosition blockposition);
@@ -72,12 +78,20 @@ class World extends IBlockAccess {
 #if exists net.minecraft.world.level.World public boolean captureTreeGeneration; && !exists io.github.opencubicchunks.cubicchunks.api.world.ICube
         // CraftBukkit does some special stuff, sometimes, when captureTreeGeneration is set
         if (instance.captureTreeGeneration) {
+  #if version >= 1.18
+            IBlockData blockData = instance.getBlockState(new BlockPosition(x, y, z));
+  #else
             IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
+  #endif
             return BlockDataRegistry.fromBlockData(blockData);
         }
 
         // Get chunk of block and it's sections
+  #if version >= 1.18
+        net.minecraft.world.level.chunk.Chunk chunk = instance.getChunk(x >> 4, z >> 4);
+  #else
         net.minecraft.world.level.chunk.Chunk chunk = instance.getChunkAt(x >> 4, z >> 4);
+  #endif
         net.minecraft.world.level.chunk.ChunkSection[] sections = chunk.getSections();
 
         // Compute the section slice from the y-coordinate
@@ -89,7 +103,10 @@ class World extends IBlockAccess {
         if (sectionIndex >= 0 && sectionIndex < sections.length) {
             net.minecraft.world.level.chunk.ChunkSection section = sections[sectionIndex];
             if (section != null) {
-  #if version >= 1.9
+                // Note: we don't use getType/getBlockState() to eliminate a cast
+  #if version >= 1.18
+                Object blockData = section.getStates().get(x & 0xF, y & 0xF, z & 0xF);
+  #elseif version >= 1.9
                 Object blockData = section.getBlocks().a(x & 0xF, y & 0xF, z & 0xF);
   #else
                 Object blockData = section.getType(x & 0xF, y & 0xF, z & 0xF);
@@ -100,6 +117,10 @@ class World extends IBlockAccess {
 
         // Fallback is AIR
         return com.bergerkiller.bukkit.common.wrappers.BlockData.AIR;
+#elseif version >= 1.18
+        // Weird stuff on forge
+        IBlockData blockData = instance.getBlockState(new BlockPosition(x, y, z));
+        return BlockDataRegistry.fromBlockData(blockData);
 #else
         // Weird stuff on forge
         IBlockData blockData = instance.getType(new BlockPosition(x, y, z));
@@ -113,13 +134,20 @@ class World extends IBlockAccess {
     public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
     </code>
 
-    public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
-
-    public long getTime();
-
+#if version >= 1.18
+    public optional (Object) IChunkProvider getChunkProvider:getChunkSource();
+    public boolean setBlockData:setBlock((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
+    public long getTime:getGameTime();
+#else
     public optional (Object) IChunkProvider getChunkProvider();
+    public boolean setBlockData:setTypeAndData((IntVector3) BlockPosition blockposition, (BlockData) IBlockData iblockdata, int updateFlags);
+    public long getTime();
+#endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public (DimensionType) DimensionManager getDimensionType:dimensionType();
+    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
+#elseif version >= 1.16
     public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
 #else
@@ -167,7 +195,11 @@ class World extends IBlockAccess {
     }
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
+        return instance.getWorldBorder().isWithinBounds(entity.getBoundingBox());
+    }
+#elseif version >= 1.14
     public boolean isWithinWorldBorder((EntityHandle) Entity entity) {
         return instance.getWorldBorder().a(entity.getBoundingBox());
     }
@@ -208,7 +240,9 @@ class World extends IBlockAccess {
     //#endif
     //
 
-#if version >= 1.13
+#if version >= 1.18
+    public boolean isNotCollidingWithBlocks:noCollision((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+#elseif version >= 1.13
     public boolean isNotCollidingWithBlocks:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #else
     public boolean isNotCollidingWithBlocks((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb) {
@@ -223,7 +257,9 @@ class World extends IBlockAccess {
     public optional (List<AxisAlignedBBHandle>) List<AxisAlignedBB> opt_getCubes_1_8:getCubes((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public (List<?>) List<T extends Entity> getRawEntitiesOfType:getEntitiesOfClass((Class<?>) Class<T extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
+#elseif version >= 1.17
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<T extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 #else
     public (List<?>) List<T extends Entity> getRawEntitiesOfType:a((Class<?>) Class<? extends Entity> rawType, (AxisAlignedBBHandle) AxisAlignedBB bounds);
@@ -231,7 +267,11 @@ class World extends IBlockAccess {
 
     public (List<EntityHandle>) List<Entity> getNearbyEntities:getEntities((EntityHandle) Entity entity, (AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
 
+#if version >= 1.18
+    public (TileEntityHandle) TileEntity getTileEntity:getBlockEntity((IntVector3) BlockPosition blockposition);
+#else
     public (TileEntityHandle) TileEntity getTileEntity((IntVector3) BlockPosition blockposition);
+#endif
 
     // Used on MC 1.8.8 only!
 #if version >= 1.9
@@ -240,7 +280,19 @@ class World extends IBlockAccess {
     public optional void makeSound(double x, double y, double z, String name, float volume, float pitch);
 #endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
+        java.util.stream.Stream iblockdata_in_bounds_stream = instance.getBlockStatesIfLoaded(bounds);
+        java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
+        while (iter.hasNext()) {
+            IBlockData iblockdata1 = (IBlockData) iter.next();
+            if (iblockdata1.is((net.minecraft.tags.Tag) net.minecraft.tags.TagsBlock.FIRE) || iblockdata1.is(net.minecraft.world.level.block.Blocks.LAVA)) {
+                return true;
+            }
+        }
+        return false;
+    }
+#elseif version >= 1.16
     public boolean isBurnArea((AxisAlignedBBHandle) AxisAlignedBB bounds) {
         java.util.stream.Stream iblockdata_in_bounds_stream = instance.c(bounds);
         java.util.Iterator iter = iblockdata_in_bounds_stream.iterator();
@@ -274,7 +326,12 @@ class World extends IBlockAccess {
     // Gone since 1.14
     // public float getExplosionFactor:a((org.bukkit.util.Vector) Vec3D vec3d, (AxisAlignedBBHandle) AxisAlignedBB bounds);
 
-#if version >= 1.14
+#if version >= 1.18
+    public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance) {
+        return instance.hasChunksAt(blockposition.getX() - distance, blockposition.getY() - distance, blockposition.getZ() - distance,
+                                    blockposition.getX() + distance, blockposition.getY() + distance, blockposition.getZ() + distance);
+    }
+#elseif version >= 1.14
     // Gone since 1.14, but isAreaLoaded still exists
     public boolean areChunksLoaded((IntVector3) BlockPosition blockposition, int distance) {
         return instance.isAreaLoaded(blockposition.getX() - distance, blockposition.getY() - distance, blockposition.getZ() - distance,
@@ -289,7 +346,12 @@ class World extends IBlockAccess {
     // Fallback...
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2) {
         RayTrace rayTrace = new RayTrace(point1, point2, RayTrace$BlockCollisionOption.OUTLINE, RayTrace$FluidCollisionOption.NONE, null);
+  #if version >= 1.18
+        MovingObjectPosition result = instance.clip(rayTrace);
+  #else
         MovingObjectPosition result = instance.rayTrace(rayTrace);
+  #endif
+
         if (result != null && result.getType() == MovingObjectPosition$EnumMovingObjectType.MISS) {
             result = null;
         }
@@ -304,30 +366,30 @@ class World extends IBlockAccess {
     public (MovingObjectPositionHandle) MovingObjectPosition rayTrace((org.bukkit.util.Vector) Vec3D point1, (org.bukkit.util.Vector) Vec3D point2);
 #endif
 
-    // >= 1.11 (has 'self' option)
-    public optional void opt_applyPhysics:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType, boolean self);
-
-    // <= 1.10.2 (lacks 'self' option)
-    public optional void opt_applyPhysics_old:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType);
-
     <code>
-    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
-        if (T.opt_applyPhysics.isAvailable()) {
-            T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
-        } else if (T.opt_applyPhysics_old.isAvailable()) {
-            T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
-        } else {
-            throw new UnsupportedOperationException("Apply physics function not available on this server");
-        }
-        // Update self
+    public void applyBlockPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        applyBlockPhysicsAround(position, causeType);
         if (self) {
             applyBlockPhysics(position, causeType);
         }
     }
     </code>
 
+#if version >= 1.11 && version <= 1.12.2
+    // Shortly had a boolean flag between MC 1.11 and 1.12.2
+    public void applyBlockPhysicsAround((IntVector3) BlockPosition position, (BlockData) Block causeType) {
+        instance.applyPhysics(position, causeType, false);
+    }
+#elseif version >= 1.18
+    public void applyBlockPhysicsAround:updateNeighborsAt((IntVector3) BlockPosition position, (BlockData) Block causeType);
+#else
+    public void applyBlockPhysicsAround:applyPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType);
+#endif
+
     public void applyBlockPhysics((IntVector3) BlockPosition position, (BlockData) Block causeType) {
-#if version >= 1.11
+#if version >= 1.18
+        instance.neighborChanged(position, causeType, position);
+#elseif version >= 1.11
         instance.a(position, causeType, position);
 #elseif version >= 1.9
         instance.e(position, causeType);

@@ -12,10 +12,17 @@ class NibbleArray {
     public (NibbleArrayHandle) NibbleArray();
     public (NibbleArrayHandle) NibbleArray(byte[] data);
 
+#if version >= 1.18
+    public int get(int x, int y, int z);
+    public void set(int x, int y, int z, int nibbleValue);
+#else
     public int get:a(int x, int y, int z);
     public void set:a(int x, int y, int z, int nibbleValue);
+#endif
 
-#if version >= 1.9
+#if version >= 1.18
+    public byte[] getData();
+#elseif version >= 1.9
     public byte[] getData:asBytes();
 #else
     public byte[] getData:a();

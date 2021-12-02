@@ -197,7 +197,7 @@ public class NBTUtil {
      * @return compound with saved data
      */
     public static CommonTagCompound saveBlockState(BlockState blockState) {
-        return saveBlockState(blockState, null);
+        return TileEntityHandle.fromBukkit(blockState).save();
     }
 
     /**
@@ -206,12 +206,16 @@ public class NBTUtil {
      * @param blockState to save
      * @param data to save the blockState to, null to create a new compound
      * @return compound with saved data
+     * @deprecated Not reliable, use {@link #saveBlockState(BlockState)} instead
      */
+    @Deprecated
     public static CommonTagCompound saveBlockState(BlockState blockState, CommonTagCompound data) {
-        if (data == null) {
-            data = new CommonTagCompound();
+        CommonTagCompound savedData = TileEntityHandle.fromBukkit(blockState).save();
+        if (data != null) {
+            data.putAll(savedData);
+            return data;
+        } else {
+            return savedData;
         }
-        TileEntityHandle.fromBukkit(blockState).save(data);
-        return data;
     }
 }

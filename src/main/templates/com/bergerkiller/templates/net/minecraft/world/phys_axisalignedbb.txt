@@ -25,7 +25,11 @@ class AxisAlignedBB {
 
     public (AxisAlignedBBHandle) AxisAlignedBB(double x1, double y1, double z1, double x2, double y2, double z2);
 
+#if version >= 1.18
+    public (AxisAlignedBBHandle) AxisAlignedBB grow:inflate(double sx, double sy, double sz);
+#else
     public (AxisAlignedBBHandle) AxisAlignedBB grow(double sx, double sy, double sz);
+#endif
 
     <code>
     public AxisAlignedBBHandle growUniform(double size) {
@@ -37,7 +41,13 @@ class AxisAlignedBB {
     }
     </code>
 
-#if version >= 1.11
+#if version >= 1.18
+    public (AxisAlignedBBHandle) AxisAlignedBB transformB:expandTowards(double lx, double ly, double lz);
+
+    public (AxisAlignedBBHandle) AxisAlignedBB translate:move(double dx, double dy, double dz);
+
+    public boolean bbTransformA:intersects((AxisAlignedBBHandle) AxisAlignedBB paramAxisAlignedBB);
+#elseif version >= 1.11
     public (AxisAlignedBBHandle) AxisAlignedBB transformB:b(double lx, double ly, double lz);
 
     public (AxisAlignedBBHandle) AxisAlignedBB translate:d(double dx, double dy, double dz);

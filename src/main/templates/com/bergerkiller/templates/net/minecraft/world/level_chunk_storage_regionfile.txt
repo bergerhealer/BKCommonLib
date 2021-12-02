@@ -19,7 +19,11 @@ class RegionFile {
     public void closeStream:c();
 #endif
 
-#if version >= 1.15
+#if version >= 1.18
+    public boolean chunkExists(int cx, int cz) {
+        return instance.hasChunk(new ChunkCoordIntPair(cx, cz));
+    }
+#elseif version >= 1.15
     public boolean chunkExists(int cx, int cz) {
         return instance.chunkExists(new ChunkCoordIntPair(cx, cz));
     }

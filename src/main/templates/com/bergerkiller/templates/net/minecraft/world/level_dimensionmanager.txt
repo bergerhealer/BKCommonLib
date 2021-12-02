@@ -34,7 +34,9 @@ class DimensionManager {
     #require net.minecraft.core.IRegistryCustom public static net.minecraft.core.IRegistry getDimensionTypeRegistry() {
         MinecraftServer server = MinecraftServer.getServer();
         IRegistryCustom$Dimension registry = server#registryHolder;
-  #if version >= 1.17
+  #if version >= 1.18
+        return registry.ownedRegistryOrThrow(net.minecraft.core.IRegistry.DIMENSION_TYPE_REGISTRY);
+  #elseif version >= 1.17
         return registry.b(net.minecraft.core.IRegistry.DIMENSION_TYPE_REGISTRY);
   #else
         return registry.a();
@@ -44,7 +46,11 @@ class DimensionManager {
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
         // First, ask the dimension manager registry what the key is
         IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+  #if version >= 1.18
+        java.util.Optional key_opt = dimensionTypeRegistry.getResourceKey((Object) instance);
+  #else
         java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
+  #endif
         if (key_opt.isPresent()) {
             return (ResourceKey) key_opt.get();
         }
@@ -62,14 +68,22 @@ class DimensionManager {
 
     public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
         IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+  #if version >= 1.18
+        return (DimensionManager) dimensionTypeRegistry.get(key);
+  #else
         return (DimensionManager) dimensionTypeRegistry.a(key);
+  #endif
     }
 
   #if version >= 1.17
     // deprecated fallback
     public int getId() {
         IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+    #if version >= 1.18
+        java.util.Optional key_opt = dimensionTypeRegistry.getResourceKey((Object) instance);
+    #else
         java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
+    #endif
         if (key_opt.isPresent()) {
             ResourceKey res_key = (ResourceKey) key_opt.get();
             if (res_key == DimensionManager.OVERWORLD_LOCATION) {
@@ -95,7 +109,11 @@ class DimensionManager {
             throw new IllegalArgumentException("Invalid dimension id " + id);
         }
         IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
+    #if version >= 1.18
+        return (DimensionManager) dimensionTypeRegistry.get(res_key);
+    #else
         return (DimensionManager) dimensionTypeRegistry.a(res_key);
+    #endif
     }
   #else
     // deprecated fallback

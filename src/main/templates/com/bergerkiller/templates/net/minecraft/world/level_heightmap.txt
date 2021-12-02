@@ -30,7 +30,10 @@ class HeightMap {
 #endif
     }
 
-#if version >= 1.13
+#if version >= 1.18
+    public int getHeight:getFirstAvailable(int x, int z);
+    private void setHeight(int x, int z, int height);
+#elseif version >= 1.13
     public int getHeight:a(int x, int z);
     private void setHeight:a(int x, int z, int height);
 #else
@@ -57,18 +60,30 @@ class HeightMap {
   #endif
 
         IChunkAccess ichunkaccess = instance#chunk;
-        org.bukkit.World world = ((Chunk) ichunkaccess).getWorld().getWorld();
         int databits_index = 0;
+  #if version >= 1.18
+        org.bukkit.World world = ((Chunk) ichunkaccess).getLevel().getWorld();
         int startX = ((Chunk) ichunkaccess).getPos().x << 4;
         int startY = ichunkaccess.b() + 15;
         int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
+  #else
+        org.bukkit.World world = ((Chunk) ichunkaccess).getWorld().getWorld();
+        int startX = ((Chunk) ichunkaccess).getPos().x << 4;
+        int startY = ichunkaccess.getHighestSectionPosition() + 15;
+        int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
+  #endif
         BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
         for (int z = 0; z < 16; ++z) {
             for (int x = 0; x < 16; ++x) {
                 int y = startY;
                 while (y > 0) {
+  #if version >= 1.18
+                    blockposition.set(x, y, z);
+                    IBlockData iblockdata = ichunkaccess.getBlockState((BlockPosition) blockposition);
+  #else
                     blockposition.d(x, y, z);
                     IBlockData iblockdata = ichunkaccess.getType((BlockPosition) blockposition);
+  #endif
 
                     // Optimization for air blocks
                     Block block = iblockdata.getBlock();
@@ -125,7 +140,7 @@ class HeightMap {
 #elseif version == 1.13.2
     public void initialize:a();
 #else
-    // On versions before 1.12.2 and after 1.14, use our own implementation
+    // On versions before 1.12.2 use our own implementation
     // The server offers no method on these versions to do so.
     public void initialize() {
         // Do not do this when this is a CubicChunks world (!!!)

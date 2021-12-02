@@ -25,7 +25,11 @@ class MapIcon {
         if (cursor.getCaption() != null) {
             title = (IChatBaseComponent) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
         }
+  #if version >= 1.18
+        return new MapIcon(MapIcon.Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+  #else
         return new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+  #endif
     }
 
     public org.bukkit.map.MapCursor toCursor() {
@@ -36,17 +40,26 @@ class MapIcon {
         IChatBaseComponent title = instance.g();
         MapIcon$Type type = instance.b();
   #endif
+
+  #if version >= 1.18
+        byte iconId = type.getIcon();
+        byte rotation = instance.getRot();
+  #else
+        byte iconId = type.a();
+        byte rotation = instance.getRotation();
+  #endif
+
         if (title != null) {
             return new org.bukkit.map.MapCursor(
-                instance.getX(), instance.getY(), instance.getRotation(),
-                type.a(),
+                instance.getX(), instance.getY(), rotation,
+                iconId,
                 true,
                 com.bergerkiller.bukkit.common.wrappers.ChatText.fromComponent(title).getMessage()
             );
         } else {
             return new org.bukkit.map.MapCursor(
-                instance.getX(), instance.getY(), instance.getRotation(),
-                type.a(),
+                instance.getX(), instance.getY(), rotation,
+                iconId,
                 true
             );
         }
@@ -85,7 +98,11 @@ class MapIcon {
     }
 #endif
 
-#if version >= 1.14.4
+#if version >= 1.18
+    public byte getTypeid() {
+        return instance.getType().getIcon();
+    }
+#elseif version >= 1.14.4
     public byte getTypeid() {
         return instance.getType().a();
     }
@@ -101,9 +118,17 @@ class MapIcon {
 
     public byte getY();
 
+#if version >= 1.18
+    public byte getDirection:getRot();
+#else
     public byte getDirection:getRotation();
+#endif
 
     optional class MapIcon.Type {
+#if version >= 1.18
+        public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:byIcon(byte id);
+#else
         public static (MapIconHandle.TypeHandle) MapIcon.Type fromId:a(byte id);
+#endif
     }
 }

@@ -40,7 +40,11 @@ class MobEffect {
     //TODO: showIcon?
     //TODO: hiddenEffect?
 
+#if version >= 1.18
+    public static (MobEffectHandle) MobEffect fromNBT:load((CommonTagCompound) NBTTagCompound compound);
+#else
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
+#endif
 }
 
 class MobEffectList {
@@ -48,6 +52,8 @@ class MobEffectList {
 
 #if exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
     // Purpur 1.17.1+
+    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
+#elseif version >= 1.18
     public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
 #else
     public static (MobEffectListHandle) MobEffectList fromId(int id);

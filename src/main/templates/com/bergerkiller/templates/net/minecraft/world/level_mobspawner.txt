@@ -2,6 +2,7 @@ package net.minecraft.world.level;
 
 import net.minecraft.core.BlockPosition;
 import net.minecraft.core.IRegistry;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.resources.MinecraftKey;
 import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.EntityTypes;
@@ -34,7 +35,13 @@ class MobSpawnerAbstract {
     private int spawnRange;
 
     public void onTick((org.bukkit.World) World world, (IntVector3) BlockPosition blockPosition) {
-#if version >= 1.17
+#if version >= 1.18
+        if (world instanceof WorldServer) {
+            instance.serverTick((WorldServer) world, blockPosition);
+        } else {
+            instance.delay(world, blockPosition);
+        }
+#elseif version >= 1.17
         if (world instanceof WorldServer) {
             instance.a((WorldServer) world, blockPosition);
         } else {
@@ -45,7 +52,18 @@ class MobSpawnerAbstract {
 #endif
     }
 
-#if version >= 1.17
+#if version >= 1.18
+    public (MinecraftKeyHandle) MinecraftKey getMobName() {
+        // No API :( will need to read NBT directly
+        NBTTagCompound spawnedEntityNBT = instance.nextSpawnData.getEntityToSpawn();
+        return MinecraftKey.tryParse(spawnedEntityNBT.getString("id"));
+    }
+    public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
+        // Set NBT directly
+        instance.nextSpawnData.getEntityToSpawn().putString("id", nameKey.toString());
+        instance.spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
+    }
+#elseif version >= 1.17
     public (MinecraftKeyHandle) MinecraftKey getMobName() {
         // They added 2 params for debug uses
         return instance.getMobName(null, null);

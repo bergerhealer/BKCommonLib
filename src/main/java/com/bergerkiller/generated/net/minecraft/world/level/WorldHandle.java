@@ -52,6 +52,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract Entity getEntityById(int entityId);
     public abstract boolean areChunksLoaded(IntVector3 blockposition, int distance);
     public abstract MovingObjectPositionHandle rayTrace(Vector point1, Vector point2);
+    public abstract void applyBlockPhysicsAround(IntVector3 position, BlockData causeType);
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
     public abstract int getMinBuildHeight();
     public abstract int getMaxBuildHeight();
@@ -61,14 +62,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public static final int UPDATE_DEFAULT = (UPDATE_PHYSICS | UPDATE_NOTIFY); // default flags used when updating block types
 
 
-    public void applyPhysics(IntVector3 position, BlockData causeType, boolean self) {
-        if (T.opt_applyPhysics.isAvailable()) {
-            T.opt_applyPhysics.invoke(getRaw(), position, causeType, self);
-        } else if (T.opt_applyPhysics_old.isAvailable()) {
-            T.opt_applyPhysics_old.invoke(getRaw(), position, causeType);
-        } else {
-            throw new UnsupportedOperationException("Apply physics function not available on this server");
-        }
+    public void applyBlockPhysics(IntVector3 position, BlockData causeType, boolean self) {
+        applyBlockPhysicsAround(position, causeType);
         if (self) {
             applyBlockPhysics(position, causeType);
         }
@@ -105,10 +100,10 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Server> getServer = new Template.Method.Converted<Server>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method<BlockData> getBlockDataAtCoord = new Template.Method<BlockData>();
-        public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
-        public final Template.Method<Long> getTime = new Template.Method<Long>();
         @Template.Optional
         public final Template.Method<Object> getChunkProvider = new Template.Method<Object>();
+        public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
+        public final Template.Method<Long> getTime = new Template.Method<Long>();
         public final Template.Method.Converted<DimensionType> getDimensionType = new Template.Method.Converted<DimensionType>();
         public final Template.Method.Converted<ResourceKey<DimensionType>> getDimensionTypeKey = new Template.Method.Converted<ResourceKey<DimensionType>>();
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
@@ -126,10 +121,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Entity> getEntityById = new Template.Method.Converted<Entity>();
         public final Template.Method.Converted<Boolean> areChunksLoaded = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MovingObjectPositionHandle> rayTrace = new Template.Method.Converted<MovingObjectPositionHandle>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> opt_applyPhysics = new Template.Method.Converted<Void>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> opt_applyPhysics_old = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> applyBlockPhysicsAround = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getMinBuildHeight = new Template.Method<Integer>();
         public final Template.Method<Integer> getMaxBuildHeight = new Template.Method<Integer>();
