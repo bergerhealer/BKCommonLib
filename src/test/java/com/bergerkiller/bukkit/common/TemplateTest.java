@@ -9,6 +9,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -21,6 +24,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
@@ -45,6 +49,61 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 public class TemplateTest {
 
+    @Test
+    @Ignore
+    public void testVersionDiff() {
+        //String className = "net.minecraft.world.level.block.state.BlockBase$BlockData"; // IBlockData
+        String className = "net.minecraft.world.level.block.state.BlockBase";
+        String methodName = "b";
+        String versionFrom = "1.17.1";
+        String versionTo = "1.18";
+
+        // Collect matches on previous version
+        List<MojangMappings.MethodSignature> matches = new ArrayList<>();
+        {
+            MojangMappings mappings = MojangMappings.fromCacheOrDownload(versionFrom);
+            mappings = mappings.translateClassNames(SpigotMappings.fromCacheOrDownload(versionFrom)::toSpigot);
+
+            if (methodName.isEmpty()) {
+                // Just list them all
+                System.out.println("All methods of " + className + ":");
+                for (MojangMappings.MethodSignature sig : mappings.forClassIfExists(className).methods) {
+                    System.out.println("- " + sig);
+                }
+                return;
+            } else {
+                for (MojangMappings.MethodSignature sig : mappings.forClassIfExists(className).methods) {
+                    if (sig.name.equals(methodName) || sig.name_obfuscated.equals(methodName)) {
+                        matches.add(sig);
+                    }
+                }
+            }
+        }
+        if (matches.isEmpty()) {
+            System.out.println("No matches!");
+            return;
+        }
+
+        // Find them again on the new version
+        System.out.println("Method matches for '" + methodName + "' on MC " + versionFrom + ", for MC " + versionTo + ":");
+        {
+            MojangMappings mappings = MojangMappings.fromCacheOrDownload(versionTo);
+            mappings = mappings.translateClassNames(SpigotMappings.fromCacheOrDownload(versionTo)::toSpigot);
+            List<MojangMappings.MethodSignature> newSignatures = mappings.forClassIfExists(className).methods;
+
+            for (MojangMappings.MethodSignature sig : matches) {
+                System.out.println("Similar matches for:");
+                System.out.println("  [" + versionFrom + "]: " + sig);
+
+                for (MojangMappings.MethodSignature newSig : newSignatures) {
+                    if (newSig.name.equals(sig.name)) {
+                        System.out.println("  [" + versionTo + "]: " + newSig);
+                    }
+                }
+            }
+        }
+    }
+    
     @Test
     public void testTestServerInitialized() {
         CommonBootstrap.initServer();

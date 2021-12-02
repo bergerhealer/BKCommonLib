@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.cdn;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
@@ -9,7 +7,6 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.resolver.ClassPathResolver;
@@ -141,27 +138,12 @@ public class MojangSpigotRemapper {
      * @param minecraftVersion Minecraft version for which to remap
      */
     protected void loadMappings(
-            final MojangMappings mojangMappings,
-            final SpigotMappings spigotMappings,
-            final ClassPathResolver classPathResolver,
-            final String minecraftVersion
+            final MojangMappings mappings,
+            final ClassPathResolver classPathResolver
     ) {
         // Reset
         remappersByDeclaringClassName.clear();
         recurseRemappersByDeclaringClassName.clear();
-
-        // Generate mappings of all methods/fields/classes, using spigot's class naming structure
-        MojangMappings mappings;
-        {
-            // Load the spigot<>mojang class mappings and verify they exist
-            SpigotMappings.ClassMappings spigotClassMappings = spigotMappings.byVersion.get(minecraftVersion);
-            if (spigotClassMappings == null) {
-                throw new IllegalArgumentException("Spigot class name mappings not available for Minecraft " + minecraftVersion);
-            }
-
-            // Translate Mojang's mappings to Spigot's class mappings
-            mappings = mojangMappings.translateClassNames(spigotClassMappings::toSpigot);
-        }
 
         // Start by resolving all classes we have remappings for - essential for later
         RemappedClassResolver resolver = new RemappedClassResolver(classPathResolver);
@@ -203,34 +185,22 @@ public class MojangSpigotRemapper {
      * @return Mojang-spigot remapper object
      */
     public static MojangSpigotRemapper load(String minecraftVersion, ClassPathResolver classPathResolver) {
-        // We require mojang's mappings
-        MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(minecraftVersion);
+        // Generate mappings of all methods/fields/classes, using spigot's class naming structure
+        MojangMappings mappings;
+        {
+            // We require mojang's mappings
+            MojangMappings mojangMappings = MojangMappings.fromCacheOrDownload(minecraftVersion);
 
-        // Retrieve Spigot-Mojang class name mappings
-        // We need this to properly remap the mojang field and method names later
-        SpigotMappings spigotMappings = new SpigotMappings();
-        String classMappingsFile = "/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat";
-        try {
-            try (InputStream in = CraftBukkitServer.class.getResourceAsStream(classMappingsFile)) {
-                spigotMappings.read(in);
-            }
-        } catch (IOException ex) {
-            Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings (corrupted jar?)", ex);
-        }
+            // We require spigot<>mojang class translation
+            SpigotMappings.ClassMappings spigotMappings = SpigotMappings.fromCacheOrDownload(minecraftVersion);
 
-        // Read the required mappings, or downloads it if missing for some weird reason
-        if (!spigotMappings.byVersion.containsKey(minecraftVersion)) {
-            Logging.LOGGER.log(Level.WARNING, "[Developer] Class mappings file has no mappings for this Minecraft version. Build problem?");
-            try {
-                spigotMappings.downloadMappings(mojangMappings, minecraftVersion);
-            } catch (IOException ex) {
-                throw new IllegalStateException("Failed to download Spigot-Mojang class name mappings");
-            }
+            // Final translation using the two
+            mappings = mojangMappings.translateClassNames(spigotMappings::toSpigot);
         }
 
         // Create remapper object
         MojangSpigotRemapper remapper = new MojangSpigotRemapper();
-        remapper.loadMappings(mojangMappings, spigotMappings, classPathResolver, minecraftVersion);
+        remapper.loadMappings(mappings, classPathResolver);
         return remapper;
     }
 

@@ -13,12 +13,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
+import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -213,6 +216,40 @@ public class SpigotMappings {
 
         // No longer need it.
         mappingsFile.delete();
+    }
+
+    /**
+     * Loads the spigot<>mojang class name mappings for a certain version of Minecraft, by reading
+     * from the jar-included cache file. If missing or corrupted, or lacks support for this version
+     * of Minecraft, downloads the spigot mappings from the spigotmc hub.
+     *
+     * @param minecraftVersion
+     * @return Class mappings
+     */
+    public static SpigotMappings.ClassMappings fromCacheOrDownload(String minecraftVersion) {
+        // Retrieve Spigot-Mojang class name mappings
+        // We need this to properly remap the mojang field and method names later
+        SpigotMappings spigotMappings = new SpigotMappings();
+        String classMappingsFile = "/com/bergerkiller/bukkit/common/internal/resources/class_mappings.dat";
+        try {
+            try (InputStream in = CraftBukkitServer.class.getResourceAsStream(classMappingsFile)) {
+                spigotMappings.read(in);
+            }
+        } catch (IOException ex) {
+            Logging.LOGGER.log(Level.SEVERE, "Failed to read class mappings (corrupted jar?)", ex);
+        }
+
+        // Read the required mappings, or downloads it if missing for some weird reason
+        if (!spigotMappings.byVersion.containsKey(minecraftVersion)) {
+            Logging.LOGGER.log(Level.WARNING, "[Developer] Class mappings file has no mappings for this Minecraft version. Build problem?");
+            try {
+                spigotMappings.downloadMappings(MojangMappings.fromCacheOrDownload(minecraftVersion), minecraftVersion);
+            } catch (IOException ex) {
+                throw new IllegalStateException("Failed to download Spigot-Mojang class name mappings");
+            }
+        }
+
+        return spigotMappings.get(minecraftVersion);
     }
 
     private static class SpigotVersionMeta {

@@ -128,6 +128,9 @@ public class MojangMappings {
 
         @Override
         public String toString() {
+            if (this.name.equals(this.name_obfuscated)) {
+                return this.name;
+            }
             return this.name + ":" + this.name_obfuscated;
         }
     }
