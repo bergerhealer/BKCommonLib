@@ -402,6 +402,26 @@ public class TemplateTest {
 
             assertEquals("SPEED_MODIFIER_POWDER_SNOW_UUID", original);
         }
+
+        // Test that methods with names similar to java interface methods are remapped properly
+        // This here tests NBTTagList, which has a get(int) method that remaps, but List.get() also exists.
+        {
+            Class<?> nbtTagListType = Class.forName("net.minecraft.nbt.NBTTagList");
+
+            String remapped = remapper.remapMethodName(nbtTagListType, "get", new Class<?>[] {
+                int.class
+            }, "BAD");
+
+            assertNotEquals("get", remapped);
+            System.out.println("NBTTagList get(int) -> " + remapped);
+
+            // Reverse it
+            String original = remapper.remapMethodNameReverse(nbtTagListType, remapped, new Class<?>[] {
+                int.class
+            }, "BAD");
+
+            assertEquals("get", original);
+        }
     }
 
     @Test

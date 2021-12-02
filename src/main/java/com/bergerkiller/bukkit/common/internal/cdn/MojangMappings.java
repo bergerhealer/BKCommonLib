@@ -28,25 +28,23 @@ public class MojangMappings {
     public static class ClassMappings extends ClassSignature {
         public final BiMap<String, String> fields_obfuscated_to_name;
         public final BiMap<String, String> fields_name_to_obfuscated;
-        public final Map<String, MethodSignature> methods_by_obfuscated;
-        public final Map<String, MethodSignature> methods_by_name;
+        public final List<MethodSignature> methods;
 
         public ClassMappings(String name, String name_obfuscated) {
             super(name, name_obfuscated);
             this.fields_obfuscated_to_name = HashBiMap.create();
             this.fields_name_to_obfuscated = this.fields_obfuscated_to_name.inverse();
-            this.methods_by_obfuscated = new HashMap<>();
-            this.methods_by_name = new HashMap<>();
+            this.methods = new ArrayList<>();
         }
 
         public void addField(String obfuscatedName, String mojangName) {
             this.fields_obfuscated_to_name.put(obfuscatedName, mojangName);
         }
 
-        public void addMethod(String obfuscatedName, String mojangName, List<ClassSignature> parameterTypes) {
-            MethodSignature sig = new MethodSignature(this, mojangName, obfuscatedName, parameterTypes);
-            this.methods_by_obfuscated.put(sig.name_obfuscated, sig);
-            this.methods_by_name.put(sig.name, sig);
+        public void addMethod(String obfuscatedName, String mojangName,
+                ClassSignature returnType, List<ClassSignature> parameterTypes
+        ) {
+            this.methods.add(new MethodSignature(this, mojangName, obfuscatedName, returnType, parameterTypes));
         }
     }
 
@@ -77,23 +75,28 @@ public class MojangMappings {
         public final ClassMappings declaring;
         public final String name;
         public final String name_obfuscated;
-        public final List<ClassSignature> parameters;
+        public final ClassSignature returnType;
+        public final List<ClassSignature> parameterTypes;
 
-        public MethodSignature(ClassMappings declaring, String name, String name_obfuscated, List<ClassSignature> parameters) {
+        public MethodSignature(ClassMappings declaring, String name, String name_obfuscated,
+                ClassSignature returnType, List<ClassSignature> parameterTypes
+        ) {
             this.declaring = declaring;
             this.name = name;
             this.name_obfuscated = name_obfuscated;
-            this.parameters = parameters;
+            this.returnType = returnType;
+            this.parameterTypes = parameterTypes;
         }
 
         @Override
         public String toString() {
             StringBuilder str = new StringBuilder();
             str.append("<").append(declaring.toString()).append("> ");
+            str.append(returnType).append(' ');
             str.append(name).append(":").append(name_obfuscated);
             str.append(" (");
             boolean first = true;
-            for (ClassSignature param : parameters) {
+            for (ClassSignature param : parameterTypes) {
                 if (first) {
                     first = false;
                 } else {
@@ -242,7 +245,7 @@ public class MojangMappings {
         // Regex: \s+[\[\]<>\w\._\-$]+\s([\w_\-$]+)\s->\s([\w_\-$]+)
         private static final Pattern FIELD_NAME_PATTERN = Pattern.compile("\\s+[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\s->\\s([\\w_\\-$]+)");
         // Regex: \s+(\d+:\d+:)?[\[\]<>\w\._\-$]+\s([\w_\-$]+)\(([\[\]<>\w\._\-,$]*)\)\s->\s([\w_\-$]+)
-        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile("\\s+(\\d+:\\d+:)?[\\[\\]<>\\w\\._\\-$]+\\s([\\w_\\-$]+)\\(([\\[\\]<>\\w\\._\\-,$]*)\\)\\s->\\s([\\w_\\-$]+)");
+        private static final Pattern METHOD_NAME_PATTERN = Pattern.compile("\\s+(\\d+:\\d+:)?([\\[\\]<>\\w\\._\\-$]+)\\s([\\w_\\-$]+)\\(([\\[\\]<>\\w\\._\\-,$]*)\\)\\s->\\s([\\w_\\-$]+)");
 
         private final MojangMappings result = new MojangMappings();
         private final Map<String, ClassSignature> mappingsByDeobfName = new HashMap<>();
@@ -323,49 +326,58 @@ public class MojangMappings {
         }
 
         private void processMethod(PendingMethod method) {
+            // Translate the return type if it refers to an obfuscated name
+            ClassSignature returnType = translateTypeName(method.returnTypeName);
+
             // Translate the argument types if they refer to obfuscated names
-            List<ClassSignature> params = new ArrayList<ClassSignature>(method.paramStrings.length);
-            for (String paramString : method.paramStrings) {
-                // Eliminate array declarations from name
-                String classNameBare = paramString;
-                String postfix = "";
-                while (classNameBare.endsWith("[]")) {
-                    classNameBare = classNameBare.substring(0, classNameBare.length() - 2);
-                    postfix += "[]";
-                }
-
-                // Find an existing remapping signature if it exists, if not, create one (cache)
-                ClassSignature argSig = this.mappingsByDeobfName.computeIfAbsent(classNameBare,
-                        c -> new ClassSignature(c, c));
-
-                // Array postfixes don't happen often enough to warrant caching and re-using signatures
-                if (!postfix.isEmpty()) {
-                    argSig = new ClassSignature(argSig.name + postfix, argSig.name_obfuscated + postfix);
-                }
-
-                params.add(argSig);
+            List<ClassSignature> params = new ArrayList<ClassSignature>(method.paramTypeNames.length);
+            for (String paramTypeName : method.paramTypeNames) {
+                params.add(translateTypeName(paramTypeName));
             }
 
             // Add
-            method.classMappings.addMethod(method.obfuscatedName, method.mojangName, params);
+            method.classMappings.addMethod(method.obfuscatedName, method.mojangName, returnType, params);
+        }
+
+        private ClassSignature translateTypeName(String name) {
+            // Eliminate array declarations from name
+            String classNameBare = name;
+            String postfix = "";
+            while (classNameBare.endsWith("[]")) {
+                classNameBare = classNameBare.substring(0, classNameBare.length() - 2);
+                postfix += "[]";
+            }
+
+            // Find an existing remapping signature if it exists, if not, create one (cache)
+            ClassSignature argSig = this.mappingsByDeobfName.computeIfAbsent(classNameBare,
+                    c -> new ClassSignature(c, c));
+
+            // Array postfixes don't happen often enough to warrant caching and re-using signatures
+            if (!postfix.isEmpty()) {
+                argSig = new ClassSignature(argSig.name + postfix, argSig.name_obfuscated + postfix);
+            }
+
+            return argSig;
         }
 
         private static final class PendingMethod {
             public final ClassMappings classMappings;
             public final String obfuscatedName;
             public final String mojangName;
-            public final String[] paramStrings;
+            public final String returnTypeName;
+            public final String[] paramTypeNames;
 
             public PendingMethod(ClassMappings classMappings, Matcher m) {
                 this.classMappings = classMappings;
-                this.obfuscatedName = m.group(4);
-                this.mojangName = m.group(2);
+                this.obfuscatedName = m.group(5);
+                this.mojangName = m.group(3);
+                this.returnTypeName = m.group(2);
 
-                String fullArgsStr = m.group(3);
+                String fullArgsStr = m.group(4);
                 if (fullArgsStr.isEmpty()) {
-                    this.paramStrings = new String[0];
+                    this.paramTypeNames = new String[0];
                 } else {
-                    this.paramStrings = fullArgsStr.split(",", -1);
+                    this.paramTypeNames = fullArgsStr.split(",", -1);
                 }
             }
         }

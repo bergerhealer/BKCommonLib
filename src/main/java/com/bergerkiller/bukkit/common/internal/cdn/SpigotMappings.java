@@ -15,12 +15,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.zip.DeflaterOutputStream;
 import java.util.zip.InflaterInputStream;
 
 import com.bergerkiller.bukkit.common.internal.cdn.MojangIO.VersionManifest;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * Communicates with hub.spigotmc.org to generate spigot <> mojang class
@@ -30,7 +31,7 @@ public class SpigotMappings {
     /**
      * All the mappings by minecraft version, is sorted in ascending (old - new) order
      */
-    public final SortedMap<String, Map<String, String>> byVersion = new TreeMap<>((a, b) -> {
+    public final SortedMap<String, ClassMappings> byVersion = new TreeMap<>((a, b) -> {
         if (a.equals(b)) {
             return 0;
         } else if (TextValueSequence.evaluateText(a, ">", b)) {
@@ -39,6 +40,16 @@ public class SpigotMappings {
             return -1;
         }
     });
+
+    /**
+     * Gets the spigot <> mojang class mappings on the specified Minecraft version
+     *
+     * @param minecraftVersion
+     * @return spigot <> mojang class name mappings
+     */
+    public ClassMappings get(String minecraftVersion) {
+        return byVersion.get(minecraftVersion);
+    }
 
     /**
      * Reads all the mappings from an input stream in binary format.
@@ -55,9 +66,9 @@ public class SpigotMappings {
             }
 
             String version = stream.readUTF();
-            Map<String, String> mapping = new HashMap<>();
+            ClassMappings mappings = new ClassMappings();
             while (numVersions-- > 0) {
-                this.byVersion.put(version, mapping);
+                this.byVersion.put(version, mappings);
                 for (String entry; !(entry = stream.readUTF()).isEmpty();) {
                     int sep = entry.indexOf('=');
                     if (sep == -1) {
@@ -65,12 +76,12 @@ public class SpigotMappings {
                         version = entry;
                         break;
                     } else if (sep == (entry.length()-1)) {
-                        mapping.remove(entry.substring(0, sep));
+                        mappings.spigotToMojang.remove(entry.substring(0, sep));
                     } else {
-                        mapping.put(entry.substring(0, sep), entry.substring(sep + 1));
+                        mappings.spigotToMojang.forcePut(entry.substring(0, sep), entry.substring(sep + 1));
                     }
                 }
-                mapping = new HashMap<String, String>(mapping);
+                mappings = mappings.clone();
             }
         }
     }
@@ -86,9 +97,9 @@ public class SpigotMappings {
         try (DataOutputStream stream = new DataOutputStream(new DeflaterOutputStream(outputStream))) {
             stream.writeInt(byVersion.size());
             Map<String, String> previous = Collections.emptyMap();
-            for (Map.Entry<String, Map<String, String>> e : byVersion.entrySet()) {
+            for (Map.Entry<String, ClassMappings> e : byVersion.entrySet()) {
                 stream.writeUTF(e.getKey());
-                Map<String, String> mapping = e.getValue();
+                Map<String, String> mapping = e.getValue().spigotToMojang;
 
                 // For all entries in the previous map that are now missing, write a 'delete'
                 for (Map.Entry<String, String> c : previous.entrySet()) {
@@ -96,7 +107,7 @@ public class SpigotMappings {
                         stream.writeUTF(c.getKey() + "=");
                     }
                 }
-                for (Map.Entry<String, String> c : e.getValue().entrySet()) {
+                for (Map.Entry<String, String> c : mapping.entrySet()) {
                     if (!previous.getOrDefault(c.getKey(), "").equals(c.getValue())) {
                         stream.writeUTF(c.getKey() + "=" + c.getValue());
                     }
@@ -142,8 +153,6 @@ public class SpigotMappings {
         if (mojangMappings == null) {
             mojangMappings = MojangMappings.fromCacheOrDownload(version);
         }
-        Map<String, String> mojang_class_mapping = mojangMappings.classes.stream().collect(
-                Collectors.toMap(v -> v.name_obfuscated, v -> v.name));
 
         // First query https://hub.spigotmc.org/versions/[version].json for full metadata
         SpigotVersionMeta versionMeta = MojangIO.downloadJson(SpigotVersionMeta.class,
@@ -180,7 +189,7 @@ public class SpigotMappings {
         // Go by all of Mojang's classes and if the class name was remapped on Bukkit,
         // store the Bukkit name for those classes. Sometimes a subclass of a class isn't
         // remapped, in which case we must perform remapping of this name ourselves.
-        Map<String, String> mappings = new HashMap<>();
+        ClassMappings mappings = new ClassMappings();
         for (MojangMappings.ClassMappings cl : mojangMappings.classes) {
             String bukkitFullName = obfuscatedToBukkit.get(cl.name_obfuscated);
             if (bukkitFullName == null) {
@@ -195,7 +204,7 @@ public class SpigotMappings {
                 }
             }
             if (bukkitFullName != null) {
-                mappings.put(bukkitFullName, cl.name);
+                mappings.spigotToMojang.put(bukkitFullName, cl.name);
             }
         }
 
@@ -211,6 +220,34 @@ public class SpigotMappings {
 
         private static class Refs {
             public String BuildData;
+        }
+    }
+
+    public static class ClassMappings {
+        private final BiMap<String, String> mojangToSpigot;
+        private final BiMap<String, String> spigotToMojang;
+
+        private ClassMappings(ClassMappings copy) {
+            this.mojangToSpigot = HashBiMap.create(copy.mojangToSpigot);
+            this.spigotToMojang = this.mojangToSpigot.inverse();
+        }
+
+        public ClassMappings() {
+            this.mojangToSpigot = HashBiMap.create(50);
+            this.spigotToMojang = this.mojangToSpigot.inverse();
+        }
+
+        @Override
+        public ClassMappings clone() {
+            return new ClassMappings(this);
+        }
+
+        public String toMojang(String spigotClassName) {
+            return spigotToMojang.getOrDefault(spigotClassName, spigotClassName);
+        }
+
+        public String toSpigot(String mojangClassName) {
+            return mojangToSpigot.getOrDefault(mojangClassName, mojangClassName);
         }
     }
 }

@@ -7,7 +7,6 @@ import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
-import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.server.CraftBukkitServer;
@@ -152,21 +151,16 @@ public class MojangSpigotRemapper {
         recurseRemappersByDeclaringClassName.clear();
 
         // Load the spigot<>mojang class mappings and verify they exist
-        Map<String, String> spigotClassMappings = spigotMappings.byVersion.get(minecraftVersion);
+        SpigotMappings.ClassMappings spigotClassMappings = spigotMappings.byVersion.get(minecraftVersion);
         if (spigotClassMappings == null) {
             throw new IllegalArgumentException("Spigot class name mappings not available for Minecraft " + minecraftVersion);
         }
-
-        // Reverse keys and values
-        spigotClassMappings = spigotClassMappings
-                .entrySet().stream().collect(Collectors.toMap(
-                        Map.Entry::getValue, Map.Entry::getKey));
 
         // Start by resolving all classes we have remappings for - essential for later
         RemappedClassResolver resolver = new RemappedClassResolver(classPathResolver);
         for (MojangMappings.ClassMappings mappings : mojangMappings.classes) {
             // Remap using spigot<>mojang class name remappings
-            String spigotClassName = spigotClassMappings.getOrDefault(mappings.name, mappings.name);
+            String spigotClassName = spigotClassMappings.toSpigot(mappings.name);
 
             // Find the class, then store if found
             Class<?> resolvedClass = resolver.tryFindClass(spigotClassName);
@@ -260,7 +254,7 @@ public class MojangSpigotRemapper {
             Class<?> type = resolver.resolve(mappings.name);
             if (type != null) {
                 ClassRemapper remapper = new ClassRemapper(mappings, type);
-                for (MojangMappings.MethodSignature sig : mappings.methods_by_name.values()) {
+                for (MojangMappings.MethodSignature sig : mappings.methods) {
                     MethodDetails details = MethodDetails.create(sig, resolver);
                     if (details != null) {
                         remapper.methods_by_name.put(details.name, details);
@@ -277,11 +271,13 @@ public class MojangSpigotRemapper {
         private static final Class<?>[] NO_ARGS = new Class<?>[0];
         public final String name;
         public final String name_obfuscated;
+        public final Class<?> returnType;
         public final Class<?>[] parameterTypes;
 
-        public MethodDetails(MojangMappings.MethodSignature sig, Class<?>[] parameterTypes) {
+        public MethodDetails(MojangMappings.MethodSignature sig, Class<?> returnType, Class<?>[] parameterTypes) {
             this.name = sig.name;
             this.name_obfuscated = sig.name_obfuscated;
+            this.returnType = returnType;
             this.parameterTypes = parameterTypes;
         }
 
@@ -301,6 +297,7 @@ public class MojangSpigotRemapper {
         @Override
         public String toString() {
             StringBuilder str = new StringBuilder();
+            str.append(returnType.getName()).append(' ');
             str.append(name).append(':').append(name_obfuscated);
             str.append("(");
             boolean first = true;
@@ -317,20 +314,25 @@ public class MojangSpigotRemapper {
         }
 
         public static MethodDetails create(MojangMappings.MethodSignature sig, RemappedClassResolver resolver) {
-            if (sig.parameters.isEmpty()) {
-                return new MethodDetails(sig, NO_ARGS);
+            Class<?> returnType = resolver.resolve(sig.returnType.name);
+            if (returnType == null) {
+                return null; // Fail!
             }
 
-            Class<?>[] arguments = new Class<?>[sig.parameters.size()];
+            if (sig.parameterTypes.isEmpty()) {
+                return new MethodDetails(sig, returnType, NO_ARGS);
+            }
+
+            Class<?>[] arguments = new Class<?>[sig.parameterTypes.size()];
             for (int i = 0 ; i < arguments.length; i++) {
-                Class<?> argType = resolver.resolve(sig.parameters.get(i).name);
+                Class<?> argType = resolver.resolve(sig.parameterTypes.get(i).name);
                 if (argType == null) {
                     return null; // Fail!
                 }
                 arguments[i] = argType;
             }
 
-            return new MethodDetails(sig, arguments);
+            return new MethodDetails(sig, returnType, arguments);
         }
     }
 
