@@ -134,14 +134,22 @@ class CraftChatMessage {
 
         while (iter.hasNext()) {
             IChatBaseComponent c = (IChatBaseComponent) iter.next();
+#if version >= 1.18
+            net.minecraft.network.chat.ChatModifier modi = c.getStyle();
+#else
             net.minecraft.network.chat.ChatModifier modi = c.getChatModifier();
+#endif
 
             // Place reset character when too many style flags are active
             if ((prev_was_bold && !modi.isBold()) ||
                 (prev_was_italic && !modi.isItalic()) ||
                 (prev_was_underlined && !modi.isUnderlined()) ||
                 (prev_was_strikeThrough && !modi.isStrikethrough()) ||
+#if version >= 1.18
+                (prev_was_obfuscated && !modi.isObfuscated()))
+#else
                 (prev_was_obfuscated && !modi.isRandom()))
+#endif
             {
                 prev_color_format = null;
                 prev_was_bold = false;
@@ -179,11 +187,19 @@ class CraftChatMessage {
                 prev_was_strikeThrough = true;
                 out.append(EnumChatFormat.STRIKETHROUGH);
             }
+#if version >= 1.18
+            if (modi.isObfuscated() && !prev_was_obfuscated) {
+#else
             if (modi.isRandom() && !prev_was_obfuscated) {
+#endif
                 prev_was_obfuscated = true;
                 out.append(EnumChatFormat.OBFUSCATED);
             }
+#if version >= 1.18
+            out.append(c.getContents());
+#else
             out.append(c.getText());
+#endif
         }
         return out.toString();
     }

@@ -3,7 +3,36 @@ package net.minecraft.network.chat;
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 
 class IChatBaseComponent {
-#if version >= 1.16
+    // Method safely sets a modifier on a IChatBaseComponent, making it mutable if required
+#if version >= 1.18
+    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).withStyle(modifier);
+        } else {
+            return (new ChatComponentText("")).append(instance).withStyle(modifier);
+        }
+    }
+#elseif version >= 1.16
+    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).setChatModifier(modifier);
+        } else {
+            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
+        }
+    }
+#else
+    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier:setChatModifier(ChatModifier modifier);
+#endif
+
+#if version >= 1.18
+    public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).append(sibling);
+        } else {
+            return instance.copy().append(sibling);
+        }
+    }
+#elseif version >= 1.16
     public (IChatBaseComponentHandle) IChatBaseComponent addSibling((IChatBaseComponentHandle) IChatBaseComponent sibling) {
         if (instance instanceof IChatMutableComponent) {
             return ((IChatMutableComponent) instance).addSibling(sibling);
@@ -23,45 +52,35 @@ class IChatBaseComponent {
 #endif
     }
 
-#if version >= 1.16
-    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:mutableCopy();
-#elseif version >= 1.13.1
-    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:h();
-#elseif version >= 1.13
-    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:e();
-#else
-    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:f();
-#endif
+#select version >=
+#case 1.18:    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:copy();
+#case 1.16:    public abstract (IChatBaseComponentHandle) IChatMutableComponent createCopy:mutableCopy();
+#case 1.13.1:  public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:h();
+#case 1.13:    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:e();
+#case else:    public abstract (IChatBaseComponentHandle) IChatBaseComponent createCopy:f();
+#endselect
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableURL(String url) {
+#if version >= 1.18
+        ChatModifier modifier = instance.getStyle();
+        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
+#else
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.OPEN_URL, url));
-
-#if version >= 1.16
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
-        } else {
-            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
-        }
-#else
-        return instance.setChatModifier(modifier);
 #endif
+        return instance#makeMutableAndSetChatModifier(modifier);
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableContent(String content) {
 #if version >= 1.15
+  #if version >= 1.18
+        ChatModifier modifier = instance.getStyle();
+        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
+  #else
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.COPY_TO_CLIPBOARD, content));
-
-  #if version >= 1.16
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
-        } else {
-            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
-        }
-  #else
-        return instance.setChatModifier(modifier);
   #endif
+        return instance#makeMutableAndSetChatModifier(modifier);
 #else
         // Feature is since 1.15, do nothing on older versions
         return instance;
@@ -69,54 +88,48 @@ class IChatBaseComponent {
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableSuggestedCommand(String command) {
+#if version >= 1.18
+        ChatModifier modifier = instance.getStyle();
+        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
+#else
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.SUGGEST_COMMAND, command));
-
-  #if version >= 1.16
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
-        } else {
-            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
-        }
-  #else
-        return instance.setChatModifier(modifier);
-  #endif
+#endif
+        return instance#makeMutableAndSetChatModifier(modifier);
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setClickableRunCommand(String command) {
+#if version >= 1.18
+        ChatModifier modifier = instance.getStyle();
+        modifier = modifier.withClickEvent(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
+#else
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatClickable(new ChatClickable(ChatClickable$EnumClickAction.RUN_COMMAND, command));
-
-  #if version >= 1.16
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
-        } else {
-            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
-        }
-  #else
-        return instance.setChatModifier(modifier);
-  #endif
+#endif
+        return instance#makeMutableAndSetChatModifier(modifier);
     }
 
     public (IChatBaseComponentHandle) IChatBaseComponent setHoverText((IChatBaseComponentHandle) IChatBaseComponent hoverText) {
+#if version >= 1.18
+        ChatModifier modifier = instance.getStyle();
+        modifier = modifier.withHoverEvent(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
+#else
         ChatModifier modifier = instance.getChatModifier();
         modifier = modifier.setChatHoverable(new ChatHoverable(ChatHoverable$EnumHoverAction.SHOW_TEXT, hoverText));
-
-#if version >= 1.16
-        if (instance instanceof IChatMutableComponent) {
-            return ((IChatMutableComponent) instance).setChatModifier(modifier);
-        } else {
-            return (new ChatComponentText("")).addSibling(instance).setChatModifier(modifier);
-        }
-#else
-        return instance.setChatModifier(modifier);
 #endif
+        return instance#makeMutableAndSetChatModifier(modifier);
     }
 
     class IChatBaseComponent.ChatSerializer {
+#if version >= 1.18
+        public static String chatComponentToJson:toJson((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
+#else
         public static String chatComponentToJson:a((IChatBaseComponentHandle) IChatBaseComponent chatComponent);
+#endif
 
-#if version >= 1.16
+#if version >= 1.18
+        public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:fromJson(String jsonString);
+#elseif version >= 1.16
         public static (IChatBaseComponentHandle) IChatMutableComponent jsonToChatComponent:a(String jsonString);
 #else
         public static (IChatBaseComponentHandle) IChatBaseComponent jsonToChatComponent:a(String jsonString);
@@ -126,10 +139,37 @@ class IChatBaseComponent {
             return new ChatComponentText("");
         }
 
-#if version >= 1.16
+#if version >= 1.18
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+            ChatModifier initial_modifier = ChatModifier.EMPTY;
+            ChatModifier modifier = initial_modifier;
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = initial_modifier;
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier = modifier.withBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier = modifier.withItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier = modifier.withStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier = modifier.withUnderlined(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier = modifier.withObfuscated(Boolean.TRUE);
+                } else {
+                    modifier = initial_modifier.withColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
+                }
+            }
+            return new ChatComponentText("").withStyle(modifier);
+        }
+#elseif version >= 1.16
         // ChatModifier is immutable since 1.16
         public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
-  #if version >= 1.16.2
+  #if version >= 1.17
+            ChatModifier initial_modifier = ChatModifier.EMPTY;
+  #elseif version >= 1.16.2
             ChatModifier initial_modifier = ChatModifier.a;
   #else
             ChatModifier initial_modifier = ChatModifier.b;
@@ -195,7 +235,11 @@ class IChatBaseComponent {
 
 // version >= 1.12
 optional class ChatMessageType {
+#if version >= 1.18
+    public byte getId:getIndex();
+    public static (Object) ChatMessageType getRawById:getForIndex(byte id);
+#else
     public byte getId:a();
-
     public static (Object) ChatMessageType getRawById:a(byte id);
+#endif
 }

@@ -30,39 +30,14 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract List<Item<?>> unwatchAndReturnAllWatched();
     public abstract List<Item<?>> returnAllWatched();
     public abstract Item<Object> read(Key<?> key);
+    public abstract void register(Key<?> key, Object defaultValue);
+    public abstract void set(Key<?> key, Object value);
+    public abstract Object get(Key<?> key);
     public abstract boolean isChanged();
     public abstract boolean isEmpty();
 
     public static DataWatcherHandle createNew(org.bukkit.entity.Entity owner) {
         return createHandle(T.constr_owner.raw.newInstance(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(owner)));
-    }
-
-
-    public <T> void register(Key<T> key, T defaultValue) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));
-    }
-
-    public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        T.set.invoke(getRaw(), key, key.getType().getConverter().convertReverse(value));
-    }
-
-    public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        Object rawValue;
-        if (T.get.isAvailable()) {
-            rawValue = T.get.invoke(getRaw(), key);
-        } else {
-            rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(this.read(key));
-        }
-        return key.getType().getConverter().convert(rawValue);
     }
     public abstract EntityHandle getOwner();
     public abstract void setOwner(EntityHandle value);
@@ -78,12 +53,9 @@ public abstract class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<List<Item<?>>> unwatchAndReturnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> register = new Template.Method.Converted<Void>();
-        @Template.Optional
-        public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
-        @Template.Optional
-        public final Template.Method.Converted<Void> set = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> register = new Template.Method<Void>();
+        public final Template.Method<Void> set = new Template.Method<Void>();
+        public final Template.Method<Object> get = new Template.Method<Object>();
         public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();
 

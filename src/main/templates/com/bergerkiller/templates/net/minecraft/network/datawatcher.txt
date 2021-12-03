@@ -33,7 +33,9 @@ class DataWatcher {
      *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
      *  } else {
      */
-#if version >= 1.9
+#if version >= 1.18
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:packDirty();
+#elseif version >= 1.9
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:b();
 #else
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> unwatchAndReturnAllWatched:b();
@@ -50,7 +52,9 @@ class DataWatcher {
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();
 #endif
 
-#if version >= 1.13
+#if version >= 1.18
+    private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:getItem((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
+#elseif version >= 1.13
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:b((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
 #elseif version >= 1.9
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>) DataWatcher.Item<T> read:c((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
@@ -58,52 +62,64 @@ class DataWatcher {
     private (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>) DataWatcher.WatchableObject read:j((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
 #endif
 
-#if version >= 1.9
-    private optional void register:registerObject((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, Object defaultValue);
-
-    public optional T get((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key);
-    public optional void set((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
+    public void register(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object defaultValue) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
+#if version >= 1.18
+        #require net.minecraft.network.syncher.DataWatcher private void register:define(DataWatcherObject<T> key, Object defaultValue);
+#elseif version >= 1.9
+        #require net.minecraft.network.syncher.DataWatcher private void register:registerObject(DataWatcherObject<T> key, Object defaultValue);
 #else
-    public optional void register:a((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T defaultValue);
-
-    public optional T get:###((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key);
-    public optional void set:watch((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) int key, T value);
+        #require net.minecraft.network.syncher.DataWatcher private void register:a((DataWatcherObject<T>) int key, Object defaultValue);
 #endif
-
-    <code>
-    public <T> void register(Key<T> key, T defaultValue) {
-        if (key == null) {
-            throw new IllegalArgumentException("key is null");
-        }
-        T.register.invoke(getRaw(), key, key.getType().getConverter().convertReverse(defaultValue));
+        instance#register((DataWatcherObject) key.getRawHandle(), key.getType().getConverter().convertReverse(defaultValue));
     }
 
-    public <T> void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key, T value) {
+    public void set(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
-        T.set.invoke(getRaw(), key, key.getType().getConverter().convertReverse(value));
+        Object convertedValue = key.getType().getConverter().convertReverse(value);
+#if version >= 1.9
+        instance.set((DataWatcherObject) key.getRawHandle(), convertedValue);
+#else
+        int id = ((com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject) key.getRawHandle()).getId();
+        instance.watch(id, convertedValue);
+#endif
     }
 
-    public <T> T get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<T> key) {
+    public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
         }
-        Object rawValue;
-        if (T.get.isAvailable()) {
-            rawValue = T.get.invoke(getRaw(), key);
-        } else {
-            rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(this.read(key));
-        }
+#if version >= 1.9
+        Object rawValue = instance.get((DataWatcherObject) key.getRawHandle());
+#else
+        com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item item;
+        Object itemRaw = com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.read.invoke(instance, key);
+        item = (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item) itemRaw;
+        rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(item);
+#endif
         return key.getType().getConverter().convert(rawValue);
     }
-    </code>
 
+#if version >= 1.18
+    public boolean isChanged:isDirty();
+    public boolean isEmpty();
+#else
     public boolean isChanged:a();
     public boolean isEmpty:d();
+#endif
 
     class DataWatcher.Item {
-#if version >= 1.9
+#if version >= 1.17
+        private optional final int typeId:###;
+        private optional final int keyId:###;
+        private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:accessor;
+        private optional T value;
+        private boolean changed:dirty;
+#elseif version >= 1.9
         private optional final int typeId:###;
         private optional final int keyId:###;
         private optional final (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key:a;
@@ -119,7 +135,10 @@ class DataWatcher {
 
         // Get/set value, use public methods for faster access
         // TODO: Verify it is actually faster than using reflection on the value field (!)
-#if version >= 1.9
+#if version >= 1.18
+        public T getValue();
+        public void setValue(T value);
+#elseif version >= 1.9
         public T getValue:b();
         public void setValue:a(T value);
 #else
@@ -152,17 +171,22 @@ class DataWatcher {
 }
 
 class DataWatcherObject {
-#if version >= 1.9
+#if version >= 1.18
+    public int getId();
+    public (Object) DataWatcherSerializer<T> getSerializer()
+#elseif version >= 1.9
     public int getId:a();
     public (Object) DataWatcherSerializer<T> getSerializer:b()
 #else
     public int getId();
     public (Object) Object getSerializer:getSerializer()
 #endif
-
-    public optional (DataWatcherObjectHandle) DataWatcherObject(int index);
 }
 
 optional class DataWatcherRegistry {
+#if version >= 1.18
+    public static int getSerializerId:getSerializedId((Object) DataWatcherSerializer<?> paramDataWatcherSerializer);
+#else
     public static int getSerializerId:b((Object) DataWatcherSerializer<?> paramDataWatcherSerializer);
+#endif
 }

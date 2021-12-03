@@ -459,9 +459,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * 
          * @return current value
          */
+        @SuppressWarnings("unchecked")
         public V get() {
             Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
-            return DataWatcherHandle.createHandle(dataWatcher).get(this.key);
+            return (V) DataWatcherHandle.createHandle(dataWatcher).get(this.key);
         }
 
         /**
