@@ -27,6 +27,7 @@ import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.World;
+import net.minecraft.world.phys.MovingObjectPositionBlock;
 import net.minecraft.world.phys.Vec3D;
 
 import com.mojang.authlib.GameProfile;
@@ -103,10 +104,17 @@ class PacketPlayOutPlayerInfo extends Packet {
 #endif
         }
 
+#if version >= 1.18
+        public (GameProfileHandle) GameProfile getProfile();
+        public int getPing:getLatency();
+        public (org.bukkit.GameMode) EnumGamemode getGameMode();
+        public (ChatText) IChatBaseComponent getListName:getDisplayName();
+#else
         public (GameProfileHandle) GameProfile getProfile:a();
         public int getPing:b();
         public (org.bukkit.GameMode) EnumGamemode getGameMode:c();
         public (ChatText) IChatBaseComponent getListName:d();
+#endif
     }
 
     class PacketPlayOutPlayerInfo.EnumPlayerInfoAction {
@@ -467,9 +475,11 @@ class PacketPlayInUseEntity extends Packet {
         return true;
     }
 
-    public boolean isUsingSecondaryAction() {
-        return instance.b();
-    }
+  #if version >= 1.18
+    public boolean isUsingSecondaryAction();
+  #else
+    public boolean isUsingSecondaryAction:b();
+  #endif
 
     public void setUsingSecondaryAction(boolean using) {
         #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryAction;
@@ -480,9 +490,7 @@ class PacketPlayInUseEntity extends Packet {
         return true;
     }
 
-    public boolean isUsingSecondaryAction() {
-        return instance.e();
-    }
+    public boolean isUsingSecondaryAction:e();
 
     public void setUsingSecondaryAction(boolean using) {
         #require net.minecraft.network.protocol.game.PacketPlayInUseEntity private boolean usingSecondaryOption:e;
@@ -564,10 +572,26 @@ class PacketPlayInUseItem extends Packet {
 #endif
 
     // Initializes the moving object position block field, when required
-#if version >= 1.14
+#if version >= 1.18
+    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock getHitResult();
+    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock initMovingObject() {
+        net.minecraft.world.phys.MovingObjectPositionBlock moving = instance.getHitResult();
+        if (moving != null) {
+            return moving;
+        }
+
+        #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.world.phys.MovingObjectPositionBlock movingObject:blockHit;
+        moving = net.minecraft.world.phys.MovingObjectPositionBlock.miss(Vec3D.ZERO, EnumDirection.DOWN, BlockPosition.ZERO);
+        instance#movingObject = moving;
+        return moving;
+    }
+
+#elseif version >= 1.14
+    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock getHitResult:c();
     #require net.minecraft.network.protocol.game.PacketPlayInUseItem public void initMovingObject() {
-        if (instance.c() != null) {
-            return;
+        net.minecraft.world.phys.MovingObjectPositionBlock moving = instance.c();
+        if (moving != null) {
+            return moving;
         }
 
   #if version >= 1.17
@@ -584,9 +608,11 @@ class PacketPlayInUseItem extends Packet {
         Vec3D origin = Vec3D.a;
   #endif
 
-        net.minecraft.world.phys.MovingObjectPositionBlock moving = net.minecraft.world.phys.MovingObjectPositionBlock.a(origin, EnumDirection.DOWN, BlockPosition.ZERO);
+        moving = net.minecraft.world.phys.MovingObjectPositionBlock.a(origin, EnumDirection.DOWN, BlockPosition.ZERO);
         instance#movingObject = moving; 
+        return moving;
     }
+
 #endif
 
     // Direction
@@ -597,12 +623,11 @@ class PacketPlayInUseItem extends Packet {
     #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.EnumDirection direction_face:b;
   #endif
     public (org.bukkit.block.BlockFace) EnumDirection getDirection() {
-        if (instance.c() == null) return null;
-        return instance.c().getDirection();
+        MovingObjectPositionBlock result = instance#getHitResult();
+        return (result == null) ? null : result.getDirection();
     }
     public void setDirection((org.bukkit.block.BlockFace) EnumDirection direction) {
-        instance#initMovingObject();
-        instance.c()#direction_face = direction;
+        instance#initMovingObject()#direction_face = direction;
     }
 #elseif version >= 1.9
     #require net.minecraft.network.protocol.game.PacketPlayInUseItem private net.minecraft.core.EnumDirection direction_face:b;
@@ -649,50 +674,91 @@ class PacketPlayInUseItem extends Packet {
     #require net.minecraft.world.phys.MovingObjectPositionBlock private final net.minecraft.core.BlockPosition blockPosition:c;
   #endif
     public (IntVector3) BlockPosition getPosition() {
-        if (instance.c() == null) return null;
-        return instance.c().getBlockPosition();
+        MovingObjectPositionBlock result = instance#getHitResult();
+  #if version >= 1.18
+        return (result == null) ? null : result.getBlockPos();
+  #else
+        return (result == null) ? null : result.getBlockPosition();
+  #endif
     }
     public void setPosition((IntVector3) BlockPosition blockPosition) {
-        instance#initMovingObject();
+        MovingObjectPositionBlock result = instance#initMovingObject();
 
         // Make sure to preserve deltas
-        Vec3D position = instance.c().getPos();
-        double new_x = position.x - instance.c().getBlockPosition().getX() + blockPosition.getX();
-        double new_y = position.y - instance.c().getBlockPosition().getY() + blockPosition.getY();
-        double new_z = position.z - instance.c().getBlockPosition().getZ() + blockPosition.getZ();
+  #if version >= 1.18
+        Vec3D position = result.getLocation();
+        double new_x = position.x - result.getBlockPos().getX() + blockPosition.getX();
+        double new_y = position.y - result.getBlockPos().getY() + blockPosition.getY();
+        double new_z = position.z - result.getBlockPos().getZ() + blockPosition.getZ();
+  #else
+        Vec3D position = result.getPos();
+        double new_x = position.x - result.getBlockPosition().getX() + blockPosition.getX();
+        double new_y = position.y - result.getBlockPosition().getY() + blockPosition.getY();
+        double new_z = position.z - result.getBlockPosition().getZ() + blockPosition.getZ();
+  #endif
         Vec3D new_pos = new Vec3D(new_x, new_y, new_z);
-        instance.c()#position = new_pos;
-        instance.c()#blockPosition = blockPosition;
+        result#position = new_pos;
+        result#blockPosition = blockPosition;
     }
     public float getDeltaX() {
-        if (instance.c() == null) return 0.0f;
-        return (float) (instance.c().getPos().x - (double) instance.c().getBlockPosition().getX());
+        MovingObjectPositionBlock result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().x - (double) result.getBlockPos().getX());
+  #else
+        return (float) (result.getPos().x - (double) result.getBlockPosition().getX());
+  #endif
     }
     public float getDeltaY() {
-        if (instance.c() == null) return 0.0f;
-        return (float) (instance.c().getPos().y - (double) instance.c().getBlockPosition().getY());
+        MovingObjectPositionBlock result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().y - (double) result.getBlockPos().getY());
+  #else
+        return (float) (result.getPos().y - (double) result.getBlockPosition().getY());
+  #endif
     }
     public float getDeltaZ() {
-        if (instance.c() == null) return 0.0f;
-        return (float) (instance.c().getPos().z - (double) instance.c().getBlockPosition().getZ());
+        MovingObjectPositionBlock result = instance#getHitResult();
+        if (result == null) return 0.0f;
+  #if version >= 1.18
+        return (float) (result.getLocation().z - (double) result.getBlockPos().getZ());
+  #else
+        return (float) (result.getPos().z - (double) result.getBlockPosition().getZ());
+  #endif
     }
     public void setDeltaX(float dx) {
-        instance#initMovingObject();
-        Vec3D old_position = instance.c().getPos();
-        Vec3D new_position = new Vec3D((double) dx + instance.c().getBlockPosition().getX(), old_position.y, old_position.z);
-        instance.c()#position = new_position;
+        MovingObjectPositionBlock result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3D old_position = result.getLocation();
+        Vec3D new_position = new Vec3D((double) dx + result.getBlockPos().getX(), old_position.y, old_position.z);
+  #else
+        Vec3D old_position = result.getPos();
+        Vec3D new_position = new Vec3D((double) dx + result.getBlockPosition().getX(), old_position.y, old_position.z);
+  #endif
+        result#position = new_position;
     }
     public void setDeltaY(float dy) {
-        instance#initMovingObject();
-        Vec3D old_position = instance.c().getPos();
-        Vec3D new_position = new Vec3D(old_position.x, (double) dy + instance.c().getBlockPosition().getY(), old_position.z);
-        instance.c()#position = new_position;
+        MovingObjectPositionBlock result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3D old_position = result.getLocation();
+        Vec3D new_position = new Vec3D(old_position.x, (double) dy + result.getBlockPos().getY(), old_position.z);
+  #else
+        Vec3D old_position = result.getPos();
+        Vec3D new_position = new Vec3D(old_position.x, (double) dy + result.getBlockPosition().getY(), old_position.z);
+  #endif
+        result#position = new_position;
     }
     public void setDeltaZ(float dz) {
-        instance#initMovingObject();
-        Vec3D old_position = instance.c().getPos();
-        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + instance.c().getBlockPosition().getZ());
-        instance.c()#position = new_position;
+        MovingObjectPositionBlock result = instance#initMovingObject();
+  #if version >= 1.18
+        Vec3D old_position = result.getLocation();
+        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + result.getBlockPos().getZ());
+  #else
+        Vec3D old_position = result.getPos();
+        Vec3D new_position = new Vec3D(old_position.x, old_position.y, (double) dz + result.getBlockPosition().getZ());
+  #endif
+        result#position = new_position;
     }
 #else
   #if version >= 1.9
@@ -1096,7 +1162,10 @@ class PacketPlayOutLogin extends Packet {
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
     public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
-#if version >= 1.17
+#if version >= 1.18
+        #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
+        instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+#elseif version >= 1.17
         #require net.minecraft.network.protocol.game.PacketPlayOutLogin private long encryptedWorldSeed:seed;
         instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
@@ -1229,7 +1298,10 @@ class PacketPlayOutRespawn extends Packet {
     // Encrypted world seed field was added on MC 1.15
     // It has little meaning, so we just add a method to initialize it
     public void setEncryptedWorldSeed((org.bukkit.World) WorldServer world) {
-#if version >= 1.17
+#if version >= 1.18
+        #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
+        instance#encryptedWorldSeed = BiomeManager.obfuscateSeed(world.getSeed());
+#elseif version >= 1.17
         #require net.minecraft.network.protocol.game.PacketPlayOutRespawn private long encryptedWorldSeed:seed;
         instance#encryptedWorldSeed = BiomeManager.a(world.getSeed());
 #elseif version >= 1.16
@@ -2045,7 +2117,12 @@ class PacketPlayOutUpdateAttributes extends Packet {
         AttributeModifiable attribute = new AttributeModifiable(attributeMapBase, GenericAttributes.maxHealth);
   #endif
 #endif
+
+#if version >= 1.18
+        attribute.setBaseValue(0.0);
+#else
         attribute.setValue(0.0);
+#endif
 
         // Create packet sending just this one attribute
         java.util.Collection attributes = java.util.Collections.singleton(attribute);

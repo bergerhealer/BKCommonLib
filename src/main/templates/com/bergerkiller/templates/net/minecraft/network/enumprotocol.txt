@@ -18,7 +18,12 @@ class EnumProtocol {
   #endif
 
     #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:a;
+
+#if version >= 1.18
+    #require net.minecraft.network.EnumProtocol.a public Integer getPacketClassId:getId(Class<?> packetClass);
+#else
     #require net.minecraft.network.EnumProtocol.a public Integer getPacketClassId:a(Class<?> packetClass);
+#endif
 
     public Class<?> getPacketClassIn(int id) {
         Object map = (instance#packetMap).get(EnumProtocolDirection.SERVERBOUND);
