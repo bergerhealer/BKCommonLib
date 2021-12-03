@@ -68,7 +68,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.EnumSkyBlockHandle;
 
 class EnumGamemode {
-    int getId();
+    public int getId();
 
 #if version >= 1.18
     public static (EnumGamemodeHandle) EnumGamemode getById:byId(int id);

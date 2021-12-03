@@ -16,11 +16,9 @@ import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.NBTTagLongArra
 
 class NBTBase {
 #if version >= 1.18
-    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getId();
     public abstract byte getTypeId:getId();
     public abstract (Object) NBTBase raw_clone:copy();
 #else
-    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getTypeId();
     public abstract byte getTypeId();
     public abstract (Object) NBTBase raw_clone:clone();
 #endif
@@ -455,6 +453,12 @@ class NBTBase {
 }
 
 class NBTTagList extends NBTBase {
+#if version >= 1.18
+    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getId();
+#else
+    #require net.minecraft.nbt.NBTBase public abstract byte getTagTypeId:getTypeId();
+#endif
+
     // Results in getData() being added, which overrides the one in NBTBase
     private readonly (List<NBTBaseHandle>) List<NBTBase> data:list;
 
@@ -671,7 +675,11 @@ class NBTTagCompound extends NBTBase {
                 } else {
                     nbt_value = (NBTBase) com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle.createRawHandleForData(value);
                 }
+#if version >= 1.18
+                result.put((String) entry.getKey(), nbt_value);
+#else
                 result.set((String) entry.getKey(), nbt_value);
+#endif
             }
         }
         return result;

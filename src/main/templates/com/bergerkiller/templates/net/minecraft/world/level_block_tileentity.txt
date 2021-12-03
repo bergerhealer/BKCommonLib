@@ -34,10 +34,10 @@ class TileEntity {
 
 #if version >= 1.18
     public (WorldHandle) World getWorld:getLevel();
-    public (BlockPositionHandle) BlockPosition getPosition();
+    public (BlockPositionHandle) BlockPosition getPosition:getBlockPos();
 #else
     public (WorldHandle) World getWorld();
-    public (BlockPositionHandle) BlockPosition getPosition:getBlockPos();
+    public (BlockPositionHandle) BlockPosition getPosition();
 #endif
 
     public (BlockData) IBlockData getBlockDataIfCached() {

@@ -110,6 +110,19 @@ public class NBTTest {
         testGetPutRemove(compound, "boolF", Boolean.FALSE);
     }
 
+    @Test
+    public void testNBTListAddGetSet() {
+        CommonTagList list = new CommonTagList();
+        list.addValue("one");
+        list.addValue("two");
+        assertEquals("one", list.getValue(0));
+        assertEquals("two", list.getValue(1));
+        list.setValue(0, "hello");
+        list.setValue(1, "world");
+        assertEquals("hello", list.getValue(0));
+        assertEquals("world", list.getValue(1));
+    }
+
     private void testGetPutRemove(CommonTagCompound compound, String key, Object value) {
         compound.putValue(key, value);
         Object getValue = compound.getValue(key, value.getClass());
