@@ -131,7 +131,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public boolean damageEntity(net.minecraft.world.damagesource.DamageSource damagesource, float f)")
+    @HookMethod("public boolean damageEntity:???(net.minecraft.world.damagesource.DamageSource damagesource, float f)")
     public boolean onDamageEntity(Object damageSource, float damage) {
         try {
             if (checkController()) {
@@ -278,13 +278,13 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethod("public String getName()")
-    public String getName() {
+    @HookMethod("public String getStringUUID:???()")
+    public String getStringUUID() {
         try {
             if (checkController()) {
                 return controller.getLocalizedName();
             } else {
-                return getName_base(this.instance());
+                return getStringUUID_base(this.instance());
             }
         } catch (Throwable t) {
             t.printStackTrace();
@@ -299,21 +299,21 @@ public class EntityHook extends ClassHook<EntityHook> {
      * @param instance Object instance
      * @return base name
      */
-    public String getName_base(Object instance) {
+    public String getStringUUID_base(Object instance) {
         // >= 1.13 it is a simple lookup of the name of the EntityTypes field value
         // This is safe, so no special logic is warranted here
         if (Common.evaluateMCVersion(">=", "1.13")) {
-            return base.getName();
+            return base.getStringUUID();
         }
 
         // <= 1.10.2 we already take care of this issue with the class translating map of entity names
         if (EntityTypesHandle.T.opt_typeNameMap_1_10_2.isAvailable()) {
-            return base.getName();
+            return base.getStringUUID();
         }
 
         // Special handling for some entity types and when a custom name is set
         if (EntityHumanHandle.T.isAssignableFrom(instance) || EntityItemHandle.T.isAssignableFrom(instance)) {
-            return base.getName();
+            return base.getStringUUID();
         }
         if (EntityHandle.T.hasCustomName.invoke(instance)) {
             return EntityHandle.T.getCustomName.invoke(instance).getMessage();
@@ -366,7 +366,7 @@ public class EntityHook extends ClassHook<EntityHook> {
         return EntityTypesHandle.getEntityInternalName(EntityHook.findInstanceBaseType(instance));
     }
 
-    @HookMethod("public void collide(net.minecraft.world.entity.Entity entity)")
+    @HookMethod("public void collide:???(net.minecraft.world.entity.Entity entity)")
     public void collide(Object entity) {
         try {
             if (checkController()) {

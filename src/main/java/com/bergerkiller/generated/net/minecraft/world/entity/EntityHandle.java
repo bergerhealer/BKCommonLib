@@ -105,6 +105,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setOutsideWorldBorder(boolean outside);
     public abstract void checkBlockCollisions();
     public abstract double calculateDistanceSquared(double x, double y, double z);
+    public abstract String getStringUUID();
     public abstract boolean damageEntity(DamageSourceHandle damagesource, float damage);
     public abstract void setPosition(double x, double y, double z);
     public abstract void setSize(float width, float height);
@@ -374,6 +375,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setOutsideWorldBorder = new Template.Method<Void>();
         public final Template.Method<Void> checkBlockCollisions = new Template.Method<Void>();
         public final Template.Method<Double> calculateDistanceSquared = new Template.Method<Double>();
+        public final Template.Method<String> getStringUUID = new Template.Method<String>();
         public final Template.Method.Converted<Boolean> damageEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method<Void> setPosition = new Template.Method<Void>();
         public final Template.Method<Void> setSize = new Template.Method<Void>();

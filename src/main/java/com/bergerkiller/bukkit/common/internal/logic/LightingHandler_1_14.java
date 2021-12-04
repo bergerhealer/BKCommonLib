@@ -373,11 +373,19 @@ public class LightingHandler_1_14 implements LightingHandler {
          *    if (layer == null) {
          *        return null;
          *    }
+         * #if version >= 1.18
+         *    NibbleArray array = layer.getDataLayerData(SectionPosition.of(cx, cy, cz));
+         *    if (array == null) {
+         *        return null;
+         *    }
+         *    return array.getData();
+         * #else
          *    NibbleArray array = layer.a(SectionPosition.a(cx, cy, cz));
          *    if (array == null) {
          *        return null;
          *    }
          *    return array.asBytes();
+         * #endif
          * }
          */
         @Template.Generated("%GET_LAYER_LIGHT_DATA%")
@@ -386,8 +394,15 @@ public class LightingHandler_1_14 implements LightingHandler {
         /*
          * <STORE_SKY_LIGHT_DATA>
          * public static void storeSkyLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         * #if version >= 1.18
+         *     final SectionPosition pos = SectionPosition.of(cx, cy, cz);
+         * #else
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         * #if version >= 1.16
+         * #endif
+         * 
+         * #if version >= 1.18
+         *     engine.queueSectionData(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
+         * #elseif version >= 1.16
          *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes), true);
          * #else
          *     engine.a(EnumSkyBlock.SKY, pos, new NibbleArray(data_bytes));
@@ -400,8 +415,15 @@ public class LightingHandler_1_14 implements LightingHandler {
         /*
          * <STORE_BLOCK_LIGHT_DATA>
          * public static void storeBlockLightData(LightEngine engine, int cx, int cy, int cz, byte[] data_bytes) {
+         * #if version >= 1.18
+         *     final SectionPosition pos = SectionPosition.of(cx, cy, cz);
+         * #else
          *     final SectionPosition pos = SectionPosition.a(cx, cy, cz);
-         * #if version >= 1.16
+         * #endif
+         * 
+         * #if version >= 1.18
+         *     engine.queueSectionData(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
+         * #elseif version >= 1.16
          *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes), true);
          * #else
          *     engine.a(EnumSkyBlock.BLOCK, pos, new NibbleArray(data_bytes));

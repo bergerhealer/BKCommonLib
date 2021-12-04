@@ -16,6 +16,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.ClassHook.HookMethodCondition;
 
 /**
  * Redirects all IInventory function calls to the appropriate method in a 
@@ -25,6 +26,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 @ClassHook.HookImport("org.bukkit.craftbukkit.entity.CraftHumanEntity")
 @ClassHook.HookImport("net.minecraft.world.item.ItemStack")
 @ClassHook.HookImport("net.minecraft.world.entity.player.EntityHuman")
+@ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     private final Inventory inventory;
 
@@ -32,7 +34,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         this.inventory = inventory;
     }
 
-    @HookMethod("public abstract int getSize()")
+    @HookMethod("public abstract int getSize:???()")
     public int getSize() {
         return this.inventory.getSize();
     }
@@ -62,12 +64,14 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         this.inventory.clear();
     }
 
-    @HookMethod(value="public abstract List<ItemStack> getContents()", optional=true)
+    @HookMethodCondition("version >= 1.11")
+    @HookMethod(value="public abstract List<ItemStack> getContents()")
     public List<?> getContents() {
         return new ConvertingList<Object>(Arrays.asList(this.inventory.getContents()), DuplexConversion.itemStack.reverse());
     }
 
-    @HookMethod(value="public abstract ItemStack[] getContents()", optional=true)
+    @HookMethodCondition("version <= 1.10.2")
+    @HookMethod(value="public abstract ItemStack[] getContents()")
     public Object[] getContents_old() {
         return LogicUtil.toArray(this.getContents(), ItemStackHandle.T.getType());
     }
@@ -83,7 +87,8 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     }
 
     // Since 1.10.2
-    @HookMethod(value="public abstract org.bukkit.Location getLocation()", optional=true)
+    @HookMethodCondition("version >= 1.10.2")
+    @HookMethod(value="public abstract org.bukkit.Location getLocation()")
     public Location getLocation() {
         if (InventoryHandle.T.getLocation.isAvailable()) {
             return InventoryHandle.T.getLocation.invoke(this.inventory);
@@ -94,7 +99,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
 
     /* Questionable implementations taken over from EntityMinecartContainer */
 
-    @HookMethod("public ItemStack splitStack(int i, int j)")
+    @HookMethod("public ItemStack splitStack:???(int i, int j)")
     public Object splitStack(int i, int j) {
         if ((i < 0) || (i >= inventory.getSize()) || (j <= 0)) {
             return ItemStackHandle.EMPTY_ITEM.getRaw();
@@ -110,7 +115,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return ItemStackHandle.getRaw(nmsItem.cloneAndSubtract(j));
     }
 
-    @HookMethod("public ItemStack splitWithoutUpdate(int i)")
+    @HookMethod("public ItemStack splitWithoutUpdate:???(int i)")
     public Object splitWithoutUpdate(int i) {
         if ((i < 0) || (i >= inventory.getSize())) {
             return ItemStackHandle.EMPTY_ITEM.getRaw();
@@ -125,7 +130,7 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
 
     /* The below are NOP because they don't make sense for an Inventory 'Base' not representing anything */
 
-    @HookMethod("public abstract void update()")
+    @HookMethod("public abstract void update:???()")
     public void update() {
     }
 
@@ -137,27 +142,27 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
     public void onClose(Object entity) {
     }
 
-    @HookMethod("public abstract void startOpen(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract void startOpen:???(EntityHuman paramEntityHuman)")
     public void startOpen(Object entityHuman) {
     }
 
-    @HookMethod("public abstract void closeContainer(EntityHuman paramEntityHuman)")
+    @HookMethod("public abstract void stopOpen:???(EntityHuman paramEntityHuman)")
     public void closeContainer(Object entityHuman) {
     }
 
-    // <= MC 1.13.2 only
-    @HookMethod(value="public abstract int getProperty:???(int key)", optional=true)
+    @HookMethodCondition("version <= 1.13.2")
+    @HookMethod(value="public abstract int getProperty:???(int key)")
     public int getProperty(int key) {
         return 0;
     }
 
-    // <= MC 1.13.2 only
-    @HookMethod(value="public abstract void setProperty:???(int key, int value)", optional=true)
+    @HookMethodCondition("version <= 1.13.2")
+    @HookMethod(value="public abstract void setProperty:???(int key, int value)")
     public void setProperty(int key, int value) {
     }
 
-    // <= MC 1.13.2 only
-    @HookMethod(value="public abstract int someFunction:???()", optional=true)
+    @HookMethodCondition("version <= 1.13.2")
+    @HookMethod(value="public abstract int someFunction:???()")
     public int someFunction() {
         return 0;
     }
@@ -172,7 +177,8 @@ public class IInventoryProxyHook extends ClassHook<IInventoryProxyHook> {
         return true;
     }
 
-    @HookMethod(value="public abstract boolean isNotEmptyOpt:???()", optional=true)
+    @HookMethodCondition("version <= 1.14.4")
+    @HookMethod(value="public abstract boolean isNotEmptyOpt:???()")
     public boolean isNotEmpty() {
         return true;
     }

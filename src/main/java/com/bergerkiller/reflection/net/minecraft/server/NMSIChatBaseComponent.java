@@ -6,5 +6,5 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 public class NMSIChatBaseComponent {
 	public static final ClassTemplate<?> T = ClassTemplate.create(IChatBaseComponentHandle.T.getType());
-	public static final MethodAccessor<String> getText = T.selectMethod("public abstract String getText()");
+	public static final MethodAccessor<String> getText = IChatBaseComponentHandle.T.getText.toMethodAccessor();
 }

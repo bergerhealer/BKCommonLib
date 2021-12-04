@@ -55,7 +55,9 @@ public class EntityMoveHandler_1_14 extends EntityMoveHandler {
         resolver.setDeclaredClassName("net.minecraft.world.level.World");
         try {
             String method_path;
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_18_getBlockCollisions.txt";
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_16_getBlockCollisions.txt";
             } else if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
                 method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_1_getBlockCollisions.txt";

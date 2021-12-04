@@ -73,7 +73,6 @@
 #include /net/minecraft/util_entityslice.txt
 #include /net/minecraft/util_inthashmap.txt
 #include /net/minecraft/util_registryid.txt
-#include /net/minecraft/util_weightedrandom.txt
 #include /net/minecraft/world/damagesource.txt
 #include /net/minecraft/world/foodmeta.txt
 #include /net/minecraft/world/inventory.txt

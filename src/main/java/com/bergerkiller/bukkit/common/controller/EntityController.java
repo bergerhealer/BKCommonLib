@@ -149,7 +149,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * @return Localized name
      */
     public String getLocalizedName() {
-        return hook.getName_base(this.getEntity().getHandle());
+        return hook.getStringUUID_base(this.getEntity().getHandle());
     }
 
     public void onPush(double dx, double dy, double dz) {

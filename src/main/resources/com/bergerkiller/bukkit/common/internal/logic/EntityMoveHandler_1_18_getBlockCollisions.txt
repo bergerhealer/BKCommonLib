@@ -1,0 +1,91 @@
+// package: net.minecraft.world.level.World;
+
+// If the entity is not inside the World Border, call the normal Block Collision handler
+// This bypasses our custom collision handler
+// This is done so that all this World Border collision logic does not have to be in BKCommonLib
+// return instance.a(voxelshape, voxelshape1, flag);
+
+// Notes:
+// flag = always false
+
+public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
+    int i = MathUtil.floor(voxelshape.min(EnumDirection$EnumAxis.X)) - 1;
+    int j = MathUtil.ceil(voxelshape.max(EnumDirection$EnumAxis.X)) + 1;
+    int k = MathUtil.floor(voxelshape.min(EnumDirection$EnumAxis.Y)) - 1;
+    int l = MathUtil.ceil(voxelshape.max(EnumDirection$EnumAxis.Y)) + 1;
+    int i1 = MathUtil.floor(voxelshape.min(EnumDirection$EnumAxis.Z)) - 1;
+    int j1 = MathUtil.ceil(voxelshape.max(EnumDirection$EnumAxis.Z)) + 1;
+    WorldBorder worldborder = this.getWorldBorder();
+    VoxelShape voxelshape2 = VoxelShapes.empty();
+
+    BlockPosition$MutableBlockPosition blockposition_b = new BlockPosition$MutableBlockPosition();
+
+    for (int k1 = i; k1 < j; ++k1) {
+        VoxelShape voxelshape3 = VoxelShapes.empty();
+
+        for (int l1 = i1; l1 < j1; ++l1) {
+            boolean flag2 = k1 == i || k1 == j - 1;
+            boolean flag3 = l1 == i1 || l1 == j1 - 1;
+
+            if (flag2 && flag3) {
+                continue;
+            }
+
+            blockposition_b.set(k1, 64, l1);
+
+            if (this.isLoaded((BlockPosition) blockposition_b)) {
+                VoxelShape voxelshape4 = VoxelShapes.empty();
+
+                for (int i2 = k; i2 < l; ++i2) {
+                    if (!flag2 && !flag3 || i2 != l - 1) {
+                        blockposition_b.set(k1, i2, l1);
+                        VoxelShape voxelshape5;
+
+                        if (!worldborder.a((BlockPosition) blockposition_b)) {
+                            voxelshape5 = VoxelShapes.block();
+                        } else {
+                            voxelshape5 = this.getBlockState((BlockPosition) blockposition_b).getCollisionShape((IBlockAccess) this, (BlockPosition) blockposition_b);
+                        }
+
+                        if (!voxelshape5.isEmpty()) {
+                            VoxelShape voxelshape6;
+                            VoxelShape voxelshape7;
+
+                            // BKCommonLib start: check actually colliding + Block Collision event handler
+                            voxelshape6 = voxelshape5.move((double) k1, (double) i2, (double) l1);
+                            if (!VoxelShapes.joinIsNotEmpty(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                                continue;
+                            }
+                            org.bukkit.craftbukkit.block.CraftBlock cb_block = new org.bukkit.craftbukkit.block.CraftBlock(this, blockposition_b.immutable());
+                            if (!handler.onBlockCollided(cb_block)) {
+                                continue;
+                            }
+                            // BKCommonLib end
+
+                            // voxelshape6 = voxelshape5.a((double) k1, (double) i2, (double) l1);
+                            if (!VoxelShapes.joinIsNotEmpty(voxelshape1, voxelshape6, OperatorBoolean.AND) && VoxelShapes.joinIsNotEmpty(voxelshape, voxelshape6, OperatorBoolean.AND)) {
+                                if (flag) {
+                                    voxelshape7 = VoxelShapes.block();
+                                    return voxelshape7;
+                                }
+
+                                voxelshape4 = VoxelShapes.joinUnoptimized(voxelshape4, voxelshape6, OperatorBoolean.OR);
+                            }
+                        }
+                    }
+                }
+
+                voxelshape3 = VoxelShapes.joinUnoptimized(voxelshape3, voxelshape4, OperatorBoolean.OR);
+            }
+        }
+
+        voxelshape2 = VoxelShapes.joinUnoptimized(voxelshape2, voxelshape3, OperatorBoolean.OR);
+    }
+
+    if (flag) {
+        return java.util.stream.Stream.empty();
+    } else {
+        voxelshape2 = voxelshape2.optimize();
+        return com.bergerkiller.mountiplex.MountiplexUtil.toStream(voxelshape2);
+    }
+}

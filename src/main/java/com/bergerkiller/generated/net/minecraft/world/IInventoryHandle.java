@@ -25,6 +25,9 @@ public abstract class IInventoryHandle extends Template.Handle {
 
     public abstract ItemStackHandle getItem(int index);
     public abstract void setItem(int paramInt, ItemStackHandle paramItemStack);
+    public abstract void stopOpen(HumanEntity paramEntityHuman);
+    public abstract ItemStack splitStack(int i, int j);
+    public abstract ItemStack splitWithoutUpdate(int i);
     public abstract int getSize();
     public abstract void update();
     public abstract boolean canOpen(HumanEntity paramEntityHuman);
@@ -38,6 +41,9 @@ public abstract class IInventoryHandle extends Template.Handle {
     public static final class IInventoryClass extends Template.Class<IInventoryHandle> {
         public final Template.Method.Converted<ItemStackHandle> getItem = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> stopOpen = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<ItemStack> splitStack = new Template.Method.Converted<ItemStack>();
+        public final Template.Method.Converted<ItemStack> splitWithoutUpdate = new Template.Method.Converted<ItemStack>();
         public final Template.Method<Integer> getSize = new Template.Method<Integer>();
         public final Template.Method<Void> update = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> canOpen = new Template.Method.Converted<Boolean>();

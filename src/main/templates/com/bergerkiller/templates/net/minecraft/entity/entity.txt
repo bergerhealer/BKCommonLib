@@ -1489,9 +1489,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #if version >= 1.18
+    public String getStringUUID();
     public boolean damageEntity:hurt((DamageSourceHandle) DamageSource damagesource, float damage);
     public void setPosition:setPos(double x, double y, double z);
 #else
+    public String getStringUUID:getName();
     public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
     public void setPosition(double x, double y, double z);
 #endif

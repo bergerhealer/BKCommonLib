@@ -78,7 +78,6 @@ public class ReflectionTest {
             loadClass(PacketType.class);
             loadClass(NMSEntityItem.class);
             loadClass(NMSItem.class);
-            loadClass(NMSMaterial.class);
             loadClass(NMSEntityHanging.class);
 
             loadClass(BPluginDescriptionFile.class);

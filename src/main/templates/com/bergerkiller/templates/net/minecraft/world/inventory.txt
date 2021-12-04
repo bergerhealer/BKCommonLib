@@ -10,11 +10,17 @@ interface IInventory {
     public abstract void setItem(int paramInt, (ItemStackHandle) ItemStack paramItemStack);
 
 #if version >= 1.18
+    public abstract void stopOpen((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack splitStack:removeItem(int i, int j);
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack splitWithoutUpdate:removeItemNoUpdate(int i);
     public abstract int getSize:getContainerSize();
     public abstract void update:setChanged();
     public abstract boolean canOpen:stillValid((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
     public abstract boolean canStoreItem:canPlaceItem(int index, (org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #else
+    public abstract void stopOpen:closeContainer((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack splitStack(int i, int j);
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack splitWithoutUpdate(int i);
     public abstract int getSize();
     public abstract void update();
     public abstract boolean canOpen:a((org.bukkit.entity.HumanEntity) EntityHuman paramEntityHuman);

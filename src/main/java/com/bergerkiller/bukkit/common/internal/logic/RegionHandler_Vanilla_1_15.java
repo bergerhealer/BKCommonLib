@@ -52,7 +52,11 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
             // PaperMC
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
+                    "#if version >= 1.18\n" +
+                    "    ChunkProviderServer cps = world.getChunkSource();\n" + 
+                    "#else\n" + 
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "#endif\n" +
                     "#if version >= 1.17\n" +
                     "    PlayerChunkMap pcm = cps.chunkMap;\n" +
                     "#else\n" +
@@ -70,7 +74,11 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
             // Spigot/CraftBukkit/vanilla NMS
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
+                    "#if version >= 1.18\n" +
+                    "    ChunkProviderServer cps = world.getChunkSource();\n" + 
+                    "#else\n" + 
                     "    ChunkProviderServer cps = world.getChunkProvider();\n" +
+                    "#endif\n" +
                     "#if version >= 1.17\n" +
                     "    PlayerChunkMap pcm = cps.chunkMap;\n" +
                     "#else\n" +
@@ -142,7 +150,11 @@ public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         {
             MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
+                    "#if version >= 1.18\n" +
+                    "    long coord = ChunkCoordIntPair.asLong(rx, rz);\n" +
+                    "#else\n" +
                     "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
+                    "#endif\n" +
                     "    return (RegionFile) cache.get(coord);\n" +
                     "}", resolver));
             findRegionFileAt.init(findRegionFileAtMethod);

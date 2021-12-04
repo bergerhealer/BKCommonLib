@@ -167,13 +167,22 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
     @Template.Import("net.minecraft.world.level.World")
+    @Template.Import("net.minecraft.world.level.border.WorldBorder")
     @Template.InstanceType("net.minecraft.world.level.portal.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
         /*
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
          *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
-         * #if version >= 1.17
+         * #if version >= 1.18
+         *     player.isChangingDimension = true;
+         *     player.unRide();
+         *     player.getLevel().removePlayerImmediately(player, Entity$RemovalReason.CHANGED_DIMENSION);
+         *     if (!player.wonGame) {
+         *         player.wonGame = true;
+         *         player.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
+         *     }
+         * #elseif version >= 1.17
          *     player.isChangingDimension = true;
          *     player.decouple();
          *     player.getWorldServer().a(player, Entity$RemovalReason.CHANGED_DIMENSION);
@@ -203,7 +212,9 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * <IS_MAIN_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
          *     World world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
-         * #if version >= 1.17
+         * #if version >= 1.18
+         *     return world.dimension() == World.END;
+         * #elseif version >= 1.17
          *     return world.getDimensionKey() == World.END;
          * #elseif version >= 1.16
          *     return world.getDimensionKey() == World.THE_END;
@@ -222,7 +233,11 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          * #if version >= 1.16.2
+         *   #if version >= 1.18
+         *     java.util.Optional opt_result = agent.findPortalAround(blockposition, world.getWorldBorder(), radius);
+         *   #else
          *     java.util.Optional opt_result = agent.findPortal(blockposition, radius);
+         *   #endif
          *     if (!opt_result.isPresent()) {
          *         return null;
          *     }
@@ -302,7 +317,10 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         * #if version >= 1.17
+         * #if version >= 1.18
+         *     VillagePlace villageplace = world.getPoiManager();
+         *     villageplace.add(blockposition, VillagePlaceType.NETHER_PORTAL);
+         * #elseif version >= 1.17
          *     VillagePlace villageplace = world.A();
          *     villageplace.a(blockposition, VillagePlaceType.NETHER_PORTAL);
          * #elseif version >= 1.16.2
@@ -344,8 +362,13 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                 int l1 = j + j1;
          *                 int i2 = k + i1 * b1 - l * b0;
          *                 boolean flag = j1 < 0;
+         * #if version >= 1.18
+         *                 pos.set(k1, l1, i2);
+         *                 if (world.getBlockState(pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         * #else
          *                 pos.d(k1, l1, i2);
          *                 if (world.getType(pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         * #endif
          *                     return null;
          *                 }
          *             }
@@ -363,7 +386,10 @@ public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     Entity entityInitiator = (Entity) entityInitiatorRaw;
          * 
-         * #if version >= 1.17
+         * #if version >= 1.18
+         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
+         *     WorldServer.makeObsidianPlatform(world, entityInitiator);
+         * #elseif version >= 1.17
          *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
          *     WorldServer.a(world, entityInitiator);
          * #elseif version >= 1.16
