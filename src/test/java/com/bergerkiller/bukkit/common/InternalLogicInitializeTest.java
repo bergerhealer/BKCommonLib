@@ -34,6 +34,7 @@ public class InternalLogicInitializeTest {
     @Test
     public void testEntityAddRemoveHandler() {
         assertNotNull(EntityAddRemoveHandler.INSTANCE);
+        EntityAddRemoveHandler.INSTANCE.forceInitialization();
     }
 
     @Test

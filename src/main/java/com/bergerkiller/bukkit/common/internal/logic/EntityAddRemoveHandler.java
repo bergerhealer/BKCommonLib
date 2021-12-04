@@ -29,8 +29,9 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
+import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
-public abstract class EntityAddRemoveHandler {
+public abstract class EntityAddRemoveHandler implements LazyInitializedObject {
     public static final EntityAddRemoveHandler INSTANCE;
     private final EntityByIdWorldMap entitiesById = new EntityByIdWorldMap();
     private CommonPlugin plugin = null;

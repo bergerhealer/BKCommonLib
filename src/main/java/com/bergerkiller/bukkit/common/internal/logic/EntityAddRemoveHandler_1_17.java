@@ -112,6 +112,13 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     }
 
     @Override
+    public void forceInitialization() {
+        entityManagerField.forceInitialization();
+        callbacksField.forceInitialization();
+        removeHandler.forceInitialization();
+    }
+
+    @Override
     public void processEvents() {
         for (LevelCallbackHandler hook : hooks) {
             hook.processEvents();
@@ -425,8 +432,13 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
          * #endif
          *     PersistentEntitySectionManager manager = world#entityManager;
+         * #if version >= 1.18
+         *     long key = ChunkCoordIntPair.asLong(cx, cz);
+         *     return manager.areEntitiesLoaded(key);
+         * #else
          *     long key = ChunkCoordIntPair.pair(cx, cz);
          *     return manager.a(key);
+         * #endif
          * }
          */
         @Template.Generated("%IS_CHUNK_ENTITIES_LOADED%")
@@ -565,7 +577,11 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *     EntityInLevelCallback callback = oldEntity#levelCallback;
          *     if (callback != EntityInLevelCallback.NULL) {
          *         if (newEntity == null) {
+         * #if version >= 1.18
+         *             callback.onRemove(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
+         * #else
          *             callback.a(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
+         * #endif
          *         } else {
          *             #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private final EntityAccess entity;
          *             if ( callback#entity == oldEntity ) {

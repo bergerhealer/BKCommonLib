@@ -113,6 +113,12 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
     }
 
     @Override
+    public void forceInitialization() {
+        entitiesByUUIDField.forceInitialization();
+        entityListField.forceInitialization();
+    }
+
+    @Override
     public void onEnabled(CommonPlugin plugin) {
         super.onEnabled(plugin);
         plugin.register(new Listener() {
