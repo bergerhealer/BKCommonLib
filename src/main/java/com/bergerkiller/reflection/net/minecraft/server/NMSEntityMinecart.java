@@ -15,7 +15,7 @@ import com.bergerkiller.mountiplex.reflection.MethodAccessor;
 
 @Deprecated
 public class NMSEntityMinecart {
-    public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartAbstractHandle.T.getType);
+    public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartAbstractHandle.T.getType());
 
     public static DataWatcher.Key<Integer> DATA_SHAKING_FACTOR = EntityMinecartAbstractHandle.DATA_SHAKING_FACTOR;
     public static DataWatcher.Key<Integer> DATA_SHAKING_DIRECTION = EntityMinecartAbstractHandle.DATA_SHAKING_DIRECTION;

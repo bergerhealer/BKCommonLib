@@ -19,12 +19,12 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract int getIndex();
+    public abstract int getFilterFlag();
     public abstract String getName();
 
-    public static Object fromIndexRaw(int index) {
+    public static Object fromFilterFlagRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {
-            if (T.getIndex.invoke(value).intValue() == index) {
+            if (T.getFilterFlag.invoke(value).intValue() == index) {
                 return value;
             }
         }
@@ -35,7 +35,7 @@ public abstract class EnumItemSlotHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EnumItemSlotClass extends Template.Class<EnumItemSlotHandle> {
-        public final Template.Method<Integer> getIndex = new Template.Method<Integer>();
+        public final Template.Method<Integer> getFilterFlag = new Template.Method<Integer>();
         public final Template.Method<String> getName = new Template.Method<String>();
 
     }

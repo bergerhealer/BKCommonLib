@@ -11,6 +11,9 @@ class AttributeModifiable {
 #if forge_nms_obfuscated
     public abstract void setValue:a(double value);
     public abstract double getValue:e();
+#elseif version >= 1.18
+    public abstract void setValue:setBaseValue(double value);
+    public abstract double getValue:getBaseValue();
 #else
     public abstract void setValue(double value);
     public abstract double getValue();
@@ -18,7 +21,10 @@ class AttributeModifiable {
 }
 
 class AttributeMapBase {
-#if version >= 1.16
+#if version >= 1.18
+    public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes:getDirtyAttributes();
+    public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:getSyncableAttributes();
+#elseif version >= 1.16
     public (Set<AttributeModifiableHandle>) Set<AttributeModifiable> getAttributes();
     public (Collection<AttributeModifiableHandle>) Collection<AttributeModifiable> getSynchronizedAttributes:b();
 #else
@@ -31,7 +37,10 @@ class AttributeMapBase {
     }
 #endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public void loadFromNBT:load((CommonTagList) NBTTagList nbttaglist);
+    public (CommonTagList) NBTTagList saveToNBT:save();
+#elseif version >= 1.16
     public void loadFromNBT:a((CommonTagList) NBTTagList nbttaglist);
     public (CommonTagList) NBTTagList saveToNBT:c();
 #else

@@ -130,7 +130,11 @@ class EntityLiving extends Entity {
         // TODO: Is there no cleaner way to do this? Maybe modify AttributeMapBase directly?
         #require net.minecraft.world.entity.EntityLiving private final AttributeMapBase attributeMapField:attributes;
         #require net.minecraft.world.entity.EntityLiving private final org.bukkit.craftbukkit.attribute.CraftAttributeMap craftAttributes;
+  #if version >= 1.18
+        AttributeMapBase new_attributes = new AttributeMapBase(AttributeDefaults.getSupplier(instance.getType()));
+  #else
         AttributeMapBase new_attributes = new AttributeMapBase(AttributeDefaults.a(instance.getEntityType()));
+  #endif
         org.bukkit.craftbukkit.attribute.CraftAttributeMap new_craftAttributes = new org.bukkit.craftbukkit.attribute.CraftAttributeMap(new_attributes);
         instance#attributeMapField = new_attributes;
         instance#craftAttributes = new_craftAttributes;
@@ -191,9 +195,15 @@ class EntityLiving extends Entity {
 #endif
     }
 
+#if version >= 1.18
+    public (AttributeMapBaseHandle) AttributeMapBase getAttributeMap:getAttributes();
+#else
     public (AttributeMapBaseHandle) AttributeMapBase getAttributeMap();
+#endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) AttributeBase iattribute);
+#elseif version >= 1.16
     public (AttributeModifiableHandle) AttributeModifiable getAttribute:getAttributeInstance((Object) AttributeBase iattribute);
 #else
     public (AttributeModifiableHandle) AttributeModifiable getAttribute((Object) IAttribute iattribute) {
@@ -291,9 +301,15 @@ class EntityLiving extends Entity {
     public boolean updateEffects;
 #endif
 
+#if version >= 1.18
+    public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects:getActiveEffects();
+#else
     public (Collection<MobEffectHandle>) Collection<MobEffect> getEffects();
+#endif
 
-#if version >= 1.9
+#if version >= 1.18
+    public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment:getItemBySlot((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
+#elseif version >= 1.9
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) EnumItemSlot paramEnumItemSlot);
 #else
     public abstract (org.bukkit.inventory.ItemStack) ItemStack getEquipment((org.bukkit.inventory.EquipmentSlot) int paramEnumItemSlot);

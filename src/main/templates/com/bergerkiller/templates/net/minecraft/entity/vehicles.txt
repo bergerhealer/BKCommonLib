@@ -63,8 +63,14 @@ class EntityMinecartAbstract extends Entity {
 
     public float getDamage();
     public void setDamage(float damage);
-    public int getType();
+
+#if version >= 1.18
+    public int getHurtTime();
+    public void activate:activateMinecart(int x, int y, int z, boolean active);
+#else
+    public int getHurtTime:getType();
     public void activate:a(int x, int y, int z, boolean active);
+#endif
 }
 
 class EntityMinecartRideable extends EntityMinecartAbstract {
@@ -117,7 +123,9 @@ class EntityMinecartHopper extends EntityMinecartAbstract {
     private int suckingCooldown:b;
 #endif
 
-#if version >= 1.16
+#if version >= 1.18
+    public boolean suckItems:suckInItems();
+#elseif version >= 1.16
     public boolean suckItems:B();
 #elseif version >= 1.14
     public boolean suckItems:C();
@@ -152,7 +160,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     private int fuse:a;
 #endif
 
-#if version >= 1.15
+#if version >= 1.18
+    protected void explode(double damage);
+#elseif version >= 1.15
     protected void explode:h(double damage);
 #elseif version >= 1.9
     protected void explode:c(double damage);
@@ -160,7 +170,9 @@ class EntityMinecartTNT extends EntityMinecartAbstract {
     protected void explode:b(double damage);
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public void prime:primeFuse();
+#elseif version >= 1.17
     public void prime:w();
 #elseif version >= 1.16
     public void prime:u();

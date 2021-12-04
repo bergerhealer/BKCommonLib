@@ -1,10 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.world.entity.decoration;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
-import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
-import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
 import java.util.UUID;
 
@@ -14,7 +11,7 @@ import java.util.UUID;
  * New handles can be created from raw instances using {@link #createHandle(Object)}.
  */
 @Template.InstanceType("net.minecraft.world.entity.decoration.EntityItemFrame")
-public abstract class EntityItemFrameHandle extends EntityHandle {
+public abstract class EntityItemFrameHandle extends EntityHangingHandle {
     /** @See {@link EntityItemFrameClass} */
     public static final EntityItemFrameClass T = Template.Class.create(EntityItemFrameClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
@@ -30,9 +27,7 @@ public abstract class EntityItemFrameHandle extends EntityHandle {
     public abstract ItemStack getItem();
     public abstract void setItem(ItemStack newItemStack);
     public abstract void refreshItem();
-    public abstract IntVector3 getBlockPosition();
     public abstract int getRotationOrdinal();
-    public abstract BlockFace getFacing();
 
     public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM, 8);
 
@@ -53,9 +48,7 @@ public abstract class EntityItemFrameHandle extends EntityHandle {
         public final Template.Method.Converted<ItemStack> getItem = new Template.Method.Converted<ItemStack>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();
         public final Template.Method<Void> refreshItem = new Template.Method<Void>();
-        public final Template.Method.Converted<IntVector3> getBlockPosition = new Template.Method.Converted<IntVector3>();
         public final Template.Method<Integer> getRotationOrdinal = new Template.Method<Integer>();
-        public final Template.Method.Converted<BlockFace> getFacing = new Template.Method.Converted<BlockFace>();
 
     }
 

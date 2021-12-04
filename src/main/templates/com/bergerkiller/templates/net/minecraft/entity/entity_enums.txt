@@ -5,22 +5,26 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EnumMainHandHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumMoveTypeHandle;
 
 class EnumItemSlot {
-#if version >= 1.16.3
-    public int getIndex:getSlotFlag();
+#if version >= 1.18
+    public int getFilterFlag();
+#elseif version >= 1.16.3
+    public int getFilterFlag:getSlotFlag();
 #else
-    public int getIndex:c();
+    public int getFilterFlag:c();
 #endif
 
-#if version >= 1.13.2
+#if version >= 1.18
+    public String getName();
+#elseif version >= 1.13.2
     public String getName:getSlotName();
 #else
     public String getName:d();
 #endif
 
     <code>
-    public static Object fromIndexRaw(int index) {
+    public static Object fromFilterFlagRaw(int index) {
         for (Object value : T.getType().getEnumConstants()) {
-            if (T.getIndex.invoke(value).intValue() == index) {
+            if (T.getFilterFlag.invoke(value).intValue() == index) {
                 return value;
             }
         }

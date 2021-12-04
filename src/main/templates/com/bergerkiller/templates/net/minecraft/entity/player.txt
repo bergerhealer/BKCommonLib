@@ -46,8 +46,13 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #if version >= 1.16
     // World dimension on 1.16 and later
     public org.bukkit.World getSpawnWorld() {
+  #if version >= 1.18
+        ResourceKey spawn = instance.getRespawnDimension();
+        World world = MinecraftServer.getServer().getLevel(spawn);
+  #else
         ResourceKey spawn = instance.getSpawnDimension();
         World world = MinecraftServer.getServer().getWorldServer(spawn);
+  #endif
         return (world == null) ? null : world.getWorld();
     }
     public void setSpawnWorld(org.bukkit.World world) {
@@ -56,7 +61,11 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
   #else
         #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
   #endif
+  #if version >= 1.18
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().dimension();
+  #else
         ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
+  #endif
         instance#spawnDimension = key;
     }
 #else
@@ -240,12 +249,20 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #else
         PlayerInventory playerInventory = instance.inventory;
 #endif
+#if version >= 1.18
+        World world = instance.getLevel();
+        BlockPosition position = instance.blockPosition();
+#else
         World world = instance.getWorld();
         BlockPosition position = instance.getChunkCoordinates();
+#endif
 
         int windowId = instance.nextContainerCounter();
 
-#if version >= 1.14
+#if version >= 1.18
+        ContainerAccess access = ContainerAccess.create(world, position);
+        ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
+#elseif version >= 1.14
         ContainerAccess access = ContainerAccess.at(world, position);
         ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
 #else
@@ -267,7 +284,9 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         instance.activeContainer = container;
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+        instance.connection.send(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+#elseif version >= 1.17
         instance.connection.sendPacket(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
 #elseif version >= 1.14
         instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));

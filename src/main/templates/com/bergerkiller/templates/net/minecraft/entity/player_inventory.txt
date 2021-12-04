@@ -6,9 +6,13 @@ import net.minecraft.world.IInventory;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 
 class PlayerInventory extends IInventory {
+#if version >= 1.18
+    public (CommonTagList) NBTTagList saveToNBT:save((CommonTagList) NBTTagList nbttaglist);
+    public void loadFromNBT:load((CommonTagList) NBTTagList nbttaglist);
+    public static int getHotbarSize:getSelectionSize();
+#else
     public (CommonTagList) NBTTagList saveToNBT:a((CommonTagList) NBTTagList nbttaglist);
-
     public void loadFromNBT:b((CommonTagList) NBTTagList nbttaglist);
-
     public static int getHotbarSize();
+#endif
 }

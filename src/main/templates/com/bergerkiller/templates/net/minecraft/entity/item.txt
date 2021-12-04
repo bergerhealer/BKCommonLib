@@ -36,7 +36,11 @@ class EntityItem extends Entity {
 
     public (EntityItemHandle) EntityItem((WorldHandle) World world, double x, double y, double z, (ItemStackHandle) ItemStack itemstack);
 
+#if version >= 1.18
+    public (ItemStackHandle) ItemStack getItemStack:getItem();
+    public void setItemStack:setItem((ItemStackHandle) ItemStack itemstack);
+#else
     public (ItemStackHandle) ItemStack getItemStack();
-
     public void setItemStack((ItemStackHandle) ItemStack itemstack);
+#endif
 }

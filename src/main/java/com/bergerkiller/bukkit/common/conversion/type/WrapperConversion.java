@@ -504,18 +504,18 @@ public class WrapperConversion {
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
-    public static int enumItemSlotToIndex(Object nmsEnumItemSlot) {
-        return EnumItemSlotHandle.T.getIndex.invoker.invoke(nmsEnumItemSlot);
+    public static int enumItemSlotToFilterFlag(Object nmsEnumItemSlot) {
+        return EnumItemSlotHandle.T.getFilterFlag.invoker.invoke(nmsEnumItemSlot);
     }
 
     @ConverterMethod
-    public static int equipmentSlotToIndex(EquipmentSlot equipmentSlot) {
-        return enumItemSlotToIndex(HandleConversion.toEnumItemSlotHandle(equipmentSlot));
+    public static int equipmentSlotToFilterFlag(EquipmentSlot equipmentSlot) {
+        return enumItemSlotToFilterFlag(HandleConversion.toEnumItemSlotHandle(equipmentSlot));
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
-    public static Object enumItemSlotFromIndex(int legacyEquipmentIndex) {
-        return EnumItemSlotHandle.fromIndexRaw(legacyEquipmentIndex);
+    public static Object enumItemSlotFromFilterFlag(int legacyEquipmentIndex) {
+        return EnumItemSlotHandle.fromFilterFlagRaw(legacyEquipmentIndex);
     }
 
     @ConverterMethod(input="net.minecraft.network.chat.ChatMessageType", optional=true)

@@ -134,7 +134,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
     }
 
-#if version >= 1.15.2
+#if version >= 1.18
+    public boolean isInSameVehicle:isPassengerOfSameVehicle((EntityHandle) Entity entity);
+#elseif version >= 1.15.2
     public boolean isInSameVehicle:isSameVehicle((EntityHandle) Entity entity);
 #elseif version >= 1.9
     public boolean isInSameVehicle:x((EntityHandle) Entity entity);
@@ -171,11 +173,30 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double lastZ;
 #endif
 
-#if version >= 1.15
+#if version >= 1.18
+    public double getLocX:getX();
+    public double getLocY:getY();
+    public double getLocZ:getZ();
+    public void setLoc:setPosRaw(double x, double y, double z);
+
+    public void setLocX(double x) {
+        instance.setPosRaw(x, instance.getY(), instance.getZ());
+    }
+
+    public void setLocY(double y) {
+        instance.setPosRaw(instance.getX(), y, instance.getZ());
+    }
+
+    public void setLocZ(double z) {
+        instance.setPosRaw(instance.getX(), instance.getY(), z);
+    }
+
+#elseif version >= 1.15
     // locX/Y/Z fields became private on 1.15
     public double getLocX:locX();
     public double getLocY:locY();
     public double getLocZ:locZ();
+    public void setLoc:setPositionRaw(double x, double y, double z);
 
   #if version >= 1.16
     // Since 1.16 they got merged into a 'Vec3D loc' field
@@ -208,8 +229,6 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance#locZ = z;
     }
   #endif
-
-    public void setLoc:setPositionRaw(double x, double y, double z);
 #else
     public double getLocX() { return instance.locX; }
     public double getLocY() { return instance.locY; }
@@ -257,7 +276,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
     }
 
-#if version >= 1.17
+#if version >= 1.18
+    public boolean isLastAndCurrentPositionDifferent() {
+        return instance.getX() != instance.xo || instance.getY() != instance.yo || instance.getZ() != instance.zo ||
+               instance.getYRot() != instance.yRotO || instance.getXRot() != instance.xRotO;
+    }
+#elseif version >= 1.17
     public boolean isLastAndCurrentPositionDifferent() {
         return instance.locX() != instance.xo || instance.locY() != instance.yo || instance.locZ() != instance.zo ||
                instance.getYRot() != instance.yRotO || instance.getXRot() != instance.xRotO;
@@ -274,10 +298,65 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
 #endif
 
+
+#if version >= 1.18
+    public org.bukkit.util.Vector getMot() {
+        Vec3D mot = instance.getDeltaMovement();
+        return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
+    }
+
+    public void setMotVector(org.bukkit.util.Vector mot) {
+        instance.setDeltaMovement(new Vec3D(mot.getX(), mot.getY(), mot.getZ()));
+    }
+
+    public void setMot(double x, double y, double z) {
+        instance.setDeltaMovement(new Vec3D(x, y, z));
+    }
+
+    public void fixMotNaN() {
+        Vec3D mot = instance.getDeltaMovement();
+        if (Double.isNaN(mot.x) || Double.isNaN(mot.y) || Double.isNaN(mot.z)) {
+            double x = mot.x;
+            double y = mot.y;
+            double z = mot.z;
+            if (Double.isNaN(x)) x = 0.0;
+            if (Double.isNaN(y)) y = 0.0;
+            if (Double.isNaN(z)) z = 0.0;
+            instance.setDeltaMovement(new Vec3D(x, y, z));
+        }
+    }
+
+    public void setMotX(double x) {
+        Vec3D mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3D(x, mot.y, mot.z));
+    }
+
+    public void setMotY(double y) {
+        Vec3D mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3D(mot.x, y, mot.z));
+    }
+
+    public void setMotZ(double z) {
+        Vec3D mot = instance.getDeltaMovement();
+        instance.setDeltaMovement(new Vec3D(mot.x, mot.y, z));
+    }
+
+    public double getMotX() {
+        return instance.getDeltaMovement().x;
+    }
+
+    public double getMotY() {
+        return instance.getDeltaMovement().y;
+    }
+
+    public double getMotZ() {
+        return instance.getDeltaMovement().z;
+    }
+
+#elseif version >= 1.14
     // motX/Y/Z is private 'mot' field on 1.14
     // For performance reasons, use the getMot/setMot methods
     // Reflection to access the private mot Vec3D is likely slower.
-#if version >= 1.14
     public org.bukkit.util.Vector getMot() {
         Vec3D mot = instance.getMot();
         return new org.bukkit.util.Vector(mot.x, mot.y, mot.z);
@@ -330,6 +409,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public double getMotZ() {
         return instance.getMot().z;
     }
+
 #else
     public org.bukkit.util.Vector getMot() {
         return new org.bukkit.util.Vector(instance.motX, instance.motY, instance.motZ);
@@ -518,7 +598,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean isCollidingWithBlock() {
         Vec3D multiplier = instance#collidingWithBlockMultiplier;
+  #if version >= 1.18
+        return multiplier.lengthSqr() > 1.0E-7;
+  #else
         return multiplier.g() > 1.0E-7;
+  #endif
     }
 
     public org.bukkit.util.Vector getBlockCollisionMultiplier() {
@@ -590,9 +674,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void setDead(boolean dead) {
         if (dead) {
             Entity$RemovalReason reason = instance.getRemovalReason();
+  #if version >= 1.18
+            if (reason == null || !reason.shouldDestroy()) {
+                instance.remove(Entity$RemovalReason.KILLED);
+            }
+  #else
             if (reason == null || !reason.a()) {
                 instance.a(Entity$RemovalReason.KILLED);
             }
+  #endif
         } else {
             //TODO: Hmmm??
             instance.unsetRemoved();
@@ -601,18 +691,42 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean isDead() {
         Entity$RemovalReason reason = instance.getRemovalReason();
+  #if version >= 1.18
+        return reason != null && reason.shouldDestroy();
+  #else
         return reason != null && reason.a();
+  #endif
     }
 
     public boolean isSavingAllowed() {
         Entity$RemovalReason reason = instance.getRemovalReason();
-        return reason == null || reason.b();
+  #if version >= 1.18
+        return reason != null && reason.shouldSave();
+  #else
+        return reason != null && reason.b();
+  #endif
     }
 
     public boolean isLoadedInWorld() {
         return !instance.isRemoved();
     }
 
+  #if version >= 1.18
+    public int getChunkX() {
+        BlockPosition blockPosition = instance.blockPosition();
+        return blockPosition.getX() >> 4;
+    }
+
+    public int getChunkY() {
+        BlockPosition blockPosition = instance.blockPosition();
+        return blockPosition.getY() >> 4;
+    }
+
+    public int getChunkZ() {
+        BlockPosition blockPosition = instance.blockPosition();
+        return blockPosition.getZ() >> 4;
+    }
+  #else
     public int getChunkX() {
         BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
         return blockPosition.getX() >> 4;
@@ -627,6 +741,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         BlockPosition blockPosition = instance.getChunkCoordinates(); // Note: block coords, NOT chunk coords!
         return blockPosition.getZ() >> 4;
     }
+  #endif
 
     public optional void setLoadedInWorld_pre_1_17:###(boolean loaded);
 
@@ -645,9 +760,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         long coordKey = callback#currentSectionKey;
 
         // Convert to chunk x/z coordinates
+    #if version >= 1.18
         int chunkX = SectionPosition.b(coordKey);
         //int chunkY = SectionPosition.c(coordKey);
         int chunkZ = SectionPosition.d(coordKey);
+    #else
+        int chunkX = SectionPosition.sectionRelativeX(coordKey);
+        //int chunkY = SectionPosition.sectionRelativeY(coordKey);
+        int chunkZ = SectionPosition.sectionRelativeZ(coordKey);
+    #endif
         return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
     }
   #endif
@@ -778,7 +899,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
   #endif
 #endif
 
-#if version >= 1.14
+#if version >= 1.18
+    public float getWidth:getBbWidth();
+    public float getHeight:getBbHeight();
+#elseif version >= 1.14
     public float getWidth();
     public float getHeight();
 #else
@@ -1064,7 +1188,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.16.2
+#if version >= 1.18
+    protected void playStepSound((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
+#elseif version >= 1.16.2
     protected void playStepSound:b((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
 #elseif version >= 1.13
     protected void playStepSound:a((IntVector3) BlockPosition position, (BlockData) IBlockData blockData);
@@ -1088,8 +1214,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     ...
      * }
      */
-#if exists net.minecraft.world.entity.Entity public void setYawPitch(float yaw, float pitch);
+#if exists net.minecraft.world.entity.Entity public void setRot(float yaw, float pitch);
+    public void setRotation:setRot(float yaw, float pitch);
+#elseif exists net.minecraft.world.entity.Entity public void setYawPitch(float yaw, float pitch);
     public void setRotation:setYawPitch(float yaw, float pitch);
+#elseif version >= 1.18
+    protected void setRotation:setRot(float yaw, float pitch);
 #else
     protected void setRotation:setYawPitch(float yaw, float pitch);
 #endif
@@ -1108,6 +1238,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         #require net.minecraft.world.entity.Entity protected void burn(int dmg);
         instance#burn((int)dmg);
     }
+#elseif version >= 1.18
+    public void burn(float dmg) {
+        if (!instance.fireImmune()) {
+            instance.hurt(DamageSource.IN_FIRE, dmg);
+        }
+    }
 #elseif version >= 1.16
     public void burn(float dmg) {
         if (!instance.isFireProof()) {
@@ -1122,7 +1258,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     protected void burn(float dmg);
 #endif
 
-#if version >= 1.13
+#if version >= 1.18
+    public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
+        return instance.spawnAtLocation(new ItemStack(material, amount), force);
+    }
+#elseif version >= 1.13
     public (org.bukkit.entity.Item) EntityItem dropItem((org.bukkit.Material) Item material, int amount, float force) {
         return instance.a(new ItemStack(material, amount), force);
     }
@@ -1130,7 +1270,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public (org.bukkit.entity.Item) EntityItem dropItem:a((org.bukkit.Material) Item material, int amount, float force);
 #endif
 
+#if version >= 1.18
+    public (org.bukkit.entity.Item) EntityItem dropItemStack:spawnAtLocation((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
+#else
     public (org.bukkit.entity.Item) EntityItem dropItemStack:a((org.bukkit.inventory.ItemStack) ItemStack itemstack, float force);
+#endif
 
     /*
      * void move(...) {
@@ -1138,7 +1282,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      #     this.a(this.##METHODNAME##(), f1, 1.0F + (this.random.nextFloat() - this.random.nextFloat()) * 0.4F);
      * }
      */
-#if version >= 1.14
+#if version >= 1.18
+    protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSwimSound();
+#elseif version >= 1.14
     protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:getSoundSwim();
 #elseif version >= 1.13
     protected (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) SoundEffect getSwimSound:ad();
@@ -1172,6 +1318,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     // Note: counts rain too as being wet!
 #select version >=
+#case 1.18:   public boolean isWet:isInWaterRainOrBubble();
 #case 1.17:   public boolean isWet:aN();
 #case 1.16.4: public boolean isWet:aG();
 #case 1.16.2: public boolean isWet:aF();
@@ -1189,6 +1336,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     // Note: checks just standing in water! Rain does not count.
 #select version >=
+#case 1.18:   public boolean isInWaterUpdate:isInWaterOrBubble();
 #case 1.17:   public boolean isInWaterUpdate:aO();
 #case 1.16.4: public boolean isInWaterUpdate:aH();
 #case 1.16.2: public boolean isInWaterUpdate:aG();
@@ -1231,7 +1379,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.17
+#if version >= 1.18
+    protected boolean hasMovementSound() {
+        #require net.minecraft.world.entity.Entity protected Entity.MovementEmission getMovementEmission();
+        Entity$MovementEmission entity_movementemission = instance#getMovementEmission();
+        return entity_movementemission.emitsSounds(); // sound only
+    }
+#elseif version >= 1.17
     protected boolean hasMovementSound() {
         #require net.minecraft.world.entity.Entity protected Entity.MovementEmission getMovementEmission:aI();
         Entity$MovementEmission entity_movementemission = instance#getMovementEmission();
@@ -1258,7 +1412,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     }
      * }
      */
-#if version >= 1.9
+#if version >= 1.18
+    protected void updateFalling:checkFallDamage(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
+#elseif version >= 1.9
     protected void updateFalling:a(double d0, boolean flag, (BlockData) IBlockData blockData, (IntVector3) BlockPosition position);
 #else
     protected void updateFalling:a(double d0, boolean flag, (BlockData) Block blockData, (IntVector3) BlockPosition position);
@@ -1307,7 +1463,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     ...
      * }
      */
+#if version >= 1.18
+    protected void checkBlockCollisions:checkInsideBlocks();
+#else
     protected void checkBlockCollisions();
+#endif
 
     /*
      * public double ##METHODNAME##(double d0, double d1, double d2) {
@@ -1318,29 +1478,54 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
      * }
      */
-#if version >= 1.16.2
-    public double calculateDistance:h(double x, double y, double z);
+#if version >= 1.18
+    public double calculateDistanceSquared:distanceToSqr(double x, double y, double z);
+#elseif version >= 1.16.2
+    public double calculateDistanceSquared:h(double x, double y, double z);
 #elseif version >= 1.15
-    public double calculateDistance:g(double x, double y, double z);
+    public double calculateDistanceSquared:g(double x, double y, double z);
 #else
-    public double calculateDistance:e(double x, double y, double z);
+    public double calculateDistanceSquared:e(double x, double y, double z);
 #endif
 
+#if version >= 1.18
+    public boolean damageEntity:hurt((DamageSourceHandle) DamageSource damagesource, float damage);
+    public void setPosition:setPos(double x, double y, double z);
+#else
     public boolean damageEntity((DamageSourceHandle) DamageSource damagesource, float damage);
-
     public void setPosition(double x, double y, double z);
+#endif
 
-#if version >= 1.17
+#if version >= 1.18
     public void setSize(float width, float height) {
         #require net.minecraft.world.entity.Entity private EntitySize dimensions;
         #require net.minecraft.world.entity.Entity private float eyeHeight;
-        #require net.minecraft.world.entity.Entity protected float getHeadHeight(EntityPose entitypose, EntitySize entitysize);
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight(EntityPose entitypose, EntitySize entitysize);
+
+        EntityPose entitypose = instance.getPose();
+        EntitySize newSize = EntitySize.scalable(width, height);
+
+        instance#dimensions = newSize;
+        instance#eyeHeight = instance#getEyeHeight(entitypose, newSize);
+
+        double half_width = (double) width / 2.0;
+        AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
+            instance.getX() - half_width, instance.getY(), instance.getZ() - half_width,
+            instance.getX() + half_width, instance.getY() + (double) height, instance.getZ() + half_width);
+
+        instance.setBoundingBox(new_BoundingBox);
+    }
+#elseif version >= 1.17
+    public void setSize(float width, float height) {
+        #require net.minecraft.world.entity.Entity private EntitySize dimensions;
+        #require net.minecraft.world.entity.Entity private float eyeHeight;
+        #require net.minecraft.world.entity.Entity protected float getEyeHeight:getHeadHeight(EntityPose entitypose, EntitySize entitysize);
 
         EntityPose entitypose = instance.getPose();
         EntitySize newSize = EntitySize.b(width, height);
 
         instance#dimensions = newSize;
-        instance#eyeHeight = instance#getHeadHeight(entitypose, newSize);
+        instance#eyeHeight = instance#getEyeHeight(entitypose, newSize);
 
         double half_width = (double) width / 2.0;
         AxisAlignedBB new_BoundingBox = new AxisAlignedBB(
@@ -1388,22 +1573,28 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void setSize:a(float width, float height);
 #endif
 
-    public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
-
-    public void setLocation(double x, double y, double z, float yaw, float pitch);
-
-    public float getHeadRotation();
-
     public (AxisAlignedBBHandle) AxisAlignedBB getBoundingBox();
 
-    public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb)
+#if version >= 1.18
+    public void setPositionRotation:moveTo(double x, double y, double z, float yaw, float pitch);
+    public void setLocation:absMoveTo(double x, double y, double z, float yaw, float pitch);
+    public void setBoundingBox((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public float getHeadRotation:getYHeadRot();
+#else
+    public void setPositionRotation(double x, double y, double z, float yaw, float pitch);
+    public void setLocation(double x, double y, double z, float yaw, float pitch);
+    public void setBoundingBox:a((AxisAlignedBBHandle) AxisAlignedBB axisalignedbb);
+    public float getHeadRotation();
+#endif
 
 #select version >=
 #case 1.16.2
     // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
     // Only the Shulker and Boat entity appear to use this flag
     public (AxisAlignedBBHandle) AxisAlignedBB getOtherBoundingBox() {
-  #if version >= 1.17
+  #if version >= 1.18
+        return instance.canBeCollidedWith() ? instance.getBoundingBox() : null;
+  #elseif version >= 1.17
         return instance.bi() ? instance.getBoundingBox() : null;
   #elseif version >= 1.16.4
         return instance.aZ() ? instance.getBoundingBox() : null;
@@ -1424,7 +1615,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #if version >= 1.16.2
     // Since 1.16.2 this was removed, implementation taken from 1.16.1 (minecart/strider/etc.)
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox((EntityHandle) Entity entity) {
+  #if version >= 1.18
+        return instance.isPushable() ? entity.getBoundingBox() : null;
+  #else
         return instance.isCollidable() ? entity.getBoundingBox() : null;
+  #endif
     }
 #else
     public (AxisAlignedBBHandle) AxisAlignedBB getEntityBoundingBox:j((EntityHandle) Entity entity);
@@ -1434,7 +1629,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     // Removed since 1.17, maybe because it was 'unsafe'. Calculates position using bounding box.
     public void setPositionFromBoundingBox() {
         AxisAlignedBB aabb = instance.getBoundingBox();
+  #if version >= 1.18
+        instance.setPosRaw((aabb.minX + aabb.maxX) / 2.0, aabb.minY, (aabb.minZ + aabb.maxZ) / 2.0);
+  #else
         instance.setPositionRaw((aabb.minX + aabb.maxX) / 2.0, aabb.minY, (aabb.minZ + aabb.maxZ) / 2.0);
+  #endif
     }
 #elseif version >= 1.9
     public void setPositionFromBoundingBox:recalcPosition();
@@ -1442,11 +1641,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     private void setPositionFromBoundingBox:recalcPosition();
 #endif
 
+#if version >= 1.18
+    public boolean isBurning:isOnFire();
+    public void setOnFire:setSecondsOnFire(int numSeconds);
+    public optional int prop_getMaxFireTicks:getFireImmuneTicks();
+#else
     public boolean isBurning();
-
     public void setOnFire(int numSeconds);
-
     public optional int prop_getMaxFireTicks:getMaxFireTicks();
+#endif
 
     <code>
     public int getMaxFireTicks() {
@@ -1460,7 +1663,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     }
     </code>
 
-#if version >= 1.14
+#if version >= 1.18
+    public optional (EntityHandle) Entity getDriverEntity:getControllingPassenger();
+#elseif version >= 1.14
     public optional (EntityHandle) Entity getDriverEntity:getRidingPassenger();
 #elseif version >= 1.13
     public optional (EntityHandle) Entity getDriverEntity:bO();
@@ -1506,7 +1711,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void onTick:s_();
 #endif
 
-#if version >= 1.17
+#if version >= 1.18
+    public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
+    public boolean onEntitySave:saveAsPassenger((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.17
     public void loadFromNBT:load((CommonTagCompound) NBTTagCompound compound);
     public boolean onEntitySave:d((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.16
@@ -1517,7 +1725,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean onEntitySave:c((CommonTagCompound) NBTTagCompound compound);
 #endif
 
-#if version >= 1.12
+#if version >= 1.18
+    public (void) NBTTagCompound saveToNBT:saveWithoutId((CommonTagCompound) NBTTagCompound compound);
+#elseif version >= 1.12
     public (void) NBTTagCompound saveToNBT:save((CommonTagCompound) NBTTagCompound compound);
 #elseif version >= 1.9.4
     public (void) NBTTagCompound saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
@@ -1525,17 +1735,23 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void saveToNBT:e((CommonTagCompound) NBTTagCompound compound);
 #endif
 
-    public boolean isSneaking();
-
-    public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
-
     public int getId();
 
+#if version >= 1.18
+    public UUID getUniqueID:getUUID();
+    public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher getDataWatcher:getEntityData();
+    public boolean isSneaking:isShiftKeyDown();
+    public void appendEntityCrashDetails:fillCrashReportCategory((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+#else
     public UUID getUniqueID();
-
     public (com.bergerkiller.bukkit.common.wrappers.DataWatcher) net.minecraft.network.syncher.DataWatcher getDataWatcher();
+    public boolean isSneaking();
+    public void appendEntityCrashDetails((CrashReportSystemDetailsHandle) CrashReportSystemDetails crashreportsystemdetails);
+#endif
 
-#if version >= 1.16.2
+#if version >= 1.18
+    public void onPush:push(double d0, double d1, double d2);
+#elseif version >= 1.16.2
     public void onPush:i(double d0, double d1, double d2);
 #elseif version >= 1.15
     public void onPush:h(double d0, double d1, double d2);
@@ -1553,6 +1769,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      * }
      */
 #select version >=
+#case 1.18:   public int getPortalCooldownMaximum:getDimensionChangingDelay();
 #case 1.16:   public int getPortalCooldownMaximum:getDefaultPortalCooldown();
 #case 1.15:   public int getPortalCooldownMaximum:ba();
 #case 1.14.3: public int getPortalCooldownMaximum:aX();
@@ -1566,7 +1783,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endselect
 
     // Since MC 1.16
-#if version >= 1.16
+#if version >= 1.18
+    public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
+#elseif version >= 1.16
     public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:a((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 #else
     public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
@@ -1595,7 +1814,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     // Since MC 1.17 - whether the entity is always ticked even if no players are nearby
     // Used by the persistent entity manager, setting visibility to TICKING
-#if version >= 1.17
+#if version >= 1.18
+    public boolean isAlwaysTicked:isAlwaysTicking();
+#elseif version >= 1.17
     public boolean isAlwaysTicked:dn();
 #else
     public boolean isAlwaysTicked() {
@@ -1611,7 +1832,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public (ChatText) String getCustomName();
 #endif
 
+#if version >= 1.18
+    public void collide:push((EntityHandle) Entity entity);
+#else
     public void collide((EntityHandle) Entity entity);
+#endif
 
     public org.bukkit.World getBukkitWorld() {
 #if version >= 1.17

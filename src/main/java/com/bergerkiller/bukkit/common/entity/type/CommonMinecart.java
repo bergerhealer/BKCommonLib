@@ -105,15 +105,6 @@ public class CommonMinecart<T extends Minecart> extends CommonEntity<T> {
     public Material getCombinedItem() { return Material.MINECART; }
 
     /**
-     * Gets an identifier for this type of Minecart
-     *
-     * @return Minecart type ID
-     */
-    public int getMinecartType() {
-        return EntityMinecartAbstractHandle.T.getType.invoke(getHandle());
-    }
-
-    /**
      * Sets the vertical offset of the block in the Minecart, in pixels
      *
      * @param offsetPixels to set to

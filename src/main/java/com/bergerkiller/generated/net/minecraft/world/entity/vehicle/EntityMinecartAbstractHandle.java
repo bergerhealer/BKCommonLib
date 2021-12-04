@@ -23,7 +23,7 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
 
     public abstract float getDamage();
     public abstract void setDamage(float damage);
-    public abstract int getType();
+    public abstract int getHurtTime();
     public abstract void activate(int x, int y, int z, boolean active);
 
     public static final Key<Integer> DATA_SHAKING_FACTOR = Key.Type.INTEGER.createKey(T.DATA_SHAKING_FACTOR, 17);
@@ -52,7 +52,7 @@ public abstract class EntityMinecartAbstractHandle extends EntityHandle {
 
         public final Template.Method<Float> getDamage = new Template.Method<Float>();
         public final Template.Method<Void> setDamage = new Template.Method<Void>();
-        public final Template.Method<Integer> getType = new Template.Method<Integer>();
+        public final Template.Method<Integer> getHurtTime = new Template.Method<Integer>();
         public final Template.Method<Void> activate = new Template.Method<Void>();
 
     }

@@ -95,7 +95,11 @@ class EntityTypes {
 
   #if version >= 1.14
     public static Class<?> getEntityClass(String internalEntityName) {
+    #if version >= 1.18
+        java.util.Optional opt = EntityTypes.byString(internalEntityName);
+    #else
         java.util.Optional opt = EntityTypes.a(internalEntityName);
+    #endif
         if (opt.isPresent()) {
             return com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(opt.get());
         } else {
@@ -122,7 +126,11 @@ class EntityTypes {
         while (iter.hasNext()) {
             EntityTypes type = (EntityTypes) iter.next();
             if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
+  #if version >= 1.18
+                MinecraftKey key = EntityTypes.getKey(type);
+  #else
                 MinecraftKey key = EntityTypes.getName(type);
+  #endif
                 if (key != null) {
                     return key.toString();
                 }

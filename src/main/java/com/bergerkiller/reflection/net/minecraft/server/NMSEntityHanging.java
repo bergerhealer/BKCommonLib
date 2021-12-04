@@ -11,5 +11,5 @@ import com.bergerkiller.mountiplex.reflection.TranslatorFieldAccessor;
 @Deprecated
 public class NMSEntityHanging extends NMSEntity {
     public static final ClassTemplate<?> T = ClassTemplate.create(EntityHangingHandle.T.getType());
-    public static final TranslatorFieldAccessor<IntVector3> blockPosition = EntityHangingHandle.T.blockPosition.toFieldAccessor();
+    public static final TranslatorFieldAccessor<IntVector3> blockPosition = EntityHangingHandle.T.blockPositionField.toFieldAccessor();
 }

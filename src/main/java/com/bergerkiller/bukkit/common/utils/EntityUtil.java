@@ -164,7 +164,7 @@ public class EntityUtil extends EntityPropertyUtil {
      * @return block
      */
     public static Block getHangingBlock(Hanging entityHanging) {
-        IntVector3 pos = EntityHangingHandle.T.blockPosition.get(HandleConversion.toEntityHandle(entityHanging));
+        IntVector3 pos = EntityHangingHandle.T.getBlockPosition.invoke(HandleConversion.toEntityHandle(entityHanging));
         return pos.toBlock(entityHanging.getWorld());
     }
 

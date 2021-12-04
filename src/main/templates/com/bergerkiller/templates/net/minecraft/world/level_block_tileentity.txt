@@ -113,7 +113,7 @@ class TileEntity {
 
     public optional int getLegacyData:###();
 
-    public (CommonPacket) Packet<PacketListenerPlayOut> getUpdatePacket();
+    public (CommonPacket) Packet<net.minecraft.network.protocol.game.PacketListenerPlayOut> getUpdatePacket();
 #elseif version >= 1.13
     public (BlockData) IBlockData getBlockData:getBlock();
 

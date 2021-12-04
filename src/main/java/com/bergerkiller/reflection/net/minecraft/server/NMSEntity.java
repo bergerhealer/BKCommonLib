@@ -244,7 +244,8 @@ public class NMSEntity {
      *     return MathHelper.sqrt(d3 * d3 + d4 * d4 + d5 * d5);
      * }
      */
-    public static final MethodAccessor<Double> calculateDistance = EntityHandle.T.calculateDistance.toMethodAccessor();
+    @Deprecated
+    public static final MethodAccessor<Double> calculateDistance = EntityHandle.T.calculateDistanceSquared.toMethodAccessor();
 
     public static final MethodAccessor<Object> getBoundingBox = EntityHandle.T.getBoundingBox.raw.toMethodAccessor();
 

@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.world.entity.decoration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+import org.bukkit.block.BlockFace;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.entity.decoration.EntityHanging</b>.
@@ -22,13 +23,18 @@ public abstract class EntityHangingHandle extends EntityHandle {
     /* ============================================================================== */
 
     public abstract IntVector3 getBlockPosition();
-    public abstract void setBlockPosition(IntVector3 value);
+    public abstract BlockFace getFacing();
+    public abstract IntVector3 getBlockPositionField();
+    public abstract void setBlockPositionField(IntVector3 value);
     /**
      * Stores class members for <b>net.minecraft.world.entity.decoration.EntityHanging</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityHangingClass extends Template.Class<EntityHangingHandle> {
-        public final Template.Field.Converted<IntVector3> blockPosition = new Template.Field.Converted<IntVector3>();
+        public final Template.Field.Converted<IntVector3> blockPositionField = new Template.Field.Converted<IntVector3>();
+
+        public final Template.Method.Converted<IntVector3> getBlockPosition = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<BlockFace> getFacing = new Template.Method.Converted<BlockFace>();
 
     }
 
