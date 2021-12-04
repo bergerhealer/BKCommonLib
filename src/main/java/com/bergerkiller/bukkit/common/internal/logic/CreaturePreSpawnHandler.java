@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 
 public abstract class CreaturePreSpawnHandler {
     public static final CreaturePreSpawnHandler INSTANCE;
@@ -21,8 +22,11 @@ public abstract class CreaturePreSpawnHandler {
         try {
             if (hasPaperPreSpawnEvent) {
                 handler = new CreaturePreSpawnHandler_Paper();
-            } else {
+            } else if (CommonBootstrap.evaluateMCVersion("<=", "1.17.1")) {
                 handler = new CreaturePreSpawnHandler_Spigot();
+            } else {
+                // Not supported. Don't bother.
+                handler = new DisabledHandler();
             }
         } catch (Throwable t) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize creature pre spawn handler, event disabled", t);

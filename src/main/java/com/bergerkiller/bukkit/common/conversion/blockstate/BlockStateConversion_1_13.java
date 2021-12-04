@@ -26,9 +26,11 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftWorldHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockStateHandle;
+import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -79,49 +81,10 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                     return non_instrumented_invokable;
                 }
             }
-        }.createInstance(CommonUtil.getClass("net.minecraft.world.level.TickListServer"));
+        }.createInstance(CommonUtil.getClass("net.minecraft.world.ticks.TickListServer"));
 
-        // Create a NMS World proxy for handling the getTileEntity call
-        proxy_nms_world = new ClassInterceptor() {
-            @Override
-            protected Invoker<?> getCallback(Method method) {
-                String methodName = method.getName();
-                Class<?>[] params = method.getParameterTypes();
-
-                // Gets the proxy world
-                if (methodName.equals("getTileEntity")) {
-                    return (instance, args) -> input_state.tileEntity;
-                }
-
-                // Gets IBlockData type information of the Block
-                if (methodName.equals("getType")) {
-                    return (instance, args) -> input_state.blockData.getData();
-                }
-
-                // setTypeAndData is used by TileEntityStructure
-                if (methodName.equals("setTypeAndData")) {
-                    return ConstantReturningInvoker.of(Boolean.TRUE);
-                }
-
-                // Gets the Minecraft Server (safe)
-                if (methodName.equals("getMinecraftServer")) {
-                    return ConstantReturningInvoker.of(MinecraftServerHandle.instance().getRaw());
-                }
-
-                // TileEntityMobSpawner uses this to perform physics logic, disable that and do nothing
-                if (methodName.equals("notify") || methodName.equals("b") || methodName.equals("updateAdjacentComparators")) {
-                    return ConstantReturningInvoker.of(null);
-                }
-
-                // Fluid and Block Tick list
-                if (params.length == 0 && CommonUtil.getClass("net.minecraft.world.level.TickList").isAssignableFrom(method.getReturnType())) {
-                    return ConstantReturningInvoker.of(proxy_nms_world_ticklist);
-                }
-
-                // All other method calls fail
-                return non_instrumented_invokable;
-            }
-        }.createInstance(WorldServerHandle.T.getType());
+        // Create a NMS World proxy for handling various calls done from tile entities / block states
+        proxy_nms_world = new WorldServerHook(this).createInstance(WorldServerHandle.T.getType());
 
         // Create a CraftWorld proxy that only supports the following calls:
         // - getTileEntityAt(x, y, z) to return our requested entity
@@ -201,6 +164,18 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             }
         }.createInstance(craftBlock_type);
         worldField.set(proxy_block, proxy_nms_world);
+    }
+
+    private static String remapWorldServerMethodName(String methodName, String... parameterTypeNames) {
+        Class<?>[] parameterTypes = new Class<?>[parameterTypeNames.length];
+        for (int i = 0 ; i < parameterTypes.length; i++) {
+            parameterTypes[i] = Resolver.loadClass(parameterTypeNames[i], false);
+            if (parameterTypes[i] == null) {
+                throw new IllegalStateException("Failed to find parameter[" + i + "] " +
+                        parameterTypeNames[i] + " of method " + methodName);
+            }
+        }
+        return Resolver.resolveMethodName(WorldServerHandle.T.getType(), methodName, parameterTypes);
     }
 
     @Override
@@ -363,6 +338,104 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 cache.put(type, result);
             }
             return result;
+        }
+    }
+
+    @ClassHook.HookPackage("net.minecraft.world.level")
+    @ClassHook.HookImport("net.minecraft.core.BlockPosition")
+    @ClassHook.HookImport("net.minecraft.server.MinecraftServer")
+    @ClassHook.HookImport("net.minecraft.world.level.block.Block")
+    @ClassHook.HookImport("net.minecraft.world.level.block.entity.TileEntity")
+    @ClassHook.HookImport("net.minecraft.world.level.block.state.IBlockData")
+    @ClassHook.HookImport("net.minecraft.world.level.chunk.Chunk")
+    @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
+    public static class WorldServerHook extends ClassHook<WorldServerHook> {
+        private final BlockStateConversion_1_13 conversion;
+
+        public WorldServerHook(BlockStateConversion_1_13 conversion) {
+            this.conversion = conversion;
+        }
+
+        @Override
+        protected Invoker<?> getCallback(Class<?> declaringClass, Method method) {
+            Invoker<?> callback = super.getCallback(declaringClass, method);
+            if (callback != null) {
+                return callback;
+            }
+
+            // Fluid and Block Tick list
+            Class<?>[] params = method.getParameterTypes();
+            if (params.length == 0 && CommonUtil.getClass("net.minecraft.world.ticks.TickList").isAssignableFrom(method.getReturnType())) {
+                return ConstantReturningInvoker.of(this.conversion.proxy_nms_world_ticklist);
+            }
+
+            // All other method calls fail
+            return this.conversion.non_instrumented_invokable;
+        }
+
+        @HookMethod("public TileEntity getTileEntity:???(BlockPosition blockPosition)")
+        public Object getTileEntity(Object blockPosition) {
+            return this.conversion.input_state.tileEntity;
+        }
+
+        @HookMethod("public IBlockData getBlockData:???(BlockPosition blockposition)")
+        public Object getBlockData(Object blockPosition) {
+            return this.conversion.input_state.blockData.getData();
+        }
+
+        @HookMethod("public MinecraftServer getMinecraftServer:???()")
+        public Object getMinecraftServer() {
+            return MinecraftServerHandle.instance().getRaw();
+        }
+
+        // Note there is also a setBlockData variant with two ints (default of second int is 512)
+        // Not sure if this is ever called anywhere...
+        @HookMethod("public boolean setBlockData:???(BlockPosition blockposition, IBlockData iblockdata, int updateFlags)")
+        public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags) {
+            return true;
+        }
+
+        @HookMethodCondition("version >= 1.18")
+        @HookMethod("public abstract void sendBlockUpdated(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1, int i)")
+        public void sendBlockUpdated(Object blockposition, Object iblockdata, Object iblockdata1, int i) {
+            // No-op
+        }
+
+        @HookMethodCondition("version >= 1.18")
+        @HookMethod("public void notifyAndUpdatePhysics(BlockPosition blockposition, Chunk chunk, IBlockData oldBlock, IBlockData newBlock, IBlockData actualBlock, int i, int j)")
+        public void notifyAndUpdatePhysics(Object blockposition, Object chunk, Object oldBlock, Object newBlock, Object actualBlock, int i, int j) {
+            // No-op
+        }
+
+        @HookMethodCondition("version >= 1.18")
+        @HookMethod("public void updateNeighbourForOutputSignal(BlockPosition blockposition, Block block)")
+        public void updateNeighbourForOutputSignal(Object blockposition, Object block) {
+            // No-op
+        }
+
+        @HookMethodCondition("version <= 1.17.1")
+        @HookMethod("public void updateAdjacentComparators(BlockPosition blockposition, Block block)")
+        public void updateAdjacentComparators(Object blockposition, Object block) {
+            // No-op
+        }
+
+        @HookMethodCondition("version <= 1.17.1")
+        @HookMethod("public void notify(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1, int i)")
+        public void notify(Object blockposition, Object iblockdata, Object iblockdata1, int i) {
+            // No-op
+        }
+
+        @HookMethodCondition("version >= 1.18")
+        @HookMethod("public void onBlockStateChange(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1)")
+        public void onBlockStateChange(Object blockposition, Object iblockdata, Object iblockdata1) {
+            // No-op
+        }
+
+        // Same as onBlockStateChange, but obfuscated method name
+        @HookMethodCondition("version <= 1.17.1")
+        @HookMethod("public void b(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1)")
+        public void onBlockStateChangeObf(Object blockposition, Object iblockdata, Object iblockdata1) {
+            // No-op
         }
     }
 }

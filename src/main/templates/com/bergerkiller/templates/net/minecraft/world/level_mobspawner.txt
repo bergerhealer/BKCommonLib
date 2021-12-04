@@ -38,14 +38,10 @@ class MobSpawnerAbstract {
 #if version >= 1.18
         if (world instanceof WorldServer) {
             instance.serverTick((WorldServer) world, blockPosition);
-        } else {
-            instance.delay(world, blockPosition);
         }
 #elseif version >= 1.17
         if (world instanceof WorldServer) {
             instance.a((WorldServer) world, blockPosition);
-        } else {
-            instance.a(world, blockPosition);
         }
 #else
         instance.c();

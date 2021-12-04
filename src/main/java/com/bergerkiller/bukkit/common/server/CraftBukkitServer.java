@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.server;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
@@ -8,6 +9,7 @@ import com.bergerkiller.mountiplex.reflection.resolver.FieldAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodAliasResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -130,10 +132,39 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
             try {
                 isInitializingMojangSpigotRemapper = true;
                 mojangSpigotRemapper = MojangSpigotRemapper.load(MC_VERSION, this::resolveClassPathEarly);
+
+                // Minor tweaks are needed when Spigot alters methods, because then the
+                // method name is no longer obfuscated in some cases.
+                removeMethodMapping("net.minecraft.server.level.EntityPlayer", "nextContainerCounter");
             } finally {
                 isInitializingMojangSpigotRemapper = false;
             }
         }
+    }
+
+    private void removeMethodMapping(String declaringClassName, String methodName, String... parameterTypeNames) {
+        Class<?> declaringClass;
+        try {
+            declaringClass = resolveFindClassEarly(declaringClassName);
+        } catch (ClassNotFoundException ex) {
+            Logging.LOGGER.severe("Mapping filter fail: declaring class " + declaringClassName + " not found");
+            return;
+        }
+        Class<?>[] paramTypes = new Class<?>[parameterTypeNames.length];
+        for (int i = 0; i < paramTypes.length; i++) {
+            try {
+                paramTypes[i] = resolveFindClassEarly(parameterTypeNames[i]);
+            } catch (ClassNotFoundException ex) {
+                Logging.LOGGER.severe("Mapping filter fail: parameter[" + i + "] class " +
+                        parameterTypeNames[i] + " not found");
+                return;
+            }
+        }
+        mojangSpigotRemapper.removeMethodMapping(declaringClass, methodName, paramTypes);
+    }
+
+    private Class<?> resolveFindClassEarly(String path) throws ClassNotFoundException {
+        return Resolver.getClassByExactName(this.resolveClassPathEarly(path));
     }
 
     /**

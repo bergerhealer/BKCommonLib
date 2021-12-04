@@ -2,13 +2,14 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
 /**
  * Stringifies BlockData information so that it can be saved as text.
  * Also handles the deserialization, going back from text to BlockData.
  * This uses the same syntax as the vanilla minecraft material argument supports.
  */
-public abstract class BlockDataSerializer {
+public abstract class BlockDataSerializer implements LazyInitializedObject {
     public static final BlockDataSerializer INSTANCE;
 
     static {

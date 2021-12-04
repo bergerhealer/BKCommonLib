@@ -42,6 +42,11 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
         }
     }
 
+    @Override
+    public boolean isBlockCollisionsMethodInitialized() {
+        return true;
+    }
+
     /**
      * Adds all the bounding boxes of blocks that collide with the movedBounds boundingbox
      * 

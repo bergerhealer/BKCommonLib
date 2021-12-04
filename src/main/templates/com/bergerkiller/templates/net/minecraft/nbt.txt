@@ -743,7 +743,11 @@ class NBTTagCompound extends NBTBase {
 
     public static (NBTBaseHandle) NBTBase fromMojangson(String mojangson) {
         try {
+#if version >= 1.18
+            return MojangsonParser.parseTag(mojangson);
+#else
             return MojangsonParser.parse(mojangson);
+#endif
         } catch (Throwable t) {
             return null;
         }

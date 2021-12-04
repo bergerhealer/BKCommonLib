@@ -143,7 +143,19 @@ class VoxelShape {
 
     public static double traceAxis((EnumAxisHandle) EnumDirection.EnumAxis axis, (AxisAlignedBBHandle) AxisAlignedBB boundingBox, (java.util.stream.Stream<VoxelShapeHandle>) java.util.stream.Stream<VoxelShape> voxels, double coordinate) {
 #if version >= 1.18
-        return VoxelShapes.collide(axis, boundingBox, voxels, coordinate);
+        // Now uses an Iterable rather than stream - but iterates only once
+        // Easiest is to just do the for loop in here
+        //return VoxelShapes.collide(axis, boundingBox, voxels, coordinate);
+
+        VoxelShape voxelshape;
+        for (java.util.Iterator iterator = voxels.iterator(); iterator.hasNext(); coordinate = voxelshape.collide(axis, boundingBox, coordinate)) {
+            voxelshape = (VoxelShape) iterator.next();
+            if (Math.abs(coordinate) < 1.0E-7D) {
+                return coordinate;
+            }
+        }
+
+        return coordinate;
 #elseif version >= 1.13.1
         // Official API as of 1.13.1
         return VoxelShapes.a(axis, boundingBox, voxels, coordinate);

@@ -231,7 +231,7 @@ class PlayerChunk {
 
 #if version >= 1.18
     public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
-        return instance.playerProvider.getPlayers(instance.getPos(), false).collect(java.util.stream.Collectors.toList());
+        return instance.playerProvider.getPlayers(instance.getPos(), false);
     }
 #elseif version >= 1.17
     public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
@@ -450,13 +450,15 @@ class PlayerChunkMap {
         // Check Stream contains Player
         ChunkCoordIntPair chunkCoordinates = new ChunkCoordIntPair(chunkX, chunkZ);
   #if version >= 1.18
-        java.util.stream.Stream players = chunk.playerProvider.getPlayers(chunkCoordinates, false);
+        java.util.List players = chunk.playerProvider.getPlayers(chunkCoordinates, false);
+        return players.contains(entityplayer);
   #elseif version >= 1.17
         java.util.stream.Stream players = chunk.playerProvider.a(chunkCoordinates, false);
+        return players.anyMatch(java.util.function.Predicate.isEqual(entityplayer));
   #else
         java.util.stream.Stream players = chunk.players.a(chunkCoordinates, false);
-  #endif
         return players.anyMatch(java.util.function.Predicate.isEqual(entityplayer));
+  #endif
     }
 #else
     public boolean isChunkEntered:a((EntityPlayerHandle) EntityPlayer entityplayer, int chunkX, int chunkZ);

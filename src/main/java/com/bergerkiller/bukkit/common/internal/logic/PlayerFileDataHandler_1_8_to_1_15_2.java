@@ -14,6 +14,7 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
@@ -22,7 +23,7 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
  */
 public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
-    private final SafeField<Object> playerListFileDataField;
+    private final FastField<Object> playerListFileDataField;
 
     public PlayerFileDataHandler_1_8_to_1_15_2() {
         ClassResolver resolver = new ClassResolver();
@@ -38,7 +39,13 @@ public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
         }
 
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.IPlayerFileData");
-        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType));
+        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType).getFastField());
+    }
+
+    @Override
+    public void forceInitialization() {
+        this.getPlayerFolderOfWorld.forceInitialization();
+        this.playerListFileDataField.forceInitialization();
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.cdn;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Level;
@@ -124,6 +125,19 @@ public class MojangSpigotRemapper {
         return defaultName;
     }
 
+    /**
+     * Removes a remapping rule for a method from this remapper
+     *
+     * @param declaringClass Class that declares the method
+     * @param methodName Public-facing (de-obfuscated) method name
+     * @param parameterTypes Parameter types of the method
+     */
+    public void removeMethodMapping(Class<?> declaringClass, String methodName, Class<?>... parameterTypes) {
+        for (ClassRemapper remapper : remappersFor(declaringClass)) {
+            remapper.removeMethodMapping(methodName, parameterTypes);
+        }
+    }
+
     private ClassRemapper[] remappersFor(Class<?> declaringClass) {
         return recurseRemappersByDeclaringClassName.getOrDefault(declaringClass, NO_REMAPPERS);
     }
@@ -238,6 +252,17 @@ public class MojangSpigotRemapper {
                 return remapper;
             }
             return null;
+        }
+
+        public void removeMethodMapping(String methodName, Class<?>[] parameterTypes) {
+            Iterator<MethodDetails> iter = methods_by_name.get(methodName).iterator();
+            while (iter.hasNext()) {
+                MethodDetails details = iter.next();
+                if (details.canAcceptParameters(parameterTypes)) {
+                    iter.remove();
+                    methods_by_obfuscated.remove(details.name_obfuscated, details);
+                }
+            }
         }
     }
 

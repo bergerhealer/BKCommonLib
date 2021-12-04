@@ -52,6 +52,12 @@ public class BlockDataSerializer_1_13 extends BlockDataSerializer {
     }
 
     @Override
+    public void forceInitialization() {
+        this.serializeMethod.forceInitialization();
+        this.deserializeMethod.forceInitialization();
+    }
+
+    @Override
     public String serialize(BlockData blockData) {
         return serializeMethod.invoke(null, blockData.getData());
     }

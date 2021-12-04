@@ -15,11 +15,12 @@ import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
+import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
 /**
  * Handles the registration and de-registration of player file data handlers
  */
-public abstract class PlayerFileDataHandler {
+public abstract class PlayerFileDataHandler implements LazyInitializedObject {
     public static final PlayerFileDataHandler INSTANCE;
 
     static {

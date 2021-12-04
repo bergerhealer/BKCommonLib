@@ -104,6 +104,13 @@ public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
     }
 
     @Override
+    public void forceInitialization() {
+        this.findBlockByNameMethod.forceInitialization();
+        this.createLegacyBlockDataMethod.forceInitialization();
+        this.setBlockDataKeyValueMethod.forceInitialization();
+    }
+
+    @Override
     public String serialize(BlockData blockData) {
         return blockData.getData().toString();
     }

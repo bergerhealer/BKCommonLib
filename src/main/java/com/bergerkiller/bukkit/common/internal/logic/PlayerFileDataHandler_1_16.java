@@ -5,6 +5,7 @@ import java.io.File;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
@@ -15,6 +16,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 
@@ -23,24 +25,34 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
  */
 public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
-    private final SafeField<Object> playerListFileDataField;
+    private final FastField<Object> playerListFileDataField;
 
     public PlayerFileDataHandler_1_16() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.server.level.WorldServer");
+        resolver.setVariable("version", Common.MC_VERSION);
 
         {
             MethodDeclaration getPlayerFolderOfWorldMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public java.io.File getPlayerDir() {\n" +
+                    "#if version >= 1.18\n" +
+                    "    return new java.io.File(instance.convertable.getDimensionPath(instance.dimension()).toFile(), \"playerdata\");\n" +
+                    "#else\n" +
                     "    return new java.io.File(instance.convertable.a(instance.getDimensionKey()), \"playerdata\");\n" +
-                    "}"));
+                    "#endif\n" +
+                    "}", resolver));
             getPlayerFolderOfWorld.init(getPlayerFolderOfWorldMethod);  
         }
-
         String fieldName = CommonBootstrap.evaluateMCVersion(">=", "1.17") ? "playerIo" : "playerFileData";
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
-        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType));
+        playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
+    }
+
+    @Override
+    public void forceInitialization() {
+        getPlayerFolderOfWorld.forceInitialization();
+        playerListFileDataField.forceInitialization();
     }
 
     @Override

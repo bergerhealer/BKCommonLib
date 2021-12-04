@@ -31,6 +31,9 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Hooks the ChunkGenerator field of the ChunkProviderServer
  * to override the getMobsFor method, in which we fire our event.
  * Not used since Paper 1.13 added their own event.
+ * 
+ * Does not work on version 1.18 and later. On there, for Spigot, we just
+ * don't optimize it.
  */
 public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     private final SafeField<Object> cpsChunkGeneratorField;

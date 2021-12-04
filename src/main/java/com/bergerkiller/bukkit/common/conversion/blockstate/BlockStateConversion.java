@@ -4,6 +4,7 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 
 /**
  * Specialized utility class that deals with conversion from TileEntity to its respective
@@ -16,6 +17,9 @@ public abstract class BlockStateConversion {
     public static final BlockStateConversion INSTANCE;
 
     static {
+        // Statically initializes WorldServer, so we must fully bootstrap the server first
+        CommonBootstrap.initServer();
+
         BlockStateConversion inst = null;
         try {
             if (Common.evaluateMCVersion(">=", "1.13")) {

@@ -70,6 +70,8 @@ public abstract class EntityMoveHandler {
         return handler;
     }
 
+    public abstract boolean isBlockCollisionsMethodInitialized();
+
     public void setBlockCollisionEnabled(boolean enabled) {
         this.blockCollisionEnabled = enabled;
     }

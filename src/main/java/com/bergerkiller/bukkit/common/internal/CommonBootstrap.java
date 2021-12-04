@@ -488,6 +488,15 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.saveddata.maps.WorldMap$PatchData", "net.minecraft.world.level.saveddata.maps.WorldMap$b");
         }
 
+        // 1.18 mappings
+        if (evaluateMCVersion(">=", "1.18")) {
+            // Pass
+        } else {
+            // TickListServer was moved, migrate past versions
+            remappings.put("net.minecraft.world.ticks.TickListServer", "net.minecraft.world.level.TickListServer");
+            remappings.put("net.minecraft.world.ticks.TickList", "net.minecraft.world.level.TickList");
+        }
+
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
         {
             boolean craftLegacyIsInUtil;

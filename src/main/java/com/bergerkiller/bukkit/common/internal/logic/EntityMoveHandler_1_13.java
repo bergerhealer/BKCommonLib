@@ -80,8 +80,8 @@ public class EntityMoveHandler_1_13 extends EntityMoveHandler {
         getBlockCollisions_method_init = success;
     }
 
-    // For under test
-    public static boolean isBlockCollisionsMethodInitialized() {
+    @Override
+    public boolean isBlockCollisionsMethodInitialized() {
         return getBlockCollisions_method_init;
     }
 

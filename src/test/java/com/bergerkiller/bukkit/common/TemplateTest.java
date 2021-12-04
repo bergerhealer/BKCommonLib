@@ -9,9 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -28,11 +26,6 @@ import com.bergerkiller.bukkit.common.internal.cdn.MojangMappings;
 import com.bergerkiller.bukkit.common.internal.cdn.MojangSpigotRemapper;
 import com.bergerkiller.bukkit.common.internal.cdn.SpigotMappings;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
-import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_13;
-import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14;
-import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
-import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
-import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
@@ -42,7 +35,6 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryS
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityArmorStandHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartRideableHandle;
-import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -53,8 +45,10 @@ public class TemplateTest {
     @Ignore
     public void testVersionDiff() {
         //String className = "net.minecraft.world.level.block.state.BlockBase$BlockData"; // IBlockData
-        String className = "net.minecraft.world.level.block.state.BlockBase";
-        String methodName = "b";
+        //String className = "net.minecraft.world.level.block.state.BlockBase";
+        String className = "net.minecraft.world.phys.shapes.VoxelShape";
+        String methodName = "c";
+        int methodParamCount = 0;
         String versionFrom = "1.17.1";
         String versionTo = "1.18";
 
@@ -74,7 +68,9 @@ public class TemplateTest {
             } else {
                 for (MojangMappings.MethodSignature sig : mappings.forClassIfExists(className).methods) {
                     if (sig.name.equals(methodName) || sig.name_obfuscated.equals(methodName)) {
-                        matches.add(sig);
+                        if (sig.parameterTypes.size() == methodParamCount) {
+                            matches.add(sig);
+                        }
                     }
                 }
             }
@@ -290,18 +286,19 @@ public class TemplateTest {
                 throw new RuntimeException("Failed to test class "+  genClassPath, t);
             }
         }
-        if (!fullySuccessful) {
-            fail("Some generated reflection template classes could not be loaded");
-        }
 
         // Attempt to fully initialize all declarations
         for (Template.Class<?> templateClass : classes) {
             try {
                 templateClass.forceInitialization();
             } catch (Throwable t) {
-                Logging.LOGGER_REFLECTION.severe("Failed to initialize " + templateClass.getHandleType().getName());
-                throw MountiplexUtil.uncheckedRethrow(t);
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to run forceInitialization()", t);
+                fullySuccessful = false;
             }
+        }
+
+        if (!fullySuccessful) {
+            fail("Some generated reflection template classes could not be fully loaded or initialized");
         }
 
         // These are optional, but they must work at runtime depending on version
@@ -331,16 +328,6 @@ public class TemplateTest {
         } else {
             assertAvailable(DataWatcherHandle.ItemHandle.T.keyId);
         }
-    }
-
-    @Test
-    public void testRegionHandler() {
-        RegionHandler.INSTANCE.forceInitialization();
-    }
-
-    @Test
-    public void testPortalHandler() {
-        PortalHandler.INSTANCE.forceInitialization();
     }
 
     @Test
@@ -375,15 +362,6 @@ public class TemplateTest {
     }
 
     @Test
-    public void testEntityMoveHandlerInitialization() {
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_14.isBlockCollisionsMethodInitialized());
-        } else if (Common.evaluateMCVersion(">=", "1.13")) {
-            assertTrue("EntityMoveHandler Block Collision method failed to initialize", EntityMoveHandler_1_13.isBlockCollisionsMethodInitialized());
-        }
-    }
-
-    @Test
     public void testArmorStandDataWatcherFields() {
         if (Common.evaluateMCVersion(">=", "1.9")) {
             assertTrue(EntityArmorStandHandle.T.DATA_ARMORSTAND_FLAGS.isAvailable());
@@ -394,11 +372,6 @@ public class TemplateTest {
             assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_LEFT.isAvailable());
             assertTrue(EntityArmorStandHandle.T.DATA_POSE_LEG_RIGHT.isAvailable());
         }
-    }
-
-    @Test
-    public void testMapDisplayMarkerApplier() {
-        MapDisplayMarkers.APPLIER.forceInitialization();
     }
 
     @Test

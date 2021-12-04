@@ -95,6 +95,7 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
             if (!levelCallbackType.equals(callbacksField.getType())) {
                 throw new IllegalStateException("Field not assignable to LevelCallback");
             }
+            callbacksField.forceInitialization();
         } catch (Throwable t) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize PersistentEntitySectionManager callbacks field: " + t.getMessage(), t);
             callbacksField.initUnavailable("callbacks field not found");
