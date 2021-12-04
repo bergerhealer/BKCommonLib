@@ -22,23 +22,33 @@ public class BlockDataSerializer_1_13 extends BlockDataSerializer {
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static String serialize(IBlockData iblockdata) {\n" +
-                "#if version >= 1.14\n" +
+                "#if version >= 1.18\n" +
+                "    return ArgumentBlock.serialize(iblockdata);\n" +
+                "#elseif version >= 1.14\n" +
                 "    return ArgumentBlock.a(iblockdata);\n" +
                 "#else\n" +
                 "    return ArgumentBlock.a(iblockdata, null);\n" +
                 "#endif\n" +
                 "}", resolver)));
-        deserializeMethod.init(new MethodDeclaration(resolver,
+        deserializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static IBlockData deserialize(String text) {\n" +
                 "    com.mojang.brigadier.StringReader reader = new com.mojang.brigadier.StringReader(text);\n" +
                 "    ArgumentBlock block;\n" +
                 "    try {\n" +
+                "#if version >= 1.18\n" +
+                "        block = (new ArgumentBlock(reader, false)).parse(true);\n" +
+                "#else\n" +
                 "        block = (new ArgumentBlock(reader, false)).a(true);\n" +
+                "#endif\n" +
                 "    } catch (com.mojang.brigadier.exceptions.CommandSyntaxException ex) {\n" +
                 "        return null;\n" +
                 "    }\n" +
+                "#if version >= 1.18\n" +
+                "    return block.getState();\n" +
+                "#else\n" +
                 "    return block.getBlockData();\n" +
-                "}"));
+                "#endif\n" +
+                "}", resolver)));
     }
 
     @Override

@@ -117,7 +117,9 @@ optional class RecipeItemStack {
 #endif
 
     public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices() {
-#if version >= 1.13
+#if version >= 1.18
+        instance.dissolve();
+#elseif version >= 1.13
         instance.buildChoices();
 #endif
         return instance#choicesRecipeItemStack;
