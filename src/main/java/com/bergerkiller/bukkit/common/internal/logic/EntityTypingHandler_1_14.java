@@ -136,7 +136,11 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         /*
          * <CLASS_FROM_ENTITYTYPES>
          * public static Class<?> findClassFromEntityTypes((Object) EntityTypes entityTypes, (Object) World world) {
+         * #if version >= 1.18
+         *     Object entity = entityTypes.create(world);
+         * #else
          *     Object entity = entityTypes.a(world);
+         * #endif
          *     if (entity == null) {
          *         return null;
          *     } else {
@@ -218,13 +222,27 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         /*
          * <CREATE_ENTRY>
          * public static Object createEntry((Object) PlayerChunkMap playerChunkMap, (Object) Entity entity) {
+         * #if version >= 1.18
+         *     EntityTypes entitytypes = entity.getType();
+         *     int i = entitytypes.clientTrackingRange() * 16;
+         * #else
          *     EntityTypes entitytypes = entity.getEntityType();
          *     int i = entitytypes.getChunkRange() * 16;
+         * #endif
+         * 
          * #if spigot
          *     i = org.spigotmc.TrackingRange.getEntityTrackingRange(entity, i);
          * #endif
+         * 
+         * #if version >= 1.18
+         *     int j = entitytypes.updateInterval();
+         *     boolean trackDeltas = entitytypes.trackDeltas();
+         * #else
          *     int j = entitytypes.getUpdateInterval();
-         *     return new PlayerChunkMap$EntityTracker(playerChunkMap, entity, i, j, entitytypes.isDeltaTracking());
+         *     boolean trackDeltas = entitytypes.isDeltaTracking();
+         * #endif
+         * 
+         *     return new PlayerChunkMap$EntityTracker(playerChunkMap, entity, i, j, trackDeltas);
          * }
          */
         @Template.Generated("%CREATE_ENTRY%")
