@@ -152,7 +152,7 @@ public class MapResourcePackTest {
         }
     }
 
-    //@Ignore
+    @Ignore
     @Test
     public void testBlockModels() {
         MapResourcePack resourcePack = MapResourcePack.VANILLA;
