@@ -11,11 +11,12 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * BlockData serializer/deserializer for Minecraft 1.13 and later.
  * Makes use of the then-introduced ArgumentBlock class (and brigadier).
  */
-public class BlockDataSerializer_1_13 extends BlockDataSerializer {
+class BlockDataSerializer_1_13 extends BlockDataSerializer {
     private FastMethod<String> serializeMethod = new FastMethod<String>();
     private FastMethod<BlockData> deserializeMethod = new FastMethod<BlockData>();
 
-    public BlockDataSerializer_1_13() {
+    @Override
+    public void enable() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.ArgumentBlock");
         resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
@@ -49,6 +50,10 @@ public class BlockDataSerializer_1_13 extends BlockDataSerializer {
                 "    return block.getBlockData();\n" +
                 "#endif\n" +
                 "}", resolver)));
+    }
+
+    @Override
+    public void disable() throws Throwable {
     }
 
     @Override

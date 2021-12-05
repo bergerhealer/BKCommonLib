@@ -30,7 +30,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * a tick-delayed task to check for portal enter events, and cancel them appropriately
  * if fired while the player is viewing credits.
  */
-public class PortalHandler_1_8 extends PortalHandler {
+class PortalHandler_1_8 extends PortalHandler {
     private final PortalTravelAgentHandle _pta = Template.Class.create(PortalTravelAgentHandle.class, Common.TEMPLATE_RESOLVER);
     private Set<Player> _ignorePortalEventPlayers = new HashSet<>();
     private RunOnceTask _ignorePortalEventPlayersCleanup;

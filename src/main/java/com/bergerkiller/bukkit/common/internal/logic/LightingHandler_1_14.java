@@ -28,7 +28,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
  * Lighting handler for Minecraft 1.14 and later. A new asynchronous lighting engine was introduced,
  * which means changes to light requires scheduling tasks on a worker thread.
  */
-public class LightingHandler_1_14 implements LightingHandler {
+class LightingHandler_1_14 implements LightingHandler {
     private final LightEngineHandle handle;
     private final Field light_layer_block;
     private final Field light_layer_sky;
@@ -145,6 +145,14 @@ public class LightingHandler_1_14 implements LightingHandler {
         this.light_storage.setAccessible(true);
         this.light_storage_array_live.setAccessible(true);
         this.light_engine_schedule.setAccessible(true);
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

@@ -11,12 +11,11 @@ import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
-import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerDisabled;
+import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerSelector;
 import com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializerInit;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.logic.RegionHandler;
-import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 import com.bergerkiller.bukkit.common.map.markers.MapDisplayMarkers;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
@@ -44,7 +43,7 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testLightingHandler() {
-        assertFalse(LightingHandler.instance() instanceof LightingHandlerDisabled);
+        assertTrue(LightingHandlerSelector.INSTANCE.isFallbackInitialized());
     }
 
     @Test
@@ -71,6 +70,7 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testBlockDataSerializer() {
+        assertNotNull(BlockDataSerializer.INSTANCE);
         BlockDataSerializer.INSTANCE.forceInitialization();
     }
 

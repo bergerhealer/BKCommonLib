@@ -6,16 +6,29 @@ import java.util.logging.Level;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.lighting.LightingHandler;
 
-public class LightingHandlerDisabled implements LightingHandler {
+class LightingHandlerDisabled implements LightingHandler {
     private final Throwable cause;
+
+    public LightingHandlerDisabled(LibraryComponentSelector<?, ?> selector) {
+        this(selector.getLastError());
+    }
 
     public LightingHandlerDisabled(Throwable cause) {
         this.cause = cause;
         if (cause != null) {
             Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize lighting handler", cause);
         }
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     private UnsupportedOperationException fail() {

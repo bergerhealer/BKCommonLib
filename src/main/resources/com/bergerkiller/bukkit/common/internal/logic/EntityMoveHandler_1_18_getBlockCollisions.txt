@@ -8,7 +8,7 @@
 // Notes:
 // flag = always false
 
-public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler_1_14 handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
+public java.util.stream.Stream<VoxelShape> getBlockCollisions(com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler handler, VoxelShape voxelshape, VoxelShape voxelshape1, boolean flag) {
     int i = MathUtil.floor(voxelshape.min(EnumDirection$EnumAxis.X)) - 1;
     int j = MathUtil.ceil(voxelshape.max(EnumDirection$EnumAxis.X)) + 1;
     int k = MathUtil.floor(voxelshape.min(EnumDirection$EnumAxis.Y)) - 1;

@@ -21,13 +21,17 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 /**
  * Interfaces with the Tuinity server 1.16.4 starlight engine
  */
-public class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
-    private StarLightEngineHandle handle;
+class LightingHandler_1_16_4_StarLightEngine implements LightingHandler {
+    private StarLightEngineHandle handle = Template.Class.create(StarLightEngineHandle.class, Common.TEMPLATE_RESOLVER);
     private final Map<World, List<Runnable>> lightUpdateQueue = new IdentityHashMap<>();
 
-    public LightingHandler_1_16_4_StarLightEngine() {
-        handle = Template.Class.create(StarLightEngineHandle.class, Common.TEMPLATE_RESOLVER);
+    @Override
+    public void enable() {
         handle.forceInitialization();
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

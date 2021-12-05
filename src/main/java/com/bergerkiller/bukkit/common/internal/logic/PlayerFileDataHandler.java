@@ -8,10 +8,11 @@ import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.controller.PlayerDataController;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
@@ -20,16 +21,11 @@ import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 /**
  * Handles the registration and de-registration of player file data handlers
  */
-public abstract class PlayerFileDataHandler implements LazyInitializedObject {
-    public static final PlayerFileDataHandler INSTANCE;
-
-    static {
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-            INSTANCE = new PlayerFileDataHandler_1_16();
-        } else {
-            INSTANCE = new PlayerFileDataHandler_1_8_to_1_15_2();
-        }
-    }
+public abstract class PlayerFileDataHandler implements LazyInitializedObject, LibraryComponent {
+    public static final PlayerFileDataHandler INSTANCE = LibraryComponentSelector.forModule(PlayerFileDataHandler.class)
+            .addVersionOption(null, "1.15.2", PlayerFileDataHandler_1_8_to_1_15_2::new)
+            .addVersionOption("1.16", null, PlayerFileDataHandler_1_16::new)
+            .update();
 
     public abstract PlayerDataController get();
     public abstract Hook hook(PlayerDataController controller);

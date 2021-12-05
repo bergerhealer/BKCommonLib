@@ -55,7 +55,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is
  * to hook the 'entitiesByUUID' map, and override the methods that add/remove from it.
  */
-public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
+class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
     private final Class<?> levelCallbackType;
     private final FastField<Object> entityManagerField = new FastField<Object>();
     private final FastField<Object> callbacksField = new FastField<Object>();
@@ -109,6 +109,14 @@ public class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
         } else {
             this.chunkEntitiesLoadedHandler = new ChunkEntitiesLoadedUsingHookHandler(sectionManagerClass);
         }
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

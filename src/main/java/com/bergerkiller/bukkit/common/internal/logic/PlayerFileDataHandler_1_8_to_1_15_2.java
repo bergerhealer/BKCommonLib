@@ -21,7 +21,7 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 /**
  * Handler for Minecraft 1.8 to Minecraft 1.15.2
  */
-public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
+class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastField<Object> playerListFileDataField;
 
@@ -40,6 +40,14 @@ public class PlayerFileDataHandler_1_8_to_1_15_2 extends PlayerFileDataHandler {
 
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.IPlayerFileData");
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), "playerFileData", playerFileDataType).getFastField());
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

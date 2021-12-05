@@ -14,8 +14,17 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Lighting handler for Minecraft 1.8 to 1.13.2. This is before the introduction
  * of a new asynchronous light engine, which means everything happens on the main thread.
  */
-public class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
+class LightingHandler_CubicChunks_1_12_2 implements LightingHandler {
     private final LightingLogicHandle handle = Template.Class.create(LightingLogicHandle.class, Common.TEMPLATE_RESOLVER);
+
+    @Override
+    public void enable() {
+        handle.forceInitialization();
+    }
+
+    @Override
+    public void disable() {
+    }
 
     @Override
     public boolean isSupported(World world) {

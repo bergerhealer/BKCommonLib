@@ -7,12 +7,25 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 
-public class RegionHandlerDisabled extends RegionHandler {
+class RegionHandlerDisabled extends RegionHandler {
     private final Throwable reason;
+
+    public RegionHandlerDisabled(LibraryComponentSelector<?, ?> selector) {
+        this(selector.getLastError());
+    }
 
     public RegionHandlerDisabled(Throwable reason) {
         this.reason = reason;
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

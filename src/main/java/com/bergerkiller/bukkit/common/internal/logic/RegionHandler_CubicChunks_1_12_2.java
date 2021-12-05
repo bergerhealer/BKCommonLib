@@ -28,7 +28,7 @@ import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
 
-public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
+class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
     private final CubicChunksHandle handle;
     private int forRegion_base_cx;
     private int forRegion_base_cy;
@@ -58,6 +58,14 @@ public class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
         };
         forRegionCallbackListChunks = interceptor.createInstance(Class.forName(
                 "cubicchunks.regionlib.util.CheckedFunction"));
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

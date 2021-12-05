@@ -5,9 +5,9 @@ import java.util.Set;
 
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
@@ -15,28 +15,34 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Selects the most appropriate region handler for a world, then
  * forwards calls to that handler.
  */
-public final class RegionHandlerSelector extends RegionHandler {
+final class RegionHandlerSelector extends RegionHandler {
     private final RegionHandler fallback;
     private final RegionHandler cubicchunks;
 
     public RegionHandlerSelector() {
         // Vanilla fallback
-        if (Common.evaluateMCVersion(">=", "1.17")) {
-            fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_17::new, RegionHandlerDisabled::new);
-        } else if (Common.evaluateMCVersion(">=", "1.15")) {
-            fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_15::new, RegionHandlerDisabled::new);
-        } else if (Common.evaluateMCVersion(">=", "1.14")) {
-            fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_14::new, RegionHandlerDisabled::new);
-        } else {
-            fallback = LogicUtil.tryCreate(RegionHandler_Vanilla_1_8::new, RegionHandlerDisabled::new);
-        }
+        fallback = LibraryComponentSelector.forModule(RegionHandler.class)
+                .setDefaultComponent(RegionHandlerDisabled::new)
+                .addVersionOption(null, "1.13.2", RegionHandler_Vanilla_1_8::new)
+                .addVersionOption("1.14", "1.14.4", RegionHandler_Vanilla_1_14::new)
+                .addVersionOption("1.15", "1.16.5", RegionHandler_Vanilla_1_15::new)
+                .addVersionOption("1.17", null, RegionHandler_Vanilla_1_17::new)
+                .update();
 
         // Cubic chunks existence check, then initialize
         if (CommonUtil.getClass("io.github.opencubicchunks.cubicchunks.api.world.ICube") != null) {
             cubicchunks = LogicUtil.tryCreate(RegionHandler_CubicChunks_1_12_2::new, RegionHandlerDisabled::new);
         } else {
-            cubicchunks = new RegionHandlerDisabled(null);
+            cubicchunks = new RegionHandlerDisabled((Throwable) null);
         }
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

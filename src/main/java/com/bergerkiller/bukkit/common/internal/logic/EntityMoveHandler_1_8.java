@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.stream.Stream;
 
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -22,7 +23,7 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 /**
  * Logic for MC 1.8 - 1.11
  */
-public class EntityMoveHandler_1_8 extends EntityMoveHandler {
+class EntityMoveHandler_1_8 extends EntityMoveHandler {
     private static boolean loggedEntityCollisionUndoFailure = false;
     private static final List<AxisAlignedBBHandle> collisions_buffer = new ArrayList<AxisAlignedBBHandle>();
 
@@ -40,6 +41,11 @@ public class EntityMoveHandler_1_8 extends EntityMoveHandler {
         } else {
             return MountiplexUtil.toStream(VoxelShapeHandle.createHandle(VoxelShapeProxy.fromAABBHandles(cubes)));
         }
+    }
+
+    @Override
+    public boolean onBlockCollided(Block block) {
+        return true;
     }
 
     @Override

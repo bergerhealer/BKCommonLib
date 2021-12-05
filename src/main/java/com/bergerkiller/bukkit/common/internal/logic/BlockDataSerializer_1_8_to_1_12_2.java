@@ -15,12 +15,13 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
  * Base implementation simply deserializes a block name (NameSpace) and either the
  * data value, or the map of key:value states.
  */
-public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
+class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
     private FastMethod<Object> findBlockByNameMethod = new FastMethod<Object>();
     private FastMethod<Object> createLegacyBlockDataMethod = new FastMethod<Object>();
     private FastMethod<Object> setBlockDataKeyValueMethod = new FastMethod<Object>();
 
-    public BlockDataSerializer_1_8_to_1_12_2() {
+    @Override
+    public void enable() {
         ClassResolver resolver = new ClassResolver();
         resolver.setDeclaredClassName("net.minecraft.world.level.block.Block");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
@@ -103,6 +104,12 @@ public class BlockDataSerializer_1_8_to_1_12_2 extends BlockDataSerializer {
                 "}", resolver)));
     }
 
+    @Override
+    public void disable() throws Throwable {
+        // TODO Auto-generated method stub
+        
+    }
+    
     @Override
     public void forceInitialization() {
         this.findBlockByNameMethod.forceInitialization();

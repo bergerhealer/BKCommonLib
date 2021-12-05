@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
@@ -9,17 +11,12 @@ import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
  * Also handles the deserialization, going back from text to BlockData.
  * This uses the same syntax as the vanilla minecraft material argument supports.
  */
-public abstract class BlockDataSerializer implements LazyInitializedObject {
-    public static final BlockDataSerializer INSTANCE;
-
-    static {
-        CommonBootstrap.initServer();
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.13")) {
-            INSTANCE = new BlockDataSerializer_1_13();
-        } else {
-            INSTANCE = new BlockDataSerializer_1_8_to_1_12_2();
-        }
-    }
+public abstract class BlockDataSerializer implements LazyInitializedObject, LibraryComponent {
+    public static final BlockDataSerializer INSTANCE = LibraryComponentSelector.forModule(BlockDataSerializer.class)
+            .runFirst(CommonBootstrap::initServer)
+            .addVersionOption(null, "1.12.2", BlockDataSerializer_1_8_to_1_12_2::new)
+            .addVersionOption("1.13", null, BlockDataSerializer_1_13::new)
+            .update();
 
     /**
      * Serializes BlockData to a String

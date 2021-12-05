@@ -31,7 +31,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
  * Class is spawned for various Entity Types. This class tracks
  * all these in a map.
  */
-public class EntityTypingHandler_1_14 extends EntityTypingHandler {
+class EntityTypingHandler_1_14 extends EntityTypingHandler {
     private final IdentityHashMap<Object, Class<?>> _cache = new IdentityHashMap<Object, Class<?>>();
     private final Handler _handler;
     private final Object nmsWorldHandle;
@@ -39,10 +39,14 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
     // Initialize findEntityTypesClass which is a fallback for types we did not pre-register
     public EntityTypingHandler_1_14() {
         this._handler = Template.Class.create(Handler.class, Common.TEMPLATE_RESOLVER);
+        this.nmsWorldHandle = WorldServerHandle.T.newInstanceNull();
+    }
+
+    @Override
+    public void enable() {
         this._handler.forceInitialization();
 
         // Initialize a dummy field with the sole purpose of constructing an entity without errors
-        this.nmsWorldHandle = WorldServerHandle.T.newInstanceNull();
         {
             // Create WorldData instance by null-constructing it
             Object nmsWorldData;
@@ -64,6 +68,10 @@ public class EntityTypingHandler_1_14 extends EntityTypingHandler {
         registerEntityTypes("LIGHTNING_BOLT", "net.minecraft.world.entity.EntityLightning");
         registerEntityTypes("PLAYER", "net.minecraft.server.level.EntityPlayer");
         registerEntityTypes("WITHER", "net.minecraft.world.entity.boss.wither.EntityWither"); // scoreboard things
+    }
+
+    @Override
+    public void disable() {
     }
 
     private void registerEntityTypes(String name, String nmsClassName) {

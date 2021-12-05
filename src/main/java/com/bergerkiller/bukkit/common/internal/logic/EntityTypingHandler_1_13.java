@@ -5,7 +5,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
-public class EntityTypingHandler_1_13 extends EntityTypingHandler_1_8 {
+class EntityTypingHandler_1_13 extends EntityTypingHandler_1_8 {
     private final FastMethod<Class<?>> findEntityTypesClass = new FastMethod<Class<?>>();
 
     public EntityTypingHandler_1_13() {

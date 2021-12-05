@@ -2,30 +2,20 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import org.bukkit.entity.Entity;
 
-import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 
-public abstract class EntityTypingHandler {
-    public static final EntityTypingHandler INSTANCE = createInstance();
-
-    private static EntityTypingHandler createInstance() {
-        CommonBootstrap.initServer();
-        try {
-            if (Common.evaluateMCVersion(">=", "1.14")) {
-                return new EntityTypingHandler_1_14();
-            } else if (Common.evaluateMCVersion(">=", "1.13")) {
-                return new EntityTypingHandler_1_13();
-            } else {
-                return new EntityTypingHandler_1_8();
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            return null;
-        }
-    }
+public abstract class EntityTypingHandler implements LibraryComponent {
+    public static final EntityTypingHandler INSTANCE = LibraryComponentSelector.forModule(EntityTypingHandler.class)
+            .runFirst(CommonBootstrap::initServer)
+            .addVersionOption(null, "1.12.2", EntityTypingHandler_1_8::new)
+            .addVersionOption("1.13", "1.13.2", EntityTypingHandler_1_13::new)
+            .addVersionOption("1.14", null, EntityTypingHandler_1_14::new)
+            .update();
 
     /**
      * Looks up an Entity Tracker Entry hook for network controllers, given an Entity Tracker Entry instance

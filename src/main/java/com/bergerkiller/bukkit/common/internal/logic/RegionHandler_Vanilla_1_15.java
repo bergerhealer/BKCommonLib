@@ -28,7 +28,7 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 /**
  * Handles region-based operations from MC 1.15 to MC 1.16.5
  */
-public class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
+class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
     private final FastMethod<Object> findRegionFileCache = new FastMethod<Object>();
     private final FastMethod<Collection<Object>> findCacheRegionFileInstances = new FastMethod<Collection<Object>>();
     private final FastMethod<Collection<IntVector3>> findCacheRegionFileCoordinates = new FastMethod<Collection<IntVector3>>();

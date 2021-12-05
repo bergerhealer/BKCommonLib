@@ -26,7 +26,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
-public class EntityMoveHandler_1_14 extends EntityMoveHandler {
+class EntityMoveHandler_1_14 extends EntityMoveHandler {
     private static final FastMethod<java.util.stream.Stream<?>> getBlockCollisions_method = new FastMethod<java.util.stream.Stream<?>>();
     private static final Converter<java.util.stream.Stream<?>, Stream<VoxelShapeHandle>> streamConverter;
     private static final boolean getBlockCollisions_method_init;

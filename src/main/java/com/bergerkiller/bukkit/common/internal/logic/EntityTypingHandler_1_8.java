@@ -27,7 +27,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
-public class EntityTypingHandler_1_8 extends EntityTypingHandler {
+class EntityTypingHandler_1_8 extends EntityTypingHandler {
     private final WorldServerHandle dummyTrackerWorld;
     private final EntityTrackerHandle dummyTracker;
     private final IntHashMap<Object> entriesMap;
@@ -66,6 +66,14 @@ public class EntityTypingHandler_1_8 extends EntityTypingHandler {
             ));
             this.fallbackConstructor.init(fallbackConstructorMethod);  
         }
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

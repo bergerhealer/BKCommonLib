@@ -46,7 +46,7 @@ import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
  * From Minecraft 1.14 onwards the best way to listen to entity add/remove events is
  * to hook the 'entitiesByUUID' map, and override the methods that add/remove from it.
  */
-public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
+class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
     private final FastField<?> entitiesByIdField = new FastField<Object>();
     private final FastField<Map<UUID, Object>> entitiesByUUIDField = new FastField<Map<UUID, Object>>();
     private final SafeField<Queue<Object>> entitiesToAddField;
@@ -124,6 +124,14 @@ public class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandle
         // Chunk EntitySlice[] field, used when entities need to be swapped, or when removing
         // entities from a chunk/world
         this.chunkEntitySliceHandler = new ChunkEntitySliceHandler();
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

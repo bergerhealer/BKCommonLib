@@ -8,9 +8,10 @@ import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
-public abstract class RegionHandler implements LazyInitializedObject {
+public abstract class RegionHandler implements LazyInitializedObject, LibraryComponent {
     public static final RegionHandler INSTANCE = new RegionHandlerSelector();
 
     /**

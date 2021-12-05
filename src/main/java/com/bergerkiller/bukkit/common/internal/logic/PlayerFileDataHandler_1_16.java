@@ -23,7 +23,7 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftServer;
 /**
  * Handler for Minecraft 1.16 and later
  */
-public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
+class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
     private final FastMethod<File> getPlayerFolderOfWorld = new FastMethod<File>();
     private final FastField<Object> playerListFileDataField;
 
@@ -47,6 +47,14 @@ public class PlayerFileDataHandler_1_16 extends PlayerFileDataHandler {
         Class<?> playerFileDataType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldNBTStorage");
         String realFieldName = Resolver.resolveFieldName(PlayerListHandle.T.getType(), fieldName);
         playerListFileDataField = CommonUtil.unsafeCast(SafeField.create(PlayerListHandle.T.getType(), realFieldName, playerFileDataType).getFastField());
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

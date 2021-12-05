@@ -16,6 +16,8 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.collections.EntityByIdWorldMap;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.events.ChunkLoadEntitiesEvent;
 import com.bergerkiller.bukkit.common.events.ChunkUnloadEntitiesEvent;
@@ -31,21 +33,16 @@ import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
 
-public abstract class EntityAddRemoveHandler implements LazyInitializedObject {
-    public static final EntityAddRemoveHandler INSTANCE;
+public abstract class EntityAddRemoveHandler implements LazyInitializedObject, LibraryComponent {
+    public static final EntityAddRemoveHandler INSTANCE = LibraryComponentSelector.forModule(EntityAddRemoveHandler.class)
+            .addVersionOption(null, "1.13.2", EntityAddRemoveHandler_1_8_to_1_13_2::new)
+            .addVersionOption("1.14", "1.16.5", EntityAddRemoveHandler_1_14_to_1_16_5::new)
+            .addVersionOption("1.17", null, EntityAddRemoveHandler_1_17::new)
+            .update();
+
     private final EntityByIdWorldMap entitiesById = new EntityByIdWorldMap();
     private CommonPlugin plugin = null;
     private Task worldSyncTask = null;
-
-    static {
-        if (Common.evaluateMCVersion(">=", "1.17")) {
-            INSTANCE = new EntityAddRemoveHandler_1_17();
-        } else if (Common.evaluateMCVersion(">=", "1.14")) {
-            INSTANCE = new EntityAddRemoveHandler_1_14_to_1_16_5();
-        } else {
-            INSTANCE = new EntityAddRemoveHandler_1_8_to_1_13_2();
-        }
-    }
 
     /**
      * Gets an entity added to a world, by its entity id. This method

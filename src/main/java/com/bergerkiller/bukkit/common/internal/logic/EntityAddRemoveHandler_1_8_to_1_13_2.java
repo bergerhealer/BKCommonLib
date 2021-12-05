@@ -46,7 +46,7 @@ import com.bergerkiller.mountiplex.reflection.util.fast.NullInvoker;
  * From MC 1.8 to MC 1.13.2 there was an IWorldAccess listener list we could subscribe to.
  * We add our own custom listener hook to that list, to listen to entity add/remove events.
  */
-public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
+class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
     private final Class<?> iWorldAccessType;
     private final SafeField<?> entitiesByIdField;
     private final FastField<Map<UUID, Object>> entitiesByUUIDField = new FastField<Map<UUID, Object>>();
@@ -110,6 +110,14 @@ public class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler
         // Chunk EntitySlice[] field, used when entities need to be swapped, or when removing
         // entities from a chunk/world
         this.chunkEntitySliceHandler = new ChunkEntitySliceHandler();
+    }
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
     }
 
     @Override

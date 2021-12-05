@@ -20,7 +20,7 @@ import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
  * Handler for Minecraft 1.14. Almost identical to the 1.14.1
  * handler, except the PortalCreateEvent isn't used anywhere.
  */
-public class PortalHandler_1_14 extends PortalHandler {
+class PortalHandler_1_14 extends PortalHandler {
     private final PortalTravelAgentHandle _pta = Template.Class.create(PortalTravelAgentHandle.class, Common.TEMPLATE_RESOLVER);
 
     /**

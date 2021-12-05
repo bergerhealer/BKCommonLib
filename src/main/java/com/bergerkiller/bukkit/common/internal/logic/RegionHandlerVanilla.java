@@ -14,7 +14,16 @@ import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 /**
  * Vanilla Minecraft region file behavior
  */
-public abstract class RegionHandlerVanilla extends RegionHandler {
+abstract class RegionHandlerVanilla extends RegionHandler {
+
+    @Override
+    public void enable() {
+    }
+
+    @Override
+    public void disable() {
+    }
+
     @Override
     public boolean isSupported(World world) {
         return true;

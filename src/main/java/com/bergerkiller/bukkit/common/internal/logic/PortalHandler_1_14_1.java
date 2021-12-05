@@ -32,7 +32,7 @@ import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
  * to 1.15.2 this has to be done by proxying an entity, passing this information
  * using the locX/Y/Z fields.
  */
-public class PortalHandler_1_14_1 extends PortalHandler implements Listener {
+class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     private final PortalTravelAgentHandle _pta = Template.Class.create(PortalTravelAgentHandle.class, Common.TEMPLATE_RESOLVER);
     private boolean _anticipatingNetherPairCreateEvent = false;
     private Block _createdNetherPortalBlock;

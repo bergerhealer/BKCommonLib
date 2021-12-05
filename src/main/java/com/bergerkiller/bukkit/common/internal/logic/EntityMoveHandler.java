@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Vehicle;
 import org.bukkit.event.entity.EntityCombustEvent;
 import org.bukkit.event.vehicle.VehicleBlockCollisionEvent;
@@ -120,6 +121,14 @@ public abstract class EntityMoveHandler {
      * @return stream of collision shapes
      */
     protected abstract Stream<VoxelShapeHandle> world_getCollisionShapes(EntityHandle entity, double dx, double dy, double dz);
+
+    /**
+     * Callback method called during movement physics handling
+     *
+     * @param block
+     * @return
+     */
+    public abstract boolean onBlockCollided(Block block);
 
     /**
      * Calls {@link #moveImpl(MoveType, double, double, double)}. Should be called to

@@ -4,6 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerSelector;
 
 /**
@@ -11,7 +12,7 @@ import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerSelector;
  * information to 16x16x16 sections of chunks. Reading can be done blocking/synchronously,
  * while writing is done asynchronously.
  */
-public interface LightingHandler {
+public interface LightingHandler extends LibraryComponent {
 
     /**
      * Gets whether this lighting handler can support operations on the world specified.

@@ -27,7 +27,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * We can use the 'isViewingCredits' method of the player to check whether portal
  * events should be ignored.
  */
-public class PortalHandler_1_9 extends PortalHandler {
+class PortalHandler_1_9 extends PortalHandler {
     private final PortalTravelAgentHandle _pta = Template.Class.create(PortalTravelAgentHandle.class, Common.TEMPLATE_RESOLVER);
 
     public PortalHandler_1_9() {
