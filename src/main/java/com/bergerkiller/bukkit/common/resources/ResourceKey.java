@@ -49,6 +49,11 @@ public final class ResourceKey<T> extends BasicWrapper<ResourceKeyHandle> {
     }
 
     @Override
+    public int hashCode() {
+        return this.getName().hashCode();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (o instanceof ResourceKey) {
             ResourceKey<?> other = (ResourceKey<?>) o;

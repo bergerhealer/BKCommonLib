@@ -10,8 +10,10 @@ import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.collections.ObjectCache;
+import com.bergerkiller.bukkit.common.component.LibraryComponentList;
 import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.controller.EntityController;
+import com.bergerkiller.bukkit.common.conversion.type.DimensionResourceKeyConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
@@ -80,6 +82,7 @@ public class CommonPlugin extends PluginBase {
      * Remaining internal variables
      */
     private static CommonPlugin instance;
+    private final LibraryComponentList<CommonPlugin> components = LibraryComponentList.forPlugin(this);
     public final List<PluginBase> plugins = new ArrayList<>();
     private EntityMap<Player, CommonPlayerMeta> playerMetadata;
     private CommonListener listener;
@@ -603,6 +606,10 @@ public class CommonPlugin extends PluginBase {
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);
 
+        // Enable all components in order
+        this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
+                DimensionResourceKeyConversion.Tracker::new);
+
         // Timings, if enabled, otherwise no-op
         if (debugTimings) {
             CommonTimings.QUEUE_PACKET = Timings.create(this, "PacketHandler::queuePacket");
@@ -725,6 +732,9 @@ public class CommonPlugin extends PluginBase {
                 entities.clear();
             }
         }
+
+        // Shut down all components
+        this.components.disable();
 
         // Shut down any ongoing tasks for the portal handler
         PortalHandler.INSTANCE.disable(this);

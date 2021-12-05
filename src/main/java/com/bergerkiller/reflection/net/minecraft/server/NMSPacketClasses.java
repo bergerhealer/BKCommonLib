@@ -1201,7 +1201,7 @@ public class NMSPacketClasses {
         public final FieldAccessor<Integer> playerId = PacketPlayOutLoginHandle.T.playerId.toFieldAccessor();
         public final FieldAccessor<Boolean> hardcore = PacketPlayOutLoginHandle.T.hardcore.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gameMode = PacketPlayOutLoginHandle.T.gameMode.toFieldAccessor();
-        public final FieldAccessor<ResourceKey<DimensionType>> dimensionType = PacketPlayOutLoginHandle.T.dimensionType.toFieldAccessor();
+        public final FieldAccessor<DimensionType> dimensionType = PacketPlayOutLoginHandle.T.dimensionType.toFieldAccessor();
         public final FieldAccessor<Integer> maxPlayers = PacketPlayOutLoginHandle.T.maxPlayers.toFieldAccessor();
         public final FieldAccessor<Boolean> reducedDebugInfo = PacketPlayOutLoginHandle.T.reducedDebugInfo.toFieldAccessor();
         public final FieldAccessor<Difficulty> difficulty = PacketPlayOutLoginHandle.T.difficulty.toFieldAccessor().ignoreInvalid(Difficulty.NORMAL);
@@ -1508,7 +1508,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutRespawn extends NMSPacket {
 
-        public final FieldAccessor<ResourceKey<DimensionType>> dimensionType = PacketPlayOutRespawnHandle.T.dimensionType.toFieldAccessor();
+        public final FieldAccessor<DimensionType> dimensionType = PacketPlayOutRespawnHandle.T.dimensionType.toFieldAccessor();
         public final TranslatorFieldAccessor<GameMode> gamemode = PacketPlayOutRespawnHandle.T.gamemode.toFieldAccessor();
 
         public final FieldAccessor<Difficulty> difficulty = new SafeDirectField<Difficulty>() {

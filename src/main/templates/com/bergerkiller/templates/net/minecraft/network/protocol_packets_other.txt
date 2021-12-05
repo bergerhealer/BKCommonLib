@@ -1098,17 +1098,17 @@ class PacketPlayOutLogin extends Packet {
 #endif
 
 #if version >= 1.17
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType;
+    private (DimensionType) DimensionManager dimensionType;
 #elseif version >= 1.16.2
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:h;
+    private (DimensionType) DimensionManager dimensionType:h;
 #elseif version >= 1.16
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:h;
+    private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
 #elseif version >= 1.15
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:e;
+    private (DimensionType) DimensionManager dimensionType:e;
 #elseif version >= 1.13.1
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:d;
+    private (DimensionType) DimensionManager dimensionType:d;
 #else
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) int dimensionType:d;
+    private (DimensionType) int dimensionType:d;
 #endif
 
     // Difficulty field only exists <= 1.13.2
@@ -1180,15 +1180,15 @@ class PacketPlayOutLogin extends Packet {
 
 class PacketPlayOutRespawn extends Packet {
 #if version >= 1.17
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType;
+    private (DimensionType) DimensionManager dimensionType;
 #elseif version >= 1.16.2
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:a;
+    private (DimensionType) DimensionManager dimensionType:a;
 #elseif version >= 1.16
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> dimensionType:a;
+    private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
 #elseif version >= 1.13.1
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) DimensionManager dimensionType:a;
+    private (DimensionType) DimensionManager dimensionType:a;
 #else
-    private (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) int dimensionType:a;
+    private (DimensionType) int dimensionType:a;
 #endif
 
     // Since Minecraft 1.16: World environment has a resource key, too!

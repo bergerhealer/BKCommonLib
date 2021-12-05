@@ -43,38 +43,6 @@ class DimensionManager {
   #endif
     }
 
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
-        // First, ask the dimension manager registry what the key is
-        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
-  #if version >= 1.18
-        java.util.Optional key_opt = dimensionTypeRegistry.getResourceKey((Object) instance);
-  #else
-        java.util.Optional key_opt = dimensionTypeRegistry.c((Object) instance);
-  #endif
-        if (key_opt.isPresent()) {
-            return (ResourceKey) key_opt.get();
-        }
-
-        // We track a pair of dimension manager and dimension type when worlds initialize and unload
-        // In case it is not part of the registry but a pair is in use by a world, this method
-        // can find those.
-        Object cached_key = com.bergerkiller.bukkit.common.internal.CommonListener.getResourceKey(instance);
-        if (cached_key != null) {
-            return (ResourceKey) cached_key;
-        }
-
-        throw new IllegalArgumentException("This dimension is not registered");
-    }
-
-    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
-        IRegistry dimensionTypeRegistry = #getDimensionTypeRegistry();
-  #if version >= 1.18
-        return (DimensionManager) dimensionTypeRegistry.get(key);
-  #else
-        return (DimensionManager) dimensionTypeRegistry.a(key);
-  #endif
-    }
-
   #if version >= 1.17
     // deprecated fallback
     public int getId() {
@@ -149,54 +117,6 @@ class DimensionManager {
     }
   #endif
 #else
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey getKey() {
-        ResourceKey category = (ResourceKey) com.bergerkiller.bukkit.common.resources.ResourceCategory.dimension_type.getCategoryKey().getRaw();
-        MinecraftKey name;
-
-  #if version >= 1.13.1
-        name = IRegistry.DIMENSION_TYPE.getKey((Object) instance);
-        if (name == null) {
-            throw new IllegalArgumentException("This dimension is not registered");
-        }
-  #else
-        // Is an enum here, with always only 3 possible values anyway
-        if (instance == DimensionManager.NETHER) {
-            name = new MinecraftKey("the_nether");
-        } else if (instance == DimensionManager.THE_END) {
-            name = new MinecraftKey("the_end");
-        } else {
-            name = new MinecraftKey("overworld");
-        }
-  #endif
-
-        return ResourceKey.create(category, name);
-    }
-
-    public static (DimensionManagerHandle) DimensionManager fromKey((com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.DimensionType>) ResourceKey key) {
-        MinecraftKey mc_key = (MinecraftKey) key.name;
-
-  #if version >= 1.13.1
-        return (DimensionManager) IRegistry.DIMENSION_TYPE.get(mc_key);
-  #else
-        // Is an enum here, with always only 3 possible values anyway
-        String name;
-    #if version >= 1.12
-        name = mc_key.getKey();
-    #else
-        name = mc_key.a();
-    #endif
-        if (name.equals("overworld")) {
-            return DimensionManager.OVERWORLD;
-        } else if (name.equals("the_nether")) {
-            return DimensionManager.NETHER;
-        } else if (name.equals("the_end")) {
-            return DimensionManager.THE_END;
-        } else {
-            return null;
-        }
-  #endif
-    }
-
     // mapped to id on 1.15.2 and before
     public int getId:getDimensionID();
     public static (DimensionManagerHandle) DimensionManager fromId:a(int id);

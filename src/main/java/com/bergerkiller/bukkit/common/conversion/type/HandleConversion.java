@@ -61,7 +61,6 @@ import com.bergerkiller.generated.net.minecraft.world.level.ChunkCoordIntPairHan
 import com.bergerkiller.generated.net.minecraft.world.level.EnumGamemodeHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.saveddata.maps.MapIconHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftArtHandle;
@@ -523,17 +522,6 @@ public class HandleConversion {
         return dimension.getId();
     }
 
-    @ConverterMethod
-    public static ResourceKey<DimensionType> dimensionKeyFromId(int dimensionId) {
-        return DimensionType.fromId(dimensionId).getKey();
-    }
-
-    @ConverterMethod
-    public static int dimensionKeyToId(ResourceKey<DimensionType> dimensionKey) {
-        DimensionManagerHandle dim = DimensionManagerHandle.fromKey(dimensionKey);
-        return (dim == null) ? 0 : dim.getId();
-    }
-
     @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager")
     public static DimensionType dimensionFromDimensionManager(Object nmsDimensionManagerHandle) {
         return DimensionType.fromDimensionManagerHandle(nmsDimensionManagerHandle);
@@ -542,16 +530,6 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionManager")
     public static Object dimensionManagerFromDimension(DimensionType dimension) {
         return dimension.getDimensionManagerHandle();
-    }
-
-    @ConverterMethod(input="net.minecraft.world.level.dimension.DimensionManager")
-    public static ResourceKey<DimensionType> dimensionKeyFromDimensionManager(Object nmsDimensionManagerHandle) {
-        return DimensionManagerHandle.T.getKey.invoke(nmsDimensionManagerHandle);
-    }
-
-    @ConverterMethod(output="net.minecraft.world.level.dimension.DimensionManager")
-    public static Object dimensionManagerFromKey(ResourceKey<DimensionType> key) {
-        return DimensionManagerHandle.T.fromKey.raw.invoke(key.getRawHandle());
     }
 
     @ConverterMethod(input="List<net.minecraft.world.phys.AxisAlignedBB>")

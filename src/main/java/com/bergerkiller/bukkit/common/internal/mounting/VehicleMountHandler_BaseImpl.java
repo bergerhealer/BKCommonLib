@@ -19,7 +19,6 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
-import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -41,7 +40,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     private final Player _player;
     protected final CommonPlugin _plugin;
     protected final SpawnedEntity _playerSpawnedEntity;
-    private ResourceKey<DimensionType> _playerDimension;
+    private DimensionType _playerDimension;
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
     private final Queue<PacketHandle> _queuedPackets;
     protected int _currentTick = 0;
@@ -51,7 +50,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
 
         this._plugin = plugin;
         this._player = player;
-        this._playerDimension = (playerDimension == null) ? null : playerDimension.getKey();
+        this._playerDimension = playerDimension;
         this._playerSpawnedEntity = new SpawnedEntity(player.getEntityId(), CommonEntityType.PLAYER);
         this._playerSpawnedEntity.state = SpawnedEntity.State.SPAWNED;
         this._spawnedEntities = new IntHashMap<>();
@@ -264,10 +263,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         synchronizeAndQueuePackets(() -> {
             // Refresh player dimension if none could be set (temporary player, pre-join)
             if (this._playerDimension == null) {
-                DimensionType playerDimension = PlayerUtil.getPlayerDimension(this._player);
-                if (playerDimension != null) {
-                    this._playerDimension = playerDimension.getKey();
-                }
+                this._playerDimension = PlayerUtil.getPlayerDimension(this._player);
             }
 
             // Event handler for further implementations
@@ -285,7 +281,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                     handleDespawn(dp.getSingleEntityId());
                 }
             } else if (type == PacketType.OUT_RESPAWN) {
-                ResourceKey<DimensionType> dimension;
+                DimensionType dimension;
                 try {
                     dimension = packet.read(PacketType.OUT_RESPAWN.dimensionType);
                 } catch (IllegalArgumentException ex) {

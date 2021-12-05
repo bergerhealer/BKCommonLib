@@ -146,7 +146,6 @@ class World extends IBlockAccess {
 
 #if version >= 1.18
     public (DimensionType) DimensionManager getDimensionType:dimensionType();
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
 #elseif version >= 1.16
     public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
@@ -178,20 +177,6 @@ class World extends IBlockAccess {
         // WorldProvider:getDimension() only returns -1, 0 or 1, as set in the constructor
         return DimensionManager.a(instance.worldProvider.getDimension());
   #endif
-    }
-
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey getDimensionTypeKey() {
-        com.bergerkiller.mountiplex.reflection.declarations.Template$Method method;
-        method = (com.bergerkiller.mountiplex.reflection.declarations.Template$Method) com.bergerkiller.generated.net.minecraft.world.level.WorldHandle.T.getDimensionType.raw;
-
-        DimensionManager dimensionType = (DimensionManager) method.invoke(instance);
-        if (dimensionType == DimensionManager.NETHER) {
-            return ResourceKey.WORLD_DIMENSION_TYPE_THE_NETHER;
-        } else if (dimensionType == DimensionManager.THE_END) {
-            return ResourceKey.WORLD_DIMENSION_TYPE_THE_END;
-        } else {
-            return ResourceKey.WORLD_DIMENSION_TYPE_OVERWORLD;
-        }
     }
 #endif
 

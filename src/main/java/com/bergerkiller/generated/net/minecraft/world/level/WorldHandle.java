@@ -3,7 +3,6 @@ package com.bergerkiller.generated.net.minecraft.world.level;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
-import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
@@ -42,7 +41,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract boolean setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
     public abstract long getTime();
     public abstract DimensionType getDimensionType();
-    public abstract ResourceKey<DimensionType> getDimensionTypeKey();
     public abstract boolean isWithinWorldBorder(EntityHandle entity);
     public abstract boolean isNotCollidingWithBlocks(EntityHandle entity, AxisAlignedBBHandle axisalignedbb);
     public abstract List<?> getRawEntitiesOfType(Class<?> rawType, AxisAlignedBBHandle bounds);
@@ -105,7 +103,6 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Boolean> setBlockData = new Template.Method.Converted<Boolean>();
         public final Template.Method<Long> getTime = new Template.Method<Long>();
         public final Template.Method.Converted<DimensionType> getDimensionType = new Template.Method.Converted<DimensionType>();
-        public final Template.Method.Converted<ResourceKey<DimensionType>> getDimensionTypeKey = new Template.Method.Converted<ResourceKey<DimensionType>>();
         public final Template.Method.Converted<Boolean> isWithinWorldBorder = new Template.Method.Converted<Boolean>();
         @Template.Optional
         public final Template.Method.Converted<Boolean> getBlockCollisions = new Template.Method.Converted<Boolean>();

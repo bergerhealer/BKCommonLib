@@ -2,7 +2,6 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
-import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.Difficulty;
 import org.bukkit.GameMode;
@@ -34,8 +33,8 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
     public abstract void setHardcore(boolean value);
     public abstract GameMode getGameMode();
     public abstract void setGameMode(GameMode value);
-    public abstract ResourceKey<DimensionType> getDimensionType();
-    public abstract void setDimensionType(ResourceKey<DimensionType> value);
+    public abstract DimensionType getDimensionType();
+    public abstract void setDimensionType(DimensionType value);
     public abstract int getMaxPlayers();
     public abstract void setMaxPlayers(int value);
     public abstract boolean isReducedDebugInfo();
@@ -48,7 +47,7 @@ public abstract class PacketPlayOutLoginHandle extends PacketHandle {
         public final Template.Field.Integer playerId = new Template.Field.Integer();
         public final Template.Field.Boolean hardcore = new Template.Field.Boolean();
         public final Template.Field.Converted<GameMode> gameMode = new Template.Field.Converted<GameMode>();
-        public final Template.Field.Converted<ResourceKey<DimensionType>> dimensionType = new Template.Field.Converted<ResourceKey<DimensionType>>();
+        public final Template.Field.Converted<DimensionType> dimensionType = new Template.Field.Converted<DimensionType>();
         @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Integer maxPlayers = new Template.Field.Integer();

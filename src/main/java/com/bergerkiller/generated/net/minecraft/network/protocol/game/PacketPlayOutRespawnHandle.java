@@ -30,8 +30,8 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
     public abstract GameMode getPreviousGameMode();
     public abstract void setPreviousGameMode(GameMode gameMode);
     public abstract void setEncryptedWorldSeed(World world);
-    public abstract ResourceKey<DimensionType> getDimensionType();
-    public abstract void setDimensionType(ResourceKey<DimensionType> value);
+    public abstract DimensionType getDimensionType();
+    public abstract void setDimensionType(DimensionType value);
     public abstract GameMode getGamemode();
     public abstract void setGamemode(GameMode value);
     /**
@@ -39,7 +39,7 @@ public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutRespawnClass extends Template.Class<PacketPlayOutRespawnHandle> {
-        public final Template.Field.Converted<ResourceKey<DimensionType>> dimensionType = new Template.Field.Converted<ResourceKey<DimensionType>>();
+        public final Template.Field.Converted<DimensionType> dimensionType = new Template.Field.Converted<DimensionType>();
         @Template.Optional
         public final Template.Field.Converted<Difficulty> difficulty = new Template.Field.Converted<Difficulty>();
         public final Template.Field.Converted<GameMode> gamemode = new Template.Field.Converted<GameMode>();

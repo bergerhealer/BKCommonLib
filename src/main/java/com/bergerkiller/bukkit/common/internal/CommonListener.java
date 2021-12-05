@@ -11,14 +11,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
-import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -47,24 +41,6 @@ public class CommonListener implements Listener {
      */
     public static boolean BLOCK_PHYSICS_FIRED = false;
 
-    /**
-     * Tracks the ResourceKey\<DimensionManager\> matching a DimensionManager instance
-     * of loaded worlds.
-     */
-    private static Map<Object, Object> RESOURCE_KEY_BY_DIMENSION_MANAGER = new HashMap<>();
-
-    public static Object getResourceKey(Object dimensionManagerHandle) {
-        synchronized (RESOURCE_KEY_BY_DIMENSION_MANAGER) {
-            return RESOURCE_KEY_BY_DIMENSION_MANAGER.get(dimensionManagerHandle);
-        }
-    }
-
-    public CommonListener() {
-        for (World world : Bukkit.getWorlds()) {
-            registerDimensionManager(WorldServerHandle.fromBukkit(world));
-        }
-    }
-
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginEnable(final PluginEnableEvent event) {
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
@@ -86,7 +62,6 @@ public class CommonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onWorldInit(final WorldInitEvent event) {
         CreaturePreSpawnHandler.INSTANCE.onWorldEnabled(event.getWorld());
-        registerDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
         CommonUtil.nextTick(() -> CommonPlugin.getInstance().notifyWorldAdded(event.getWorld()));
     }
 
@@ -98,7 +73,6 @@ public class CommonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
     protected void onWorldUnload(WorldUnloadEvent event) {
         EntityAddRemoveHandler.INSTANCE.onWorldDisabled(event.getWorld());
-        deregisterDimensionManager(WorldServerHandle.fromBukkit(event.getWorld()));
     }
 
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
@@ -195,21 +169,6 @@ public class CommonListener implements Listener {
             // Call a player exit event
             final Vehicle vehicle = (Vehicle) event.getRightClicked();
             event.setCancelled(CommonUtil.callEvent(new VehicleExitEvent(vehicle, event.getPlayer())).isCancelled());
-        }
-    }
-
-    private void registerDimensionManager(WorldServerHandle world) {
-        synchronized (RESOURCE_KEY_BY_DIMENSION_MANAGER) {
-            RESOURCE_KEY_BY_DIMENSION_MANAGER.put(
-                    world.getDimensionType().getDimensionManagerHandle(),
-                    world.getDimensionTypeKey().getRawHandle());
-        }
-    }
-
-    private void deregisterDimensionManager(WorldServerHandle world) {
-        synchronized (RESOURCE_KEY_BY_DIMENSION_MANAGER) {
-            RESOURCE_KEY_BY_DIMENSION_MANAGER.remove(
-                    world.getDimensionType().getDimensionManagerHandle());
         }
     }
 }

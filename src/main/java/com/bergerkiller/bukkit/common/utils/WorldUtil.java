@@ -545,16 +545,6 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
-     * Gets the key of the dimension type of a world. See also: {@link #getDimensionType(World)}
-     * 
-     * @param world to get from
-     * @return world dimension type key
-     */
-    public static ResourceKey<DimensionType> getDimensionTypeKey(org.bukkit.World world) {
-        return WorldHandle.fromBukkit(world).getDimensionTypeKey();
-    }
-
-    /**
      * Gets the key that uniquely identified the world as a dimension. The first three default
      * main worlds are called overworld, the_nether and the_end. Worlds beyond that use
      * a custom key with the world name.

@@ -47,15 +47,6 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
     }
 
     /**
-     * Gets the resource key used to refer to this dimension type
-     * 
-     * @return dimension type key
-     */
-    public ResourceKey<DimensionType> getKey() {
-        return handle.getKey();
-    }
-
-    /**
      * Gets the dimension manager handle that is used on MC 1.9 and later.
      * Returns a replacement implementation on MC 1.8.8 and before.
      * 
@@ -78,16 +69,6 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
         case 1: return THE_END;
         default: return fromIdFallback(id);
         }
-    }
-
-    /**
-     * Gets a dimension by its key. Returns null if not found.
-     * 
-     * @param dimensionKey
-     * @return dimension by this key, null if not found
-     */
-    public static DimensionType fromKey(ResourceKey<DimensionType> dimensionKey) {
-        return fromDimensionManagerHandle(DimensionManagerHandle.T.fromKey.raw.invoke(dimensionKey.getRawHandle()));
     }
 
     /**
@@ -128,10 +109,6 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
     public String toString() {
         try {
             return handle.toString();
-        } catch (Throwable t) {}
-
-        try {
-            return handle.getKey().toString();
         } catch (Throwable t) {}
 
         return "UNKNOWN[" + handle.getRaw().getClass().getName() + "]";
