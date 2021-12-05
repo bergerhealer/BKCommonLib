@@ -13,6 +13,7 @@ import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
+import org.bukkit.plugin.Plugin;
 import java.util.List;
 import java.util.UUID;
 
@@ -47,6 +48,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract WorldDataServerHandle getWorldData();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
+    public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded);
     public abstract Iterable<Entity> getEntities();
     public abstract void removeEntity(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
@@ -86,7 +88,6 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<WorldDataServerHandle> getWorldData = new Template.Method.Converted<WorldDataServerHandle>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
-        @Template.Optional
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();

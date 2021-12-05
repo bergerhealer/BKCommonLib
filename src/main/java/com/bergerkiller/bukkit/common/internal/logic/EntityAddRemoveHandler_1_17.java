@@ -558,8 +558,13 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          * public static void replaceInChunkStorage(Entity oldEntity, Entity newEntity) {
          *     // Paper: added an entities field to Chunk
          * #if exists net.minecraft.world.level.chunk.Chunk public final com.destroystokyo.paper.util.maplist.EntityList entities;
+         *   #if version >= 1.18
+         *     net.minecraft.core.BlockPosition pos = oldEntity.blockPosition();
+         *     net.minecraft.world.level.World world = oldEntity.getLevel();
+         *   #else
          *     net.minecraft.core.BlockPosition pos = oldEntity.getChunkCoordinates();
          *     net.minecraft.world.level.World world = oldEntity.getWorld();
+         *   #endif
          *     if (world == null || pos == null) {
          *         return;
          *     }
