@@ -64,12 +64,12 @@ class HeightMap {
   #if version >= 1.18
         org.bukkit.World world = ((Chunk) ichunkaccess).getLevel().getWorld();
         int startX = ((Chunk) ichunkaccess).getPos().x << 4;
-        int startY = ichunkaccess.b() + 15;
+        int startY = ichunkaccess.getHighestSectionPosition() + 15;
         int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
   #else
         org.bukkit.World world = ((Chunk) ichunkaccess).getWorld().getWorld();
         int startX = ((Chunk) ichunkaccess).getPos().x << 4;
-        int startY = ichunkaccess.getHighestSectionPosition() + 15;
+        int startY = ichunkaccess.b() + 15;
         int startZ = ((Chunk) ichunkaccess).getPos().z << 4;
   #endif
         BlockPosition$MutableBlockPosition blockposition = new BlockPosition$MutableBlockPosition();
