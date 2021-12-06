@@ -64,7 +64,7 @@ class MinecraftKey {
             return null;
         }
         return (MinecraftKey) MinecraftKeyHandle.T.constr_code_parts.newInstance(
-            0,
+            Integer.valueOf(0),
             new String[] { namespace, name }
         );
     }

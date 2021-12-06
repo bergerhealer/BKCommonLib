@@ -46,8 +46,10 @@ class BlockDataSerializer_1_13 extends BlockDataSerializer {
                 "    }\n" +
                 "#if version >= 1.18\n" +
                 "    return block.getState();\n" +
-                "#else\n" +
+                "#elseif version >= 1.13.2\n" +
                 "    return block.getBlockData();\n" +
+                "#else\n" +
+                "    return block.b();\n" +
                 "#endif\n" +
                 "}", resolver)));
     }
