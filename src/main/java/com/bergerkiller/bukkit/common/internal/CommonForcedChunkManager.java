@@ -23,7 +23,6 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkLoadTimeoutException;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
 import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
@@ -113,14 +112,9 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
         // This method is available on 1.13.1+
         // The ChunkUnloadEvent is not used for this, then
-        if (WorldServerHandle.T.setForceLoadedAsync.isAvailable()) {
-            WorldServerHandle.T.setForceLoadedAsync.invoke(
-                    HandleConversion.toWorldHandle(chunk.world),
-                    Integer.valueOf(chunk.chunkX),
-                    Integer.valueOf(chunk.chunkZ),
-                    this.plugin,
-                    Boolean.valueOf(forced)
-            );
+        if (CommonCapabilities.HAS_CHUNK_TICKET_API) {
+            WorldServerHandle.fromBukkit(chunk.world).setForceLoadedAsync(
+                    chunk.chunkX, chunk.chunkZ, this.plugin, forced);
         }
 
         // Load/unload the chunk

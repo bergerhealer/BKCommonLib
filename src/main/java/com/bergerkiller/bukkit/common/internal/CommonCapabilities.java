@@ -132,6 +132,11 @@ public class CommonCapabilities {
     public static final boolean BLOCK_SLAB_HAS_OWN_BLOCK = CommonBootstrap.evaluateMCVersion(">=", "1.13");
 
     /**
+     * Whether the ForcedChunk provider can make use of a chunk (plugin) ticket API to keep chunks loaded
+     */
+    public static final boolean HAS_CHUNK_TICKET_API = CommonBootstrap.evaluateMCVersion(">=", "1.13.1");
+
+    /**
      * Since Minecraft 1.14 the LongHashSet, LongObjectHashMap and IntHashMap collections are no longer
      * used. Instead, a library is used for these.
      */
