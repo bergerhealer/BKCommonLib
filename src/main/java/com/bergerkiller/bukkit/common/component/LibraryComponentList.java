@@ -129,10 +129,17 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
      * @return Created and enabled component, or null if any of that failed
      */
     public <L extends LibraryComponent> L enable(LibraryComponent.Conditional<E, L> conditional) {
+        // Ensure (environment) is initialized first
         if (!this.runInitializers()) {
             return null;
         }
 
+        // If not supported, fail and return null
+        if (!conditional.isSupported(this.environment)) {
+            return null;
+        }
+
+        // Try to create and initialize the new component
         L component = this.tryCreateAndEnableComponent(conditional);
         if (component != null) {
             enabledComponents.offer(new EnabledComponent(component, conditional.getIdentifier()));

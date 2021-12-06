@@ -100,7 +100,7 @@ public class LibraryComponentHolder<E> {
             component = conditional.create(environment);
         } catch (Throwable t) {
             logger.log(Level.SEVERE, "Failed to create component '" +
-                    conditional.getIdentifier() + "' of " + holderIdentifier);
+                    conditional.getIdentifier() + "' of " + holderIdentifier, t);
             lastError = t;
             return null;
         }
@@ -110,7 +110,7 @@ public class LibraryComponentHolder<E> {
             component.enable();
         } catch (Throwable t) {
             logger.log(Level.SEVERE, "Failed to enable component '" +
-                    conditional.getIdentifier() + "' of " + holderIdentifier);
+                    conditional.getIdentifier() + "' of " + holderIdentifier, t);
             lastError = t;
             return null;
         }
