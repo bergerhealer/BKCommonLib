@@ -238,7 +238,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     public class NMSWorldHook extends ClassHook<NMSWorldHook> {
         @Override
         protected Invoker<?> getCallback(Class<?> hookedType, Method method) {
-            Invoker<?> callback = super.getCallback(method);
+            Invoker<?> callback = super.getCallback(hookedType, method);
             return (callback != null) ? callback : non_instrumented_invokable;
         }
 
