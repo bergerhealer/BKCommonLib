@@ -237,7 +237,7 @@ public class BlockStateConversion_1_12_2 extends BlockStateConversion {
     @ClassHook.HookPackage("net.minecraft.server")
     public class NMSWorldHook extends ClassHook<NMSWorldHook> {
         @Override
-        protected Invoker<?> getCallback(Method method) {
+        protected Invoker<?> getCallback(Class<?> hookedType, Method method) {
             Invoker<?> callback = super.getCallback(method);
             return (callback != null) ? callback : non_instrumented_invokable;
         }

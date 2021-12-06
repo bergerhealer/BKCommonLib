@@ -295,7 +295,7 @@ class EntityAddRemoveHandler_1_8_to_1_13_2 extends EntityAddRemoveHandler {
         }
 
         @Override
-        protected Invoker<?> getCallback(Method method) {
+        protected Invoker<?> getCallback(Class<?> hookedType, Method method) {
             // First check if this method is hooked
             Invoker<?> result = super.getCallback(method);
             if (result != null) {
