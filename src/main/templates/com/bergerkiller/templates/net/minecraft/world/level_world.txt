@@ -148,7 +148,6 @@ class World extends IBlockAccess {
     public (DimensionType) DimensionManager getDimensionType:dimensionType();
 #elseif version >= 1.16
     public (DimensionType) DimensionManager getDimensionType:getDimensionManager();
-    public (com.bergerkiller.bukkit.common.resources.ResourceKey<DimensionType>) ResourceKey<DimensionManager> getDimensionTypeKey:getTypeKey();
 #else
     public (DimensionType) DimensionManager getDimensionType() {
   #if version >= 1.14.1

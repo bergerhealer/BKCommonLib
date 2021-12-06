@@ -761,13 +761,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
         // Convert to chunk x/z coordinates
     #if version >= 1.18
-        int chunkX = SectionPosition.b(coordKey);
-        //int chunkY = SectionPosition.c(coordKey);
-        int chunkZ = SectionPosition.d(coordKey);
-    #else
         int chunkX = SectionPosition.sectionRelativeX(coordKey);
         //int chunkY = SectionPosition.sectionRelativeY(coordKey);
         int chunkZ = SectionPosition.sectionRelativeZ(coordKey);
+    #else
+        int chunkX = SectionPosition.b(coordKey);
+        //int chunkY = SectionPosition.c(coordKey);
+        int chunkZ = SectionPosition.d(coordKey);
     #endif
         return ((WorldServer) instance.level).getChunkIfLoaded(chunkX, chunkZ);
     }

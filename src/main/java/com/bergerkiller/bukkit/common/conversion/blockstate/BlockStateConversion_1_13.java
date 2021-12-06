@@ -389,9 +389,19 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         }
 
         // Note there is also a setBlockData variant with two ints (default of second int is 512)
-        // Not sure if this is ever called anywhere...
-        @HookMethod("public boolean setBlockData:???(BlockPosition blockposition, IBlockData iblockdata, int updateFlags)")
+        // Since a later version of Minecraft, this method calls that one. For this reason on Paper,
+        // this method is final. As such we've made the method optional so it won't warn.
+        @HookMethod(value="public boolean setBlockData:???(BlockPosition blockposition, IBlockData iblockdata, int updateFlags)", optional=true)
         public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags) {
+            return true;
+        }
+
+        // This method was added in Minecraft 1.16. On Paper the normal setBlockData method
+        // is made final and calls this method. To override properly, we must override this method
+        // as well.
+        @HookMethodCondition("version >= 1.16 && version <= 1.17.1")
+        @HookMethod("public boolean a(BlockPosition blockposition, IBlockData iblockdata, int i, int j)")
+        public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags, int otherFlags) {
             return true;
         }
 
