@@ -589,7 +589,7 @@ public class CommonBootstrap {
                     if (!namespace.equals(defaultNamespace)) {
                         // Remap
                         for (String name : new String[] {
-                                "PurpurConfig"
+                                "PurpurConfig", "PurpurWorldConfig"
                         }) {
                             remappings.put(defaultNamespace + name, namespace + name);
                         }
