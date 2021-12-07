@@ -21,13 +21,16 @@ import com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -45,6 +48,7 @@ import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
+import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
 import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
@@ -82,6 +86,27 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class WrapperConversion {
+
+    @ConverterMethod(input="net.minecraft.nbt.NBTTagCompound")
+    public static BlockStateChange deserializeBlockStateChange(Object nmsNBTTagCompoundMetadataHandle) {
+        return BlockStateChange.fromMetadataPacked(CommonTagCompound.create(
+                NBTTagCompoundHandle.createHandle(nmsNBTTagCompoundMetadataHandle)));
+    }
+
+    @ConverterMethod(input="net.minecraft.world.level.block.entity.TileEntityTypes")
+    public static BlockStateType toBlockStateType(Object nmsTileEntityTypesHandle) {
+        return BlockStateType.fromTileEntityTypesHandle(nmsTileEntityTypesHandle);
+    }
+
+    @ConverterMethod
+    public static BlockStateType tileEntityTypesIdToBlockStateType(int id) {
+        return BlockStateType.bySerializedId(id);
+    }
+
+    @ConverterMethod(input="net.minecraft.resources.MinecraftKey")
+    public static BlockStateType tileEntityTypesKeyToBlockStateType(Object nmsMinecraftKeyHandle) {
+        return BlockStateType.byKey(MinecraftKeyHandle.createHandle(nmsMinecraftKeyHandle));
+    }
 
     @ConverterMethod(input="net.minecraft.world.entity.Entity", output="T extends org.bukkit.entity.Entity")
     public static org.bukkit.entity.Entity toEntity(Object nmsEntityHandle) {
@@ -155,6 +180,7 @@ public class WrapperConversion {
         return handle.getWorld().getWorld().getBlockAt(pos.getX(), pos.getY(), pos.getZ());
     }
 
+    @SuppressWarnings("deprecation")
     @ConverterMethod(input="net.minecraft.world.level.block.entity.TileEntity")
     public static org.bukkit.block.BlockState toBlockState(Object nmsTileEntityHandle) {
         return BlockStateConversion.INSTANCE.tileEntityToBlockState(nmsTileEntityHandle);

@@ -1,0 +1,66 @@
+package net.minecraft.world.level.block.entity;
+
+import net.minecraft.resources.MinecraftKey;
+import net.minecraft.core.IRegistry;
+
+import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityTypesHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+
+class TileEntityTypes {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
+#if version >= 1.13.1
+    public (MinecraftKeyHandle) MinecraftKey getKey() {
+        return (MinecraftKey) IRegistry.BLOCK_ENTITY_TYPE.getKey(instance);
+    }
+
+    public int getId() {
+        Object minecraftKey = IRegistry.BLOCK_ENTITY_TYPE.getKey(instance);
+        return com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.getId(minecraftKey);
+    }
+
+    public static Object getRawByKey((MinecraftKeyHandle) MinecraftKey key) {
+        return IRegistry.BLOCK_ENTITY_TYPE.get(key);
+    }
+
+    public static Object getRawById(int id) {
+        MinecraftKey minecraftKey = (MinecraftKey) com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
+        return (minecraftKey == null) ? null : IRegistry.BLOCK_ENTITY_TYPE.get(minecraftKey);
+    }
+#elseif version >= 1.13
+    public (MinecraftKeyHandle) MinecraftKey getKey() {
+        return (MinecraftKey) TileEntityTypes.a.b(instance);
+    }
+
+    public int getId() {
+        Object minecraftKey = TileEntityTypes.a.b(instance);
+        return com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.getId(minecraftKey);
+    }
+
+    public static Object getRawByKey((MinecraftKeyHandle) MinecraftKey key) {
+        return TileEntityTypes.a.get(key);
+    }
+
+    public static Object getRawById(int id) {
+        Object minecraftKey = com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
+        return (minecraftKey == null) ? null : TileEntityTypes.a.get(minecraftKey);
+    }
+#else
+    public (MinecraftKeyHandle) MinecraftKey getKey() {
+        return (MinecraftKey) instance.minecraftKey;
+    }
+
+    public int getId() {
+        return instance.id;
+    }
+
+    public static Object getRawByKey((MinecraftKeyHandle) MinecraftKey key) {
+        return TileEntityTypes.byKey(key);
+    }
+
+    public static Object getRawById(int id) {
+        return TileEntityTypes.byId(id);
+    }
+#endif
+
+}

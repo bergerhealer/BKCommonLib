@@ -31,12 +31,14 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -1226,55 +1228,40 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> x = PacketPlayOutMapChunkHandle.T.x.toFieldAccessor();
         public final FieldAccessor<Integer> z = PacketPlayOutMapChunkHandle.T.z.toFieldAccessor();
-        public final FieldAccessor<Integer> sectionsMask = new SafeDirectField<Integer>() {
-            @Override
-            public Integer get(Object instance) {
-                return PacketPlayOutMapChunkHandle.createHandle(instance).getSectionsMask();
-            }
-
-            @Override
-            public boolean set(Object instance, Integer value) {
-                PacketPlayOutMapChunkHandle.createHandle(instance).setSectionsMask(value.intValue());
-                return true;
-            }
-        };
-        public final FieldAccessor<CommonTagCompound> metadata = new SafeDirectField<CommonTagCompound>() {
+        public final FieldAccessor<CommonTagCompound> heightmaps = new SafeDirectField<CommonTagCompound>() {
             @Override
             public CommonTagCompound get(Object instance) {
-                return PacketPlayOutMapChunkHandle.createHandle(instance).getMetadata();
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getHeightmaps();
             }
 
             @Override
             public boolean set(Object instance, CommonTagCompound value) {
-                PacketPlayOutMapChunkHandle.createHandle(instance).setMetadata(value);
+                PacketPlayOutMapChunkHandle.createHandle(instance).setHeightmaps(value);
                 return true;
             }
         };
-        public final FieldAccessor<byte[]> data = new SafeDirectField<byte[]>() {
+        public final FieldAccessor<byte[]> buffer = new SafeDirectField<byte[]>() {
             @Override
             public byte[] get(Object instance) {
-                return PacketPlayOutMapChunkHandle.createHandle(instance).getData();
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getBuffer();
             }
 
             @Override
             public boolean set(Object instance, byte[] value) {
-                PacketPlayOutMapChunkHandle.createHandle(instance).setData(value);
+                PacketPlayOutMapChunkHandle.createHandle(instance).setBuffer(value);
                 return true;
             }
         };
-        public final FieldAccessor<List<CommonTagCompound>> tags = new SafeDirectField<List<CommonTagCompound>>() {
+        public final FieldAccessor<List<BlockStateChange>> blockStates = new SafeDirectField<List<BlockStateChange>>() {
             @Override
-            public List<CommonTagCompound> get(Object instance) {
-                return PacketPlayOutMapChunkHandle.createHandle(instance).getTags();
+            public List<BlockStateChange> get(Object instance) {
+                return PacketPlayOutMapChunkHandle.createHandle(instance).getBlockStates();
             }
 
             @Override
-            public boolean set(Object instance, List<CommonTagCompound> value) {
-                if (PacketPlayOutMapChunkHandle.T.tags.isAvailable()) {
-                    PacketPlayOutMapChunkHandle.createHandle(instance).setTags(value);
-                    return true;
-                }
-                return false;
+            public boolean set(Object instance, List<BlockStateChange> value) {
+                PacketPlayOutMapChunkHandle.createHandle(instance).setBlockStates(value);
+                return true;
             }
         };
     }
@@ -1967,11 +1954,11 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutTileEntityData extends NMSPacket {
 
         public final TranslatorFieldAccessor<IntVector3> position = PacketPlayOutTileEntityDataHandle.T.position.toFieldAccessor();
-        public final FieldAccessor<Integer> action = PacketPlayOutTileEntityDataHandle.T.action.toFieldAccessor();
+        public final FieldAccessor<BlockStateType> type = PacketPlayOutTileEntityDataHandle.T.type.toFieldAccessor();
         public final FieldAccessor<CommonTagCompound> data = PacketPlayOutTileEntityDataHandle.T.data.toFieldAccessor();
 
-        public CommonPacket newInstance(IntVector3 blockPosition, int action, CommonTagCompound data) {
-            return PacketPlayOutTileEntityDataHandle.createNew(blockPosition, action, data).toCommonPacket();
+        public CommonPacket newInstance(IntVector3 blockPosition, BlockStateType type, CommonTagCompound data) {
+            return PacketPlayOutTileEntityDataHandle.createNew(blockPosition, type, data).toCommonPacket();
         }
     }
 

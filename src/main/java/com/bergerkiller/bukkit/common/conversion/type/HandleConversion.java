@@ -23,10 +23,12 @@ import com.bergerkiller.bukkit.common.internal.proxy.EntitySliceProxy_1_8_3;
 import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
@@ -76,6 +78,26 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 public class HandleConversion {
+
+    @ConverterMethod(output="net.minecraft.nbt.NBTTagCompound")
+    public static Object serializeBlockStateChange(BlockStateChange blockStateChange) {
+        return blockStateChange.serialize().getRawHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.world.level.block.entity.TileEntityTypes")
+    public static Object toTileEntityTypesHandle(BlockStateType blockStateType) {
+        return blockStateType.getRawHandle();
+    }
+
+    @ConverterMethod
+    public static int blockStateTypeToId(BlockStateType blockStateType) {
+        return blockStateType.getSerializedId();
+    }
+
+    @ConverterMethod(output="net.minecraft.resources.MinecraftKey")
+    public static Object blockStateTypeToKey(BlockStateType blockStateType) {
+        return blockStateType.getKey().getRaw();
+    }
 
     @ConverterMethod(output="T extends net.minecraft.world.entity.Entity")
     public static Object toEntityHandle(org.bukkit.entity.Entity entity) {

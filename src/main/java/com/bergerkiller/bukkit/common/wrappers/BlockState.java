@@ -7,6 +7,8 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.state.properti
 
 /**
  * A single state of a block
+ *
+ * TODO: Rename to BlockDataState to avoid confusion with Bukkit BlockState API
  */
 public class BlockState<T extends Comparable<?>> extends BasicWrapper<IBlockStateHandle> {
 

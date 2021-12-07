@@ -70,6 +70,13 @@ public class CommonCapabilities {
     public static final boolean ITEMSTACK_EMPTY_STATE = CommonBootstrap.evaluateMCVersion(">=", "1.11");
 
     /**
+     * Since Minecraft 1.11 all tile entities' serialized NBT data use Minecraft key names, still
+     * standard to this day. Before that version it used fairly random names instead, which require
+     * translation.
+     */
+    public static final boolean TILE_ENTITY_LEGACY_NAMES = CommonBootstrap.evaluateMCVersion("<=", "1.10.2");
+
+    /**
      * Since Minecraft 1.9 more than one passenger per vehicle are permitted
      */
     public static final boolean MULTIPLE_PASSENGERS = CommonBootstrap.evaluateMCVersion(">=", "1.9");

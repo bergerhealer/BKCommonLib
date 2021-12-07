@@ -420,8 +420,9 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.levelgen.HeightMap$Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
             remappings.put("com.bergerkiller.bukkit.common.internal.proxy.HeightMap.Type", "com.bergerkiller.bukkit.common.internal.proxy.HeightMapProxy_1_12_2$Type");
             remappings.put("net.minecraft.world.phys.shapes.VoxelShape", "com.bergerkiller.bukkit.common.internal.proxy.VoxelShapeProxy");
+            remappings.put("net.minecraft.world.level.block.entity.TileEntityTypes", "com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesProxy_1_8_to_1_12_2");
         }
-        
+
         // EnumArt has seen many places...
         if (evaluateMCVersion("<=", "1.8")) {
             remappings.put("net.minecraft.world.entity.decoration.Paintings", "net.minecraft.world.entity.decoration.EnumArt");
@@ -491,7 +492,13 @@ public class CommonBootstrap {
 
         // 1.18 mappings
         if (evaluateMCVersion(">=", "1.18")) {
-            // Pass
+            // Some class names still obfuscated
+            remappings.put("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$BlockEntityData", "net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData$a");
+
+            // PacketPlayOutMapChunk was replaced by a different packet which stores light and block data
+            // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
+            // and changed block state information is available. We handle the adaptering in template code.
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk", "net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
         } else {
             // TickListServer was moved, migrate past versions
             remappings.put("net.minecraft.world.ticks.TickListServer", "net.minecraft.world.level.TickListServer");

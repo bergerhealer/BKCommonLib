@@ -23,6 +23,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
+import net.minecraft.world.level.block.entity.TileEntityTypes;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.EnumGamemode;
 import net.minecraft.world.level.dimension.DimensionManager;
@@ -36,9 +37,11 @@ import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 
+import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.UseAction;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -54,7 +57,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle.ChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
@@ -1324,6 +1326,14 @@ class PacketPlayOutPlayerListHeaderFooter extends Packet {
 #endif
 }
 
+// Is 'ClientboundLevelChunkWithLightPacket' on Minecraft 1.18 and later
+// Then all data is stored in Chunk and Light data fields, not individual fields
+// This is actually the ClientboundLevelChunkWithLightPacket
+//
+//TODO: Shortly a BitSet/int of a mask of sections stored was used
+//      Add it? Same for 'biome storage' and 'has biome data'
+//      On 1.18 and later light data is also stored (also 1.8.8 and before)
+//      I don't use it, so if anyone wants it, PR it.
 class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.17
     private int x;
@@ -1333,124 +1343,125 @@ class PacketPlayOutMapChunk extends Packet {
     private int z:b;
 #endif
 
-#if version >= 1.17
-    private optional int sectionsMask:availableSections;
-    private optional (CommonTagCompound) NBTTagCompound metadata:heightmaps;
-    private unknown int[] biomeStorage:biomes;
-    private optional byte[] data:buffer;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:blockEntitiesTags;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-#elseif version >= 1.15
-    private optional int sectionsMask:c;
-    private optional (CommonTagCompound) NBTTagCompound metadata:d;
-  #if version >= 1.16.2
-    private unknown int[] biomeStorage:e;
-  #else
-    private unknown BiomeStorage biomeStorage:e;
-  #endif
-    private optional byte[] data:f;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:g;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private unknown boolean hasBiomeData:h;
+    public static (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk createNew() {
+        return new PacketPlayOutMapChunk(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+    }
+
+    // Heightmap data, not available on MC 1.13.2 and before
+    public (CommonTagCompound) NBTTagCompound getHeightmaps() {
+#if version >= 1.18
+        return instance.getChunkData().getHeightmaps();
+#elseif version >= 1.17
+        return instance.f();
 #elseif version >= 1.14
-    private optional int sectionsMask:c;
-    private optional (CommonTagCompound) NBTTagCompound metadata:d;
-    private optional byte[] data:e;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:f;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private unknown boolean hasBiomeData:g;
-#elseif version >= 1.9.4
-    private optional int sectionsMask:c;
-    private optional (CommonTagCompound) NBTTagCompound metadata:###;
-    private optional byte[] data:d;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:e;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private unknown boolean hasBiomeData:f;
-#elseif version >= 1.9
-    private optional int sectionsMask:c;
-    private optional (CommonTagCompound) NBTTagCompound metadata:###;
-    private optional byte[] data:d;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:###;
-    private unknown boolean hasBiomeData:e;
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private NBTTagCompound heightmapsField:d;
+        return instance#heightmapsField;
 #else
-    private optional int sectionsMask:###;
-    private optional (CommonTagCompound) NBTTagCompound metadata:###;
-    private optional byte[] data:###;
-    private optional (List<CommonTagCompound>) List<NBTTagCompound> tags:###;
-    private optional (PacketPlayOutMapChunkHandle.ChunkMapHandle) PacketPlayOutMapChunk.ChunkMap chunkInfo:c;
-    private unknown boolean hasBiomeData:d;
+        return null; // Not available
+#endif
+    }
+
+    public void setHeightmaps((CommonTagCompound) NBTTagCompound heightmapsData) {
+#if version >= 1.18
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final NBTTagCompound heightmaps;
+        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        data#heightmaps = heightmapsData;
+#elseif version >= 1.17
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private final NBTTagCompound heightmaps;
+        instance#heightmaps = heightmapsData;
+#elseif version >= 1.14
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private NBTTagCompound heightmaps:d;
+        instance#heightmapsField = heightmaps;
+#else
+        // Not available
+#endif
+    }
+
+    // Byte buffer of serialized chunk block data. Use at your own peril.
+    // TODO: Kind of useless without the section mask...
+#if version >= 1.18
+    #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final byte[] chunkDataBuffer:buffer;
+#elseif version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:buffer;
+#elseif version >= 1.15
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:f;
+#elseif version >= 1.14
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:e;
+#elseif version >= 1.9
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private byte[] chunkDataBuffer:d;
+#else
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private PacketPlayOutMapChunk.ChunkMap chunkData:c;
+    #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk.ChunkMap  public byte[] chunkDataBuffer:a;
 #endif
 
+    public byte[] getBuffer() {
+#if version >= 1.18
+        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        return data#chunkDataBuffer;
+#elseif version >= 1.19
+        return instance#chunkDataBuffer;
+#else
+        PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
+        return data#chunkDataBuffer;
+#endif
+    }
+
+    public void setBuffer(byte[] buffer) {
+#if version >= 1.18
+        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        data#chunkDataBuffer = buffer;
+#elseif version >= 1.19
+        instance#chunkDataBuffer = buffer;
+#else
+        PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
+        data#chunkDataBuffer = buffer;
+#endif
+    }
+
+    // List of Block states that are inside the chunk. We offer a clean API for this.
+    public List<BlockStateChange> getBlockStates() {
+#if version >= 1.18
+        // Complicated: requires conversion using chunk x/z
+        net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
+        #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData private final List<net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData> blockEntitiesData;
+        return com.bergerkiller.bukkit.common.conversion.blockstate.ChunkBlockStateChangeConverter.convertList(
+                data#blockEntitiesData, instance.getX(), instance.getZ());
+#elseif version >= 1.9.4
+  #if version >= 1.17
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags;
+  #elseif version >= 1.15
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:g;
+  #elseif version >= 1.14
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:f;
+  #else
+        #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private (List<BlockStateChange) List<NBTTagCompound> blockEntitiesTags:e;
+  #endif
+        return instance#blockEntitiesTags;
+#else
+        // Does not exist, uses update sign packets instead
+        return java.util.Collections.emptyList();
+#endif
+    }
+
     <code>
-    public CommonTagCompound getMetadata() {
-        if (T.metadata.isAvailable()) {
-            return T.metadata.get(getRaw());
-        } else {
-            return new CommonTagCompound();
+    public void setBlockStates(List<BlockStateChange> states) {
+        List<BlockStateChange> baseStates = this.getBlockStates();
+        int count = states.size();
+        int limit = Math.min(count, baseStates.size());
+        for (int i = 0; i < limit; i++) {
+            BlockStateChange change = states.get(i);
+            if (baseStates.get(i) != change) {
+                baseStates.set(i, change);
+            }
         }
-    }
-
-    public void setMetadata(CommonTagCompound metadata) {
-        if (T.metadata.isAvailable()) {
-            T.metadata.set(getRaw(), metadata);
+        for (int i = limit; i < count; i++) {
+            baseStates.add(states.get(i));
         }
-    }
-
-    public int getSectionsMask() {
-        if (T.sectionsMask.isAvailable()) {
-            return T.sectionsMask.getInteger(getRaw());
-        } else {
-            return T.chunkInfo.get(getRaw()).getSectionsMask();
-        }
-    }
-
-    public void setSectionsMask(int sectionsMask) {
-        if (T.sectionsMask.isAvailable()) {
-            T.sectionsMask.set(getRaw(), sectionsMask);
-        } else {
-            T.chunkInfo.get(getRaw()).setSectionsMask(sectionsMask);
-        }
-    }
-
-    public byte[] getData() {
-        if (T.data.isAvailable()) {
-            return T.data.get(getRaw());
-        } else {
-            return T.chunkInfo.get(getRaw()).getData();
-        }
-    }
-    
-    public void setData(byte[] data) {
-        if (T.data.isAvailable()) {
-            T.data.set(getRaw(), data);
-        } else {
-            T.chunkInfo.get(getRaw()).setData(data);
-        }
-    }
-
-    public List<CommonTagCompound> getTags() {
-        if (T.tags.isAvailable()) {
-            return T.tags.get(getRaw());
-        } else {
-            return java.util.Collections.emptyList();
-        }
-    }
-
-    public void setTags(List<CommonTagCompound> tags) {
-        if (T.tags.isAvailable()) {
-            T.tags.set(getRaw(), tags);
-        } else {
-            // Unsupported. Do nothing.
+        while (baseStates.size() > count) {
+            baseStates.remove(baseStates.size()-1);
         }
     }
     </code>
-
-    // MC 1.8.8 only
-    optional class PacketPlayOutMapChunk.ChunkMap {
-        public byte[] data:a;
-        public int sectionsMask:b;
-    }
 }
 
 // Only >= MC 1.9 (MC 1.8.8 relies on clients themselves to unload as needed, for some reason)
@@ -2344,17 +2355,25 @@ class PacketPlayInChat extends Packet {
 }
 
 class PacketPlayOutTileEntityData extends Packet {
-#if version >= 1.17
+#if version >= 1.18
     private final (IntVector3) BlockPosition position:pos;
-    private final int action:type;
+    private final (BlockStateType) TileEntityTypes<?> type;
+    private final (CommonTagCompound) NBTTagCompound data:tag;
+#elseif version >= 1.17
+    private final (IntVector3) BlockPosition position:pos;
+    private final (BlockStateType) int type;
     private final (CommonTagCompound) NBTTagCompound data:tag;
 #else
     private (IntVector3) BlockPosition position:a;
-    private int action:b;
+    private (BlockStateType) int type:b;
     private (CommonTagCompound) NBTTagCompound data:c;
 #endif
 
-    public (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, int action, (CommonTagCompound) NBTTagCompound data);
+#if version >= 1.18
+    private (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, (BlockStateType) TileEntityTypes<?> type, (CommonTagCompound) NBTTagCompound data);
+#else
+    public (PacketPlayOutTileEntityDataHandle) PacketPlayOutTileEntityData((IntVector3) BlockPosition blockPosition, (BlockStateType) int type, (CommonTagCompound) NBTTagCompound data);
+#endif
 }
 
 class PacketPlayOutOpenSignEditor extends Packet {

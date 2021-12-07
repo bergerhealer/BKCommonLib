@@ -1,0 +1,51 @@
+package net.minecraft.network.protocol.game;
+
+import net.minecraft.core.SectionPosition;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.level.block.entity.TileEntityTypes;
+
+import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
+import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
+
+// Since Minecraft 1.18
+optional class ClientboundLevelChunkPacketData {
+    // Note: field template code is in PacketPlayOutMapChunk for simplicity, since
+    //       we need the chunk x/z for deserialization purposes.
+
+    optional class ClientboundLevelChunkPacketData.BlockEntityData {
+        final (BlockStateType) TileEntityTypes<?> type;
+        final (CommonTagCompound) NBTTagCompound tag;
+
+        public IntVector3 getPosition(int chunkX, int chunkZ) {
+#if version >= 1.18
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData final int packedXZ;
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData final int blockEntityY:y;
+#endif
+            int packedXZ = instance#packedXZ;
+            int y = instance#blockEntityY;
+
+            // Convert relative x/z in the packed value, into absolute x/z
+            int x = packedXZ >> 4;
+            int z = packedXZ & 0xF;
+            x += (chunkX << 4);
+            z += (chunkZ << 4);
+            return new IntVector3(x, y, z);
+        }
+
+        public static Object encodeRaw(IntVector3 position, (BlockStateType) TileEntityTypes<?> type, (CommonTagCompound) NBTTagCompound tag) {
+#if version >= 1.18
+            #require net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData private ClientboundLevelChunkPacketData.BlockEntityData createData:<init>(int packedXZ, int y, TileEntityTypes<?> type, NBTTagCompound tag);
+#endif
+
+            // If tag is empty, make null
+            if (tag != null && tag.isEmpty()) {
+                tag = null;
+            }
+
+            int packedXZ = (SectionPosition.sectionRelative(position.x) << 4) | SectionPosition.sectionRelative(position.z);
+            return #createData(packedXZ, position.y, type, tag);
+        }
+    }
+}

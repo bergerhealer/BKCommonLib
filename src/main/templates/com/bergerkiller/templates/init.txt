@@ -51,6 +51,7 @@
 #include /net/minecraft/network/enumprotocol.txt
 #include /net/minecraft/network/manager.txt
 #include /net/minecraft/network/protocol_direction.txt
+#include /net/minecraft/network/protocol_chunk_data.txt
 #include /net/minecraft/network/protocol_packet.txt
 #include /net/minecraft/network/protocol_packet_map.txt
 #include /net/minecraft/network/protocol_packets_movement.txt
@@ -84,6 +85,7 @@
 #include /net/minecraft/world/level_block.txt
 #include /net/minecraft/world/level_block_soundeffecttype.txt
 #include /net/minecraft/world/level_block_tileentity.txt
+#include /net/minecraft/world/level_block_tileentity_types.txt
 #include /net/minecraft/world/level_block_iblockdata.txt
 #include /net/minecraft/world/level_block_iblockstate.txt
 #include /net/minecraft/world/level_chunk.txt
