@@ -30,7 +30,6 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.SafeField;
-import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.fast.ConstantReturningInvoker;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -164,18 +163,6 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
             }
         }.createInstance(craftBlock_type);
         worldField.set(proxy_block, proxy_nms_world);
-    }
-
-    private static String remapWorldServerMethodName(String methodName, String... parameterTypeNames) {
-        Class<?>[] parameterTypes = new Class<?>[parameterTypeNames.length];
-        for (int i = 0 ; i < parameterTypes.length; i++) {
-            parameterTypes[i] = Resolver.loadClass(parameterTypeNames[i], false);
-            if (parameterTypes[i] == null) {
-                throw new IllegalStateException("Failed to find parameter[" + i + "] " +
-                        parameterTypeNames[i] + " of method " + methodName);
-            }
-        }
-        return Resolver.resolveMethodName(WorldServerHandle.T.getType(), methodName, parameterTypes);
     }
 
     @Override
@@ -369,6 +356,11 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 return ConstantReturningInvoker.of(this.conversion.proxy_nms_world_ticklist);
             }
 
+            // For all void return type methods, return a no-op method
+            if (method.getReturnType() == void.class) {
+                return ConstantReturningInvoker.of(null);
+            }
+
             // All other method calls fail
             return this.conversion.non_instrumented_invokable;
         }
@@ -403,49 +395,6 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         @HookMethod("public boolean a(BlockPosition blockposition, IBlockData iblockdata, int i, int j)")
         public boolean setBlockData(Object blockPosition, Object iblockdata, int updateFlags, int otherFlags) {
             return true;
-        }
-
-        @HookMethodCondition("version >= 1.18")
-        @HookMethod("public abstract void sendBlockUpdated(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1, int i)")
-        public void sendBlockUpdated(Object blockposition, Object iblockdata, Object iblockdata1, int i) {
-            // No-op
-        }
-
-        @HookMethodCondition("version >= 1.18")
-        @HookMethod("public void notifyAndUpdatePhysics(BlockPosition blockposition, Chunk chunk, IBlockData oldBlock, IBlockData newBlock, IBlockData actualBlock, int i, int j)")
-        public void notifyAndUpdatePhysics(Object blockposition, Object chunk, Object oldBlock, Object newBlock, Object actualBlock, int i, int j) {
-            // No-op
-        }
-
-        @HookMethodCondition("version >= 1.18")
-        @HookMethod("public void updateNeighbourForOutputSignal(BlockPosition blockposition, Block block)")
-        public void updateNeighbourForOutputSignal(Object blockposition, Object block) {
-            // No-op
-        }
-
-        @HookMethodCondition("version <= 1.17.1")
-        @HookMethod("public void updateAdjacentComparators(BlockPosition blockposition, Block block)")
-        public void updateAdjacentComparators(Object blockposition, Object block) {
-            // No-op
-        }
-
-        @HookMethodCondition("version <= 1.17.1")
-        @HookMethod("public void notify(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1, int i)")
-        public void notify(Object blockposition, Object iblockdata, Object iblockdata1, int i) {
-            // No-op
-        }
-
-        @HookMethodCondition("version >= 1.18")
-        @HookMethod("public void onBlockStateChange(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1)")
-        public void onBlockStateChange(Object blockposition, Object iblockdata, Object iblockdata1) {
-            // No-op
-        }
-
-        // Same as onBlockStateChange, but obfuscated method name
-        @HookMethodCondition("version <= 1.17.1")
-        @HookMethod("public void b(BlockPosition blockposition, IBlockData iblockdata, IBlockData iblockdata1)")
-        public void onBlockStateChangeObf(Object blockposition, Object iblockdata, Object iblockdata1) {
-            // No-op
         }
     }
 }
