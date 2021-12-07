@@ -16,7 +16,6 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.inventory.InventoryHandle;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
-import com.bergerkiller.mountiplex.reflection.ClassHook.HookMethodCondition;
 
 /**
  * Redirects all IInventory function calls to the appropriate method in a 

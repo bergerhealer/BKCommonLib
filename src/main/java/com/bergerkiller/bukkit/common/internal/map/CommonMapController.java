@@ -1244,6 +1244,7 @@ public final class CommonMapController implements PacketListener, Listener {
         }
     }
 
+    @SuppressWarnings("deprecation")
     protected synchronized void handleMapShowEvent(MapShowEvent event) {
         // Check if there are other map displays that should be shown to the player automatically
         // This uses the 'isGlobal()' property of the display
