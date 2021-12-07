@@ -178,17 +178,17 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #endif
          * 
          * // Purpur World configuration
-         * #if fieldexists net.minecraft.world.level.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
-         *     #require net.minecraft.world.level.World public final net.pl3x.purpur.PurpurWorldConfig purpurConfig;
-         *     net.pl3x.purpur.PurpurWorldConfig purpurConfig;
-         *   #if exists net.pl3x.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.WorldServer level, String worldName, org.bukkit.World.Environment environment);
-         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig(worldserver, "DUMMY", org.bukkit.World$Environment.NORMAL);
-         *   #elseif exists net.pl3x.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
-         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY", org.bukkit.World$Environment.NORMAL);
-         *   #elseif exists net.pl3x.purpur.PurpurWorldConfig public net.pl3x.purpur.PurpurWorldConfig(String worldName);
-         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY");
+         * #if fieldexists net.minecraft.world.level.World public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
+         *     #require net.minecraft.world.level.World public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
+         *     org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
+         *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.WorldServer level, String worldName, org.bukkit.World.Environment environment);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(worldserver, "DUMMY", org.bukkit.World$Environment.NORMAL);
+         *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY", org.bukkit.World$Environment.NORMAL);
+         *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public org.purpurmc.purpur.PurpurWorldConfig(String worldName);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY");
          *   #else
-         *     purpurConfig = new net.pl3x.purpur.PurpurWorldConfig("DUMMY", paperConfig, spigotConfig);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY", paperConfig, spigotConfig);
          *   #endif
          *     worldserver#purpurConfig = purpurConfig;
          * #endif

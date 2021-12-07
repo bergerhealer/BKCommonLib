@@ -572,6 +572,33 @@ public class CommonBootstrap {
             }
         }
 
+        // Various namespaces for purpur
+        {
+            String defaultNamespace = "org.purpurmc.purpur.";
+            String[] purpurNamespaces = new String[] {
+                    defaultNamespace,
+                    "net.pl3x.purpur."
+            };
+            for (String namespace : purpurNamespaces) {
+                boolean exists = false;
+                try {
+                    MPLType.getClassByName(namespace + "PurpurConfig");
+                    exists = true;
+                } catch (ClassNotFoundException ex) {}
+                if (exists) {
+                    if (!namespace.equals(defaultNamespace)) {
+                        // Remap
+                        for (String name : new String[] {
+                                "PurpurConfig"
+                        }) {
+                            remappings.put(defaultNamespace + name, namespace + name);
+                        }
+                    }
+                    break;
+                }
+            }
+        }
+
         // If remappings exist, add a resolver for them
         if (!remappings.isEmpty()) {
             if (server instanceof CraftBukkitServer) {

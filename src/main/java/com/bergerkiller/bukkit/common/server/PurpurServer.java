@@ -12,10 +12,16 @@ public class PurpurServer extends SpigotServer {
         }
 
         // Attempt to load the Purpurpigot's 'PurpurConfig' class, which only exists on purpurspigot servers
+        // Note: different namespaces
+        try {
+            Class.forName("org.purpurmc.purpur.PurpurConfig");
+            return true;
+        } catch (Throwable t) {}
         try {
             Class.forName("net.pl3x.purpur.PurpurConfig");
             return true;
         } catch (Throwable t) {}
+
         return false;
     }
 
