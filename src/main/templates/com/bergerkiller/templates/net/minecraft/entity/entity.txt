@@ -761,9 +761,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
         // Convert to chunk x/z coordinates
     #if version >= 1.18
-        int chunkX = SectionPosition.sectionRelativeX(coordKey);
-        //int chunkY = SectionPosition.sectionRelativeY(coordKey);
-        int chunkZ = SectionPosition.sectionRelativeZ(coordKey);
+        int chunkX = SectionPosition.x(coordKey);
+        //int chunkY = SectionPosition.y(coordKey);
+        int chunkZ = SectionPosition.z(coordKey);
     #else
         int chunkX = SectionPosition.b(coordKey);
         //int chunkY = SectionPosition.c(coordKey);
