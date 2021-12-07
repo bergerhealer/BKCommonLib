@@ -112,7 +112,7 @@ interface IRecipe {
 optional class RecipeItemStack {
 #if version >= 1.17
     #require net.minecraft.world.item.crafting.RecipeItemStack public ItemStack[] choicesRecipeItemStack:itemStacks;
-#else
+#elseif version >= 1.12
     #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
 #endif
 
