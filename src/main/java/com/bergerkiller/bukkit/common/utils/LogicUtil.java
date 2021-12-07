@@ -23,6 +23,7 @@ import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 
 import com.bergerkiller.bukkit.common.bases.CheckedSupplier;
+import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -1051,5 +1052,19 @@ public class LogicUtil {
         <T> CompletableFuture<T> exceptionallyAsync(CompletableFuture<T> future,
                                                     Function<Throwable, ? extends T> fn,
                                                     Executor executor);
+    }
+
+    /**
+     * Caches the result of a supplier, so it only has to be called once. This is
+     * useful if initializing the value takes some time, or the getter imposes
+     * an overhead. The returned supplier is thread-safe. Multiple gets that
+     * occur from different threads will guaranteed only initialize the value once.
+     *
+     * @param <T> Type of value
+     * @param supplier Base supplier to call to get the needed value
+     * @return Cached supplier
+     */
+    public static <T> DeferredSupplier<T> deferred(Supplier<T> supplier) {
+        return DeferredSupplier.of(supplier);
     }
 }
