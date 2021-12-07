@@ -542,18 +542,35 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
         }
 
-        // Tuinity Starlight was migrated into paper, but before that, it sat in its own namespace
-        try {
-            MPLType.getClassByName("com.tuinity.tuinity.chunk.light.SWMRNibbleArray");
-
-            // Found, remap the paper namespace to here
-            for (String name : new String[] {
-                    "SWMRNibbleArray", "StarLightInterface", "StarLightEngine",
-                    "SkyStarLightEngine", "BlockStarLightEngine"
-            }) {
-                remappings.put("ca.spottedleaf.starlight.light." + name, "com.tuinity.tuinity.chunk.light." + name);
+        // There have been various locations where starlight was installed
+        // This was also part of tuinity at some point, but was then ported into paper
+        {
+            String defaultNamespace = "ca.spottedleaf.starlight.common.light."; // Also used in templates
+            String[] starlightNamespaces = new String[] {
+                    defaultNamespace,
+                    "ca.spottedleaf.starlight.light.",
+                    "com.tuinity.tuinity.chunk.light."
+            };
+            for (String namespace : starlightNamespaces) {
+                boolean exists = false;
+                try {
+                    MPLType.getClassByName(namespace + "StarLightEngine");
+                    exists = true;
+                } catch (ClassNotFoundException ex) {}
+                if (exists) {
+                    if (!namespace.equals(defaultNamespace)) {
+                        // Remap
+                        for (String name : new String[] {
+                                "SWMRNibbleArray", "StarLightInterface", "StarLightEngine",
+                                "SkyStarLightEngine", "BlockStarLightEngine"
+                        }) {
+                            remappings.put(defaultNamespace + name, namespace + name);
+                        }
+                    }
+                    break;
+                }
             }
-        } catch (ClassNotFoundException ex) {}
+        }
 
         // If remappings exist, add a resolver for them
         if (!remappings.isEmpty()) {

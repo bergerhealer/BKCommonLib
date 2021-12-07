@@ -59,7 +59,7 @@ public final class LightingHandlerSelector implements LightingHandler {
 
                     @Override
                     public boolean isSupported(Void environment) {
-                        return CommonUtil.getClass("ca.spottedleaf.starlight.light.SWMRNibbleArray") != null;
+                        return CommonUtil.getClass("ca.spottedleaf.starlight.common.light.StarLightEngine") != null;
                     }
 
                     @Override
