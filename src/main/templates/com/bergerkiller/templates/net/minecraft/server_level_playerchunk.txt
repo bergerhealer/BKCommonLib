@@ -6,6 +6,7 @@ import net.minecraft.network.protocol.game.PacketPlayOutMapChunk;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.ChunkCoordIntPair;
+import net.minecraft.world.level.lighting.LightEngine;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -43,6 +44,10 @@ class PlayerChunk {
         return instance#playerChunkMap;
 #endif
     }
+
+#if version >= 1.16
+    #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LightEngine lightEngineField:lightEngine;
+#endif
 
     public boolean resendChunk() {
         Chunk chunk = (Chunk) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getChunkIfLoaded.raw).invoke(instance);
@@ -97,13 +102,12 @@ class PlayerChunk {
             return false;
         }
 
-        // Resend lighting information first on 1.14 and later
-#if version >= 1.14
-        PlayerChunkHandle.T.resendAllLighting.invoke(instance);
-#endif
-
         // Create a map chunk packet
-#if version >= 1.17
+#if version >= 1.18
+        // Note: is now ClientboundLevelChunkWithLightPacket
+        LightEngine lightengine = instance#lightEngineField;
+        PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, lightengine, null, null, true);
+#elseif version >= 1.17
         PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk);
 #elseif exists net.minecraft.network.protocol.game.PacketPlayOutMapChunk public PacketPlayOutMapChunk(net.minecraft.world.level.chunk.Chunk chunk, int sectionsMask);
         PacketPlayOutMapChunk packet = new PacketPlayOutMapChunk(chunk, 0x1FFFF);
@@ -118,9 +122,19 @@ class PlayerChunk {
             EntityPlayer player = (EntityPlayer) iter.next();
             PlayerConnection connection = player#playerConnection;
             if (connection != null) {
+#if version >= 1.18
+                connection.send((net.minecraft.network.protocol.Packet) packet);
+#else
                 connection.sendPacket((net.minecraft.network.protocol.Packet) packet);
+#endif
             }
         }
+
+        // Resend lighting information afterwards between 1.14 and 1.17.1
+        // After 1.18 light and chunk data are in one packet again, so no need
+#if version >= 1.14 && version <= 1.17.1
+        PlayerChunkHandle.T.resendAllLighting.invoke(instance);
+#endif
 
         return true;
     }
@@ -165,8 +179,7 @@ class PlayerChunk {
   #endif
 
         // Retrieve LightEngine (used to make the update packet)
-        #require net.minecraft.server.level.PlayerChunk private final net.minecraft.world.level.lighting.LightEngine lightEngine;
-        net.minecraft.world.level.lighting.LightEngine lightEngine = instance#lightEngine;
+        LightEngine lightEngine = instance#lightEngineField;
 
         // Create a lighting update packet, similar to how it is done in PlayerChunk
   #if version >= 1.17
