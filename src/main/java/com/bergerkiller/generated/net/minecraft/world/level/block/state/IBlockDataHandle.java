@@ -26,7 +26,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
     public abstract BlockHandle getBlock();
     public abstract BlockFaceSet getCachedOpaqueFaces();
     public abstract int getCachedOpacity();
-    public abstract boolean isBuildable();
+    public abstract boolean isSolid();
     public abstract Object get(IBlockStateHandle state);
     public abstract IBlockDataHandle set(IBlockStateHandle state, Object value);
     public abstract Map<IBlockStateHandle, Comparable<?>> getStates();
@@ -65,7 +65,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
         public final Template.Method.Converted<BlockHandle> getBlock = new Template.Method.Converted<BlockHandle>();
         public final Template.Method<BlockFaceSet> getCachedOpaqueFaces = new Template.Method<BlockFaceSet>();
         public final Template.Method<Integer> getCachedOpacity = new Template.Method<Integer>();
-        public final Template.Method<Boolean> isBuildable = new Template.Method<Boolean>();
+        public final Template.Method<Boolean> isSolid = new Template.Method<Boolean>();
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method.Converted<IBlockDataHandle> set = new Template.Method.Converted<IBlockDataHandle>();
         public final Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>> getStates = new Template.Method.Converted<Map<IBlockStateHandle, Comparable<?>>>();

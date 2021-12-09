@@ -590,8 +590,8 @@ public class BlockDataImpl extends BlockData {
     }
 
     @Override
-    public boolean isBuildable() {
-        return this.data.isBuildable();
+    public boolean isSolid() {
+        return this.data.isSolid();
     }
 
     @Override

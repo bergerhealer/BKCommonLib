@@ -209,9 +209,9 @@ interface IBlockData {
     }
 #endif
 
-    public boolean isBuildable() {
+    public boolean isSolid() {
 #if version >= 1.18
-        return instance.getMaterial().isReplaceable();
+        return instance.getMaterial().isSolid();
 #elseif version >= 1.9
         return instance.getMaterial().isBuildable();
 #else

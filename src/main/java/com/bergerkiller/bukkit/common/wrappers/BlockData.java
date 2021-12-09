@@ -461,8 +461,18 @@ public abstract class BlockData extends BlockDataRegistry {
      * Gets whether this Block can support other attachable blocks, like signs
      * 
      * @return True if buildable
+     * @deprecated Same as {@link #isSolid()}
      */
-    public abstract boolean isBuildable();
+    public final boolean isBuildable() {
+        return isSolid();
+    }
+
+    /**
+     * Gets whether this Block can support other attachable blocks, like signs
+     * 
+     * @return True if buildable
+     */
+    public abstract boolean isSolid();
 
     /**
      * Gets the damage resilience of a block to damage dealt
