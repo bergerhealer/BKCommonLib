@@ -23,7 +23,7 @@
         <!-- Library versions -->
         <minecraft.version>1.18</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.60</mountiplex.version>
+        <mountiplex.version>2.61</mountiplex.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -133,13 +133,6 @@
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
             <version>${mountiplex.version}</version>
-            <exclusions>
-                <!-- Exclude dependencies of the maven plugin, this is a temp fix and needs to be corrected -->
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
         <!-- Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings -->
         <dependency>
@@ -375,7 +368,7 @@
                 </configuration>
             </plugin>
 
-            <!-- Needed for shading in Mountiplex, CGLib and Objenesis -->
+            <!-- Needed for shading in Mountiplex, ASM and Objenesis -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
@@ -395,10 +388,6 @@
                             <shadedPattern>com.bergerkiller.bukkit.common.dep.gson</shadedPattern>
                         </relocation>
                         <relocation>
-                            <pattern>net.sf.cglib</pattern>
-                            <shadedPattern>com.bergerkiller.mountiplex.dep.net.sf.cglib</shadedPattern>
-                        </relocation>
-                        <relocation>
                             <pattern>org.objectweb.asm</pattern>
                             <shadedPattern>com.bergerkiller.mountiplex.dep.org.objectweb.asm</shadedPattern>
                         </relocation>
@@ -414,7 +403,6 @@
                     <artifactSet>
                         <includes>
                             <include>org.ow2.asm</include>
-                            <include>cglib</include>
                             <include>org.objenesis</include>
                             <include>org.javassist</include>
                             <include>com.bergerkiller.mountiplex</include>
