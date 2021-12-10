@@ -112,6 +112,8 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
         try {
             MPLType.getClassByName(path);
             return path;
+        } catch (NullPointerException ex) {
+            return "missing.type." + path; // Mohist bug
         } catch (ClassNotFoundException e) {
             return "missing.type." + path;
         }

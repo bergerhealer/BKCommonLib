@@ -110,7 +110,6 @@ public class CommonPlugin extends PluginBase {
 
     public CommonPlugin() {
         instance = this;
-        gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
         MountiplexUtil.LOGGER = this.getLogger();
     }
 
@@ -488,6 +487,9 @@ public class CommonPlugin extends PluginBase {
                         "setBlockData(Lorg/bukkit/block/data/BlockData;)V"
                 ))));
             }
+
+            // Must be loaded early
+            gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
 
             // Load the classes contained in this library
             CommonClasses.init();
