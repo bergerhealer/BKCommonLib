@@ -99,7 +99,7 @@ class DataWatcher {
         com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item item;
         Object itemRaw = com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.read.invoke(instance, key);
         item = (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item) itemRaw;
-        rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(item);
+        Object rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(item);
 #endif
         return key.getType().getConverter().convert(rawValue);
     }
