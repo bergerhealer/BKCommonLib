@@ -126,7 +126,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 return base_onInteractBy(humanEntity, humanHand);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity onInteractBy callback", t);
             return InteractionResult.FAIL;
         }
     }
@@ -140,7 +140,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 return base.onDamageEntity(damageSource, damage);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity damageEntity callback", t);
             return false;
         }
     }
@@ -154,7 +154,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.onTick();
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity tick callback", t);
         }
     }
 
@@ -167,7 +167,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.onPush(dx, dy, dz);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity push callback", t);
         }
     }
 
@@ -200,7 +200,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 }
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity move callback", t);
         }
     }
 
@@ -254,7 +254,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.die();
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
         }
     }
 
@@ -274,7 +274,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.onEntityRemoved_1_17(removalReason);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
         }
     }
 
@@ -294,7 +294,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.onEntityRemoved(removalReason);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the entity remove callback", t);
         }
     }
 
@@ -307,7 +307,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 return getStringUUID_base(this.instance());
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred serializing saved entity identifier", t);
             return "ERROR";
         }
     }
@@ -376,7 +376,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 return this.onEntitySave(tag);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the save callback", t);
             return false;
         }
     }
@@ -410,7 +410,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.collide(entity);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the collide callback", t);
         }
     }
 
@@ -437,7 +437,7 @@ public class EntityHook extends ClassHook<EntityHook> {
                 base.setInventoryItem(i, itemstack);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "An unhandled exception occurred during the setItem callback", t);
         }
     }
 
