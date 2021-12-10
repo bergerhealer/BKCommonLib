@@ -1,11 +1,14 @@
-package com.bergerkiller.bukkit.common.internal;
+package com.bergerkiller.bukkit.common.internal.logging;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.logging.Level;
 
 import org.apache.logging.log4j.Marker;
+import org.apache.logging.log4j.core.Logger;
+import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.message.Message;
+import org.apache.logging.log4j.message.MessageFactory;
 import org.apache.logging.log4j.spi.AbstractLogger;
 
 import com.bergerkiller.bukkit.common.ModuleLogger;
@@ -13,7 +16,7 @@ import com.bergerkiller.bukkit.common.ModuleLogger;
 /**
  * Logger only used during test to reduce initialization time of the server
  */
-public class CommonLog4jExtendedLogger extends AbstractLogger {
+class CommonLog4jCoreLogger extends Logger {
     private static final long serialVersionUID = 2180779091871302549L;
     private final ModuleLogger logger;
 
@@ -35,7 +38,9 @@ public class CommonLog4jExtendedLogger extends AbstractLogger {
         }
     }
 
-    public CommonLog4jExtendedLogger(String name) {
+    public CommonLog4jCoreLogger(LoggerContext context, String name) {
+        super(context, name, null);
+        //     protected Logger(final LoggerContext context, final String name, final MessageFactory messageFactory) {
         this.logger = new ModuleLogger(name);
     }
 

@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.logging.CommonLog4jTestLogging;
 import com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializerInit;
 import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.server.CommonServer.PostInitEvent;
@@ -125,7 +126,7 @@ public class CommonBootstrap {
                 CommonServer server = null;
                 if (isTestMode()) {
                     // Use our own logger to speed up initialization under test
-                    initLog4j();
+                    CommonLog4jTestLogging.initLog4j();
 
                     // Always Spigot server
                     server = new SpigotServer();
@@ -663,57 +664,5 @@ public class CommonBootstrap {
         NBTBaseHandle.NBTTagStringHandle.T.forceInitialization();
         NBTTagCompoundHandle.T.forceInitialization();
         NBTTagListHandle.T.forceInitialization();
-    }
-
-    /**
-     * Initializes the Logger Context Factory of log4j to log to our own Module Logger.
-     * This prevents very slow initialization of the default logger under test.
-     */
-    private static void initLog4j() {
-        org.apache.logging.log4j.LogManager.setFactory(new LoggerContextFactory() {
-            @Override
-            public LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3) {
-                return new LoggerContext() {
-                    @Override
-                    public Object getExternalContext() {
-                        return null;
-                    }
-
-                    @Override
-                    public ExtendedLogger getLogger(String name) {
-                        return new CommonLog4jExtendedLogger(name);
-                    }
-
-                    @Override
-                    public ExtendedLogger getLogger(String arg0, MessageFactory arg1) {
-                        return getLogger(arg0);
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0, MessageFactory arg1) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0, Class<? extends MessageFactory> arg1) {
-                        return true;
-                    }
-                };
-            }
-
-            @Override
-            public LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3, URI arg4, String arg5) {
-                return getContext(arg0, arg1, arg2, arg3);
-            }
-
-            @Override
-            public void removeContext(LoggerContext arg0) {
-            }
-        });
     }
 }
