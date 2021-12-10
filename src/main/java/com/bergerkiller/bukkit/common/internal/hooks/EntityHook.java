@@ -258,8 +258,28 @@ public class EntityHook extends ClassHook<EntityHook> {
         }
     }
 
-    @HookMethodCondition("version >= 1.17")
-    @HookMethod("public void a(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
+    @HookMethodCondition("version >= 1.17 && version <= 1.17.1")
+    @HookMethod("public void remove:a(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
+    public void onEntityRemoved_1_17(Object removalReason) {
+        try {
+            if (checkController()) {
+                if (removalReason == ENTTIY_REMOVE_REASON_KILLED) {
+                    controller.onDie(true);
+                } else if (removalReason == ENTTIY_REMOVE_REASON_DISCARDED) {
+                    controller.onDie(false);
+                } else {
+                    base.onEntityRemoved_1_17(removalReason);
+                }
+            } else {
+                base.onEntityRemoved_1_17(removalReason);
+            }
+        } catch (Throwable t) {
+            t.printStackTrace();
+        }
+    }
+
+    @HookMethodCondition("version >= 1.18")
+    @HookMethod("public void remove(net.minecraft.world.entity.Entity.RemovalReason removalReason)")
     public void onEntityRemoved(Object removalReason) {
         try {
             if (checkController()) {
