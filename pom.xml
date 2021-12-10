@@ -24,6 +24,7 @@
         <minecraft.version>1.18.1</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>2.61</mountiplex.version>
+        <cloud.version>1.6.0</cloud.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -168,6 +169,39 @@
             <artifactId>log4j-core</artifactId>
             <version>2.15.0</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- Cloud command framework -->
+        <!-- Is remapped - requires appropriate remapping in plugins using it -->
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-paper</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-annotations</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${cloud.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>me.lucko</groupId>
+            <artifactId>commodore</artifactId>
+            <version>1.10</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-api</artifactId>
+            <version>4.9.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.kyori</groupId>
+            <artifactId>adventure-platform-bukkit</artifactId>
+            <version>4.0.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Provided dependencies -->
@@ -374,7 +408,7 @@
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
-                    <minimizeJar>true</minimizeJar>
+                    <minimizeJar>false</minimizeJar>
                     <finalName>${project.name}-${project.version}-${project.build.number}</finalName>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
@@ -387,6 +421,8 @@
                             <pattern>com.google.gson</pattern>
                             <shadedPattern>com.bergerkiller.bukkit.common.dep.gson</shadedPattern>
                         </relocation>
+
+                        <!-- Mountiplex and its dependencies -->
                         <relocation>
                             <pattern>org.objectweb.asm</pattern>
                             <shadedPattern>com.bergerkiller.mountiplex.dep.org.objectweb.asm</shadedPattern>
@@ -399,6 +435,24 @@
                             <pattern>javassist</pattern>
                             <shadedPattern>com.bergerkiller.mountiplex.dep.javassist</shadedPattern>
                         </relocation>
+
+                        <!-- Cloud command framework and its dependencies -->
+                        <relocation>
+                            <pattern>cloud.commandframework</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.cloud</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>io.leangen.geantyref</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.typetoken</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>me.lucko.commodore</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.me.lucko.commodore</shadedPattern>
+                        </relocation>
+                        <relocation>
+                            <pattern>net.kyori</pattern>
+                            <shadedPattern>com.bergerkiller.bukkit.common.dep.net.kyori</shadedPattern>
+                        </relocation>
                     </relocations>
                     <artifactSet>
                         <includes>
@@ -408,6 +462,12 @@
                             <include>com.bergerkiller.mountiplex</include>
                             <include>com.google.code.gson</include>
                             <include>co.aikar</include>
+
+                            <!-- Cloud command framework -->
+                            <include>org.bergerhealer.cloud.commandframework</include>
+                            <include>io.leangen.geantyref</include>
+                            <include>me.lucko:commodore</include>
+                            <include>net.kyori</include>
                         </includes>
                     </artifactSet>
                 </configuration>

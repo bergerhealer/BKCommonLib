@@ -15,6 +15,10 @@ It also simplifies coding:
 * Nanosecond StopWatch class for performance monitoring
 * Operation class to handle entities, players, chunks and worlds the way you want it
 
+### Cloud Command Framework
+BKCommonLib also shades in the Cloud Command Framework, and adds some useful helper classes.
+Read more about it [here](CLOUD_HOWTO.md).
+
 ### License
 MIT License
 
