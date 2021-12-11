@@ -234,10 +234,18 @@ public class EntityHook extends ClassHook<EntityHook> {
 
     public void onBaseDeath(boolean killed) {
         if (CommonCapabilities.ENTITY_REMOVE_WITH_REASON) {
-            if (killed) {
-                base.onEntityRemoved(ENTTIY_REMOVE_REASON_KILLED);
+            if (CommonCapabilities.MOJANGMAP_METHODS) {
+                if (killed) {
+                    base.onEntityRemoved(ENTTIY_REMOVE_REASON_KILLED);
+                } else {
+                    base.onEntityRemoved(ENTTIY_REMOVE_REASON_DISCARDED);
+                }
             } else {
-                base.onEntityRemoved(ENTTIY_REMOVE_REASON_DISCARDED);
+                if (killed) {
+                    base.onEntityRemoved_1_17(ENTTIY_REMOVE_REASON_KILLED);
+                } else {
+                    base.onEntityRemoved_1_17(ENTTIY_REMOVE_REASON_DISCARDED);
+                }
             }
         } else {
             base.die();

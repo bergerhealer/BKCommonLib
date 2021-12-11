@@ -227,4 +227,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.17 entity removal comes with a reason, and there is not just a die() method.
      */
     public static final boolean ENTITY_REMOVE_WITH_REASON = CommonBootstrap.evaluateMCVersion(">=", "1.17");
+
+    /**
+     * Since Minecraft 1.18 all methods names are de-obfuscated
+     */
+    public static final boolean MOJANGMAP_METHODS = CommonBootstrap.evaluateMCVersion(">=", "1.18");
 }
