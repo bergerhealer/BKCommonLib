@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.blockstate;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
@@ -17,7 +16,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.ChunkUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
@@ -44,8 +42,6 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     private final Object proxy_nms_world_ticklist;
     private final Block proxy_block;
     private final Map<Material, NullInstantiator<BlockState>> blockStateInstantiators;
-    private final Class<?> craftBlockEntityState_type;
-    private final SafeField<?> craftBlockEntityState_snapshot_field;
     private final Invoker<Object> non_instrumented_invokable = (instance, args) -> {
         String name = instance.getClass().getSuperclass().getSimpleName();
         throw new UnsupportedOperationException("Method not instrumented by the " + name + " proxy");
@@ -59,11 +55,6 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
 
         // Stores a mapping of CraftBlockState types we have already created, by Block Material
         this.blockStateInstantiators = new EnumMap<Material, NullInstantiator<BlockState>>(Material.class);
-
-        // Find CraftBlockEntityState class; we need to fix up the 'world' property of the snapshot tile
-        this.craftBlockEntityState_type = CommonUtil.getClass("org.bukkit.craftbukkit.block.CraftBlockEntityState");
-        this.craftBlockEntityState_snapshot_field = SafeField.create(this.craftBlockEntityState_type,
-                "snapshot", TileEntityHandle.T.getType());
 
         // NMS World Proxy has a 'TickListServer' object that is requested by TileEntityCommand
         proxy_nms_world_ticklist = new ClassInterceptor() {
@@ -219,54 +210,39 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // If cached, create the BlockState by null-instantiating it and calling load() on it ourselves
         // This prevents creating a snapshot copy of the Tile Entity state
         NullInstantiator<BlockState> state_instantiator = this.blockStateInstantiators.get(blockData.getType());
-        if (state_instantiator != null) {
-            BlockState result = state_instantiator.create();
+        if (state_instantiator == null) {
+            // Initialize a new instantiator. Use getState() to figure out what BlockState class to use.
 
-            // Initialize the fields in BlockState
-            // public void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) 
-            CraftBlockStateHandle.T.init.invoke(result, block, chunk, blockData.getData(), nmsTileEntity);
+            // Store and restore old state in case of recursive calls to this function
+            // This could happen if inside BlockState construction a chunk is loaded anyway
+            // Would be bad, but its best to assume the worst
+            TileState old_state = input_state;
+            try {
+                input_state = new TileState(chunk, block, nmsTileEntity, blockData);
+                BlockState result = proxy_block.getState();
 
-            return result;
+                // Now we know what BlockState to create for this type of BlockData
+                // Store a null-instantiator that will initialize this Class
+                state_instantiator = NullInstantiator.of(result.getClass());
+                this.blockStateInstantiators.put(blockData.getType(), state_instantiator);
+            } catch (Throwable t) {
+                Logging.LOGGER_CONVERSION.once(Level.SEVERE, "Failed to convert " +
+                        nmsTileEntity.getClass().getName() + " to CraftBlockState", t);
+                return CraftBlockStateHandle.createNew(input_state.block);
+            } finally {
+                input_state = old_state;
+            }
         }
 
-        // Store and restore old state in case of recursive calls to this function
-        // This could happen if inside BlockState construction a chunk is loaded anyway
-        // Would be bad, but its best to assume the worst
-        TileState old_state = input_state;
-        try {
-            input_state = new TileState(chunk, block, nmsTileEntity, blockData);
-            World world = block.getWorld();
-            BlockState result = proxy_block.getState();
+        // Create a new instance, which will have all fields left to the defaults
+        BlockState result = state_instantiator.create();
 
-            // Internal BlockState needs to have all proxy field instances replaced with what it should be
-            BlockStateCache cache = BlockStateCache.get(result.getClass());
-            for (SafeField<World> worldField : cache.worldFields) {
-                worldField.set(result, world);
-            }
-            for (SafeField<Chunk> chunkField : cache.chunkFields) {
-                chunkField.set(result, chunk);
-            }
+        // Initialize the fields in BlockState
+        // public void init(org.bukkit.block.Block block, org.bukkit.Chunk chunk, IBlockData blockData, TileEntity tileEntity) 
+        CraftBlockStateHandle.T.init.invoke(result, block, chunk, blockData.getData(), nmsTileEntity);
 
-            // Correct the snapshot field for BlockEntityState Block States
-            if (this.craftBlockEntityState_type.isAssignableFrom(result.getClass())) {
-                Object snapshotTile = this.craftBlockEntityState_snapshot_field.get(result);
-                if (snapshotTile != null) {
-                    TileEntityHandle.T.world_field.set(snapshotTile, world);
-                }
-            }
-
-            // Cache type instantiator for next time
-            this.blockStateInstantiators.put(blockData.getType(), NullInstantiator.of(result.getClass()));
-
-            // All done!
-            return result;
-        } catch (Throwable t) {
-            Logging.LOGGER_CONVERSION.once(Level.SEVERE, "Failed to convert " +
-                    nmsTileEntity.getClass().getName() + " to CraftBlockState", t);
-            return CraftBlockStateHandle.createNew(input_state.block);
-        } finally {
-            input_state = old_state;
-        }
+        // Done!
+        return result;
     }
 
     public Object getTileEntityFromWorld(Block block) {
@@ -294,27 +270,17 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     // caches the CraftWorld/CraftChunk fields stored inside the BlockState for later re-swapping
     private static final class BlockStateCache {
         private static final HashMap<Class<?>, BlockStateCache> cache = new HashMap<Class<?>, BlockStateCache>();
-        public final SafeField<Chunk> chunkFields[];
-        public final SafeField<World> worldFields[];
         public final SafeField<Object> tileEntityField;
 
         @SuppressWarnings("unchecked")
         private BlockStateCache(Class<?> type) {
             ClassTemplate<?> template = ClassTemplate.create(type);
-            ArrayList<SafeField<?>> tmpChunkFields = new ArrayList<SafeField<?>>();
-            ArrayList<SafeField<?>> tmpWorldFields = new ArrayList<SafeField<?>>();
             SafeField<?> tmpTileEntityField = null;
             for (SafeField<?> f : template.getFields()) {
-                if (Chunk.class.isAssignableFrom(f.getType())) {
-                    tmpChunkFields.add(f);
-                } else if (World.class.isAssignableFrom(f.getType())) {
-                    tmpWorldFields.add(f);
-                } else if (TileEntityHandle.T.isAssignableFrom(f.getType())) {
+                if (TileEntityHandle.T.isAssignableFrom(f.getType())) {
                     tmpTileEntityField = f;
                 }
             }
-            chunkFields = LogicUtil.toArray(tmpChunkFields, SafeField.class);
-            worldFields = LogicUtil.toArray(tmpWorldFields, SafeField.class);
             tileEntityField = (SafeField<Object>) tmpTileEntityField;
         }
 

@@ -52,7 +52,7 @@ class CraftBlockState {
             entityState#tileEntity = tileEntity;
             entityState#snapshot = tileEntity;
 
-  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
+  #if exists org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T> tileEntityClass;
             #require org.bukkit.craftbukkit.block.CraftBlockEntityState private final Class<T extends TileEntity> tileEntityClass;
             entityState#tileEntityClass = tileEntity.getClass();
   #endif
