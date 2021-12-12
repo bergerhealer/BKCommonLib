@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.localization;
 
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import org.bukkit.command.CommandSender;
 
 /**
@@ -9,7 +8,7 @@ import org.bukkit.command.CommandSender;
  * The get routine has to be implemented to link to the localization source
  * Plugin
  */
-public abstract class LocalizationEnum implements ILocalizationDefault {
+public abstract class LocalizationEnum implements ILocalizationEnum {
 
     private final String name;
     private final String defValue;
@@ -35,11 +34,9 @@ public abstract class LocalizationEnum implements ILocalizationDefault {
      * @param sender to send to
      * @param arguments for the node
      */
+    @Override
     public void message(CommandSender sender, String... arguments) {
-        String text = get(arguments);
-        if (!LogicUtil.nullOrEmpty(text)) {
-            sender.sendMessage(text);
-        }
+        ILocalizationEnum.super.message(sender, arguments);
     }
 
     /**
@@ -48,5 +45,6 @@ public abstract class LocalizationEnum implements ILocalizationDefault {
      * @param arguments for the node
      * @return Locale value
      */
+    @Override
     public abstract String get(String... arguments);
 }

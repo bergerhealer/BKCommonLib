@@ -130,6 +130,11 @@ public class CloudSimpleHandler {
         handle(CommandExecutionException.class, this::handleException);
         handle(PipelineException.class, this::handleException);
 
+        // Makes LocalizedParserException functional
+        handle(CloudLocalizedException.class, (sender, ex) -> {
+            sender.sendMessage(ex.getMessage());
+        });
+
         // Suggests a player name, either of a player that is online right now,
         // or of a player that was online in the past.
         suggest("playername", (context, input) -> {
