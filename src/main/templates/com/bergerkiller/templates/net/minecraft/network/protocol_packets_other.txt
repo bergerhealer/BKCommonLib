@@ -590,7 +590,7 @@ class PacketPlayInUseItem extends Packet {
 
 #elseif version >= 1.14
     #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock getHitResult:c();
-    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public void initMovingObject() {
+    #require net.minecraft.network.protocol.game.PacketPlayInUseItem public net.minecraft.world.phys.MovingObjectPositionBlock initMovingObject() {
         net.minecraft.world.phys.MovingObjectPositionBlock moving = instance.c();
         if (moving != null) {
             return moving;
