@@ -1,17 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import java.io.PrintStream;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
-import org.apache.logging.log4j.message.MessageFactory;
-import org.apache.logging.log4j.spi.ExtendedLogger;
-import org.apache.logging.log4j.spi.LoggerContext;
-import org.apache.logging.log4j.spi.LoggerContextFactory;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -119,6 +114,14 @@ public class CommonBootstrap {
             if (_isInitializingCommonServer) {
                 throw new UnsupportedOperationException("CommonServer is already being initialized. Fix your code!");
             }
+
+            // Some common packages we KNOW for a fact are packages, and never ever should not be
+            // If some plugin decides to include such a package name as a Class, we reject it.
+            Resolver.getPackageNameCache().addDefaultPackage("net.minecraft.server")
+                                          .addDefaultPackage("net.minecraft.core")
+                                          .addDefaultPackage("org.bukkit.craftbukkit")
+                                          .addDefaultPackage("com.mojang.authlib")
+                                          .addDefaultPackage("org.spigotmc");
 
             // Get all available server types
             _isInitializingCommonServer = true;
