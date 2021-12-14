@@ -32,11 +32,8 @@ import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -1055,23 +1052,62 @@ public abstract class PluginBase extends JavaPlugin {
         }
     }
 
-    private String readPluginYamlContent(JavaPlugin plugin, org.bukkit.configuration.file.YamlConfiguration config) {
+    private String readPluginYamlContent(Plugin plugin, org.bukkit.configuration.file.YamlConfiguration config) {
         try {
-            String yamlText;
-            try (InputStream stream = plugin.getResource("plugin.yml")) {
-                ByteArrayOutputStream result = new ByteArrayOutputStream();
-                byte[] buffer = new byte[1024];
-                for (int length; (length = stream.read(buffer)) != -1; ) {
-                    result.write(buffer, 0, length);
-                }
-                yamlText = new String(result.toByteArray(), StandardCharsets.UTF_8);
-            }
+            String yamlText = readPluginYAML(plugin);
             config.loadFromString(yamlText);
             return yamlText;
-        } catch (Exception ex) {
-            getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + plugin.getName() + ":", ex);
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "[Configuration] An error occured while loading plugin.yml resource for plugin " + plugin.getName() + ":", t);
         }
         return "";
+    }
+
+    /**
+     * Locates the plugin.yml of a plugin. Some plugins (*cough* AsyncWorldEdit)
+     * inject class loader stuff into the server that breaks getResource("plugin.yml").
+     * This method tries to use findResource(), which doesn't suffer from this.
+     *
+     * @param plugin The plugin to read the plugin.yml of
+     * @return Plugin YAML text content
+     */
+    private String readPluginYAML(Plugin plugin) {
+        java.io.InputStream found_stream = null;
+        if (plugin instanceof JavaPlugin) {
+            try {
+                java.lang.reflect.Method m = JavaPlugin.class.getDeclaredMethod("getClassLoader");
+                m.setAccessible(true);
+                ClassLoader loader = (ClassLoader) m.invoke(plugin);
+                if (loader instanceof java.net.URLClassLoader) {
+                    java.net.URL resource = ((java.net.URLClassLoader) loader).findResource("plugin.yml");
+                    if (resource != null) {
+                        java.net.URLConnection connection = resource.openConnection();
+                        connection.setUseCaches(false);
+                        found_stream = connection.getInputStream();
+                    }
+                }
+            } catch (Throwable t) {
+                this.getLogger().log(java.util.logging.Level.WARNING,
+                        "Error selecting plugin.yml of " + plugin.getName() +
+                        ", trying fallback", t);
+            }
+        }
+        if (found_stream == null) {
+            found_stream = plugin.getResource("plugin.yml");
+        }
+        if (found_stream == null) {
+            throw new IllegalStateException("Failed to find plugin.yml");
+        }
+        try (java.io.InputStream stream = found_stream) {
+            java.io.ByteArrayOutputStream result = new java.io.ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            for (int length; (length = stream.read(buffer)) != -1; ) {
+                result.write(buffer, 0, length);
+            }
+            return new String(result.toByteArray(), java.nio.charset.StandardCharsets.UTF_8);
+        } catch (java.io.IOException ex) {
+            throw new IllegalStateException("Failed to read plugin.yml", ex);
+        }
     }
 
     /**
