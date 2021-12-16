@@ -701,9 +701,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean isSavingAllowed() {
         Entity$RemovalReason reason = instance.getRemovalReason();
   #if version >= 1.18
-        return reason != null && reason.shouldSave();
+        return reason == null || reason.shouldSave();
   #else
-        return reason != null && reason.b();
+        return reason == null || reason.b();
   #endif
     }
 
