@@ -603,7 +603,10 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *         }
          * 
          *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private EntitySection currentSection;
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager callbackPESM:this$0;
          *         EntitySection section = callback#currentSection;
+         * 
+         *         boolean checkStartTickingNewEntity = false;
          * 
          *         #require net.minecraft.world.level.entity.EntitySection private final net.minecraft.util.EntitySlice storage;
          *         EntitySlice slice = section#storage;
@@ -615,8 +618,43 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *                     iter.remove();
          *                 } else {
          *                     iter.set(newEntity);
+         *                     checkStartTickingNewEntity = true;
          *                 }
          *             }
+         *         }
+         * 
+         *         // If isAlwaysTicking() of the old and new entity differs, we may have to stop/start ticking ourselves
+         *         // This is because of a bug in the persistent entity section manager that, if isAlwaysTicking() is true,
+         *         // the updateStatus function does not work anymore to update this state.
+         *         if (checkStartTickingNewEntity) {
+         * #if version >= 1.18
+         *             boolean wasAlwaysTicking = oldEntity.isAlwaysTicking();
+         *             boolean isAlwaysTicking = newEntity.isAlwaysTicking();
+         *             boolean sectionTicking = section.getStatus().isTicking();
+         * #else
+         *             boolean wasAlwaysTicking = oldEntity.dn();
+         *             boolean isAlwaysTicking = newEntity.dn();
+         *             boolean sectionTicking = section.c().a();
+         * #endif
+         * 
+         *             // Start ticking when section is not ticking, and we go from not always ticking
+         *             // to always ticking. This is because this 'load' trigger already fired, and so it
+         *             // presumes startTicking() was already performed.
+         *             if (isAlwaysTicking && !wasAlwaysTicking && !sectionTicking) {
+         * #if version >= 1.18
+         *                 #require net.minecraft.world.level.entity.PersistentEntitySectionManager void pesmStartTicking:startTicking(T t0);
+         * #else
+         *                 #require net.minecraft.world.level.entity.PersistentEntitySectionManager void pesmStartTicking:c(T t0);
+         * #endif
+         *                 PersistentEntitySectionManager pesm = callback#callbackPESM;
+         *                 pesm#pesmStartTicking(newEntity);
+         *             }
+         * 
+         *             // Stop ticking when section is not ticking, and we go from always ticking to
+         *             // not always ticking. For same reason as before.
+         *             // TODO: Implement this? No use case as of right now.
+         *             //if (!isAlwaysTicking && wasAlwaysTicking && !sectionTicking) {
+         *             //}
          *         }
          *     }
          * }
