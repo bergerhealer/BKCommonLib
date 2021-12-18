@@ -20,7 +20,6 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
-import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
@@ -409,11 +408,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             }
         }
 
-        // *** DataWatcher field of the old Entity ***
-        Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(newInstance.getRaw());
-        if (dataWatcher != null) {
-            DataWatcherHandle.T.owner.set(dataWatcher, newInstance);
-        }
+        // *** Replace data that is stored in the entity itself ***
+        newInstance.assignEntityReference();
 
         // *** Perform further replacement all over the place in the server ***
         EntityAddRemoveHandler.INSTANCE.replace(oldInstance, newInstance);

@@ -276,6 +276,35 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
     }
 
+    // Assigns this Entity instance to deep members of this Entity
+    // Used during entity replacement logic to swap out two instances
+    public void assignEntityReference() {
+        //TODO: Migrate more from CommonEntity to here
+
+        // -- DataWatcher Owner field --
+#if version >= 1.18
+        net.minecraft.network.syncher.DataWatcher dw = instance.getEntityData();
+#else
+        net.minecraft.network.syncher.DataWatcher dw = instance.getDataWatcher();
+#endif
+        if (dw != null) {
+            com.bergerkiller.mountiplex.reflection.declarations.Template.Field field;
+            field = (com.bergerkiller.mountiplex.reflection.declarations.Template.Field) com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.owner.raw;
+            field.set(dw, instance);
+        }
+
+        // -- Paper LootableInventory field --
+#if exists net.minecraft.world.entity.Entity public com.destroystokyo.paper.loottable.PaperLootableInventoryData lootableData;
+        #require com.destroystokyo.paper.loottable.PaperLootableInventoryData private final com.destroystokyo.paper.loottable.PaperLootableInventory paperLootable:lootable;
+        com.destroystokyo.paper.loottable.PaperLootableInventory paperLootableInv = instance.lootableData#paperLootable;
+        if (paperLootableInv instanceof com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) {
+            com.destroystokyo.paper.loottable.PaperMinecartLootableInventory minecartInv = (com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) paperLootableInv;
+            #require com.destroystokyo.paper.loottable.PaperMinecartLootableInventory private net.minecraft.world.entity.vehicle.EntityMinecartContainer emcEntity:entity;
+            minecartInv#emcEntity = instance;
+        }
+#endif
+    }
+
 #if version >= 1.18
     public boolean isLastAndCurrentPositionDifferent() {
         return instance.getX() != instance.xo || instance.getY() != instance.yo || instance.getZ() != instance.zo ||
