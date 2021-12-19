@@ -26,7 +26,8 @@ public class Common {
             "Common:FishingHookFixes1.16",
             "Common:Chunk:FutureProvider",
             "Common:IntCuboid",
-            "Common:WorldBlockBorder"
+            "Common:WorldBlockBorder",
+            "Common:EntityController:FixedOnDieDuringTeleport"
     ).collect(Collectors.toSet());
 
     /**
