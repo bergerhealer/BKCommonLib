@@ -54,7 +54,7 @@ public class EntityUtil extends EntityPropertyUtil {
         EntityHandle nmsentity = CommonNMS.getHandle(entity);
         WorldServerHandle nmsworld = nmsentity.getWorldServer();
         entity.getWorld().getChunkAt(MathUtil.toChunk(nmsentity.getLocX()), MathUtil.toChunk(nmsentity.getLocZ()));
-        nmsentity.setDead(false);
+        nmsentity.setDestroyed(false);
         // Remove an entity tracker for this entity if it was present
         nmsworld.getEntityTracker().stopTracking(entity);
         // Add the entity to the world

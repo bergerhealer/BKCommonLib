@@ -396,7 +396,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     public void setDead(boolean dead) {
-        this.handle.setDead(dead);
+        this.handle.setDestroyed(dead);
     }
 
     /**
@@ -770,8 +770,32 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         }
     }
 
+    /**
+     * @deprecated Use {@link #isRemoved()} instead, isDead() is unclear
+     */
+    @Deprecated
     public boolean isDead() {
         return entity.isDead();
+    }
+
+    /**
+     * Whether this entity has been removed from the world or server. This is
+     * true when the entity is killed, or when the entity unloads.
+     *
+     * @return True if removed
+     */
+    public boolean isRemoved() {
+        return entity.isDead();
+    }
+
+    /**
+     * Whether this Entity has been destroyed. This is true when the entity was
+     * killed or purged from the server, rather than merely unloaded.
+     *
+     * @return True if the entity was destroyed
+     */
+    public boolean isDestroyed() {
+        return handle.isDestroyed();
     }
 
     public boolean isEmpty() {

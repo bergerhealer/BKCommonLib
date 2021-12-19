@@ -78,8 +78,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract Vector getBlockCollisionMultiplier();
     public abstract void setNotCollidingWithBlock();
     public abstract void setRemovedPassive();
-    public abstract void setDead(boolean dead);
-    public abstract boolean isDead();
+    public abstract void setDestroyed(boolean dead);
+    public abstract boolean isDestroyed();
     public abstract boolean isSavingAllowed();
     public abstract boolean isLoadedInWorld();
     public abstract int getChunkX();
@@ -141,6 +141,12 @@ public abstract class EntityHandle extends Template.Handle {
 
     public com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle getWorldServer() {
         return com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle.createHandle(T.getWorld.raw.invoke(getRaw()));
+    }
+
+
+    @Deprecated
+    public boolean isDead() {
+        return isDestroyed();
     }
 
 
@@ -345,8 +351,8 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Vector> getBlockCollisionMultiplier = new Template.Method<Vector>();
         public final Template.Method<Void> setNotCollidingWithBlock = new Template.Method<Void>();
         public final Template.Method<Void> setRemovedPassive = new Template.Method<Void>();
-        public final Template.Method<Void> setDead = new Template.Method<Void>();
-        public final Template.Method<Boolean> isDead = new Template.Method<Boolean>();
+        public final Template.Method<Void> setDestroyed = new Template.Method<Void>();
+        public final Template.Method<Boolean> isDestroyed = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isSavingAllowed = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isLoadedInWorld = new Template.Method<Boolean>();
         public final Template.Method<Integer> getChunkX = new Template.Method<Integer>();

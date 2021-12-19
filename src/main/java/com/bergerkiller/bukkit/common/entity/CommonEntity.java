@@ -545,7 +545,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         } else {
             // Remove from one world and add to the other
             this.handle.getWorldServer().removeEntity(this.handle);
-            this.handle.setDead(false);
+            this.handle.setDestroyed(false);
             this.handle.setWorld(newworld);
             this.handle.setLocation(location.getX(), location.getY(), location.getZ(), location.getYaw(), location.getPitch());
 

@@ -79,7 +79,7 @@ public class CommonListener implements Listener {
     protected void onVehicleEnter(final VehicleEnterEvent event) {
         // Set the vehicle and passenger handles for Hook entities
         // This is required to avoid problems with replaced Entities
-        if (EntityHandle.fromBukkit(event.getVehicle()).isDead()) {
+        if (EntityHandle.fromBukkit(event.getVehicle()).isDestroyed()) {
             // Find the real Entity and redirect the call
             final org.bukkit.entity.Entity realVehicle = EntityUtil.getEntity(event.getEntered().getWorld(), event.getVehicle().getUniqueId());
             if (realVehicle != null && realVehicle != event.getVehicle()) {

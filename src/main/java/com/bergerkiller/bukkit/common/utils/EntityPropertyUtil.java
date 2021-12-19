@@ -123,8 +123,16 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
         return EntityHandle.T.getChunkZ.invoke(h(entity));
     }
 
+    /**
+     * @deprecated Use {@link #setDestroyed(Entity, boolean)} instead
+     */
+    @Deprecated
     public static void setDead(Entity entity, boolean dead) {
-        EntityHandle.T.setDead.invoke(h(entity), dead);
+        EntityHandle.T.setDestroyed.invoke(h(entity), dead);
+    }
+
+    public static void setDestroyed(Entity entity, boolean dead) {
+        EntityHandle.T.setDestroyed.invoke(h(entity), dead);
     }
 
     /**

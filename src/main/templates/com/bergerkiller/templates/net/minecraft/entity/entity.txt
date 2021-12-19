@@ -690,6 +690,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     //     private unknown boolean outsideWorldBorderField:g;
     // #endif
 
+    <code>
+    @Deprecated
+    public boolean isDead() {
+        return isDestroyed();
+    }
+    </code>
+
 #if version >= 1.17
     #require net.minecraft.world.entity.Entity private Entity.RemovalReason removalReason;
 
@@ -700,7 +707,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.valid = false;
     }
 
-    public void setDead(boolean dead) {
+    public void setDestroyed(boolean dead) {
         if (dead) {
             Entity$RemovalReason reason = instance.getRemovalReason();
   #if version >= 1.18
@@ -718,7 +725,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         }
     }
 
-    public boolean isDead() {
+    public boolean isDestroyed() {
         Entity$RemovalReason reason = instance.getRemovalReason();
   #if version >= 1.18
         return reason != null && reason.shouldDestroy();
@@ -867,11 +874,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.valid = false;
     }
 
-    public void setDead(boolean dead) {
+    public void setDestroyed(boolean dead) {
         instance.dead = dead;
     }
 
-    public boolean isDead() {
+    public boolean isDestroyed() {
         return instance.dead;
     }
 
