@@ -370,6 +370,72 @@ class WorldServer extends World {
     public void removeEntity((EntityHandle) Entity entity);
 #endif
 
+    // Removes an entity from the World without firing any events
+    // Packets for removal ARE sent to viewers of the entity, but entity death
+    // isn't fired, for one.
+#if version >= 1.17
+    public void removeEntityWithoutDeath((EntityHandle) Entity entity) {
+        entity.setRemoved(net.minecraft.world.entity.Entity$RemovalReason.DISCARDED);
+    }
+#elseif version >= 1.14
+    public void removeEntityWithoutDeath:removeEntity((EntityHandle) Entity entity);
+#else
+    public void removeEntityWithoutDeath((EntityHandle) Entity entity) {
+        org.spigotmc.AsyncCatcher.catchOp( "entity remove"); // Spigot check
+
+        // Cannot be done during entity tick - protect!
+        #require net.minecraft.world.level.World private boolean guardEntityList;
+        boolean isTickingEntities = instance#guardEntityList;
+        if (isTickingEntities) {
+            throw new IllegalStateException("Can not remove entity silently while ticking entities");
+        }
+
+        // Do not execute these two!
+        //entity.b(false);
+        //entity.die();
+
+        // Remove from chunk
+  #if fieldexists net.minecraft.world.entity.Entity public int chunkX
+        if (entity.inChunk)
+            instance.getChunkAt(entity.chunkX, entity.chunkZ).b(entity);
+  #elseif version >= 1.13
+        if (entity.inChunk)
+            instance.getChunkAt(entity.ae, entity.ag).b(entity);
+  #elseif version >= 1.11
+        if (entity.aa)
+            instance.getChunkAt(entity.ab, entity.ad).b(entity);
+  #elseif version >= 1.10.2
+        if (entity.ab)
+            instance.getChunkAt(entity.ac, entity.ae).b(entity);
+  #elseif version >= 1.9
+        if (entity.aa)
+            instance.getChunkAt(entity.ab, entity.ad).b(entity);
+  #else
+        if (entity.ad)
+            instance.getChunkAt(entity.ae, entity.ag).b(entity);
+  #endif
+
+        // Remove from entity tick list
+        #require net.minecraft.world.level.World private int tickPosition;
+        int index = instance.entityList.indexOf(entity);
+        if (index != -1) {
+            int tickPosition = instance#tickPosition;
+            if (index <= tickPosition) {
+                instance#tickPosition = (tickPosition-1);
+            }
+            instance.entityList.remove(index);
+        }
+
+        // Notify entity removal - sends destroy packets (network sync)
+  #if version >= 1.9
+        #require net.minecraft.world.level.World protected void notifyEntityRemoved:c(Entity entity);
+  #else
+        #require net.minecraft.world.level.World protected void notifyEntityRemoved:b(Entity entity);
+  #endif
+        instance#notifyEntityRemoved(entity);
+    }
+#endif
+
 #if version >= 1.18
     public boolean addEntity:addFreshEntity((EntityHandle) Entity entity);
     public (MinecraftServerHandle) MinecraftServer getMinecraftServer:getServer();

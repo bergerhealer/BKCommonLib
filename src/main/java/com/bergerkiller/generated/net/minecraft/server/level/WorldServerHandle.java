@@ -51,6 +51,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded);
     public abstract Iterable<Entity> getEntities();
     public abstract void removeEntity(EntityHandle entity);
+    public abstract void removeEntityWithoutDeath(EntityHandle entity);
     public abstract boolean addEntity(EntityHandle entity);
     public abstract MinecraftServerHandle getMinecraftServer();
     public abstract void saveLevel();
@@ -93,6 +94,7 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method.Converted<ForcedChunkHandle> getForcedChunk = new Template.Method.Converted<ForcedChunkHandle>();
         public final Template.Method.Converted<Iterable<Entity>> getEntities = new Template.Method.Converted<Iterable<Entity>>();
         public final Template.Method.Converted<Void> removeEntity = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<Void> removeEntityWithoutDeath = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<Boolean> addEntity = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<MinecraftServerHandle> getMinecraftServer = new Template.Method.Converted<MinecraftServerHandle>();
         public final Template.Method<Void> saveLevel = new Template.Method<Void>();
