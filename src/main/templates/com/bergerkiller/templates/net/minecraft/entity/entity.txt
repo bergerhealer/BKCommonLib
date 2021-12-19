@@ -295,12 +295,14 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
         // -- Paper LootableInventory field --
 #if exists net.minecraft.world.entity.Entity public com.destroystokyo.paper.loottable.PaperLootableInventoryData lootableData;
-        #require com.destroystokyo.paper.loottable.PaperLootableInventoryData private final com.destroystokyo.paper.loottable.PaperLootableInventory paperLootable:lootable;
-        com.destroystokyo.paper.loottable.PaperLootableInventory paperLootableInv = instance.lootableData#paperLootable;
-        if (paperLootableInv instanceof com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) {
-            com.destroystokyo.paper.loottable.PaperMinecartLootableInventory minecartInv = (com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) paperLootableInv;
-            #require com.destroystokyo.paper.loottable.PaperMinecartLootableInventory private net.minecraft.world.entity.vehicle.EntityMinecartContainer emcEntity:entity;
-            minecartInv#emcEntity = instance;
+        if (instance.lootableData != null) {
+            #require com.destroystokyo.paper.loottable.PaperLootableInventoryData private final com.destroystokyo.paper.loottable.PaperLootableInventory paperLootable:lootable;
+            com.destroystokyo.paper.loottable.PaperLootableInventory paperLootableInv = instance.lootableData#paperLootable;
+            if (paperLootableInv instanceof com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) {
+                com.destroystokyo.paper.loottable.PaperMinecartLootableInventory minecartInv = (com.destroystokyo.paper.loottable.PaperMinecartLootableInventory) paperLootableInv;
+                #require com.destroystokyo.paper.loottable.PaperMinecartLootableInventory private net.minecraft.world.entity.vehicle.EntityMinecartContainer emcEntity:entity;
+                minecartInv#emcEntity = instance;
+            }
         }
 #endif
     }
