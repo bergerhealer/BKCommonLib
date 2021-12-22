@@ -681,11 +681,13 @@ class BlockDataImpl extends BlockData {
         }
 
         public BlockDataConstant getOrCreate(Object rawIBlockData) {
+            BlockDataConstant last = this.last;
             if (last.getBlockRaw() == rawIBlockData) {
                 return last;
             } else {
                 BlockDataConstant fromCache = cache.get(rawIBlockData);
                 if (fromCache != null) {
+                    this.last = fromCache;
                     return fromCache;
                 }
             }
