@@ -9,7 +9,6 @@ import org.bukkit.material.MaterialData;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
 public class BlockDataRegistry {
@@ -43,13 +42,7 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlockData(Object iBlockData) {
-        BlockData data = BlockDataImpl.retrieveFromCache(iBlockData);
-        if (data != null) {
-            return data;
-        } else {
-            IBlockDataHandle b = IBlockDataHandle.createHandle(iBlockData);
-            return BlockDataImpl.createAndStoreInCache(b);
-        }
+        return BlockDataImpl.BY_BLOCK_DATA.getOrCreate(iBlockData);
     }
 
     /**
@@ -170,6 +163,6 @@ public class BlockDataRegistry {
      * @return all BlockData values
      */
     public static Collection<BlockData> values() {
-        return BlockDataImpl.getAllCachedValues();
+        return BlockDataImpl.BY_BLOCK_DATA.getAll();
     }
 }

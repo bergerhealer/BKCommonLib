@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -9,7 +8,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
-import java.util.concurrent.locks.StampedLock;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -51,7 +49,7 @@ import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 @SuppressWarnings("deprecation")
-public class BlockDataImpl extends BlockData {
+class BlockDataImpl extends BlockData {
     private BlockHandle block;
     private IBlockDataHandle data;
     private MaterialData materialData;
@@ -73,8 +71,7 @@ public class BlockDataImpl extends BlockData {
     public static final BlockDataConstant AIR;
     public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
     public static final Map<Object, BlockDataConstant> BY_BLOCK = new IdentityHashMap<Object, BlockDataConstant>();
-    private static final IdentityHashMap<Object, BlockDataConstant> BY_BLOCK_DATA = new IdentityHashMap<Object, BlockDataConstant>();
-    private static final StampedLock BY_BLOCK_DATA_LOCK = new StampedLock();
+    public static final Cache BY_BLOCK_DATA;
 
     // Legacy: array of all possible Material values with all possible legacy data values
     // Index into it by taking data x 1024 | mat.ordinal()
@@ -103,6 +100,9 @@ public class BlockDataImpl extends BlockData {
             BY_MATERIAL.put(material, blockConst);
         }
 
+        // Create cache
+        BY_BLOCK_DATA = new Cache(AIR);
+
         // Cache a mapping of all possible IBlockData instances
         {
             BlockDataConstant[] tmp = new BlockDataConstant[1 << 14];
@@ -114,7 +114,7 @@ public class BlockDataImpl extends BlockData {
                 if (block_const.getData() != rawIBlockData) {
                     block_const = new BlockDataConstant(blockData);
                 }
-                BY_BLOCK_DATA.put(rawIBlockData, block_const);
+                BY_BLOCK_DATA.cacheWritable.put(rawIBlockData, block_const);
 
                 int combined_id = block_const.getCombinedId_1_8_8();
                 while (combined_id >= tmp.length) {
@@ -131,7 +131,8 @@ public class BlockDataImpl extends BlockData {
             REGISTRY_MASK = REGISTRY_SIZE - 1;
         }
 
-        BY_BLOCK_DATA.put(null, AIR);
+        // Cache
+        BY_BLOCK_DATA.updateVisible();
 
         // Sanity check
         if (CommonLegacyMaterials.getAllMaterials().length >= (1<<BY_LEGACY_MAT_DATA_SHIFT)) {
@@ -229,44 +230,9 @@ public class BlockDataImpl extends BlockData {
     private static BlockDataConstant findConstant(IBlockDataHandle iblockdata) {
         BlockDataConstant dataBlockConst = BY_BLOCK_DATA.get(iblockdata.getRaw());
         if (dataBlockConst == null) {
-            dataBlockConst = new BlockDataConstant(iblockdata);
-            BY_BLOCK_DATA.put(iblockdata.getRaw(), dataBlockConst);
+            return BY_BLOCK_DATA.create(iblockdata);
         }
         return dataBlockConst;
-    }
-
-    public static Collection<BlockData> getAllCachedValues() {
-        final StampedLock lock = BY_BLOCK_DATA_LOCK;
-        long stamp = lock.readLock();
-        try {
-            return Collections.unmodifiableCollection(new ArrayList<BlockData>(BY_BLOCK_DATA.values()));
-        } finally {
-            lock.unlockRead(stamp);
-        }
-    }
-
-    public static BlockDataConstant retrieveFromCache(Object rawIBlockData) {
-        final StampedLock lock = BY_BLOCK_DATA_LOCK;
-        long stamp = lock.readLock();
-        try {
-            return BY_BLOCK_DATA.get(rawIBlockData);
-        } finally {
-            lock.unlockRead(stamp);
-        }
-    }
-
-    public static BlockDataConstant createAndStoreInCache(IBlockDataHandle iblockdataHandle) {
-        final BlockDataConstant c = new BlockDataImpl.BlockDataConstant(iblockdataHandle);
-        final StampedLock lock = BY_BLOCK_DATA_LOCK;
-
-        long stamp = lock.writeLock();
-        try {
-            BY_BLOCK_DATA.put(iblockdataHandle.getRaw(), c);
-        } finally {
-            lock.unlockWrite(stamp);
-        }
-
-        return c;
     }
 
     /**
@@ -639,22 +605,22 @@ public class BlockDataImpl extends BlockData {
     @Override
     public BlockData setState(String key, Object value) {
         IBlockDataHandle updated_data = this.data.set(key, value);
-        BlockData data = retrieveFromCache(updated_data.getRaw());
+        BlockData data = BY_BLOCK_DATA.get(updated_data.getRaw());
         if (data != null) {
             return data;
         } else {
-            return createAndStoreInCache(updated_data);
+            return BY_BLOCK_DATA.create(updated_data);
         }
     }
 
     @Override
     public BlockData setState(BlockState<?> state, Object value) {
         IBlockDataHandle updated_data = this.data.set(state.getBackingHandle(), value);
-        BlockData data = retrieveFromCache(updated_data.getRaw());
+        BlockData data = BY_BLOCK_DATA.get(updated_data.getRaw());
         if (data != null) {
             return data;
         } else {
-            return createAndStoreInCache(updated_data);
+            return BY_BLOCK_DATA.create(updated_data);
         }
     }
 
@@ -688,5 +654,56 @@ public class BlockDataImpl extends BlockData {
     @Override
     public org.bukkit.inventory.ItemStack createItem(int amount) {
         return ItemStackHandle.fromBlockData(this.data, amount).toBukkit();
+    }
+
+    public static final class Cache {
+        private final IdentityHashMap<Object, BlockDataConstant> cacheWritable;
+        private IdentityHashMap<Object, BlockDataConstant> cache;
+        private BlockDataConstant last;
+
+        private Cache(BlockDataConstant air) {
+            this.cacheWritable = new IdentityHashMap<>();
+            this.cacheWritable.put(air.getBlockRaw(), air);
+            this.last = air;
+            updateVisible();
+        }
+
+        public Collection<BlockData> getAll() {
+            return Collections.unmodifiableCollection(cache.values());
+        }
+
+        public BlockDataConstant get(Object rawIBlockData) {
+            if (last.getBlockRaw() == rawIBlockData) {
+                return last;
+            } else {
+                return cache.get(rawIBlockData);
+            }
+        }
+
+        public BlockDataConstant getOrCreate(Object rawIBlockData) {
+            if (last.getBlockRaw() == rawIBlockData) {
+                return last;
+            } else {
+                BlockDataConstant fromCache = cache.get(rawIBlockData);
+                if (fromCache != null) {
+                    return fromCache;
+                }
+            }
+
+            IBlockDataHandle b = IBlockDataHandle.createHandle(rawIBlockData);
+            return create(b);
+        }
+
+        public synchronized BlockDataConstant create(IBlockDataHandle iblockdataHandle) {
+            BlockDataConstant c = new BlockDataImpl.BlockDataConstant(iblockdataHandle);
+            cacheWritable.put(iblockdataHandle.getRaw(), c);
+            updateVisible();
+            return c;
+        }
+
+        @SuppressWarnings("unchecked")
+        private void updateVisible() {
+            cache = (IdentityHashMap<Object, BlockDataConstant>) cacheWritable.clone();
+        }
     }
 }
