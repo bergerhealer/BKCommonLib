@@ -80,7 +80,9 @@ class EntityTracker {
 
         // Remove any previous entry
         EntityTrackerEntry previous = (EntityTrackerEntry) instance.trackedEntities.d(entityId);
-        set.remove(previous);
+        if (previous != null) {
+            set.remove(previous);
+        }
 
         // Add the new entry
         if (entry != null) {
@@ -397,7 +399,11 @@ class EntityTrackerEntryState {
 
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
+  #if nachospigot
+    public int raw_headYaw:lastHeadYaw;
+  #else
     public int raw_headYaw:i;
+  #endif
 #endif
 
 #if version >= 1.17
@@ -424,12 +430,17 @@ class EntityTrackerEntryState {
     private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
 
     public int tickCounter:a;
+#elseif nachospigot
+    public optional double opt_xVel:motionX;
+    public optional double opt_yVel:motionY;
+    public optional double opt_zVel:motionZ;
+    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
+    public int tickCounter:tickCount;
 #else
     public optional double opt_xVel:j;
     public optional double opt_yVel:k;
     public optional double opt_zVel:l;
     private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
-
     public int tickCounter:m;
 #endif
 
@@ -551,9 +562,15 @@ class EntityTrackerEntryState {
     // When it changes by more than 16 blocks, rescan all players
     public boolean checkTrackNeeded() {
         #require net.minecraft.server.level.EntityTrackerEntryState private final net.minecraft.world.entity.Entity entity:tracker;
+  #if nachospigot
+        #require net.minecraft.server.level.EntityTrackerEntryState private double prevX:posX;
+        #require net.minecraft.server.level.EntityTrackerEntryState private double prevY:posY;
+        #require net.minecraft.server.level.EntityTrackerEntryState private double prevZ:posZ;
+  #else
         #require net.minecraft.server.level.EntityTrackerEntryState private double prevX:q;
         #require net.minecraft.server.level.EntityTrackerEntryState private double prevY:r;
         #require net.minecraft.server.level.EntityTrackerEntryState private double prevZ:s;
+  #endif
         #require net.minecraft.server.level.EntityTrackerEntryState private boolean synched:isMoving;
 
         Entity entity = instance#entity;
@@ -729,6 +746,10 @@ class EntityTrackerEntryState {
     private int timeSinceLocationSync:v;
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:w;
     private optional (org.bukkit.entity.Entity) Entity opt_vehicle:###;
+#elseif nachospigot
+    private int timeSinceLocationSync:ticksSinceLastForcedTeleport;
+    private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:###;
+    private optional (org.bukkit.entity.Entity) Entity opt_vehicle:lastRecoredRider;
 #else
     private int timeSinceLocationSync:v;
     private optional (List<org.bukkit.entity.Entity>) List<Entity> opt_passengers:###;
@@ -754,6 +775,8 @@ class EntityTrackerEntryState {
     }
 #elseif version >= 1.9
     private (CommonPacket) Packet<?> getSpawnPacket:e();
+#elseif nachospigot
+    protected (CommonPacket) Packet getSpawnPacket:c();
 #else
     private (CommonPacket) Packet getSpawnPacket:c();
 #endif

@@ -145,6 +145,7 @@ public class CommonBootstrap {
                     servers.add(new ArclightServerLegacy());
                     servers.add(new CatServerServer());
                     servers.add(new Bukkit4FabricServer());
+                    servers.add(new NachoSpigotServer());
                     servers.add(new PurpurServer());
                     servers.add(new SpigotServer());
                     servers.add(new SportBukkitServer());
