@@ -10,6 +10,8 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.bergerkiller.bukkit.common.AsyncTask;
@@ -312,15 +314,54 @@ public class DebugUtil {
      * @param delay after which to log the stack trace
      */
     public static void logStackTraceAsynchronously(long delay) {
-        final Thread thread = Thread.currentThread();
+        logStackTraceAsynchronously(delay, LogicUtil.constantSupplier(
+                Collections.singletonList(Thread.currentThread())));
+    }
+
+    /**
+     * Logs the stack trace of a thread after a delay in milliseconds.
+     * All threads running at the time are passed by the predicate, and the
+     * one to dump can be filtered out.
+     *
+     * @param delay after which to log the stack trace
+     * @param threadPredicate filter for threads
+     */
+    public static void logStackTraceAsynchronously(long delay, final Predicate<Thread> threadPredicate) {
+        logStackTraceAsynchronously(delay, () -> {
+            Thread loggerThread = Thread.currentThread(); // Ignore self
+            Thread[] tmp = new Thread[Thread.activeCount() + 32];
+            List<Thread> result = new ArrayList<>();
+            int count = Thread.enumerate(tmp);
+            for (int i = 0; i < count; i++) {
+                if (tmp[i] != loggerThread && threadPredicate.test(tmp[i])) {
+                    result.add(tmp[i]);
+                }
+            }
+            return result;
+        });
+    }
+
+    /**
+     * Logs the stack trace of a thread after a delay in milliseconds.
+     * Can be used to debug application freezes. The thread to dump is
+     * retrieved after the delay, using the supplier specified. In there a lookup
+     * by name or otherwise can be performed. If the supplier returns null, then no
+     * thread info is dumped.
+     *
+     * @param delay after which to log the stack trace
+     * @param threadSelector selector to call to find the threads to dump
+     */
+    public static void logStackTraceAsynchronously(long delay, final Supplier<? extends Iterable<Thread>> threadSelector) {
         new AsyncTask() {
             @Override
             public void run() {
                 sleep(delay);
-                StackTraceElement[] stack = thread.getStackTrace();
-                Logging.LOGGER_DEBUG.warning("Stack trace of thread " + thread.getName() + ":");
-                for (StackTraceElement element : stack) {
-                    Logging.LOGGER_DEBUG.warning("  at " + element.toString());
+                for (Thread thread : threadSelector.get()) {
+                    StackTraceElement[] stack = thread.getStackTrace();
+                    Logging.LOGGER_DEBUG.warning("Stack trace of thread " + thread.getName() + ":");
+                    for (StackTraceElement element : stack) {
+                        Logging.LOGGER_DEBUG.warning("  at " + element.toString());
+                    }
                 }
             }
         }.start();
