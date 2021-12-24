@@ -610,7 +610,7 @@ public class CommonPlugin extends PluginBase {
         setDisableMessage(null);
 
         // Enable all components in order
-        this.components.enable(OfflineWorld::initializeComponent);
+        this.components.enableCreate(OfflineWorld::initializeComponent);
         this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
                 DimensionResourceKeyConversion.Tracker::new);
 

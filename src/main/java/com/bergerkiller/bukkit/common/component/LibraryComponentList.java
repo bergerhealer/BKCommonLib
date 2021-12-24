@@ -131,7 +131,7 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
      * @param creator Factory method creating a new library component
      * @return Input component, or null if creating or enabling fails
      */
-    public <L extends LibraryComponent> L enable(final Function<E, L> creator) {
+    public <L extends LibraryComponent> L enableCreate(final Function<E, L> creator) {
         return enable(new LibraryComponent.Conditional<E, L>() {
             @Override
             public String getIdentifier() {
