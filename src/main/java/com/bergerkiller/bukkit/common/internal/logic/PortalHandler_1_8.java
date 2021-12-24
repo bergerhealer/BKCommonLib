@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.RunOnceTask;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
 /**
@@ -85,8 +86,9 @@ class PortalHandler_1_8 extends PortalHandler {
 
     @Override
     public Block createNetherPortal(Block startBlock, BlockFace orientation, Entity initiator) {
-        if (_pta.createNetherPortal(startBlock, 16)) {
-            return _pta.findNetherPortal(startBlock, 16);
+        int radius = WorldServerHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius();
+        if (_pta.createNetherPortal(startBlock, radius)) {
+            return _pta.findNetherPortal(startBlock, radius);
         } else {
             return null;
         }

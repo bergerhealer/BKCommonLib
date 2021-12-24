@@ -456,12 +456,22 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets the server-configured search radius for nether portals. This value
+     * is before any transformation using world coordinate scaling (1:8)
+     *
+     * @param world World to check
+     * @return Nether portal search radius on this world
+     */
+    public static int getNetherPortalSearchRadius(World world) {
+        return WorldServerHandle.fromBukkit(world).getNetherPortalSearchRadius();
+    }
+
+    /**
      * Searches for a lit nether portal frame from a start block area. The nearest
      * lit portal is returned, or null if no portal could be found. No portal
      * is ever created.<br>
      * <br>
-     * This uses the server-configured search radius of 128, which might be altered
-     * by some server implementations.
+     * The search radius to use can be specified.
      * 
      * @param searchStart The block from which to start searching for the portal
      * @param searchRadius The radius to look for the portal, 128 is a default

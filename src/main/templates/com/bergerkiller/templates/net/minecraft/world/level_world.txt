@@ -398,6 +398,26 @@ class World extends IBlockAccess {
     }
 #endif
 
+    public int getNetherPortalSearchRadius() {
+        // Paper per-world configuration
+#if exists com.destroystokyo.paper.PaperWorldConfig public int portalSearchRadius;
+        System.out.println("SEARCH " + instance.paperConfig.portalSearchRadius);
+        return instance.paperConfig.portalSearchRadius;
+#endif
+
+        return 128; // Vanilla default
+    }
+
+    public int getNetherPortalCreateRadius() {
+        // Paper per-world configuration
+#if exists com.destroystokyo.paper.PaperWorldConfig public int portalCreateRadius;
+        System.out.println("CREATE " + instance.paperConfig.portalCreateRadius);
+        return instance.paperConfig.portalCreateRadius;
+#endif
+
+        return 16; // Vanilla default
+    }
+
     <code>
     public org.bukkit.World toBukkit() {
         return com.bergerkiller.bukkit.common.conversion.Conversion.toWorld.convert(getRaw());

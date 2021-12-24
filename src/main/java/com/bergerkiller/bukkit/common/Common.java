@@ -27,7 +27,8 @@ public class Common {
             "Common:Chunk:FutureProvider",
             "Common:IntCuboid",
             "Common:WorldBlockBorder",
-            "Common:EntityController:FixedOnDieDuringTeleport"
+            "Common:EntityController:FixedOnDieDuringTeleport",
+            "Common:WorldUtil:getDefaultNetherPortalSearchRadius"
     ).collect(Collectors.toSet());
 
     /**

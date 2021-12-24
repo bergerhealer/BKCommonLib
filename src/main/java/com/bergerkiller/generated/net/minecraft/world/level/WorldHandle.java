@@ -54,6 +54,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public abstract void applyBlockPhysics(IntVector3 position, BlockData causeType);
     public abstract int getMinBuildHeight();
     public abstract int getMaxBuildHeight();
+    public abstract int getNetherPortalSearchRadius();
+    public abstract int getNetherPortalCreateRadius();
 
     public static final int UPDATE_PHYSICS = 0x1; // flag specifying block physics should occur after the change
     public static final int UPDATE_NOTIFY = 0x2; // flag specifying the change should be updated to players
@@ -122,6 +124,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
         public final Template.Method.Converted<Void> applyBlockPhysics = new Template.Method.Converted<Void>();
         public final Template.Method<Integer> getMinBuildHeight = new Template.Method<Integer>();
         public final Template.Method<Integer> getMaxBuildHeight = new Template.Method<Integer>();
+        public final Template.Method<Integer> getNetherPortalSearchRadius = new Template.Method<Integer>();
+        public final Template.Method<Integer> getNetherPortalCreateRadius = new Template.Method<Integer>();
 
     }
 

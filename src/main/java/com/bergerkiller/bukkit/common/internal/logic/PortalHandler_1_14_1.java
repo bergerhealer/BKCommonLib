@@ -19,6 +19,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.mountiplex.reflection.ClassInterceptor;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.util.fast.Invoker;
@@ -87,7 +88,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
                     orientation,
                     initiator == null ? null : HandleConversion.toEntityHandle(initiator),
                     _dummyEntityInstance,
-                    16);
+                    WorldServerHandle.fromBukkit(startBlock.getWorld()).getNetherPortalCreateRadius());
 
             return _createdNetherPortalBlock;
         } finally {
