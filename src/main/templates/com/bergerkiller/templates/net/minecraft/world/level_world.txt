@@ -401,7 +401,6 @@ class World extends IBlockAccess {
     public int getNetherPortalSearchRadius() {
         // Paper per-world configuration
 #if exists com.destroystokyo.paper.PaperWorldConfig public int portalSearchRadius;
-        System.out.println("SEARCH " + instance.paperConfig.portalSearchRadius);
         return instance.paperConfig.portalSearchRadius;
 #endif
 
@@ -411,7 +410,6 @@ class World extends IBlockAccess {
     public int getNetherPortalCreateRadius() {
         // Paper per-world configuration
 #if exists com.destroystokyo.paper.PaperWorldConfig public int portalCreateRadius;
-        System.out.println("CREATE " + instance.paperConfig.portalCreateRadius);
         return instance.paperConfig.portalCreateRadius;
 #endif
 
