@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.component;
 
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 import org.bukkit.plugin.Plugin;
@@ -97,7 +98,7 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
      * is not added and will not be disabled again later.
      *
      * @param component
-     * @return Input component, also when enabling fails
+     * @return Input component, or null if enabling fails
      */
     public <L extends LibraryComponent> L enable(final L component) {
         return enable(new LibraryComponent.Conditional<E, L>() {
@@ -114,6 +115,37 @@ public class LibraryComponentList<E> extends LibraryComponentHolder<E> {
             @Override
             public L create(E environment) throws Throwable {
                 return component;
+            }
+        });
+    }
+
+    /**
+     * Tries to enable a component, adding it to the list of enabled
+     * components. If enabling fails with an error, then the component
+     * is not added and will not be disabled again later.<br>
+     * <br>
+     * A creator function/factory can be specified that accepts the environment
+     * data as input argument. This typically will be a class constructor or
+     * static create function.
+     *
+     * @param creator Factory method creating a new library component
+     * @return Input component, or null if creating or enabling fails
+     */
+    public <L extends LibraryComponent> L enable(final Function<E, L> creator) {
+        return enable(new LibraryComponent.Conditional<E, L>() {
+            @Override
+            public String getIdentifier() {
+                return creator.getClass().getSimpleName();
+            }
+
+            @Override
+            public boolean isSupported(E environment) {
+                return true;
+            }
+
+            @Override
+            public L create(E environment) throws Throwable {
+                return creator.apply(environment);
             }
         });
     }

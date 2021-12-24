@@ -35,6 +35,7 @@ import com.bergerkiller.bukkit.common.internal.network.ProtocolLibPacketHandler;
 import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -609,6 +610,7 @@ public class CommonPlugin extends PluginBase {
         setDisableMessage(null);
 
         // Enable all components in order
+        this.components.enable(OfflineWorld::initializeComponent);
         this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
                 DimensionResourceKeyConversion.Tracker::new);
 
