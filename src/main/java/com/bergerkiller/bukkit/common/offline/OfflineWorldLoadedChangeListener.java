@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.offline;
 
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -14,12 +13,13 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld.BukkitWorldSupplier;
 
 /**
  * Listener-based tracker of the loaded world of an OfflineWorld instance.
  * Internal use only!
  */
-final class OfflineWorldLoadedChangeListener implements LibraryComponent {
+final class OfflineWorldLoadedChangeListener implements LibraryComponent, OfflineWorld.BukkitWorldSupplierHandler {
     private final Plugin plugin;
     private BukkitTask asyncClearTask;
 
@@ -30,23 +30,23 @@ final class OfflineWorldLoadedChangeListener implements LibraryComponent {
 
     @Override
     public void enable() throws Throwable {
-        OfflineWorld.setLoadedWorldSupplier(WorldSupplier::new);
+        OfflineWorld.setLoadedWorldSupplier(this);
 
         // Listen for when worlds load and unload
         Bukkit.getPluginManager().registerEvents(new Listener() {
             @EventHandler(priority = EventPriority.LOWEST)
             public void onWorldInit(WorldInitEvent event) {
-                Supplier<World> supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
+                OfflineWorld.BukkitWorldSupplier supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
                 if (supplier instanceof WorldSupplier) {
-                    ((WorldSupplier) supplier).loadedWorld = event.getWorld();
+                    ((WorldSupplier) supplier).update(event.getWorld());
                 }
             }
 
             @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void onWorldUnload(WorldUnloadEvent event) {
-                Supplier<World> supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
+                OfflineWorld.BukkitWorldSupplier supplier = OfflineWorld.of(event.getWorld()).loadedWorldSupplier;
                 if (supplier instanceof WorldSupplier) {
-                    ((WorldSupplier) supplier).loadedWorld = null;
+                    ((WorldSupplier) supplier).update(null);
                 }
                 OfflineWorld.clearByBukkitWorldCache(); // Just in case!
             }
@@ -63,19 +63,41 @@ final class OfflineWorldLoadedChangeListener implements LibraryComponent {
     public void disable() {
         this.asyncClearTask.cancel();
         this.asyncClearTask = null;
-        OfflineWorld.setLoadedWorldSupplier(OfflineWorld.toWorldSupplierFuncDefault);
+        OfflineWorld.setLoadedWorldSupplier(OfflineWorld.DefaultBukkitWorldSupplierHandler.INSTANCE);
     }
 
-    private static final class WorldSupplier implements Supplier<World> {
-        public World loadedWorld;
+    @Override
+    public BukkitWorldSupplier createBukkitWorldSupplier(UUID worldUUID) {
+        return new WorldSupplier(worldUUID);
+    }
+
+    @Override
+    public boolean cacheByBukkitWorld() {
+        return true;
+    }
+
+    private static final class WorldSupplier implements OfflineWorld.BukkitWorldSupplier {
+        private World loadedWorld;
+        private Object comparer;
 
         public WorldSupplier(UUID worldUUID) {
             this.loadedWorld = Bukkit.getWorld(worldUUID);
+            this.comparer = this.loadedWorld;
+        }
+
+        public void update(World world) {
+            this.loadedWorld = world;
+            this.comparer = (world == null) ? new Object() : world;
         }
 
         @Override
         public World get() {
             return this.loadedWorld;
+        }
+
+        @Override
+        public boolean isWorld(World world) {
+            return world == this.comparer;
         }
     }
 }

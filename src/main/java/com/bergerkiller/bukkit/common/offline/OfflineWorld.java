@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -34,11 +33,10 @@ public class OfflineWorld {
     private static OfflineWorld cacheLastReturned = NONE; // Speeds up of(world)
     private static Map<World, OfflineWorld> byBukkitWorld = new IdentityHashMap<>();
     private static Map<UUID, OfflineWorld> worlds = new HashMap<UUID, OfflineWorld>(); // Copy created on modify
-    static final OfflineWorldHandler toWorldSupplierFuncDefault = uuid -> (() -> Bukkit.getWorld(uuid));
-    private static OfflineWorldHandler toWorldSupplierFunc = toWorldSupplierFuncDefault;
+    private static BukkitWorldSupplierHandler toWorldSupplierFunc = DefaultBukkitWorldSupplierHandler.INSTANCE;
     private final int hashCode;
     private final UUID worldUUID;
-    protected Supplier<World> loadedWorldSupplier;
+    protected BukkitWorldSupplier loadedWorldSupplier;
 
     /**
      * Used to initialize the OfflineWorld API at startup. Don't ever call this. Internal
@@ -61,7 +59,7 @@ public class OfflineWorld {
      *
      * @param newToWorldSupplierFunc
      */
-    static void setLoadedWorldSupplier(OfflineWorldHandler newToWorldSupplierFunc) {
+    static void setLoadedWorldSupplier(BukkitWorldSupplierHandler newToWorldSupplierFunc) {
         synchronized (OfflineWorld.class) {
             toWorldSupplierFunc = newToWorldSupplierFunc;
             for (OfflineWorld world : worlds.values()) {
@@ -80,6 +78,7 @@ public class OfflineWorld {
         synchronized (OfflineWorld.class) {
             byBukkitWorld = new IdentityHashMap<>();
             byBukkitWorld.put(null, NONE);
+            cacheLastReturned = NONE;
         }
     }
 
@@ -115,7 +114,7 @@ public class OfflineWorld {
         // Optimizes repetitive calls to of() with the same Bukkit World
         {
             OfflineWorld lastReturned = cacheLastReturned;
-            if (lastReturned.loadedWorldSupplier.get() == world) {
+            if (lastReturned.loadedWorldSupplier.isWorld(world)) {
                 return lastReturned;
             }
         }
@@ -141,7 +140,17 @@ public class OfflineWorld {
     private OfflineWorld() {
         this.worldUUID = null;
         this.hashCode = 0;
-        this.loadedWorldSupplier = () -> null;
+        this.loadedWorldSupplier = new BukkitWorldSupplier() {
+            @Override
+            public World get() {
+                return null;
+            }
+
+            @Override
+            public boolean isWorld(World world) {
+                return world == null;
+            }
+        };
     }
 
     private OfflineWorld(UUID worldUUID) {
@@ -235,11 +244,57 @@ public class OfflineWorld {
         }
     }
 
-    @FunctionalInterface
-    static interface OfflineWorldHandler {
-        Supplier<World> createBukkitWorldSupplier(UUID worldUUID);
+    /**
+     * Supplies the Bukkit World. Also has a check to see if an
+     * input argument is the World, which handles null properly.
+     */
+    static interface BukkitWorldSupplier {
+        World get();
+        boolean isWorld(World world);
+    }
 
-        default boolean cacheByBukkitWorld() {
+    /**
+     * Creates new Bukkit World Supplier instances for a given World UUID
+     */
+    static interface BukkitWorldSupplierHandler {
+
+        /**
+         * Creates a new supplier for the Bukkit World of a world UUID
+         *
+         * @param worldUUID
+         * @return Bukkit World supplier
+         */
+        BukkitWorldSupplier createBukkitWorldSupplier(UUID worldUUID);
+
+        /**
+         * Whether to track a by-instance identity map of Bukkit World to OfflineWorld
+         * instances
+         *
+         * @return Whether to cache by bukkit world
+         */
+        boolean cacheByBukkitWorld();
+    }
+
+    static final class DefaultBukkitWorldSupplierHandler implements BukkitWorldSupplierHandler {
+        public static final DefaultBukkitWorldSupplierHandler INSTANCE = new DefaultBukkitWorldSupplierHandler();
+
+        @Override
+        public BukkitWorldSupplier createBukkitWorldSupplier(final UUID worldUUID) {
+            return new BukkitWorldSupplier() {
+                @Override
+                public World get() {
+                    return Bukkit.getWorld(worldUUID);
+                }
+
+                @Override
+                public boolean isWorld(World world) {
+                    return world != null && world.getUID().equals(worldUUID);
+                }
+            };
+        }
+
+        @Override
+        public boolean cacheByBukkitWorld() {
             return false;
         }
     }
