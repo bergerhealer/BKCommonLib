@@ -20,10 +20,18 @@ class TestServerFactory_1_18 extends TestServerFactory {
 
     @Override
     protected void init(ServerEnvironment env) throws Throwable {
-        // Initialize shared constants first - required by DispenserRegistry
+        // Initialize shared constants first - required by DispenserRegistry and DataConverterRegistry
         Class<?> sharedConstantsClass = Class.forName("net.minecraft.SharedConstants");
         Method initSharedConstantsMethod = Resolver.resolveAndGetDeclaredMethod(sharedConstantsClass, "tryDetectVersion");
         initSharedConstantsMethod.invoke(null);
+
+        // Initialize the Data Converter Registry in such a way that no datafixers are registered at all
+        // We don't need that trash during the tests we run - it slows it down by way too much
+        // This is done by temporarily hacking the bootstrapExecutor to never run tasks - this allows
+        // the build() method to return instantly.
+        try (BackgroundWorkerDefuser defuser = BackgroundWorkerDefuser.start(Class.forName("net.minecraft.SystemUtils"))) {
+            Class.forName("net.minecraft.util.datafix.DataConverterRegistry");
+        }
 
         // Bootstrap is required
         Class<?> dispenserRegistryClass = Class.forName("net.minecraft.server.DispenserRegistry");
