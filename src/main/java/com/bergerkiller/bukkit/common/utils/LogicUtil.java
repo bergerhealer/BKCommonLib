@@ -38,6 +38,7 @@ public class LogicUtil {
     private static final Consumer<Object> _noopConsumer = obj -> {};
     private static final Predicate<Object> _alwaysTruePredicate = obj -> true;
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
+    private static final Supplier<Object> _nullSupplier = () -> null;
     private static final ItemSynchronizer<Object, Object> _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
         @Override
         public boolean isItem(Object item, Object value) {
@@ -402,7 +403,15 @@ public class LogicUtil {
      */
     public static Class<?> getArrayType(Class<?> componentType) {
         if (componentType.isPrimitive()) {
-            return Array.newInstance(componentType, 0).getClass();
+            try {
+                return Array.newInstance(componentType, 0).getClass();
+            } catch (IllegalArgumentException ex) {
+                if (componentType == void.class) {
+                    throw new IllegalArgumentException("Cannot create an array of void");
+                } else {
+                    throw ex;
+                }
+            }
         } else {
             try {
                 return Class.forName("[L" + componentType.getName() + ";");
@@ -1029,6 +1038,17 @@ public class LogicUtil {
      */
     public static <T> Supplier<T> constantSupplier(T value) {
         return () -> value;
+    }
+
+    /**
+     * Creates a new supplier that returns null
+     *
+     * @param <T> Type
+     * @return Supplier that returns null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> Supplier<T> nullSupplier() {
+        return (Supplier<T>) _nullSupplier;
     }
 
     /**
