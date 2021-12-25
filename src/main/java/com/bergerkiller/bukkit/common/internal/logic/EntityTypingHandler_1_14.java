@@ -162,18 +162,42 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         /*
          * <INIT_WORLD>
          * public static void initWorldServer((Object) WorldServer worldserver, (Object) WorldDataServer worldData) {
+         *     String dummyWorldName = "ZZDUMMYZZ";
          * 
          * // Spigot World configuration
          * #if fieldexists net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
-         *     #require net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
-         *     org.spigotmc.SpigotWorldConfig spigotConfig = new org.spigotmc.SpigotWorldConfig("DUMMY");
-         *     worldserver#spigotConfig = spigotConfig;
+         *     org.spigotmc.SpigotWorldConfig spigotConfig;
+         * 
+         *     // While loading set verbose to false, and later restore, to avoid logging a bunch of crap about this dummy world
+         *     String spigotDummyWorldConfigKey = "world-settings." + dummyWorldName;
+         *     String spigotConfigVerboseKey = spigotDummyWorldConfigKey + ".verbose";
+         *     boolean hadDummyWorldConfig = org.spigotmc.SpigotConfig.config.contains(spigotDummyWorldConfigKey);
+         *     boolean hadVerboseConfigOption = org.spigotmc.SpigotConfig.config.contains(spigotConfigVerboseKey, true);
+         *     boolean prevVerboseConfigOption = org.spigotmc.SpigotConfig.config.getBoolean(spigotConfigVerboseKey, true);
+         *     org.spigotmc.SpigotConfig.config.set(spigotConfigVerboseKey, Boolean.FALSE);
+         *     try {
+         *         #require net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
+         *         spigotConfig = new org.spigotmc.SpigotWorldConfig(dummyWorldName);
+         *         worldserver#spigotConfig = spigotConfig;
+         *     } finally {
+         *         // Restore
+         *         if (hadVerboseConfigOption) {
+         *             org.spigotmc.SpigotConfig.config.set(spigotConfigVerboseKey, Boolean.valueOf(prevVerboseConfigOption));
+         *         } else {
+         *             org.spigotmc.SpigotConfig.config.set(spigotConfigVerboseKey, null);
+         *         }
+         *         // This will almost always be the case, unless some idiot named his world exactly like that...
+         *         // Don't underestimate stupidity! So check for that 1/1000000 chance.
+         *         if (!hadDummyWorldConfig) {
+         *             org.spigotmc.SpigotConfig.config.set(spigotDummyWorldConfigKey, null);
+         *         }
+         *     }
          * #endif
          * 
          * // PaperSpigot World configuration
          * #if fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
-         *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig("DUMMY", spigotConfig);
+         *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
          *     worldserver#paperConfig = paperConfig;
          * #endif
          * 
@@ -182,13 +206,13 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     #require net.minecraft.world.level.World public final org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
          *     org.purpurmc.purpur.PurpurWorldConfig purpurConfig;
          *   #if exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(net.minecraft.server.level.WorldServer level, String worldName, org.bukkit.World.Environment environment);
-         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(worldserver, "DUMMY", org.bukkit.World$Environment.NORMAL);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(worldserver, dummyWorldName, org.bukkit.World$Environment.NORMAL);
          *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public PurpurWorldConfig(String worldName, org.bukkit.World.Environment environment);
-         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY", org.bukkit.World$Environment.NORMAL);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName, org.bukkit.World$Environment.NORMAL);
          *   #elseif exists org.purpurmc.purpur.PurpurWorldConfig public org.purpurmc.purpur.PurpurWorldConfig(String worldName);
-         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY");
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName);
          *   #else
-         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig("DUMMY", paperConfig, spigotConfig);
+         *     purpurConfig = new org.purpurmc.purpur.PurpurWorldConfig(dummyWorldName, paperConfig, spigotConfig);
          *   #endif
          *     worldserver#purpurConfig = purpurConfig;
          * #endif
@@ -221,7 +245,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     // worldData field
          *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldData worldData;
          *     worldserver#worldData = worldData;
-         * #endif    
+         * #endif
          * }
          */
         @Template.Generated("%INIT_WORLD%")
