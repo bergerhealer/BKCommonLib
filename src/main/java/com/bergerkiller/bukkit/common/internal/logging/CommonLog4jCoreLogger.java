@@ -8,8 +8,6 @@ import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.core.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.message.Message;
-import org.apache.logging.log4j.message.MessageFactory;
-import org.apache.logging.log4j.spi.AbstractLogger;
 
 import com.bergerkiller.bukkit.common.ModuleLogger;
 
