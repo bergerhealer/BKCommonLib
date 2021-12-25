@@ -3,8 +3,11 @@ package com.bergerkiller.bukkit.common.internal.cdn;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -26,7 +29,13 @@ import com.google.common.collect.ListMultimap;
 public class MojangSpigotRemapper {
     private static final ClassRemapper[] NO_REMAPPERS = new ClassRemapper[0];
     private final Map<Class<?>, ClassRemapper> remappersByDeclaringClassName = new IdentityHashMap<>();
-    private final Map<Class<?>, ClassRemapper[]> recurseRemappersByDeclaringClassName = new IdentityHashMap<>();
+    private Map<Class<?>, ClassRemapper[]> recurseRemappersByDeclaringClassName = new IdentityHashMap<>(); // Cloned on modify
+    private MojangMappings mappings = null;
+
+    /**
+     * While initializing remappers, stores a by-name cache lookup of all classes used in Minecraft Server
+     */
+    private final LazyClassLookup classLookup = new LazyClassLookup();
 
     /**
      * Checks what the true obfuscated field name is, provided a mojang-mapped field name.
@@ -139,7 +148,42 @@ public class MojangSpigotRemapper {
     }
 
     private ClassRemapper[] remappersFor(Class<?> declaringClass) {
-        return recurseRemappersByDeclaringClassName.getOrDefault(declaringClass, NO_REMAPPERS);
+        // Check already cached, if so, return that
+        {
+            ClassRemapper[] remappers = recurseRemappersByDeclaringClassName.get(declaringClass);
+            if (remappers != null) {
+                return remappers;
+            }
+        }
+
+        // While synchronized, try to load a new remapper if this is possible
+        synchronized (this) {
+            ClassRemapper remapper = initRemapper(declaringClass);
+            if (remapper == null) {
+                return NO_REMAPPERS;
+            }
+
+            // Store it in the recurse map too!
+            ClassRemapper[] result = remapper.recurse(this::initRemapper);
+            Map<Class<?>, ClassRemapper[]> newRecurseMap = new IdentityHashMap<>(recurseRemappersByDeclaringClassName);
+            newRecurseMap.put(declaringClass, result);
+            recurseRemappersByDeclaringClassName = newRecurseMap;
+            return result;
+        }
+    }
+
+    private ClassRemapper initRemapper(Class<?> declaringClass) {
+        // Check mappings for this class exist at all
+        // Check this first because this code is hit a lot while working with non-Minecraft types!
+        final MojangMappings.ClassMappings mappings = this.mappings.forClassIfExists(declaringClass.getName());
+        if (mappings == null) {
+            return null;
+        }
+
+        // Compute a new remapper if needed
+        return this.remappersByDeclaringClassName.computeIfAbsent(declaringClass, c -> {
+            return ClassRemapper.create(mappings, classLookup);
+        });
     }
 
     /**
@@ -151,41 +195,31 @@ public class MojangSpigotRemapper {
      * @param classPathResolver Resolver for the 'true' class path of class names
      * @param minecraftVersion Minecraft version for which to remap
      */
-    protected void loadMappings(
-            final MojangMappings mappings,
-            final ClassPathResolver classPathResolver
+    protected synchronized void loadMappings(
+            final MojangMappings mappings
     ) {
         // Reset
         remappersByDeclaringClassName.clear();
-        recurseRemappersByDeclaringClassName.clear();
+        recurseRemappersByDeclaringClassName = new IdentityHashMap<>();
+        classLookup.reset();
 
-        // Start by resolving all classes we have remappings for - essential for later
-        RemappedClassResolver resolver = new RemappedClassResolver(classPathResolver);
+        // Fill the class lookup with all classes used in the mappings
+        // This part here defines exactly what types can be loaded while resolving remappers,
+        // no other types can ever be loaded.
+        // Note that usage of this cache is synchronized!
         for (MojangMappings.ClassMappings classMappings : mappings.classes()) {
-            // Find the class, then store if found
-            Class<?> resolvedClass = resolver.tryFindClass(classMappings.name);
-            if (resolvedClass != null) {
-                resolver.store(classMappings.name, resolvedClass);
+            classLookup.add(classMappings.name);
+            for (MojangMappings.MethodSignature method : classMappings.methods) {
+                classLookup.add(method.returnType.name);
+                for (MojangMappings.ClassSignature sig : method.parameterTypes) {
+                    classLookup.add(sig.name);
+                }
             }
         }
 
-        // All that taken care of, actually parse the full mojang mappings and translate using resolver
-        // After this the resolver is no longer used and only still-valid remappings are kept
-        for (MojangMappings.ClassMappings classMappings : mappings.classes()) {
-            ClassRemapper remapper = ClassRemapper.create(classMappings, resolver);
-            if (remapper != null) {
-                remappersByDeclaringClassName.put(remapper.type, remapper);
-            }
-        }
-
-        // Final step is to handle recursion. When requesting a (public!) method or field from a class,
-        // we want to make sure this also works when calling the same method or field on an implementation
-        // of that same class. For example, methods on Entity should also be callable on EntityLiving.
-        // We only store the base classes/interfaces that have mapping data.
-        for (ClassRemapper remapper : remappersByDeclaringClassName.values()) {
-            recurseRemappersByDeclaringClassName.put(remapper.type,
-                    remapper.recurse(remappersByDeclaringClassName));
-        }
+        // Setup the mojang mappings for later!
+        // ClassRemapper instances will be created lazily using this information
+        this.mappings = mappings;
     }
 
     /**
@@ -208,13 +242,17 @@ public class MojangSpigotRemapper {
             // We require spigot<>mojang class translation
             SpigotMappings.ClassMappings spigotMappings = SpigotMappings.fromCacheOrDownload(minecraftVersion);
 
-            // Final translation using the two
-            mappings = mojangMappings.translateClassNames(spigotMappings::toSpigot);
+            // Final translation using the two, also translate using the class path resolver
+            mappings = mojangMappings.translateClassNames(name -> {
+                String spigotName = spigotMappings.toSpigot(name);
+                String remappedName = classPathResolver.resolveClassPath(spigotName);
+                return remappedName;
+            });
         }
 
         // Create remapper object
         MojangSpigotRemapper remapper = new MojangSpigotRemapper();
-        remapper.loadMappings(mappings, classPathResolver);
+        remapper.loadMappings(mappings);
         return remapper;
     }
 
@@ -231,19 +269,19 @@ public class MojangSpigotRemapper {
             this.fields_obfuscated_to_name = mappings.fields_obfuscated_to_name;
         }
 
-        public ClassRemapper[] recurse(Map<Class<?>, ClassRemapper> allRemappers) {
+        public ClassRemapper[] recurse(Function<Class<?>, ClassRemapper> remapperLookup) {
             return ReflectionUtil.getAllClassesAndInterfaces(this.type)
-                    .map(allRemappers::get)
+                    .map(remapperLookup)
                     .filter(Objects::nonNull)
                     .toArray(ClassRemapper[]::new);
         }
 
-        public static ClassRemapper create(MojangMappings.ClassMappings mappings, RemappedClassResolver resolver) {
-            Class<?> type = resolver.resolve(mappings.name);
+        public static ClassRemapper create(MojangMappings.ClassMappings mappings, LazyClassLookup classLookup) {
+            Class<?> type = classLookup.get(mappings.name);
             if (type != null) {
                 ClassRemapper remapper = new ClassRemapper(mappings, type);
                 for (MojangMappings.MethodSignature sig : mappings.methods) {
-                    MethodDetails details = MethodDetails.create(sig, resolver);
+                    MethodDetails details = MethodDetails.create(sig, classLookup);
                     if (details != null) {
                         remapper.methods_by_name.put(details.name, details);
                         remapper.methods_by_obfuscated.put(details.name_obfuscated, details);
@@ -312,8 +350,8 @@ public class MojangSpigotRemapper {
             return str.toString();
         }
 
-        public static MethodDetails create(MojangMappings.MethodSignature sig, RemappedClassResolver resolver) {
-            Class<?> returnType = resolver.resolve(sig.returnType.name);
+        public static MethodDetails create(MojangMappings.MethodSignature sig, LazyClassLookup classLookup) {
+            Class<?> returnType = classLookup.get(sig.returnType.name);
             if (returnType == null) {
                 return null; // Fail!
             }
@@ -324,7 +362,7 @@ public class MojangSpigotRemapper {
 
             Class<?>[] arguments = new Class<?>[sig.parameterTypes.size()];
             for (int i = 0 ; i < arguments.length; i++) {
-                Class<?> argType = resolver.resolve(sig.parameterTypes.get(i).name);
+                Class<?> argType = classLookup.get(sig.parameterTypes.get(i).name);
                 if (argType == null) {
                     return null; // Fail!
                 }
@@ -335,89 +373,123 @@ public class MojangSpigotRemapper {
         }
     }
 
-    private static class RemappedClassResolver {
-        private final ClassPathResolver classPathResolver;
-        private final Map<String, Class<?>> cache = new HashMap<>();
+    /**
+     * Caches the loaded Class by the in-mapping represented Class names.
+     * As these are all internal server types, this poses no memory leak
+     * danger. It also can only get classes that were originally represented
+     * in the mapping details.
+     */
+    private static final class LazyClassLookup {
+        private final Map<String, Supplier<Class<?>>> map = new HashMap<>();
 
-        public RemappedClassResolver(ClassPathResolver classPathResolver) {
-            this.classPathResolver = classPathResolver;
+        public void reset() {
+            map.clear();
 
             // Store primitive types and boxed types up-front
             // The ClassLoader can't seem to actually find such types
             for (Class<?> type : BoxedType.getUnboxedTypes()) {
-                store(type.getSimpleName(), type);
+                map.put(type.getSimpleName(), LogicUtil.constantSupplier(type));
+
+                if (type != void.class) {
+                    // Can't make void arrays!
+                    // Create all the way down to 10 dimensions - should be plenty!
+                    String nameTmp = type.getSimpleName();
+                    Class<?> typeTmp = type;
+                    for (int dims = 0; dims < 10; dims++) {
+                        nameTmp += "[]";
+                        typeTmp = LogicUtil.getArrayType(typeTmp);
+                        map.put(nameTmp, LogicUtil.constantSupplier(typeTmp));
+                    }
+                }
             }
             for (Class<?> type : BoxedType.getBoxedTypes()) {
-                store(type.getName(), type);
+                map.put(type.getName(), LogicUtil.constantSupplier(type));
+            }
+
+            // Why not, they're bound to show up :shrug:
+            map.put(String.class.getName(), LogicUtil.constantSupplier(String.class));
+            map.put(List.class.getName(), LogicUtil.constantSupplier(List.class));
+            map.put(Map.class.getName(), LogicUtil.constantSupplier(Map.class));
+        }
+
+        public Class<?> get(String name) {
+            return map.getOrDefault(name, LogicUtil.nullSupplier()).get();
+        }
+
+        public void add(String name) {
+            map.computeIfAbsent(name, this::createNewLookup);
+        }
+
+        private GeneratingLookup createNewLookup(String name) {
+            if (name.endsWith("[]")) {
+                int numDims = 0;
+                String tmp = name;
+                do {
+                    tmp = tmp.substring(0, tmp.length() - 2);
+                    numDims++;
+                } while (tmp.endsWith("[]"));
+                return new GeneratingArrayTypeLookup(map, name, numDims);
+            } else {
+                return new GeneratingLookup(map, name);
             }
         }
 
-        public void store(String mojangName, Class<?> resolvedClass) {
-            cache.put(mojangName, resolvedClass);
+        private static final class GeneratingArrayTypeLookup extends GeneratingLookup {
+            private final int numDims;
+
+            public GeneratingArrayTypeLookup(Map<String, Supplier<Class<?>>> map, String name, int numDims) {
+                super(map, name);
+                this.numDims = numDims;
+            }
+
+            @Override
+            public Class<?> load(String className) {
+                // Remove dimension part of String
+                // Then re-add the dimensions to the class
+                className = className.substring(0, className.length() - numDims * 2);
+                Class<?> foundClass = super.load(className);
+                if (foundClass != null) {
+                    foundClass = LogicUtil.getArrayType(foundClass, numDims);
+                }
+                return foundClass;
+            }
         }
 
-        public Class<?> tryFindClass(String name) {
-            // Before attempting to find the class, consult the ClassPathResolver what the true name is
-            // If a remapper is used (forge!) then the actual class name might be entirely different,
-            // even after remapping to the correct 'spigot' names.
-            String remappedName = this.classPathResolver.resolveClassPath(name);
+        private static class GeneratingLookup implements Supplier<Class<?>> {
+            private final Map<String, Supplier<Class<?>>> map;
+            private final String name;
 
-            try {
-                return MPLType.getClassByName(name, false, this.getClass().getClassLoader());
-            } catch (ClassNotFoundException e) {
-                // Debugging - this will actually happen a lot because the server mappings include a lot
-                // of classes used by Mojang for development, like test tools or other types.
-                // if (name.equals(remappedName)) {
-                //     Logging.LOGGER.log(Level.WARNING, "Failed to find server class " + name);
-                // } else {
-                //     Logging.LOGGER.log(Level.WARNING, "Failed to find server class " +
-                //             name + " (" + remappedName + ")");
-                // }
-                return null;
-            } catch (Throwable t) {
-                if (name.equals(remappedName)) {
-                    Logging.LOGGER.log(Level.SEVERE, "An error occurred loading server class " + name, t);
+            public GeneratingLookup(Map<String, Supplier<Class<?>>> map, String name) {
+                this.map = map;
+                this.name = name;
+            }
+
+            public Class<?> load(String className) {
+                try {
+                    return MPLType.getClassByName(className, false, this.getClass().getClassLoader());
+                } catch (ClassNotFoundException e) {
+                    // Debugging - this will actually happen a lot because the server mappings include a lot
+                    // of classes used by Mojang for development, like test tools or other types.
+                    // Logging.LOGGER.log(Level.WARNING, "Failed to find server class " + name);
+                    return null;
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "An error occurred loading server class " + className, t);
+                    return null;
+                }
+            }
+
+            @Override
+            public final Class<?> get() {
+                Class<?> foundClass = this.load(name);
+                if (foundClass != null) {
+                    // Store this as a constant in the map instead, discarding this entry
+                    map.put(name, LogicUtil.constantSupplier(foundClass));
                 } else {
-                    Logging.LOGGER.log(Level.SEVERE, "An error occurred loading server class " +
-                            name + " (" + remappedName + ")", t);
+                    // Remove from map so it can't be found next time
+                    map.remove(name);
                 }
-                return null;
+                return foundClass;
             }
-        }
-
-        /**
-         * Resolves a mojang class name to the at-runtime found Class type.
-         * If not found, returns null to indicate the mappings are no longer
-         * valid.
-         *
-         * @param mojangName
-         * @return Found Class, or null if not found
-         */
-        public Class<?> resolve(String mojangName) {
-            return cache.computeIfAbsent(mojangName, this::resolveNewName);
-        }
-
-        private Class<?> resolveNewName(String mojangName) {
-            int numArrayDims = 0;
-            while (mojangName.endsWith("[]")) {
-                mojangName = mojangName.substring(0, mojangName.length() - 2);
-                numArrayDims++;
-            }
-
-            // Retry cache once if this is an array
-            if (numArrayDims > 0) {
-                Class<?> inCache = cache.get(mojangName);
-                if (inCache != null) {
-                    return LogicUtil.getArrayType(inCache, numArrayDims);
-                }
-            }
-
-            // Try to see if the type exists - most common case
-            Class<?> baseType = tryFindClass(mojangName);
-            if (baseType != null && numArrayDims > 0) {
-                baseType = LogicUtil.getArrayType(baseType, numArrayDims);
-            }
-            return baseType;
         }
     }
 }
