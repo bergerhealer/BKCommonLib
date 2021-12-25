@@ -665,4 +665,47 @@ public class DebugUtil {
     private static boolean isInterestingType(Class<?> type) {
         return !type.isPrimitive() && type != String.class && !Number.class.isAssignableFrom(type);
     }
+
+    /**
+     * Pauses execution until the VisualVM profiler has hooked its agent into the JVM
+     *
+     * @param timeout Maximum time to wait for the profiler agent to be installed
+     * @param setupDuration Amount of time to give for the profiler to initialize itself
+     */
+    public static void waitForVisualVMProfiler(long timeout, long setupDuration) {
+        long startTime = System.currentTimeMillis();
+
+        // Wait until VisualVM has installed the agent into the JVM
+        // This is a custom .dll (windows) or .so (linux/solaris)
+        boolean found = false;
+        try {
+            do {
+                Thread.sleep(100);
+                javax.management.ObjectName diagnosticsCommandName;
+                diagnosticsCommandName = new javax.management.ObjectName(
+                        "com.sun.management:type=DiagnosticCommand");
+                String result = (String) java.lang.management.ManagementFactory.getPlatformMBeanServer().invoke(
+                        diagnosticsCommandName, "vmDynlibs", null, null);
+                for (String line : result.split("\n")) {
+                    if (line.endsWith("profilerinterface.dll") ||
+                        line.endsWith("libprofilerinterface.so") ||
+                        line.endsWith("libprofilerinterface.jnilib"))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+            } while (!found && (System.currentTimeMillis() - startTime) < timeout);
+        } catch (Throwable t) {
+            throw new UnsupportedOperationException("Failed to check whether VisualVM is hooked", t);
+        }
+
+        if (!found) {
+            throw new IllegalStateException("Timed out waiting for VisualVM to be hooked!");
+        }
+
+        try {
+            Thread.sleep(setupDuration);
+        } catch (InterruptedException e) {}
+    }
 }
