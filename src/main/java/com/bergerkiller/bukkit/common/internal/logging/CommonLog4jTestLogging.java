@@ -68,45 +68,48 @@ public class CommonLog4jTestLogging {
      * This prevents very slow initialization of the default logger under test.
      */
     public static void initLog4j() {
+        // Initialize it only once!
+        final org.apache.logging.log4j.core.LoggerContext context = new org.apache.logging.log4j.core.LoggerContext("Test") {
+            @Override
+            public Object getExternalContext() {
+                return null;
+            }
+
+            @Override
+            public org.apache.logging.log4j.core.Logger getLogger(String name) {
+                return new CommonLog4jCoreLogger(this, name);
+            }
+
+            @Override
+            public org.apache.logging.log4j.core.Logger getLogger(String arg0, MessageFactory arg1) {
+                return getLogger(arg0);
+            }
+
+            @Override
+            public boolean hasLogger(String arg0) {
+                return true;
+            }
+
+            @Override
+            public boolean hasLogger(String arg0, MessageFactory arg1) {
+                return true;
+            }
+
+            @Override
+            public boolean hasLogger(String arg0, Class<? extends MessageFactory> arg1) {
+                return true;
+            }
+        };
+
         org.apache.logging.log4j.LogManager.setFactory(new LoggerContextFactory() {
             @Override
             public org.apache.logging.log4j.core.LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3) {
-                return new org.apache.logging.log4j.core.LoggerContext("Test") {
-                    @Override
-                    public Object getExternalContext() {
-                        return null;
-                    }
-
-                    @Override
-                    public org.apache.logging.log4j.core.Logger getLogger(String name) {
-                        return new CommonLog4jCoreLogger(this, name);
-                    }
-
-                    @Override
-                    public org.apache.logging.log4j.core.Logger getLogger(String arg0, MessageFactory arg1) {
-                        return getLogger(arg0);
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0, MessageFactory arg1) {
-                        return true;
-                    }
-
-                    @Override
-                    public boolean hasLogger(String arg0, Class<? extends MessageFactory> arg1) {
-                        return true;
-                    }
-                };
+                return context;
             }
 
             @Override
             public org.apache.logging.log4j.core.LoggerContext getContext(String arg0, ClassLoader arg1, Object arg2, boolean arg3, URI arg4, String arg5) {
-                return getContext(arg0, arg1, arg2, arg3);
+                return context;
             }
 
             @Override
