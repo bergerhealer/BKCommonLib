@@ -931,14 +931,21 @@ public class MapWidget implements MapDisplayEvents {
     // Convenience method, see below
     private final void handleDraw() {
         if (this.parent != null) {
-            this.handleDraw(this.parent.getAbsoluteX(), this.parent.getAbsoluteY());
+            boolean parentVisible = true;
+            MapWidget tmp = this.parent;
+            do {
+                parentVisible &= tmp.isVisible();
+                tmp = tmp.parent;
+            } while (tmp != null);
+
+            this.handleDraw(this.parent.getAbsoluteX(), this.parent.getAbsoluteY(), parentVisible);
         } else {
-            this.handleDraw(0, 0);
+            this.handleDraw(0, 0, true);
         }
     }
 
     // Handles the drawing of this widget (if invalidated) and all children
-    private final void handleDraw(int absoluteX, int absoluteY) {
+    private final void handleDraw(int absoluteX, int absoluteY, boolean visible) {
         // If not attached yet, don't draw
         if (!this._attached) {
             return;
@@ -948,10 +955,13 @@ public class MapWidget implements MapDisplayEvents {
         absoluteX += this._x;
         absoluteY += this._y;
 
+        // If self is not visible, don't draw
+        visible &= this.isVisible();
+
         // If invalidated, redraw
         if (this._invalidated) {
             this.refreshView(absoluteX, absoluteY);
-            if (this != this.root && this.isVisible()) {
+            if (this != this.root && visible) {
                 this.onDraw();
             }
             this._lastX = absoluteX;
@@ -984,7 +994,7 @@ public class MapWidget implements MapDisplayEvents {
 
         // Draw children of this widget, relative to the current coordinates
         for (MapWidget child : this._children) {
-            child.handleDraw(absoluteX, absoluteY);
+            child.handleDraw(absoluteX, absoluteY, visible);
         }
     }
 
