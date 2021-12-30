@@ -11,14 +11,29 @@ import com.bergerkiller.bukkit.common.map.widgets.MapWidget;
  */
 public class MapWidgetNavigator {
 
+    private static boolean isWidgetVisibleRecurse(MapWidget widget) {
+        while (widget != null) {
+            if (!widget.isVisible()) {
+                return false;
+            }
+            widget = widget.getParent();
+        }
+        return true;
+    }
+
     public static List<MapWidget> getFocusableWidgets(MapWidget widget) {
         List<MapWidget> result = new ArrayList<MapWidget>();
-        addFocusableWidgets(result, widget);
+        if (isWidgetVisibleRecurse(widget)) {
+            addFocusableWidgets(result, widget);
+        }
         return result;
     }
 
     public static void addFocusableWidgets(List<MapWidget> result, MapWidget widget) {
         for (MapWidget child : widget.getWidgets()) {
+            if (!child.isVisible()) {
+                continue;
+            }
             if (child.isFocusable() && child.isEnabled() && child.getWidth() > 0 && child.getHeight() > 0) {
                 result.add(child);
             } else {
@@ -37,6 +52,10 @@ public class MapWidgetNavigator {
         int minWeight = Integer.MAX_VALUE;
         MapWidget result = current;
         for (MapWidget widget : widgets) {
+            if (!isWidgetVisibleRecurse(widget)) {
+                continue;
+            }
+
             int weight = Integer.MAX_VALUE;
             if (key == MapPlayerInput.Key.LEFT) {
                 weight = getWeightLeft(current, widget, key);

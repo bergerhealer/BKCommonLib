@@ -28,7 +28,25 @@ public class MapWidgetRoot extends MapWidget {
         return this._focusedWidget;
     }
 
+    private static boolean isWidgetVisibleRecurse(MapWidget widget) {
+        while (widget != null) {
+            if (!widget.isVisible()) {
+                return false;
+            }
+            widget = widget.parent;
+        }
+        return true;
+    }
+
     private static MapWidgetDepthPair findFocusableWidget(MapWidget widget, int depth) {
+        return isWidgetVisibleRecurse(widget.parent)
+                ? findFocusableWidgetRecurse(widget, depth) : null;
+    }
+
+    private static MapWidgetDepthPair findFocusableWidgetRecurse(MapWidget widget, int depth) {
+        if (!widget.isVisible()) {
+            return null;
+        }
         if (widget.isFocusable()) {
             return new MapWidgetDepthPair(widget, depth);
         }
@@ -45,6 +63,11 @@ public class MapWidgetRoot extends MapWidget {
     }
 
     public void setFocusedWidget(MapWidget widget) {
+        // If widget is invisible, do nothing
+        if (widget != null && !isWidgetVisibleRecurse(widget)) {
+            return;
+        }
+
         // When widget is not focusable, pick a child widget that is
         if (widget != null && !widget.isFocusable()) {
             MapWidgetDepthPair pair = findFocusableWidget(widget, 0);
@@ -55,7 +78,7 @@ public class MapWidgetRoot extends MapWidget {
             }
         }
 
-        // When NULL is used, remove all focused widgets
+        // When NULL or an invisible widget is used, remove all focused widgets
         MapWidget prevFocus = this._focusedWidget;
         if (widget == null) {
             this._focusedWidget = null;
@@ -150,6 +173,9 @@ public class MapWidgetRoot extends MapWidget {
     }
 
     public void setActivatedWidget(MapWidget widget) {
+        if (!isWidgetVisibleRecurse(widget)) {
+            return; // Can't activate an invisible widget
+        }
         if (this._activatedWidget == widget) {
             return;
         }
@@ -176,7 +202,7 @@ public class MapWidgetRoot extends MapWidget {
             // Set the activated widget to the widget specified
             // Activate a parent widget of the widget if the widget is not focusable
             MapWidget tmp = widget;
-            while (tmp != null && !tmp.isFocusable()) {
+            while (tmp != null && (!tmp.isFocusable() || !tmp.isVisible())) {
                 tmp = tmp.parent;
             }
             if (tmp == null) {
