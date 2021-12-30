@@ -8,7 +8,9 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 
 class EntityBoat extends Entity {
-#if version >= 1.14
+#if version >= 1.17
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:DATA_ID_TYPE;
+#elseif version >= 1.14
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:e;
 #elseif version >= 1.9
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_WOOD_TYPE:d;
