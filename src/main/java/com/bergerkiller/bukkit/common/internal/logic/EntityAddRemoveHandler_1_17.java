@@ -603,7 +603,11 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
          *         }
          * 
          *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private EntitySection currentSection;
+         * #if version <= 1.17.1 && exists net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager b;
+         *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager callbackPESM:b;
+         * #else
          *         #require net.minecraft.world.level.entity.PersistentEntitySectionManager.a private PersistentEntitySectionManager callbackPESM:this$0;
+         * #endif
          *         EntitySection section = callback#currentSection;
          * 
          *         boolean checkStartTickingNewEntity = false;
