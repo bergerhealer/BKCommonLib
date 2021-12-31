@@ -9,6 +9,8 @@ import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.chunk.Chunk;
 import net.minecraft.world.level.chunk.IChunkAccess;
 
+import io.github.opencubicchunks.cubicchunks.api.world.ICubicWorld;
+
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
 
 class HeightMap {
