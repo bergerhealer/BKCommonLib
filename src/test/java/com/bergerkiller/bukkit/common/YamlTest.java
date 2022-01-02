@@ -27,6 +27,34 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
 
+    public static enum TestEnum {
+        VALUE_ONE,
+        VALUE_TWO_WITH_SUBCLASS {
+            @Override
+            public void method() {
+                System.out.println("Overrided!");
+            }
+        },
+        VALUE_THREE;
+
+        public void method() {
+        }
+    }
+
+    @Test
+    public void testYamlEnumValues() {
+        // Verify that serializing an enum value works correctly
+        // The stock yaml has a bug in it that it cannot serialize an enum
+        // value that is a subclass correctly.
+        YamlNode root = new YamlNode();
+        root.set("test", TestEnum.VALUE_ONE);
+        assertEquals("test: VALUE_ONE\n", root.toString());
+        root.set("test", TestEnum.VALUE_TWO_WITH_SUBCLASS);
+        assertEquals("test: VALUE_TWO_WITH_SUBCLASS\n", root.toString());
+        root.set("test", TestEnum.VALUE_THREE);
+        assertEquals("test: VALUE_THREE\n", root.toString());
+    }
+
     @Test
     public void testYamlAssignRetrieveList() {
         YamlNode root = new YamlNode();

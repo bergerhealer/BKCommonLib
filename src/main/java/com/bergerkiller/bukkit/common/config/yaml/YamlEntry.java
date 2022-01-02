@@ -629,7 +629,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
                 } else if (node instanceof YamlNodeAbstract<?>) {
                     // Generate YAML that looks like this: {}\n
                     value = Collections.emptyMap();
-                } else if (value != null && value.getClass().isEnum()) {
+                } else if (value instanceof Enum) {
                     // Special handling for enums: write the text version of it instead
                     // For enum values true/false (Bukkit PermissionDefault) write boolean true/false
                     // TODO: Is toString() really the right way to go? name() might be better.
