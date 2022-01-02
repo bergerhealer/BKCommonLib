@@ -29,10 +29,10 @@ import io.github.opencubicchunks.cubicchunks.api.world.ICubeProviderServer;
 
 class Chunk {
 #if version >= 1.18
-    #require public World getChunkWorld:getLevel();
+    #require net.minecraft.world.level.chunk.Chunk public World getChunkWorld:getLevel();
     public (WorldHandle) World getWorld:getLevel();
 #else
-    #require public World getChunkWorld:getWorld();
+    #require net.minecraft.world.level.chunk.Chunk public World getChunkWorld:getWorld();
     public (WorldHandle) World getWorld();
 #endif
 
