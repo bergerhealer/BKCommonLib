@@ -1773,6 +1773,35 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
+     * Flood-fills all item frames with the same item that are considered to be a single map display
+     * cluster. Empty item frames are filled into as well, and are considered to be part of the
+     * start item frame. This allows an existing display to be enlarged.
+     *
+     * @param startItemFrame Item frame from which to flood-fill
+     * @param item Item to place inside the item frames
+     */
+    public static void fillItemFrames(ItemFrame startItemFrame, ItemStack item) {
+        CommonPlugin.getInstance().getMapController().fillItemFrames(startItemFrame, item);
+    }
+
+    /**
+     * Flood-fills all item frames with the same map that are considered to be a single map display
+     * cluster. Empty item frames are filled into as well, and are considered to be part of the
+     * start item frame. This allows an existing display to be enlarged.<br>
+     * <br>
+     * To set additional properties before placing, make use of
+     * {@link MapDisplayProperties#createNew(Class)} instead. Create such a properties object,
+     * set additional properties as desired, then call
+     * {@link MapDisplayProperties#fillItemFrames(ItemFrame)} to fill the item frames.
+     *
+     * @param startItemFrame Item frame from which to flood-fill
+     * @param mapDisplayClass Map display class for which to create an item, which is placed
+     */
+    public static void fillItemFrames(ItemFrame startItemFrame, Class<? extends MapDisplay> mapDisplayClass) {
+        MapDisplayProperties.createNew(mapDisplayClass).fillItemFrames(startItemFrame);
+    }
+
+    /**
      * UpdateTask that simply calls update(). Is used over a lambda so
      * that it shows up in timings better.
      */

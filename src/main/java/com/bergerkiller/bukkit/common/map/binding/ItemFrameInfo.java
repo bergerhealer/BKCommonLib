@@ -6,7 +6,6 @@ import java.util.UUID;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -39,6 +38,7 @@ public class ItemFrameInfo {
     public final ItemFrame itemFrame;
     public final EntityItemFrameHandle itemFrameHandle;
     public final DataWatcher.Item<?> itemFrame_dw_item;
+    public final IntVector3 coordinates;
     public final HashSet<Player> viewers;
     public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
     public MapUUID preReloadMapUUID; // Map UUID known from before a reload, and if encountered again, will avoid resending the item (popping)
@@ -67,6 +67,7 @@ public class ItemFrameInfo {
         this.itemFrame = (ItemFrame) itemFrame.getBukkitEntity();
         this.itemFrameHandle = itemFrame;
         this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
+        this.coordinates = this.itemFrameHandle.getBlockPosition();
         this.viewers = new HashSet<Player>();
         this.removed = false;
         this.lastMapUUID = null;
@@ -137,7 +138,7 @@ public class ItemFrameInfo {
         // Compare facing with the eye ray to calculate the eye distance to the item frame
         final double distance;
         boolean withinBounds = true;
-        IntVector3 frameBlock = this.itemFrameHandle.getBlockPosition();
+        IntVector3 frameBlock = this.coordinates;
         BlockFace facing = this.itemFrameHandle.getFacing();
         switch (facing) {
         case NORTH:
@@ -392,7 +393,7 @@ public class ItemFrameInfo {
         // This is a slow and lengthy procedure; hopefully it does not happen too often
         // What we do is: we add all neighbours, then find the most top-left item frame
         // Subtracting coordinates will give us the tile x/y of this item frame
-        IntVector3 itemFramePosition = itemFrameHandle.getBlockPosition();
+        IntVector3 itemFramePosition = this.coordinates;
         ItemFrameCluster cluster = this.controller.findCluster(itemFrameHandle, itemFramePosition);
 
         // If not fully loaded, 'park' this item frame until surrounding chunks are loaded too
@@ -407,7 +408,7 @@ public class ItemFrameInfo {
         }
 
         // Calculate UUID of this item frame
-        this.recalculateUUIDInCluster(itemFramePosition, cluster);
+        this.recalculateUUIDInCluster(cluster);
 
         // Cluster is fully loaded, check if there are any other item frames part of
         // this cluster that were waiting to be further loaded. If so, load them in!
@@ -417,35 +418,21 @@ public class ItemFrameInfo {
         // By doing this here we make sure the display resolution is correct instantly,
         // as otherwise there is a tick delay until these other item frames initialize.
         if (cluster.hasMultipleTiles()) {
-            for (Entity entity : WorldUtil.getEntities(world, null,
-                    cluster.min_coord.x + 0.01,
-                    cluster.min_coord.y + 0.01,
-                    cluster.min_coord.z + 0.01,
-                    cluster.max_coord.x + 0.99,
-                    cluster.max_coord.y + 0.99,
-                    cluster.max_coord.z + 0.99))
-            {
-                if (!(entity instanceof ItemFrame)) {
-                    continue;
-                }
-                ItemFrameInfo itemFrame = this.controller.getItemFrame(entity.getEntityId());
-                if (itemFrame == null || itemFrame == this) {
-                    continue;
-                }
-                IntVector3 position = itemFrame.itemFrameHandle.getBlockPosition();
-                if (!cluster.coordinates.contains(position)) {
+            for (ItemFrameInfo itemFrame : this.controller.findClusterItemFrames(cluster)) {
+                if (itemFrame == this) {
                     continue;
                 }
                 if ((itemFrame.lastFrameItemUpdateNeeded && itemFrame.checkItemChanged()) || itemFrame.requiresFurtherLoading) {
-                    itemFrame.recalculateUUIDInCluster(position, cluster);
+                    itemFrame.recalculateUUIDInCluster(cluster);
                 }
             }
         }
     }
 
-    private void recalculateUUIDInCluster(IntVector3 itemFramePosition, ItemFrameCluster cluster) {
+    private void recalculateUUIDInCluster(ItemFrameCluster cluster) {
         this.requiresFurtherLoading = false;
 
+        IntVector3 itemFramePosition = this.coordinates;
         UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
         if (mapUUID == null) {
             return;

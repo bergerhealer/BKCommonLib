@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 
@@ -17,6 +18,8 @@ import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
  * Group of item frames that are connected together and face the same way
  */
 public final class ItemFrameCluster {
+    // World where this item frame cluster is at
+    public final OfflineWorld world;
     // Facing of the display
     public final BlockFace facing;
     // Set of coordinates where item frames are stored
@@ -34,7 +37,8 @@ public final class ItemFrameCluster {
     // A temporary builder which we use to track what chunks need to be loaded to load a cluster
     private static final ChunkDependencyBuilder BUILDER = new ChunkDependencyBuilder();
 
-    public ItemFrameCluster(BlockFace facing, Set<IntVector3> coordinates, int rotation) {
+    public ItemFrameCluster(OfflineWorld world, BlockFace facing, Set<IntVector3> coordinates, int rotation) {
+        this.world = world;
         this.facing = facing;
         this.coordinates = coordinates;
         this.rotation = rotation;

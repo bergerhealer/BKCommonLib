@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -70,6 +71,7 @@ import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
 import com.bergerkiller.bukkit.common.map.util.MapLookPosition;
 import com.bergerkiller.bukkit.common.map.util.MapUUID;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.offline.OfflineWorld;
 import com.bergerkiller.bukkit.common.map.MapPlayerInput;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
@@ -1026,6 +1028,39 @@ public final class CommonMapController implements PacketListener, Listener {
         }
     }
 
+    /**
+     * Flood-fills all item frames with the same item that are considered to be a single map display
+     * cluster. Empty item frames are filled into as well, and are considered to be part of the
+     * start item frame. This allows an existing display to be enlarged.
+     *
+     * @param startItemFrame
+     * @param item
+     */
+    public synchronized void fillItemFrames(ItemFrame startItemFrame, ItemStack item) {
+        if (!this.isFrameDisplaysEnabled) {
+            throw new UnsupportedOperationException("Item frame map displays are disabled in BKCommonLib's configuration");
+        }
+        if (!this.isFrameTilingSupported) {
+            throw new UnsupportedOperationException("Item frame map display tiling is disabled in BKCommonLib's configuration");
+        }
+        if (startItemFrame.isDead()) {
+            throw new IllegalArgumentException("Input item frame was removed (dead)");
+        }
+        ItemFrameInfo info = this.getItemFrame(startItemFrame.getEntityId());
+        if (info == null) {
+            throw new IllegalStateException("Item frame had no metadata information for some reason");
+        }
+
+        // Find this item frame cluster
+        ItemFrameCluster cluster = this.findCluster(info.itemFrameHandle, info.coordinates, true);
+        for (ItemFrameInfo frame : this.findClusterItemFrames(cluster)) {
+            // Update the item inside this item frame. Also schedule it for an instant refresh!
+            // We could spin up the display and such here too, but let's keep it simple for now.
+            frame.itemFrameHandle.setItem(item);
+            frame.needsItemRefresh.set(true);
+        }
+    }
+
     protected SetMultimap<UUID, MapUUID> swapDirtyMapUUIDs() {
         final SetMultimap<UUID, MapUUID> dirtyMaps;
         dirtyMaps = dirtyMapUUIDSet;
@@ -1323,22 +1358,97 @@ public final class CommonMapController implements PacketListener, Listener {
     }
 
     /**
+     * Looks up all item frame information loaded of a particular item frame cluster
+     *
+     * @param world World the cluster is in
+     * @param cluster Item frame cluster
+     * @return List of item frame info
+     */
+    public List<ItemFrameInfo> findClusterItemFrames(ItemFrameCluster cluster) {
+        if (!cluster.world.isLoaded()) {
+            return Collections.emptyList();
+        }
+
+        List<ItemFrameInfo> result = new ArrayList<>(cluster.coordinates.size());
+        for (Entity entity : WorldUtil.getEntities(cluster.world.getLoadedWorld(), null,
+                cluster.min_coord.x + 0.01,
+                cluster.min_coord.y + 0.01,
+                cluster.min_coord.z + 0.01,
+                cluster.max_coord.x + 0.99,
+                cluster.max_coord.y + 0.99,
+                cluster.max_coord.z + 0.99))
+        {
+            if (!(entity instanceof ItemFrame)) {
+                continue;
+            }
+            ItemFrameInfo itemFrame = this.getItemFrame(entity.getEntityId());
+            if (itemFrame == null) {
+                continue;
+            }
+            if (!cluster.coordinates.contains(itemFrame.coordinates)) {
+                continue;
+            }
+            result.add(itemFrame);
+        }
+        return result;
+    }
+
+    /**
      * Finds a cluster of all connected item frames that an item frame is part of
      * 
-     * @param itemFrame
+     * @param itemFrame Start item frame
+     * @param itemFramePosition Start block position of itemFrame
      * @return cluster
      */
-    public final synchronized ItemFrameCluster findCluster(EntityItemFrameHandle itemFrame, IntVector3 itemFramePosition) {
-        UUID itemFrameMapUUID;
-        if (!this.isFrameTilingSupported || (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) == null) {
-            return new ItemFrameCluster(itemFrame.getFacing(),
-                    Collections.singleton(itemFramePosition), 0); // no neighbours or tiling disabled
+    public final synchronized ItemFrameCluster findCluster(
+            final EntityItemFrameHandle itemFrame,
+            final IntVector3 itemFramePosition
+    ) {
+        return findCluster(itemFrame, itemFramePosition, false);
+    }
+
+    /**
+     * Finds a cluster of all connected item frames that an item frame is part of
+     * 
+     * @param itemFrame Start item frame
+     * @param itemFramePosition Start block position of itemFrame
+     * @param includingEmpty Whether to include frames in the cluster that have no item
+     * @return cluster
+     */
+    public final synchronized ItemFrameCluster findCluster(
+            final EntityItemFrameHandle itemFrame,
+            final IntVector3 itemFramePosition,
+            final boolean includingEmpty
+    ) {
+        final Predicate<EntityItemFrameHandle> itemFrameFilter;
+        if (includingEmpty && ItemUtil.isEmpty(itemFrame.getItem())) {
+            // Proceed only filling empty item frames
+            itemFrameFilter = e -> ItemUtil.isEmpty(e.getItem());
+        } else {
+            final UUID itemFrameMapUUID;
+            if (this.isFrameTilingSupported && (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) != null) {
+                if (includingEmpty) {
+                    itemFrameFilter = e -> {
+                        return itemFrameMapUUID.equals(e.getItemMapDisplayUUID()) ||
+                               ItemUtil.isEmpty(e.getItem());
+                    };
+                } else {
+                    itemFrameFilter = e -> {
+                        return itemFrameMapUUID.equals(e.getItemMapDisplayUUID());
+                    };
+                }
+            } else {
+                // no neighbours or tiling disabled
+                return new ItemFrameCluster(OfflineWorld.of(itemFrame.getBukkitWorld()),
+                        itemFrame.getFacing(),
+                        Collections.singleton(itemFramePosition), 0);
+            }
         }
 
         // Look up in cache first
         World world = itemFrame.getBukkitWorld();
         Map<IntVector3, ItemFrameCluster> cachedClusters;
-        if (itemFrameClustersByWorldEnabled) {
+        if (!includingEmpty && itemFrameClustersByWorldEnabled) {
             cachedClusters = itemFrameClustersByWorld.get(world);
             if (cachedClusters == null) {
                 cachedClusters = new HashMap<>();
@@ -1365,15 +1475,11 @@ public final class CommonMapController implements PacketListener, Listener {
             // - Are on the same world as this item frame
             // - Facing the same way
             // - Along the same x/y/z (facing)
-            // - Same ItemStack map UUID
+            // - Same ItemStack map UUID (or, if includingEmpty, are empty)
 
             ItemFrameClusterKey key = new ItemFrameClusterKey(world, itemFrame.getFacing(), itemFramePosition);
             for (EntityItemFrameHandle otherFrame : getItemFrameEntities(key)) {
-                if (otherFrame.getId() == itemFrame.getId()) {
-                    continue;
-                }
-                UUID otherFrameMapUUID = otherFrame.getItemMapDisplayUUID();
-                if (itemFrameMapUUID.equals(otherFrameMapUUID)) {
+                if (otherFrame.getId() != itemFrame.getId() && itemFrameFilter.test(otherFrame)) {
                     cache.put(otherFrame);
                 }
             }
@@ -1419,7 +1525,7 @@ public final class CommonMapController implements PacketListener, Listener {
             }
 
             // The final combined result
-            ItemFrameCluster cluster = new ItemFrameCluster(key.facing, result, rotation_idx * 90);
+            ItemFrameCluster cluster = new ItemFrameCluster(OfflineWorld.of(key.world), key.facing, result, rotation_idx * 90);
             if (cachedClusters != null) {
                 for (IntVector3 position : cluster.coordinates) {
                     cachedClusters.put(position, cluster);

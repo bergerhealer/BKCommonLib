@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.ItemFrame;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 
@@ -173,6 +174,19 @@ public abstract class MapDisplayProperties {
      */
     public <T> T get(String key, T defaultValue) {
         return getMetadata().getValue(key, defaultValue);
+    }
+
+    /**
+     * Flood-fills all item frames with the same item that are considered to be a single map display
+     * cluster. Empty item frames are filled into as well, and are considered to be part of the
+     * start item frame. This allows an existing display to be enlarged.<br>
+     * <br>
+     * The item obtained through {@link #getMapItem()} is set on all item frames.
+     *
+     * @param startItemFrame Item frame from which to flood-fill
+     */
+    public void fillItemFrames(ItemFrame startItemFrame) {
+        CommonPlugin.getInstance().getMapController().fillItemFrames(startItemFrame, ItemUtil.cloneItem(this.getMapItem()));
     }
 
     /**
