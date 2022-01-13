@@ -544,6 +544,15 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Multiplies this matrix with a translation transformation.
+     * 
+     * @param translation
+     */
+    public final void translate(Vector translation) {
+        this.translate(translation.getX(), translation.getY(), translation.getZ());
+    }
+
+    /**
      * Multiplies this matrix with a translation transformation
      * 
      * @param dx translation
@@ -558,12 +567,57 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
-     * Multiplies this matrix with a translation transformation.
-     * 
+     * Multiplies a {@link #translation(Vector)} matrix with this matrix,
+     * writing the result to this matrix. This results in a world-relative
+     * translation. Rotation/scale/shear information of this matrix have no
+     * effect on the translation performed.
+     *
      * @param translation
      */
-    public final void translate(Vector translation) {
-        this.translate(translation.getX(), translation.getY(), translation.getZ());
+    public final void worldTranslate(Vector3 translation) {
+        worldTranslate(translation.x, translation.y, translation.z);
+    }
+
+    /**
+     * Multiplies a {@link #translation(Vector)} matrix with this matrix,
+     * writing the result to this matrix. This results in a world-relative
+     * translation. Rotation/scale/shear information of this matrix have no
+     * effect on the translation performed.
+     *
+     * @param translation
+     */
+    public final void worldTranslate(Vector translation) {
+        worldTranslate(translation.getX(), translation.getY(), translation.getZ());
+    }
+
+    /**
+     * Multiplies a {@link #translation(Vector)} matrix with this matrix,
+     * writing the result to this matrix. This results in a world-relative
+     * translation. Rotation/scale/shear information of this matrix have no
+     * effect on the translation performed.
+     *
+     * @param dx translation
+     * @param dy translation
+     * @param dz translation
+     */
+    public final void worldTranslate(double dx, double dy, double dz) {
+        // Equivalent to:
+        // Matrix4x4.multiply(Matrix4x4.translation(dx, dy, dz), this, this);
+
+        this.m00 += dx * this.m30;
+        this.m01 += dx * this.m31;
+        this.m02 += dx * this.m32;
+        this.m03 += dx * this.m33;
+
+        this.m10 += dy * this.m30;
+        this.m11 += dy * this.m31;
+        this.m12 += dy * this.m32;
+        this.m13 += dy * this.m33;
+
+        this.m20 += dz * this.m30;
+        this.m21 += dz * this.m31;
+        this.m22 += dz * this.m32;
+        this.m23 += dz * this.m33;
     }
 
     /**
@@ -795,6 +849,21 @@ public class Matrix4x4 implements Cloneable {
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof Matrix4x4) {
+            Matrix4x4 m = (Matrix4x4) o;
+            return m00 == m.m00 && m01 == m.m01 && m02 == m.m02 && m03 == m.m03 &&
+                   m10 == m.m10 && m11 == m.m11 && m12 == m.m12 && m13 == m.m13 &&
+                   m20 == m.m20 && m21 == m.m21 && m22 == m.m22 && m23 == m.m23 &&
+                   m30 == m.m30 && m31 == m.m31 && m32 == m.m32 && m33 == m.m33;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
     public String toString() {
         return "{" +
             m00 + ", " + m01 + ", " + m02 + ", " + m03 + "\n " +
@@ -828,8 +897,8 @@ public class Matrix4x4 implements Cloneable {
      * @return transformation matrix for location
      */
     public static Matrix4x4 fromLocation(Location location) {
-        Matrix4x4 result = new Matrix4x4();
-        result.translateRotate(location);
+        Matrix4x4 result = translation(location.getX(), location.getY(), location.getZ());
+        result.rotateYawPitchRoll(location.getPitch(), location.getYaw(), 0.0f);
         return result;
     }
 
@@ -846,6 +915,41 @@ public class Matrix4x4 implements Cloneable {
      */
     public static Matrix4x4 identity() {
         return new Matrix4x4();
+    }
+
+    /**
+     * Returns a new 4x4 identity matrix translated by the specified amount.
+     *
+     * @param position Translation vector
+     * @return translated identity matrix
+     */
+    public static Matrix4x4 translation(Vector3 position) {
+        return translation(position.x, position.y, position.z);
+    }
+
+    /**
+     * Returns a new 4x4 identity matrix translated by the specified amount.
+     *
+     * @param position Translation vector
+     * @return translated identity matrix
+     */
+    public static Matrix4x4 translation(Vector position) {
+        return translation(position.getX(), position.getY(), position.getZ());
+    }
+
+    /**
+     * Returns a new 4x4 identity matrix translated by the specified amount.
+     *
+     * @param x X-translation
+     * @param y Y-translation
+     * @param z Z-translation
+     * @return translated identity matrix
+     */
+    public static Matrix4x4 translation(double x, double y, double z) {
+        return new Matrix4x4(1.0, 0.0, 0.0, x,
+                             0.0, 1.0, 0.0, y,
+                             0.0, 0.0, 1.0, z,
+                             0.0, 0.0, 0.0, 1.0);
     }
 
     /**

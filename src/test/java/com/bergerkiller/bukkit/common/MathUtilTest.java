@@ -19,6 +19,35 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class MathUtilTest {
 
     @Test
+    public void testCreateTranslationMatrix() {
+        Matrix4x4 m1 = new Matrix4x4();
+        m1.translate(10.0, -20.0, 30.5);
+
+        Matrix4x4 m2 = Matrix4x4.translation(10.0, -20.0, 30.5);
+
+        assertEquals(m1, m2);
+    }
+
+    @Test
+    public void testWorldTranslate() {
+        // Input
+        Matrix4x4 input = Matrix4x4.identity();
+        input.translate(5.0, -20.5, 30.5);
+        input.rotateYawPitchRoll(20.0, 30.0, -50.0);
+
+        // Control
+        Matrix4x4 m1 = new Matrix4x4();
+        m1.translate(5.0, 30.7, -60.3);
+        m1.multiply(input);
+
+        // Actual
+        Matrix4x4 m2 = input.clone();
+        m2.worldTranslate(5.0, 30.7, -60.3);
+
+        assertEquals(m1, m2);
+    }
+
+    @Test
     public void testMatrixRotation() {
         Matrix4x4 transform = new Matrix4x4();
         transform.translateRotate(2.0, 3.0, 4.0, -12.0f, 34.0f);
