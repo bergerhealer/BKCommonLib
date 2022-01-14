@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.com.mojang.authlib;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.generated.com.mojang.authlib.properties.PropertyHandle;
 import java.util.Collection;
 import java.util.Set;
@@ -27,6 +28,10 @@ public abstract class GameProfileHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static GameProfileHandle deserialize(CommonTagCompound data) {
+        return T.deserialize.invoke(data);
+    }
+
     public abstract UUID getId();
     public abstract String getName();
     public abstract void clearProperties();
@@ -34,6 +39,7 @@ public abstract class GameProfileHandle extends Template.Handle {
     public abstract Collection<PropertyHandle> getProperties(String key);
     public abstract boolean putProperty(String key, PropertyHandle property);
     public abstract void setAllProperties(GameProfileHandle profile);
+    public abstract CommonTagCompound serialize();
 
     public static GameProfileHandle getForPlayer(org.bukkit.entity.HumanEntity player) {
         Object handle = com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player);
@@ -46,6 +52,8 @@ public abstract class GameProfileHandle extends Template.Handle {
     public static final class GameProfileClass extends Template.Class<GameProfileHandle> {
         public final Template.Constructor.Converted<GameProfileHandle> constr_uuid_name = new Template.Constructor.Converted<GameProfileHandle>();
 
+        public final Template.StaticMethod.Converted<GameProfileHandle> deserialize = new Template.StaticMethod.Converted<GameProfileHandle>();
+
         public final Template.Method<UUID> getId = new Template.Method<UUID>();
         public final Template.Method<String> getName = new Template.Method<String>();
         public final Template.Method<Void> clearProperties = new Template.Method<Void>();
@@ -53,6 +61,7 @@ public abstract class GameProfileHandle extends Template.Handle {
         public final Template.Method.Converted<Collection<PropertyHandle>> getProperties = new Template.Method.Converted<Collection<PropertyHandle>>();
         public final Template.Method.Converted<Boolean> putProperty = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Void> setAllProperties = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<CommonTagCompound> serialize = new Template.Method.Converted<CommonTagCompound>();
 
     }
 

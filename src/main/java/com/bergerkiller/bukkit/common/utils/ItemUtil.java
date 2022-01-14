@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
+import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
@@ -28,6 +29,22 @@ import org.bukkit.inventory.ItemStack;
  * Contains item stack, item and inventory utilities
  */
 public class ItemUtil {
+
+    /**
+     * Creates a new player head item with the game profile information specified.
+     * This creates a player head with this profile's skin texture information.
+     *
+     * @param gameProfile
+     * @return Skull item
+     */
+    @SuppressWarnings("deprecation")
+    public static ItemStack createPlayerHeadItem(GameProfileHandle gameProfile) {
+        ItemStack item = createItem(MaterialUtil.getFirst("PLAYER_HEAD", "LEGACY_SKULL_ITEM"), 1);
+        CommonTagCompound nbt = getMetaTag(item, true);
+        nbt.put("SkullOwner", gameProfile.serialize());
+        item.setDurability((short) 3); // For supporting MC 1.12.2 and before
+        return item;
+    }
 
     /**
      * Tests if the given ItemStacks can be fully transferred to another array

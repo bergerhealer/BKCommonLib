@@ -28,7 +28,8 @@ public class Common {
             "Common:IntCuboid",
             "Common:WorldBlockBorder",
             "Common:EntityController:FixedOnDieDuringTeleport",
-            "Common:WorldUtil:getDefaultNetherPortalSearchRadius"
+            "Common:WorldUtil:getDefaultNetherPortalSearchRadius",
+            "Common:Item:CreatePlayerHeadUsingGameProfile"
     ).collect(Collectors.toSet());
 
     /**
