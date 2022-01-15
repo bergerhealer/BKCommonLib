@@ -2,6 +2,9 @@ package com.bergerkiller.bukkit.common.utils;
 
 import java.io.*;
 import java.nio.channels.FileChannel;
+import java.nio.file.AtomicMoveNotSupportedException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -280,5 +283,40 @@ public class StreamUtil {
      */
     public static DeflaterOutputStream createDeflaterOutputStreamWithCompressionLevel(OutputStream stream, int deflaterCompressionLevel) throws IOException {
         return new DeflaterOutputStream(stream, new Deflater(deflaterCompressionLevel), 512, false);
+    }
+
+    /**
+     * Attempts to perform an atomic move operation from one file to another, overwriting the destination
+     * file's contents. This attempts to use the safest method available on the underlying filesystem.
+     *
+     * @param fromFile File to move
+     * @param toFile File to replace with the file
+     * @throws IOException If the atomic move failed for some reason
+     */
+    public static void atomicReplace(File fromFile, File toFile) throws IOException {
+        // First try a newer Java's Files.move as this allows for an atomic move with overwrite
+        // If this doesn't work, only then do we try our custom non-atomic methods
+        try {
+            Files.move(fromFile.toPath(), toFile.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+            return;
+        } catch (AtomicMoveNotSupportedException | UnsupportedOperationException unsupportedIgnored) {
+            // Efficient move using this method is not supported, use a fallback
+        }
+
+        // More dangerous: delete target file, then move the temp file to it
+        // This operation is not atomic and could fail
+        if (toFile.delete() && fromFile.renameTo(toFile)) {
+            return;
+        }
+
+        // Even more risky: copy the data by using file streams
+        // This could result in partial data in the destination file :(
+        if (StreamUtil.tryCopyFile(fromFile, toFile)) {
+            fromFile.delete();
+            return;
+        }
+
+        // No idea anymore
+        throw new IOException("Failed to move " + fromFile.getAbsolutePath() + " to " + toFile.getAbsolutePath());
     }
 }

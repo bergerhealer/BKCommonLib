@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.io;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -10,9 +9,6 @@ import java.nio.channels.FileChannel;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CoderResult;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.AtomicMoveNotSupportedException;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
@@ -70,36 +66,12 @@ public class AsyncTextWriter {
             }
 
             public void move() {
-                // First try a newer Java's Files.move as this allows for an atomic move with overwrite
-                // If this doesn't work, only then do we try our custom non-atomic methods
                 try {
-                    Files.move(tempFile.toPath(), file.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING);
+                    StreamUtil.atomicReplace(tempFile, file);
                     future.complete(null);
-                    return;
-                } catch (AtomicMoveNotSupportedException | UnsupportedOperationException unsupportedIgnored) {
-                    // Efficient move using this method is not supported, use a fallback
                 } catch (Throwable t) {
                     future.completeExceptionally(t);
-                    return;
                 }
-
-                // More dangerous: delete target file, then move the temp file to it
-                // This operation is not atomic and could fail
-                if (file.delete() && tempFile.renameTo(file)) {
-                    future.complete(null);
-                    return;
-                }
-
-                // Even more risky: copy the data by using file streams
-                // This could result in partial data in the destination file :(
-                if (StreamUtil.tryCopyFile(tempFile, file)) {
-                    tempFile.delete();
-                    future.complete(null);
-                    return;
-                }
-
-                // No idea anymore
-                future.completeExceptionally(new IOException("Failed to move " + tempFile.getAbsolutePath() + " to " + file.getAbsolutePath()));
             }
         });
         return future;
