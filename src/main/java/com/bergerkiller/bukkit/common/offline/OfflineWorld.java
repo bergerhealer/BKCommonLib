@@ -22,7 +22,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
  * World of this World. This information is automatically updated through
  * event listeners in the background.
  */
-public class OfflineWorld {
+public final class OfflineWorld {
     /**
      * Single OfflineWorld constant for a 'null' world. This world will never be loaded,
      * the UUID and Bukkit World methods return null, and all methods act as if it refers
