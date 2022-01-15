@@ -619,11 +619,30 @@ public class CommonUtil {
      * @return executor
      */
     public static Executor getPluginExecutor(Plugin plugin) {
-        return (task) -> {
+        return task -> {
             if (!plugin.isEnabled()) {
                 Logging.LOGGER.warning("Failed to execute task for plugin " + plugin.getName() + " because plugin is disabled");
             } else if (plugin.getServer().getScheduler().scheduleSyncDelayedTask(plugin, task) == -1) {
                 Logging.LOGGER.warning("Failed to execute task for plugin " + plugin.getName() + " because scheduling failed");
+            }
+        };
+    }
+
+    /**
+     * Creates an executor that executes runnables asynchronously on a Bukkit-managed task
+     * thread pool. The plugin will show to be owning this task in any debug reports about it.
+     * If tasks are scheduled after the plugin is disabled, these
+     * tasks will no longer be run and a warning about it will be logged.
+     *
+     * @param plugin The plugin owning the scheduled tasks
+     * @return executor
+     */
+    public static Executor getPluginAsyncExecutor(Plugin plugin) {
+        return task -> {
+            if (!plugin.isEnabled()) {
+                Logging.LOGGER.warning("Failed to execute asynchronous task for plugin " + plugin.getName() + " because plugin is disabled");
+            } else {
+                plugin.getServer().getScheduler().runTaskAsynchronously(plugin, task);
             }
         };
     }
