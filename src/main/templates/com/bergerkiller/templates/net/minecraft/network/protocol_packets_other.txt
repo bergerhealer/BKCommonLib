@@ -58,6 +58,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEquipmentHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMountHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityMetadataHandle
@@ -2336,6 +2337,22 @@ class PacketPlayOutCamera extends Packet {
 #else
     public int entityId:a;
 #endif
+
+    <code>
+    public static PacketPlayOutCameraHandle createNew(int entityId) {
+        PacketPlayOutCameraHandle packet = createNew();
+        packet.setEntityId(entityId);
+        return packet;
+    }
+    </code>
+
+    public static (PacketPlayOutCameraHandle) PacketPlayOutCamera createNew() {
+#if version >= 1.17
+        return new PacketPlayOutCamera(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutCamera();
+#endif
+    }
 }
 
 class PacketPlayInHeldItemSlot extends Packet {

@@ -26,7 +26,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
  */
 public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 {
     public static final PacketType[] LISTENED_PACKETS = {PacketType.IN_ENTITY_ACTION, PacketType.IN_STEER_VEHICLE,
-            PacketType.IN_POSITION, PacketType.IN_POSITION_LOOK, PacketType.OUT_MOUNT,
+            PacketType.IN_POSITION, PacketType.IN_POSITION_LOOK, PacketType.OUT_MOUNT, PacketType.OUT_CAMERA,
             PacketType.OUT_ENTITY_TELEPORT, PacketType.OUT_ENTITY_MOVE, PacketType.OUT_ENTITY_MOVE_LOOK};
     private boolean _is_sneaking;
     private Vector in_pos = null;

@@ -20,6 +20,16 @@ public abstract class PacketPlayOutCameraHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutCameraHandle createNew() {
+        return T.createNew.invoke();
+    }
+
+
+    public static PacketPlayOutCameraHandle createNew(int entityId) {
+        PacketPlayOutCameraHandle packet = createNew();
+        packet.setEntityId(entityId);
+        return packet;
+    }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
     /**
@@ -28,6 +38,8 @@ public abstract class PacketPlayOutCameraHandle extends PacketHandle {
      */
     public static final class PacketPlayOutCameraClass extends Template.Class<PacketPlayOutCameraHandle> {
         public final Template.Field.Integer entityId = new Template.Field.Integer();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutCameraHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutCameraHandle>();
 
     }
 

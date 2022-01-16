@@ -14,7 +14,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
  * The ATTACH packet is used.
  */
 public class VehicleMountHandler_1_8_to_1_8_8 extends VehicleMountHandler_BaseImpl {
-    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_ENTITY_ATTACH};
+    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_ENTITY_ATTACH, PacketType.OUT_CAMERA};
 
     public VehicleMountHandler_1_8_to_1_8_8(CommonPlugin plugin, Player player) {
         super(plugin, player);

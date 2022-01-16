@@ -15,7 +15,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
  * The MOUNT packet is used.
  */
 public class VehicleMountHandler_1_9_to_1_15_2 extends VehicleMountHandler_BaseImpl {
-    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_MOUNT};
+    public static final PacketType[] LISTENED_PACKETS = {PacketType.OUT_MOUNT, PacketType.OUT_CAMERA};
 
     public VehicleMountHandler_1_9_to_1_15_2(CommonPlugin plugin, Player player) {
         super(plugin, player);

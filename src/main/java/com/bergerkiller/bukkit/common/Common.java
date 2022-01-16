@@ -29,7 +29,8 @@ public class Common {
             "Common:WorldBlockBorder",
             "Common:EntityController:FixedOnDieDuringTeleport",
             "Common:WorldUtil:getDefaultNetherPortalSearchRadius",
-            "Common:Item:CreatePlayerHeadUsingGameProfile"
+            "Common:Item:CreatePlayerHeadUsingGameProfile",
+            "Common:VehicleMountController:Spectating"
     ).collect(Collectors.toSet());
 
     /**

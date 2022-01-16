@@ -75,6 +75,58 @@ public interface VehicleMountController {
     void respawn(int entityId, RespawnFunctionWithEntityId respawnFunction);
 
     /**
+     * Starts spectating an entity. Will keep spectating until {@link #stopSpectating(int)}
+     * is called with the same entity Id, or until the entity is despawned.<br>
+     * <br>
+     * An entity can only be spectated once. If spectated a second time, the previous
+     * spectator session is cancelled/removed.<br>
+     * <br>
+     * When stop is called, spectator mode will switch back to the previously spectated entity.
+     * Once all spectated entities are exhausted, it switches back to the server-defined entity,
+     * or disables spectator mode entirely.
+     *
+     * @param entityId ID of the entity to spectate
+     */
+    void startSpectating(int entityId);
+
+    /**
+     * Stops spectating an entity that was previously spectated using {@link #startSpectating(int)}.<br>
+     * <br>
+     * When called, spectator mode will switch back to the previously spectated entity.
+     * Once all spectated entities are exhausted, it switches back to the server-defined entity,
+     * or disables spectator mode entirely.
+     *
+     * @param entityId ID of the entity to stop spectating
+     */
+    void stopSpectating(int entityId);
+
+    /**
+     * Starts spectating the new entity while forgetting to spectate the previous. Unless a different entity
+     * is being spectated right now, this is equivalent to:
+     * <pre>
+     * startSpectating(newEntityId);
+     * stopSpectating(oldEntityId);
+     * </pre>
+     * If a different entity is currently spectated, only the underlying history stack is updated.
+     * If the old entity is not being spectated at all, then the new entity id is spectated
+     * as if {@link #startSpectating(int)} was called.
+     *
+     * @param oldEntityId The ID of the entity to stop spectating
+     * @param newEntityId The ID of the entity to start spectating
+     */
+    void swapSpectating(int oldEntityId, int newEntityId);
+
+    /**
+     * Gets whether this controller is currently spectating an entity. This excludes entities
+     * spectated using server/Bukkit mechanics. If true, that means a call to
+     * {@link #startSpectating(int)} is still active.
+     *
+     * @param entityId ID of the entity to check
+     * @return True if this entity is being spectated
+     */
+    boolean isSpectating(int entityId);
+
+    /**
      * Respawns an Entity previous hidden using despawn. Only calls the respawn function
      * if without ever calling despawn the entity would have existed otherwise. If the server
      * already despawned the entity while in the despawned state, nothing happens.

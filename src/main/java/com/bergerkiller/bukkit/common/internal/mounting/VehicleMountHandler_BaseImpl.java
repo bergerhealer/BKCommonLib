@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.mounting;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Queue;
@@ -19,11 +20,13 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
@@ -44,6 +47,8 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     protected IntHashMap<SpawnedEntity> _spawnedEntities;
     private final Queue<PacketHandle> _queuedPackets;
     protected int _currentTick = 0;
+    private int _vanillaSpectatedEntity;
+    private int[] _spectatorStack;
 
     public VehicleMountHandler_BaseImpl(CommonPlugin plugin, Player player) {
         DimensionType playerDimension = PlayerUtil.getPlayerDimension(player);
@@ -56,6 +61,8 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         this._spawnedEntities = new IntHashMap<>();
         this._spawnedEntities.put(this._playerSpawnedEntity.id, this._playerSpawnedEntity);
         this._queuedPackets = new ConcurrentLinkedQueue<PacketHandle>();
+        this._vanillaSpectatedEntity = player.getEntityId();
+        this._spectatorStack = new int[0];
     }
 
     @Override
@@ -247,6 +254,117 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         });
     }
 
+    @Override
+    public synchronized boolean isSpectating(int entityId) {
+        int len = this._spectatorStack.length;
+        while (--len >= 0) {
+            if (this._spectatorStack[len] == entityId) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public synchronized void startSpectating(int entityId) {
+        // Append to the end of the list
+        int len = this._spectatorStack.length;
+        if (len == 0) {
+            this._spectatorStack = new int[] { entityId };
+        } else if (this._spectatorStack[len - 1] == entityId) {
+            return; // No change, don't send a new packet
+        } else {
+            // Remove duplicate existing entity id. Is rare, so don't care about efficiency.
+            removeFromSpectatorStack(entityId);
+            len = this._spectatorStack.length;
+
+            // Append to the end of the array
+            int[] newArr = Arrays.copyOf(this._spectatorStack, len + 1);
+            newArr[len] = entityId;
+            this._spectatorStack = newArr;
+        }
+
+        // Send a packet to start spectating. Ignore listeners - we don't want to track this as
+        // it is not a vanilla 'start spectating' packet.
+        PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(entityId), false);
+    }
+
+    @Override
+    public synchronized void stopSpectating(int entityId) {
+        // Stop spectating, spectate a previous entity if changed
+        int previousSpectatedEntityId = handleStopSpectating(entityId);
+        if (previousSpectatedEntityId != -1) {
+            PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(previousSpectatedEntityId), false);
+        }
+    }
+
+    @Override
+    public synchronized void swapSpectating(int oldEntityId, int newEntityId) {
+        // Try to replace an existing entry
+        int idx = this._spectatorStack.length - 1;
+        if (idx >= 0) {
+            if (this._spectatorStack[idx] == oldEntityId) {
+                if (oldEntityId == newEntityId) {
+                    return; // Avoid pointless packet
+                }
+                this._spectatorStack[idx] = newEntityId;
+            } else {
+                // Update in the middle of the stack, perhaps?
+                // No packet is sent then.
+                while (--idx >= 0) {
+                    if (this._spectatorStack[idx] == oldEntityId) {
+                        this._spectatorStack[idx] = newEntityId;
+                        return;
+                    }
+                }
+
+                // Append to stack, send a packet
+                int len = this._spectatorStack.length;
+                this._spectatorStack = Arrays.copyOf(this._spectatorStack, len + 1);
+                this._spectatorStack[len] = newEntityId;
+            }
+        }
+
+        // Send a packet to refresh
+        PacketUtil.sendPacket(this._player, PacketPlayOutCameraHandle.createNew(newEntityId), false);
+    }
+
+    // Stops spectating. Returns the next entity id to spectate, or -1 to do nothing.
+    private int handleStopSpectating(int entityId) {
+        int len = this._spectatorStack.length;
+        if (len == 0) {
+            return -1; // Nothing is spectated
+        } else if (len == 1) {
+            // Special case - spectate the vanilla entity if removed
+            if (this._spectatorStack[0] != entityId) {
+                return -1;
+            }
+            this._spectatorStack = new int[0];
+            return this._vanillaSpectatedEntity;
+        } else if (this._spectatorStack[len - 1] == entityId) {
+            // Remove from the end, we must send a packet
+            this._spectatorStack = Arrays.copyOf(this._spectatorStack, len - 1);
+            return this._spectatorStack[len - 2];
+        } else {
+            // Try to remove from the middle of the array. Silently
+            removeFromSpectatorStack(entityId);
+            return -1;
+        }
+    }
+
+    private void removeFromSpectatorStack(int entityId) {
+        int len = this._spectatorStack.length;
+        for (int n = len - 1; n >= 0; n--) {
+            if (this._spectatorStack[n] == entityId) {
+                int[] newArr = new int[len - 1];
+                System.arraycopy(this._spectatorStack, 0, newArr, 0, n);
+                System.arraycopy(this._spectatorStack, n + 1, newArr, n, len - n - 1);
+                this._spectatorStack = newArr;
+                return;
+            }
+        }
+    }
+
     /**
      * Called every tick to perform routine updates
      */
@@ -291,6 +409,16 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 if (dimension != null && !dimension.equals(this._playerDimension)) {
                     this._playerDimension = dimension;
                     handleReset();
+                }
+            } else if (type == PacketType.OUT_CAMERA) {
+                // Called when vanilla/server/Bukkit starts or stops spectating an Entity
+                // We remember this choice for later
+                this._vanillaSpectatedEntity = packet.read(PacketType.OUT_CAMERA.entityId);
+
+                // If currently spectating something already, override
+                int len = this._spectatorStack.length;
+                if (len > 0) {
+                    packet.write(PacketType.OUT_CAMERA.entityId, this._spectatorStack[len - 1]);
                 }
             } else {
                 if (this.isPositionTracked()) {
@@ -479,6 +607,33 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         }
         for (Mount mount : entity.passengerMounts) {
             mount.sent = false;
+        }
+
+        // If we were spectating this entity in Vanilla, destroying the entity
+        // causes spectating to stop. Remember this.
+        if (this._vanillaSpectatedEntity == entity.id) {
+            this._vanillaSpectatedEntity = this._player.getEntityId();
+        }
+
+        // If this entity was spectated before, that means stopSpectating() wasn't called.
+        // In that case we call it ourselves, but, because this is inside a packet listener/monitor
+        // handler, it is not safe to send packets here. We must do so, synchronous, the next
+        // tick.
+        // This is generally fine because in perfect code, this logic should never even execute.
+        // Might result in two camera packets being sent, but it prevents issues at least.
+        if (this.handleStopSpectating(entity.id) != -1) {
+            CommonUtil.nextTick(() -> {
+                synchronized (VehicleMountHandler_BaseImpl.this) {
+                    int len = this._spectatorStack.length;
+                    int currSpectatedEntity;
+                    if (len == 0) {
+                        currSpectatedEntity = this._vanillaSpectatedEntity;
+                    } else {
+                        currSpectatedEntity = this._spectatorStack[len - 1];
+                    }
+                    PacketUtil.sendPacket(_player, PacketPlayOutCameraHandle.createNew(currSpectatedEntity), false);
+                }
+            });
         }
     }
 
