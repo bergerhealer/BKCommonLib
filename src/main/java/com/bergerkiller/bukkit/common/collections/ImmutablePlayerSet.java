@@ -2,7 +2,9 @@ package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
@@ -44,6 +46,16 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
     }
 
     @Override
+    public Iterator<Player> iterator() {
+        return super.iterator();
+    }
+
+    @Override
+    public Stream<Player> stream() {
+        return super.stream();
+    }
+
+    @Override
     public int hashCode() {
         return super.hashCode();
     }
@@ -51,6 +63,11 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
     }
 
     /**
@@ -109,6 +126,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * @param player to add
      * @return changed immutable set of players
      */
+    @Override
     public ImmutablePlayerSet add(Player player) {
         return super.add(player);
     }
@@ -121,6 +139,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * @param players to remove
      * @return changed immutable set of players
      */
+    @Override
     public ImmutablePlayerSet removeAll(Iterable<Player> players) {
         return super.removeAll(players);
     }
@@ -133,8 +152,9 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * @param add option, True to add, False to remove
      * @return changed immutable set of players
      */
-    public final ImmutablePlayerSet addOrRemove(Player player, boolean add) {
-        return add ? add(player) : remove(player);
+    @Override
+    public ImmutablePlayerSet addOrRemove(Player value, boolean add) {
+        return super.addOrRemove(value, add);
     }
 
     /**
@@ -142,6 +162,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * 
      * @return player count
      */
+    @Override
     public int size() {
         return super.size();
     }
@@ -151,7 +172,8 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * 
      * @return cleared player set
      */
-    public final ImmutablePlayerSet clear() {
+    @Override
+    public ImmutablePlayerSet clear() {
         return EMPTY;
     }
 

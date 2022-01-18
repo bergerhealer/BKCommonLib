@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common.collections;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import org.bukkit.entity.Player;
 
@@ -29,6 +32,81 @@ public final class ImmutableCachedSet<E> extends ImmutableCachedSetAbstract<E, I
 
     private ImmutableCachedSet(Cache<E, ImmutableCachedSet<E>> cache, Set<E> values, int hashCode) {
         super(cache, values, hashCode);
+    }
+
+    @Override
+    public Iterator<E> iterator() {
+        return super.iterator();
+    }
+
+    @Override
+    public Stream<E> stream() {
+        return super.stream();
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString();
+    }
+
+    @Override
+    public boolean contains(E value) {
+        return super.contains(value);
+    }
+
+    @Override
+    public boolean containsAll(Collection<E> values) {
+        return super.containsAll(values);
+    }
+
+    @Override
+    public ImmutableCachedSet<E> remove(E value) {
+        return super.remove(value);
+    }
+
+    @Override
+    public ImmutableCachedSet<E> addAll(Iterable<E> values) {
+        return super.addAll(values);
+    }
+
+    @Override
+    public ImmutableCachedSet<E> add(E value) {
+        return super.add(value);
+    }
+
+    @Override
+    public ImmutableCachedSet<E> removeAll(Iterable<E> values) {
+        return super.removeAll(values);
+    }
+
+    @Override
+    public ImmutableCachedSet<E> addOrRemove(E value, boolean add) {
+        return super.addOrRemove(value, add);
+    }
+
+    @Override
+    public int size() {
+        return super.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty();
+    }
+
+    @Override
+    public final ImmutableCachedSet<E> clear() {
+        return super.clear();
     }
 
     /**
