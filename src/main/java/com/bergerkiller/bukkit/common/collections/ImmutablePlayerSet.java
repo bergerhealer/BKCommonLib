@@ -6,6 +6,8 @@ import java.util.Set;
 
 import org.bukkit.entity.Player;
 
+import com.bergerkiller.bukkit.common.internal.CommonListener;
+
 /**
  * An immutable set of players. The sets are shared such that the same set of players is cached and re-used.
  * This reduces memory usage when a lot of player sets are created for the same set of players.<br>
@@ -33,6 +35,9 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      * An empty set of players
      */
     public static final ImmutablePlayerSet EMPTY = ImmutableCachedSet.createNew(ImmutablePlayerSet::new);
+    static {
+        CommonListener.registerImmutablePlayerSet(EMPTY);
+    }
 
     private ImmutablePlayerSet(Cache<Player, ImmutablePlayerSet> cache, Set<Player> values, int hashCode) {
         super(cache, values, hashCode);

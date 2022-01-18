@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.collections.ImmutablePlayerSet;
+import com.bergerkiller.bukkit.common.collections.ImmutableCachedSetAbstract;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -13,6 +13,11 @@ import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
+
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -41,6 +46,16 @@ public class CommonListener implements Listener {
      * This is used by BlockData to detect block physics occurring
      */
     public static boolean BLOCK_PHYSICS_FIRED = false;
+    /**
+     * Stores all caches of immutable player sets created
+     */
+    private static final List<WeakReference<ImmutableCachedSetAbstract<Player, ?>>> CACHED_IMMUTABLE_PLAYER_SETS = new ArrayList<>();
+
+    public static void registerImmutablePlayerSet(ImmutableCachedSetAbstract<Player, ?> set) {
+        synchronized (CACHED_IMMUTABLE_PLAYER_SETS) {
+            CACHED_IMMUTABLE_PLAYER_SETS.add(new WeakReference<>(set));
+        }
+    }
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginEnable(final PluginEnableEvent event) {
@@ -96,7 +111,21 @@ public class CommonListener implements Listener {
     protected void onPlayerQuit(PlayerQuitEvent event) {
         CommonScoreboard.removePlayer(event.getPlayer());
         CommonPlugin.getInstance().getVehicleMountManager().remove(event.getPlayer());
-        ImmutablePlayerSet.EMPTY.releaseFromCache(event.getPlayer());
+        removeFromCachedImmutablePlayerSets(event.getPlayer());
+    }
+
+    private void removeFromCachedImmutablePlayerSets(Player player) {
+        synchronized (CACHED_IMMUTABLE_PLAYER_SETS) {
+            Iterator<WeakReference<ImmutableCachedSetAbstract<Player, ?>>> iter = CACHED_IMMUTABLE_PLAYER_SETS.iterator();
+            while (iter.hasNext()) {
+                ImmutableCachedSetAbstract<Player, ?> set = iter.next().get();
+                if (set == null) {
+                    iter.remove();
+                } else {
+                    set.releaseFromCache(player);
+                }
+            }
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

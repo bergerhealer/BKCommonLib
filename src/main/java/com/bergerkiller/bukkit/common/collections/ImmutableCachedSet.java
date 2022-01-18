@@ -2,6 +2,10 @@ package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Set;
 
+import org.bukkit.entity.Player;
+
+import com.bergerkiller.bukkit.common.internal.CommonListener;
+
 /**
  * An immutable cached set. When adding or removing elements, a new
  * immutable hash set is created efficiently. Because contents are immutable, this
@@ -21,7 +25,7 @@ import java.util.Set;
  *
  * @param <E> Element type
  */
-public class ImmutableCachedSet<E> extends ImmutableCachedSetAbstract<E, ImmutableCachedSet<E>> {
+public final class ImmutableCachedSet<E> extends ImmutableCachedSetAbstract<E, ImmutableCachedSet<E>> {
 
     private ImmutableCachedSet(Cache<E, ImmutableCachedSet<E>> cache, Set<E> values, int hashCode) {
         super(cache, values, hashCode);
@@ -38,5 +42,18 @@ public class ImmutableCachedSet<E> extends ImmutableCachedSetAbstract<E, Immutab
      */
     public static <E> ImmutableCachedSet<E> createNew() {
         return createNew(ImmutableCachedSet::new);
+    }
+
+    /**
+     * Creates a new immutable player set. When players log off, the cache is automatically cleaned
+     * up.
+     *
+     * @return New empty immutable player set backed by it's own cache
+     * @see {@link #createNew()}
+     */
+    public static ImmutableCachedSet<Player> createNewPlayerSet() {
+        ImmutableCachedSet<Player> set = createNew();
+        CommonListener.registerImmutablePlayerSet(set);
+        return set;
     }
 }
