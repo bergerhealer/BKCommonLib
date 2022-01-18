@@ -380,9 +380,6 @@ public abstract class ImmutableCachedSetAbstract<E, S extends ImmutableCachedSet
                         }
                     }
 
-                    // Promote early gc
-                    set.lastRemoveOperation = Cache.RemoveOperation.none();
-
                     iter.remove();
                 }
             }
