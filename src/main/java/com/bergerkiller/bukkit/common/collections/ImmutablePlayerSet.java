@@ -2,12 +2,9 @@ package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.Set;
 
 import org.bukkit.entity.Player;
-
-import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
  * An immutable set of players. The sets are shared such that the same set of players is cached and re-used.
@@ -15,7 +12,10 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
  * <br>
  * All standard methods for adding and removing return a new immutable player set with the changed contents.
  * To check whether contents were changed as a result of a call, simply check whether the returned instance
- * is the same as the one the method was called on.<br>
+ * is the same as the one the method was called on. When players log off, any immutable sets that
+ * contain this player are purged from the cache to help the garbage collector.<br>
+ * <br>
+ * For storing things other than players, {@link ImmutableCachedSet} can be used instead.<br>
  * <br>
  * <b>Code sample:</b>
  * <pre>
@@ -28,67 +28,25 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
  * }
  * </pre>
  */
-public abstract class ImmutablePlayerSet implements Iterable<Player> {
+public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player, ImmutablePlayerSet> {
     /**
      * An empty set of players
      */
-    public static final ImmutablePlayerSet EMPTY = new ImmutablePlayerSet() {
-        @Override
-        public Iterator<Player> iterator() {
-            return Collections.emptyIterator();
-        }
+    public static final ImmutablePlayerSet EMPTY = ImmutableCachedSet.createNew(ImmutablePlayerSet::new);
 
-        @Override
-        public boolean contains(Player player) {
-            return false;
-        }
-
-        @Override
-        public boolean containsAll(Collection<Player> players) {
-            return false;
-        }
-
-        @Override
-        public ImmutablePlayerSet add(Player player) {
-            return get(player);
-        }
-
-        @Override
-        public ImmutablePlayerSet addAll(Iterable<Player> players) {
-            return get(players);
-        }
-
-        @Override
-        public ImmutablePlayerSet remove(Player player) {
-            return this;
-        }
-
-        @Override
-        public ImmutablePlayerSet removeAll(Iterable<Player> players) {
-            return this;
-        }
-
-        @Override
-        public int size() {
-            return 0;
-        }
-
-        @Override
-        public int hashCode() {
-            return 0;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            return o == this;
-        }
-    };
+    private ImmutablePlayerSet(Cache<Player, ImmutablePlayerSet> cache, Set<Player> values, int hashCode) {
+        super(cache, values, hashCode);
+    }
 
     @Override
-    public abstract int hashCode();
+    public int hashCode() {
+        return super.hashCode();
+    }
 
     @Override
-    public abstract boolean equals(Object o);
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
 
     /**
      * Checks whether a particular player is contained
@@ -96,7 +54,10 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param player
      * @return True if the player is contained in this set
      */
-    public abstract boolean contains(Player player);
+    @Override
+    public boolean contains(Player player) {
+        return super.contains(player);
+    }
 
     /**
      * Checks whether all players specified are contained within this immutable player set
@@ -104,7 +65,10 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param players to check
      * @return True if all players are contained
      */
-    public abstract boolean containsAll(Collection<Player> players);
+    @Override
+    public boolean containsAll(Collection<Player> players) {
+        return super.containsAll(players);
+    }
 
     /**
      * Returns a new immutable player set with the contents of this set, with
@@ -114,7 +78,10 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param player to add
      * @return changed immutable set of players
      */
-    public abstract ImmutablePlayerSet remove(Player player);
+    @Override
+    public ImmutablePlayerSet remove(Player player) {
+        return (ImmutablePlayerSet) super.remove(player);
+    }
 
     /**
      * Returns a new immutable player set with the contents of this set, with
@@ -124,7 +91,10 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param players to add
      * @return changed immutable set of players
      */
-    public abstract ImmutablePlayerSet addAll(Iterable<Player> players);
+    @Override
+    public ImmutablePlayerSet addAll(Iterable<Player> players) {
+        return super.addAll(players);
+    }
 
     /**
      * Returns a new immutable player set with the contents of this set, with
@@ -134,7 +104,9 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param player to add
      * @return changed immutable set of players
      */
-    public abstract ImmutablePlayerSet add(Player player);
+    public ImmutablePlayerSet add(Player player) {
+        return super.add(player);
+    }
 
     /**
      * Returns a new immutable player set with the contents of this set, with
@@ -144,7 +116,9 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @param players to remove
      * @return changed immutable set of players
      */
-    public abstract ImmutablePlayerSet removeAll(Iterable<Player> players);
+    public ImmutablePlayerSet removeAll(Iterable<Player> players) {
+        return super.removeAll(players);
+    }
 
     /**
      * Conditionally adds or removes a player based on a boolean state.
@@ -163,7 +137,9 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * 
      * @return player count
      */
-    public abstract int size();
+    public int size() {
+        return super.size();
+    }
 
     /**
      * Simply returns the {@link #EMPTY} immutable player set
@@ -181,7 +157,7 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @return unique immutable player set singleton with the player in it
      */
     public static ImmutablePlayerSet get(Player player) {
-        return get(Collections.singleton(player));
+        return EMPTY.add(player);
     }
 
     /**
@@ -194,7 +170,7 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
         if (players.length == 0) {
             return EMPTY;
         } else {
-            return get(Arrays.asList(players));
+            return EMPTY.addAll(Arrays.asList(players));
         }
     }
 
@@ -205,6 +181,6 @@ public abstract class ImmutablePlayerSet implements Iterable<Player> {
      * @return unique immutable player set for this set of players
      */
     public static ImmutablePlayerSet get(Iterable<Player> players) {
-        return CommonPlugin.getInstance().getImmutablePlayerSetManager().get(players);
+        return EMPTY.addAll(players);
     }
 }

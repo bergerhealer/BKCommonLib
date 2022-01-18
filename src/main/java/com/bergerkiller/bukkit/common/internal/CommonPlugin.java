@@ -97,7 +97,6 @@ public class CommonPlugin extends PluginBase {
     private PacketHandler packetHandler = null;
     private PermissionHandler permissionHandler = null;
     private CommonMapController mapController = null;
-    private CommonImmutablePlayerSetManager immutablePlayerSetManager = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
@@ -288,15 +287,6 @@ public class CommonPlugin extends PluginBase {
      */
     public CommonEventFactory getEventFactory() {
         return eventFactory;
-    }
-
-    /**
-     * Gets the immutable player set manager (as used by {@link ImmutablePlayerSet})
-     * 
-     * @return immutable player set manager
-     */
-    public CommonImmutablePlayerSetManager getImmutablePlayerSetManager() {
-        return this.immutablePlayerSetManager;
     }
 
     /**
@@ -650,9 +640,6 @@ public class CommonPlugin extends PluginBase {
         // Initialize forced chunk manager
         forcedChunkManager = new CommonForcedChunkManager(this);
         forcedChunkManager.enable();
-
-        // Initialize immutable player set manager
-        immutablePlayerSetManager = new CommonImmutablePlayerSetManager();
 
         // Initialize permissions
         permissionHandler = new PermissionHandler();

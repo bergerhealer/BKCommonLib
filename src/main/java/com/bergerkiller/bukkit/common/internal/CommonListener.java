@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
+import com.bergerkiller.bukkit.common.collections.ImmutablePlayerSet;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -94,8 +95,8 @@ public class CommonListener implements Listener {
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPlayerQuit(PlayerQuitEvent event) {
         CommonScoreboard.removePlayer(event.getPlayer());
-        CommonPlugin.getInstance().getImmutablePlayerSetManager().clearCache(event.getPlayer());
         CommonPlugin.getInstance().getVehicleMountManager().remove(event.getPlayer());
+        ImmutablePlayerSet.EMPTY.releaseFromCache(event.getPlayer());
     }
 
     @EventHandler(priority = EventPriority.MONITOR)

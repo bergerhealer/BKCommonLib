@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -39,6 +40,7 @@ public class LogicUtil {
     private static final Predicate<Object> _alwaysTruePredicate = obj -> true;
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
     private static final Supplier<Object> _nullSupplier = () -> null;
+    private static final WeakReference<Object> _nullWeakReference = new WeakReference<Object>(null);
     private static final ItemSynchronizer<Object, Object> _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
         @Override
         public boolean isItem(Object item, Object value) {
@@ -1086,5 +1088,16 @@ public class LogicUtil {
      */
     public static <T> DeferredSupplier<T> deferred(Supplier<T> supplier) {
         return DeferredSupplier.of(supplier);
+    }
+
+    /**
+     * Returns a null-initialized weak reference constant
+     *
+     * @param <T> Element type
+     * @return Weak reference constant, get() will yield null.
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> WeakReference<T> nullWeakReference() {
+        return (WeakReference<T>) _nullWeakReference;
     }
 }
