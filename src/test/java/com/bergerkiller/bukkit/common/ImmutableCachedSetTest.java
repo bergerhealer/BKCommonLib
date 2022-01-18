@@ -93,12 +93,21 @@ public class ImmutableCachedSetTest {
     }
 
     @Test
-    public void testReleaseCache() {
+    public void testReleaseCacheAdd() {
         ImmutableCachedSet<String> value1 = EMPTY.add("value004a");
         ImmutableCachedSet<String> value2 = value1.add("value004b");
         EMPTY.releaseFromCache("value004a");
-        assertTrue(value1 != EMPTY.add("value004"));
+        assertTrue(value1 != EMPTY.add("value004a"));
         assertTrue(value2 != value1.add("value004b"));
+    }
+
+    @Test
+    public void testReleaseCacheRemove() {
+        ImmutableCachedSet<String> base = EMPTY.add("value004c").add("value004d").add("value004e");
+        ImmutableCachedSet<String> value1 = base.add("value004f");
+        ImmutableCachedSet<String> value2 = value1.remove("value004d");
+        EMPTY.releaseFromCache("value004f");
+        assertTrue(value2 != value1.remove("value004d"));
     }
 
     @Test

@@ -216,7 +216,7 @@ public abstract class ImmutableCachedSetAbstract<E, S extends ImmutableCachedSet
 
                 // Store as add-operation so future add() with the same value is optimized
                 {
-                    op = new Cache.AddOperation<E, S>(value, result);
+                    op = new Cache.AddOperation<E, S>(value, result, this);
                     this.lastAddOperation = new WeakReference<Cache.AddOperation<E, S>>(op);
                     ((ImmutableCachedSetAbstract<E, S>) result).lastAddOperationGC = op;
                 }
@@ -287,7 +287,9 @@ public abstract class ImmutableCachedSetAbstract<E, S extends ImmutableCachedSet
 
     /**
      * Deletes all cached immutable cached sets from the cache pool that store the specified
-     * value. Doing so may help speed up garbage collecting these sets.
+     * value. Doing so may help speed up garbage collecting these sets. Note that it does not
+     * matter on what immutable instance this method is called, as it operates on the cache
+     * shared by all.
      *
      * @param value Immutable cached sets that contain this value are removed
      */
@@ -371,9 +373,15 @@ public abstract class ImmutableCachedSetAbstract<E, S extends ImmutableCachedSet
                         AddOperation<E, S> op = set.lastAddOperationGC;
                         if (op != null) {
                             set.lastAddOperationGC = null;
-                            ((ImmutableCachedSetAbstract<E, S>) op.result).lastAddOperation = LogicUtil.nullWeakReference();
+                            ImmutableCachedSetAbstract<E, S> creator = op.creator.get();
+                            if (creator != null && creator.lastAddOperation.get() == op) {
+                                creator.lastAddOperation = LogicUtil.nullWeakReference();
+                            }
                         }
                     }
+
+                    // Promote early gc
+                    set.lastRemoveOperation = Cache.RemoveOperation.none();
 
                     iter.remove();
                 }
@@ -401,10 +409,12 @@ public abstract class ImmutableCachedSetAbstract<E, S extends ImmutableCachedSet
         private static class AddOperation<E, S extends ImmutableCachedSetAbstract<E, S>> {
             public final E addedElement;
             public final S result;
+            public final WeakReference<ImmutableCachedSetAbstract<E, S>> creator;
 
-            public AddOperation(E addedElement, S result) {
+            public AddOperation(E addedElement, S result, ImmutableCachedSetAbstract<E, S> creator) {
                 this.addedElement = addedElement;
                 this.result = result;
+                this.creator = new WeakReference<ImmutableCachedSetAbstract<E, S>>(creator);
             }
         }
 
