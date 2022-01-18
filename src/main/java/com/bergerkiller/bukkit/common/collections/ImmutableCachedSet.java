@@ -23,11 +23,7 @@ import com.google.common.collect.MapMaker;
  * Null values are not supported. Returned ImmutableCachedSet instances will remain
  * cached until they are garbage-collected.<br>
  * <br>
- * To start using this immutable cached set, call {@link #createNew(Constructor)}
- * with a suitable constructor for constructing new immutable hash set instances. For this,
- * ImmutableCachedSet must be implemented by a class first. An example is
- * {@link ImmutableCachedSet}<br>
- * <br>
+ * To start using this immutable cached set, call {@link #createNew()}.
  * With {@link #add(Object)} new elements can then be added to this set, producing
  * a new immutable cached set. Performing the same add operation again will result
  * in a cached value being returned, provided the original immutable cached set did
