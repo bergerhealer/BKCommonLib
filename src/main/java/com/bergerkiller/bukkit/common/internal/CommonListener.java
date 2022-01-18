@@ -2,7 +2,7 @@ package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
-import com.bergerkiller.bukkit.common.collections.ImmutableCachedSetAbstract;
+import com.bergerkiller.bukkit.common.collections.ImmutableCachedSet;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
@@ -49,9 +49,9 @@ public class CommonListener implements Listener {
     /**
      * Stores all caches of immutable player sets created
      */
-    private static final List<WeakReference<ImmutableCachedSetAbstract<Player, ?>>> CACHED_IMMUTABLE_PLAYER_SETS = new ArrayList<>();
+    private static final List<WeakReference<ImmutableCachedSet<Player>>> CACHED_IMMUTABLE_PLAYER_SETS = new ArrayList<>();
 
-    public static void registerImmutablePlayerSet(ImmutableCachedSetAbstract<Player, ?> set) {
+    public static void registerImmutablePlayerSet(ImmutableCachedSet<Player> set) {
         synchronized (CACHED_IMMUTABLE_PLAYER_SETS) {
             CACHED_IMMUTABLE_PLAYER_SETS.add(new WeakReference<>(set));
         }
@@ -116,9 +116,9 @@ public class CommonListener implements Listener {
 
     private void removeFromCachedImmutablePlayerSets(Player player) {
         synchronized (CACHED_IMMUTABLE_PLAYER_SETS) {
-            Iterator<WeakReference<ImmutableCachedSetAbstract<Player, ?>>> iter = CACHED_IMMUTABLE_PLAYER_SETS.iterator();
+            Iterator<WeakReference<ImmutableCachedSet<Player>>> iter = CACHED_IMMUTABLE_PLAYER_SETS.iterator();
             while (iter.hasNext()) {
-                ImmutableCachedSetAbstract<Player, ?> set = iter.next().get();
+                ImmutableCachedSet<Player> set = iter.next().get();
                 if (set == null) {
                     iter.remove();
                 } else {

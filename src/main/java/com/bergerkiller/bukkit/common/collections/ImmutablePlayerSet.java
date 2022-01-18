@@ -32,17 +32,26 @@ import com.bergerkiller.bukkit.common.internal.CommonListener;
  * }
  * </pre>
  */
-public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player, ImmutablePlayerSet> {
+public final class ImmutablePlayerSet extends ImmutableCachedSet<Player> {
     /**
      * An empty set of players
      */
-    public static final ImmutablePlayerSet EMPTY = ImmutableCachedSet.createNew(ImmutablePlayerSet::new);
+    public static final ImmutablePlayerSet EMPTY = new ImmutablePlayerSet();
     static {
         CommonListener.registerImmutablePlayerSet(EMPTY);
     }
 
-    private ImmutablePlayerSet(Cache<Player, ImmutablePlayerSet> cache, Set<Player> values, int hashCode) {
-        super(cache, values, hashCode);
+    private ImmutablePlayerSet() {
+        super();
+    }
+
+    private ImmutablePlayerSet(ImmutablePlayerSet emptyRoot, Set<Player> values, int hashCode) {
+        super(emptyRoot, values, hashCode);
+    }
+
+    @Override
+    protected ImmutablePlayerSet createNew(Set<Player> values, int hashCode) {
+        return new ImmutablePlayerSet(this, values, hashCode);
     }
 
     @Override
@@ -115,7 +124,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      */
     @Override
     public ImmutablePlayerSet addAll(Iterable<Player> players) {
-        return super.addAll(players);
+        return (ImmutablePlayerSet) super.addAll(players);
     }
 
     /**
@@ -128,7 +137,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      */
     @Override
     public ImmutablePlayerSet add(Player player) {
-        return super.add(player);
+        return (ImmutablePlayerSet) super.add(player);
     }
 
     /**
@@ -141,7 +150,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      */
     @Override
     public ImmutablePlayerSet removeAll(Iterable<Player> players) {
-        return super.removeAll(players);
+        return (ImmutablePlayerSet) super.removeAll(players);
     }
 
     /**
@@ -154,7 +163,7 @@ public final class ImmutablePlayerSet extends ImmutableCachedSetAbstract<Player,
      */
     @Override
     public ImmutablePlayerSet addOrRemove(Player value, boolean add) {
-        return super.addOrRemove(value, add);
+        return (ImmutablePlayerSet) super.addOrRemove(value, add);
     }
 
     /**
