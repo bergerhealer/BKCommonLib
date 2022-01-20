@@ -384,11 +384,14 @@ class WorldServer extends World {
         org.spigotmc.AsyncCatcher.catchOp( "entity remove"); // Spigot check
 
         // Cannot be done during entity tick - protect!
+        // Code doesn't work for some servers like Mohist that removed this field
+  #if exists net.minecraft.world.level.World private boolean guardEntityList;
         #require net.minecraft.world.level.World private boolean guardEntityList;
         boolean isTickingEntities = instance#guardEntityList;
         if (isTickingEntities) {
             throw new IllegalStateException("Can not remove entity silently while ticking entities");
         }
+  #endif
 
         // Do not execute these two!
         //entity.b(false);
