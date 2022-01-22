@@ -121,6 +121,14 @@ public interface CommonServer {
     public File getWorldFolder(String worldName);
 
     /**
+     * Gets the File Location of the level.dat where world settings are stored
+     *
+     * @param worldName World name
+     * @return World level.dat File
+     */
+    public File getWorldLevelFile(String worldName);
+
+    /**
      * Gets a Collection of all worlds that can be loaded without creating it
      *
      * @return Loadable world names

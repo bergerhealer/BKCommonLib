@@ -30,7 +30,8 @@ public class Common {
             "Common:EntityController:FixedOnDieDuringTeleport",
             "Common:WorldUtil:getDefaultNetherPortalSearchRadius",
             "Common:Item:CreatePlayerHeadUsingGameProfile",
-            "Common:VehicleMountController:Spectating"
+            "Common:VehicleMountController:Spectating",
+            "Common:WorldUtil:getWorldLevelFile"
     ).collect(Collectors.toSet());
 
     /**

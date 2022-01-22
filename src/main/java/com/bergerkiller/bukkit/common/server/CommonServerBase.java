@@ -57,6 +57,11 @@ public abstract class CommonServerBase implements CommonServer {
     }
 
     @Override
+    public File getWorldLevelFile(String worldName) {
+        return new File(getWorldFolder(worldName), "level.dat");
+    }
+
+    @Override
     public boolean isLoadableWorld(String worldName) {
         if (Bukkit.getWorld(worldName) != null) {
             return true;

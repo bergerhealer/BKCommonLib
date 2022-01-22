@@ -52,22 +52,27 @@ public class ArclightServer extends SpigotServer {
 
     @Override
     public Collection<String> getLoadableWorlds() {
-        return ForgeSupport.getLoadableWorlds();
+        return ForgeSupport.bukkit().getLoadableWorlds();
     }
 
     @Override
     public boolean isLoadableWorld(String worldName) {
-        return ForgeSupport.isLoadableWorld(worldName);
+        return ForgeSupport.bukkit().isLoadableWorld(worldName);
     }
 
     @Override
     public File getWorldRegionFolder(String worldName) {
-        return ForgeSupport.getWorldRegionFolder(worldName);
+        return ForgeSupport.bukkit().getWorldRegionFolder(worldName);
     }
 
     @Override
     public File getWorldFolder(String worldName) {
-        return ForgeSupport.getWorldFolder(worldName);
+        return ForgeSupport.bukkit().getWorldFolder(worldName);
+    }
+
+    @Override
+    public File getWorldLevelFile(String worldName) {
+        return ForgeSupport.bukkit().getWorldLevelFile(worldName);
     }
 
     @Override

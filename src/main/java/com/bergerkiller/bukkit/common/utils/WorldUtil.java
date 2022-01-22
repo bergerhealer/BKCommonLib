@@ -348,6 +348,16 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets the level.dat file in which world settings are stored
+     *
+     * @param world (can not be null)
+     * @return level.dat file
+     */
+    public static File getWorldLevelFile(org.bukkit.World world) {
+        return getWorldLevelFile(world.getName());
+    }
+
+    /**
      * Checks whether a given world name can be loaded
      *
      * @param worldName to check
@@ -365,6 +375,16 @@ public class WorldUtil extends ChunkUtil {
      */
     public static File getWorldFolder(String worldName) {
         return Common.SERVER.getWorldFolder(worldName);
+    }
+
+    /**
+     * Gets the level.dat file in which world settings are stored
+     *
+     * @param worldName (can not be null)
+     * @return level.dat file
+     */
+    public static File getWorldLevelFile(String worldName) {
+        return Common.SERVER.getWorldLevelFile(worldName);
     }
 
     /**
