@@ -25,100 +25,20 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract double getXVel();
+    public abstract double getYVel();
+    public abstract double getZVel();
+    public abstract void setXVel(double x);
+    public abstract void setYVel(double y);
+    public abstract void setZVel(double z);
+    public abstract Vector getVelocity();
+    public abstract void setVelocity(double x, double y, double z);
     public abstract boolean checkTrackNeeded();
     public abstract CommonPacket getSpawnPacket();
     public abstract void onTick();
 
-    public double getXVel() {
-        if (T.opt_xVel.isAvailable()) {
-            return T.opt_xVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-        }
-    }
-
-    public double getYVel() {
-        if (T.opt_yVel.isAvailable()) {
-            return T.opt_yVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-        }
-    }
-
-    public double getZVel() {
-        if (T.opt_zVel.isAvailable()) {
-            return T.opt_zVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-        }
-    }
-
-    public void setXVel(double x) {
-        if (T.opt_xVel.isAvailable()) {
-            T.opt_xVel.setDouble(getRaw(), x);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-            setVelocity(x, y, z);
-        }
-    }
-
-    public void setYVel(double y) {
-        if (T.opt_yVel.isAvailable()) {
-            T.opt_yVel.setDouble(getRaw(), y);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-            setVelocity(x, y, z);
-        }
-    }
-
-    public void setZVel(double z) {
-        if (T.opt_zVel.isAvailable()) {
-            T.opt_zVel.setDouble(getRaw(), z);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-            setVelocity(x, y, z);
-        }
-    }
-
-    public org.bukkit.util.Vector getVelocity() {
-        if (T.opt_velocity.isAvailable()) {
-            return T.opt_velocity.get(getRaw());
-        } else {
-            double x = T.opt_xVel.getDouble(getRaw());
-            double y = T.opt_yVel.getDouble(getRaw());
-            double z = T.opt_zVel.getDouble(getRaw());
-            return new org.bukkit.util.Vector(x, y, z);
-        }
-    }
-
     public void setVelocity(org.bukkit.util.Vector velocity) {
-        if (T.opt_velocity.isAvailable()) {
-            T.opt_velocity.set(getRaw(), velocity);
-        } else {
-            T.opt_xVel.setDouble(getRaw(), velocity.getX());
-            T.opt_yVel.setDouble(getRaw(), velocity.getY());
-            T.opt_zVel.setDouble(getRaw(), velocity.getZ());
-        }
-    }
-
-    public void setVelocity(double x, double y, double z) {
-        if (T.opt_velocity.isAvailable()) {
-            Object vel = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-            T.opt_velocity.raw.set(getRaw(), vel);
-        } else {
-            T.opt_xVel.setDouble(getRaw(), x);
-            T.opt_yVel.setDouble(getRaw(), y);
-            T.opt_zVel.setDouble(getRaw(), z);
-        }
+        setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
 
@@ -278,14 +198,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         public final Template.Field.Integer raw_xRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_yRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_headYaw = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Double opt_xVel = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double opt_yVel = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double opt_zVel = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Converted<Vector> opt_velocity = new Template.Field.Converted<Vector>();
         public final Template.Field.Integer tickCounter = new Template.Field.Integer();
         public final Template.Field.Integer timeSinceLocationSync = new Template.Field.Integer();
         @Template.Optional
@@ -293,6 +205,14 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Converted<Entity> opt_vehicle = new Template.Field.Converted<Entity>();
 
+        public final Template.Method<Double> getXVel = new Template.Method<Double>();
+        public final Template.Method<Double> getYVel = new Template.Method<Double>();
+        public final Template.Method<Double> getZVel = new Template.Method<Double>();
+        public final Template.Method<Void> setXVel = new Template.Method<Void>();
+        public final Template.Method<Void> setYVel = new Template.Method<Void>();
+        public final Template.Method<Void> setZVel = new Template.Method<Void>();
+        public final Template.Method<Vector> getVelocity = new Template.Method<Vector>();
+        public final Template.Method<Void> setVelocity = new Template.Method<Void>();
         @Template.Optional
         public final Template.Method.Converted<Void> onViewerAdded_tuinity = new Template.Method.Converted<Void>();
         @Template.Optional

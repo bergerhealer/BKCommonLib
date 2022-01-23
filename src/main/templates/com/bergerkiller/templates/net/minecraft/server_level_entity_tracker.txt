@@ -1,5 +1,6 @@
 package net.minecraft.server.level;
 
+import net.minecraft.world.phys.Vec3D;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
@@ -407,134 +408,136 @@ class EntityTrackerEntryState {
 #endif
 
 #if version >= 1.17
-    private optional double opt_xVel:###;
-    private optional double opt_yVel:###;
-    private optional double opt_zVel:###;
-    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:ap;
     public int tickCounter:tickCount;
-#elseif version >= 1.14
-    private optional double opt_xVel:###;
-    private optional double opt_yVel:###;
-    private optional double opt_zVel:###;
-    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:m;
-
-  #if version >= 1.15
+#elseif version >= 1.15
     public int tickCounter;
-  #else
+#elseif version >= 1.14
     public int tickCounter:n;
-  #endif
 #elseif version >= 1.9
-    private optional double opt_xVel:n;
-    private optional double opt_yVel:o;
-    private optional double opt_zVel:p;
-    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
-
     public int tickCounter:a;
 #elseif nachospigot
-    public optional double opt_xVel:motionX;
-    public optional double opt_yVel:motionY;
-    public optional double opt_zVel:motionZ;
-    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
     public int tickCounter:tickCount;
 #else
-    public optional double opt_xVel:j;
-    public optional double opt_yVel:k;
-    public optional double opt_zVel:l;
-    private optional (org.bukkit.util.Vector) Vec3D opt_velocity:###;
     public int tickCounter:m;
 #endif
 
-    <code>
+#if version >= 1.14
+    // Velocity is a Vec3D
+  #if version >= 1.17
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:ap;
+  #else
+    #require net.minecraft.server.level.EntityTrackerEntryState private Vec3D vel:m;
+  #endif
+
     public double getXVel() {
-        if (T.opt_xVel.isAvailable()) {
-            return T.opt_xVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-        }
+        Object velocity = instance#vel;
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
     }
 
     public double getYVel() {
-        if (T.opt_yVel.isAvailable()) {
-            return T.opt_yVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-        }
+        Object velocity = instance#vel;
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
     }
 
     public double getZVel() {
-        if (T.opt_zVel.isAvailable()) {
-            return T.opt_zVel.getDouble(getRaw());
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-        }
+        Object velocity = instance#vel;
+        return com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
     }
 
     public void setXVel(double x) {
-        if (T.opt_xVel.isAvailable()) {
-            T.opt_xVel.setDouble(getRaw(), x);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-            setVelocity(x, y, z);
-        }
+        Object velocity = instance#vel;
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
+        Vec3D newVel = new Vec3D(x, y, z);
+        instance#vel = newVel;
     }
 
     public void setYVel(double y) {
-        if (T.opt_yVel.isAvailable()) {
-            T.opt_yVel.setDouble(getRaw(), y);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-            double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(vel);
-            setVelocity(x, y, z);
-        }
+        Object velocity = instance#vel;
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
+        Vec3D newVel = new Vec3D(x, y, z);
+        instance#vel = newVel;
     }
 
     public void setZVel(double z) {
-        if (T.opt_zVel.isAvailable()) {
-            T.opt_zVel.setDouble(getRaw(), z);
-        } else {
-            Object vel = T.opt_velocity.raw.get(getRaw());
-            double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(vel);
-            double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(vel);
-            setVelocity(x, y, z);
-        }
+        Object velocity = instance#vel;
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
+        Vec3D newVel = new Vec3D(x, y, z);
+        instance#vel = newVel;
     }
 
     public org.bukkit.util.Vector getVelocity() {
-        if (T.opt_velocity.isAvailable()) {
-            return T.opt_velocity.get(getRaw());
-        } else {
-            double x = T.opt_xVel.getDouble(getRaw());
-            double y = T.opt_yVel.getDouble(getRaw());
-            double z = T.opt_zVel.getDouble(getRaw());
-            return new org.bukkit.util.Vector(x, y, z);
-        }
-    }
-
-    public void setVelocity(org.bukkit.util.Vector velocity) {
-        if (T.opt_velocity.isAvailable()) {
-            T.opt_velocity.set(getRaw(), velocity);
-        } else {
-            T.opt_xVel.setDouble(getRaw(), velocity.getX());
-            T.opt_yVel.setDouble(getRaw(), velocity.getY());
-            T.opt_zVel.setDouble(getRaw(), velocity.getZ());
-        }
+        Object velocity = instance#vel;
+        double x = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.x.getDouble(velocity);
+        double y = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.y.getDouble(velocity);
+        double z = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.z.getDouble(velocity);
+        return new org.bukkit.util.Vector(x, y, z);
     }
 
     public void setVelocity(double x, double y, double z) {
-        if (T.opt_velocity.isAvailable()) {
-            Object vel = com.bergerkiller.generated.net.minecraft.world.phys.Vec3DHandle.T.constr_x_y_z.raw.newInstance(x, y, z);
-            T.opt_velocity.raw.set(getRaw(), vel);
-        } else {
-            T.opt_xVel.setDouble(getRaw(), x);
-            T.opt_yVel.setDouble(getRaw(), y);
-            T.opt_zVel.setDouble(getRaw(), z);
-        }
+        Vec3D velocity = new Vec3D(x, y, z);
+        instance#vel = velocity;
+    }
+
+#else
+    // Velocity is three separate x/y/z fields
+  #if version >= 1.9
+    #require net.minecraft.server.level.EntityTrackerEntryState private double xVel:n;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double yVel:o;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double zVel:p;
+  #elseif nachospigot
+    #require net.minecraft.server.level.EntityTrackerEntryState private double xVel:motionX;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double yVel:motionY;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double zVel:motionZ;
+  #else
+    #require net.minecraft.server.level.EntityTrackerEntryState private double xVel:j;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double yVel:k;
+    #require net.minecraft.server.level.EntityTrackerEntryState private double zVel:l;
+  #endif
+
+    public double getXVel() {
+        return instance#xVel;
+    }
+
+    public double getYVel() {
+        return instance#yVel;
+    }
+
+    public double getZVel() {
+        return instance#zVel;
+    }
+
+    public void setXVel(double x) {
+        instance#xVel = x;
+    }
+
+    public void setYVel(double y) {
+        instance#yVel = y;
+    }
+
+    public void setZVel(double z) {
+        instance#zVel = z;
+    }
+
+    public org.bukkit.util.Vector getVelocity() {
+        double x = instance#xVel;
+        double y = instance#yVel;
+        double z = instance#zVel;
+        return new org.bukkit.util.Vector(x, y, z);
+    }
+
+    public void setVelocity(double x, double y, double z) {
+        instance#xVel = x;
+        instance#yVel = y;
+        instance#zVel = z;
+    }
+#endif
+
+    <code>
+    public void setVelocity(org.bukkit.util.Vector velocity) {
+        setVelocity(velocity.getX(), velocity.getY(), velocity.getZ());
     }
     </code>
 
