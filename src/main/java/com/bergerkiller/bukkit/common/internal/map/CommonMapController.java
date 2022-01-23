@@ -978,13 +978,14 @@ public final class CommonMapController implements PacketListener, Listener {
             for (IntVector2 depending : dependingChunks) {
                 // Check this depending chunk is still loaded with all entities inside
                 // If not, then when it loads the cluster will be revived then
-                if (!WorldUtil.isChunkEntitiesLoaded(world, depending.x, depending.z)) {
+                Chunk dependingChunk = WorldUtil.getChunk(world, depending.x, depending.z);
+                if (dependingChunk == null || !WorldUtil.isChunkEntitiesLoaded(dependingChunk)) {
                     continue;
                 }
 
                 // Go by all entities in this depending chunk to find the item frames
                 // Quicker than iterating all item frames on the world
-                for (Entity entity : ChunkUtil.getEntities(WorldUtil.getChunk(world, depending.x, depending.z))) {
+                for (Entity entity : ChunkUtil.getEntities(dependingChunk)) {
                     if (!(entity instanceof ItemFrame)) {
                         continue;
                     }
