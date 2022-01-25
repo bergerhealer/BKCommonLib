@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.map.widgets;
 
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.WeakHashMap;
 
@@ -53,6 +55,7 @@ public class MapWidgetAnvil extends MapWidget {
     public final Button MIDDLE_BUTTON = new Button(this, 1);
     public final Button RIGHT_BUTTON = new Button(this, 2);
     private final Set<InventoryView> _openInventories;
+    private final Set<Player> _openFor = new HashSet<>();
     private final Listener _listener;
     private boolean _isWindowOpen = false;
     private String _text = "";
@@ -75,6 +78,20 @@ public class MapWidgetAnvil extends MapWidget {
      */
     public String getText() {
         return this._text;
+    }
+
+    /**
+     * Instead of opening this anvil menu for players controlling the map with steering
+     * controls, opens it for the players specified. If an Empty collection is
+     * specified, opens it for controlling players instead.
+     *
+     * @param players Players to open the menu for
+     * @return this
+     */
+    public MapWidgetAnvil openFor(Collection<Player> players) {
+        this._openFor.clear();
+        this._openFor.addAll(players);
+        return this;
     }
 
     /**
@@ -150,7 +167,11 @@ public class MapWidgetAnvil extends MapWidget {
             this._text = "";
 
             // Open windows for all viewing players
-            for (Player player : this.display.getViewers()) {
+            for (Player player : (_openFor.isEmpty() ? this.display.getViewers() : _openFor)) {
+                if (_openFor.isEmpty() && !this.display.isControlling(player)) {
+                    continue;
+                }
+
                 final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(null);
 
                 // Required for handling text changes < MC 1.9
@@ -162,6 +183,11 @@ public class MapWidgetAnvil extends MapWidget {
 
                 this._openInventories.add(view);
                 this.refreshButtons(view);
+            }
+
+            // If it couldn't be opened for anyone, close itself
+            if (this._openInventories.isEmpty()) {
+                setWindowOpen(false);
             }
 
         } else {
