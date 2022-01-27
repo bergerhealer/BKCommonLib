@@ -31,7 +31,8 @@ public class Common {
             "Common:WorldUtil:getDefaultNetherPortalSearchRadius",
             "Common:Item:CreatePlayerHeadUsingGameProfile",
             "Common:VehicleMountController:Spectating",
-            "Common:WorldUtil:getWorldLevelFile"
+            "Common:WorldUtil:getWorldLevelFile",
+            "Common:EntityController:forceControllerInitialization"
     ).collect(Collectors.toSet());
 
     /**

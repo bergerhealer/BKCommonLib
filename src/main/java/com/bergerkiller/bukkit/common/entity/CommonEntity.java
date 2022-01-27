@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.entity;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.ToggledState;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.*;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -50,6 +51,24 @@ import java.util.logging.Level;
  * @param <T> - type of Entity
  */
 public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEntity<T> {
+    private static final ToggledState _controllerLogicInitialized = new ToggledState(false);
+
+    /**
+     * If you plan to use Entity (Network) Controllers in your plugin, it is a good
+     * idea to call this method up-front so that the neccesary back-end is generated
+     * early. This avoids a lag spike when controllers are first installed.
+     */
+    public static void forceControllerInitialization() {
+        if (_controllerLogicInitialized.set()) {
+            try {
+                EntityHandle.T.forceInitialization();
+                EntityTrackerEntryHandle.T.forceInitialization();
+                EntityTrackerEntryStateHandle.T.forceInitialization();
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize some entity controller logic", t);
+            }
+        }
+    }
 
     public CommonEntity(T entity) {
         super(entity);
