@@ -24,6 +24,8 @@ import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -62,8 +64,11 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
         if (_controllerLogicInitialized.set()) {
             try {
                 EntityHandle.T.forceInitialization();
+                EntityTrackerHandle.T.forceInitialization();
                 EntityTrackerEntryHandle.T.forceInitialization();
                 EntityTrackerEntryStateHandle.T.forceInitialization();
+                PlayerChunkHandle.T.forceInitialization();
+                PlayerChunkMapHandle.T.forceInitialization();
             } catch (Throwable t) {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize some entity controller logic", t);
             }
