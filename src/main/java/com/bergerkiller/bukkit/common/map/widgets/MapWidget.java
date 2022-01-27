@@ -32,6 +32,7 @@ public class MapWidget implements MapDisplayEvents {
     private int _z; // depth value can be changed if desired
     private int _x, _y, _width, _height; // live bounds (relative to parent)
     private int _lastX, _lastY, _lastWidth, _lastHeight; // last drawn bounds (absolute)
+    private boolean _positionAbsolute;
     private boolean _enabled;
     private boolean _invalidated;
     private boolean _focusable;
@@ -45,6 +46,7 @@ public class MapWidget implements MapDisplayEvents {
 
     public MapWidget() {
         this._wasFocused = false;
+        this._positionAbsolute = false;
         this._enabled = true;
         this._invalidated = true;
         this._boundsChanged = true;
@@ -167,6 +169,16 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Gets whether the x/y position of this widget is absolute (relative to 0,0 of the
+     * entire map display) or relative (to the parent widget).
+     *
+     * @return Whether this widget's position is absolute
+     */
+    public final boolean isPositionAbsolute() {
+        return this._positionAbsolute;
+    }
+
+    /**
      * Gets the x-position of this widget relative to the parent
      * 
      * @return x-position
@@ -208,7 +220,7 @@ public class MapWidget implements MapDisplayEvents {
      * @return absolute x-position
      */
     public final int getAbsoluteX() {
-        return (this.parent == null) ? this._x : (this._x + this.parent.getAbsoluteX());
+        return (this.parent == null || this._positionAbsolute) ? this._x : (this._x + this.parent.getAbsoluteX());
     }
 
     /**
@@ -217,7 +229,7 @@ public class MapWidget implements MapDisplayEvents {
      * @return absolute y-position
      */
     public final int getAbsoluteY() {
-        return (this.parent == null) ? this._y : (this._y + this.parent.getAbsoluteY());
+        return (this.parent == null || this._positionAbsolute) ? this._y : (this._y + this.parent.getAbsoluteY());
     }
 
     /**
@@ -737,6 +749,26 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
+     * Sets whether the position, set using {@link #setPosition(int, int)},
+     * is absolute rather than relative to the parent widget. If absolute,
+     * it will be positioned relative to 0,0 of the full map display view.<br>
+     * <br>
+     * By default position is not absolute (false).
+     *
+     * @param absolute Whether position is absolute
+     * @return this widget
+     */
+    public final MapWidget setPositionAbsolute(boolean absolute) {
+        if (this._positionAbsolute != absolute) {
+            this._positionAbsolute = absolute;
+            this._boundsChanged = true;
+            this.refreshView();
+            this.invalidate();
+        }
+        return this;
+    }
+
+    /**
      * Changes the size of this widget
      * 
      * @param width
@@ -796,7 +828,7 @@ public class MapWidget implements MapDisplayEvents {
 
         // Check whether this widget sits entirely within the parent's widget
         // If so, no clipping is required here, and ask the parent only
-        if (this._x >= 0 && this._y >= 0 &&
+        if (!this._positionAbsolute && this._x >= 0 && this._y >= 0 &&
             (this._x + this._width) < this.parent.getWidth() &&
             (this._y + this._height) < this.parent.getHeight())
         {
@@ -825,8 +857,13 @@ public class MapWidget implements MapDisplayEvents {
      */
     private final void clearInvalidatedAreas(int absoluteX, int absoluteY) {
         // Add position of this widget to absoluteX/Y
-        absoluteX += this._x;
-        absoluteY += this._y;
+        if (this._positionAbsolute) {
+            absoluteX = this._x;
+            absoluteY = this._y;
+        } else {
+            absoluteX += this._x;
+            absoluteY += this._y;
+        }
 
         // Only do this when the widget has been drawn before (and is not root)
         if (this != this.root && this.layer != null && this._lastWidth > 0 && this._lastHeight > 0) {
@@ -951,9 +988,14 @@ public class MapWidget implements MapDisplayEvents {
             return;
         }
 
-        // Add own coordinates
-        absoluteX += this._x;
-        absoluteY += this._y;
+        // Add own coordinates, unless absolute
+        if (this._positionAbsolute) {
+            absoluteX = this._x;
+            absoluteY = this._y;
+        } else {
+            absoluteX += this._x;
+            absoluteY += this._y;
+        }
 
         // If self is not visible, don't draw
         visible &= this.isVisible();
@@ -975,19 +1017,38 @@ public class MapWidget implements MapDisplayEvents {
         // invalidate the intersected widgets too to enable proper overlay. This is a work-around
         // for an annoying to use z-buffer...
         for (MapWidget child : this._children) {
-            if (child._invalidated) {
-                for (MapWidget otherChild : this._children) {
-                    if (otherChild == child || otherChild._invalidated) {
-                        continue;
-                    }
-                    if (
-                        (otherChild.getX() + otherChild.getWidth()) >= child.getX() &&
-                        otherChild.getX() <= (child.getX() + child.getWidth()) &&
-                        (otherChild.getY() + otherChild.getHeight()) >= child.getY() &&
-                        otherChild.getY() <= (child.getY() + child.getHeight())
-                    ) {
-                        otherChild.invalidate();
-                    }
+            if (!child._invalidated) {
+                continue;
+            }
+
+            // Get absolute position of child (efficiently)
+            int childX = child.getX();
+            int childY = child.getY();
+            if (!child.isPositionAbsolute()) {
+                childX += absoluteX;
+                childY += absoluteY;
+            }
+
+            for (MapWidget otherChild : this._children) {
+                if (otherChild == child || otherChild._invalidated) {
+                    continue;
+                }
+
+                // Get absolute position of other child (efficiently)
+                int otherChildX = otherChild.getX();
+                int otherChildY = otherChild.getY();
+                if (!otherChild.isPositionAbsolute()) {
+                    otherChildX += absoluteX;
+                    otherChildY += absoluteY;
+                }
+
+                if (
+                    (otherChildX + otherChild.getWidth()) >= childX &&
+                    otherChildX <= (childX + child.getWidth()) &&
+                    (otherChildY + otherChild.getHeight()) >= childY &&
+                    otherChildY <= (childY + child.getHeight())
+                ) {
+                    otherChild.invalidate();
                 }
             }
         }
