@@ -20,7 +20,6 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
@@ -621,6 +620,9 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
         // tick.
         // This is generally fine because in perfect code, this logic should never even execute.
         // Might result in two camera packets being sent, but it prevents issues at least.
+        //
+        // Disabled: by nature of packets being asynchronous, it just didn't work.
+        /*
         if (this.handleStopSpectating(entity.id) != -1) {
             CommonUtil.nextTick(() -> {
                 synchronized (VehicleMountHandler_BaseImpl.this) {
@@ -635,6 +637,7 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
                 }
             });
         }
+        */
     }
 
     private synchronized final void tryRemoveFromTracking(SpawnedEntity entity) {
