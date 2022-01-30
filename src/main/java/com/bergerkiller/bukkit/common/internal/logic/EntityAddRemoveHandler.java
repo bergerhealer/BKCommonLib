@@ -1,10 +1,13 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -230,19 +233,50 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
         if (list == null) {
             return false;
         }
-        boolean changed = false;
-        ListIterator<Object> iter = list.listIterator();
-        while (iter.hasNext()) {
-            if (iter.next() == oldValue) {
-                if (newValue == null) {
-                    iter.remove();
-                } else {
-                    iter.set(newValue);
+
+        if (newValue == null) {
+            return list.remove(oldValue);
+        } else if (canMutateListIterator(list)) {
+            boolean changed = false;
+            ListIterator<Object> iter = list.listIterator();
+            while (iter.hasNext()) {
+                if (iter.next() == oldValue) {
+                    if (newValue == null) {
+                        iter.remove();
+                    } else {
+                        iter.set(newValue);
+                    }
+                    changed = true;
                 }
-                changed = true;
+            }
+            return changed;
+        } else {
+            if (list.remove(oldValue)) {
+                list.add(newValue);
+                return true;
+            } else {
+                return false;
             }
         }
-        return changed;
+    }
+
+    private static boolean canMutateListIterator(List<?> list) {
+        for (Class<?> type : listsWithImmutableListIterator) {
+            if (type.isInstance(list)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // These list types cannot be modified using the listIterator().
+    private static final List<Class<?>> listsWithImmutableListIterator;
+    static {
+        List<Class<?>> lists = new ArrayList<>();
+        lists.add(CommonUtil.getClass("io.papermc.paper.util.maplist.ObjectMapList", false));
+        listsWithImmutableListIterator = lists.stream()
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     /**
