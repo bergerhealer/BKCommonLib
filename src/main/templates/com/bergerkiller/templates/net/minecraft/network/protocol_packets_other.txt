@@ -2598,3 +2598,12 @@ class PacketPlayInSpectate extends Packet {
 
     public (PacketPlayInSpectateHandle) PacketPlayInSpectate(UUID uuid);
 }
+
+// Since Minecraft 1.12
+optional class PacketPlayOutAdvancements extends Packet {
+#if version >= 1.17
+    private boolean initial:reset;
+#else
+    private boolean initial:a;
+#endif
+}

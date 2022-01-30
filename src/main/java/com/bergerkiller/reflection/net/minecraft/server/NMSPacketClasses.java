@@ -71,6 +71,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInVehicleMoveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInWindowClickHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAdvancementsHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAttachEntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
@@ -628,7 +629,7 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutAdvancements extends NMSPacket {
 
-        public final FieldAccessor<Boolean> initial = nextField("private boolean a");
+        public final FieldAccessor<Boolean> initial = PacketPlayOutAdvancementsHandle.T.initial.toFieldAccessor();
         //TODO: Fields
     }
 
