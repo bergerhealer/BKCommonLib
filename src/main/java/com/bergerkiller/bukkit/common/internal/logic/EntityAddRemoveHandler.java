@@ -241,11 +241,7 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
             ListIterator<Object> iter = list.listIterator();
             while (iter.hasNext()) {
                 if (iter.next() == oldValue) {
-                    if (newValue == null) {
-                        iter.remove();
-                    } else {
-                        iter.set(newValue);
-                    }
+                    iter.set(newValue);
                     changed = true;
                 }
             }
