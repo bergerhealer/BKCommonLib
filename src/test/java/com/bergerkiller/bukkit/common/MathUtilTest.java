@@ -19,6 +19,35 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class MathUtilTest {
 
     @Test
+    public void testQuaternionFlipAxis() {
+        Quaternion input = Quaternion.fromLookDirection(new Vector(1, 2, 3), new Vector(2, -3, 0));
+
+        // X
+        {
+            Quaternion control = input.clone(), actual = input.clone();
+            control.rotateX(180.0);
+            actual.rotateXFlip();
+            testQuaternionsEqual(control, actual);
+        }
+
+        // Y
+        {
+            Quaternion control = input.clone(), actual = input.clone();
+            control.rotateY(180.0);
+            actual.rotateYFlip();
+            testQuaternionsEqual(control, actual);
+        }
+
+        // Z
+        {
+            Quaternion control = input.clone(), actual = input.clone();
+            control.rotateZ(180.0);
+            actual.rotateZFlip();
+            testQuaternionsEqual(control, actual);
+        }
+    }
+
+    @Test
     public void testCreateTranslationMatrix() {
         Matrix4x4 m1 = new Matrix4x4();
         m1.translate(10.0, -20.0, 30.5);

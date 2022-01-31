@@ -341,7 +341,12 @@ public class Quaternion implements Cloneable {
      * Rotates the Quaternion 180 degrees around the x-axis
      */
     public final void rotateXFlip() {
-        rotateX_unsafe(0.0, 1.0);
+        // rotateX_unsafe(0.0, 1.0);
+        double x = this.x, y = this.y, z = this.z, w = this.w;
+        this.x = w;
+        this.y = z;
+        this.z = -y;
+        this.w = -x;
     }
 
     /**
@@ -381,7 +386,12 @@ public class Quaternion implements Cloneable {
      * Rotates the Quaternion 180 degrees around the y-axis
      */
     public final void rotateYFlip() {
-        rotateY_unsafe(0.0, 1.0);
+        // rotateY_unsafe(0.0, 1.0);
+        double x = this.x, y = this.y, z = this.z, w = this.w;
+        this.x = -z;
+        this.y = w;
+        this.z = x;
+        this.w = -y;
     }
 
     /**
@@ -421,7 +431,12 @@ public class Quaternion implements Cloneable {
      * Rotates the Quaternion 180 degrees around the z-axis
      */
     public final void rotateZFlip() {
-        rotateZ_unsafe(0.0, 1.0);
+        // rotateZ_unsafe(0.0, 1.0);
+        double x = this.x, y = this.y, z = this.z, w = this.w;
+        this.x = y;
+        this.y = -x;
+        this.z = w;
+        this.w = -z;
     }
 
     /**
