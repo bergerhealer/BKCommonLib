@@ -206,7 +206,17 @@ public final class OfflineWorld {
      * @return OfflineBlock for the Block at these coordinates
      */
     public OfflineBlock getBlockAt(int x, int y, int z) {
-        return new OfflineBlock(this, new IntVector3(x, y, z));
+        return new OfflineBlock(this, IntVector3.of(x, y, z));
+    }
+
+    /**
+     * Gets the OfflineBlock of a Bukkit Block on this world
+     *
+     * @param bukkitBlock Bukkit Block
+     * @return OfflineBlock for the Block
+     */
+    public OfflineBlock getBlock(Block bukkitBlock) {
+        return new OfflineBlock(this, IntVector3.coordinatesOf(bukkitBlock));
     }
 
     /**
