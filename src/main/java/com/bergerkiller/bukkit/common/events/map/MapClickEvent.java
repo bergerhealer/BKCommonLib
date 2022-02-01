@@ -127,6 +127,11 @@ public class MapClickEvent extends Event implements Cancellable, IMapLookPositio
     }
 
     @Override
+    public double getEdgeDistance() {
+        return this.position.getEdgeDistance();
+    }
+
+    @Override
     public boolean isCancelled() {
         return this.cancelled;
     }

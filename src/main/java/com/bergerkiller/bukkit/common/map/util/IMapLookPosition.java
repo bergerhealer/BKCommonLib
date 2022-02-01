@@ -74,4 +74,13 @@ public interface IMapLookPosition {
      * @return True if the player looks exactly within an item frame's bounds
      */
     boolean isWithinBounds();
+
+    /**
+     * Gets the distance from the edge of the item frame that the player is looking at.
+     * Is 0 when {@link #isWithinBounds()} is true. Is {@link Double#MAX_VALUE} when
+     * looking away from the item frame entirely.
+     *
+     * @return Edge distance
+     */
+    double getEdgeDistance();
 }

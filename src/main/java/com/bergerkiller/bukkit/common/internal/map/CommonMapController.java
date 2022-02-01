@@ -1094,9 +1094,11 @@ public final class CommonMapController implements PacketListener, Listener {
         }
 
         // Ask item frame to compute look-at information
+        // If looking further than 16 map pixels away from the edge, fail
         MapLookPosition position = frameInfo.findLookPosition(startPosition, lookDirection);
-        if (position == null) {
-            return null; // doesn't really happen (withinBounds = false), but just in case
+        final double limit = 16.0;
+        if (position == null || position.getEdgeDistance() > (limit / 128.0)) {
+            return null;
         }
 
         // Keep position within bounds of the display
@@ -1105,13 +1107,12 @@ public final class CommonMapController implements PacketListener, Listener {
         MapDisplay display = stack.stack.getLast();
         double new_x = position.getDoubleX();
         double new_y = position.getDoubleY();
-        final double limit = 16.0;
         if (new_x < -limit || new_y < -limit || new_x > (display.getWidth() + limit) || new_y >= (display.getHeight() + limit)) {
             return null;
         } else if (new_x < 0.0 || new_y < 0.0 || new_x >= display.getWidth() || new_y >= display.getHeight()) {
             new_x = MathUtil.clamp(new_x, 0.0, (double) display.getWidth() - 1e-10);
             new_y = MathUtil.clamp(new_y, 0.0, (double) display.getHeight() - 1e-10);
-            position = new MapLookPosition(position.getItemFrameInfo(), new_x, new_y, position.getDistance(), position.isWithinBounds());
+            position = new MapLookPosition(position.getItemFrameInfo(), new_x, new_y, position.getDistance(), position.getEdgeDistance());
         }
 
         return new LookAtSearchResult(display, position);

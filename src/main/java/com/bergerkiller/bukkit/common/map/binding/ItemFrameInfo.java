@@ -206,8 +206,13 @@ public class ItemFrameInfo {
         final double at_z = distance * lookDirection.getZ() + startPosition.getZ() - frameBlock.z - 0.5;
 
         // If outside range [-0.5 .. 0.5] then this item frame was not looked at
-        if (withinBounds && (at_x < -0.5 || at_x > 0.5 || at_z < -0.5 || at_z > 0.5 || at_y < -0.5 || at_y > 0.5)) {
-            withinBounds = false;
+        double edgeDistance = Double.MAX_VALUE;
+        if (withinBounds) {
+            // Get distance from the edge of each coordinate space
+            final Vector edge = new Vector(Math.max(0.0, Math.abs(at_x) - 0.5),
+                                           Math.max(0.0, Math.abs(at_y) - 0.5),
+                                           Math.max(0.0, Math.abs(at_z) - 0.5));
+            edgeDistance = edge.length();
         }
 
         // Convert x/y/z into x/y using facing information
@@ -271,7 +276,7 @@ public class ItemFrameInfo {
         return new MapLookPosition(this,
                 MapDisplayTile.RESOLUTION * (map_x + this.lastMapUUID.getTileX()),
                 MapDisplayTile.RESOLUTION * (map_y + this.lastMapUUID.getTileY()),
-                distance, withinBounds);
+                distance, edgeDistance);
     }
 
     /**

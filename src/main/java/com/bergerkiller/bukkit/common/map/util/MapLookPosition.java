@@ -13,14 +13,19 @@ public final class MapLookPosition implements IMapLookPosition {
     private final double px;
     private final double py;
     private final double distance;
-    private final boolean withinBounds;
+    private final double edgeDistance;
 
-    public MapLookPosition(ItemFrameInfo itemFrame, double px, double py, double distance, boolean isWithinBounds) {
+    @Deprecated
+    public MapLookPosition(ItemFrameInfo itemFrame, double px, double py, double distance, boolean withinBounds) {
+        this(itemFrame, px, py, distance, withinBounds ? 0.0 : Double.MAX_VALUE);
+    }
+
+    public MapLookPosition(ItemFrameInfo itemFrame, double px, double py, double distance, double edgeDistance) {
         this.itemFrame = itemFrame;
         this.px = px;
         this.py = py;
         this.distance = distance;
-        this.withinBounds = isWithinBounds;
+        this.edgeDistance = edgeDistance;
     }
 
     @Override
@@ -60,7 +65,12 @@ public final class MapLookPosition implements IMapLookPosition {
 
     @Override
     public boolean isWithinBounds() {
-        return this.withinBounds;
+        return this.edgeDistance <= 0.0;
+    }
+
+    @Override
+    public double getEdgeDistance() {
+        return this.edgeDistance;
     }
 
     @Override
