@@ -27,8 +27,10 @@ public abstract class NetworkManagerHandle extends Template.Handle {
     public abstract boolean isConnected();
 
     private static final java.lang.reflect.Constructor _queuedPacketConstructor;
+    private static final Throwable _queuedPacketConstructorError;
     static {
         java.lang.reflect.Constructor c = null;
+        Throwable error = null;
         try {
             Class<?> queuedPacketType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("net.minecraft.network.NetworkManager$QueuedPacket");
             Class<?> listenerType = com.bergerkiller.bukkit.common.utils.CommonUtil.getClass("io.netty.util.concurrent.GenericFutureListener");
@@ -47,16 +49,22 @@ public abstract class NetworkManagerHandle extends Template.Handle {
             }
             c.setAccessible(true);
         } catch (Throwable t) {
-            t.printStackTrace();
+            error = t;
+            com.bergerkiller.bukkit.common.Logging.LOGGER_REFLECTION.log(java.util.logging.Level.SEVERE, "Failed to find queued packet constructor", t);
         }
         _queuedPacketConstructor = c;
+        _queuedPacketConstructorError = error;
     }
 
     public static Object createQueuedPacket(Object packet) {
         try {
             return _queuedPacketConstructor.newInstance(packet, null);
         } catch (Throwable t) {
-            throw com.bergerkiller.mountiplex.MountiplexUtil.uncheckedRethrow(t);
+            if (_queuedPacketConstructorError != null) { // NPE
+                throw new UnsupportedOperationException("Failed to find queued packet constructor", _queuedPacketConstructorError);
+            } else {
+                throw com.bergerkiller.mountiplex.MountiplexUtil.uncheckedRethrow(t);
+            }
         }
     }
     public abstract Channel getChannel();
