@@ -76,10 +76,7 @@ public class InternalLogicInitializeTest {
 
     @Test
     public void testEntityMoveHandler() {
-        EntityMoveHandler handler = EntityMoveHandler.create(null);
-        if (!handler.isBlockCollisionsMethodInitialized()) {
-            fail("Failed to initialize " + handler.getClass().getName() + " block collision handler");
-        }
+        EntityMoveHandler.assertInitialized();
     }
 
     @Test

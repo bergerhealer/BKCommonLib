@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Scanner;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.bukkit.block.Block;
@@ -27,65 +28,14 @@ import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 class EntityMoveHandler_1_14 extends EntityMoveHandler {
-    private static final FastMethod<java.util.stream.Stream<?>> getBlockCollisions_method = new FastMethod<java.util.stream.Stream<?>>();
-    private static final Converter<java.util.stream.Stream<?>, Stream<VoxelShapeHandle>> streamConverter;
-    private static final boolean getBlockCollisions_method_init;
+    private final HandlerLogic logic;
 
-    static {
-        // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
-        streamConverter = CommonUtil.unsafeCast(Conversion.find(
-                TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.T.getType()),
-                TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
-
-        boolean success = true;
-        ClassResolver resolver = new ClassResolver();
-        resolver.setVariable("version", Common.MC_VERSION);
-        resolver.addImport("net.minecraft.core.BlockPosition");
-        resolver.addImport("net.minecraft.core.BlockPosition$MutableBlockPosition");
-        resolver.addImport("net.minecraft.core.EnumDirection");
-        resolver.addImport("net.minecraft.core.EnumDirection$EnumAxis");
-        resolver.addImport("net.minecraft.util.MathHelper");
-        resolver.addImport("net.minecraft.world.phys.AxisAlignedBB");
-        resolver.addImport("net.minecraft.world.phys.shapes.OperatorBoolean");
-        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
-        resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
-        resolver.addImport("net.minecraft.world.level.border.WorldBorder");
-        resolver.addImport("net.minecraft.world.level.IBlockAccess");
-        resolver.addImport(MathUtil.class.getName());
-        resolver.setDeclaredClassName("net.minecraft.world.level.World");
-        try {
-            String method_path;
-            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_18_getBlockCollisions.txt";
-            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
-                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_16_getBlockCollisions.txt";
-            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
-                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_1_getBlockCollisions.txt";
-            } else {
-                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
-            }
-            try (InputStream input = EntityMoveHandler_1_14.class.getResourceAsStream(method_path)) {
-                try (Scanner scanner = new Scanner(input, "UTF-8")) {
-                    scanner.useDelimiter("\\A");
-                    String method_body = scanner.next();
-                    method_body = SourceDeclaration.preprocess(method_body, resolver);
-                    method_body = method_body.replaceAll("this", "instance");
-                    method_body = method_body.trim();
-
-                    getBlockCollisions_method.init(new MethodDeclaration(resolver, method_body));
-                    getBlockCollisions_method.forceInitialization();
-                }
-            }
-        } catch (Throwable t) {
-            t.printStackTrace();
-            success = false;
-        }
-        getBlockCollisions_method_init = success;
+    private EntityMoveHandler_1_14(HandlerLogic logic) {
+        this.logic = logic;
     }
 
-    @Override
-    public boolean isBlockCollisionsMethodInitialized() {
-        return getBlockCollisions_method_init;
+    public static Supplier<EntityMoveHandler> initialize() throws Throwable {
+        return new HandlerLogic();
     }
 
     @Override
@@ -120,7 +70,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
     }
 
     private Stream<VoxelShapeHandle> world_getBlockCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
-        if (!this.blockCollisionEnabled || !isBlockCollisionsMethodInitialized()) {
+        if (!this.blockCollisionEnabled) {
             return Stream.empty();
         }
 
@@ -139,7 +89,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         WorldHandle world = entity.getWorld();
 
         // Execute generated method and convert to Stream<VoxelShapeHandle>
-        return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false));
+        return logic.getBlockCollisions(world, this, voxelshapeBounds, voxelshapeAABB);
     }
 
     private Stream<VoxelShapeHandle> world_getEntityCollisionShapes(EntityHandle entity, double mx, double my, double mz) {
@@ -209,4 +159,63 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         }
     }
 
+    private static class HandlerLogic implements Supplier<EntityMoveHandler> {
+        private final FastMethod<java.util.stream.Stream<?>> getBlockCollisions_method = new FastMethod<java.util.stream.Stream<?>>();
+        private final Converter<java.util.stream.Stream<?>, Stream<VoxelShapeHandle>> streamConverter;
+
+        public HandlerLogic() throws Throwable {
+            // Turn Stream<VoxelShape> into Stream<VoxelShapeHandle>
+            streamConverter = CommonUtil.unsafeCast(Conversion.find(
+                    TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.T.getType()),
+                    TypeDeclaration.createGeneric(Stream.class, VoxelShapeHandle.class)));
+
+            // Handles the block collision logic
+            ClassResolver resolver = new ClassResolver();
+            resolver.setVariable("version", Common.MC_VERSION);
+            resolver.addImport("net.minecraft.core.BlockPosition");
+            resolver.addImport("net.minecraft.core.BlockPosition$MutableBlockPosition");
+            resolver.addImport("net.minecraft.core.EnumDirection");
+            resolver.addImport("net.minecraft.core.EnumDirection$EnumAxis");
+            resolver.addImport("net.minecraft.util.MathHelper");
+            resolver.addImport("net.minecraft.world.phys.AxisAlignedBB");
+            resolver.addImport("net.minecraft.world.phys.shapes.OperatorBoolean");
+            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShape");
+            resolver.addImport("net.minecraft.world.phys.shapes.VoxelShapes");
+            resolver.addImport("net.minecraft.world.level.border.WorldBorder");
+            resolver.addImport("net.minecraft.world.level.IBlockAccess");
+            resolver.addImport(MathUtil.class.getName());
+            resolver.setDeclaredClassName("net.minecraft.world.level.World");
+            String method_path;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_18_getBlockCollisions.txt";
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_16_getBlockCollisions.txt";
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.14.1")) {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_1_getBlockCollisions.txt";
+            } else {
+                method_path = "/com/bergerkiller/bukkit/common/internal/logic/EntityMoveHandler_1_14_getBlockCollisions.txt";
+            }
+            try (InputStream input = EntityMoveHandler_1_14.class.getResourceAsStream(method_path)) {
+                try (Scanner scanner = new Scanner(input, "UTF-8")) {
+                    scanner.useDelimiter("\\A");
+                    String method_body = scanner.next();
+                    method_body = SourceDeclaration.preprocess(method_body, resolver);
+                    method_body = method_body.replaceAll("this", "instance");
+                    method_body = method_body.trim();
+
+                    getBlockCollisions_method.init(new MethodDeclaration(resolver, method_body));
+                    getBlockCollisions_method.forceInitialization();
+                }
+            }
+        }
+
+        public Stream<VoxelShapeHandle> getBlockCollisions(WorldHandle world, EntityMoveHandler handler, VoxelShapeHandle voxelshapeBounds, VoxelShapeHandle voxelshapeAABB) {
+            return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false));
+        }
+
+        @Override
+        public EntityMoveHandler get() {
+            return new EntityMoveHandler_1_14(this);
+        }
+    }
 }

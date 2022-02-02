@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import org.bukkit.Bukkit;
@@ -44,6 +45,31 @@ import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
  * These collisions are to be handled by the controller attached to the Entity
  */
 public abstract class EntityMoveHandler {
+    private static final Supplier<EntityMoveHandler> moveHandlerFactory = initMoveHandlerFactory();
+
+    private static Supplier<EntityMoveHandler> initMoveHandlerFactory() {
+        try {
+            if (Common.evaluateMCVersion(">=", "1.14")) {
+                return EntityMoveHandler_1_14.initialize();
+            } else if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
+                return EntityMoveHandler_1_13.initialize();
+            } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
+                return EntityMoveHandler_1_11_2.initialize();
+            } else {
+                return EntityMoveHandler_1_8.initialize();
+            }
+        } catch (Throwable t) {
+            return new ErrorFactory(t);
+        }
+    }
+
+    public static void assertInitialized() {
+        if (moveHandlerFactory instanceof ErrorFactory) {
+            throw new IllegalStateException("Failed to initialize entity movement handler",
+                    ((ErrorFactory) moveHandlerFactory).cause);
+        }
+    }
+
     protected boolean blockCollisionEnabled = true;
     protected boolean blockActivationEnabled = true;
     protected boolean entityCollisionEnabled = true;
@@ -57,21 +83,10 @@ public abstract class EntityMoveHandler {
     }
 
     public static EntityMoveHandler create(EntityController<?> controller) {
-        EntityMoveHandler handler;
-        if (Common.evaluateMCVersion(">=", "1.14")) {
-            handler = new EntityMoveHandler_1_14();
-        } else if (CommonCapabilities.HAS_VOXELSHAPE_LOGIC) {
-            handler = new EntityMoveHandler_1_13();
-        } else if (WorldHandle.T.getBlockCollisions.isAvailable()) {
-            handler = new EntityMoveHandler_1_11_2();
-        } else {
-            handler = new EntityMoveHandler_1_8();
-        }
+        EntityMoveHandler handler = moveHandlerFactory.get();
         handler.controller = controller;
         return handler;
     }
-
-    public abstract boolean isBlockCollisionsMethodInitialized();
 
     public void setBlockCollisionEnabled(boolean enabled) {
         this.blockCollisionEnabled = enabled;
@@ -592,4 +607,16 @@ public abstract class EntityMoveHandler {
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.stopTiming(); // Spigot
     }
 
+    private static final class ErrorFactory implements Supplier<EntityMoveHandler> {
+        public final Throwable cause;
+
+        public ErrorFactory(Throwable cause) {
+            this.cause = cause;
+        }
+
+        @Override
+        public EntityMoveHandler get() {
+            throw new UnsupportedOperationException("Failed to initialize the entity movement handler", cause);
+        }
+    }
 }

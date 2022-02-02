@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.entity;
 
 import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.ToggledState;
+import com.bergerkiller.bukkit.common.bases.CheckedDeferredSupplier;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.controller.*;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerEntryHook;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityTrackerHook;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -21,15 +22,18 @@ import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
+import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -53,25 +57,43 @@ import java.util.logging.Level;
  * @param <T> - type of Entity
  */
 public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEntity<T> {
-    private static final ToggledState _controllerLogicInitialized = new ToggledState(false);
+    private static final CheckedDeferredSupplier<Void> CONTROLLER_INITIALIZER = CheckedDeferredSupplier.of(() -> {
+        try {
+            // Entity controller / replacement / physics logic
+            EntityHandle.T.forceInitialization();
+            PlayerChunkHandle.T.forceInitialization();
+            PlayerChunkMapHandle.T.forceInitialization();
+            EntityMoveHandler.assertInitialized();
+
+            // Vehicle mount handler tracks the dimension player is on
+            DimensionManagerHandle.T.forceInitialization();
+
+            // Network controller logic - packets, etc.
+            PlayerConnectionHandle.T.forceInitialization();
+            NetworkManagerHandle.T.forceInitialization();
+            EntityTrackerHandle.T.forceInitialization();
+            EntityTrackerEntryHandle.T.forceInitialization();
+            EntityTrackerEntryStateHandle.T.forceInitialization();
+            return null;
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize some entity controller logic", t);
+            throw t;
+        }
+    });
 
     /**
      * If you plan to use Entity (Network) Controllers in your plugin, it is a good
-     * idea to call this method up-front so that the neccesary back-end is generated
+     * idea to call this method up-front so that the necessary back-end is generated
      * early. This avoids a lag spike when controllers are first installed.
+     *
+     * @throws UnsupportedOperationException If initialization for some reason failed and controllers
+     *                                       cannot be safely used.
      */
     public static void forceControllerInitialization() {
-        if (_controllerLogicInitialized.set()) {
-            try {
-                EntityHandle.T.forceInitialization();
-                EntityTrackerHandle.T.forceInitialization();
-                EntityTrackerEntryHandle.T.forceInitialization();
-                EntityTrackerEntryStateHandle.T.forceInitialization();
-                PlayerChunkHandle.T.forceInitialization();
-                PlayerChunkMapHandle.T.forceInitialization();
-            } catch (Throwable t) {
-                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize some entity controller logic", t);
-            }
+        try {
+            CONTROLLER_INITIALIZER.get();
+        } catch (Throwable t) {
+            throw new UnsupportedOperationException("Failed to initialize", t);
         }
     }
 
