@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.EntityUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -23,6 +24,7 @@ import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
 import com.bergerkiller.generated.net.minecraft.network.NetworkManagerHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerHandle;
@@ -33,7 +35,6 @@ import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionH
 import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
@@ -59,16 +60,22 @@ import java.util.logging.Level;
 public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEntity<T> {
     private static final CheckedDeferredSupplier<Void> CONTROLLER_INITIALIZER = CheckedDeferredSupplier.of(() -> {
         try {
+            // CommonEntityType for use in various places - cinit
+            CommonEntityType.PLAYER.getClass();
+
             // Entity controller / replacement / physics logic
             EntityHandle.T.forceInitialization();
             PlayerChunkHandle.T.forceInitialization();
             PlayerChunkMapHandle.T.forceInitialization();
             EntityMoveHandler.assertInitialized();
 
-            // Vehicle mount handler tracks the dimension player is on
-            DimensionManagerHandle.T.forceInitialization();
+            // Vehicle mount handler tracks the dimension player is on - cinit
+            DimensionType.OVERWORLD.getClass();
 
             // Network controller logic - packets, etc.
+            EntityPlayerHandle.T.createHandle(null, true);
+            WorldServerHandle.T.createHandle(null, true);
+            PlayerChunkMapHandle.T.createHandle(null, true);
             PlayerConnectionHandle.T.forceInitialization();
             NetworkManagerHandle.T.forceInitialization();
             EntityTrackerHandle.T.forceInitialization();
