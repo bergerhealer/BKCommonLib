@@ -210,7 +210,7 @@ class EntityMoveHandler_1_14 extends EntityMoveHandler {
         }
 
         public Stream<VoxelShapeHandle> getBlockCollisions(WorldHandle world, EntityMoveHandler handler, VoxelShapeHandle voxelshapeBounds, VoxelShapeHandle voxelshapeAABB) {
-            return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), this, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false));
+            return streamConverter.convertInput(getBlockCollisions_method.invoke(world.getRaw(), handler, voxelshapeBounds.getRaw(), voxelshapeAABB.getRaw(), false));
         }
 
         @Override
