@@ -1,5 +1,7 @@
 package net.minecraft.server.network;
 
+import net.minecraft.network.protocol.Packet;
+
 import net.minecraft.network.protocol.game.PacketPlayOutPosition;
 import net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags;
 
@@ -13,11 +15,11 @@ class PlayerConnection {
 #endif
 
 #if version >= 1.18
-    public void sendPacket:send((Object) net.minecraft.network.protocol.Packet<?> packet);
+    public void sendPacket:send((Object) Packet<?> packet);
 #elseif version >= 1.9
-    public void sendPacket((Object) net.minecraft.network.protocol.Packet<?> packet);
+    public void sendPacket((Object) Packet<?> packet);
 #else
-    public void sendPacket((Object) net.minecraft.network.protocol.Packet packet);
+    public void sendPacket((Object) Packet packet);
 #endif
 
     <code>
@@ -117,11 +119,11 @@ class PlayerConnection {
         flags.add(PacketPlayOutPosition$EnumPlayerTeleportFlags.X_ROT);
         flags.add(PacketPlayOutPosition$EnumPlayerTeleportFlags.Y_ROT);
   #if version >= 1.18
-        instance.send(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
+        instance.send((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
   #elseif version >= 1.17
-        instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
+        instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0, false));
   #else
-        instance.sendPacket(new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
+        instance.sendPacket((Packet) new PacketPlayOutPosition(x, y, z, 0.0f, 0.0f, flags, 0));
   #endif
     }
 }
