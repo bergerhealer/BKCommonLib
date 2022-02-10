@@ -63,7 +63,6 @@ import org.bukkit.generator.BlockPopulator;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.awt.Color;
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Constructor;
@@ -621,7 +620,7 @@ public class CommonPlugin extends PluginBase {
         }
 
         // Initialize MapColorPalette (static initializer)
-        MapColorPalette.getColor(Color.RED);
+        MapColorPalette.getColor(0, 0, 0);
 
         // Initialize NBT early
         NBTBaseHandle.T.forceInitialization();
