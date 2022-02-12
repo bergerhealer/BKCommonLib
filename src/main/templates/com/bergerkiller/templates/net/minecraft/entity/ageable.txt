@@ -1,0 +1,38 @@
+package net.minecraft.world.entity;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+class EntityAgeable extends EntityInsentient {
+#if version >= 1.17
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:DATA_BABY_ID;
+#elseif version >= 1.16.2
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bo;
+#elseif version >= 1.16
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bv;
+#elseif version >= 1.15
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+#elseif version >= 1.14
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bz;
+#elseif version >= 1.13
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bC;
+#elseif version >= 1.12
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bx;
+#elseif version >= 1.11
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+#elseif version >= 1.10.2
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bx;
+#elseif version >= 1.9.4
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bw;
+#elseif version >= 1.9
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:bv;
+#else
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_IS_BABY:###;
+#endif
+
+    <code>
+    public static final Key<Boolean> DATA_IS_BABY = Key.Type.BOOLEAN.createKey(T.DATA_IS_BABY, 12);
+    </code>
+}
