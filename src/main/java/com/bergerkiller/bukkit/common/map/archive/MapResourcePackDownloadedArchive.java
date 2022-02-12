@@ -8,8 +8,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -20,7 +22,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
@@ -174,21 +175,55 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
     }
 
     private PackDownload downloadPack() {
-        PackDownload download = new PackDownload();
-
         // Log that we are going to be downloading!
         log.warning("Downloading resource pack " + this.resourcePackURL + "...");
 
-        // Open a connection for downloading the resource pack
-        URLConnection con;
-        try {
-            con = this.resourcePackURL.openConnection();
-            con.addRequestProperty("User-Agent", "BKCommonLib/" + CommonPlugin.getInstance().getVersion());
-            con.setReadTimeout(10000);
-        } catch (IOException ex) {
-            log.log(Level.SEVERE, "Failed to start download for " + this.resourcePackURL, ex);
-            return null;
+        // Maximum 10 redirects, to prevent a redirect DDOS
+        URL currURL = this.resourcePackURL;
+        for (int n = 0; n < 10; n++) {
+            // Open a connection for downloading the resource pack
+            URLConnection con;
+            try {
+                con = currURL.openConnection();
+                if (CommonPlugin.hasInstance()) {
+                    con.addRequestProperty("User-Agent", "BKCommonLib/Unknown");
+                } else {
+                    con.addRequestProperty("User-Agent", "BKCommonLib/" + CommonPlugin.getInstance().getVersion());
+                }
+                con.setReadTimeout(10000);
+
+                // Check for redirects
+                if (con instanceof HttpURLConnection) {
+                    int code = ((HttpURLConnection) con).getResponseCode();
+                    if (code ==  HttpURLConnection.HTTP_MOVED_PERM || code ==  HttpURLConnection.HTTP_MOVED_TEMP) {
+                        // Redirect to the new location
+                        String redirectLocation = con.getHeaderField("Location");
+                        redirectLocation = URLDecoder.decode(redirectLocation, "UTF-8");
+                        URL redirectURL = new URL(currURL, redirectLocation); // Deal with relative URLs
+                        currURL = redirectURL;
+                        log.warning("Redirected to " + redirectURL + "...");
+                        ((HttpURLConnection) con).disconnect();
+                        continue;
+                    }
+
+                    //TODO: Should we check for other types of error codes?
+                }
+
+                // Try to download the pack
+                return downloadPackFileContent(con, currURL);
+            } catch (IOException ex) {
+                log.log(Level.SEVERE, "Failed to start download for " + currURL, ex);
+                return null;
+            }
         }
+
+        // Bad server
+        log.log(Level.SEVERE, "Reached the maximum of 10 redirects downloading " + this.resourcePackURL);
+        return null;
+    }
+
+    private PackDownload downloadPackFileContent(URLConnection con, URL url) throws IOException {
+        PackDownload download = new PackDownload();
 
         // Retrieve the original file name from the url using the content disposition header
         String fieldValue = con.getHeaderField("Content-Disposition");
@@ -205,7 +240,7 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
 
         // If no header was set, deduce the file name from the URL
         if (download.realName == null) {
-            download.realName = new File(this.resourcePackURL.getPath()).getName();
+            download.realName = new File(url.getPath()).getName();
         }
 
         // Generate a temp file name from the real name
@@ -239,9 +274,6 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
                 // Refresh size
                 download.size += len;
             }
-        } catch (Throwable t) {
-            log.log(Level.SEVERE, "Failed to download resource pack " + this.resourcePackURL, t);
-            return null;
         }
 
         download.hash = "";
