@@ -525,10 +525,21 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("Normally you should not have to make changes to this file");
         config.addHeader("Unused components of the library can be disabled to improve performance");
         config.addHeader("By default all components and features are enabled");
+
         config.setHeader("enableMapDisplays", "\nWhether the Map Display engine is enabled, running in the background to refresh and render maps");
         config.addHeader("enableMapDisplays", "When enabled, the map item tracking may impose a slight overhead");
         config.addHeader("enableMapDisplays", "If no plugin is using map displays, then this can be safely disabled to improve performance");
         this.isMapDisplaysEnabled = config.get("enableMapDisplays", true);
+
+        // If java.awt is not available, the map display API won't work. Just disable it, and log an error.
+        if (this.isMapDisplaysEnabled && CommonBootstrap.isHeadlessJDK()) {
+            this.isMapDisplaysEnabled = false;
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "The Map Displays feature has been turned off because the server is incompatible");
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Reason: The Java AWT runtime library is not available");
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "This is usually because a headless JVM is used for the server");
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Please install and configure a non-headless JVM to have Map Displays work");
+        }
+
         config.setHeader("enableItemFrameDisplays", "\nWhether all item frames on the server are tracked to see if they display a map display.");
         config.addHeader("enableItemFrameDisplays", "This allows for map displays to be displayed on item frames and interacted with.");
         config.addHeader("enableItemFrameDisplays", "If 'enableItemFrameTiling' is also true, then this allows for multi-item frame displays.");
@@ -620,7 +631,10 @@ public class CommonPlugin extends PluginBase {
         }
 
         // Initialize MapColorPalette (static initializer)
-        MapColorPalette.getColor(0, 0, 0);
+        // Do not do this if map displays are disabled.
+        if (this.isMapDisplaysEnabled) {
+            MapColorPalette.getColor(0, 0, 0);
+        }
 
         // Initialize NBT early
         NBTBaseHandle.T.forceInitialization();

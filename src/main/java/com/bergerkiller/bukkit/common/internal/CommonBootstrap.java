@@ -669,4 +669,18 @@ public class CommonBootstrap {
         NBTTagCompoundHandle.T.forceInitialization();
         NBTTagListHandle.T.forceInitialization();
     }
+
+    /**
+     * Gets whether this is a headless JDK that doesn't contain the Java AWT library
+     *
+     * @return True if java.awt is not available
+     */
+    public static boolean isHeadlessJDK() {
+        try {
+            Class.forName("java.awt.Color");
+            return false;
+        } catch (ClassNotFoundException ex) {
+            return true;
+        }
+    }
 }

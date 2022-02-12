@@ -11,6 +11,7 @@ import java.awt.image.Raster;
 import java.awt.image.WritableRaster;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.logging.Level;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
@@ -22,7 +23,7 @@ import com.bergerkiller.bukkit.common.map.color.MapColorSpaceData;
  * Additional functionality on top of Bukkit's MapPalette
  */
 public class MapColorPalette {
-    private static final MapColorSpaceData COLOR_MAP_DATA = new MapColorSpaceData();
+    private static final MapColorSpaceData COLOR_MAP_DATA;
     private static final IndexColorModel COLOR_INDEX_MODEL;
     public static final byte[] COLOR_MAP_AVERAGE  = new byte[0x10000];
     public static final byte[] COLOR_MAP_ADD      = new byte[0x10000];
@@ -45,6 +46,17 @@ public class MapColorPalette {
     public static final byte COLOR_PINK = 82;
 
     static {
+        // We NEED java awt or all will just fail to work anyway.
+        if (CommonBootstrap.isHeadlessJDK()) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "The Java AWT runtime library is not available");
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "This is usually because a headless JVM is used for the server");
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Please install and configure a non-headless JVM to have Map Displays work");
+            throw new UnsupportedOperationException("Map Displays require a non-headless JVM (Uses AWT)");
+        }
+
+        // Now we know java.awt exists we can initialize this one
+        COLOR_MAP_DATA = new MapColorSpaceData();
+
         // Load color map data from the Bubble format file bundled with the library
         {
             boolean success = false;
