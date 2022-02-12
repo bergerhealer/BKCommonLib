@@ -22,12 +22,16 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
  * While the player presses down the sneak button, the player is teleported to where he would
  * be if inside the vehicle every tick. This behavior can also be turned off.<br>
  * <br>
+ * Also fixes an issue where, when a OUT_POSITION packet is sent to the player, the player dismounted.
+ * This is fixed by re-sending the mount packets for the player if the player happens to be in a vehicle.<br>
+ * <br>
  * The MOUNT packet is used.
  */
 public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 {
     public static final PacketType[] LISTENED_PACKETS = {PacketType.IN_ENTITY_ACTION, PacketType.IN_STEER_VEHICLE,
             PacketType.IN_POSITION, PacketType.IN_POSITION_LOOK, PacketType.OUT_MOUNT, PacketType.OUT_CAMERA,
-            PacketType.OUT_ENTITY_TELEPORT, PacketType.OUT_ENTITY_MOVE, PacketType.OUT_ENTITY_MOVE_LOOK};
+            PacketType.OUT_ENTITY_TELEPORT, PacketType.OUT_ENTITY_MOVE, PacketType.OUT_ENTITY_MOVE_LOOK,
+            PacketType.OUT_POSITION};
     private boolean _is_sneaking;
     private Vector in_pos = null;
     private Vector last_pos = null;
@@ -43,6 +47,17 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
     @Override
     protected boolean isPositionTracked() {
         return _plugin.teleportPlayersToSeat();
+    }
+
+    @Override
+    protected void onPacketSend(CommonPacket packet) {
+        super.onPacketSend(packet);
+        if (packet.getType() == PacketType.OUT_POSITION) {
+            // Resend current mounts for the Player, if any
+            if (this._playerSpawnedEntity.vehicleMount != null) {
+                this.onMountReady(this._playerSpawnedEntity.vehicleMount);
+            }
+        }
     }
 
     @Override
