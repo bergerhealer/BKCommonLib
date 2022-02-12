@@ -1,11 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +37,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.Hastebin;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.collections.OverwritingCircularBuffer;
+import com.bergerkiller.bukkit.common.internal.CommonServerLogRecorder.FormattedLogRecord;
+import com.bergerkiller.bukkit.common.logging.WeakLoggingHandler;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
@@ -57,30 +55,36 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
     public static final String PERMISSION = "bkcommonlib.command.startuplog";
     private static final Object LOCK = new Object(); // A global lock avoids a shitton of problems
     private final Plugin plugin;
-    private final List<StartupLogRecord> startupLogRecords = new ArrayList<>();
+    private final List<FormattedLogRecord> startupLogRecords = new ArrayList<>();
     private final StringBuilder startupLog = new StringBuilder(); // Includes records of dependencies!
+    private final OverwritingCircularBuffer<LogRecord> lastLogRecords = OverwritingCircularBuffer.create(32);
     private final Set<CommonDependencyStartupLogHandler> startupLogSources = new HashSet<>();
     private final Set<CommonDependencyStartupLogHandler> startupLogSinks = new HashSet<>();
-    protected boolean enabled = true;
+    protected boolean isStartup = true;
+    protected volatile boolean lastLogRecordsChanged = false;
 
     protected CommonDependencyStartupLogHandler(Plugin plugin) {
         this.plugin = plugin;
         this.startupLogSources.add(this);
         this.startupLogSinks.add(this);
-        ServerLogRecorder.bind(this); // Make sure bound on first use!
     }
 
     @Override
     public void publish(LogRecord j_record) {
-        if (!enabled) {
-            return;
-        }
+        if (isStartup) {
+            // Pre-format the log and notify everybody
+            FormattedLogRecord record = FormattedLogRecord.format(j_record);
 
-        StartupLogRecord record = new StartupLogRecord(j_record);
-
-        synchronized (LOCK) {
-            startupLogRecords.add(record);
-            startupLogSinks.forEach(sink -> record.appendTo(sink.startupLog));
+            synchronized (LOCK) {
+                startupLogRecords.add(record);
+                startupLogSinks.forEach(sink -> record.appendTo(sink.startupLog));
+            }
+        } else {
+            // Track the log record. No need for locking, in this state the set won't change
+            startupLogSinks.forEach(sink -> {
+                sink.lastLogRecords.add(j_record);
+                sink.lastLogRecordsChanged = true;
+            });
         }
     }
 
@@ -134,11 +138,28 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
         fullStartupLog.append("---- Plugin logs ----\n");
         synchronized (LOCK) {
             fullStartupLog.append(startupLog.toString());
+
+            // Include the last messages logged for the plugin, or a dependency of the plugin
+            this.lastLogRecordsChanged = false;
+            List<LogRecord> lastRecords = this.lastLogRecords.values();
+            if (!lastRecords.isEmpty()) {
+                final List<FormattedLogRecord> lastLogsFormatted = new ArrayList<>(lastRecords.size());
+                lastRecords.forEach(r -> lastLogsFormatted.add(FormattedLogRecord.format(r)));
+                Collections.sort(lastLogsFormatted);
+                fullStartupLog.append("[...]\n");
+                lastLogsFormatted.forEach(r -> r.appendTo(fullStartupLog));
+            }
         }
 
         fullStartupLog.append("\n---- Miscellaneous server logs ----\n");
-        synchronized (ServerLogRecorder.INSTANCE) {
-            ServerLogRecorder.INSTANCE.records.forEach(r -> r.appendTo(fullStartupLog));
+        if (CommonPlugin.hasInstance()) {
+            CommonServerLogRecorder serverLogs = CommonPlugin.getInstance().getServerLogRecorder();
+            serverLogs.getStartupLogRecords().forEach(r -> r.appendTo(fullStartupLog));
+            List<FormattedLogRecord> runtimeLogs = serverLogs.getRuntimeLogRecords();
+            if (!runtimeLogs.isEmpty()) {
+                fullStartupLog.append("[...]\n");
+                runtimeLogs.forEach(r -> r.appendTo(fullStartupLog));
+            }
         }
 
         return fullStartupLog.toString();
@@ -182,27 +203,27 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
 
     public void bindDependency(Plugin plugin) {
         // Bind an existing handler
-        for (java.util.logging.Handler handler : plugin.getLogger().getHandlers()) {
+        for (java.util.logging.Handler handler : WeakLoggingHandler.unwrapHandlers(plugin.getLogger())) {
             if (handler instanceof CommonDependencyStartupLogHandler) {
                 handleAddDependency((CommonDependencyStartupLogHandler) handler);
                 return;
             }
         }
 
-        // Bind a new one - make sure to de-register it the next tick!
+        // Bind a new one - make sure to disable tracking startup log the next tick!
         // No need to do this if the plugin never enabled - there is nothing to log.
         if (plugin.isEnabled()) {
             final CommonDependencyStartupLogHandler new_dep_handler = new CommonDependencyStartupLogHandler(plugin);
-            plugin.getLogger().addHandler(new_dep_handler);
+            WeakLoggingHandler.addHandler(plugin.getLogger(), new_dep_handler);
             Bukkit.getScheduler().scheduleSyncDelayedTask(plugin,
-                    () -> plugin.getLogger().removeHandler(new_dep_handler));
+                    () -> { new_dep_handler.isStartup = false; });
             handleAddDependency(new_dep_handler);
         }
     }
 
     public static CommonDependencyStartupLogHandler.PluginBaseHandler bindSelf(PluginBase plugin) {
         PluginBaseHandler handler = new PluginBaseHandler(plugin);
-        plugin.getLogger().addHandler(handler);
+        WeakLoggingHandler.addHandler(plugin.getLogger(), handler);
         return handler;
     }
 
@@ -235,14 +256,13 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
             return this.criticalStartupFailure != null;
         }
 
-        public void stopReadingLogNextTick() {
-            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), this::stopReadingLogNow);
+        public void setNotStartupNextTick() {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(getPlugin(), () -> { this.isStartup = false; });
         }
 
         public void stopReadingLogNow() {
-            enabled = false;
-            getPlugin().getLogger().removeHandler(this);
-            ServerLogRecorder.unbind();
+            isStartup = false;
+            WeakLoggingHandler.removeHandler(getPlugin().getLogger(), this);
         }
 
         /**
@@ -261,7 +281,7 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
 
             // Stop tracking startup logs beyond this point, but keep the logger hooked for one more tick
             // Depending plugins will still want to see the startup log
-            enabled = false;
+            isStartup = false;
             Bukkit.getScheduler().scheduleSyncDelayedTask(commonPlugin, this::stopReadingLogNow);
 
             Bukkit.getPluginManager().registerEvents(new Listener() {
@@ -455,6 +475,9 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
         }
 
         private boolean hasStartupLog() {
+            if (this.lastLogRecordsChanged) {
+                return false; // Needs re-generating
+            }
             CompletableFuture<Hastebin.UploadResult> c = this.startupLogUpload;
             try {
                 return c != null && c.isDone() && !c.isCompletedExceptionally() && c.get().success();
@@ -485,109 +508,6 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
         public CriticalAltCommand(String name) {
             this.name = name;
             this.aliases = Collections.emptyList();
-        }
-    }
-
-    private static final class ServerLogRecorder extends java.util.logging.Handler {
-        public static final ServerLogRecorder INSTANCE;
-        public final List<StartupLogRecord> records = new ArrayList<>();
-        private final List<java.util.logging.Logger> hookedLoggers = new ArrayList<>();
-        private final List<CommonDependencyStartupLogHandler> upstream = new ArrayList<>();
-        static {
-            INSTANCE = new ServerLogRecorder();
-            INSTANCE.hookedLoggers.add(Bukkit.getLogger());
-            INSTANCE.hookedLoggers.add(Logger.getLogger(Bukkit.getServer().getClass().getName()));
-            INSTANCE.hookedLoggers.forEach(l -> l.addHandler(INSTANCE));
-        }
-
-        public static void bind(CommonDependencyStartupLogHandler handler) {
-            synchronized (INSTANCE) {
-                INSTANCE.upstream.add(handler);
-            }
-        }
-
-        public static void unbind() {
-            synchronized (INSTANCE) {
-                INSTANCE.hookedLoggers.forEach(l -> l.removeHandler(INSTANCE));
-                INSTANCE.hookedLoggers.clear();
-            }
-        }
-
-        @Override
-        public void publish(LogRecord j_record) {
-            StartupLogRecord record = new StartupLogRecord(j_record);
-
-            synchronized (this) {
-                records.add(record);
-            }
-        }
-
-        @Override
-        public void flush() {
-        }
-
-        @Override
-        public void close() throws SecurityException {
-        }
-    }
-
-    private static final class StartupLogRecord implements Comparable<StartupLogRecord> {
-        public final long timestamp;
-        public final String content;
-
-        public StartupLogRecord(LogRecord record) {
-            timestamp = record.getMillis();
-            content = StartupLogFormatter.INSTANCE.format(record);
-        }
-
-        @Override
-        public int compareTo(StartupLogRecord o) {
-            return Long.compare(this.timestamp, o.timestamp);
-        }
-
-        public void appendTo(StringBuilder builder) {
-            builder.append(content).append('\n');
-        }
-    }
-
-    private static final class StartupLogFormatter extends java.util.logging.Formatter {
-        public static final StartupLogFormatter INSTANCE = new StartupLogFormatter();
-
-        @Override
-        public String format(LogRecord record) {
-            ZonedDateTime zdt = ZonedDateTime.ofInstant(
-                    Instant.ofEpochMilli(record.getMillis()), ZoneId.systemDefault());
-            String source;
-            if (record.getSourceClassName() != null) {
-                source = record.getSourceClassName();
-                if (record.getSourceMethodName() != null) {
-                   source += " " + record.getSourceMethodName();
-                }
-            } else {
-                source = record.getLoggerName();
-            }
-            String message = formatMessage(record);
-            String throwable = "";
-            if (record.getThrown() != null) {
-                StringWriter sw = new StringWriter();
-                PrintWriter pw = new PrintWriter(sw);
-                pw.println();
-                record.getThrown().printStackTrace(pw);
-                pw.close();
-                throwable = sw.toString();
-
-                // Get rid of double-newline issues
-                if (throwable.endsWith("\n")) {
-                    throwable = throwable.substring(0, throwable.length() - 1);
-                }
-            }
-            return String.format("[%tT] [%4$s] [%3$s] %5$s%6$s",
-                                 zdt,
-                                 source,
-                                 record.getLoggerName(),
-                                 record.getLevel().getName(),
-                                 message,
-                                 throwable);
         }
     }
 }

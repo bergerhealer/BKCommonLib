@@ -845,7 +845,7 @@ public abstract class PluginBase extends JavaPlugin {
 
             // Disable startup logging next tick. This makes sure that stuff logged by this plugin
             // while other plugins (depending on it) enable is still included in the history.
-            startupLogHandler.stopReadingLogNextTick();
+            startupLogHandler.setNotStartupNextTick();
 
             // Start Metrics if enabled
             if (metrics != null) {

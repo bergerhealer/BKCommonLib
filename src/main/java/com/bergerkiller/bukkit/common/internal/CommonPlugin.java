@@ -95,6 +95,7 @@ public class CommonPlugin extends PluginBase {
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;
     private PermissionHandler permissionHandler = null;
+    private CommonServerLogRecorder serverLogRecorder = new CommonServerLogRecorder(this);
     private CommonMapController mapController = null;
     private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
@@ -335,6 +336,16 @@ public class CommonPlugin extends PluginBase {
         return this.gameVersionSupplier;
     }
 
+    /**
+     * Gets the server log recorder, which stores the last logged messages of the
+     * server / system loggers.
+     *
+     * @return Server log recorder
+     */
+    public CommonServerLogRecorder getServerLogRecorder() {
+        return this.serverLogRecorder;
+    }
+
     private boolean updatePacketHandler() {
         try {
             final Class<? extends PacketHandler> handlerClass;
@@ -377,6 +388,9 @@ public class CommonPlugin extends PluginBase {
     protected void onCriticalStartupFailure(String reason) {
         log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
         super.onCriticalStartupFailure(reason);
+
+        // We don't need server logs beyond this - just to make sure it's stopped
+        serverLogRecorder.disable();
     }
 
     /**
@@ -610,6 +624,7 @@ public class CommonPlugin extends PluginBase {
         setDisableMessage(null);
 
         // Enable all components in order
+        this.components.enable(this.serverLogRecorder);
         this.components.enableCreate(OfflineWorld::initializeComponent);
         this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
                 DimensionResourceKeyConversion.Tracker::new);
