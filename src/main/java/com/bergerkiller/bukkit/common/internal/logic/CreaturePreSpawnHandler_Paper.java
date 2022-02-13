@@ -22,6 +22,7 @@ public class CreaturePreSpawnHandler_Paper extends CreaturePreSpawnHandler {
 
     public CreaturePreSpawnHandler_Paper() throws Throwable {
         handle = Template.Class.create(PreCreatureSpawnEventHandle.class);
+        handle.forceInitialization();
 
         // Since we don't know about paper's events at compile time (maybe fix this?), generate
         // a handler class that we shall use to listen for the PreCreatureSpawnEvent
