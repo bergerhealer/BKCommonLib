@@ -1,14 +1,12 @@
 package com.bergerkiller.bukkit.common.internal;
 
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedList;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.function.LongPredicate;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -25,6 +23,8 @@ import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
 import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
+import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 
@@ -33,8 +33,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
  * with a reference counter.
  */
 public class CommonForcedChunkManager extends ForcedChunkManager {
-    private final Map<ChunkKey, Entry> chunks = new HashMap<ChunkKey, Entry>();
-    private final Set<ChunkKey> pending = new HashSet<ChunkKey>();
+    private IdentityHashMap<World, ForcedWorld> forcedWorlds = new IdentityHashMap<>(); // Cloned on modify
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
@@ -49,24 +48,14 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.plugin = plugin;
     }
 
-    public synchronized void enable() {
+    public void enable() {
         this.asyncLoadCallbackHandler.setExecutorTask(new ChunkLoadCallbackExecutor(this.plugin));
         this.loadTimeoutTracker = new ChunkLoadTimeoutTracker(this.plugin);
         this.loadTimeoutTracker.start(1, 1);
         this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
-                synchronized (CommonForcedChunkManager.this) {
-                    synchronized (pending) {
-                        for (ChunkKey key : pending) {
-                            Entry entry = chunks.get(key);
-                            if (entry != null) {
-                                entry.sync();
-                            }
-                        }
-                        pending.clear();
-                    }
-                }
+                forcedWorlds.values().forEach(ForcedWorld::sync);
             }
         };
         if (CommonCapabilities.CAN_CANCEL_CHUNK_UNLOAD_EVENT) {
@@ -74,92 +63,80 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
     }
 
-    public synchronized void disable(CommonPlugin plugin) {
+    public void disable(CommonPlugin plugin) {
         this.loadTimeoutTracker.stop();
         this.loadTimeoutTracker = null;
         this.pendingHandler.stop();
         this.pendingHandler = null;
-        this.pending.clear();
-        while (!this.chunks.isEmpty()) {
-            for (Entry e : this.chunks.values().toArray(new Entry[0])) {
-                e.disable();
-            }
-        }
-        this.chunks.clear();
+        this.forcedWorlds.values().forEach(ForcedWorld::disable);
+        this.forcedWorlds = new IdentityHashMap<>();
         this.asyncLoadCallbackHandler.setExecutorTask(null);
     }
 
-    public synchronized int getNumberOfForcedLoadedChunks() {
-        return chunks.size();
+    /**
+     * Same asLong function as used by Minecraft itself in ChunkCoordIntPair.
+     * Keeps things simple with the 'isKeptLoaded' check, avoiding the need for
+     * unwrapping the long.
+     *
+     * @param cx
+     * @param cz
+     * @return key
+     */
+    private static long makeChunkKey(int cx, int cz) {
+        return (long) cx & 4294967295L | ((long) cz & 4294967295L) << 32;
     }
 
-    public synchronized boolean isForced(Chunk chunk) {
-        return chunks.containsKey(new ChunkKey(chunk.getWorld(), chunk.getX(), chunk.getZ()));
+    public int getNumberOfForcedLoadedChunks() {
+        int count = 0;
+        for (ForcedWorld world : this.forcedWorlds.values()) {
+            count += world.numKeptLoaded();
+        }
+        return count;
     }
 
-    // This method is only called on the main thread!
-    protected void setForced(Entry entry, boolean forced) {
-        // Verify forced while synchronized around this.
-        // Remove the entry when indeed, the chunk is no longer forced
-        if (!forced) {
-            synchronized (this) {
-                chunks.remove(entry.getKey());
-            }
-        }
-
-        ChunkKey chunk = entry.getKey();
-
-        // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
-        // This method is available on 1.13.1+
-        // The ChunkUnloadEvent is not used for this, then
-        if (CommonCapabilities.HAS_CHUNK_TICKET_API) {
-            WorldServerHandle.fromBukkit(chunk.world).setForceLoadedAsync(
-                    chunk.chunkX, chunk.chunkZ, this.plugin, forced);
-        }
-
-        // Load/unload the chunk
-        if (forced) {
-            // Request the chunk to be loaded asynchronously
-            // The loadTimeoutTracker will error the chunk load if timed out
-            loadTimeoutTracker.add(entry);
-            entry.startLoadingAsync();
-        } else {
-            // Trigger the server to unload the chunk. It will fire a single
-            // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
-            chunk.world.unloadChunkRequest(chunk.chunkX, chunk.chunkZ);
-            entry.resetAsyncLoad();
-        }
-    }
-
-    private void scheduleUpdate(Entry entry) {
-        synchronized (pending) {
-            if (pending.isEmpty()) {
-                pendingHandler.start();
-            }
-            pending.add(entry.getKey());
-        }
+    public boolean isForced(Chunk chunk) {
+        ForcedWorld forced = forcedWorlds.get(chunk.getWorld());
+        return forced != null && forced.isKeptLoaded(chunk.getX(), chunk.getZ());
     }
 
     @Override
-    public synchronized ForcedChunkEntry add(World world, int chunkX, int chunkZ) {
-        ChunkKey key = new ChunkKey(world, chunkX, chunkZ);
-        Entry entry = this.chunks.get(key);
-        if (entry == null) {
-            entry = new Entry(key);
-            this.chunks.put(key, entry);
+    public ForcedChunkEntry add(World world, int chunkX, int chunkZ) {
+        return getOrCreateForcedWorld(world).add(chunkX, chunkZ);
+    }
+
+    private ForcedWorld getOrCreateForcedWorld(World world) {
+        ForcedWorld forcedWorld;
+
+        if ((forcedWorld = this.forcedWorlds.get(world)) != null) {
+            return forcedWorld;
         }
-        entry.add();
-        return entry;
+
+        synchronized (this) {
+            if ((forcedWorld = this.forcedWorlds.get(world)) != null) {
+                return forcedWorld;
+            }
+
+            forcedWorld = new ForcedWorld(world);
+            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(this.forcedWorlds);
+            newForcedWorlds.put(world, forcedWorld);
+            this.forcedWorlds = newForcedWorlds;
+            return forcedWorld;
+        }
     }
 
     private final class Entry implements ForcedChunkEntry, Consumer<Object> {
-        private final ChunkKey key;
+        private final ForcedWorld world;
+        private final long key;
+        private final int cx, cz;
         private final AtomicInteger asyncCounter; // tracks state on other threads
         private int counter; // updated on main thread only
         private CompletableFuture<Chunk> chunkFuture;
 
-        public Entry(ChunkKey key) {
+        public Entry(ForcedWorld world, long key, int cx, int cz) {
+            this.world = world;
             this.key = key;
+            this.cx = cx;
+            this.cz = cz;
             this.asyncCounter = new AtomicInteger();
             this.counter = 0;
             this.resetAsyncLoad();
@@ -178,7 +155,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             this.asyncCounter.set(0);
             if (this.counter > 0) {
                 this.counter = 0;
-                setForced(this, false);
+                world.setForced(this, false);
             }
         }
 
@@ -186,12 +163,12 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             if (this.counter <= 0) {
                 this.counter += this.asyncCounter.getAndSet(0);
                 if (this.counter > 0) {
-                    setForced(this, true);
+                    world.setForced(this, true);
                 }
             } else {
                 this.counter += this.asyncCounter.getAndSet(0);
                 if (this.counter <= 0) {
-                    setForced(this, false);
+                    world.setForced(this, false);
                 }
             }
         }
@@ -203,7 +180,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 this.sync();
             } else if (new_async == 1) {
                 // Schedule a sync very soon on the main thread
-                scheduleUpdate(this);
+                world.scheduleUpdate(this);
             }
         }
 
@@ -214,27 +191,27 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 this.sync();
             } else if (new_async == -1) {
                 // Schedule a sync very soon on the main thread
-                scheduleUpdate(this);
+                world.scheduleUpdate(this);
             }
         }
 
-        public ChunkKey getKey() {
+        public long getKey() {
             return this.key;
         }
 
         @Override
         public World getWorld() {
-            return this.key.world;
+            return this.world.world;
         }
 
         @Override
         public int getX() {
-            return this.key.chunkX;
+            return this.cx;
         }
 
         @Override
         public int getZ() {
-            return this.key.chunkZ;
+            return this.cz;
         }
 
         @Override
@@ -244,7 +221,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                     return this.chunkFuture.get();
                 } catch (Throwable t) {}
             }
-            Chunk chunk = this.key.getChunk();
+            Chunk chunk = world.world.getChunkAt(cx, cz);
             this.chunkFuture.complete(chunk);
             return chunk;
         }
@@ -260,7 +237,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
          */
         public void abortIfNotLoaded() {
             if (this.isForced() && !this.chunkFuture.isDone()) {
-                this.chunkFuture.completeExceptionally(new ForcedChunkLoadTimeoutException(key.world, key.chunkX, key.chunkZ));
+                this.chunkFuture.completeExceptionally(new ForcedChunkLoadTimeoutException(world.world, cx, cz));
             }
         }
 
@@ -293,9 +270,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             }
 
             // If already loaded, complete it right away!
-            WorldServerHandle worldHandle = WorldServerHandle.fromBukkit(this.key.world);
             {
-                org.bukkit.Chunk loadedChunk = worldHandle.getChunkIfLoaded(this.key.chunkX, this.key.chunkZ);
+                org.bukkit.Chunk loadedChunk = this.world.handle.getChunkIfLoaded(this.cx, this.cz);
                 if (loadedChunk != null) {
                     this.chunkFuture.complete(loadedChunk);
                     return;
@@ -304,47 +280,171 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
             // This consumer is called from internal when the chunk is ready
             // Null is returned when loading fails
-            final ChunkProviderServerHandle cps_handle = worldHandle.getChunkProviderServer();
+            final ChunkProviderServerHandle cps_handle = this.world.handle.getChunkProviderServer();
             final Executor executor = cps_handle.getAsyncExecutor();
             if (executor == null) {
-                cps_handle.getChunkAtAsync(this.key.chunkX, this.key.chunkZ, this);
+                cps_handle.getChunkAtAsync(this.cx, this.cz, this);
             } else {
-                CompletableFuture.runAsync(() -> cps_handle.getChunkAtAsync(this.key.chunkX, this.key.chunkZ, Entry.this), executor);
+                CompletableFuture.runAsync(() -> cps_handle.getChunkAtAsync(this.cx, this.cz, Entry.this), executor);
             }
         }
     }
 
-    private static final class ChunkKey {
+    /**
+     * Everything about a Bukkit World where chunks are kept (force) loaded
+     */
+    private final class ForcedWorld {
         public final World world;
-        public final int chunkX;
-        public final int chunkZ;
+        public final WorldServerHandle handle;
+        public final LongHashMap<Entry> chunks = new LongHashMap<Entry>();
+        public final LongHashSet pending = new LongHashSet();
+        private boolean disabled = false;
 
-        public ChunkKey(World world, int chunkX, int chunkZ) {
+        public ForcedWorld(World world) {
             this.world = world;
-            this.chunkX = chunkX;
-            this.chunkZ = chunkZ;
+            this.handle = WorldServerHandle.fromBukkit(world);
+            if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
+                this.enableTickListsHook();
+            }
         }
 
-        public Chunk getChunk() {
-            return world.getChunkAt(chunkX, chunkZ);
+        public synchronized void disable() {
+            disabled = true;
+            pending.clear();
+            Entry[] entries;
+            while ((entries = chunks.values().toArray(new Entry[0])).length > 0) {
+                for (Entry e : entries) {
+                    e.disable();
+                }
+            }
+            if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
+                this.disableTickListsHook();
+            }
         }
 
-        @Override
-        public boolean equals(Object o) {
-            ChunkKey other = (ChunkKey) o;
-            return other.world == world &&
-                   other.chunkX == chunkX &&
-                   other.chunkZ == chunkZ;
+        public synchronized void sync() {
+            LongHashSet.LongIterator iter = pending.longIterator();
+            while (iter.hasNext()) {
+                Entry entry = chunks.get(iter.next());
+                if (entry != null) {
+                    entry.sync();
+                }
+            }
+            pending.clear();
+
+            if (this.chunks.size() == 0) {
+                this.disabled = true;
+
+                // Cleanup
+                if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
+                    this.disableTickListsHook();
+                }
+
+                // Un-register from the by-world mapping
+                synchronized (CommonForcedChunkManager.this) {
+                    IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(forcedWorlds);
+                    if (newForcedWorlds.remove(this.world) == this) {
+                        forcedWorlds = newForcedWorlds;
+                    }
+                }
+            }
         }
 
-        @Override
-        public int hashCode() {
-            return chunkX * 31 + chunkZ;
+        public synchronized Entry add(int cx, int cz) {
+            if (this.disabled) {
+                // Re-roll it.
+                ForcedWorld defer = getOrCreateForcedWorld(this.world);
+                if (this == defer) {
+                    throw new IllegalStateException("ForcedWorld is disabled, but still stored in lookup table");
+                } else {
+                    return defer.add(cx, cz);
+                }
+            }
+
+            long key = makeChunkKey(cx, cz);
+            Entry entry = this.chunks.get(key);
+            if (entry == null) {
+                entry = new Entry(this, key, cx, cz);
+                this.chunks.put(key, entry);
+            }
+            entry.add();
+            return entry;
         }
 
-        @Override
-        public String toString() {
-            return "Chunk{world=" + this.world.getName() + ",x=" + this.chunkX + ",z=" + this.chunkZ + "}";
+        public synchronized void scheduleUpdate(Entry entry) {
+            if (pending.isEmpty()) {
+                pendingHandler.start();
+            }
+            pending.add(entry.getKey());
+        }
+
+        public synchronized int numKeptLoaded() {
+            return chunks.size();
+        }
+
+        public synchronized boolean isKeptLoaded(int x, int z) {
+            return this.chunks.contains(x, z);
+        }
+
+        public synchronized boolean isKeptLoaded(long key) {
+            return this.chunks.contains(key);
+        }
+
+        // This method is only called on the main thread!
+        public void setForced(Entry entry, boolean forced) {
+            // Verify forced while synchronized around this.
+            // Remove the entry when indeed, the chunk is no longer forced
+            if (!forced) {
+                synchronized (this) {
+                    chunks.remove(entry.getKey());
+                }
+            }
+
+            // This performs chunk loading/unloading automatically using 'tickets' in NMS ChunkMapDistance
+            // This method is available on 1.13.1+
+            // The ChunkUnloadEvent is not used for this, then
+            if (CommonCapabilities.HAS_CHUNK_TICKET_API) {
+                WorldServerHandle.fromBukkit(world).setForceLoadedAsync(
+                        entry.getX(), entry.getZ(), plugin, forced);
+            }
+
+            // Load/unload the chunk
+            if (forced) {
+                // Request the chunk to be loaded asynchronously
+                // The loadTimeoutTracker will error the chunk load if timed out
+                loadTimeoutTracker.add(entry);
+                entry.startLoadingAsync();
+            } else {
+                // Trigger the server to unload the chunk. It will fire a single
+                // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
+                world.unloadChunkRequest(entry.getX(), entry.getZ());
+                entry.resetAsyncLoad();
+            }
+        }
+
+        private LongPredicate hookTickPredicate(LongPredicate previous) {
+            if (previous instanceof ChunkTickingPredicate) {
+                previous = ((ChunkTickingPredicate) previous).base; // avoid stack
+            }
+            return new ChunkTickingPredicate(this, previous);
+        }
+
+        private LongPredicate unhookTickPredicate(LongPredicate previous) {
+            if (previous instanceof ChunkTickingPredicate) {
+                return ((ChunkTickingPredicate) previous).base;
+            } else {
+                return previous;
+            }
+        }
+
+        private void enableTickListsHook() {
+            handle.transactBlockTicksChunkPredicate(this::hookTickPredicate);
+            handle.transactFluidTicksChunkPredicate(this::hookTickPredicate);
+        }
+
+        private void disableTickListsHook() {
+            handle.transactBlockTicksChunkPredicate(this::unhookTickPredicate);
+            handle.transactFluidTicksChunkPredicate(this::unhookTickPredicate);
         }
     }
 
@@ -416,6 +516,25 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         public ChunkLoadCallbackExecutor(JavaPlugin plugin) {
             super(plugin);
+        }
+    }
+
+    /**
+     * Used on Minecraft 1.18 and later to replace the old predicate, to allow
+     * forced chunks to tick blocks/fluids.
+     */
+    private static final class ChunkTickingPredicate implements LongPredicate {
+        private final ForcedWorld world;
+        private final LongPredicate base;
+
+        public ChunkTickingPredicate(ForcedWorld world, LongPredicate base) {
+            this.base = base;
+            this.world = world;
+        }
+
+        @Override
+        public boolean test(long value) {
+            return base.test(value) || world.isKeptLoaded(value);
         }
     }
 }

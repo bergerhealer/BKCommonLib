@@ -13,8 +13,12 @@ import net.minecraft.world.level.IBlockAccess;
 import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.Vec3D;
+import net.minecraft.world.ticks.TickListServer;
 
 import net.minecraft.server.MinecraftServer;
+
+import java.util.function.Function;
+import java.util.function.LongPredicate;
 
 import com.bergerkiller.bukkit.common.wrappers.PlayerRespawnPoint;
 
@@ -340,6 +344,39 @@ class WorldServer extends World {
     }
 #else
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk:###();
+#endif
+
+#if version >= 1.18
+    #require net.minecraft.server.level.WorldServer private final TickListServer blockTicks;
+    #require net.minecraft.server.level.WorldServer private final TickListServer fluidTicks;
+
+    #require net.minecraft.world.ticks.TickListServer private final java.util.function.LongPredicate tickCheck;
+
+    public void transactBlockTicksChunkPredicate(Function<LongPredicate, LongPredicate> func) {
+        TickListServer tickList = instance#blockTicks;
+        LongPredicate old = tickList#tickCheck;
+        LongPredicate repl = func.apply(old);
+        if (old != repl) {
+            tickList#tickCheck = repl;
+        }
+    }
+
+    public void transactFluidTicksChunkPredicate(Function<LongPredicate, LongPredicate> func) {
+        TickListServer tickList = instance#blockTicks;
+        LongPredicate old = tickList#tickCheck;
+        LongPredicate repl = func.apply(old);
+        if (old != repl) {
+            tickList#tickCheck = repl;
+        }
+    }
+#else
+    public void transactBlockTicksChunkPredicate(Function<LongPredicate, LongPredicate> func) {
+        throw new UnsupportedOperationException("Not supported MC < 1.18");
+    }
+
+    public void transactFluidTicksChunkPredicate(Function<LongPredicate, LongPredicate> func) {
+        throw new UnsupportedOperationException("Not supported MC < 1.18");
+    }
 #endif
 
 #if version >= 1.18
