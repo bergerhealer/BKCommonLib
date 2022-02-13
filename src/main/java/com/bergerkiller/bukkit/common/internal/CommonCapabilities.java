@@ -232,9 +232,4 @@ public class CommonCapabilities {
      * Since Minecraft 1.18 all methods names are de-obfuscated
      */
     public static final boolean MOJANGMAP_METHODS = CommonBootstrap.evaluateMCVersion(">=", "1.18");
-
-    /**
-     * Since Minecraft 1.18 chunks kept loaded with chunk tickets don't get ticked anymore (block physics)
-     */
-    public static final boolean CHUNK_TICKETS_NOT_TICKED = CommonBootstrap.evaluateMCVersion(">=", "1.18");
 }

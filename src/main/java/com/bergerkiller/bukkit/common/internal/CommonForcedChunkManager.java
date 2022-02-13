@@ -6,7 +6,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import java.util.function.LongPredicate;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -303,9 +302,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         public ForcedWorld(World world) {
             this.world = world;
             this.handle = WorldServerHandle.fromBukkit(world);
-            if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
-                this.enableTickListsHook();
-            }
         }
 
         public synchronized void disable() {
@@ -316,9 +312,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 for (Entry e : entries) {
                     e.disable();
                 }
-            }
-            if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
-                this.disableTickListsHook();
             }
         }
 
@@ -334,11 +327,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
             if (this.chunks.size() == 0) {
                 this.disabled = true;
-
-                // Cleanup
-                if (CommonCapabilities.CHUNK_TICKETS_NOT_TICKED) {
-                    this.disableTickListsHook();
-                }
 
                 // Un-register from the by-world mapping
                 synchronized (CommonForcedChunkManager.this) {
@@ -421,31 +409,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 entry.resetAsyncLoad();
             }
         }
-
-        private LongPredicate hookTickPredicate(LongPredicate previous) {
-            if (previous instanceof ChunkTickingPredicate) {
-                previous = ((ChunkTickingPredicate) previous).base; // avoid stack
-            }
-            return new ChunkTickingPredicate(this, previous);
-        }
-
-        private LongPredicate unhookTickPredicate(LongPredicate previous) {
-            if (previous instanceof ChunkTickingPredicate) {
-                return ((ChunkTickingPredicate) previous).base;
-            } else {
-                return previous;
-            }
-        }
-
-        private void enableTickListsHook() {
-            handle.transactBlockTicksChunkPredicate(this::hookTickPredicate);
-            handle.transactFluidTicksChunkPredicate(this::hookTickPredicate);
-        }
-
-        private void disableTickListsHook() {
-            handle.transactBlockTicksChunkPredicate(this::unhookTickPredicate);
-            handle.transactFluidTicksChunkPredicate(this::unhookTickPredicate);
-        }
     }
 
     // Used on MC 1.13.2 and before, where the event could still be cancelled
@@ -516,25 +479,6 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         public ChunkLoadCallbackExecutor(JavaPlugin plugin) {
             super(plugin);
-        }
-    }
-
-    /**
-     * Used on Minecraft 1.18 and later to replace the old predicate, to allow
-     * forced chunks to tick blocks/fluids.
-     */
-    private static final class ChunkTickingPredicate implements LongPredicate {
-        private final ForcedWorld world;
-        private final LongPredicate base;
-
-        public ChunkTickingPredicate(ForcedWorld world, LongPredicate base) {
-            this.base = base;
-            this.world = world;
-        }
-
-        @Override
-        public boolean test(long value) {
-            return base.test(value) || world.isKeptLoaded(value);
         }
     }
 }
