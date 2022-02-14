@@ -54,6 +54,17 @@ public class IntVector3 implements Comparable<IntVector3> {
         }
     }
 
+    /**
+     * Version of {@link #equals(Object)} that eliminates reference equality and
+     * type casting.
+     *
+     * @param other Other vector, can not be null or a NPE is thrown
+     * @return True if this and the other IntVector are the same
+     */
+    public boolean isSame(IntVector3 other) {
+        return this.x == other.x && this.y == other.y && this.z == other.z;
+    }
+
     @Override
     public int hashCode() {
         return this.x + (this.z << 8) + (this.y << 16);

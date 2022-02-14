@@ -144,8 +144,8 @@ public final class OfflineBlock {
             return true;
         } else if (o instanceof OfflineBlock) {
             OfflineBlock other = (OfflineBlock) o;
-            return this.position.equals(other.position) &&
-                   this.world.equals(other.world);
+            return this.position.isSame(other.position) &&
+                   this.world == other.world;
         } else {
             return false;
         }
