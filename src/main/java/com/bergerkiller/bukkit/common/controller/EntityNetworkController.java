@@ -563,6 +563,20 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     /**
+     * Called when the passengers of the entity changes. By default calls
+     * {@link #onSyncPassengers(Player, List, List)} for all viewers of the
+     * entity.
+     *
+     * @param oldPassengers Old passengers of the Entity
+     * @param newPassengers New passengers of the Entity
+     */
+    protected void onPassengersChanged(List<org.bukkit.entity.Entity> oldPassengers, List<org.bukkit.entity.Entity> newPassengers) {
+        for (Player viewer : this.getViewers()) {
+            onSyncPassengers(viewer, oldPassengers, newPassengers);
+        }
+    }
+
+    /**
      * Synchronizes new passenger information to a player viewer.
      * This function is only called on MC >= 1.10.2.
      * The oldPassengers list will be empty when the player sees this Entity
@@ -905,9 +919,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 }
 
                 // Send update packet for the new passengers
-                for (Player viewer : this.getViewers()) {
-                    onSyncPassengers(viewer, old_passengers_bu, new_passengers);
-                }
+                onPassengersChanged(old_passengers_bu, new_passengers);
             }
         } else if (EntityTrackerEntryStateHandle.T.opt_vehicle.isAvailable()) {
             // On MC <= 1.8.8 we must update the vehicle of this Entity
@@ -932,9 +944,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 }
                 this.last_passenger_1_8_8 = new_entity;
 
-                for (Player viewer : this.getViewers()) {
-                    onSyncPassengers(viewer, old_list, new_list);
-                }
+                onPassengersChanged(old_list, new_list);
             }
         }
     }

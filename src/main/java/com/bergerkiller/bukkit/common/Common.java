@@ -32,7 +32,8 @@ public class Common {
             "Common:Item:CreatePlayerHeadUsingGameProfile",
             "Common:VehicleMountController:Spectating",
             "Common:WorldUtil:getWorldLevelFile",
-            "Common:EntityController:forceControllerInitialization"
+            "Common:EntityController:forceControllerInitialization",
+            "Common:EntityNetworkController:HasOnPassengersChanged"
     ).collect(Collectors.toSet());
 
     /**
