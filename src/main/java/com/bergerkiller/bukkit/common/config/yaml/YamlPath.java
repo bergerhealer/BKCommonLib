@@ -151,7 +151,7 @@ public class YamlPath {
      * Gets a child path of this path. The child path can contain
      * multiple path parts to refer to a deeper child. If the child
      * path is empty, this path is returned instead.
-     * 
+     *
      * @param childPath The path to the child
      * @return child path
      */
@@ -163,7 +163,7 @@ public class YamlPath {
      * Gets a child path of this path. The child path can contain
      * multiple path parts to refer to a deeper child. If the child
      * path is root, this path is returned instead.
-     * 
+     *
      * @param childPath The YamlPath to append to this path to make a child
      * @return child path
      */
@@ -173,6 +173,19 @@ public class YamlPath {
         } else {
             return child(childPath.parent()).child(childPath.name());
         }
+    }
+
+    /**
+     * Gets a child path of this path. The {@link #name()} of the node
+     * specified is appended to this path. This is slightly more
+     * efficient than {@link #child(String)} because it eliminates name
+     * format parsing that would otherwise occur.
+     *
+     * @param nameOfPath YamlPath whose name to use
+     * @return child path
+     */
+    public YamlPath childWithName(YamlPath nameOfPath) {
+        return nameOfPath.appendNameTo(this);
     }
 
     /**
@@ -193,6 +206,10 @@ public class YamlPath {
      */
     public String name() {
         return this.name;
+    }
+
+    protected YamlPath appendNameTo(YamlPath parent) {
+        return new YamlPath(parent, this.name);
     }
 
     /**
@@ -265,6 +282,11 @@ public class YamlPath {
             this.index = index;
         }
 
+        private YamlPathListElement(YamlPath parent, String name, int index) {
+            super(parent, name);
+            this.index = index;
+        }
+
         @Override
         public int listIndex() {
             return this.index;
@@ -273,6 +295,11 @@ public class YamlPath {
         @Override
         public boolean isListElement() {
             return true;
+        }
+
+        @Override
+        protected YamlPathListElement appendNameTo(YamlPath parent) {
+            return new YamlPathListElement(parent, this.name(), this.index);
         }
 
         @Override
