@@ -115,6 +115,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocation(double x, double y, double z, float yaw, float pitch);
     public abstract void setBoundingBox(AxisAlignedBBHandle axisalignedbb);
     public abstract float getHeadRotation();
+    public abstract void setHeadRotation(float angle);
     public abstract AxisAlignedBBHandle getOtherBoundingBox();
     public abstract AxisAlignedBBHandle getEntityBoundingBox(EntityHandle entity);
     public abstract void setPositionFromBoundingBox();
@@ -392,6 +393,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocation = new Template.Method<Void>();
         public final Template.Method.Converted<Void> setBoundingBox = new Template.Method.Converted<Void>();
         public final Template.Method<Float> getHeadRotation = new Template.Method<Float>();
+        public final Template.Method<Void> setHeadRotation = new Template.Method<Void>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getOtherBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method.Converted<AxisAlignedBBHandle> getEntityBoundingBox = new Template.Method.Converted<AxisAlignedBBHandle>();
         public final Template.Method<Void> setPositionFromBoundingBox = new Template.Method<Void>();

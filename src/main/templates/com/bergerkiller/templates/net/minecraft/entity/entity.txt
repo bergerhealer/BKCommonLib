@@ -1628,6 +1628,13 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #select version >=
+#case 1.18:  public void setHeadRotation:setYHeadRot(float angle);
+#case 1.12:  public void setHeadRotation(float angle);
+#case 1.9:   public void setHeadRotation:h(float angle);
+#case else:  public void setHeadRotation:f(float angle);
+#endselect
+
+#select version >=
 #case 1.16.2
     // Since 1.16.2 there's a flag, which gets whether the 'other' bounding box exists
     // Only the Shulker and Boat entity appear to use this flag
