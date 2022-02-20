@@ -1,7 +1,7 @@
 package com.bergerkiller.bukkit.common.events;
 
+import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
@@ -13,16 +13,14 @@ import org.bukkit.entity.EntityType;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Processes server happenings and raises events accordingly
  */
 public class CommonEventFactory {
-
     private final EntityMoveEvent entityMoveEvent = new EntityMoveEvent();
-    private final List<EntityHandle> entityMoveEntities = new LinkedList<EntityHandle>();
+    private final SortedIdentityCache<Object, EntityHandle> entityMoveEntities = SortedIdentityCache.create(EntityHandle::createHandle);
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
 
     // Concatenates all world entity lists into one long iterable
@@ -37,23 +35,6 @@ public class CommonEventFactory {
         return Iterables.concat(world_entity_lists);
     }
 
-    // Used for handleEntityMove() LogicUtil.synchronizeList
-    private final LogicUtil.ItemSynchronizer<Object, EntityHandle> entity_move_synchronizer = new LogicUtil.ItemSynchronizer<Object, EntityHandle>() {
-        @Override
-        public boolean isItem(EntityHandle item, Object value) {
-            return item.getRaw() == value;
-        }
-
-        @Override
-        public EntityHandle onAdded(Object value) {
-            return EntityHandle.createHandle(value);
-        }
-
-        @Override
-        public void onRemoved(EntityHandle item) {
-        }
-    };
-
     /**
      * Fires Entity Move events for all entities that moved on the server
      */
@@ -64,15 +45,15 @@ public class CommonEventFactory {
         }
 
         // Keeps a list of all raw entity handles synchronized with EntityHandle wrappers
-        LogicUtil.synchronizeList(this.entityMoveEntities, getAllServerEntities(), this.entity_move_synchronizer);
+        this.entityMoveEntities.sync(getAllServerEntities());
 
         // Fire all events
-        for (EntityHandle entity : entityMoveEntities) {
+        this.entityMoveEntities.forEach(entity -> {
             if (entity.isLastAndCurrentPositionDifferent()) {
                 entityMoveEvent.setEntity(entity);
                 CommonUtil.callEvent(entityMoveEvent);
             }
-        }
+        });
     }
 
     /**

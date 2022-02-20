@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.map;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 import org.bukkit.entity.Player;
@@ -9,9 +7,9 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Task;
+import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 
@@ -20,22 +18,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  */
 class MapDisplayHeldMapUpdater extends Task {
     private final CommonMapController controller;
-    private final List<MapViewEntry> entries = new LinkedList<MapViewEntry>();
-    private final LogicUtil.ItemSynchronizer<Player, MapViewEntry> synchronizer = new LogicUtil.ItemSynchronizer<Player, MapViewEntry>() {
-        @Override
-        public boolean isItem(MapViewEntry entry, Player player) {
-            return entry.player == player;
-        }
-
-        @Override
-        public MapViewEntry onAdded(Player player) {
-            return new MapViewEntry(player);
-        }
-
-        @Override
-        public void onRemoved(MapViewEntry entry) {
-        }
-    };
+    private final SortedIdentityCache<Player, MapViewEntry> entries = SortedIdentityCache.create(MapViewEntry::new);
 
     public MapDisplayHeldMapUpdater(JavaPlugin plugin, CommonMapController controller) {
         super(plugin);
@@ -44,10 +27,8 @@ class MapDisplayHeldMapUpdater extends Task {
 
     @Override
     public void run() {
-        LogicUtil.synchronizeList(entries, CommonUtil.getOnlinePlayers(), this.synchronizer);
-        for (MapViewEntry entry : entries) {
-            entry.update();
-        }
+        entries.sync(CommonUtil.getOnlinePlayers());
+        entries.forEach(MapViewEntry::update);
     }
 
     private class MapViewEntry {
