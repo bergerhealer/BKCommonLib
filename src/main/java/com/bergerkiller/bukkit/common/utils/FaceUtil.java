@@ -14,11 +14,12 @@ public class FaceUtil {
     public static final BlockFace[] BLOCK_SIDES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP, BlockFace.DOWN};
     public static final BlockFace[] ATTACHEDFACES = {BlockFace.NORTH, BlockFace.EAST, BlockFace.SOUTH, BlockFace.WEST, BlockFace.UP};
     public static final BlockFace[] ATTACHEDFACESDOWN = BLOCK_SIDES;
-    private static final EnumMap<BlockFace, Integer> notches = new EnumMap<BlockFace, Integer>(BlockFace.class);
+    private static final int[] notches;
 
     static {
+        notches = new int[BlockFace.values().length];
         for (int i = 0; i < RADIAL.length; i++) {
-            notches.put(RADIAL[i], i);
+            notches[RADIAL[i].ordinal()] = i;
         }
         for (int i = 0; i < AXIS.length; i++) {
             AXIS[i] = RADIAL[i << 1];
@@ -46,8 +47,7 @@ public class FaceUtil {
      * @return Notch of the face
      */
     public static int faceToNotch(BlockFace face) {
-        Integer notch = notches.get(face);
-        return notch == null ? 0 : notch.intValue();
+        return notches[face.ordinal()];
     }
 
     /**
