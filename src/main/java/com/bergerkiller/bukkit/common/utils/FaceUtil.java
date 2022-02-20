@@ -5,8 +5,6 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.util.Vector;
 
-import java.util.EnumMap;
-
 public class FaceUtil {
 
     public static final BlockFace[] AXIS = new BlockFace[4];
