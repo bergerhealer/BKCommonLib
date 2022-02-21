@@ -298,7 +298,10 @@ public class FileConfiguration extends BasicConfiguration {
                 }
             } catch (TimeoutException ex) {
                 return false;
-            } catch (Throwable t) {}
+            } catch (Throwable t) {
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to save", t);
+                return false;
+            }
         }
     }
 }
