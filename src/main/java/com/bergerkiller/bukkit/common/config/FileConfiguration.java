@@ -130,7 +130,7 @@ public class FileConfiguration extends BasicConfiguration {
         putSaveOperation(this.file, Long.MAX_VALUE, ()-> {
             // Once writing finishes, perform cleanup and also handle errors
             CompletableFuture<Void> future = saveToFileAsync(file);
-            future.handle(new BiFunction<Void, Throwable, Void>() {
+            return future.handle(new BiFunction<Void, Throwable, Void>() {
                 @Override
                 public Void apply(Void ignored, Throwable error) {
                     // Attempt cleanup
@@ -143,8 +143,7 @@ public class FileConfiguration extends BasicConfiguration {
 
                     // Log errors
                     if (error != null) {
-                        Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while saving to file '" + file + "':");
-                        error.printStackTrace();
+                        Logging.LOGGER_CONFIG.log(Level.SEVERE, "An error occured while saving to file '" + file + "':", error);
                         return null;
                     }
 
@@ -156,7 +155,6 @@ public class FileConfiguration extends BasicConfiguration {
                     return null;
                 }
             });
-            return future;
         });
     }
 
@@ -298,10 +296,7 @@ public class FileConfiguration extends BasicConfiguration {
                 }
             } catch (TimeoutException ex) {
                 return false;
-            } catch (Throwable t) {
-                Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to save", t);
-                return false;
-            }
+            } catch (Throwable t) {}
         }
     }
 }

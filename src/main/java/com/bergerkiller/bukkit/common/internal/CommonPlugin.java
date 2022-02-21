@@ -69,6 +69,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -91,6 +95,7 @@ public class CommonPlugin extends PluginBase {
     private final List<Task> startedTasks = new ArrayList<>();
     private final ImplicitlySharedSet<org.bukkit.entity.Entity> entitiesRemovedFromServer = new ImplicitlySharedSet<>();
     private final HashMap<String, TypedValue> debugVariables = new HashMap<>();
+    private final ThreadPoolExecutor fileIOWorker;
     private CommonEventFactory eventFactory;
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;
@@ -109,8 +114,21 @@ public class CommonPlugin extends PluginBase {
     private boolean isDebugCommandRegistered = false;
 
     public CommonPlugin() {
-        instance = this;
+        // Initialize thread pool, might be used pretty early on...
+        // The IO worker is shut down if no IO occurs for 60 seconds
+        // Up to 3 concurrent IO workers can be active at once.
+        fileIOWorker = new ThreadPoolExecutor(3, 3, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(1024), r -> {
+            Thread t = new Thread(r, "BKCommonLib-IOWorker");
+            t.setDaemon(true);
+            return t;
+        });
+        fileIOWorker.allowCoreThreadTimeOut(true);
+
+        // When mountiplex logs, log as BKCommonLib
         MountiplexUtil.LOGGER = this.getLogger();
+
+        // Now it's open for business
+        instance = this;
     }
 
     public static boolean hasInstance() {
@@ -344,6 +362,15 @@ public class CommonPlugin extends PluginBase {
      */
     public CommonServerLogRecorder getServerLogRecorder() {
         return this.serverLogRecorder;
+    }
+
+    /**
+     * Gets the asynchronous executor responsible for file reading/writing I/O
+     *
+     * @return IO worker executor
+     */
+    public Executor getFileIOExecutor() {
+        return this.fileIOWorker;
     }
 
     private boolean updatePacketHandler() {
@@ -807,6 +834,9 @@ public class CommonPlugin extends PluginBase {
 
         // Wait for pending FileConfiguration save() to complete
         flushSaveOperations(null);
+
+        // Shutdown the IO worker now
+        this.fileIOWorker.shutdown();
 
         // Server-specific disabling occurs
         Common.SERVER.disable(this);
