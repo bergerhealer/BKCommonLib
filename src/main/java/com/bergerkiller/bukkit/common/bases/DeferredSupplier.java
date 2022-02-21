@@ -12,13 +12,11 @@ import java.util.function.Supplier;
  * and a value is initialized already.
  */
 public final class DeferredSupplier<T> implements Supplier<T> {
-    private final Supplier<T> supplier;
-    private volatile boolean initialized;
+    private volatile Supplier<T> supplier;
     private T value;
 
     private DeferredSupplier(Supplier<T> supplier) {
         this.supplier = supplier;
-        this.initialized = false;
         this.value = null;
     }
 
@@ -31,18 +29,19 @@ public final class DeferredSupplier<T> implements Supplier<T> {
      *         is cheap.
      */
     public boolean isInitialized() {
-        return initialized;
+        return supplier == null;
     }
 
     @Override
     public T get() {
-        if (initialized) {
+        if (supplier == null) {
             return value;
         } else {
             synchronized (this) {
-                if (!initialized) {
-                    value = supplier.get();
-                    initialized = true;
+                Supplier<T> theSupplier = this.supplier;
+                if (theSupplier != null) {
+                    value = theSupplier.get();
+                    this.supplier = null;
                 }
                 return value;
             }
