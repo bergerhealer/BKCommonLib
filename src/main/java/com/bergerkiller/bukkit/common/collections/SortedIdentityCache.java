@@ -122,7 +122,23 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
      * @param keyStream Stream of keys to sync with
      */
     public void sync(Stream<K> keyStream) {
-        Syncher syncher = new Syncher();
+        sync(keyStream, c -> {});
+    }
+
+    /**
+     * Fills this cache with values for all keys encountered in the specified
+     * stream, in the same element order. Elements that are not filled are
+     * removed from this cache. This synchronizes the elements of this cache
+     * with the keys found in the specified stream.<br>
+     * <br>
+     * At the same time as synchronizing this cache, iterates the values mapped
+     * to the keys passed in.
+     *
+     * @param keyStream Stream of keys to sync with
+     * @param action Consumer to supply with the synchronized values for each key
+     */
+    public void sync(Stream<K> keyStream, Consumer<? super V> action) {
+        Syncher syncher = new Syncher(action);
         keyStream.forEachOrdered(syncher);
         syncher.trimRemaining();
     }
@@ -136,7 +152,23 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
      * @param keys Keys to sync with
      */
     public void sync(Iterable<K> keys) {
-        Syncher syncher = new Syncher();
+        sync(keys, c -> {});
+    }
+
+    /**
+     * Fills this cache with values for all keys encountered in the specified
+     * iterable, in the same element order. Elements that are not filled are
+     * removed from this cache. This synchronizes the elements of this cache
+     * with the keys found in the specified iterable.<br>
+     * <br>
+     * At the same time as synchronizing this cache, iterates the values mapped
+     * to the keys passed in.
+     *
+     * @param keys Keys to sync with
+     * @param action Consumer to supply with the synchronized values for each key
+     */
+    public void sync(Iterable<K> keys, Consumer<? super V> action) {
+        Syncher syncher = new Syncher(action);
         keys.forEach(syncher);
         syncher.trimRemaining();
     }
@@ -150,7 +182,23 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
      * @param keysIterator Iterator of keys to sync with
      */
     public void sync(Iterator<K> keysIterator) {
-        Syncher syncher = new Syncher();
+        sync(keysIterator, c -> {});
+    }
+
+    /**
+     * Fills this cache with values for all keys encountered in the specified
+     * iterator, in the same element order. Elements that are not filled are
+     * removed from this cache. This synchronizes the elements of this cache
+     * with the keys found in the specified iterator.<br>
+     * <br>
+     * At the same time as synchronizing this cache, iterates the values mapped
+     * to the keys passed in.
+     *
+     * @param keysIterator Iterator of keys to sync with
+     * @param action Consumer to supply with the synchronized values for each key
+     */
+    public void sync(Iterator<K> keysIterator, Consumer<? super V> action) {
+        Syncher syncher = new Syncher(action);
         keysIterator.forEachRemaining(syncher);
         syncher.trimRemaining();
     }
@@ -238,10 +286,13 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
     }
 
     private final class Syncher implements Consumer<K> {
+        private final Consumer<? super V> action;
         private LinkEntry<K, V> prev = SortedIdentityCache.this.first;
         private LinkEntry<K, V> curr = prev.next;
 
-        public Syncher() {
+        public Syncher(Consumer<? super V> action) {
+            this.action = action;
+
             // Before we fill, flip the fillState around. All existing entries will
             // then be seen as 'not yet filled', and every item we then fill with keys,
             // will be made correct. This eliminates otherwise needed iteration.
@@ -257,6 +308,7 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
                 curr.fillState = fillState;
                 this.prev = curr;
                 this.curr = curr.next;
+                this.action.accept(curr.value);
                 return;
             }
 
@@ -286,6 +338,7 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
                 newEntry.fillState = fillState;
                 this.prev = newEntry; // Resume with same curr, new prev
             }
+            this.action.accept(newEntry.value);
         }
 
         public void trimRemaining() {
