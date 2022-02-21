@@ -155,26 +155,12 @@ class ItemStack {
         return org.bukkit.craftbukkit.inventory.CraftItemStack.asCraftMirror(instance);
     }
 
+    public boolean isMapItem() {
+        return instance.getItem() == Items.FILLED_MAP;
+    }
+
     public int getMapId() {
-#if version >= 1.13
-        NBTTagCompound metadata = instance.getTag();
-        if (metadata == null) {
-            return -1;
-        }
-        NBTBase mapId = metadata.get("map");
-        if (!(mapId instanceof NBTNumber)) {
-            return -1;
-        }
-  #if version >= 1.18
-        return ((NBTNumber) mapId).getAsInt();
-  #elseif version >= 1.13.2
-        return ((NBTNumber) mapId).asInt();
-  #else
-        return ((NBTNumber) mapId).e();
-  #endif
-#else
-        return instance.getData();
-#endif
+        return instance#getItemStackMapId();
     }
 
     public void setMapId(int mapId) {
@@ -187,57 +173,26 @@ class ItemStack {
 #endif
     }
 
+    public java.util.UUID getMapDisplayDynamicOnlyUUID() {
+        if (instance.getItem() != Items.FILLED_MAP) {
+            return null;
+        }
+        return instance#getItemStackMapDisplayUUID();
+    }
+
     public java.util.UUID getMapDisplayUUID() {
         if (instance.getItem() != Items.FILLED_MAP) {
             return null;
         }
-        NBTTagCompound metadata = instance.getTag();
-        long fallbackMapId;
-        if (metadata == null) {
-#if version >= 1.13
-            return null;
-#else
-            fallbackMapId = (long) instance.getData();
-#endif
-        } else {
-            NBTBase mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
-            if (mapDisplayUUIDMost instanceof NBTTagLong) {
-                NBTBase mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
-                if (mapDisplayUUIDLeast instanceof NBTTagLong) {
-                    long mostBits, leastBits;
-#if version >= 1.18
-                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).getAsLong();
-                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).getAsLong();
-#elseif version >= 1.13.2
-                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).asLong();
-                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).asLong();
-#elseif version >= 1.10.2
-                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).d();
-                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).d();
-#else
-                    mostBits = ((NBTTagLong) mapDisplayUUIDMost).c();
-                    leastBits = ((NBTTagLong) mapDisplayUUIDLeast).c();
-#endif
-                    return new java.util.UUID(mostBits, leastBits);
-                }
-            }
-#if version >= 1.13
-            NBTBase mapId = metadata.get("map");
-            if (!(mapId instanceof NBTNumber)) {
-                return null;
-            }
-  #if version >= 1.18
-            fallbackMapId = ((NBTNumber) mapId).getAsLong();
-  #elseif version >= 1.13.2
-            fallbackMapId = ((NBTNumber) mapId).asLong();
-  #else
-            fallbackMapId = ((NBTNumber) mapId).d();
-  #endif
-#else
-            fallbackMapId = (long) instance.getData();
-#endif
+        java.util.UUID mapDisplayUUID = instance#getItemStackMapDisplayUUID();
+        if (mapDisplayUUID != null) {
+            return mapDisplayUUID;
         }
-        return new java.util.UUID(0L, fallbackMapId);
+        int mapId = instance#getItemStackMapId();
+        if (mapId != -1) {
+            return new java.util.UUID(0L, (long) mapId);
+        }
+        return null;
     }
 
     <code>

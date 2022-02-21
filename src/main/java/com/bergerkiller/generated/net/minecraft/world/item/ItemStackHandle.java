@@ -48,8 +48,10 @@ public abstract class ItemStackHandle extends Template.Handle {
     public abstract CommonTagCompound saveToNBT(CommonTagCompound compound);
     public abstract ItemStackHandle cloneAndSubtract(int n);
     public abstract ItemStack toBukkit();
+    public abstract boolean isMapItem();
     public abstract int getMapId();
     public abstract void setMapId(int mapId);
+    public abstract UUID getMapDisplayDynamicOnlyUUID();
     public abstract UUID getMapDisplayUUID();
 
     public static final ItemStackHandle EMPTY_ITEM;
@@ -104,8 +106,10 @@ public abstract class ItemStackHandle extends Template.Handle {
         public final Template.Method.Converted<CommonTagCompound> saveToNBT = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<ItemStackHandle> cloneAndSubtract = new Template.Method.Converted<ItemStackHandle>();
         public final Template.Method<ItemStack> toBukkit = new Template.Method<ItemStack>();
+        public final Template.Method<Boolean> isMapItem = new Template.Method<Boolean>();
         public final Template.Method<Integer> getMapId = new Template.Method<Integer>();
         public final Template.Method<Void> setMapId = new Template.Method<Void>();
+        public final Template.Method<UUID> getMapDisplayDynamicOnlyUUID = new Template.Method<UUID>();
         public final Template.Method<UUID> getMapDisplayUUID = new Template.Method<UUID>();
 
     }

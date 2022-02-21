@@ -99,12 +99,28 @@ class EntityItemFrame extends EntityHanging {
         return item != null && item.getItem() == Items.FILLED_MAP;
     }
 
-    public java.util.UUID getItemMapDisplayUUID() {
+    public java.util.UUID getItemMapDisplayDynamicOnlyUUID() {
         ItemStack item = instance.getItem();
-        if (item == null) {
+        if (item == null || item.getItem() != Items.FILLED_MAP) {
             return null;
         }
-        return (java.util.UUID) com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle.T.getMapDisplayUUID.invoke(item);
+        return item#getItemStackMapDisplayUUID();
+    }
+
+    public java.util.UUID getItemMapDisplayUUID() {
+        ItemStack item = instance.getItem();
+        if (item == null || item.getItem() != Items.FILLED_MAP) {
+            return null;
+        }
+        java.util.UUID mapDisplayUUID = item#getItemStackMapDisplayUUID();
+        if (mapDisplayUUID != null) {
+            return mapDisplayUUID;
+        }
+        int mapId = item#getItemStackMapId();
+        if (mapId != -1) {
+            return new java.util.UUID(0L, (long) mapId);
+        }
+        return null;
     }
 
     public (org.bukkit.inventory.ItemStack) ItemStack getItem();

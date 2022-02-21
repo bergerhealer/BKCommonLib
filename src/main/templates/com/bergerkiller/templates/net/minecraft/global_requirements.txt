@@ -1,0 +1,58 @@
+package net.minecraft.world.item;
+
+import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.NBTNumber;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NBTTagLong;
+
+#require net.minecraft.world.item.ItemStack public int getItemStackMapId() {
+#if version >= 1.13
+    NBTTagCompound metadata = instance.getTag();
+    if (metadata == null) {
+        return -1;
+    }
+    NBTBase mapId = metadata.get("map");
+    if (!(mapId instanceof NBTNumber)) {
+        return -1;
+    }
+  #if version >= 1.18
+    return ((NBTNumber) mapId).getAsInt();
+  #elseif version >= 1.13.2
+    return ((NBTNumber) mapId).asInt();
+  #elseif version >= 1.10.2
+    return ((NBTNumber) mapId).e();
+  #else
+    return ((NBTNumber) mapId).d();
+  #endif
+#else
+    return instance.getData();
+#endif
+}
+
+#require net.minecraft.world.item.ItemStack public java.util.UUID getItemStackMapDisplayUUID() {
+    NBTTagCompound metadata = instance.getTag();
+    if (metadata != null) {
+        NBTBase mapDisplayUUIDMost = metadata.get("mapDisplayUUIDMost");
+        if (mapDisplayUUIDMost instanceof NBTTagLong) {
+            NBTBase mapDisplayUUIDLeast = metadata.get("mapDisplayUUIDLeast");
+            if (mapDisplayUUIDLeast instanceof NBTTagLong) {
+                long mostBits, leastBits;
+#if version >= 1.18
+                mostBits = ((NBTTagLong) mapDisplayUUIDMost).getAsLong();
+                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).getAsLong();
+#elseif version >= 1.13.2
+                mostBits = ((NBTTagLong) mapDisplayUUIDMost).asLong();
+                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).asLong();
+#elseif version >= 1.10.2
+                mostBits = ((NBTTagLong) mapDisplayUUIDMost).d();
+                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).d();
+#else
+                mostBits = ((NBTTagLong) mapDisplayUUIDMost).c();
+                leastBits = ((NBTTagLong) mapDisplayUUIDLeast).c();
+#endif
+                return new java.util.UUID(mostBits, leastBits);
+            }
+        }
+    }
+    return null;
+}

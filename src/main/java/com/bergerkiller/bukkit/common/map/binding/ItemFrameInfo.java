@@ -438,7 +438,7 @@ public class ItemFrameInfo {
         this.requiresFurtherLoading = false;
 
         IntVector3 itemFramePosition = this.coordinates;
-        UUID mapUUID = this.itemFrameHandle.getItemMapDisplayUUID();
+        UUID mapUUID = this.itemFrameHandle.getItemMapDisplayDynamicOnlyUUID();
         if (mapUUID == null) {
             return;
         }

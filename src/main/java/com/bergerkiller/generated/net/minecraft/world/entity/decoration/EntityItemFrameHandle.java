@@ -23,6 +23,7 @@ public abstract class EntityItemFrameHandle extends EntityHangingHandle {
     /* ============================================================================== */
 
     public abstract boolean getItemIsMap();
+    public abstract UUID getItemMapDisplayDynamicOnlyUUID();
     public abstract UUID getItemMapDisplayUUID();
     public abstract ItemStack getItem();
     public abstract void setItem(ItemStack newItemStack);
@@ -44,6 +45,7 @@ public abstract class EntityItemFrameHandle extends EntityHangingHandle {
         public final Template.StaticField.Converted<Key<Object>> DATA_ITEM = new Template.StaticField.Converted<Key<Object>>();
 
         public final Template.Method<Boolean> getItemIsMap = new Template.Method<Boolean>();
+        public final Template.Method<UUID> getItemMapDisplayDynamicOnlyUUID = new Template.Method<UUID>();
         public final Template.Method<UUID> getItemMapDisplayUUID = new Template.Method<UUID>();
         public final Template.Method.Converted<ItemStack> getItem = new Template.Method.Converted<ItemStack>();
         public final Template.Method.Converted<Void> setItem = new Template.Method.Converted<Void>();

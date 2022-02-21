@@ -1428,15 +1428,15 @@ public final class CommonMapController implements PacketListener, Listener {
             itemFrameFilter = e -> ItemUtil.isEmpty(e.getItem());
         } else {
             final UUID itemFrameMapUUID;
-            if (this.isFrameTilingSupported && (itemFrameMapUUID = itemFrame.getItemMapDisplayUUID()) != null) {
+            if (this.isFrameTilingSupported && (itemFrameMapUUID = itemFrame.getItemMapDisplayDynamicOnlyUUID()) != null) {
                 if (includingEmpty) {
                     itemFrameFilter = e -> {
-                        return itemFrameMapUUID.equals(e.getItemMapDisplayUUID()) ||
+                        return itemFrameMapUUID.equals(e.getItemMapDisplayDynamicOnlyUUID()) ||
                                ItemUtil.isEmpty(e.getItem());
                     };
                 } else {
                     itemFrameFilter = e -> {
-                        return itemFrameMapUUID.equals(e.getItemMapDisplayUUID());
+                        return itemFrameMapUUID.equals(e.getItemMapDisplayDynamicOnlyUUID());
                     };
                 }
             } else {

@@ -22,6 +22,9 @@
 #include /org/bukkit/craftbukkit/art.txt
 #include /org/bukkit/craftbukkit/scheduler.txt
 
+// Adds #require used in more than one place
+#include /net/minecraft/global_requirements.txt
+
 #include /net/minecraft/core_blockposition.txt
 #include /net/minecraft/core_nonnulllist.txt
 #include /net/minecraft/core_registry.txt
