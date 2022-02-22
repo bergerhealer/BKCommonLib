@@ -45,8 +45,10 @@ public class CommonEventFactory {
         }
 
         // Keeps a list of all raw entity handles synchronized with EntityHandle wrappers
-        // As we sync, iterate all the cached EntityHandle values for each entity.
-        this.entityMoveEntities.sync(getAllServerEntities(), entity -> {
+        this.entityMoveEntities.sync(getAllServerEntities());
+
+        // Fire all events
+        this.entityMoveEntities.forEach(entity -> {
             if (entity.isLastAndCurrentPositionDifferent()) {
                 entityMoveEvent.setEntity(entity);
                 CommonUtil.callEvent(entityMoveEvent);
