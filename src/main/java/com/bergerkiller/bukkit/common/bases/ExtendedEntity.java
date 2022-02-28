@@ -1123,14 +1123,18 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         entity.setTicksLived(arg0);
     }
 
-    public void setVelocity(Vector arg0) {
-        entity.setVelocity(arg0);
+    public void setVelocity(Vector velocity) {
+        velocity.checkFinite();
+
+        // Note: can't use this because Paper does some annoying >4 checks on this
+        //       from an API standpoint that spam is garbage.
+        //entity.setVelocity(arg0);
+
+        handle.setMot(velocity.getX(), velocity.getY(), velocity.getZ());
     }
 
     public void setVelocity(double motX, double motY, double motZ) {
-        handle.setMotX(motX);
-        handle.setMotY(motY);
-        handle.setMotZ(motZ);
+        handle.setMot(motX, motY, motZ);
     }
 
     public boolean teleport(Location location) {
