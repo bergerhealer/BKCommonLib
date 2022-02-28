@@ -292,6 +292,7 @@ public final class SortedIdentityCache<K, V> implements Iterable<V> {
             // Break the chain at the current link entry
             LinkEntry<K, V> end = SortedIdentityCache.this.last;
             prev.next = end;
+            end.prev = prev;
 
             // All entries that now remain have been removed
             // Remove them from the HashMap as well

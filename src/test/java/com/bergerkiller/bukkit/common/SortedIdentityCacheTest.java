@@ -43,7 +43,7 @@ public class SortedIdentityCacheTest {
     }
 
     @Test
-    public void testFillSimple() {
+    public void testSyncSimple() {
         SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
         ArrayList<TestKey> keys = new ArrayList<>(Arrays.asList(KEYS));
 
@@ -57,29 +57,43 @@ public class SortedIdentityCacheTest {
     }
 
     @Test
-    public void testFillWithElementAddedAndRemoved() {
+    public void testSyncWithElementAddedAndRemoved() {
         SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
-        ArrayList<TestKey> keys = new ArrayList<>();
-        keys.add(KEYS[0]);
-        keys.add(KEYS[1]);
-        keys.add(KEYS[2]);
-        keys.add(KEYS[3]);
-        keys.add(KEYS[5]);
-
-        cache.sync(keys);
-        verifyCache(cache, keys);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2], KEYS[3], KEYS[5]);
 
         // Remove value and add new value elsewhere
         // Removes KEYS[2] and puts KEYS[4] after KEYS[3]
-        keys.clear();
-        keys.add(KEYS[0]);
-        keys.add(KEYS[1]);
-        keys.add(KEYS[3]);
-        keys.add(KEYS[4]);
-        keys.add(KEYS[5]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[3], KEYS[4], KEYS[5]);
 
-        cache.sync(keys);
-        verifyCache(cache, keys);
+        // And in reverse
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2], KEYS[3], KEYS[5]);
+    }
+
+    @Test
+    public void testSyncSwapElementAtBeginning() {
+        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+        syncAndVerifyCache(cache, KEYS[3], KEYS[1], KEYS[2]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+    }
+
+    @Test
+    public void testSyncSwapElementMiddle() {
+        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[3], KEYS[2]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+    }
+
+    @Test
+    public void testSyncSwapElementAtEnd() {
+        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[3]);
+        syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
     }
 
     @Test
@@ -148,6 +162,12 @@ public class SortedIdentityCacheTest {
         }
         long end = System.currentTimeMillis();
         System.out.println("TOOK: " + ((double) (end-start) / (double) count) + " millis/cycle");
+    }
+
+    private void syncAndVerifyCache(SortedIdentityCache<TestKey, TestValue> cache, TestKey... keys) {
+        List<TestKey> keysList = Arrays.asList(keys);
+        cache.sync(keysList);
+        verifyCache(cache, keysList);
     }
 
     private void verifyCache(SortedIdentityCache<TestKey, TestValue> cache, List<TestKey> keys) {
