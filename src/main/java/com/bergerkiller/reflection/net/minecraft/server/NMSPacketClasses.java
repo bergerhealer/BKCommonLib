@@ -984,7 +984,18 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityEffect extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutEntityEffectHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<Byte> effectId = PacketPlayOutEntityEffectHandle.T.effectId.toFieldAccessor();
+        public final FieldAccessor<Integer> effectId = new SafeDirectField<Integer>() {
+            @Override
+            public Integer get(Object instance) {
+                return PacketPlayOutEntityEffectHandle.T.getEffectId.invoke(instance);
+            }
+
+            @Override
+            public boolean set(Object instance, Integer value) {
+                PacketPlayOutEntityEffectHandle.T.setEffectId.invoke(instance, value);
+                return true;
+            }
+        };
         public final FieldAccessor<Byte> effectAmplifier = PacketPlayOutEntityEffectHandle.T.effectAmplifier.toFieldAccessor();
         public final FieldAccessor<Integer> effectDuration = PacketPlayOutEntityEffectHandle.T.effectDurationTicks.toFieldAccessor();
         public final FieldAccessor<Byte> effectFlags = PacketPlayOutEntityEffectHandle.T.flags.toFieldAccessor();

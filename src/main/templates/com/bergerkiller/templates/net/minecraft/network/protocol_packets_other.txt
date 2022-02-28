@@ -2434,16 +2434,37 @@ class PacketPlayOutEntityEffect extends Packet {
 
 #if version >= 1.17
     private final int entityId;
-    private final byte effectId;
     private final byte effectAmplifier;
     private final int effectDurationTicks;
     private final byte flags;
 #else
     private int entityId:a;
-    private byte effectId:b;
     private byte effectAmplifier:c;
     private int effectDurationTicks:d;
     private byte flags:e;
+#endif
+
+#if version >= 1.18.2
+    public int getEffectId();
+    public void setEffectId(int id) {
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectId;
+        instance#effectId = id;
+    }
+#else
+  #if version >= 1.17
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final byte effectId;
+  #else
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectId:b;
+  #endif
+
+    public int getEffectId() {
+        return (int) instance#effectId;
+    }
+
+    public void setEffectId(int id) {
+        byte b = (byte) id;
+        instance#effectId = b;
+    }
 #endif
 
     public (PacketPlayOutEntityEffectHandle) PacketPlayOutEntityEffect(int entityId, (org.bukkit.potion.PotionEffect) MobEffect mobeffect);

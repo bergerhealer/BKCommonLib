@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
@@ -24,6 +25,9 @@ public class MC1_17_Conversion {
 
         try {
             String methodName = "d"; // 1.17
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+                methodName = Resolver.resolveMethodName(spcType, "getPlayer", new Class[0]);
+            }
 
             if (spcType == null) {
                 throw new IllegalStateException("ServerPlayerConnection class not found");

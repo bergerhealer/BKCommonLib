@@ -25,14 +25,14 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public abstract int getEffectId();
+    public abstract void setEffectId(int id);
 
     public static final int FLAG_AMBIENT = 1;
     public static final int FLAG_VISIBLE = 2;
     public static final int FLAG_SHOW_ICON = 4;
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract byte getEffectId();
-    public abstract void setEffectId(byte value);
     public abstract byte getEffectAmplifier();
     public abstract void setEffectAmplifier(byte value);
     public abstract int getEffectDurationTicks();
@@ -47,10 +47,12 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
         public final Template.Constructor.Converted<PacketPlayOutEntityEffectHandle> constr_entityId_mobeffect = new Template.Constructor.Converted<PacketPlayOutEntityEffectHandle>();
 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        public final Template.Field.Byte effectId = new Template.Field.Byte();
         public final Template.Field.Byte effectAmplifier = new Template.Field.Byte();
         public final Template.Field.Integer effectDurationTicks = new Template.Field.Integer();
         public final Template.Field.Byte flags = new Template.Field.Byte();
+
+        public final Template.Method<Integer> getEffectId = new Template.Method<Integer>();
+        public final Template.Method<Void> setEffectId = new Template.Method<Void>();
 
     }
 

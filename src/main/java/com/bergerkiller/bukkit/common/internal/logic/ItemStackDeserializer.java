@@ -146,8 +146,11 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.18 to MC 1.18.1
         this.register(2860, NO_CONVERSION);
 
+        // From MC 1.18.1 to MC 1.18.2
+        this.register(2865, NO_CONVERSION);
+
         // Maximum supported data version
-        this.max_version = 2865; // MC 1.18.1
+        this.max_version = 2975; // MC 1.18.2
     }
 
     // Registers a converter if it can convert from a future data version only

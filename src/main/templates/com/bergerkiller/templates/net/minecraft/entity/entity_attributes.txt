@@ -54,6 +54,8 @@ class AttributeMapBase {
 }
 
 class GenericAttributes {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
 #if version >= 1.16
     public static final (Object) AttributeBase FOLLOW_RANGE;
     public static final (Object) AttributeBase MOVEMENT_SPEED;

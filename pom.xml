@@ -21,7 +21,7 @@
         <jdk.version.test>17</jdk.version.test>
 
         <!-- Library versions -->
-        <minecraft.version>1.18.1</minecraft.version>
+        <minecraft.version>1.18.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>2.69</mountiplex.version>
         <cloud.version>1.6.0</cloud.version>

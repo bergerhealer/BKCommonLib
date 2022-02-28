@@ -59,10 +59,9 @@ class TestServerFactory_1_18 extends TestServerFactory {
         setField(mc_server, "serverThread", Thread.currentThread());
 
         // Initialize the dimension root registry for the server
-        // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
         // this.f = iregistrycustom_dimension; (MinecraftServer.java)
-        Object customRegistry = createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.builtin();");
-        setField(mc_server, "registryHolder", customRegistry);
+        Object customRegistryDimension = initCustomRegistryDimension(minecraftServerType);
+        setField(mc_server, "registryHolder", customRegistryDimension);
 
         // Assign to the Bukkit server silently (don't want a duplicate server info log line with random null's)
         Field bkServerField = Bukkit.class.getDeclaredField("server");
@@ -91,139 +90,8 @@ class TestServerFactory_1_18 extends TestServerFactory {
                     "return net.minecraft.SystemUtils.backgroundExecutor();"));
         }
 
-        // this.dataPackResources = DataPackResources (passed through constructor)
-        // The place where this is created can be found in Main.java and looks similar to this
-        // Difference is that no configuration is read in, and we assume a default environment
-        // Lambdas are a pain in the ass, but we're coping :(
-        {
-            final String repopath = "net.minecraft.server.packs.repository.";
-
-            /*
-             * First create a lambda, which requires generating a class that implements an anonymous interface
-             * 
-             * Equivalent to:
-             * 
-             * Inside ResourcePackRepository.java:
-             * 
-             * (s, ichatbasecomponent, flag, supplier, resourcepackinfo, resourcepackloader_position, packsource) -> {
-             *     return new ResourcePackLoader(s, ichatbasecomponent, flag, supplier, resourcepackinfo, enumresourcepacktype, resourcepackloader_position, packsource);
-             * }
-             * 
-             * TODO: Should be a cleaner method in Mountiplex for stuff like this
-             *
-             * T create(String s,
-             *          IChatBaseComponent ichatbasecomponent,
-             *          boolean flag,
-             *          Supplier<IResourcePack> supplier,
-             *          ResourcePackInfo resourcepackinfo,
-             *          ResourcePackLoader.Position resourcepackloader_position,
-             *          PackSource packsource);
-             */
-            Object resourcePackLoaderNew;
-            {
-                Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
-                final Object packTypeServerData = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
-                
-                final Class<?> resourcePackLoaderType = Class.forName(repopath + "ResourcePackLoader");
-                ClassInterceptor interceptor = new ClassInterceptor() {
-                    @Override
-                    protected Invoker<?> getCallback(Method method) {
-                        if (method.getReturnType().equals(resourcePackLoaderType)) {
-                            return (instance, args) -> {
-                                return construct(resourcePackLoaderType,
-                                        args[0], /* s */
-                                        args[1], /* ichatbasecomponent */
-                                        args[2], /* flag */
-                                        args[3], /* supplier */
-                                        args[4], /* resourcepackinfo */
-                                        packTypeServerData, /* enumresourcepacktype */
-                                        args[5], /* resourcepackloader_position */
-                                        args[6]  /* packsource */);
-                            };
-                        }
-                        return null;
-                    }
-                };
-
-                resourcePackLoaderNew = interceptor.createInstance(Class.forName(repopath + "ResourcePackLoader$a"));
-            }
-
-            /*
-             * Create the ResourcePackRepository instance
-             * 
-             * ResourcePackRepository<ResourcePackLoader> resourcepackrepository = new ResourcePackRepository<>(
-             *     ResourcePackLoader::new,
-             *     new ResourcePackSource[] {new ResourcePackSourceVanilla()}
-             */
-            Object resourcepackrepository;
-            {
-                Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
-                resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
-                resourcepackrepository = construct(Class.forName(repopath + "ResourcePackRepository"),
-                        resourcePackLoaderNew, resourcePackSources);
-            }
-
-            /*
-             * Create the Data pack configuration instance
-             * 
-             * DataPackConfiguration datapackconfiguration1 = MinecraftServer.a(resourcepackrepository, DataPackConfiguration.a, true);
-             */
-            Object datapackconfiguration;
-            {
-                Object defaultDPConfig = getStaticField(Class.forName("net.minecraft.world.level.DataPackConfiguration"), "a");
-                Method createDPConfig = Resolver.resolveAndGetDeclaredMethod(minecraftServerType, "configurePackRepository",
-                        Class.forName(repopath + "ResourcePackRepository"),
-                        Class.forName("net.minecraft.world.level.DataPackConfiguration"),
-                        boolean.class);
-                datapackconfiguration = createDPConfig.invoke(null, resourcepackrepository, defaultDPConfig, true);
-            }
-
-            /*
-             * Create a completable future completed when the resource pack is loaded fully.
-             * Call get() on it to load it synchronously right here right now
-             * 
-             * CompletableFuture completablefuture = DataPackResources.a(
-             *         resourcepackrepository.f(),
-             *         CommandDispatcher.ServerType.DEDICATED,
-             *         2, //dedicatedserversettings.getProperties().functionPermissionLevel,
-             *         SystemUtils.f(),
-             *         Runnable::run);
-             */
-            CompletableFuture<Object> futureDPLoaded;
-            {
-                java.util.List<?> packs = (java.util.List<?>) resourcepackrepository.getClass().getMethod("f").invoke(resourcepackrepository);
-                Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
-                Object serverType = getStaticField(serverTypeType, "DEDICATED");
-                int functionPermissionLevel = 2;
-                Executor executor1 = (Executor) Class.forName("net.minecraft.SystemUtils").getMethod("f").invoke(null);
-                Executor executor2 = Runnable::run;
-                Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
-                Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
-                        List.class,
-                        Class.forName("net.minecraft.core.IRegistryCustom"),
-                        serverTypeType,
-                        int.class,
-                        Executor.class,
-                        Executor.class);
-                futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
-                        packs, customRegistry, serverType, functionPermissionLevel, executor1, executor2);
-            }
-
-            // Retrieve it, using get(). May throw if problems occur.
-            Object datapackresources = futureDPLoaded.get();
-
-            // Call j() on the result - which calls bind() on the tags
-            // datapackresources.i();
-            {
-                Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
-                Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateGlobals").invoke(datapackresources);
-            }
-
-            // Now set all these fields in the MinecraftServer instance
-            setField(mc_server, "packRepository", resourcepackrepository);
-            setField(mc_server, "datapackconfiguration", datapackconfiguration);
-            setField(mc_server, "resources", datapackresources);
-        }
+        // ResourcePack initialization (makes recipes available)
+        initDataPack(minecraftServerType, mc_server, customRegistryDimension);
 
         // Initialize WorldDataServer instance
         // public WorldDataServer(WorldSettings worldsettings, GeneratorSettings generatorsettings, Lifecycle lifecycle)
@@ -245,5 +113,146 @@ class TestServerFactory_1_18 extends TestServerFactory {
         m.setAccessible(true);
         m.invoke(mc_server, serverDir, worldData);
         */
+    }
+
+    protected Object initCustomRegistryDimension(Class<?> minecraftServerType) {
+        // IRegistryCustom.Dimension iregistrycustom_dimension = IRegistryCustom.b(); (Main.java)
+        return createFromCode(minecraftServerType, "return net.minecraft.core.IRegistryCustom.builtin();");
+    }
+
+    @SuppressWarnings({"unchecked"})
+    protected void initDataPack(Class<?> minecraftServerType, Object mc_server, Object customRegistryDimension) throws Throwable {
+        final String repopath = "net.minecraft.server.packs.repository.";
+
+        // this.dataPackResources = DataPackResources (passed through constructor)
+        // The place where this is created can be found in Main.java and looks similar to this
+        // Difference is that no configuration is read in, and we assume a default environment
+        // Lambdas are a pain in the ass, but we're coping :(
+
+        /*
+         * First create a lambda, which requires generating a class that implements an anonymous interface
+         * 
+         * Equivalent to:
+         * 
+         * Inside ResourcePackRepository.java:
+         * 
+         * (s, ichatbasecomponent, flag, supplier, resourcepackinfo, resourcepackloader_position, packsource) -> {
+         *     return new ResourcePackLoader(s, ichatbasecomponent, flag, supplier, resourcepackinfo, enumresourcepacktype, resourcepackloader_position, packsource);
+         * }
+         * 
+         * TODO: Should be a cleaner method in Mountiplex for stuff like this
+         *
+         * T create(String s,
+         *          IChatBaseComponent ichatbasecomponent,
+         *          boolean flag,
+         *          Supplier<IResourcePack> supplier,
+         *          ResourcePackInfo resourcepackinfo,
+         *          ResourcePackLoader.Position resourcepackloader_position,
+         *          PackSource packsource);
+         */
+        Object resourcePackLoaderNew;
+        {
+            Class<?> enumSourcePackTypeClass = Class.forName("net.minecraft.server.packs.EnumResourcePackType");
+            final Object packTypeServerData = getStaticField(enumSourcePackTypeClass, "SERVER_DATA");
+            
+            final Class<?> resourcePackLoaderType = Class.forName(repopath + "ResourcePackLoader");
+            ClassInterceptor interceptor = new ClassInterceptor() {
+                @Override
+                protected Invoker<?> getCallback(Method method) {
+                    if (method.getReturnType().equals(resourcePackLoaderType)) {
+                        return (instance, args) -> {
+                            return construct(resourcePackLoaderType,
+                                    args[0], /* s */
+                                    args[1], /* ichatbasecomponent */
+                                    args[2], /* flag */
+                                    args[3], /* supplier */
+                                    args[4], /* resourcepackinfo */
+                                    packTypeServerData, /* enumresourcepacktype */
+                                    args[5], /* resourcepackloader_position */
+                                    args[6]  /* packsource */);
+                        };
+                    }
+                    return null;
+                }
+            };
+
+            resourcePackLoaderNew = interceptor.createInstance(Class.forName(repopath + "ResourcePackLoader$a"));
+        }
+
+        /*
+         * Create the ResourcePackRepository instance
+         * 
+         * ResourcePackRepository<ResourcePackLoader> resourcepackrepository = new ResourcePackRepository<>(
+         *     ResourcePackLoader::new,
+         *     new ResourcePackSource[] {new ResourcePackSourceVanilla()}
+         */
+        Object resourcepackrepository;
+        {
+            Object[] resourcePackSources = LogicUtil.createArray(Class.forName(repopath + "ResourcePackSource"), 1);
+            resourcePackSources[0] = construct(Class.forName(repopath + "ResourcePackSourceVanilla"));
+            resourcepackrepository = construct(Class.forName(repopath + "ResourcePackRepository"),
+                    resourcePackLoaderNew, resourcePackSources);
+        }
+
+        /*
+         * Create the Data pack configuration instance
+         * 
+         * DataPackConfiguration datapackconfiguration1 = MinecraftServer.a(resourcepackrepository, DataPackConfiguration.a, true);
+         */
+        Object datapackconfiguration;
+        {
+            Object defaultDPConfig = getStaticField(Class.forName("net.minecraft.world.level.DataPackConfiguration"), "a");
+            Method createDPConfig = Resolver.resolveAndGetDeclaredMethod(minecraftServerType, "configurePackRepository",
+                    Class.forName(repopath + "ResourcePackRepository"),
+                    Class.forName("net.minecraft.world.level.DataPackConfiguration"),
+                    boolean.class);
+            datapackconfiguration = createDPConfig.invoke(null, resourcepackrepository, defaultDPConfig, true);
+        }
+
+        /*
+         * Create a completable future completed when the resource pack is loaded fully.
+         * Call get() on it to load it synchronously right here right now
+         * 
+         * CompletableFuture completablefuture = DataPackResources.a(
+         *         resourcepackrepository.f(),
+         *         CommandDispatcher.ServerType.DEDICATED,
+         *         2, //dedicatedserversettings.getProperties().functionPermissionLevel,
+         *         SystemUtils.f(),
+         *         Runnable::run);
+         */
+        CompletableFuture<Object> futureDPLoaded;
+        {
+            java.util.List<?> packs = (java.util.List<?>) resourcepackrepository.getClass().getMethod("f").invoke(resourcepackrepository);
+            Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
+            Object serverType = getStaticField(serverTypeType, "DEDICATED");
+            int functionPermissionLevel = 2;
+            Executor executor1 = (Executor) Class.forName("net.minecraft.SystemUtils").getMethod("f").invoke(null);
+            Executor executor2 = Runnable::run;
+            Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
+            Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
+                    List.class,
+                    Class.forName("net.minecraft.core.IRegistryCustom"),
+                    serverTypeType,
+                    int.class,
+                    Executor.class,
+                    Executor.class);
+            futureDPLoaded = (CompletableFuture<Object>) startLoadingMethod.invoke(null,
+                    packs, customRegistryDimension, serverType, functionPermissionLevel, executor1, executor2);
+        }
+
+        // Retrieve it, using get(). May throw if problems occur.
+        Object datapackresources = futureDPLoaded.get();
+
+        // Call j() on the result - which calls bind() on the tags
+        // datapackresources.i();
+        {
+            Class<?> datapackresourceType = Class.forName("net.minecraft.server.DataPackResources");
+            Resolver.resolveAndGetDeclaredMethod(datapackresourceType, "updateGlobals").invoke(datapackresources);
+        }
+
+        // Now set all these fields in the MinecraftServer instance
+        setField(mc_server, "packRepository", resourcepackrepository);
+        setField(mc_server, "datapackconfiguration", datapackconfiguration);
+        setField(mc_server, "resources", datapackresources);
     }
 }
