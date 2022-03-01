@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.conversion.type;
 
 import java.util.WeakHashMap;
-import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -10,7 +9,7 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.WorldInitEvent;
 
-import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
@@ -25,22 +24,30 @@ public class MC1_18_2_Conversion {
     public static void init() {
         handler = Template.Class.create(HolderLogic.class);
         handler.forceInitialization();
+    }
 
-        if (CommonPlugin.hasInstance()) {
-            try {
+    public static LibraryComponent initComponent(final CommonPlugin plugin) {
+        return new LibraryComponent() {
+            @Override
+            public void enable() throws Throwable {
                 for (World world : Bukkit.getWorlds()) {
                     track(world);
                 }
-                CommonPlugin.getInstance().register(new Listener() {
+                plugin.register(new Listener() {
                     @EventHandler(priority = EventPriority.LOWEST)
                     public void onWorldInit(WorldInitEvent event) {
                         track(event.getWorld());
                     }
                 });
-            } catch (Throwable t) {
-                Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to initialize DimensionManager holders", t);
             }
-        }
+
+            @Override
+            public void disable() throws Throwable {
+                synchronized (holdersByDimensionManager) {
+                    holdersByDimensionManager.clear();
+                }
+            }
+        };
     }
 
     private static void track(World world) {
@@ -89,6 +96,7 @@ public class MC1_18_2_Conversion {
          *     return world.getHandle().dimensionType();
          * }
          */
+        @Template.Generated("%GET_DIMENSION_TYPE_OF_WORLD%")
         public abstract Object getDimensionTypeOfWorld(World world);
 
         /*

@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.config.FileConfiguration;
 import com.bergerkiller.bukkit.common.controller.EntityController;
 import com.bergerkiller.bukkit.common.conversion.type.DimensionResourceKeyConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.MC1_18_2_Conversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntity;
 import com.bergerkiller.bukkit.common.events.CommonEventFactory;
 import com.bergerkiller.bukkit.common.events.CreaturePreSpawnEvent;
@@ -652,6 +653,8 @@ public class CommonPlugin extends PluginBase {
 
         // Enable all components in order
         this.components.enable(this.serverLogRecorder);
+        this.components.enableForVersions("Dimension to Holder conversion", "1.18.2", null,
+                MC1_18_2_Conversion::initComponent);
         this.components.enableCreate(OfflineWorld::initializeComponent);
         this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
                 DimensionResourceKeyConversion.Tracker::new);
