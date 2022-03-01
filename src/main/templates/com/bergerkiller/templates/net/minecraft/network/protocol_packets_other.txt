@@ -1100,7 +1100,9 @@ class PacketPlayOutLogin extends Packet {
     }
 #endif
 
-#if version >= 1.17
+#if version >= 1.18.2
+    private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+#elseif version >= 1.17
     private (DimensionType) DimensionManager dimensionType;
 #elseif version >= 1.16.2
     private (DimensionType) DimensionManager dimensionType:h;
@@ -1182,7 +1184,9 @@ class PacketPlayOutLogin extends Packet {
 }
 
 class PacketPlayOutRespawn extends Packet {
-#if version >= 1.17
+#if version >= 1.18.2
+    private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+#elseif version >= 1.17
     private (DimensionType) DimensionManager dimensionType;
 #elseif version >= 1.16.2
     private (DimensionType) DimensionManager dimensionType:a;

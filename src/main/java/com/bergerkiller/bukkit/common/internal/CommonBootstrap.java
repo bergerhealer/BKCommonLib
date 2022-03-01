@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.DimensionResourceKeyConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_17_Conversion;
+import com.bergerkiller.bukkit.common.conversion.type.MC1_18_2_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.NBTConversion;
 import com.bergerkiller.bukkit.common.conversion.type.PropertyConverter;
@@ -640,6 +641,10 @@ public class CommonBootstrap {
                 Logging.LOGGER_REFLECTION.log(Level.SEVERE,
                         "Failed to register ResourceKey<>DimensionManager converter", t);
             }
+        }
+        if (evaluateMCVersion(">=", "1.18.2")) {
+            MC1_18_2_Conversion.init();
+            Conversion.registerConverters(MC1_18_2_Conversion.class);
         }
 
         // Initialize the 'Conversion' classes right after to catch errors happening here
