@@ -3,6 +3,9 @@ package com.bergerkiller.bukkit.common.map.archive;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -20,6 +23,7 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
     private final Logger log;
     private final File clientJarFile;
     private final File clientJarTempFile;
+    private Map<String, List<String>> directories = null;
     private JarFile archive = null;
 
     public MapResourcePackClientArchive() {
@@ -132,6 +136,21 @@ public class MapResourcePackClientArchive implements MapResourcePackArchive {
             }
         }
         return null;
+    }
+
+    @Override
+    public List<String> listFiles(String folder) throws IOException {
+        if (this.directories == null) {
+            if (this.archive == null) {
+                return Collections.emptyList();
+            } else {
+                this.directories = MapResourcePackZipArchive.readDirectories(this.archive.stream()
+                        .filter(e -> e.getName().startsWith("assets/minecraft") ||
+                                     e.getName().startsWith("data/minecraft")));
+            }
+        }
+
+        return this.directories.getOrDefault(folder, Collections.emptyList());
     }
 
     private static class DownloadFailure extends RuntimeException {

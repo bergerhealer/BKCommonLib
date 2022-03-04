@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collections;
+import java.util.List;
 
 import com.bergerkiller.bukkit.common.Logging;
 
@@ -49,4 +51,9 @@ public class MapResourcePackAutoArchive implements MapResourcePackArchive {
         return this.archive.openFileStream(path);
     }
 
+    @Override
+    public List<String> listFiles(String folder) throws IOException {
+        if (this.archive == null) return Collections.emptyList();
+        return this.archive.listFiles(folder);
+    }
 }

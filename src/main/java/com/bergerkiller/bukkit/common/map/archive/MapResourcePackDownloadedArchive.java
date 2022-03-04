@@ -295,6 +295,11 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
         return (this.archive == null) ? null : this.archive.openFileStream(path);
     }
 
+    @Override
+    public List<String> listFiles(String folder) throws IOException {
+        return (this.archive == null) ? Collections.emptyList() : this.archive.listFiles(folder);
+    }
+
     private static class PackDownload {
         public String tempName = null;
         public String realName = null;

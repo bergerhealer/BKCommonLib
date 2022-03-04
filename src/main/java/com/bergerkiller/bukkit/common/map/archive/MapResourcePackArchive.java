@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.map.archive;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
 /**
  * Abstract interface for accessing the file contents of a resource pack.
@@ -23,4 +24,13 @@ public interface MapResourcePackArchive {
      * @throws IOException when an error occurs trying to access the file
      */
     InputStream openFileStream(String path) throws IOException;
+
+    /**
+     * Lists all the files that exist inside a folder of this resource pack archive
+     *
+     * @param folder Folder relative to the root of the archive to list
+     * @return List of files found in the folder
+     * @throws IOException when an error occurs trying to access the archive
+     */
+    List<String> listFiles(String folder) throws IOException;
 }

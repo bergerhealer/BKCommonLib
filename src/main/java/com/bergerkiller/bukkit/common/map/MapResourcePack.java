@@ -6,9 +6,11 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 import org.bukkit.Material;
@@ -16,9 +18,11 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
+import org.yaml.snakeyaml.error.YAMLException;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.config.ConfigurationNode;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
@@ -93,6 +97,7 @@ public class MapResourcePack {
     private final MapResourcePack baseResourcePack;
     protected MapResourcePackArchive archive;
     private final Map<String, MapTexture> textureCache = new HashMap<String, MapTexture>();
+    private final Map<String, ConfigurationNode> yamlCache = new HashMap<String, ConfigurationNode>();
     private final Map<String, Model> modelCache = new HashMap<String, Model>();
     private final Map<BlockRenderOptions, Model> blockModelCache = new HashMap<BlockRenderOptions, Model>();
     private BlockRenderProvider currProvider = null;
@@ -366,6 +371,96 @@ public class MapResourcePack {
     }
 
     /**
+     * Lists all the resources found inside a folder of the given resource type. As some resources
+     * like models sit in a specific root directory, the folder path is relative to that directory.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.
+     *
+     * @param type Type of resources to find
+     * @param folder Folder relative to the resource type root to look for files
+     * @return Set of files matching this resource type found in the folder. Without extension.
+     *         These paths can be directly used with methods like {@link #getTexture(String)}
+     *         and {@link #getConfig(String)}.
+     */
+    public Set<String> listResources(ResourceType type, String folder) {
+        // Must end with / to be a valid zip directory 'file'
+        if (!folder.endsWith("/")) {
+            folder += "/";
+        }
+
+        String zipFolderPath;
+        if (folder.equals("/")) {
+            zipFolderPath = type.getRoot();
+        } else {
+            zipFolderPath = type.getRoot() + folder;
+        }
+
+        Set<String> result = new HashSet<>();
+        this.listResources(type, folder, zipFolderPath, result, false);
+        return result;
+    }
+
+    /**
+     * Lists all the sub-directories storing resources of a given resource type. The resource
+     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.
+     *
+     * @param type Type of resources to list directories of in a folder
+     * @param folder Folder relative to the resource type root to look for files
+     * @return Set of directory paths that are child of the folder path specified
+     */
+    public Set<String> listDirectories(ResourceType type, String folder) {
+        // Must end with / to be a valid zip directory 'file'
+        if (!folder.endsWith("/")) {
+            folder += "/";
+        }
+
+        String zipFolderPath;
+        if (folder.equals("/")) {
+            zipFolderPath = type.getRoot();
+            folder = ""; // Don't return results starting with /
+        } else {
+            zipFolderPath = type.getRoot() + folder;
+        }
+
+        Set<String> result = new HashSet<>();
+        this.listResources(type, folder, zipFolderPath, result, true);
+        return result;
+    }
+
+    /**
+     * Loads a YAML file stored in the resource pack at the path specified.
+     * If not found, returns an empty configuration node.<br>
+     * <br>
+     * Please make sure not to make modifications to the returned configuration node
+     * without first {@link ConfigurationNode#clone() cloning} it. As the returned
+     * configuration is cached, the changes will persist.
+     *
+     * @param path Path in the resource pack to look for YAML-encoded file (.yml extension excluded)
+     * @return configuration node of the decoded YAML file found at this path
+     * @throws YAMLException If an error occurs reading or decoding the YAML file (and the file exists)
+     */
+    public ConfigurationNode getConfig(String path) throws YAMLException {
+        ConfigurationNode result = yamlCache.get(path);
+        if (result == null) {
+            result = new ConfigurationNode();
+            try {
+                try (InputStream inputStream = openFileStream(ResourceType.YAML, path)) {
+                    if (inputStream != null) {
+                        result.loadFromStream(inputStream);
+                    }
+                }
+            } catch (YAMLException ex) {
+                throw ex;
+            } catch (IOException ex) {
+                throw new YAMLException("Failed to open YAML file stream at " + path, ex);
+            }
+
+            // Cache for next time
+            yamlCache.put(path, result);
+        }
+        return result;
+    }
+
+    /**
      * Loads a texture from this resource pack.
      * 
      * @param path to the texture, e.g. "blocks/stone"
@@ -609,6 +704,44 @@ public class MapResourcePack {
     }
 
     /**
+     * Called by the main listResources() function to fill a set of strings with files
+     * found in a folder.
+     *
+     * @param type
+     * @param folder
+     * @param rootRelFolder
+     * @param result
+     * @param directories Whether to list directories instead of files
+     */
+    protected void listResources(ResourceType type, String folder, String rootRelFolder, Set<String> result, boolean directories) {
+        // =null: failed to load resource pack file
+        this.handleLoad(true, false);
+        if (this.archive != null) {
+            try {
+                if (directories) {
+                    for (String file : this.archive.listFiles(rootRelFolder)) {
+                        if (file.endsWith("/")) {
+                            result.add(folder + file.substring(0, file.length() - 1));
+                        }
+                    }
+                } else {
+                    for (String file : this.archive.listFiles(rootRelFolder)) {
+                        if (type.isExtension(file)) {
+                            result.add(folder + file.substring(0, file.length() - type.getExtension().length()));
+                        }
+                    }
+                }
+            } catch (IOException ex) {
+            }
+        }
+
+        // Ask base pack as well!
+        if (this.baseResourcePack != null) {
+            this.baseResourcePack.listResources(type, folder, rootRelFolder, result, directories);
+        }
+    }
+
+    /**
      * Attempts to find a file in the resource pack and open it for reading
      * 
      * @param type of resource to find
@@ -704,7 +837,7 @@ public class MapResourcePack {
         }
         return null;
     }
-    
+
     /**
      * A type of resource that can be read from a Resource Pack
      */
@@ -716,7 +849,9 @@ public class MapResourcePack {
         /** Textures found in <b>assets/minecraft/textures/</b> */
         TEXTURES("assets/minecraft/textures/", ".png"),
         /** Texture metadata found in <b>assets/minecraft/textures/</b> */
-        TEXTURES_META("assets/minecraft/textures/", ".png.mcmeta");
+        TEXTURES_META("assets/minecraft/textures/", ".png.mcmeta"),
+        /** YAML configuration files stored anywhere under <b>assets/</b> */
+        YAML("assets/", ".yml");
 
         private final String root;
         private final String ext;
