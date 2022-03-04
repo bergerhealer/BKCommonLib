@@ -62,6 +62,7 @@ public class SpigotMappings {
      * @throws IOException
      */
     public void read(InputStream inputStream) throws IOException {
+        HashMap<String, String> spigotToMojang = new HashMap<>();
         try (DataInputStream stream = new DataInputStream(new InflaterInputStream(inputStream))) {
             int numVersions = stream.readInt();
             if (numVersions == 0) {
@@ -69,22 +70,24 @@ public class SpigotMappings {
             }
 
             String version = stream.readUTF();
-            ClassMappings mappings = new ClassMappings();
             while (numVersions-- > 0) {
-                this.byVersion.put(version, mappings);
+                String nextVersion = version;
                 for (String entry; !(entry = stream.readUTF()).isEmpty();) {
                     int sep = entry.indexOf('=');
                     if (sep == -1) {
                         // Version string
-                        version = entry;
+                        nextVersion = entry;
                         break;
                     } else if (sep == (entry.length()-1)) {
-                        mappings.spigotToMojang.remove(entry.substring(0, sep));
+                        spigotToMojang.remove(entry.substring(0, sep));
                     } else {
-                        mappings.spigotToMojang.forcePut(entry.substring(0, sep), entry.substring(sep + 1));
+                        spigotToMojang.put(entry.substring(0, sep), entry.substring(sep + 1));
                     }
                 }
-                mappings = mappings.clone();
+
+                this.byVersion.put(version, new ClassMappings(spigotToMojang));
+
+                version = nextVersion;
             }
         }
     }
@@ -192,7 +195,7 @@ public class SpigotMappings {
         // Go by all of Mojang's classes and if the class name was remapped on Bukkit,
         // store the Bukkit name for those classes. Sometimes a subclass of a class isn't
         // remapped, in which case we must perform remapping of this name ourselves.
-        ClassMappings mappings = new ClassMappings();
+        HashMap<String, String> newMappings = new HashMap<>();
         for (MojangMappings.ClassMappings cl : mojangMappings.classes()) {
             String bukkitFullName = obfuscatedToBukkit.get(cl.name_obfuscated);
             if (bukkitFullName == null) {
@@ -207,12 +210,12 @@ public class SpigotMappings {
                 }
             }
             if (bukkitFullName != null) {
-                mappings.spigotToMojang.put(bukkitFullName, cl.name);
+                newMappings.put(bukkitFullName, cl.name);
             }
         }
 
         // Store the result
-        this.byVersion.put(version, mappings);
+        this.byVersion.put(version, new ClassMappings(newMappings));
 
         // No longer need it.
         mappingsFile.delete();
@@ -264,19 +267,9 @@ public class SpigotMappings {
         private final BiMap<String, String> mojangToSpigot;
         private final BiMap<String, String> spigotToMojang;
 
-        private ClassMappings(ClassMappings copy) {
-            this.mojangToSpigot = HashBiMap.create(copy.mojangToSpigot);
-            this.spigotToMojang = this.mojangToSpigot.inverse();
-        }
-
-        public ClassMappings() {
-            this.mojangToSpigot = HashBiMap.create(50);
-            this.spigotToMojang = this.mojangToSpigot.inverse();
-        }
-
-        @Override
-        public ClassMappings clone() {
-            return new ClassMappings(this);
+        public ClassMappings(Map<String, String> spigotToMojang) {
+            this.spigotToMojang = HashBiMap.create(spigotToMojang);
+            this.mojangToSpigot = this.spigotToMojang.inverse();
         }
 
         public String toMojang(String spigotClassName) {
