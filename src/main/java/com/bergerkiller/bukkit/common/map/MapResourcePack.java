@@ -709,10 +709,14 @@ public class MapResourcePack {
      * A type of resource that can be read from a Resource Pack
      */
     public static enum ResourceType {
-        MODELS("models/", ".json"),
-        BLOCKSTATES("blockstates/", ".json"),
-        TEXTURES("textures/", ".png"),
-        TEXTURES_META("textures/", ".png.mcmeta");
+        /** Models found in <b>assets/minecraft/models/</b> */
+        MODELS("assets/minecraft/models/", ".json"),
+        /** Block States found in <b>assets/minecraft/blockstates/</b> */
+        BLOCKSTATES("assets/minecraft/blockstates/", ".json"),
+        /** Textures found in <b>assets/minecraft/textures/</b> */
+        TEXTURES("assets/minecraft/textures/", ".png"),
+        /** Texture metadata found in <b>assets/minecraft/textures/</b> */
+        TEXTURES_META("assets/minecraft/textures/", ".png.mcmeta");
 
         private final String root;
         private final String ext;
@@ -730,8 +734,13 @@ public class MapResourcePack {
             return this.ext;
         }
 
+        public boolean isExtension(String filePath) {
+            int extIdx = filePath.indexOf('.');
+            return extIdx != -1 && filePath.substring(extIdx).equals(this.ext);
+        }
+
         public String makePath(String path) {
-            return "assets/minecraft/" + this.root + stripNS(path) + this.ext;
+            return this.root + stripNS(path) + this.ext;
         }
 
         public String makeBKCPath(String path) {
