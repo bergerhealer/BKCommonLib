@@ -18,7 +18,6 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.*;
 import com.comphenix.protocol.injector.GamePhase;
-import com.comphenix.protocol.injector.PlayerLoggedOutException;
 import com.comphenix.protocol.injector.packet.PacketRegistry;
 
 import org.bukkit.Bukkit;
@@ -38,6 +37,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private final List<CommonPacketListener> listeners = new ArrayList<CommonPacketListener>();
     private final SilentPacketQueue silentPacketQueueFallback = new SilentPacketQueue();
     private final SilentQueueCleanupTask silentQueueCleanupTask = new SilentQueueCleanupTask();
+    private Class<?> loggedOutPlayerExceptionType = String.class;
     private boolean useSilentPacketQueue = false;
     private boolean isSendSilentPacketBroken = false;
 
@@ -52,6 +52,12 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         Class<?> packetContainer = CommonUtil.getClass(LIB_ROOT + "events.PacketContainer");
         if (manager == null || packetContainer == null) {
             return false;
+        }
+
+        // Exception thrown on older protocollib versions
+        loggedOutPlayerExceptionType = CommonUtil.getClass(LIB_ROOT + "injector.PlayerLoggedOutException");
+        if (loggedOutPlayerExceptionType == null) {
+            loggedOutPlayerExceptionType = String.class; // Avoid NPE doing instanceof checks at runtime (never assignable)
         }
 
         // Detect silent packet bug
@@ -123,8 +129,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
         try {
             getProtocolManager().recieveClientPacket(player, toReceive);
-        } catch (PlayerLoggedOutException ex) {
-            // Ignore
+        } catch (RuntimeException ex) {
+            if (this.loggedOutPlayerExceptionType.isInstance(ex)) {
+                return; // Ignore
+            }
+            throw ex;
         } catch (Exception e) {
             throw new RuntimeException("Error while receiving packet:", e);
         }
@@ -161,8 +170,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             try {
                 final PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
                 getProtocolManager().sendServerPacket(player, toSend, null, false);
-            } catch (PlayerLoggedOutException ex) {
-                // Ignore
+            } catch (RuntimeException ex) {
+                if (this.loggedOutPlayerExceptionType.isInstance(ex)) {
+                    return; // Ignore
+                }
+                throw ex;
             } catch (LinkageError err) {
                 // Serious issue inside the ProtocolLib library. We cannot use it.
                 Logging.LOGGER_NETWORK.log(Level.SEVERE, "A severe error occurred inside ProtocolLib while trying to send a packet");
