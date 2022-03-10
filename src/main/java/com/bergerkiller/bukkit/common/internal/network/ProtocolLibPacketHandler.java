@@ -444,9 +444,13 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             // use this, as it exposes plugins to a lot of potential errors.
             Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
             try {
-                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
-            } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.temporary.TemporaryPlayer");
+            } catch (Throwable t1) {
+                try {
+                    tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
+                } catch (Throwable t2) {
+                    Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+                }
             }
             this.temporaryPlayerClass = tempPlayerClass;
         }
