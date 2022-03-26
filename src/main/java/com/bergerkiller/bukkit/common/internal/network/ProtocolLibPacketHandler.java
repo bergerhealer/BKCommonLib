@@ -14,6 +14,9 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
+import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
+import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.*;
@@ -24,6 +27,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import java.lang.reflect.Method;
 import java.util.*;
 import java.util.logging.Level;
 
@@ -37,6 +41,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private final List<CommonPacketListener> listeners = new ArrayList<CommonPacketListener>();
     private final SilentPacketQueue silentPacketQueueFallback = new SilentPacketQueue();
     private final SilentQueueCleanupTask silentQueueCleanupTask = new SilentQueueCleanupTask();
+    private final FastMethod<Void> receivePacketMethod = new FastMethod<Void>();
     private Class<?> loggedOutPlayerExceptionType = String.class;
     private boolean useSilentPacketQueue = false;
     private boolean isSendSilentPacketBroken = false;
@@ -58,6 +63,32 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         loggedOutPlayerExceptionType = CommonUtil.getClass(LIB_ROOT + "injector.PlayerLoggedOutException");
         if (loggedOutPlayerExceptionType == null) {
             loggedOutPlayerExceptionType = String.class; // Avoid NPE doing instanceof checks at runtime (never assignable)
+        }
+
+        // ProtocolLib renamed this typo with v5.0
+        try {
+            // Legacy pre-5.0 API
+            this.receivePacketMethod.init(manager.getDeclaredMethod("recieveClientPacket", Player.class, packetContainer));
+            this.receivePacketMethod.forceInitialization();
+        } catch (Throwable t1) {
+            // Try the 5.0 API which adds a bool parameter and fixes the typo.
+            // We got to adapt the function to make it work, though
+            try {
+                // Validate it exists
+                manager.getDeclaredMethod("receiveClientPacket", Player.class, packetContainer, boolean.class);
+                // Runtime-generated adaptor function
+                ClassResolver resolver = new ClassResolver();
+                resolver.setDeclaredClass(manager);
+                resolver.addImport(Player.class.getName());
+                resolver.addImport(packetContainer.getName());
+                this.receivePacketMethod.init(new MethodDeclaration(resolver,
+                        "public void receivePacket(Player player, PacketContainer container) {\n" +
+                        "    instance.receiveClientPacket(player, container, true);\n" +
+                        "}"));
+                this.receivePacketMethod.forceInitialization();
+            } catch (Throwable t) {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to initialize receiveClientPacket method for ProtocolLib", t);
+            }
         }
 
         // Detect silent packet bug
@@ -128,7 +159,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         type.preprocess(packet);
         PacketContainer toReceive = new PacketContainer(getPacketType(packet.getClass()), packet);
         try {
-            getProtocolManager().recieveClientPacket(player, toReceive);
+            this.receivePacketMethod.invoke(getProtocolManager(), player, toReceive);
         } catch (RuntimeException ex) {
             if (this.loggedOutPlayerExceptionType.isInstance(ex)) {
                 return; // Ignore
