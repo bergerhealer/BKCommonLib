@@ -387,7 +387,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         @Override
         public void onPacketReceiving(PacketEvent event) {
             // Check not temporary
-            if (this.isTemporary(event.getPlayer())) {
+            if (this.isTemporary(event)) {
                 return;
             }
 
@@ -397,7 +397,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         @Override
         public void onPacketSending(PacketEvent event) {
             // Check not temporary
-            if (this.isTemporary(event.getPlayer())) {
+            if (this.isTemporary(event)) {
                 return;
             }
 
@@ -420,7 +420,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         @Override
         public void onPacketReceiving(PacketEvent event) {
             // Check not temporary
-            if (this.isTemporary(event.getPlayer())) {
+            if (this.isTemporary(event)) {
                 return;
             }
 
@@ -443,7 +443,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             }
 
             // Check not temporary
-            if (this.isTemporary(event.getPlayer())) {
+            if (this.isTemporary(event)) {
                 return;
             }
 
@@ -461,6 +461,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         public final PacketType[] types;
         private final ListeningWhitelist receiving;
         private final ListeningWhitelist sending;
+        private final boolean eventHasIsTemporaryPlayerMethod;
         private final Class<?> temporaryPlayerClass;
 
         public CommonPacketAdapter(Plugin plugin, ListenerPriority priority, PacketType[] types) {
@@ -469,31 +470,52 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.receiving = getWhiteList(priority, types, true);
             this.sending = getWhiteList(priority, types, false);
 
-            // ProtocolLib uses a 'TemporaryPlayer' object to represent players before
-            // they are spawned in the world. We want to ignore events of players that
-            // use this, as it exposes plugins to a lot of potential errors.
+            // Check that the PacketEvent has a isPlayerTemporary() method
+            boolean hasIsTemporaryPlayerMethod = false;
             Class<?> tempPlayerClass = String.class; // fallback, always unassignable to player
             try {
-                tempPlayerClass = Class.forName("com.comphenix.protocol.injector.temporary.TemporaryPlayer");
-            } catch (Throwable t1) {
+                PacketEvent.class.getDeclaredMethod("isPlayerTemporary");
+                hasIsTemporaryPlayerMethod = true;
+            } catch (NoSuchMethodException ex) {
+                // Note: this is probably never going to be used. The isPlayerTemporary method
+                // probably existed since the dawn of time.
+
+                // ProtocolLib uses a 'TemporaryPlayer' object to represent players before
+                // they are spawned in the world. We want to ignore events of players that
+                // use this, as it exposes plugins to a lot of potential errors.
                 try {
-                    tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
-                } catch (Throwable t2) {
-                    Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+                    tempPlayerClass = Class.forName("com.comphenix.protocol.injector.temporary.TemporaryPlayer");
+                } catch (Throwable t1) {
+                    try {
+                        tempPlayerClass = Class.forName("com.comphenix.protocol.injector.server.TemporaryPlayer");
+                    } catch (Throwable t2) {
+                        Logging.LOGGER_NETWORK.warning("Failed to find ProtocolLib TemporaryPlayer class!");
+                    }
                 }
             }
+
+            this.eventHasIsTemporaryPlayerMethod = hasIsTemporaryPlayerMethod;
             this.temporaryPlayerClass = tempPlayerClass;
         }
 
         /**
-         * Gets whether the player instance is a temporary one. A temporary player has no entity
+         * Gets whether the event involves a temporary player. A temporary player has no entity
          * id, no world and no location information.
          *
          * @param player
-         * @return True if temporary
+         * @return True if event is using a temporary player
          */
-        protected boolean isTemporary(Player player) {
+        protected boolean isTemporary(PacketEvent event) {
+            if (eventHasIsTemporaryPlayerMethod) {
+                return isEventPlayerTemporary(event);
+            }
+
+            Player player = event.getPlayer();
             return player == null || this.temporaryPlayerClass.isAssignableFrom(player.getClass());
+        }
+
+        private static boolean isEventPlayerTemporary(PacketEvent event) {
+            return event.isPlayerTemporary();
         }
 
         private static ListeningWhitelist getWhiteList(ListenerPriority priority, PacketType[] types, boolean receiving) {
