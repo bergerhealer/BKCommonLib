@@ -14,8 +14,6 @@ import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
-import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
-import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
@@ -66,27 +64,18 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         // ProtocolLib renamed this typo with v5.0
         try {
-            // Legacy pre-5.0 API
-            this.receivePacketMethod.init(manager.getDeclaredMethod("recieveClientPacket", Player.class, packetContainer));
+            // 5.0+ API
+            this.receivePacketMethod.init(manager.getMethod("receiveClientPacket", Player.class, packetContainer));
             this.receivePacketMethod.forceInitialization();
         } catch (Throwable t1) {
-            // Try the 5.0 API which adds a bool parameter and fixes the typo.
-            // We got to adapt the function to make it work, though
+            // Try legacy pre-5.0 API
             try {
-                // Validate it exists
-                manager.getDeclaredMethod("receiveClientPacket", Player.class, packetContainer, boolean.class);
-                // Runtime-generated adaptor function
-                ClassResolver resolver = new ClassResolver();
-                resolver.setDeclaredClass(manager);
-                resolver.addImport(Player.class.getName());
-                resolver.addImport(packetContainer.getName());
-                this.receivePacketMethod.init(new MethodDeclaration(resolver,
-                        "public void receivePacket(Player player, PacketContainer container) {\n" +
-                        "    instance.receiveClientPacket(player, container, true);\n" +
-                        "}"));
+                // 5.0+ API
+                this.receivePacketMethod.init(manager.getMethod("recieveClientPacket", Player.class, packetContainer));
                 this.receivePacketMethod.forceInitialization();
-            } catch (Throwable t) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to initialize receiveClientPacket method for ProtocolLib", t);
+            } catch (Throwable t2) {
+                // Try legacy pre-5.0 API
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to initialize receiveClientPacket method for ProtocolLib", t1);
             }
         }
 
