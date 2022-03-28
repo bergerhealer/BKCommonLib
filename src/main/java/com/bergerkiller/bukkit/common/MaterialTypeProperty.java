@@ -95,7 +95,8 @@ public class MaterialTypeProperty extends MaterialBooleanProperty {
     public Boolean get(BlockData blockData) {
         return ordinals.contains(CommonLegacyMaterials.getOrdinal(blockData.getType())) ||
                 ( CommonCapabilities.MATERIAL_ENUM_CHANGES &&
-                  legacyOrdinals.contains(CommonLegacyMaterials.getOrdinal(blockData.getLegacyType())) );
+                  legacyOrdinals.contains(CommonLegacyMaterials.getOrdinal(blockData.getLegacyType())) &&
+                  blockData.hasLegacyType() );
     }
 
     @Override

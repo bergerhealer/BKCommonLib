@@ -26,6 +26,7 @@ import com.bergerkiller.bukkit.common.internal.CommonListener;
 import com.bergerkiller.bukkit.common.internal.blocks.BlockRenderProvider;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialDataToIBlockData;
+import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -54,6 +55,7 @@ class BlockDataImpl extends BlockData {
     private IBlockDataHandle data;
     private MaterialData materialData;
     private Material type;
+    private Material legacyType;
     private boolean hasRenderOptions;
     private int combinedId;
 
@@ -68,6 +70,7 @@ class BlockDataImpl extends BlockData {
     public static final int REGISTRY_MASK;
     public static final BlockDataConstant[] BY_ID_AND_DATA;
 
+    public static final Material LEGACY_AIR_TYPE;
     public static final BlockDataConstant AIR;
     public static final EnumMap<Material, BlockDataConstant> BY_MATERIAL = new EnumMap<Material, BlockDataConstant>(Material.class);
     public static final Map<Object, BlockDataConstant> BY_BLOCK = new IdentityHashMap<Object, BlockDataConstant>();
@@ -91,6 +94,7 @@ class BlockDataImpl extends BlockData {
         Iterable<?> REGISTRY = BlockHandle.getRegistry();
 
         // Fill BY_MATERIAL and BY_BLOCK mapping with all existing Block types
+        LEGACY_AIR_TYPE = MaterialsByName.getMaterial("LEGACY_AIR");
         AIR = new BlockDataConstant(BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(Material.AIR)));
         for (Object rawBlock : REGISTRY) {
             BlockHandle block = BlockHandle.createHandle(rawBlock);
@@ -308,6 +312,7 @@ class BlockDataImpl extends BlockData {
         this.hasRenderOptions = true;
         this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
         this.materialData = IBlockDataToMaterialData.getMaterialData(this.data);
+        this.legacyType = CommonLegacyMaterials.toLegacy(this.materialData.getItemType());
         this.combinedId = BlockHandle.getCombinedId(this.data);
         this.cachedOpaqueFaces = this.data.getCachedOpaqueFaces();
         this.cachedOpacity = this.data.getCachedOpacity();
@@ -335,7 +340,14 @@ class BlockDataImpl extends BlockData {
 
     @Override
     public final org.bukkit.Material getLegacyType() {
-        return CommonLegacyMaterials.toLegacy(this.materialData.getItemType());
+        return this.legacyType;
+    }
+
+    @Override
+    public final boolean hasLegacyType() {
+        // If the legacy type is air, and this block data isn't air, then this BlockData has
+        // no legacy type.
+        return this.legacyType != LEGACY_AIR_TYPE || this == AIR;
     }
 
     @Override

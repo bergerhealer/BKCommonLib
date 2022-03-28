@@ -197,11 +197,25 @@ public abstract class BlockData extends BlockDataRegistry {
     /**
      * Gets the legacy Material type of the Block.
      * If your plugin uses an older pre-1.13 API, use this method instead of
-     * {@link #getType()}.
+     * {@link #getType()}.<br>
+     * <br>
+     * Will return LEGACY_AIR for block data that has no legacy type,
+     * according to {@link #hasLegacyType()}.
      * 
      * @return Block Material Type
      */
     public abstract org.bukkit.Material getLegacyType();
+
+    /**
+     * Gets whether this BlockData has a valid, existing legacy Material type
+     * that is exactly the same. For example, BlockData of OAK_PLANKS will match
+     * the LEGACY_WOOD type, and as such, has a legacy type (=true). But WARPED_PLANKS
+     * lacks any legacy type because it was added to the game after the material
+     * api changes (=false)
+     *
+     * @return True if this BlockData has a valid legacy type
+     */
+    public abstract boolean hasLegacyType();
 
     /**
      * Creates an ItemStack holding a stack of blocks of this type of BlockData.
@@ -263,7 +277,7 @@ public abstract class BlockData extends BlockDataRegistry {
      */
     public final boolean isType(org.bukkit.Material type) {
         if (MaterialUtil.isLegacyType(type)) {
-            return getLegacyType() == type;
+            return this.getLegacyType() == type && this.hasLegacyType();
         } else {
             return getType() == type;
         }
