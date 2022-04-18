@@ -198,6 +198,20 @@ public abstract class VehicleMountHandler_BaseImpl implements VehicleMountContro
     }
 
     @Override
+    public synchronized int getVehicle(int passengerEntityId) {
+        SpawnedEntity spawnedEntity = getSpawnedEntity(passengerEntityId, false);
+        return (spawnedEntity == null || spawnedEntity.vehicleMount == null || !spawnedEntity.vehicleMount.sent)
+                ? -1 : spawnedEntity.vehicleMount.vehicle.id;
+    }
+
+    @Override
+    public synchronized int[] getPassengers(int vehicleEntityId) {
+        SpawnedEntity spawnedEntity = getSpawnedEntity(vehicleEntityId, false);
+        return (spawnedEntity == null)
+                ? new int[0] : spawnedEntity.collectSentPassengerIds();
+    }
+
+    @Override
     public void despawn(int entityId) {
         synchronizeAndQueuePackets(() -> {
             SpawnedEntity entity = getSpawnedEntity(entityId, true);

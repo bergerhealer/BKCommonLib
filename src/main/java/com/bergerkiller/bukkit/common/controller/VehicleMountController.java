@@ -56,6 +56,28 @@ public interface VehicleMountController {
     void clear(int entityId);
 
     /**
+     * Gets the Entity ID of the vehicle a passenger is mounted inside of. Returns -1
+     * if the passenger isn't inside a vehicle.<br>
+     * <br>
+     * This method is multithread-safe.
+     *
+     * @param passengerEntityId ID of the passenger Entity
+     * @return Vehicle Entity ID, or -1 if not mounted
+     */
+    int getVehicle(int passengerEntityId);
+
+    /**
+     * Gets the Entity ID's of the passengers mounted inside a vehicle. Returns an
+     * empty array if the vehicle has no passengers.<br>
+     * <br>
+     * This method is multithread-safe.
+     *
+     * @param vehicleEntityId ID of the vehicle Entity
+     * @return Array of passenger Entity ID's
+     */
+    int[] getPassengers(int vehicleEntityId);
+
+    /**
      * Despawns an Entity and prevents the Entity from being spawned by the server until
      * {@link #respawn(int, RespawnFunction)} is called. If the Entity was already spawned,
      * the entity is despawned right away.
