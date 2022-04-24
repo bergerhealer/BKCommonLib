@@ -986,6 +986,14 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             return;
         }
 
+        // If source and target share the same root, we must operate on a clone to avoid problems
+        // TODO: We could optimize this and allow it when this and clone are not sharing a common
+        //       path space. This could be achieved with a YamlPath startsWith function.
+        if (this._root == clone._root) {
+            this.clone().cloneChildrenTo(clone, filterRoot, filter, removeOthers);
+            return;
+        }
+
         // If clone had no existing values, we don't need to check for them further down
         boolean isCloneEmpty = clone.isEmpty();
         if (isCloneEmpty) {
@@ -1036,7 +1044,11 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                 } else {
                     childCloneNode = childClone.createNodeValue();
                 }
-                originalChildNode.cloneChildrenTo(childCloneNode, filterPath, filter, removeOthers);
+                try {
+                    originalChildNode.cloneChildrenTo(childCloneNode, filterPath, filter, removeOthers);
+                } catch (StackOverflowError err) {
+                    throw new IllegalStateException("YAML tree too deep or infinite recursion", err);
+                }
             } else if (isNewNode) {
                 // Can set instantly, is a new node and yaml will regen
                 childClone.value = child.value;
