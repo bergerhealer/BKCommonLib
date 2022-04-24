@@ -8,10 +8,14 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
+import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
@@ -24,6 +28,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
  */
 public class ItemStackDeserializer implements Function<Map<String, Object>, ItemStack> {
     private static final ConverterFunction NO_CONVERSION = map -> { return true; };
+    private static final Material FALLBACK_MATERIAL = MaterialUtil.getFirst("OAK_WOOD", "LEGACY_WOOD");
     public static final ItemStackDeserializer INSTANCE = new ItemStackDeserializer();
     private final List<ItemStackConverter> converters;
     private final int curr_version;
@@ -192,7 +197,31 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             }
         }
 
-        return ItemStack.deserialize(args);
+        try {
+            return ItemStack.deserialize(args);
+        } catch (NullPointerException ex) {
+            // This is sometimes thrown when the Material type cannot be found
+            Object typeNameObj = args.get("type");
+            if (typeNameObj instanceof String) {
+                String typeName = (String) typeNameObj;
+                Material type;
+                if (CommonCapabilities.MATERIAL_ENUM_CHANGES && args.containsKey("v")) {
+                    // Uses post-1.13 format
+                    type = MaterialUtil.getMaterial(typeName);
+                } else {
+                    // Uses pre-1.13 format. Prefix LEGACY_ to the name
+                    type = CommonLegacyMaterials.getLegacyMaterial(typeName);
+                }
+                if (type != null) {
+                    // Valid material. Rethrow original exception. It's valid.
+                    throw ex;
+                }
+            }
+
+            // Type doesn't exist on this version of Minecraft. As work-around, return
+            // a generic wood block
+            return new ItemStack(FALLBACK_MATERIAL);
+        }
     }
 
     /**
