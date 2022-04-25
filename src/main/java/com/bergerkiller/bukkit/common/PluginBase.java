@@ -360,7 +360,7 @@ public abstract class PluginBase extends JavaPlugin {
      * @param localizationDefault to load from
      */
     public void loadLocale(ILocalizationDefault localizationDefault) {
-        this.loadLocale(localizationDefault.getName(), localizationDefault.getDefault());
+        localizationDefault.initDefaults(this.localizationconfig);
     }
 
     /**

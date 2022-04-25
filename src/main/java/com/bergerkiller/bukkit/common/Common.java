@@ -33,7 +33,8 @@ public class Common {
             "Common:VehicleMountController:Spectating",
             "Common:WorldUtil:getWorldLevelFile",
             "Common:EntityController:forceControllerInitialization",
-            "Common:EntityNetworkController:HasOnPassengersChanged"
+            "Common:EntityNetworkController:HasOnPassengersChanged",
+            "Common:Localization:InitDefaults"
     ).collect(Collectors.toSet());
 
     /**
