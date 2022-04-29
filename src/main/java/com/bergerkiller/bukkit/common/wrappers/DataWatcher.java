@@ -529,14 +529,17 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             Object token = this.handle.getSerializer();
             DataSerializerRegistry.InternalType internalType = DataSerializerRegistry.getInternalTypeFromToken(token);
 
-            if (internalType == null) {
-                throw new RuntimeException("Token serializer not found: " + token);
-            }
-            if (serializer == null) {
-                serializer = Type.getForType(CommonUtil.unsafeCast(internalType.type));
-            }
+            if (internalType != null) {
+                if (serializer == null) {
+                    serializer = Type.getForType(CommonUtil.unsafeCast(internalType.type));
+                }
 
-            this._serializer = serializer.setInternalOptional(internalType.optional);
+                this._serializer = serializer.setInternalOptional(internalType.optional);
+            } else if (serializer != null) {
+                this._serializer = serializer;
+            } else {
+                this._serializer = new Type<V>(token, DuplexConverter.createNull(TypeDeclaration.OBJECT));
+            }
         }
 
         /**
