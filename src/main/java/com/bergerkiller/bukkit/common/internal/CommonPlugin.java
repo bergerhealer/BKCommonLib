@@ -113,6 +113,7 @@ public class CommonPlugin extends PluginBase {
     private boolean teleportPlayersToSeat = true;
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
+    private boolean cloudDisableBrigadier = false;
 
     public CommonPlugin() {
         // Initialize thread pool, might be used pretty early on...
@@ -169,6 +170,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean forceSynchronousSaving() {
         return forceSynchronousSaving;
+    }
+
+    public boolean isCloudBrigadierDisabled() {
+        return cloudDisableBrigadier;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -607,6 +612,9 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("debugTimings", "These timings might be useful to identify performance problems, or their causes");
         config.addHeader("debugTimings", "They may cause a slight performance hit, so leave this option disabled unless you need them");
         final boolean debugTimings = config.get("debugTimings", false);
+        config.setHeader("cloudDisableBrigadier", "\nWhether to disable using brigadier for all plugins that use BKCL's cloud command framework");
+        config.addHeader("cloudDisableBrigadier", "This might fix problems that occur because of bugs in brigadier, or cloud's handler of it");
+        this.cloudDisableBrigadier = config.get("cloudDisableBrigadier", false);
         config.save();
 
         // Welcome message
