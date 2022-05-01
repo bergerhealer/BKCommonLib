@@ -34,7 +34,8 @@ public class Common {
             "Common:WorldUtil:getWorldLevelFile",
             "Common:EntityController:forceControllerInitialization",
             "Common:EntityNetworkController:HasOnPassengersChanged",
-            "Common:Localization:InitDefaults"
+            "Common:Localization:InitDefaults",
+            "Common:BlockData:EmissionBlockParameter"
     ).collect(Collectors.toSet());
 
     /**

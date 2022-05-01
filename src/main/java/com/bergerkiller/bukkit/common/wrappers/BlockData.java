@@ -434,8 +434,29 @@ public abstract class BlockData extends BlockDataRegistry {
      * Gets the amount of light the Block radiates, value between 0 and 15.
      *
      * @return light emission
+     * @deprecated Does not work with forge, which requires block information to be passed
      */
+    @Deprecated
     public abstract int getEmission();
+
+    /**
+     * Gets the amount of light the Block radiates, value between 0 and 15.
+     *
+     * @param world The world the block is in
+     * @param x The X-coordinate of the block
+     * @param y The Y-coordinate of the block
+     * @param z The Z-coordinate of the block
+     * @return light emission
+     */
+    public abstract int getEmission(World world, int x, int y, int z);
+
+    /**
+     * Gets the amount of light the Block radiates, value between 0 and 15.
+     *
+     * @param block The block to get emission of
+     * @return light emission
+     */
+    public abstract int getEmission(Block block);
 
     /**
      * Gets whether this Block is fully occluding, not allowing light to pass through

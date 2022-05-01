@@ -7,6 +7,7 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import org.bukkit.Material;
@@ -47,7 +48,9 @@ import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
+import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 @SuppressWarnings("deprecation")
 class BlockDataImpl extends BlockData {
@@ -543,8 +546,19 @@ class BlockDataImpl extends BlockData {
     }
 
     @Override
+    @Deprecated
     public final int getEmission() {
-        return this.block.getEmission(this.data);
+        return this.block.getEmission(this.data, null, 0, 0, 0);
+    }
+
+    @Override
+    public int getEmission(World world, int x, int y, int z) {
+        return this.block.getEmission(this.data, world, x, y, z);
+    }
+
+    @Override
+    public int getEmission(Block block) {
+        return this.block.getEmission(this.data, block.getWorld(), block.getX(), block.getY(), block.getZ());
     }
 
     @Override

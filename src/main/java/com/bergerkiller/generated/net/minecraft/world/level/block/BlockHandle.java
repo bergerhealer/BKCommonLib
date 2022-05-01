@@ -48,7 +48,7 @@ public abstract class BlockHandle extends Template.Handle {
     public abstract String getTitle();
     public abstract boolean isFaceOpaque(IBlockDataHandle iblockdata, World world, int x, int y, int z, BlockFace direction);
     public abstract int getOpacity(IBlockDataHandle iblockdata, World world, int x, int y, int z);
-    public abstract int getEmission(IBlockDataHandle iblockdata);
+    public abstract int getEmission(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract boolean isOccluding_at(IBlockDataHandle iblockdata, World world, int x, int y, int z);
     public abstract boolean isOccluding(IBlockDataHandle iblockdata, Block block);
     public abstract boolean isPowerSource(IBlockDataHandle iblockdata);

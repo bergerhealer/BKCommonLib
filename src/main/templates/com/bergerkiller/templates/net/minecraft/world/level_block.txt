@@ -111,7 +111,14 @@ class Block {
         return instance.getLightBlock(iblockdata, world, new BlockPosition(x, y, z));
     }
 
-    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata) {
+    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        // Forge
+  #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
+        if (world != null) {
+            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+        }
+  #endif
+
         return iblockdata.getLightEmission();
     }
 
@@ -142,13 +149,20 @@ class Block {
   #endif
     }
 
-  #if version >= 1.16
-    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata) {
-        return iblockdata.f();
-    }
-  #else
-    public int getEmission:a((IBlockDataHandle) IBlockData iblockdata);
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        // Forge
+  #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
+        if (world != null) {
+            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+        }
   #endif
+
+  #if version >= 1.16
+        return iblockdata.f();
+  #else
+        return instance.a(iblockdata);
+  #endif
+    }
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
     #if version >= 1.16
@@ -175,11 +189,20 @@ class Block {
         return iblockdata.b(world, new BlockPosition(x, y, z));
     }
 
-    #if pre <= 7
-        public int getEmission:l((IBlockDataHandle) IBlockData iblockdata);
-    #else
-        public int getEmission:m((IBlockDataHandle) IBlockData iblockdata);
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        // Forge
+    #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
+        if (world != null) {
+            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+        }
     #endif
+
+    #if pre <= 7
+        return instance.l(iblockdata);
+    #else
+        return instance.m(iblockdata);
+    #endif
+    }
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.isOccluding(iblockdata);
@@ -193,9 +216,23 @@ class Block {
 #elseif version >= 1.9
     // On later versions, it has an IBlockData argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+  #if exists net.minecraft.world.level.block.Block public int getLightOpacity(IBlockData data, IBlockAccess world, BlockPosition pos);
+        // Forge
+        return instance.getLightOpacity(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
+  #else
         return instance.m(iblockdata);
+  #endif
     }
-    public int getEmission:o((IBlockDataHandle) IBlockData iblockdata);
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        // Forge
+    #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
+        if (world != null) {
+            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+        }
+    #endif
+
+        return instance.o(iblockdata);
+    }
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         return instance.isOccluding(iblockdata);
@@ -209,14 +246,24 @@ class Block {
 #else
     // By IBlockData does not exist; proxy to the empty args version
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-  #if version >= 1.8.3
+  #if exists net.minecraft.world.level.block.Block public int getLightOpacity(IBlockData data, IBlockAccess world, BlockPosition pos);
+        // Forge
+        return instance.getLightOpacity(iblockdata, world, new BlockPosition(x, y, z));
+  #elseif version >= 1.8.3
         return instance.p();
   #else
         return instance.n();
   #endif
     }
 
-    public int getEmission((IBlockDataHandle) IBlockData iblockdata) {
+    public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
+        // Forge
+  #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
+        if (world != null) {
+            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+        }
+  #endif
+
   #if version >= 1.8.3
         return instance.r();
   #else
