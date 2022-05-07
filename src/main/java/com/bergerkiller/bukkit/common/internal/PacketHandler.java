@@ -31,8 +31,9 @@ public interface PacketHandler {
     public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types);
 
     /**
-     * Sends a packet right now
-     * 
+     * Sends a packet right now. Should not be used from packet monitor or listener callbacks,
+     * as that can cause a deadlock.
+     *
      * @param player
      * @param type
      * @param packet
@@ -41,8 +42,11 @@ public interface PacketHandler {
     public void sendPacket(Player player, PacketType type, Object packet, boolean throughListeners);
 
     /**
-     * Sends a packet after all other packets have been sent
-     * 
+     * Sends a packet after the handling of the current packet. This should be called on
+     * the thread currently executing a packet monitor or listener. If not currently
+     * handling a packet, behaves the same as
+     * {@link #sendPacket(Player, PacketType, Object, boolean)}.
+     *
      * @param player
      * @param type
      * @param packet

@@ -39,6 +39,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private final SilentPacketQueue silentPacketQueueFallback = new SilentPacketQueue();
     private final SilentQueueCleanupTask silentQueueCleanupTask = new SilentQueueCleanupTask();
     private final FastMethod<Void> receivePacketMethod = new FastMethod<Void>();
+    private final ThreadLocal<PacketEvent> currentHandledEvent = new ThreadLocal<>();
     private Class<?> loggedOutPlayerExceptionType = String.class;
     private boolean useSilentPacketQueue = false;
     private boolean isSendSilentPacketBroken = false;
@@ -216,6 +217,47 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void queuePacket(Player player, PacketType type, Object packet, boolean throughListeners) {
+        // If run from a thread where we are handling a packet being listener or monitored, then
+        // we can use the existing marker object to queue it in
+        PacketEvent currentEvent;
+        if ((currentEvent = this.currentHandledEvent.get()) != null) {
+            // Must pre-process the packet first before queing it up
+            type.preprocess(packet);
+
+            // Store in the silent/suppression queue if used
+            if (!throughListeners && this.useSilentPacketQueue) {
+                this.silentPacketQueueFallback.add(player, packet);
+            }
+
+            // Turn into a ScheduledPacket
+            try {
+                final PacketContainer toSend = new PacketContainer(getPacketType(packet.getClass()), packet);
+                final ScheduledPacket scheduled = new ScheduledPacket(toSend, player, throughListeners);
+                currentEvent.schedule(scheduled);
+            } catch (RuntimeException ex) {
+                if (this.loggedOutPlayerExceptionType.isInstance(ex)) {
+                    return; // Ignore
+                }
+                throw ex;
+            } catch (LinkageError err) {
+                // Serious issue inside the ProtocolLib library. We cannot use it.
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "A severe error occurred inside ProtocolLib while trying to schedule a packet");
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Please look for an update of ProtocolLib to get this issue resolved");
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error that occurred", err);
+
+                // Failure :(
+            } catch (Throwable t) {
+                throw new RuntimeException("Error while sending packet:", t);
+            }
+
+            return;
+        }
+
+        // There is no marker, so we can be reasonably certain it is safe to send the packet like normal
+        this.sendPacket(player, type, packet, throughListeners);
+
+        // Below was old logic for queuing packets, but we now use the NetworkMarker approach
+        /*
         if (throughListeners || this.useSilentPacketQueue) {
             type.preprocess(packet);
             PlayerConnectionHandle connection = PlayerConnectionHandle.forPlayer(player);
@@ -234,6 +276,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             //       https://www.spigotmc.org/threads/protocollib-send-packet-after-current-handled-packet.416910/
             CommonUtil.nextTick(() -> sendPacket(player, type, packet, throughListeners));
         }
+        */
     }
 
     @Override
@@ -283,7 +326,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
     @Override
     public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
-        CommonPacketListener commonListener = new CommonPacketListener(this, plugin, listener, types);
+        CommonPacketListener commonListener = new CommonPacketListener(plugin, listener, types);
         getProtocolManager().addPacketListener(commonListener);
         this.listeners.add(commonListener);
     }
@@ -364,7 +407,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         return manager;
     }
 
-    private static class CommonPacketMonitor extends CommonPacketAdapter {
+    private class CommonPacketMonitor extends CommonPacketAdapter {
 
         public final PacketMonitor monitor;
 
@@ -390,20 +433,23 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 return;
             }
 
-            monitor.onMonitorPacketSend(new CommonPacket(event.getPacket().getHandle()), event.getPlayer());
+            ThreadLocal<PacketEvent> tCurrentEvent = currentHandledEvent;
+            try {
+                tCurrentEvent.set(event);
+                monitor.onMonitorPacketSend(new CommonPacket(event.getPacket().getHandle()), event.getPlayer());
+            } finally {
+                tCurrentEvent.set(null);
+            }
         }
     }
 
-    private static class CommonPacketListener extends CommonPacketAdapter {
+    private class CommonPacketListener extends CommonPacketAdapter {
 
         public final PacketListener listener;
-        private final ProtocolLibPacketHandler packetHandler;
 
-        public CommonPacketListener(ProtocolLibPacketHandler packetHandler, Plugin plugin, PacketListener listener, PacketType[] types) {
+        public CommonPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
             super(plugin, ListenerPriority.NORMAL, types);
-            this.packetHandler = packetHandler;
             this.listener = listener;
-
         }
 
         @Override
@@ -425,8 +471,8 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             // Check not silent
             // See: onEnable why this is here.
             Object raw_packet = event.getPacket().getHandle();
-            if (this.packetHandler.useSilentPacketQueue &&
-                this.packetHandler.silentPacketQueueFallback.take(event.getPlayer(), raw_packet))
+            if (useSilentPacketQueue &&
+                silentPacketQueueFallback.take(event.getPlayer(), raw_packet))
             {
                 return;
             }
@@ -439,7 +485,15 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             CommonPacket packet = new CommonPacket(raw_packet);
             PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), packet);
             sendEvent.setCancelled(event.isCancelled());
-            listener.onPacketSend(sendEvent);
+
+            ThreadLocal<PacketEvent> tCurrentEvent = currentHandledEvent;
+            try {
+                tCurrentEvent.set(event);
+                listener.onPacketSend(sendEvent);
+            } finally {
+                tCurrentEvent.set(null);
+            }
+
             event.setCancelled(sendEvent.isCancelled());
         }
     }
