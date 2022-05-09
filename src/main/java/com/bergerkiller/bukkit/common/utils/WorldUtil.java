@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.BlockPhysicsEventDataAccessor;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
@@ -45,6 +46,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.util.Vector;
 
 import java.io.File;
@@ -62,6 +64,17 @@ public class WorldUtil extends ChunkUtil {
 
     /** The number of chunks on each axis of a single region (32) */
     public static final int CHUNKS_PER_REGION_AXIS = 32;
+
+    /**
+     * Gets the BlockData of the Block of a BlockPhysicsEvent. Is optimized
+     * for paper 1.17.1 and newer.
+     *
+     * @param event
+     * @return BlockData of the Block
+     */
+    public static BlockData getBlockData(BlockPhysicsEvent event) {
+        return BlockPhysicsEventDataAccessor.INSTANCE.get(event);
+    }
 
     /**
      * Gets BlockData for a particular Block
