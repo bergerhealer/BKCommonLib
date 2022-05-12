@@ -103,7 +103,6 @@ public class CommonPlugin extends PluginBase {
     private PermissionHandler permissionHandler = null;
     private CommonServerLogRecorder serverLogRecorder = new CommonServerLogRecorder(this);
     private CommonMapController mapController = null;
-    private CommonChunkLoaderPool chunkLoaderPool = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
     private PlayerGameVersionSupplier gameVersionSupplier = null;
@@ -324,16 +323,6 @@ public class CommonPlugin extends PluginBase {
     }
 
     /**
-     * Gets a helper class dealing with the asynchronous chunk loading not supported on later versions
-     * of Minecraft natively.
-     * 
-     * @return chunk loader pool
-     */
-    public CommonChunkLoaderPool getChunkLoaderPool() {
-        return this.chunkLoaderPool;
-    }
-
-    /**
      * Gets a helper class that allows to designate chunks as 'force loaded', keeping them loaded.
      * 
      * @return forced chunk manager
@@ -411,8 +400,7 @@ public class CommonPlugin extends PluginBase {
             Logging.LOGGER_NETWORK.log(Level.INFO, "Now using " + handler.getName() + " to provide Packet Listener and Monitor support");
             return true;
         } catch (Throwable t) {
-        	Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to register a valid Packet Handler:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to register a valid Packet Handler", t);
             return false;
         }
     }
@@ -680,7 +668,7 @@ public class CommonPlugin extends PluginBase {
         try {
             LookupEntityClassMap.hook();
         } catch (Throwable t) {
-            t.printStackTrace();
+            getLogger().log(Level.SEVERE, "Failed to hook LookupEntityClassMap", t);
         }
 
         // Initialize MapColorPalette (static initializer)
@@ -699,9 +687,6 @@ public class CommonPlugin extends PluginBase {
         // Initialize vehicle mount manager
         vehicleMountManager = new CommonVehicleMountManager(this);
         vehicleMountManager.enable();
-
-        // Initialize chunk loader pool
-        chunkLoaderPool = new CommonChunkLoaderPool();
 
         // Initialize forced chunk manager
         forcedChunkManager = new CommonForcedChunkManager(this);
@@ -821,8 +806,7 @@ public class CommonPlugin extends PluginBase {
         try {
             packetHandler.onDisable();
         } catch (Throwable t) {
-            log(Level.SEVERE, "Failed to properly disable the Packet Handler:");
-            t.printStackTrace();
+            getLogger().log(Level.SEVERE, "Failed to properly disable the Packet Handler", t);
         }
         packetHandler = null;
 
@@ -830,18 +814,12 @@ public class CommonPlugin extends PluginBase {
         try {
             LookupEntityClassMap.unhook();
         } catch (Throwable t) {
-            t.printStackTrace();
+            getLogger().log(Level.SEVERE, "Failed to unhook LookupEntityClassMap", t);
         }
 
         // Disable CommonForcedChunkManager
         this.forcedChunkManager.disable(this);
         this.forcedChunkManager = null;
-
-        // Shut down the chunk loader pool, allowing tasks to complete first
-        // Set to null to not allow new tasks to be queued
-        CommonChunkLoaderPool oldPool = chunkLoaderPool;
-        chunkLoaderPool = null;
-        oldPool.disable();
 
         // Wait for pending FileConfiguration save() to complete
         flushSaveOperations(null);
