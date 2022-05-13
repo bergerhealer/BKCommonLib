@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -15,6 +16,7 @@ import org.bukkit.material.Attachable;
 import org.bukkit.material.MaterialData;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
@@ -53,7 +55,7 @@ public class IBlockDataToMaterialData {
                     iblockdataToMaterialdata_map = CommonUtil.unsafeCast(f.get(null));
                     f.setAccessible(false);
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize CraftLegacy dataToMaterial", t);
                 }
             }
         }

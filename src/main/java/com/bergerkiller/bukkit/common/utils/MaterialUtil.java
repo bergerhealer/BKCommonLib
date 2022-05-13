@@ -6,7 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.MaterialBlockProperty;
 import com.bergerkiller.bukkit.common.MaterialBooleanProperty;
 import com.bergerkiller.bukkit.common.MaterialProperty;
@@ -45,7 +47,7 @@ public class MaterialUtil {
                 }
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Failed to initialize material categories table", t);
         }
 
         // Read the contents of the post-processed config file. Format:

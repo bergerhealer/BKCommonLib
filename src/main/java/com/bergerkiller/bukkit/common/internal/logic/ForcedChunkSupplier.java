@@ -3,7 +3,9 @@ package com.bergerkiller.bukkit.common.internal.logic;
 import java.lang.reflect.Constructor;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 
@@ -25,7 +27,7 @@ public class ForcedChunkSupplier implements Supplier<Object>, Function<String, O
                     constructor = type.getConstructor();
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error finding ForcedChunkSupplier constructor", t);
             }
         }
         this.constructor = constructor;

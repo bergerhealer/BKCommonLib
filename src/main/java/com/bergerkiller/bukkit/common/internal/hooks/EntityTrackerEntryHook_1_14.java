@@ -47,8 +47,7 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
                 }
             }
         } catch (Throwable t) {
-            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hide for all viewers:");
-            t.printStackTrace();
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to hide for all viewers", t);
         }
     }
 

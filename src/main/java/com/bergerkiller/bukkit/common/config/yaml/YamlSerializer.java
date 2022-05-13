@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.file.YamlRepresenter;
 import org.yaml.snakeyaml.DumperOptions;
@@ -20,6 +21,7 @@ import org.yaml.snakeyaml.representer.BaseRepresenter;
 import org.yaml.snakeyaml.resolver.Resolver;
 import org.yaml.snakeyaml.serializer.Serializer;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.io.StringBuilderWriter;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -196,7 +198,7 @@ public class YamlSerializer {
             serializerSerializedNodesField.set(serializer, noop_set);
             serializerSerializedNodesField.setAccessible(false);
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER_CONFIG.log(Level.SEVERE, "Unhandled error disabling YAML anchors", t);
         }
     }
 

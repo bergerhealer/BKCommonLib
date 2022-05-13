@@ -833,7 +833,7 @@ public class MapResourcePack {
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
                     " at " + path + ": " + ex.getMessage());
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
         }
         return null;
     }

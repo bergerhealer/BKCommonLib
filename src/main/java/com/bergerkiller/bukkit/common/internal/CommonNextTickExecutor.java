@@ -123,8 +123,7 @@ public final class CommonNextTickExecutor implements Executor {
     }
 
     private static void handleTaskError(Runnable command, Throwable error) {
-        Logging.LOGGER.log(Level.SEVERE, "An error occurred in next-tick task '" + command.getClass().getName() + "':");
-        CommonUtil.filterStackTrace(error).printStackTrace();
+        Logging.LOGGER.log(Level.SEVERE, "An error occurred in next-tick task '" + command.getClass().getName() + "'", CommonUtil.filterStackTrace(error));
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -29,6 +30,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.ItemStack;
@@ -967,7 +969,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                                 register(dataType.type, f.get(null), isOptional);
                             }
                         } catch (Throwable t) {
-                            t.printStackTrace();
+                            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error registering Datawatcher serializer " + f, t);
                         }
                     }
                 }

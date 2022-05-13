@@ -6,11 +6,13 @@ import java.nio.file.AtomicMoveNotSupportedException;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.UnmodifiableListCollector;
 
 /**
@@ -161,7 +163,7 @@ public class StreamUtil {
             copyFile(sourceLocation, targetLocation);
             return true;
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Failed to copy file " + sourceLocation + " to " + targetLocation, ex);
             return false;
         }
     }

@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
+import java.util.logging.Level;
+
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -116,7 +118,7 @@ public abstract class AsyncTask implements Runnable {
         try {
             this.thread.start();
         } catch (IllegalThreadStateException ex) {
-            ex.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Failed to start async task", ex);
         }
         return this;
     }

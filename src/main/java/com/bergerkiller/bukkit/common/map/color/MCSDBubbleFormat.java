@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.stream.IntStream;
 import java.util.zip.Deflater;
 import java.util.zip.InflaterInputStream;
@@ -271,7 +272,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
                     try {
                         codec.writePackets(bitStream);
                     } catch (IOException ex) {
-                        ex.printStackTrace(); // Oh well.
+                        Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "IO Exception while writing packets", ex); // Oh well.
                     }
                 });
 

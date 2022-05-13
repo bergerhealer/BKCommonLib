@@ -94,12 +94,13 @@ public class MaterialDataToIBlockData {
                         "    } catch (RuntimeException ex) {\n" +
                         "        // Occurs on TacoSpigot and Forge (and mods!) when intermediate set() fails\n" +
                         "    } catch (Throwable t) {\n" +
-                        "        System.err.println(\"[BKCommonLib] An error occurred inside fromLegacyData(\"+Byte.toString(materialdata.getData())+\"):\");\n" +
-                        "        t.printStackTrace();\n" +
+                        "        com.bergerkiller.bukkit.common.Logging.LOGGER_REFLECTION.log(java.util.logging.Level.SEVERE,\n" +
+                        "                \"An error occurred inside fromLegacyData(\"+Byte.toString(materialdata.getData())+\"):\", t);\n" +
                         "    }\n" +
                         "    result = block#getBlockData();\n" +
                         "    if (result == null) {\n" +
-                        "        System.err.println(\"[BKCommonLib] Block \"+block.toString()+\" getBlockData() returned null!\");\n" +
+                        "        com.bergerkiller.bukkit.common.Logging.LOGGER_REFLECTION.log(java.util.logging.Level.WARNING,\n" +
+                        "                \"Block \"+block.toString()+\" getBlockData() returned null!\");\n" +
                         "    }\n" +
                         "    return result;\n" +
                         "}"

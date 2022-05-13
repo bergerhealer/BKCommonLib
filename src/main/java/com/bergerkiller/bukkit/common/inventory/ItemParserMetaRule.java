@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.inventory;
 
+import java.util.logging.Level;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
 /**
@@ -145,7 +147,7 @@ public class ItemParserMetaRule {
                         try {
                             this._valuePattern = Pattern.compile(regexStr.toString());
                         } catch (PatternSyntaxException ex) {
-                            ex.printStackTrace();
+                            Logging.LOGGER.log(Level.WARNING, "Failed to compile item parser meta regex pattern", ex);
                         }
                     }
                 }

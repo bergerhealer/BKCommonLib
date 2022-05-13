@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.logging.Level;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -146,7 +147,7 @@ public class Hastebin {
             } catch (InvalidServerResponseException ex3) {
                 complete(result, new UploadResult(false, null, ex3.getMessage()));
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.WARNING, "Unhandled error uploading to hastebin", t);
                 complete(result, new UploadResult(false, null, "Error occurred: " + t.getMessage()));
             }
         });
@@ -210,7 +211,7 @@ public class Hastebin {
             } catch (InvalidServerResponseException ex3) {
                 complete(result, DownloadResult.error(url, ex3.getMessage()));
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_NETWORK.log(Level.WARNING, "Unhandled error downloading from hastebin", t);
                 complete(result, DownloadResult.error(url, "Error occurred: " + t.getMessage()));
             }
         });

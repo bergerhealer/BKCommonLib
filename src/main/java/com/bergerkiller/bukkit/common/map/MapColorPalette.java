@@ -78,7 +78,7 @@ public class MapColorPalette {
                     success = true;
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled map color format initialization error", t);
             }
             if (success) {
                 COLOR_MAP_DATA.readFrom(bubbleData);

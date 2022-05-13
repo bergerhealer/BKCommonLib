@@ -107,12 +107,11 @@ class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
                         RegionFileHandle.createHandle(entry.getValue()).closeStream();
                         iter.remove();
                     } catch (Exception ex) {
-                        ex.printStackTrace();
+                        Logging.LOGGER.log(Level.WARNING, "Failed to close region file handle stream", ex);
                     }
                 }
             } catch (Exception ex) {
-                Logging.LOGGER.log(Level.WARNING, "Exception while closing streams for '" + world.getName() + "'!");
-                ex.printStackTrace();
+                Logging.LOGGER.log(Level.WARNING, "Exception while closing streams for '" + world.getName() + "'!", ex);
             }
         }
     }

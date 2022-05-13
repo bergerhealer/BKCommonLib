@@ -15,6 +15,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
+import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
 import org.bukkit.Chunk;
@@ -1311,7 +1312,7 @@ public final class CommonMapController implements PacketListener, Listener {
                         MapDisplay display = displayClass.newInstance();
                         event.setDisplay((JavaPlugin) plugin, display);
                     } catch (InstantiationException | IllegalAccessException e) {
-                        e.printStackTrace();
+                        plugin.getLogger().log(Level.SEVERE, "Failed to initialize MapDisplay", e);
                     }
                 }
             }

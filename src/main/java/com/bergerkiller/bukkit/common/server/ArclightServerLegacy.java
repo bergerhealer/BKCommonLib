@@ -4,7 +4,9 @@ import java.io.File;
 import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
@@ -57,7 +59,7 @@ public class ArclightServerLegacy extends SpigotServer implements FieldNameResol
             classLoaderRemapper = field.get(loader);
             field.setAccessible(false);
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to initialize Arclight remapper", t);
             return false;
         }
 
@@ -200,7 +202,7 @@ public class ArclightServerLegacy extends SpigotServer implements FieldNameResol
          *     try {
          *         return remapper.tryMapFieldToSrg(type, fieldName);
          *     } catch (Throwable t) {
-         *         t.printStackTrace();
+         *         com.bergerkiller.bukkit.common.Logging.LOGGER_REFLECTION.log(java.util.logging.Level.WARNING, "Failed to remap field " + fieldName, t);
          *         return fieldName;
          *     }
          * }

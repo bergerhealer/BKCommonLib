@@ -951,7 +951,7 @@ public class CommonUtil {
                 }
                 return LogicUtil.toArray(constants, type);
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER.log(Level.WARNING, "Failed to find class constants of " + theClass, t);
                 return LogicUtil.createArray(type, 0);
             }
         }

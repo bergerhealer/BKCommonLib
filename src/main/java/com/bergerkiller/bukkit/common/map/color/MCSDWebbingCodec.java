@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.logging.Level;
 import java.util.zip.Deflater;
 
 import com.bergerkiller.bukkit.common.Logging;
@@ -280,7 +281,7 @@ public class MCSDWebbingCodec {
             bitStream.close(); // Flushes all data that is pending
             return bs.size();
         } catch (IOException ex) {
-            ex.printStackTrace();
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "IO Exception while writing data", ex);
         }
         return 0;
     }

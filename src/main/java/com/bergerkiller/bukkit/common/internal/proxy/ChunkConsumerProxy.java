@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.internal.proxy;
 
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
@@ -29,7 +31,7 @@ public class ChunkConsumerProxy implements Runnable {
         try {
             chunk = cps_getChunkAt.invoke(this.cps, this.chunkX, this.chunkZ);
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Error in ChunkConsumerProxy", t);
         }
         this.consumer.accept(chunk);
     }

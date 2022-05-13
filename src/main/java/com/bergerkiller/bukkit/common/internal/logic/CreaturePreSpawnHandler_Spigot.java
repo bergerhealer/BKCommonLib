@@ -91,7 +91,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
                     generator = hook.hook(generator);
                     cpsChunkGeneratorField.set(cps, generator);
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error hooking CreaturePreSpawnHandler", t);
                 }
             }
         }
@@ -107,7 +107,7 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
                 generator = ClassHook.unhook(generator);
                 cpsChunkGeneratorField.set(cps, generator);
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error un-hooking CreaturePreSpawnHandler", t);
             }
         }
     }

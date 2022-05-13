@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.legacy.IBlockDataToMaterialData;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
@@ -49,7 +51,7 @@ public class CommonLegacyMaterials extends MaterialsByName {
                     materialToId.put(mat, id);
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to initialize material mappings", t);
             }
         }
     }

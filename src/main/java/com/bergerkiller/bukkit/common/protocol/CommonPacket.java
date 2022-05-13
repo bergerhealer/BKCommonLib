@@ -69,8 +69,7 @@ public class CommonPacket {
         try {
             SafeField.set(packet, field, value);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Invalid field name: " + field);
+            throw new IllegalArgumentException("Invalid field name: " + field, e);
         }
     }
 
@@ -106,8 +105,7 @@ public class CommonPacket {
         try {
             return SafeField.get(packet, field, null);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Invalid field name: " + field);
+            throw new IllegalArgumentException("Invalid field name: " + field, e);
         }
     }
     
@@ -122,8 +120,7 @@ public class CommonPacket {
         try {
             return SafeField.get(packet, field, fieldType);
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new IllegalArgumentException("Invalid field name: " + field);
+            throw new IllegalArgumentException("Invalid field name: " + field, e);
         }
     }
 

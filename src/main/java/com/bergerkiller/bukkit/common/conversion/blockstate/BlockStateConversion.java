@@ -1,9 +1,12 @@
 package com.bergerkiller.bukkit.common.conversion.blockstate;
 
+import java.util.logging.Level;
+
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 
 /**
@@ -28,7 +31,7 @@ public abstract class BlockStateConversion {
                 inst = new BlockStateConversion_1_12_2();
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER_CONVERSION.log(Level.SEVERE, "Unhandled error initializing block state conversion logic", t);
         }       
         INSTANCE = inst;
     }

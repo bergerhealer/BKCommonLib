@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
@@ -121,7 +123,8 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
                 return method.getName();
             }
         } catch (Throwable t) {
-            t.printStackTrace(); // They really need to fix this.
+            // They really need to fix this.
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to resolve method " + methodName, t);
         }
 
         return methodName;
@@ -135,7 +138,8 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
                 return field.getName();
             }
         } catch (Throwable t) {
-            t.printStackTrace(); // They really need to fix this.
+            // They really need to fix this.
+            Logging.LOGGER_REFLECTION.log(Level.WARNING, "Failed to resolve field " + fieldName, t);
         }
 
         return fieldName;

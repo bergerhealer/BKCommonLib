@@ -7,8 +7,8 @@ import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
-import java.util.Locale;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -48,9 +48,7 @@ import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingMap;
-import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
-import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 @SuppressWarnings("deprecation")
 class BlockDataImpl extends BlockData {
@@ -230,7 +228,7 @@ class BlockDataImpl extends BlockData {
             }
         } catch (Throwable t) {
             // This happens sometimes?
-            t.printStackTrace();
+            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error initializing BlockData updateState() blacklist", t);
         }
     }
 

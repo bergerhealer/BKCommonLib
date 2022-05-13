@@ -3,9 +3,11 @@ package com.bergerkiller.bukkit.common.internal.legacy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
@@ -49,7 +51,7 @@ public class MaterialsByName {
             try {
                 values = (Material[]) Material.class.getMethod("values").invoke(null);
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER_REGISTRY.log(Level.WARNING, "Material values() method not found, trying fallback", t);
                 values = Material.class.getEnumConstants();
             }
 
@@ -75,7 +77,7 @@ public class MaterialsByName {
                 allMaterialValuesByName.put(getMaterialName(material), material);
             }
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Error while initializing allMaterialValuesByName", t);
         }
 
         // Fill the allBlockMaterialValues array with all the materials that are blocks

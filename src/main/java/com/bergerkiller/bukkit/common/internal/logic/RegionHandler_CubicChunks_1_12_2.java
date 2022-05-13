@@ -446,7 +446,7 @@ class RegionHandler_CubicChunks_1_12_2 extends RegionHandler {
          *         storage.forEachCube(callback);
          *         return true;
          *     } catch (java.io.IOException ex) {
-         *         ex.printStackTrace();
+         *         com.bergerkiller.bukkit.common.Logging.LOGGER.log(java.util.logging.Level.WARNING, "IO Exception while iterating cubes", ex);
          *         return false;
          *     }
          * #endif

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.proxies;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 
 import java.lang.reflect.Method;
 import java.util.logging.Level;
@@ -83,7 +84,7 @@ public class ProxyBase<T> implements Proxy<T> {
             }
             return succ;
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Error while validating proxy class " + proxy, t);
             return false;
         }
     }

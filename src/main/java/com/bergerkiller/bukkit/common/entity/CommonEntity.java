@@ -418,7 +418,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
             // Create a new entity instance and perform data/property transfer
             replaceEntity(EntityHandle.createHandle(type.createNMSHookFromEntity(this)));
         } catch (Throwable t) {
-            t.printStackTrace();
+            Logging.LOGGER.log(Level.SEVERE, "Failed to prepare entity controller hook", t);
             throw new RuntimeException("Failed to set controller:", t);
         }
     }
@@ -878,16 +878,14 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
                     controller.onDetached();
                 }
             } catch (Throwable t) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to handle controller detachment:");
-                t.printStackTrace();
+                Logging.LOGGER.log(Level.SEVERE, "Failed to handle controller detachment", t);
             }
             try {
                 // Transfer data and replace
                 Object newInstance = EntityHook.unhook(oldInstance);
                 commonEntity.replaceEntity(EntityHandle.createHandle(newInstance));
             } catch (Throwable t) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to unhook Common Entity Controller:");
-                t.printStackTrace();
+                Logging.LOGGER.log(Level.SEVERE, "Failed to unhook Common Entity Controller", t);
             }
         }
     }

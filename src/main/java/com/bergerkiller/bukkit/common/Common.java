@@ -5,8 +5,6 @@ import com.bergerkiller.bukkit.common.server.*;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.templates.TemplateResolver;
 
-import org.bukkit.Bukkit;
-
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
@@ -175,14 +173,14 @@ public class Common {
      */
     protected static void handleReflectionMissing(String type, String name, Class<?> source) {
         String msg = type + " '" + name + "' does not exist in class file " + source.getSimpleName();
-        Exception ex = new Exception(msg);
+        Exception ex = new Exception();
         for (StackTraceElement elem : ex.getStackTrace()) {
             if (elem.getClassName().startsWith(COMMON_ROOT + ".reflection")) {
-                Bukkit.getServer().getLogger().log(Level.SEVERE, "[BKCommonLib] " + msg + " (Update BKCommonLib?)");
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, msg + " (Update BKCommonLib?)", ex);
                 return;
             }
         }
-        ex.printStackTrace();
+        Logging.LOGGER_REFLECTION.log(Level.SEVERE, msg, ex);
     }
 
     /**

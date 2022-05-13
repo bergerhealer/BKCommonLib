@@ -151,7 +151,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
             Class.forName(NBTTagListHandle.class.getName());
             Class.forName(NBTTagCompoundHandle.class.getName());
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            com.bergerkiller.bukkit.common.Logging.LOGGER_NETWORK.log(java.util.logging.Level.SEVERE, "Failed to find core NBT class (corrupt jar?)", e);
         }
     }
     /**

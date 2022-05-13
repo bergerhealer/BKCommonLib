@@ -233,8 +233,8 @@ public abstract class PluginBase extends JavaPlugin {
         }
         try {
             this.register(listener.newInstance());
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Throwable t) {
+            Logging.LOGGER_REGISTRY.log(Level.SEVERE, "Failed to register listener " + listener, t);
         }
     }
 
@@ -1171,8 +1171,7 @@ public abstract class PluginBase extends JavaPlugin {
         } catch (Throwable t) {
             StringBuilder msg = new StringBuilder("Unhandled exception executing command '");
             msg.append(command).append("' in plugin ").append(this.getName()).append(" v").append(this.getVersion());
-            Common.LOGGER.log(Level.SEVERE, msg.toString());
-            t.printStackTrace();
+            Common.LOGGER.log(Level.SEVERE, msg.toString(), t);
             sender.sendMessage(ChatColor.RED + "An internal error occured while executing this command");
         }
         return true;

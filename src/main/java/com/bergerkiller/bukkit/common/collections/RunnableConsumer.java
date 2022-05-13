@@ -2,7 +2,9 @@ package com.bergerkiller.bukkit.common.collections;
 
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 /**
@@ -44,7 +46,7 @@ public final class RunnableConsumer<T> implements Consumer<T> {
                     return opt_left.get();
                 }
             } catch (Throwable t) {
-                t.printStackTrace();
+                Logging.LOGGER.log(Level.SEVERE, "Unhandled error unpacking DF either", t);
             }
             return null;
         } else {

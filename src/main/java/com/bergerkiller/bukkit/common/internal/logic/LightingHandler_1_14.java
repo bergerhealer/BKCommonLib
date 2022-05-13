@@ -321,7 +321,7 @@ class LightingHandler_1_14 implements LightingHandler {
                         array = light_storage_array_live.get(storage);
                     }
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to access block light layer data", t);
                 }
 
                 this.block_storage = storage;
@@ -338,7 +338,7 @@ class LightingHandler_1_14 implements LightingHandler {
                         array = light_storage_array_live.get(storage);
                     }
                 } catch (Throwable t) {
-                    t.printStackTrace();
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to access sky light layer data", t);
                 }
 
                 this.sky_storage = storage;
