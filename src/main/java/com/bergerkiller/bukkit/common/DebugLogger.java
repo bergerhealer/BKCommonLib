@@ -48,7 +48,7 @@ public class DebugLogger {
     public DebugLogger bufferDone() {
         this._backBufferActive = false;
         for (String message : this._backBuffer) {
-            System.out.println(message);
+            Logging.LOGGER.info(message);
         }
         this._backBuffer.clear();
         return this;
@@ -190,7 +190,7 @@ public class DebugLogger {
         if (this._backBufferActive) {
             this._backBuffer.add(this._buffer.toString());
         } else {
-            System.out.println(this._buffer.toString());
+            Logging.LOGGER.info(this._buffer.toString());
         }
         this._buffer.setLength(this._name.length());
         this._col = 0;

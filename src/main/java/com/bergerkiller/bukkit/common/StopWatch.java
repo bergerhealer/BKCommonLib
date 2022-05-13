@@ -119,7 +119,7 @@ public class StopWatch {
      * @return This Stop Watch
      */
     public StopWatch log(final String name) {
-        System.out.println(name + ": " + this.get() + " ms");
+        Logging.LOGGER.info(name + ": " + this.get() + " ms");
         return this;
     }
 }

@@ -33,7 +33,7 @@ public abstract class IBlockDataHandle extends Template.Handle {
 
     public void logStates() {
         for (java.util.Map.Entry<IBlockStateHandle, Comparable<?>> entry : getStates().entrySet()) {
-            System.out.println(entry.getKey() + " = " + entry.getValue());
+            com.bergerkiller.bukkit.common.Logging.LOGGER.info(entry.getKey() + " = " + entry.getValue());
         }
     }
 
