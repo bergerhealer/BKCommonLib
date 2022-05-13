@@ -13,7 +13,6 @@ import org.bukkit.World;
 import org.bukkit.block.BlockState;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
@@ -83,7 +82,6 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, PotionEffect> potionEffect = pair(toPotionEffect, toMobEffect);
     public static final DuplexConverter<Object, MapCursor> mapCursor = pair(toMapCursor, toMapIconHandle);
     public static final DuplexConverter<Object, ChatText> chatText = pair(toChatText, toChatComponentHandle);
-    public static final DuplexConverter<Object, EquipmentSlot> equipmentSlot = pair(toEquipmentSlot, toEnumItemSlotHandle);
 
     // Collection element transformation
     public static final DuplexConverter<List<Object>, List<Entity>> entityList = pairElem(List.class, entity);

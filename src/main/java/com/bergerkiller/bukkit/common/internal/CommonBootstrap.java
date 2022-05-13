@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.conversion.type.DimensionResourceKeyConversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.conversion.type.ItemSlotConversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_17_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_18_2_Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.MC1_8_8_Conversion;
@@ -626,6 +627,19 @@ public class CommonBootstrap {
         Conversion.registerConverters(WrapperConversion.class);
         Conversion.registerConverters(HandleConversion.class);
         Conversion.registerConverters(NBTConversion.class);
+
+        // EquipmentSlot <> EnumItemSlot, only for later version of 1.8 builds
+        {
+            boolean hasEquipmentSlotClass = false;
+            try {
+                Class.forName("org.bukkit.inventory.EquipmentSlot");
+                hasEquipmentSlotClass = true;
+            } catch (ClassNotFoundException ex) { /* not supported */ }
+
+            if (hasEquipmentSlotClass) {
+                Conversion.registerConverters(ItemSlotConversion.class);
+            }
+        }
         if (evaluateMCVersion("<=", "1.8.8")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
         }

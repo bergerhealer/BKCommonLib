@@ -8,7 +8,12 @@ import org.bukkit.inventory.EquipmentSlot;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.generated.net.minecraft.world.entity.EnumItemSlotHandle;
+import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
+/**
+ * Converts between EnumItemSlot and Bukkit EquipmentSlot.
+ * Only works on a later version of Minecraft 1.8, where EnumItemSlot exists.
+ */
 public class ItemSlotConversion {
     private static final Map<Object, EquipmentSlot> slotMap_a = new IdentityHashMap<Object, EquipmentSlot>();
     private static final Map<EquipmentSlot, Object> slotMap_b = new IdentityHashMap<EquipmentSlot, Object>();
@@ -50,11 +55,18 @@ public class ItemSlotConversion {
         }
     }
 
+    @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
     public static Object getEnumItemSlot(EquipmentSlot slot) {
         return slotMap_b.get(slot);
     }
 
+    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
     public static EquipmentSlot getEquipmentSlot(Object enumItemSlot) {
         return slotMap_a.get(enumItemSlot);
+    }
+
+    @ConverterMethod
+    public static int equipmentSlotToFilterFlag(EquipmentSlot equipmentSlot) {
+        return WrapperConversion.enumItemSlotToFilterFlag(getEnumItemSlot(equipmentSlot));
     }
 }

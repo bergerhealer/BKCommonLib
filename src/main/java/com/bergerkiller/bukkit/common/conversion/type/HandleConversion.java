@@ -6,7 +6,6 @@ import java.util.List;
 import org.bukkit.ChatColor;
 import org.bukkit.Difficulty;
 import org.bukkit.block.Block;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.map.MapCursor;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -379,11 +378,6 @@ public class HandleConversion {
     @ConverterMethod
     public static String getChatTextMessage(ChatText text) {
         return text.getMessage();
-    }
-
-    @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
-    public static Object toEnumItemSlotHandle(EquipmentSlot equipmentSlot) {
-        return ItemSlotConversion.getEnumItemSlot(equipmentSlot);
     }
 
     @ConverterMethod(output="net.minecraft.network.chat.ChatMessageType", optional=true)

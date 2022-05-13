@@ -21,7 +21,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.map.MapCursor;
@@ -116,7 +115,6 @@ public class Conversion {
     public static final InputConverter<PotionEffect> toPotionEffect = getConverterTo(PotionEffect.class);
     public static final InputConverter<MapCursor> toMapCursor = getConverterTo(MapCursor.class);
     public static final InputConverter<ChatText> toChatText = getConverterTo(ChatText.class);
-    public static final InputConverter<EquipmentSlot> toEquipmentSlot = getConverterTo(EquipmentSlot.class);
     // Arrays
     public static final InputConverter<ItemStack[]> toItemStackArr = getConverterTo(ItemStack[].class);
     public static final InputConverter<Object[]> toItemStackHandleArr = getConverterTo(TypeDeclaration.createArray(CommonUtil.getClass("net.minecraft.world.item.ItemStack", false)));

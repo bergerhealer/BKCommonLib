@@ -8,7 +8,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.inventory.CraftingInventory;
-import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.map.MapCursor;
 import org.bukkit.material.MaterialData;
 import org.bukkit.potion.PotionEffect;
@@ -525,18 +524,8 @@ public class WrapperConversion {
     }
 
     @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
-    public static EquipmentSlot toEquipmentSlot(Object enumItemSlotHandle) {
-        return ItemSlotConversion.getEquipmentSlot(enumItemSlotHandle);
-    }
-
-    @ConverterMethod(input="net.minecraft.world.entity.EnumItemSlot")
     public static int enumItemSlotToFilterFlag(Object nmsEnumItemSlot) {
         return EnumItemSlotHandle.T.getFilterFlag.invoker.invoke(nmsEnumItemSlot);
-    }
-
-    @ConverterMethod
-    public static int equipmentSlotToFilterFlag(EquipmentSlot equipmentSlot) {
-        return enumItemSlotToFilterFlag(HandleConversion.toEnumItemSlotHandle(equipmentSlot));
     }
 
     @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
