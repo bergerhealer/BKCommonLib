@@ -35,6 +35,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template.Handle;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.LazyInitializedObject;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 public abstract class EntityAddRemoveHandler implements LazyInitializedObject, LibraryComponent {
     public static final EntityAddRemoveHandler INSTANCE = LibraryComponentSelector.forModule(EntityAddRemoveHandler.class)
@@ -290,7 +291,7 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
                 boolean isLists = false;
                 try {
                     String fieldName = Resolver.resolveFieldName(ChunkHandle.T.getType(), "entitySlices");
-                    java.lang.reflect.Field entitySlicesField = ChunkHandle.T.getType().getDeclaredField(fieldName);
+                    java.lang.reflect.Field entitySlicesField = MPLType.getDeclaredField(ChunkHandle.T.getType(), fieldName);
                     Class<?> fieldType = entitySlicesField.getType();
                     isLists = (fieldType == List[].class);
                     if (!fieldType.isArray()) {
