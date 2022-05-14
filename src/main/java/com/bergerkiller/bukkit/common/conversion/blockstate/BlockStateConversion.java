@@ -42,6 +42,8 @@ public abstract class BlockStateConversion {
 
     public abstract BlockState tileEntityToBlockState(org.bukkit.Chunk chunk, Object nmsTileEntity);
 
+    public abstract Object getTileEntityFromWorld(Block block);
+
     /**
      * <b>Deprecated: may cause unwanted chunk load when trying to convert</b>
      */

@@ -35,13 +35,15 @@ public abstract class TileEntityHandle extends Template.Handle {
     public abstract BlockData getBlockData();
     public abstract Material getType();
     public abstract CommonPacket getUpdatePacket();
+    public abstract boolean isRemoved();
 
+    @SuppressWarnings("deprecation")
     public org.bukkit.block.BlockState toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.Conversion.toBlockState.convert(getRaw());
+        return com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.tileEntityToBlockState(getRaw());
     }
 
     public static TileEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
-        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
+        return createHandle(com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState));
     }
     public abstract World getWorld_field();
     public abstract void setWorld_field(World value);
@@ -65,6 +67,7 @@ public abstract class TileEntityHandle extends Template.Handle {
         @Template.Optional
         public final Template.Method<Integer> getLegacyData = new Template.Method<Integer>();
         public final Template.Method.Converted<CommonPacket> getUpdatePacket = new Template.Method.Converted<CommonPacket>();
+        public final Template.Method<Boolean> isRemoved = new Template.Method<Boolean>();
 
     }
 

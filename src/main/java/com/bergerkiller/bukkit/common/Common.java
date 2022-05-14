@@ -33,7 +33,8 @@ public class Common {
             "Common:EntityController:forceControllerInitialization",
             "Common:EntityNetworkController:HasOnPassengersChanged",
             "Common:Localization:InitDefaults",
-            "Common:BlockData:EmissionBlockParameter"
+            "Common:BlockData:EmissionBlockParameter",
+            "Common:SignChangeTracker"
     ).collect(Collectors.toSet());
 
     /**

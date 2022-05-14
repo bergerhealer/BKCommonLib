@@ -245,6 +245,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         return result;
     }
 
+    @Override
     public Object getTileEntityFromWorld(Block block) {
         return getTileEntityFromWorld(block.getWorld(), HandleConversion.toBlockPositionHandle(block));
     }

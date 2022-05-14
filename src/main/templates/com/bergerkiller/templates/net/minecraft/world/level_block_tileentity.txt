@@ -163,13 +163,21 @@ class TileEntity {
     #endif
 #endif
 
+#select version >=
+#case 1.14:  public boolean isRemoved();
+#case 1.13:  public boolean isRemoved:x();
+#case 1.11:  public boolean isRemoved:y();
+#case else:  public boolean isRemoved:x();
+#endselect
+
     <code>
+    @SuppressWarnings("deprecation")
     public org.bukkit.block.BlockState toBukkit() {
-        return com.bergerkiller.bukkit.common.conversion.Conversion.toBlockState.convert(getRaw());
+        return com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.tileEntityToBlockState(getRaw());
     }
 
     public static TileEntityHandle fromBukkit(org.bukkit.block.BlockState blockState) {
-        return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toTileEntityHandle.convert(blockState));
+        return createHandle(com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.blockStateToTileEntity(blockState));
     }
     </code>
 }
@@ -204,4 +212,25 @@ class TileEntityHopper extends TileEntity {
         return TileEntityHopper.a(ihopper);
     }
 #endif
+}
+
+class TileEntitySign extends TileEntity {
+    public Object[] getRawLines() {
+#if version >= 1.17
+        return (Object[]) instance.messages;
+#else
+        return (Object[]) instance.lines;
+#endif
+    }
+
+    <code>
+    @Override
+    public org.bukkit.block.Sign toBukkit() {
+        return (org.bukkit.block.Sign) super.toBukkit();
+    }
+
+    public static TileEntitySignHandle fromBukkit(org.bukkit.block.Sign sign) {
+        return createHandle(com.bergerkiller.bukkit.common.conversion.blockstate.BlockStateConversion.INSTANCE.blockStateToTileEntity(sign));
+    }
+    </code>
 }
