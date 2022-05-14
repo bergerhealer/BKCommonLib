@@ -79,8 +79,8 @@ class BlockDataImpl extends BlockData {
 
     // Legacy: array of all possible Material values with all possible legacy data values
     // Index into it by taking data x 1024 | mat.ordinal()
-    public static final int BY_LEGACY_MAT_DATA_SHIFT = 14; // (1<<14 == 16384)
-    public static final BlockDataConstant[] BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
+    public static final int BY_LEGACY_MAT_DATA_SHIFT;
+    public static final BlockDataConstant[] BY_LEGACY_MAT_DATA;
 
     // These Material types do not support Block.updateState, as they cause issues with block physics events being fired
     private static final EnumSet<Material> BLOCK_UPDATE_STATE_BLACKLIST = EnumSet.noneOf(Material.class);
@@ -139,10 +139,13 @@ class BlockDataImpl extends BlockData {
         // Cache
         BY_BLOCK_DATA.updateVisible();
 
-        // Sanity check
-        if (CommonLegacyMaterials.getAllMaterials().length >= (1<<BY_LEGACY_MAT_DATA_SHIFT)) {
-            throw new IllegalStateException("BY_LEGACY_MAT_DATA_SHIFT is too low, can't store " +
-                    CommonLegacyMaterials.getAllMaterials().length + " materials");
+        // Compute how large to make the legacy material data array to fit in all materials
+        {
+            int shift = 1;
+            while (CommonLegacyMaterials.getAllMaterials().length >= (1<<shift))
+                shift++;
+            BY_LEGACY_MAT_DATA_SHIFT = shift;
+            BY_LEGACY_MAT_DATA = new BlockDataConstant[16 << BY_LEGACY_MAT_DATA_SHIFT];
         }
 
         // Check for any missing Material enum values - store those also in the BY_MATERIAL mapping
