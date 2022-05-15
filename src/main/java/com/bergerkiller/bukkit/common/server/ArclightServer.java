@@ -51,6 +51,24 @@ public class ArclightServer extends SpigotServer {
     }
 
     @Override
+    public boolean canLoadClassPath(String classPath) {
+        // The .class data at this path contains obfuscated type information
+        // These obfuscated names are deobufscated at runtime
+        // This difference causes compiler errors at runtime, so instead of
+        // loading the .class files, inspect the signatures using reflection.
+        if (classPath.startsWith("org.bukkit.craftbukkit.")) {
+            return false;
+        }
+
+        // NMS World class 'entitiesById' has different field modifiers in bytecode than loaded class
+        if (classPath.startsWith("net.minecraft.server.")) {
+            return false;
+        }
+
+        return false;
+    }
+
+    @Override
     public Collection<String> getLoadableWorlds() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }

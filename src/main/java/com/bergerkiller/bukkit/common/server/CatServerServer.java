@@ -103,6 +103,12 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
             return false;
         }
 
+        // Forge re-writes these classes at runtime, so we can't rely on loading
+        // the .class files from there.
+        if (classPath.startsWith("net.minecraft.")) {
+            return false;
+        }
+
         return true;
     }
 

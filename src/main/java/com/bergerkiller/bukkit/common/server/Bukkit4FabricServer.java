@@ -112,6 +112,12 @@ public class Bukkit4FabricServer extends SpigotServer implements FieldNameResolv
             return false;
         }
 
+        // Forge re-writes these classes at runtime, so we can't rely on loading
+        // the .class files from there.
+        if (classPath.startsWith("net.minecraft.")) {
+            return false;
+        }
+
         return true;
     }
 
