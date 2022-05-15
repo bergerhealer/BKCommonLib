@@ -3,6 +3,7 @@ package net.minecraft.world.item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.IBlockData;
 import net.minecraft.world.level.IMaterial;
+import net.minecraft.world.item.ItemWorldMap;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTNumber;
@@ -156,7 +157,7 @@ class ItemStack {
     }
 
     public boolean isMapItem() {
-        return instance.getItem() == Items.FILLED_MAP;
+        return instance.getItem() instanceof ItemWorldMap;
     }
 
     public int getMapId() {
@@ -174,14 +175,14 @@ class ItemStack {
     }
 
     public java.util.UUID getMapDisplayDynamicOnlyUUID() {
-        if (instance.getItem() != Items.FILLED_MAP) {
+        if (!(instance.getItem() instanceof ItemWorldMap)) {
             return null;
         }
         return instance#getItemStackMapDisplayUUID();
     }
 
     public java.util.UUID getMapDisplayUUID() {
-        if (instance.getItem() != Items.FILLED_MAP) {
+        if (!(instance.getItem() instanceof ItemWorldMap)) {
             return null;
         }
         java.util.UUID mapDisplayUUID = instance#getItemStackMapDisplayUUID();

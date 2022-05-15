@@ -8,6 +8,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemWorldMap;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -96,12 +97,12 @@ class EntityItemFrame extends EntityHanging {
 
     public boolean getItemIsMap() {
         ItemStack item = instance.getItem();
-        return item != null && item.getItem() == Items.FILLED_MAP;
+        return item != null && item.getItem() instanceof ItemWorldMap;
     }
 
     public java.util.UUID getItemMapDisplayDynamicOnlyUUID() {
         ItemStack item = instance.getItem();
-        if (item == null || item.getItem() != Items.FILLED_MAP) {
+        if (item == null || !(item.getItem() instanceof ItemWorldMap)) {
             return null;
         }
         return item#getItemStackMapDisplayUUID();
@@ -109,7 +110,7 @@ class EntityItemFrame extends EntityHanging {
 
     public java.util.UUID getItemMapDisplayUUID() {
         ItemStack item = instance.getItem();
-        if (item == null || item.getItem() != Items.FILLED_MAP) {
+        if (item == null || !(item.getItem() instanceof ItemWorldMap)) {
             return null;
         }
         java.util.UUID mapDisplayUUID = item#getItemStackMapDisplayUUID();
