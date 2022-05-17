@@ -46,7 +46,7 @@ public class ClassMap<V> {
     /**
      * Obtains the value bound to a given instance type
      *
-     * @param type of instance
+     * @param type Type of instance
      * @return the value bound to the instance type
      */
     public V get(Class<?> type) {
@@ -63,6 +63,30 @@ public class ClassMap<V> {
             }
         }
         return null;
+    }
+
+    /**
+     * Obtains the value bound to a given instance type, or returns the
+     * default value if none match.
+     *
+     * @param type Type of instance
+     * @param defaultValue Defaul value to return when not found
+     * @return the value bound to the instance type, or the default value
+     */
+    public V getOrDefault(Class<?> type, V defaultValue) {
+        if (type == null) {
+            return defaultValue;
+        }
+        final V value = classes.get(type);
+        if (value != null) {
+            return value;
+        }
+        for (Entry<Class<?>, V> entry : classes.entrySet()) {
+            if (entry.getKey().isAssignableFrom(type)) {
+                return entry.getValue();
+            }
+        }
+        return defaultValue;
     }
 
     /**

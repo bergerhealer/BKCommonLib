@@ -6,6 +6,7 @@ import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
@@ -16,8 +17,11 @@ import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
@@ -25,7 +29,16 @@ public class PacketType extends ClassTemplate<Object> {
         CommonBootstrap.initTemplates();
     }
 
-    private static final ClassMap<List<PacketType>> typesByPacketClass = new ClassMap<List<PacketType>>();
+    private static Map<Class<?>, PacketTypeOptions> typesByPacketClassVisible = Collections.emptyMap();
+    private static final ClassMap<PacketTypeOptions> typesByPacketClass = new ClassMap<PacketTypeOptions>();
+    private static final PacketTypeOptions NO_TYPE_OPTIONS = new PacketTypeOptions() {
+        @Override
+        public PacketType firstRegistered() { return null; }
+        @Override
+        public PacketType find(Object packetHandle) { return null; }
+        @Override
+        public PacketTypeOptions add(PacketType newType) { return new PacketTypeOptionsSingleton(newType); }
+    };
 
     /*
      * ========================
@@ -202,14 +215,10 @@ public class PacketType extends ClassTemplate<Object> {
 
         // Store in mapping (ignore raw Packet type!)
         if (!packetClass.equals(PacketHandle.T.getType())) {
-            List<PacketType> types_old = typesByPacketClass.get(packetClass);
-            if (types_old == null || types_old.isEmpty()) {
-                typesByPacketClass.put(packetClass, Collections.singletonList(this));
-            } else {
-                ArrayList<PacketType> new_list = new ArrayList<PacketType>(types_old);
-                new_list.add(0, this);
-                new_list.trimToSize();
-                typesByPacketClass.put(packetClass, new_list);
+            // Register in the ClassMap
+            synchronized (PacketType.class) {
+                typesByPacketClass.put(packetClass, typesByPacketClass.getOrDefault(packetClass, NO_TYPE_OPTIONS).add(this));
+                typesByPacketClassVisible = new HashMap<>(typesByPacketClass.getData()); // Regenerate, excludes mappings of extended classes
             }
         }
 
@@ -296,45 +305,130 @@ public class PacketType extends ClassTemplate<Object> {
      * @param packetHandle
      * @return Packet Type
      */
-    public static PacketType getType(Object packetHandle) {
-        if (packetHandle == null) {
-            throw new IllegalArgumentException("Null packets can not be used");
+    public static PacketType getType(final Object packetHandle) {
+        // Get class, protect against null
+        final Class<?> packetHandleType;
+        try {
+            packetHandleType = packetHandle.getClass();
+        } catch (NullPointerException ex) {
+            if (packetHandle == null) {
+                throw new IllegalArgumentException("Input packet is null");
+            } else {
+                throw ex; // never happens?
+            }
         }
-        List<PacketType> types = typesByPacketClass.get(packetHandle);
-        if (types == null || types.isEmpty()) {
-            // Packet class has no known type
-            return new PacketType(packetHandle.getClass());
-        } else if (types.size() == 1) {
-            // Packet class has only one possible type
-            return types.get(0);
+
+        return LogicUtil.synchronizeCopyOnWrite(PacketType.class,
+                () -> typesByPacketClassVisible.getOrDefault(packetHandleType, NO_TYPE_OPTIONS).find(packetHandle),
+                () -> {
+                    PacketTypeOptions options = typesByPacketClass.getOrDefault(packetHandleType, NO_TYPE_OPTIONS);
+                    PacketType type = options.find(packetHandle);
+                    if (type == null) {
+                        // Register an entirely new PacketType. This also registers it in both maps.
+                        return new PacketType(packetHandleType);
+                    }
+
+                    // Update visible map cache - eliminates use of isAssignable logic in ClassMap
+                    Map<Class<?>, PacketTypeOptions> newMap = new HashMap<Class<?>, PacketTypeOptions>(typesByPacketClassVisible);
+                    newMap.put(packetHandleType, options);
+                    typesByPacketClassVisible = newMap;
+
+                    return type;
+                });
+    }
+
+    @Deprecated
+    public static PacketType getType(int packetId, boolean outGoing) {
+        final Class<?> packetHandleType;
+        if (outGoing) {
+            packetHandleType = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
         } else {
-            // Multiple packet classes are possible, use method to filter
+            packetHandleType = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
+        }
+        if (packetHandleType == null) {
+            return null;
+        }
+
+        return LogicUtil.synchronizeCopyOnWrite(PacketType.class,
+                () -> typesByPacketClassVisible.getOrDefault(packetHandleType, NO_TYPE_OPTIONS).firstRegistered(),
+                () -> {
+                    PacketTypeOptions options = typesByPacketClass.getOrDefault(packetHandleType, NO_TYPE_OPTIONS);
+                    PacketType type = options.firstRegistered();
+                    if (type == null) {
+                        // Register an entirely new PacketType. This also registers it in both maps.
+                        return new PacketType(packetHandleType);
+                    }
+
+                    // Update visible map cache - eliminates use of isAssignable logic in ClassMap
+                    Map<Class<?>, PacketTypeOptions> newMap = new HashMap<Class<?>, PacketTypeOptions>(typesByPacketClassVisible);
+                    newMap.put(packetHandleType, options);
+                    typesByPacketClassVisible = newMap;
+
+                    return type;
+                });
+    }
+
+    private static interface PacketTypeOptions {
+        PacketType firstRegistered();
+        PacketType find(Object packetHandle);
+        PacketTypeOptions add(PacketType newType);
+    }
+
+    private static final class PacketTypeOptionsSingleton implements PacketTypeOptions {
+        private final PacketType type;
+
+        public PacketTypeOptionsSingleton(PacketType type) {
+            this.type = type;
+        }
+
+        @Override
+        public PacketType firstRegistered() {
+            return type;
+        }
+
+        @Override
+        public PacketType find(Object packetHandle) {
+            return type;
+        }
+
+        @Override
+        public PacketTypeOptions add(PacketType newType) {
+            ArrayList<PacketType> types = new ArrayList<PacketType>(2);
+            types.add(newType);
+            types.add(type);
+            return new PacketTypeOptionsMultiple(types);
+        }
+    }
+
+    private static final class PacketTypeOptionsMultiple implements PacketTypeOptions {
+        private final PacketType[] types;
+
+        public PacketTypeOptionsMultiple(List<PacketType> types) {
+            this.types = types.toArray(new PacketType[types.size()]);
+        }
+
+        @Override
+        public PacketType firstRegistered() {
+            return this.types[types.length - 1];
+        }
+
+        @Override
+        public PacketType find(Object packetHandle) {
             for (PacketType type : types) {
                 if (type.matchPacket(packetHandle)) {
                     return type;
                 }
             }
-            // Weird?
-            return new PacketType(packetHandle.getClass());
-        }
-    }
 
-    @Deprecated
-    public static PacketType getType(int packetId, boolean outGoing) {
-        final Class<?> packetHandleClass;
-        if (outGoing) {
-            packetHandleClass = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
-        } else {
-            packetHandleClass = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
-        }
-        if (packetHandleClass == null) {
             return null;
-        } else {
-            List<PacketType> types = typesByPacketClass.get(packetHandleClass);
-            if (types == null || types.isEmpty()) {
-                types = Collections.singletonList(new PacketType(packetHandleClass));
-            }
-            return types.get(0);
+        }
+
+        @Override
+        public PacketTypeOptions add(PacketType newType) {
+            ArrayList<PacketType> newTypes = new ArrayList<PacketType>(types.length + 1);
+            newTypes.add(newType);
+            newTypes.addAll(Arrays.asList(types));
+            return new PacketTypeOptionsMultiple(newTypes);
         }
     }
 }
