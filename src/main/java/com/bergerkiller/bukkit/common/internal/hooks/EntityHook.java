@@ -150,6 +150,9 @@ public class EntityHook extends ClassHook<EntityHook> {
         try {
             if (checkController()) {
                 controller.onTick();
+                if (EntityHandle.T.opt_tick_pushToHopper.isAvailable()) {
+                    EntityHandle.T.opt_tick_pushToHopper.invoke(instance());
+                }
             } else {
                 base.onTick();
             }

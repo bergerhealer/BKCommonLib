@@ -248,8 +248,12 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
             }
             return changed;
         } else {
-            if (list.remove(oldValue)) {
-                list.add(newValue);
+            // Note: weird List class returns Integer.MIN_VALUE rather than -1 when not found
+            // Check for index within range to cover all cases safely.
+            int index = list.indexOf(oldValue);
+            if (index >= 0 && index < list.size() && list.get(index) == oldValue) {
+                list.remove(oldValue); // by index not always supported
+                list.add(index, newValue);
                 return true;
             } else {
                 return false;

@@ -1829,6 +1829,19 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   public int getPortalCooldownMaximum:ar();
 #endselect
 
+    // On some versions of the server, entities push items into hoppers instead of hoppers pulling from entities
+    // This is normally done in onTick, but if overrided, it wouldn't run anymore. Call this method
+    // in onTick
+#if exists net.techcable.tacospigot.HopperPusher
+    public optional void opt_tick_pushToHopper() {
+        if (instance instanceof net.techcable.tacospigot.HopperPusher) {
+            ((net.techcable.tacospigot.HopperPusher) instance).tryPutInHopper();
+        }
+    }
+#else
+    public optional void opt_tick_pushToHopper:###();
+#endif
+
     // Since MC 1.16
 #if version >= 1.18
     public optional (InteractionResult) EnumInteractionResult onInteractBy_1_16:interact((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.MainHand) EnumHand enumhand);
