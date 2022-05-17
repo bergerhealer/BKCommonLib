@@ -203,7 +203,7 @@ public class DebugLogger {
             this._columnSpacing = Arrays.copyOf(this._columnSpacing, (this._col + n));
         }
     }
-    
+
     /**
      * Retrieves or creates a new debug logger by name
      * 
@@ -211,11 +211,6 @@ public class DebugLogger {
      * @return logger
      */
     public static synchronized DebugLogger get(String name) {
-        DebugLogger logger = _loggers.get(name);
-        if (logger == null) {
-            logger = new DebugLogger(name);
-            _loggers.put(name, logger);
-        }
-        return logger;
+        return _loggers.computeIfAbsent(name, DebugLogger::new);
     }
 }

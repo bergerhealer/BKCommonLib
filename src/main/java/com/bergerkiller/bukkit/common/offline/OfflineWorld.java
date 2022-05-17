@@ -12,6 +12,7 @@ import org.bukkit.block.Block;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Stores information about an offline world. The world uuid is always
@@ -91,16 +92,12 @@ public final class OfflineWorld {
      * @return OfflineWorld instance
      */
     public static OfflineWorld of(UUID worldUUID) {
-        OfflineWorld world = worlds.get(worldUUID);
-        if (world == null) {
-            // Modify it while synchronized
-            synchronized (OfflineWorld.class) {
-                Map<UUID, OfflineWorld> copy = new HashMap<>(worlds);
-                world = copy.computeIfAbsent(worldUUID, OfflineWorld::new);
-                worlds = copy;
-            }
-        }
-        return world;
+        return LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, worlds, worldUUID, Map::get, (map, key) -> {
+            Map<UUID, OfflineWorld> copy = new HashMap<>(map);
+            OfflineWorld world = copy.computeIfAbsent(key, OfflineWorld::new);
+            worlds = copy;
+            return world;
+        });
     }
 
     /**
@@ -121,20 +118,19 @@ public final class OfflineWorld {
 
         // Try fast by-identity cache. If this fails, try by world UUID
         // If cache is disabled, don't cache to avoid memory leaks.
-        OfflineWorld offlineWorld = byBukkitWorld.get(world);
-        if (offlineWorld == null) {
-            offlineWorld = of(world.getUID());
+        return cacheLastReturned = LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, byBukkitWorld, world, Map::get, (map, w) -> {
+            OfflineWorld offlineWorld = of(w.getUID());
 
             // Modify it while synchronized, also check we should cache at all...
-            synchronized (OfflineWorld.class) {
-                if (toWorldSupplierFunc.cacheByBukkitWorld()) {
-                    IdentityHashMap<World, OfflineWorld> copy = new IdentityHashMap<>(byBukkitWorld);
-                    copy.put(world, offlineWorld);
-                    byBukkitWorld = copy;
-                }
+            // This is turned off when the plugin is disabling/disabled
+            if (toWorldSupplierFunc.cacheByBukkitWorld()) {
+                IdentityHashMap<World, OfflineWorld> copy = new IdentityHashMap<>(byBukkitWorld);
+                copy.put(w, offlineWorld);
+                byBukkitWorld = copy;
             }
-        }
-        return offlineWorld;
+
+            return offlineWorld;
+        });
     }
 
     private OfflineWorld() {

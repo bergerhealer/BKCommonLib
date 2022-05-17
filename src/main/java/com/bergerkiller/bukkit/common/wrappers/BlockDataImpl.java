@@ -33,6 +33,7 @@ import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.RegistryBlockIDHandle;
@@ -711,19 +712,17 @@ class BlockDataImpl extends BlockData {
             BlockDataConstant last = this.last;
             if (last.getBlockRaw() == rawIBlockData) {
                 return last;
-            } else {
-                BlockDataConstant fromCache = cache.get(rawIBlockData);
-                if (fromCache != null) {
-                    this.last = fromCache;
-                    return fromCache;
-                }
             }
 
-            IBlockDataHandle b = IBlockDataHandle.createHandle(rawIBlockData);
-            return create(b);
+            return this.last = LogicUtil.synchronizeCopyOnWrite(this, cache, rawIBlockData, Map::get, (map, key) ->
+                createUnsynchronized(IBlockDataHandle.createHandle(rawIBlockData)));
         }
 
         public synchronized BlockDataConstant create(IBlockDataHandle iblockdataHandle) {
+            return createUnsynchronized(iblockdataHandle);
+        }
+
+        private BlockDataConstant createUnsynchronized(IBlockDataHandle iblockdataHandle) {
             BlockDataConstant c = new BlockDataImpl.BlockDataConstant(iblockdataHandle);
             cacheWritable.put(iblockdataHandle.getRaw(), c);
             updateVisible();

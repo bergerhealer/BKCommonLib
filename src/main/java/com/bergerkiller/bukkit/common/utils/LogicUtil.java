@@ -15,6 +15,7 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -1099,5 +1100,57 @@ public class LogicUtil {
     @SuppressWarnings("unchecked")
     public static <T> WeakReference<T> nullWeakReference() {
         return (WeakReference<T>) _nullWeakReference;
+    }
+
+    /**
+     * Performs copy-on-write logic. Tries reading a value from a public immutable mapping
+     * first. If that fails, the input lock is synchronized on and another read is attempted.
+     * If that also (still) fails, then the computer function is called while still synchronized,
+     * to write a new value to the mapping.
+     *
+     * @param <S> Source data container type, like a Map
+     * @param <K> Source data container Key type
+     * @param <V> Source data container Value type
+     * @param lock Lock to synchronize on when computing
+     * @param source Data container
+     * @param key Input Key
+     * @param getter Public getter function, should return null to compute a new value
+     * @param computer Synchronized new-value computer function
+     * @return Gotten or computed Value mapped to Key
+     */
+    public static <S, K, V> V synchronizeCopyOnWrite(Object lock, S source, K key, BiFunction<S, ? super K, V> getter, BiFunction<S, ? super K, V> computer) {
+        V result = getter.apply(source, key);
+        if (result == null) {
+            synchronized (lock) {
+                result = getter.apply(source, key);
+                if (result == null) {
+                    result = computer.apply(source, key);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Same as {@link #synchronizeCopyOnWrite(Object, Object, Object, BiFunction, BiFunction)}, but without
+     * passing the input data container or key to the getter/computer functions.
+     *
+     * @param <T>
+     * @param lock Lock to synchronize on when computing
+     * @param getter Public getter supplier, should return null to compute a new value
+     * @param computer Synchronized new-value computer supplier
+     * @return Gotten or computed Value mapped to Key
+     */
+    public static <T> T synchronizeCopyOnWrite(Object lock, Supplier<T> getter, Supplier<T> computer) {
+        T result = getter.get();
+        if (result == null) {
+            synchronized (lock) {
+                result = getter.get();
+                if (result == null) {
+                    result = computer.get();
+                }
+            }
+        }
+        return result;
     }
 }
