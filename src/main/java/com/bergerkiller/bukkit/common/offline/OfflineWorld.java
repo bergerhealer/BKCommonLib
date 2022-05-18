@@ -123,7 +123,7 @@ public final class OfflineWorld {
 
             // Modify it while synchronized, also check we should cache at all...
             // This is turned off when the plugin is disabling/disabled
-            if (toWorldSupplierFunc.cacheByBukkitWorld()) {
+            if (toWorldSupplierFunc.cacheByBukkitWorld() && offlineWorld.getLoadedWorld() == w) {
                 IdentityHashMap<World, OfflineWorld> copy = new IdentityHashMap<>(byBukkitWorld);
                 copy.put(w, offlineWorld);
                 byBukkitWorld = copy;
