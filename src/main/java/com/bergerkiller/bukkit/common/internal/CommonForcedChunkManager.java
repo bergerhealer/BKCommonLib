@@ -109,7 +109,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     private ForcedWorld getOrCreateForcedWorld(World world) {
-        return LogicUtil.synchronizeCopyOnWrite(this, this.forcedWorlds, world, IdentityHashMap::get, (map, key) -> {
+        return LogicUtil.synchronizeCopyOnWrite(this, l -> forcedWorlds, world, IdentityHashMap::get, (fwmap, key) -> {
             // Note: with asynchronous access this could fail spuriously!
             // In those cases, a sync task is scheduled to perform any operations that will follow
             // That task will figure out the world is unloaded, and cancel the request there and then
@@ -119,7 +119,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
             // Register a new ForcedWorld
             ForcedWorld forcedWorld = new ForcedWorld(world);
-            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(map);
+            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(fwmap);
             newForcedWorlds.put(world, forcedWorld);
             this.forcedWorlds = newForcedWorlds;
 

@@ -714,8 +714,8 @@ class BlockDataImpl extends BlockData {
                 return last;
             }
 
-            return this.last = LogicUtil.synchronizeCopyOnWrite(this, cache, rawIBlockData, Map::get, (map, key) ->
-                createUnsynchronized(IBlockDataHandle.createHandle(rawIBlockData)));
+            return this.last = LogicUtil.synchronizeCopyOnWrite(this, l -> cache, rawIBlockData, IdentityHashMap::get,
+                    (map, key) -> createUnsynchronized(IBlockDataHandle.createHandle(key)));
         }
 
         public synchronized BlockDataConstant create(IBlockDataHandle iblockdataHandle) {

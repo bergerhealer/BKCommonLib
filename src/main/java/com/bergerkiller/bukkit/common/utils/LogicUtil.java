@@ -1103,28 +1103,32 @@ public class LogicUtil {
     }
 
     /**
-     * Performs copy-on-write logic. Tries reading a value from a public immutable mapping
+     * Performs copy-on-write logic. Tries reading a value from a visible immutable mapping
      * first. If that fails, the input lock is synchronized on and another read is attempted.
      * If that also (still) fails, then the computer function is called while still synchronized,
-     * to write a new value to the mapping.
+     * to write a new value to the mapping.<br>
+     * <br>
+     * The lock is used as input for the source function.
      *
-     * @param <S> Source data container type, like a Map
-     * @param <K> Source data container Key type
-     * @param <V> Source data container Value type
+     * @param <L> Lock type, input for mapping source type
+     * @param <S> Mapping source type
+     * @param <K> Key type
+     * @param <V> Value type
      * @param lock Lock to synchronize on when computing
-     * @param source Data container
+     * @param source Source function that returns the live state of the immutable mapping from a Lock instance
      * @param key Input Key
-     * @param getter Public getter function, should return null to compute a new value
-     * @param computer Synchronized new-value computer function
+     * @param getter Public getter function, accepting the source and key. Should return null to compute a new value
+     * @param computer Synchronized new-value computer function, accepting the source and key
      * @return Gotten or computed Value mapped to Key
      */
-    public static <S, K, V> V synchronizeCopyOnWrite(Object lock, S source, K key, BiFunction<S, ? super K, V> getter, BiFunction<S, ? super K, V> computer) {
-        V result = getter.apply(source, key);
+    public static <L, S, K, V> V synchronizeCopyOnWrite(L lock, Function<L, S> source, K key, BiFunction<S, K, V> getter, BiFunction<S, K, V> computer) {
+        V result = getter.apply(source.apply(lock), key);
         if (result == null) {
             synchronized (lock) {
-                result = getter.apply(source, key);
+                S sourceLive = source.apply(lock);
+                result = getter.apply(sourceLive, key);
                 if (result == null) {
-                    result = computer.apply(source, key);
+                    result = computer.apply(sourceLive, key);
                 }
             }
         }
@@ -1132,17 +1136,49 @@ public class LogicUtil {
     }
 
     /**
-     * Same as {@link #synchronizeCopyOnWrite(Object, Object, Object, BiFunction, BiFunction)}, but without
-     * passing the input data container or key to the getter/computer functions.
+     * Performs copy-on-write logic. Tries reading a value from a visible immutable mapping
+     * first. If that fails, the input lock is synchronized on and another read is attempted.
+     * If that also (still) fails, then the computer function is called while still synchronized,
+     * to write a new value to the mapping.
      *
-     * @param <T>
+     * @param <S> Mapping source type
+     * @param <K> Key type
+     * @param <V> Value type
+     * @param lock Lock to synchronize on when computing
+     * @param source Source supplier that returns the live state of the immutable mapping
+     * @param key Input Key
+     * @param getter Public getter function, accepting the source and key. Should return null to compute a new value
+     * @param computer Synchronized new-value computer function, accepting the source and key
+     * @return Gotten or computed Value mapped to Key
+     */
+    public static <S, K, V> V synchronizeCopyOnWrite(Object lock, Supplier<S> source, K key, BiFunction<S, K, V> getter, BiFunction<S, K, V> computer) {
+        V result = getter.apply(source.get(), key);
+        if (result == null) {
+            synchronized (lock) {
+                S sourceLive = source.get();
+                result = getter.apply(sourceLive, key);
+                if (result == null) {
+                    result = computer.apply(sourceLive, key);
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Performs copy-on-write logic. Tries reading a value from a visible immutable mapping
+     * first. If that fails, the input lock is synchronized on and another read is attempted.
+     * If that also (still) fails, then the computer function is called while still synchronized,
+     * to write a new value to the mapping.
+     *
+     * @param <V> Value type
      * @param lock Lock to synchronize on when computing
      * @param getter Public getter supplier, should return null to compute a new value
      * @param computer Synchronized new-value computer supplier
-     * @return Gotten or computed Value mapped to Key
+     * @return Gotten or computed Value
      */
-    public static <T> T synchronizeCopyOnWrite(Object lock, Supplier<T> getter, Supplier<T> computer) {
-        T result = getter.get();
+    public static <V> V synchronizeCopyOnWrite(Object lock, Supplier<V> getter, Supplier<V> computer) {
+        V result = getter.get();
         if (result == null) {
             synchronized (lock) {
                 result = getter.get();

@@ -92,7 +92,7 @@ public final class OfflineWorld {
      * @return OfflineWorld instance
      */
     public static OfflineWorld of(UUID worldUUID) {
-        return LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, worlds, worldUUID, Map::get, (map, key) -> {
+        return LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, () -> worlds, worldUUID, Map::get, (map, key) -> {
             Map<UUID, OfflineWorld> copy = new HashMap<>(map);
             OfflineWorld world = copy.computeIfAbsent(key, OfflineWorld::new);
             worlds = copy;
@@ -118,13 +118,13 @@ public final class OfflineWorld {
 
         // Try fast by-identity cache. If this fails, try by world UUID
         // If cache is disabled, don't cache to avoid memory leaks.
-        return cacheLastReturned = LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, byBukkitWorld, world, Map::get, (map, w) -> {
+        return cacheLastReturned = LogicUtil.synchronizeCopyOnWrite(OfflineWorld.class, () -> byBukkitWorld, world, Map::get, (map, w) -> {
             OfflineWorld offlineWorld = of(w.getUID());
 
             // Modify it while synchronized, also check we should cache at all...
             // This is turned off when the plugin is disabling/disabled
             if (toWorldSupplierFunc.cacheByBukkitWorld() && offlineWorld.getLoadedWorld() == w) {
-                IdentityHashMap<World, OfflineWorld> copy = new IdentityHashMap<>(byBukkitWorld);
+                IdentityHashMap<World, OfflineWorld> copy = new IdentityHashMap<>(map);
                 copy.put(w, offlineWorld);
                 byBukkitWorld = copy;
             }
