@@ -61,8 +61,12 @@ class WorldServer extends World {
     public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 #endif
 #if version >= 1.18
-    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer:getChunkSource();
-    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer:getChunkSource();
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkSource();
+    }
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkSource();
+    }
 #elseif version >= 1.13.2
     #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
         return (ChunkProviderServer) instance.getChunkProvider();
@@ -71,8 +75,13 @@ class WorldServer extends World {
         return (ChunkProviderServer) instance.getChunkProvider();
     }
 #elseif version >= 1.9
-    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer();
-    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
+    // Note: Don't simplify or it breaks on Forge, which returns IChunkProvider.
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkProviderServer();
+    }
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkProviderServer();
+    }
 #else
     #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
         return instance.chunkProviderServer;
