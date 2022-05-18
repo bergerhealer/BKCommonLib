@@ -72,34 +72,32 @@ public class OfflineWorldMap<V> {
 
     /**
      * Gets the value mapped to an OfflineWorld, or returns the
-     * default value if no value is stored.
+     * default value if no value is stored, or the value is null.<br>
+     * <br>
+     * <b>Does not support null values</b>
      *
      * @param world
-     * @param defaultValue
-     * @return Value mapped to world, or defaultValue if not stored
+     * @param defaultValue Default value to return when no value is stored, or is null
+     * @return Value mapped to world, or defaultValue if not stored or is null
      */
     public V getOrDefault(OfflineWorld world, V defaultValue) {
-        if (world == lastGetKey) {
-            return lastGetValue;
-        } else {
-            return values.getOrDefault(world, defaultValue);
-        }
+        V value = this.get(world);
+        return (value != null) ? value : defaultValue;
     }
 
     /**
      * Gets the value mapped to a Bukkit World, or returns the
-     * default value if no value is stored.
+     * default value if no value is stored, or the value is null.<br>
+     * <br>
+     * <b>Does not support null values</b>
      *
      * @param world
-     * @param defaultValue
-     * @return Value mapped to world, or defaultValue if not stored
+     * @param defaultValue Default value to return when no value is stored, or is null
+     * @return Value mapped to world, or defaultValue if not stored or is null
      */
     public V getOrDefault(World world, V defaultValue) {
-        if (world == lastGetKey.getLoadedWorld()) {
-            return lastGetValue;
-        } else {
-            return values.getOrDefault(OfflineWorld.of(world), defaultValue);
-        }
+        V value = this.get(world);
+        return (value != null) ? value : defaultValue;
     }
 
     /**
@@ -154,10 +152,17 @@ public class OfflineWorldMap<V> {
      * @return Current or computed value mapped to world
      */
     public V computeIfAbsent(OfflineWorld world, Function<OfflineWorld, ? extends V> mappingFunction) {
-        if (lastGetKey == world) {
-            return lastGetValue;
+        V value;
+        if (lastGetKey == world && (value = lastGetValue) != null) {
+            return value;
         } else {
-            return values.computeIfAbsent(world, mappingFunction);
+            try {
+                lastGetKey = world;
+                return lastGetValue = values.computeIfAbsent(world, mappingFunction);
+            } catch (RuntimeException | Error e) {
+                lastGetKey = OfflineWorld.NONE;
+                throw e;
+            }
         }
     }
 
@@ -169,10 +174,18 @@ public class OfflineWorldMap<V> {
      * @return Current or computed value mapped to world
      */
     public V computeIfAbsent(World world, Function<World, ? extends V> mappingFunction) {
-        if (lastGetKey.getLoadedWorld() == world) {
-            return lastGetValue;
+        V value;
+        if (lastGetKey.getLoadedWorld() == world && (value = lastGetValue) != null) {
+            return value;
         } else {
-            return values.computeIfAbsent(OfflineWorld.of(world), unused -> mappingFunction.apply(world));
+            try {
+                OfflineWorld offlineWorld = OfflineWorld.of(world);
+                lastGetKey = offlineWorld;
+                return lastGetValue = values.computeIfAbsent(offlineWorld, unused -> mappingFunction.apply(world));
+            } catch (RuntimeException | Error e) {
+                lastGetKey = OfflineWorld.NONE;
+                throw e;
+            }
         }
     }
 
