@@ -14,6 +14,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
+import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.Task;
@@ -22,6 +23,8 @@ import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
 import com.bergerkiller.bukkit.common.collections.RunnableConsumer;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.LongHashMap;
 import com.bergerkiller.bukkit.common.wrappers.LongHashSet;
 import com.bergerkiller.generated.net.minecraft.server.level.ChunkProviderServerHandle;
@@ -34,6 +37,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 public class CommonForcedChunkManager extends ForcedChunkManager {
     private IdentityHashMap<World, ForcedWorld> forcedWorlds = new IdentityHashMap<>(); // Cloned on modify
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
+    private final WorldUnloadEventListener worldUnloadListener = new WorldUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
     private final CommonNextTickExecutor asyncLoadCallbackHandler = new CommonNextTickExecutor();
@@ -60,6 +64,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         if (CommonCapabilities.CAN_CANCEL_CHUNK_UNLOAD_EVENT) {
             plugin.register(this.chunkUnloadListener);
         }
+        plugin.register(this.worldUnloadListener);
     }
 
     public void disable(CommonPlugin plugin) {
@@ -67,7 +72,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.loadTimeoutTracker = null;
         this.pendingHandler.stop();
         this.pendingHandler = null;
-        this.forcedWorlds.values().forEach(ForcedWorld::disable);
+        this.forcedWorlds.values().forEach(f -> f.unload(false));
         this.forcedWorlds = new IdentityHashMap<>();
         this.asyncLoadCallbackHandler.setExecutorTask(null);
     }
@@ -104,23 +109,46 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     private ForcedWorld getOrCreateForcedWorld(World world) {
-        ForcedWorld forcedWorld;
-
-        if ((forcedWorld = this.forcedWorlds.get(world)) != null) {
-            return forcedWorld;
-        }
-
-        synchronized (this) {
-            if ((forcedWorld = this.forcedWorlds.get(world)) != null) {
-                return forcedWorld;
+        return LogicUtil.synchronizeCopyOnWrite(this, this.forcedWorlds, world, IdentityHashMap::get, (map, key) -> {
+            // Note: with asynchronous access this could fail spuriously!
+            // In those cases, a sync task is scheduled to perform any operations that will follow
+            // That task will figure out the world is unloaded, and cancel the request there and then
+            if (!WorldUtil.isLoaded(world)) {
+                throw new IllegalStateException("Can't keep chunk on world " + world.getName() + " loaded because the world is unloaded!");
             }
 
-            forcedWorld = new ForcedWorld(world);
-            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(this.forcedWorlds);
+            // Register a new ForcedWorld
+            ForcedWorld forcedWorld = new ForcedWorld(world);
+            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(map);
             newForcedWorlds.put(world, forcedWorld);
             this.forcedWorlds = newForcedWorlds;
+
+            // Make sure we run the main update tick at least once. This is so that invalid
+            // forced worlds can be removed gracefully if they got created asynchronously.
+            pendingHandler.start();
+
             return forcedWorld;
+        });
+    }
+
+    private void unloadForcedWorld(World world) {
+        // Remove from the by-world lookup. This also prevents anyone from registering new tasks later.
+        ForcedWorld forcedWorld;
+        synchronized (this) {
+            if (!this.forcedWorlds.containsKey(world)) {
+                return;
+            }
+
+            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(this.forcedWorlds);
+            forcedWorld = newForcedWorlds.remove(world);
+            this.forcedWorlds = newForcedWorlds;
+            if (forcedWorld == null) {
+                return;
+            }
         }
+
+        // Undo all chunk tickets we have previously registered
+        forcedWorld.unload(false);
     }
 
     private final class Entry implements ForcedChunkEntry, Consumer<Object> {
@@ -156,6 +184,11 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 this.counter = 0;
                 world.setForced(this, false);
             }
+        }
+
+        public void resetCounters() {
+            this.asyncCounter.set(0);
+            this.counter = 0;
         }
 
         public void sync() {
@@ -220,7 +253,14 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                     return this.chunkFuture.get();
                 } catch (Throwable t) {}
             }
-            Chunk chunk = world.world.getChunkAt(cx, cz);
+
+            Chunk chunk;
+            try {
+                chunk = world.world.getChunkAt(cx, cz);
+            } catch (RuntimeException ex) {
+                world.checkUnloaded();
+                throw ex;
+            }
             this.chunkFuture.complete(chunk);
             return chunk;
         }
@@ -293,61 +333,85 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
      * Everything about a Bukkit World where chunks are kept (force) loaded
      */
     private final class ForcedWorld {
-        public final World world;
-        public final WorldServerHandle handle;
+        // Below fields are set to null when the world unloads to prevent a memory leak
+        public World world;
+        public WorldServerHandle handle;
+        private boolean unloaded;
+
+        public final String worldName;
         public final LongHashMap<Entry> chunks = new LongHashMap<Entry>();
         public final LongHashSet pending = new LongHashSet();
-        private boolean disabled = false;
 
         public ForcedWorld(World world) {
             this.world = world;
             this.handle = WorldServerHandle.fromBukkit(world);
+            this.worldName = world.getName();
+            this.unloaded = false;
         }
 
-        public synchronized void disable() {
-            disabled = true;
-            pending.clear();
-            Entry[] entries;
-            while ((entries = chunks.values().toArray(new Entry[0])).length > 0) {
-                for (Entry e : entries) {
-                    e.disable();
-                }
-            }
-        }
-
-        public synchronized void sync() {
-            LongHashSet.LongIterator iter = pending.longIterator();
-            while (iter.hasNext()) {
-                Entry entry = chunks.get(iter.next());
-                if (entry != null) {
-                    entry.sync();
-                }
-            }
-            pending.clear();
-
-            if (this.chunks.size() == 0) {
-                this.disabled = true;
-
-                // Un-register from the by-world mapping
-                synchronized (CommonForcedChunkManager.this) {
-                    IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(forcedWorlds);
-                    if (newForcedWorlds.remove(this.world) == this) {
-                        forcedWorlds = newForcedWorlds;
+        // This is only called on the main thread!
+        public void unload(boolean removeFromMapping) {
+            if (removeFromMapping) {
+                World key = this.world;
+                if (key != null) {
+                    synchronized (CommonForcedChunkManager.this) {
+                        IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(forcedWorlds);
+                        if (newForcedWorlds.remove(key) == this) {
+                            forcedWorlds = newForcedWorlds;
+                        }
                     }
                 }
+            }
+
+            synchronized (this) {
+                if (unloaded) {
+                    pending.clear();
+                    chunks.clear();
+                    return;
+                }
+
+                unloaded = true;
+                pending.clear();
+                Entry[] entries;
+                while ((entries = chunks.values().toArray(new Entry[0])).length > 0) {
+                    for (Entry e : entries) {
+                        e.disable();
+                        e.resetAsyncLoad(); // To be sure
+                    }
+                }
+
+                // Avoid memory leak
+                world = null;
+                handle = null;
+            }
+        }
+
+        // This is only called on the main thread!
+        public synchronized void sync() {
+            if (this.handle.isLoaded()) {
+                // Process more of the pending tasks
+                LongHashSet.LongIterator iter = pending.longIterator();
+                while (iter.hasNext()) {
+                    Entry entry = chunks.get(iter.next());
+                    if (entry != null) {
+                        entry.sync();
+                    }
+                }
+                pending.clear();
+            } else {
+                // Force a disable of this forced world. Missed an unload?
+                this.unload(true);
+            }
+        }
+
+        private void checkUnloaded() {
+            if (unloaded) {
+                throw new IllegalStateException("World " + worldName + " has unloaded, chunks cannot be kept loaded");
             }
         }
 
         public synchronized Entry add(int cx, int cz) {
-            if (this.disabled) {
-                // Re-roll it.
-                ForcedWorld defer = getOrCreateForcedWorld(this.world);
-                if (this == defer) {
-                    throw new IllegalStateException("ForcedWorld is disabled, but still stored in lookup table");
-                } else {
-                    return defer.add(cx, cz);
-                }
-            }
+            checkUnloaded();
 
             long key = makeChunkKey(cx, cz);
             Entry entry = this.chunks.get(key);
@@ -361,6 +425,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         public synchronized void scheduleUpdate(Entry entry) {
             if (pending.isEmpty()) {
+                checkUnloaded();
                 pendingHandler.start();
             }
             pending.add(entry.getKey());
@@ -384,7 +449,22 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             // Remove the entry when indeed, the chunk is no longer forced
             if (!forced) {
                 synchronized (this) {
-                    chunks.remove(entry.getKey());
+                    Entry e = chunks.remove(entry.getKey());
+                    if (e != null) {
+                        e.resetAsyncLoad();
+                    }
+                }
+            }
+
+            // Check world hasn't unloaded. We can't make changes anymore, then.
+            // When force-loading is requested, we throw
+            // When unloading is requested, we ignore it
+            if (unloaded) {
+                entry.resetCounters();
+                if (forced) {
+                    checkUnloaded();
+                } else {
+                    return;
                 }
             }
 
@@ -408,6 +488,15 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 world.unloadChunkRequest(entry.getX(), entry.getZ());
                 entry.resetAsyncLoad();
             }
+        }
+    }
+
+    // Checks when worlds are about to be unloaded. Makes sure to release chunk tickets when it happens.
+    private class WorldUnloadEventListener implements Listener {
+
+        @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
+        public void onWorldUnload(WorldUnloadEvent event) {
+            unloadForcedWorld(event.getWorld());
         }
     }
 
