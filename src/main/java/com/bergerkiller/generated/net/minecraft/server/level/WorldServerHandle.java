@@ -40,6 +40,7 @@ public abstract class WorldServerHandle extends WorldHandle {
 
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract ChunkProviderServerHandle getChunkProviderServer();
+    public abstract boolean isLoaded();
     public abstract List<EntityPlayerHandle> getPlayers();
     public abstract Entity getEntityByUUID(UUID entityUUID);
     public abstract EntityTracker getEntityTracker();
@@ -81,6 +82,7 @@ public abstract class WorldServerHandle extends WorldHandle {
 
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
+        public final Template.Method<Boolean> isLoaded = new Template.Method<Boolean>();
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
         public final Template.Method.Converted<Entity> getEntityByUUID = new Template.Method.Converted<Entity>();
         public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();

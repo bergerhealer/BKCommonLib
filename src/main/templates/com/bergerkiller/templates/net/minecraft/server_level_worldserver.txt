@@ -83,6 +83,30 @@ class WorldServer extends World {
 #endif
     // ==========================================================================================================
 
+    public boolean isLoaded() {
+#if version >= 1.18
+        #require net.minecraft.world.level.storage.Convertable.ConversionSession final net.minecraft.util.SessionLock conv_lock:lock;
+        net.minecraft.util.SessionLock lock = instance.convertable#conv_lock;
+        return lock.isValid();
+#elseif version >= 1.17
+        #require net.minecraft.world.level.storage.Convertable.ConversionSession final net.minecraft.util.SessionLock conv_lock:lock;
+        net.minecraft.util.SessionLock lock = instance.convertable#conv_lock;
+        return lock.a();
+#elseif version >= 1.16
+        #require net.minecraft.world.level.storage.Convertable.ConversionSession private final net.minecraft.util.SessionLock conv_lock:lock;
+        net.minecraft.util.SessionLock lock = instance.convertable#conv_lock;
+        return lock.a();
+#else
+        // Due to a bug in CraftServer, unloading a world with save=false resulted in only a partial de-registering
+        // As a result, the only reliable way to check whether the world is loaded is to check the worlds list
+        // Since we already track world loading/unloading anyway, in a much more efficient IdentityHashMap,
+        // we instead just let the BKCL OfflineWorld API handle this.
+        // On 1.15 it's a mess, we ignore that one.
+        org.bukkit.World world = instance.getWorld();
+        return com.bergerkiller.bukkit.common.offline.OfflineWorld.of(world).getLoadedWorld() == world;
+#endif
+    }
+
 #if version >= 1.18
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers:players();
 #elseif version >= 1.14

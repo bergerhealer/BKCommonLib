@@ -66,6 +66,22 @@ public class WorldUtil extends ChunkUtil {
     public static final int CHUNKS_PER_REGION_AXIS = 32;
 
     /**
+     * Gets whether a Bukkit World instance has been unloaded from the server.
+     * Use this to check whether loading new chunks for a World is acceptable, and
+     * to purge world-tied volatile data.<br>
+     * <br>
+     * Is multithread-safe, but may have unpredictable outputs when not called on
+     * the main thread when the world is in the process of unloading.
+     *
+     * @param world Bukkit World to check
+     * @return True if the World is loaded, False if not
+     */
+    public static boolean isLoaded(World world) {
+        Object nmsWorldServerHandle = HandleConversion.toWorldHandle(world);
+        return WorldServerHandle.T.isLoaded.invoker.invoke(nmsWorldServerHandle);
+    }
+
+    /**
      * Gets the BlockData of the Block of a BlockPhysicsEvent. Is optimized
      * for paper 1.17.1 and newer.
      *
