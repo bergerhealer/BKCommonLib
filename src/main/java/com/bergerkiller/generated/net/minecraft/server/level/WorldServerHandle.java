@@ -38,15 +38,15 @@ public abstract class WorldServerHandle extends WorldHandle {
         return T.getByDimensionKey.invoke(key);
     }
 
+    public abstract PlayerChunkMapHandle getPlayerChunkMap();
+    public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract List<EntityPlayerHandle> getPlayers();
     public abstract Entity getEntityByUUID(UUID entityUUID);
     public abstract EntityTracker getEntityTracker();
     public abstract Object getEntityTrackerHandle();
     public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
-    public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract ResourceKey<World> getDimensionKey();
     public abstract WorldDataServerHandle getWorldData();
-    public abstract ChunkProviderServerHandle getChunkProviderServer();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
     public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded);
     public abstract Iterable<Entity> getEntities();
@@ -79,15 +79,15 @@ public abstract class WorldServerHandle extends WorldHandle {
 
         public final Template.StaticMethod.Converted<World> getByDimensionKey = new Template.StaticMethod.Converted<World>();
 
+        public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
+        public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<List<EntityPlayerHandle>> getPlayers = new Template.Method.Converted<List<EntityPlayerHandle>>();
         public final Template.Method.Converted<Entity> getEntityByUUID = new Template.Method.Converted<Entity>();
         public final Template.Method<EntityTracker> getEntityTracker = new Template.Method<EntityTracker>();
         public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
         public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
-        public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method.Converted<ResourceKey<World>> getDimensionKey = new Template.Method.Converted<ResourceKey<World>>();
         public final Template.Method.Converted<WorldDataServerHandle> getWorldData = new Template.Method.Converted<WorldDataServerHandle>();
-        public final Template.Method.Converted<ChunkProviderServerHandle> getChunkProviderServer = new Template.Method.Converted<ChunkProviderServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional

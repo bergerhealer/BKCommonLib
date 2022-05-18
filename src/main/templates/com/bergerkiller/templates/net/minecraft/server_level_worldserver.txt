@@ -34,6 +34,55 @@ import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataSer
 class WorldServer extends World {
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
 
+    // ====================== WorldServer PlayerChunkMap/ChunkProviderServer accessors ======================
+#if version >= 1.18
+    #require net.minecraft.server.level.WorldServer public PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkSource()).chunkMap;
+    }
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkSource()).chunkMap;
+    }
+#elseif version >= 1.17
+    #require net.minecraft.server.level.WorldServer public PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkProvider()).chunkMap;
+    }
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkProvider()).chunkMap;
+    }
+#elseif version >= 1.14
+    #require net.minecraft.server.level.WorldServer public PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkProvider()).playerChunkMap;
+    }
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
+        return ((ChunkProviderServer) instance.getChunkProvider()).playerChunkMap;
+    }
+#else
+    #require net.minecraft.server.level.WorldServer public PlayerChunkMap getPlayerChunkMap();
+    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
+#endif
+#if version >= 1.18
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer:getChunkSource();
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer:getChunkSource();
+#elseif version >= 1.13.2
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkProvider();
+    }
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+        return (ChunkProviderServer) instance.getChunkProvider();
+    }
+#elseif version >= 1.9
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer();
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer();
+#else
+    #require net.minecraft.server.level.WorldServer public ChunkProviderServer getChunkProviderServer() {
+        return instance.chunkProviderServer;
+    }
+    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
+        return instance.chunkProviderServer;
+    }
+#endif
+    // ==========================================================================================================
+
 #if version >= 1.18
     public (List<EntityPlayerHandle>) List<EntityPlayer> getPlayers:players();
 #elseif version >= 1.14
@@ -71,48 +120,27 @@ class WorldServer extends World {
         return new com.bergerkiller.bukkit.common.wrappers.EntityTracker(handle);
     }
 
-    // PlayerChunkMap field of ChunkProviderServer
-#if version >= 1.17
-    #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap:chunkMap;
-#elseif version >= 1.14
-    #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
-#endif
-
-#if version >= 1.18
     public Object getEntityTrackerHandle() {
-        return instance.getChunkSource()#playerChunkMap;
-    }
-
-    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-        instance.getChunkSource()#playerChunkMap = entityTrackerHandle;
-    }
-
-    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
-        return instance.getChunkSource()#playerChunkMap;
-    }
-#elseif version >= 1.14
-    public Object getEntityTrackerHandle() {
-        return instance.getChunkProvider()#playerChunkMap;
-    }
-
-    public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
-        instance.getChunkProvider()#playerChunkMap = entityTrackerHandle;
-    }
-
-    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap() {
-        return instance.getChunkProvider()#playerChunkMap;
-    }
+#if version >= 1.14
+        return instance#getPlayerChunkMap();
 #else
-    public Object getEntityTrackerHandle() {
         return instance.tracker;
+#endif
     }
 
     public void setEntityTrackerHandle((Object) EntityTracker entityTrackerHandle) {
+#if version >= 1.14
+        ChunkProviderServer cps = instance#getChunkProviderServer();
+  #if version >= 1.17
+        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap:chunkMap;
+  #else
+        #require net.minecraft.server.level.ChunkProviderServer public final PlayerChunkMap playerChunkMap;
+  #endif
+        cps#playerChunkMap = entityTrackerHandle;
+#else
         instance.tracker = entityTrackerHandle;
-    }
-
-    public (PlayerChunkMapHandle) PlayerChunkMap getPlayerChunkMap();
 #endif
+    }
 
 #if version >= 1.18
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey:dimension();
@@ -190,35 +218,14 @@ class WorldServer extends World {
     public (WorldDataServerHandle) WorldDataServer getWorldData();
 #endif
 
-    public (ChunkProviderServerHandle) ChunkProviderServer getChunkProviderServer() {
-#if version >= 1.18
-        return (ChunkProviderServer) instance.getChunkSource();
-#elseif version >= 1.9
-        return (ChunkProviderServer) instance.getChunkProvider();
-#else
-        return instance.chunkProviderServer;
-#endif
-    }
-
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {
-        ChunkProviderServer cps;
-#if version >= 1.18
-        cps = (ChunkProviderServer) instance.getChunkSource();
-#elseif version >= 1.13.2
-        cps = (ChunkProviderServer) instance.getChunkProvider();
-#elseif version >= 1.9
-        cps = (ChunkProviderServer) instance.getChunkProviderServer();
-#else
-        cps = instance.chunkProviderServer;
-#endif
-
 #if version >= 1.14
   #if version >= 1.18
         long key = ChunkCoordIntPair.asLong(cx, cz);
   #else
         long key = ChunkCoordIntPair.pair(cx, cz);
   #endif
-        PlayerChunkMap playerChunkMap = cps#playerChunkMap;
+        PlayerChunkMap playerChunkMap = instance#getPlayerChunkMap();
 
   #if exists net.minecraft.server.level.PlayerChunkMap public PlayerChunk getVisibleChunkIfPresent(long key);
         PlayerChunk chunk = (PlayerChunk) playerChunkMap.getVisibleChunkIfPresent(key);
@@ -252,26 +259,29 @@ class WorldServer extends World {
         // return instance.getChunkAt(cx, cz, ChunkStatus.FULL, false);
 #elseif version >= 1.13.1
         long key = ChunkCoordIntPair.a(cx, cz);
+        ChunkProviderServer cps = instance#getChunkProviderServer();
         return (Chunk) cps.chunks.get(key);
 
         // Note: suffers deadlock because of synchronized (this.chunkLoader) (chunks are already synchronized, anyway)
         // return cps.getChunkAt(cx, cz, false, false);
 #else
+        ChunkProviderServer cps = instance#getChunkProviderServer();
         return cps.getChunkIfLoaded(cx, cz);
 #endif
     }
 
 #if exists net.minecraft.server.level.TicketType public static final TicketType<org.bukkit.plugin.Plugin> PLUGIN_TICKET;
     public void setForceLoadedAsync(int x, int z, org.bukkit.plugin.Plugin plugin, boolean loaded) {
+        PlayerChunkMap chunkMap = instance#getPlayerChunkMap();
         ChunkMapDistance chunkDistanceManager;
   #if version >= 1.18
-        chunkDistanceManager = instance.getChunkSource().chunkMap.getDistanceManager();
+        chunkDistanceManager = chunkMap.getDistanceManager();
   #elseif version >= 1.17
-        chunkDistanceManager = instance.getChunkProvider().chunkMap.distanceManager;
+        chunkDistanceManager = chunkMap.distanceManager;
   #elseif exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
-        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.chunkDistanceManager;
+        chunkDistanceManager = chunkMap.chunkDistanceManager;
   #else
-        chunkDistanceManager = instance.getChunkProvider().playerChunkMap.u;
+        chunkDistanceManager = chunkMap.u;
   #endif
 
         ChunkCoordIntPair chunkCoord = new ChunkCoordIntPair(x, z);
@@ -466,16 +476,14 @@ class WorldServer extends World {
 #if version >= 1.18
     public void saveLevel() {
         #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:saveAllChunks(boolean flag);
-        ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkSource();
-        PlayerChunkMap pcm = cps#playerChunkMap;
-        pcm#saveChunkMap(true);
+        PlayerChunkMap chunkMap = instance#getPlayerChunkMap();
+        chunkMap#saveChunkMap(true);
     }
 #elseif version >= 1.14
     public void saveLevel() {
         #require net.minecraft.server.level.PlayerChunkMap protected void saveChunkMap:save(boolean flag);
-        ChunkProviderServer cps = (ChunkProviderServer) instance.getChunkProvider();
-        PlayerChunkMap pcm = cps#playerChunkMap;
-        pcm#saveChunkMap(true);
+        PlayerChunkMap chunkMap = instance#getPlayerChunkMap();
+        chunkMap#saveChunkMap(true);
     }
 #elseif version >= 1.13
     public void saveLevel() {
