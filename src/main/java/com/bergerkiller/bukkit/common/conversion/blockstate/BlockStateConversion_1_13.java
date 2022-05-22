@@ -80,10 +80,12 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // - getTileEntityAt(x, y, z) to return our requested entity
         // All other methods will fail.
         proxy_world = (World) new ClassInterceptor() {
+            final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
+
             @Override
             protected Invoker<?> getCallback(Method method) {
                 // Gets our requested tile entity
-                if (method.getName().equals("getTileEntityAt")) {
+                if (method.getReturnType().equals(tileEntityType)) {
                     return (instance, args) -> input_state.tileEntity;
                 }
 
