@@ -80,7 +80,7 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
         // - getTileEntityAt(x, y, z) to return our requested entity
         // All other methods will fail.
         proxy_world = (World) new ClassInterceptor() {
-            final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
+            private final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
 
             @Override
             protected Invoker<?> getCallback(Method method) {
@@ -307,6 +307,9 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
     @ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
     public static class WorldServerHook extends ClassHook<WorldServerHook> {
         private final BlockStateConversion_1_13 conversion;
+        private static final Class<?> tileEntityType = CommonUtil.getClass("net.minecraft.world.level.block.entity.TileEntity");
+        private static final Class<?> iBlockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.IBlockData");
+        private static final Class<?> minecraftServerType = CommonUtil.getClass("net.minecraft.server.MinecraftServer");
 
         public WorldServerHook(BlockStateConversion_1_13 conversion) {
             this.conversion = conversion;
@@ -330,23 +333,23 @@ public class BlockStateConversion_1_13 extends BlockStateConversion {
                 return ConstantReturningInvoker.of(null);
             }
 
+            // For all methods returning a TileEntity, return our tile entity
+            if (method.getReturnType().equals(tileEntityType)) {
+                return (instance, args) -> this.conversion.input_state.tileEntity;
+            }
+
+            // For all methods returning IBlockData, return our tile's block data
+            if (method.getReturnType().equals(iBlockDataType)) {
+                return (instance, args) -> this.conversion.input_state.blockData.getData();
+            }
+
+            // For all methods returning MinecraftServer or a derivative, return the server
+            if (minecraftServerType.isAssignableFrom(method.getReturnType())) {
+                return ConstantReturningInvoker.of(MinecraftServerHandle.instance().getRaw());
+            }
+
             // All other method calls fail
             return this.conversion.non_instrumented_invokable;
-        }
-
-        @HookMethod("public TileEntity getTileEntity:???(BlockPosition blockPosition)")
-        public Object getTileEntity(Object blockPosition) {
-            return this.conversion.input_state.tileEntity;
-        }
-
-        @HookMethod("public IBlockData getBlockData:???(BlockPosition blockposition)")
-        public Object getBlockData(Object blockPosition) {
-            return this.conversion.input_state.blockData.getData();
-        }
-
-        @HookMethod("public MinecraftServer getMinecraftServer:???()")
-        public Object getMinecraftServer() {
-            return MinecraftServerHandle.instance().getRaw();
         }
 
         // Note there is also a setBlockData variant with two ints (default of second int is 512)
