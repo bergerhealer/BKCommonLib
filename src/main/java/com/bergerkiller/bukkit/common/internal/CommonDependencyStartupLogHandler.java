@@ -1,7 +1,10 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.io.File;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -129,6 +132,16 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
                         fullStartupLog.append(((PluginBase) plugin).getDebugVersion());
                     } else {
                         fullStartupLog.append(plugin.getDescription().getVersion());
+                    }
+                    if (plugin.getClass().getClassLoader() instanceof URLClassLoader) {
+                        for (URL url : ((URLClassLoader) plugin.getClass().getClassLoader()).getURLs()) {
+                            String file = url.getFile();
+                            if (!file.isEmpty()) {
+                                fullStartupLog.append(" (jar: ")
+                                              .append((new File(file)).getName())
+                                              .append(')');
+                            }
+                        }
                     }
                     fullStartupLog.append('\n');
                 });
