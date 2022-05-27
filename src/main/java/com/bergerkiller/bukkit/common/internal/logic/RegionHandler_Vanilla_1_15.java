@@ -15,9 +15,9 @@ import org.bukkit.World;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
-import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
@@ -51,17 +51,7 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         if (t_RegionFileCache.isAssignableFrom(PlayerChunkMapHandle.T.getType())) {
             // PaperMC
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
-                    "#if version >= 1.18\n" +
-                    "    ChunkProviderServer cps = world.getChunkSource();\n" + 
-                    "#else\n" + 
-                    "    ChunkProviderServer cps = world.getChunkProvider();\n" +
-                    "#endif\n" +
-                    "#if version >= 1.17\n" +
-                    "    PlayerChunkMap pcm = cps.chunkMap;\n" +
-                    "#else\n" +
-                    "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
-                    "#endif\n" +
+                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(PlayerChunkMap pcm) {\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
                     "#if version >= 1.17\n" +
                     "    return rfc.regionCache;\n" +
@@ -73,17 +63,7 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         } else {
             // Spigot/CraftBukkit/vanilla NMS
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
-                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(WorldServer world) {\n" +
-                    "#if version >= 1.18\n" +
-                    "    ChunkProviderServer cps = world.getChunkSource();\n" + 
-                    "#else\n" + 
-                    "    ChunkProviderServer cps = world.getChunkProvider();\n" +
-                    "#endif\n" +
-                    "#if version >= 1.17\n" +
-                    "    PlayerChunkMap pcm = cps.chunkMap;\n" +
-                    "#else\n" +
-                    "    PlayerChunkMap pcm = cps.playerChunkMap;\n" +
-                    "#endif\n" +
+                    "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(PlayerChunkMap pcm) {\n" +
                     "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
                     "#if exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
                     /*   Paperspigot compatible code  */
@@ -161,9 +141,13 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         }
     }
 
+    private Object findRegionFileCache(World world) {
+        return findRegionFileCache.invoke(null, WorldServerHandle.fromBukkit(world).getPlayerChunkMap().getRaw());
+    }
+
     @Override
     public void closeStreams(World world) {
-        Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
+        Object regionFileCache = findRegionFileCache(world);
         for (Object regionFile : findCacheRegionFileInstances.invoke(null, regionFileCache)) {
             RegionFileHandle.createHandle(regionFile).closeStream();
         }
@@ -174,7 +158,7 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         HashSet<IntVector3> regionIndices = new HashSet<IntVector3>();
 
         // Add all RegionFile instances in the cache
-        Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
+        Object regionFileCache = findRegionFileCache(world);
         regionIndices.addAll(findCacheRegionFileCoordinates.invoke(null, regionFileCache));
 
         // Figure out the minimum/maximum region y coordinate
@@ -215,7 +199,7 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
     public BitSet getRegionChunks3(World world, int rx, int ry, int rz) {
         BitSet chunks = new BitSet(1024);
 
-        Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
+        Object regionFileCache = findRegionFileCache(world);
         RegionFileHandle regionFileHandle = RegionFileHandle.createHandle(findRegionFileAt.invoke(null,
                 regionFileCache, rx, rz));
 
@@ -263,7 +247,7 @@ class RegionHandler_Vanilla_1_15 extends RegionHandlerVanilla {
         cz &= 0x1F;
 
         // Try checking if a RegionFile instance is available. If so, use that.
-        Object regionFileCache = findRegionFileCache.invoke(null, HandleConversion.toWorldHandle(world));
+        Object regionFileCache = findRegionFileCache(world);
         RegionFileHandle regionFileHandle = RegionFileHandle.createHandle(findRegionFileAt.invoke(null,
                 regionFileCache, rx, rz));
         if (regionFileHandle != null) {

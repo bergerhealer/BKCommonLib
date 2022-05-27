@@ -28,6 +28,7 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
 import com.bergerkiller.mountiplex.reflection.declarations.SourceDeclaration;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
@@ -71,9 +72,9 @@ class RegionHandler_Vanilla_1_8 extends RegionHandlerVanilla {
         try {
             Field field;
             try {
-                field = regionFileCacheType.getDeclaredField("cache");
+                field = Resolver.resolveAndGetDeclaredField(regionFileCacheType, "cache");
             } catch (Throwable t) {
-                field = regionFileCacheType.getDeclaredField("a");
+                field = Resolver.resolveAndGetDeclaredField(regionFileCacheType, "a");
             }
             this.cacheField.init(field);
         } catch (Throwable t) {
