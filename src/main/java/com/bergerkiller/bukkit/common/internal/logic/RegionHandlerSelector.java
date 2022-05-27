@@ -24,8 +24,7 @@ final class RegionHandlerSelector extends RegionHandler {
         fallback = LibraryComponentSelector.forModule(RegionHandler.class)
                 .setDefaultComponent(RegionHandlerDisabled::new)
                 .addVersionOption(null, "1.13.2", RegionHandler_Vanilla_1_8::new)
-                .addVersionOption("1.14", "1.14.4", RegionHandler_Vanilla_1_14::new)
-                .addVersionOption("1.15", "1.16.5", RegionHandler_Vanilla_1_15::new)
+                .addVersionOption("1.14", "1.16.5", RegionHandler_Vanilla_1_14::new)
                 .addVersionOption("1.17", null, RegionHandler_Vanilla_1_17::new)
                 .update();
 

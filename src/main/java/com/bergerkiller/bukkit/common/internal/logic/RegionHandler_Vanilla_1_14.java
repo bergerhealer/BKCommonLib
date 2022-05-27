@@ -13,8 +13,13 @@ import org.bukkit.Chunk;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.chunk.storage.RegionFileHandle;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
@@ -36,11 +41,63 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         resolver.addImport("net.minecraft.server.level.PlayerChunkMap");
         resolver.addImport("net.minecraft.server.level.ChunkProviderServer");
         resolver.addImport("net.minecraft.server.level.WorldServer");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.IChunkLoader");
+        resolver.addImport("net.minecraft.world.level.chunk.storage.RegionFile");
         resolver.setDeclaredClassName("net.minecraft.world.level.chunk.storage.RegionFileCache");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
 
         // Initialize runtime generated method to obtain the RegionFileCache cache map instance of a World
-        {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.15")) {
+            // This is slightly different on PaperSpigot, where they changed the IChunkLoader to extend RegionFileCache, rather than adding a field
+            Class<?> t_RegionFileCache = CommonUtil.getClass("net.minecraft.world.level.chunk.storage.RegionFileCache");
+            if (t_RegionFileCache.isAssignableFrom(PlayerChunkMapHandle.T.getType())) {
+                // PaperMC
+                MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+                        "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(PlayerChunkMap pcm) {\n" +
+                        "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
+                        "#if version >= 1.17\n" +
+                        "    return rfc.regionCache;\n" +
+                        "#else\n" +
+                        "    return rfc.cache;\n" +
+                        "#endif\n" +
+                        "}", resolver));
+                findRegionFileCache.init(findRegionFileCacheMethod);
+            } else {
+                // Spigot/CraftBukkit/vanilla NMS
+                MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
+                        "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(PlayerChunkMap pcm) {\n" +
+                        "    IChunkLoader icl = (IChunkLoader) pcm;\n" +
+                        "#if exists net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                        /*   Paperspigot compatible code  */
+                        "    #require net.minecraft.world.level.chunk.storage.IChunkLoader protected final RegionFileCache regionFileCache;\n" +
+                        "    RegionFileCache rfc = icl#regionFileCache;\n" +
+                        "#else\n" +
+                        /*   Normal Spigot code */
+                        "  #if version >= 1.17\n" +
+                        "    #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:worker;\n" +
+                        "  #else\n" +
+                        "    #require net.minecraft.world.level.chunk.storage.IChunkLoader private final net.minecraft.world.level.chunk.storage.IOWorker ioworker:a;\n" +
+                        "  #endif\n" +
+                        "    IOWorker ioworker = icl#ioworker;\n" +
+                        "  #if version >= 1.17\n" +
+                        "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:storage;\n" +
+                        "  #elseif version >= 1.16\n" +
+                        "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:d;\n" +
+                        "  #else\n" +
+                        "    #require net.minecraft.world.level.chunk.storage.IOWorker private final RegionFileCache cache:e;\n" +
+                        "  #endif\n" +
+                        "    RegionFileCache rfc = ioworker#cache;\n" +
+                        "#endif\n" +
+                        "#if version >= 1.17\n" +
+                        "    return rfc.regionCache;\n" +
+                        "#else\n" +
+                        "    return rfc.cache;\n" +
+                        "#endif\n" +
+                        "}", resolver));
+                findRegionFileCache.init(findRegionFileCacheMethod);
+            }
+        } else {
+            // Simple field on MC 1.14
             MethodDeclaration findRegionFileCacheMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(PlayerChunkMap pcm) {\n" +
                     "    RegionFileCache rfc = (RegionFileCache) pcm;\n" +
@@ -84,7 +141,11 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         {
             MethodDeclaration findRegionFileAtMethod = new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                     "public static RegionFile findRegionFileAt(it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap cache, int rx, int rz) {\n" +
+                    "#if version >= 1.18\n" +
+                    "    long coord = ChunkCoordIntPair.asLong(rx, rz);\n" +
+                    "#else\n" +
                     "    long coord = ChunkCoordIntPair.pair(rx, rz);\n" +
+                    "#endif\n" +
                     "    return (RegionFile) cache.get(coord);\n" +
                     "}", resolver));
             findRegionFileAt.init(findRegionFileAtMethod);
@@ -111,6 +172,12 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
         Object regionFileCache = findRegionFileCache(world);
         regionIndices.addAll(findCacheRegionFileCoordinates.invoke(null, regionFileCache));
 
+        // Figure out the minimum/maximum region y coordinate
+        // Since Minecraft 1.17 there can be more than one region (32 chunks) vertically
+        WorldHandle worldHandle = WorldHandle.fromBukkit(world);
+        int minRegionY = worldHandle.getMinBuildHeight() >> 9;
+        int maxRegionY = (worldHandle.getMaxBuildHeight()-1) >> 9;
+
         // Obtain the region coordinates from all files in regions folder
         File regionFolder = Common.SERVER.getWorldRegionFolder(world.getName());
         if (regionFolder != null) {
@@ -118,9 +185,11 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
             for (String regionFileName : regionFileNames) {
                 File file = new File(regionFolder, regionFileName);
                 if (file.isFile() && file.exists() && file.length() >= 4096) {
-                    IntVector3 coords = getRegionFileCoordinates(file).toIntVector3(0);
-                    if (coords != null && !regionIndices.contains(coords)) {
-                        regionIndices.add(coords);
+                    IntVector2 coords = getRegionFileCoordinates(file);
+                    if (coords != null) {
+                        for (int ry = minRegionY; ry <= maxRegionY; ry++) {
+                            regionIndices.add(coords.toIntVector3(ry));
+                        }
                     }
                 }
             }
@@ -128,8 +197,10 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         // Look at all loaded chunks of the world and add the regions they are inside of
         for (Chunk chunk : world.getLoadedChunks()) {
-            IntVector3 coords = new IntVector3(chunk.getX() >> 5, 0, chunk.getZ() >> 5);
-            regionIndices.add(coords);
+            IntVector2 coords = new IntVector2(chunk.getX() >> 5, chunk.getZ() >> 5);
+            for (int ry = minRegionY; ry <= maxRegionY; ry++) {
+                regionIndices.add(coords.toIntVector3(ry));
+            }
         }
 
         return regionIndices;
