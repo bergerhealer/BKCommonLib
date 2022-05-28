@@ -906,7 +906,7 @@ public class CommonPlugin extends PluginBase {
         for (File file : FileConfiguration.findSaveOperationsInDirectory(directory)) {
             // First try and flush the save operation with a timeout of 500 milliseconds
             // if it takes longer than this, log a message and wait for as long as it takes
-            if (FileConfiguration.flushSaveOperation(file, 500)) {
+            if (!FileConfiguration.flushSaveOperation(file, 500)) {
                 logger.log(Level.INFO, "Saving " + getPluginsRelativePath(plugin, file) + "...");
                 FileConfiguration.flushSaveOperation(file);
             }
