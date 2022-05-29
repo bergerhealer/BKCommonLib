@@ -19,10 +19,6 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
     private static final Map<Object, BlockStateType> _cache = new IdentityHashMap<>();
     public static final BlockStateType SIGN = byName("sign");
 
-    static {
-        _cache.put(null, null); // Avoid trouble
-    }
-
     private BlockStateType(TileEntityTypesHandle handle) {
         setHandle(handle);
     }
@@ -91,6 +87,10 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      * @return Block state type for this handle, always succeeds. Null if handle is null.
      */
     public static BlockStateType fromTileEntityTypesHandle(Object nmsTileEntityTypesHandle) {
+        if (nmsTileEntityTypesHandle == null) {
+            return null;
+        }
+
         synchronized (_cache) {
             return _cache.computeIfAbsent(nmsTileEntityTypesHandle,
                     raw -> new BlockStateType(TileEntityTypesHandle.createHandle(raw)));

@@ -5,6 +5,7 @@ import java.util.Iterator;
 import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
+import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutMapChunkHandle;
@@ -23,10 +24,16 @@ class BlockStateChangePacketHandler_1_9_3 extends BlockStateChangePacketHandler 
         register(PacketType.OUT_TILE_ENTITY_DATA, (player, commonPacket, listener) -> {
             final PacketPlayOutTileEntityDataHandle packet = PacketPlayOutTileEntityDataHandle.createHandle(commonPacket.getHandle());
 
+            // Parse BlockState type. If unknown/invalid, ignore the packet.
+            BlockStateType tileType = packet.getType();
+            if (tileType == null) {
+                return true;
+            }
+
             CommonTagCompound metadata = packet.getData();
             if (metadata != null) {
                 // There's metadata, nothing special needs to be done
-                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), packet.getType(),
+                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), tileType,
                         LogicUtil.constantSupplier(metadata), () -> true);
 
                 // Handle it, if false, cancel the packet entirely
@@ -36,7 +43,7 @@ class BlockStateChangePacketHandler_1_9_3 extends BlockStateChangePacketHandler 
             } else {
                 // Initialize metadata on first use
                 final DeferredSupplier<CommonTagCompound> metadataSupplier = DeferredSupplier.of(CommonTagCompound::new);
-                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), packet.getType(),
+                BlockStateChange change = BlockStateChange.deferred(packet.getPosition(), tileType,
                         metadataSupplier, metadataSupplier::isInitialized);
 
                 // Handle it, if false, cancel the packet entirely
