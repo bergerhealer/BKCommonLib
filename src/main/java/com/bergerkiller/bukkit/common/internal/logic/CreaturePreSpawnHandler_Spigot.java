@@ -8,6 +8,7 @@ import java.util.logging.Level;
 
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
@@ -33,7 +34,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  * Not used since Paper 1.13 added their own event.
  * 
  * Does not work on version 1.18 and later. On there, for Spigot, we just
- * don't optimize it.
+ * don't optimize it. Only handles NATURAL spawn causes.
  */
 public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
     private final SafeField<Object> cpsChunkGeneratorField;
@@ -136,7 +137,9 @@ public class CreaturePreSpawnHandler_Spigot extends CreaturePreSpawnHandler {
                 SpawnRateHandle handle = SpawnRateHandle.createHandle(mobs.get(n));
                 EntityType entityType = CommonEntityType.byNMSEntityClass(handle.getEntityClass()).entityType;
 
-                if (eventFactory.handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), entityType)) {
+                if (eventFactory.handleCreaturePreSpawn(world, pos.getX(), pos.getY(), pos.getZ(), entityType,
+                        CreatureSpawnEvent.SpawnReason.NATURAL))
+                {
                     // Allowed, if the list we're returning is new (has cancelled spawns) then
                     // add this entry to the list.
                     if (result != mobs) {

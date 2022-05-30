@@ -10,6 +10,7 @@ import com.google.common.collect.Iterables;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -65,9 +66,10 @@ public class CommonEventFactory {
      * @param y Y-coordinate of the block near which is spawned
      * @param z Z-coordinate of the block near which is spawned
      * @param entityType Type of entity being spawned
+     * @param reason Reason for spawning the entity
      * @return True if spawning is allowed, False if it should be cancelled
      */
-    public boolean handleCreaturePreSpawn(World world, int x, int y, int z, EntityType entityType) {
+    public boolean handleCreaturePreSpawn(World world, int x, int y, int z, EntityType entityType, CreatureSpawnEvent.SpawnReason reason) {
         creaturePreSpawnEvent.cancelled = false;
         creaturePreSpawnEvent.spawnLocation.setWorld(world);
         creaturePreSpawnEvent.spawnLocation.setX(x);
@@ -76,6 +78,7 @@ public class CommonEventFactory {
         creaturePreSpawnEvent.spawnLocation.setYaw(0.0f);
         creaturePreSpawnEvent.spawnLocation.setPitch(0.0f);
         creaturePreSpawnEvent.entityType = entityType;
+        creaturePreSpawnEvent.reason = reason;
         return !CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled();
     }
 
@@ -85,9 +88,10 @@ public class CommonEventFactory {
      *
      * @param at The location near or at which is spawned
      * @param entityType Type of entity being spawned
+     * @param reason Reason for spawning the entity
      * @return True if spawning is allowed, False if it should be cancelled
      */
-    public boolean handleCreaturePreSpawn(Location at, EntityType entityType) {
+    public boolean handleCreaturePreSpawn(Location at, EntityType entityType, CreatureSpawnEvent.SpawnReason reason) {
         creaturePreSpawnEvent.cancelled = false;
         creaturePreSpawnEvent.spawnLocation.setWorld(at.getWorld());
         creaturePreSpawnEvent.spawnLocation.setX(at.getX());
@@ -96,6 +100,7 @@ public class CommonEventFactory {
         creaturePreSpawnEvent.spawnLocation.setYaw(at.getYaw());
         creaturePreSpawnEvent.spawnLocation.setPitch(at.getPitch());
         creaturePreSpawnEvent.entityType = entityType;
+        creaturePreSpawnEvent.reason = reason;
         return !CommonUtil.callEvent(creaturePreSpawnEvent).isCancelled();
     }
 }

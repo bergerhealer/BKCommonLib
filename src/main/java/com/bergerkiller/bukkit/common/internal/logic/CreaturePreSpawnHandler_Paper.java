@@ -5,6 +5,7 @@ import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 import org.objectweb.asm.AnnotationVisitor;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
@@ -88,9 +89,20 @@ public class CreaturePreSpawnHandler_Paper extends CreaturePreSpawnHandler {
      */
     public void onCreaturePreSpawnEvent(Object event) {
         if (!handle.isCancelled(event)) {
+            // Only handle natural/spawner for performance reasons.
+            // Others should be handled by the CreatureSpawnEvent, because
+            // our pre spawn event lacks a reason historically. May in the future
+            // be removed, where people need to handle event.getReason() appropriately.
+            CreatureSpawnEvent.SpawnReason reason = handle.getReason(event);
+            if (reason != CreatureSpawnEvent.SpawnReason.NATURAL &&
+                reason != CreatureSpawnEvent.SpawnReason.SPAWNER)
+            {
+                return;
+            }
+
             Location at = handle.getLocation(event);
             EntityType entityType = handle.getEntityType(event);
-            if (!CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(at, entityType)) {
+            if (!CommonPlugin.getInstance().getEventFactory().handleCreaturePreSpawn(at, entityType, reason)) {
                 handle.abort(event);
             }
         }
@@ -156,5 +168,14 @@ public class CreaturePreSpawnHandler_Paper extends CreaturePreSpawnHandler {
          */
         @Template.Generated("%PRESPAWN_GET_ENTITYTYPE%")
         public abstract EntityType getEntityType(Object event);
+
+        /*
+         * <PRESPAWN_GET_REASON>
+         * public static org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason getReason(PreCreatureSpawnEvent event) {
+         *     return event.getReason();
+         * }
+         */
+        @Template.Generated("%PRESPAWN_GET_REASON%")
+        public abstract CreatureSpawnEvent.SpawnReason getReason(Object event);
     }
 }

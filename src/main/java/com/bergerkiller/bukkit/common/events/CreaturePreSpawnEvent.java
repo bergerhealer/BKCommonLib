@@ -5,6 +5,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.bukkit.event.entity.CreatureSpawnEvent;
 
 /**
  * Fired right before a group of entities is spawned in a world
@@ -14,6 +15,7 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     protected boolean cancelled;
     protected EntityType entityType;
+    protected CreatureSpawnEvent.SpawnReason reason;
     protected final Location spawnLocation = new Location(null, 0, 0, 0);
 
     protected CreaturePreSpawnEvent() {
@@ -26,6 +28,15 @@ public final class CreaturePreSpawnEvent extends Event implements Cancellable {
      */
     public EntityType getEntityType() {
         return this.entityType;
+    }
+
+    /**
+     * Gets the reason this entity type is about to be spawned
+     *
+     * @return spawn reason
+     */
+    public CreatureSpawnEvent.SpawnReason getSpawnReason() {
+        return this.reason;
     }
 
     /**
