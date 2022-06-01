@@ -113,7 +113,7 @@ public abstract class RegionHandler implements LazyInitializedObject, LibraryCom
     public abstract boolean isChunkSaved(World world, int cx, int cz);
 
     /**
-     * Gets the minimum Block X-coordinates possible on a world
+     * Gets the minimum Block Y-coordinates possible on a world
      *
      * @param world
      * @return World minimum height

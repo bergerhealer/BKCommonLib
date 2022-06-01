@@ -1265,6 +1265,26 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Gets the minimum Block Y-coordinates possible on a world
+     *
+     * @param world
+     * @return World minimum height
+     */
+    public static int getWorldMinimumHeight(World world) {
+        return RegionHandler.INSTANCE.getMinHeight(world);
+    }
+
+    /**
+     * Gets the maximum Block Y-coordinates possible on a world
+     *
+     * @param world
+     * @return World maximum height
+     */
+    public static int getWorldMaximumHeight(World world) {
+        return RegionHandler.INSTANCE.getMaxHeight(world);
+    }
+
+    /**
      * Gets the raw nibble data storing the sky light for a 16x16x16 section of the world
      * 
      * @param world
