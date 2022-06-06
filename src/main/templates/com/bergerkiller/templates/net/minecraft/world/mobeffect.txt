@@ -1,6 +1,11 @@
 package net.minecraft.world.effect;
 
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.world.effect.MobEffectList;
+
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.craftbukkit.potion.CraftPotionUtil;
 
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -45,12 +50,59 @@ class MobEffect {
 #else
     public static (MobEffectHandle) MobEffect fromNBT:b((CommonTagCompound) NBTTagCompound compound);
 #endif
+
+    public PotionEffect toBukkit() {
+#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static org.bukkit.potion.PotionEffect toBukkit(net.minecraft.world.effect.MobEffect effect);
+        return CraftPotionUtil.toBukkit(instance);
+#else
+        // Fallback for before this method was added
+  #if exists net.minecraft.world.effect.MobEffect public int getEffectId();
+        PotionEffectType type = PotionEffectType.getById(instance.getEffectId());
+  #else
+        MobEffectHandle mobEffectHandle = MobEffectHandle.createHandle(instance); // Weird!
+        MobEffectListHandle mobEffectType = mobEffectHandle.getEffectList();
+        int mobEffectTypeId = MobEffectListHandle.getId(mobEffectType);
+        PotionEffectType type = PotionEffectType.getById(mobEffectTypeId);
+  #endif
+        int amp = instance.getAmplifier();
+        int duration = instance.getDuration();
+        boolean ambient = instance.isAmbient();
+        boolean particles = instance.isShowParticles();
+        return new PotionEffect(type, duration, amp, ambient, particles);
+#endif
+    }
+
+    public static (MobEffectHandle) MobEffect fromBukkit(PotionEffect effect) {
+#if version >= 1.9 || exists org.bukkit.craftbukkit.potion.CraftPotionUtil public static net.minecraft.world.effect.MobEffect fromBukkit(org.bukkit.potion.PotionEffect effect);
+        return CraftPotionUtil.fromBukkit(effect);
+#elseif exists net.minecraft.world.effect.MobEffect public MobEffect(int effectId, int duration, int amplification, boolean ambient, boolean particles);
+        // Fallback for before this method was added
+        int effectId = effect.getType().getId();
+        return new MobEffect(effectId, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
+#else
+        // Fallback for before this method was added (weird edge case)
+        MobEffectList type = MobEffectListHandle.fromId(effect.getType().getId()).getRaw();
+        return new MobEffect(type, effect.getDuration(), effect.getAmplifier(), effect.isAmbient(), effect.hasParticles());
+#endif
+    }
 }
 
 class MobEffectList {
+#if version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public final int id;
+    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
+        return mobeffectlist.id;
+    }
+#else
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
+#endif
 
-#if exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
+#if version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
+    // NachoSpigot 1.8.8 has some weird hack thing
+    public static (MobEffectListHandle) MobEffectList fromId(int id) {
+        MobEffectList[] byId = MobEffectList.byId;
+        return (id >= 0 && id < byId.length) ? byId[id] : null;
+    }
+#elseif exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
     // Purpur 1.17.1+
     public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
 #elseif version >= 1.18

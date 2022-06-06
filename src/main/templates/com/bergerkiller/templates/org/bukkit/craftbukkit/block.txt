@@ -111,6 +111,7 @@ class CraftBlock {
 #elseif version >= 1.13
         return org.bukkit.craftbukkit.block.CraftBlock.at(world, tileEntity.getPosition());
 #else
+        net.minecraft.core.BlockPosition position = tileEntity.getPosition();
         return world.getWorld().getBlockAt(position.getX(), position.getY(), position.getZ());
 #endif
     }

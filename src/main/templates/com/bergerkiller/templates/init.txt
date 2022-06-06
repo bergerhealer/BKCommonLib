@@ -16,7 +16,6 @@
 #include /org/bukkit/craftbukkit/inventories.txt
 #include /org/bukkit/craftbukkit/chunk.txt
 #include /org/bukkit/craftbukkit/server.txt
-#include /org/bukkit/craftbukkit/potions.txt
 #include /org/bukkit/craftbukkit/util.txt
 #include /org/bukkit/craftbukkit/sound.txt
 #include /org/bukkit/craftbukkit/art.txt

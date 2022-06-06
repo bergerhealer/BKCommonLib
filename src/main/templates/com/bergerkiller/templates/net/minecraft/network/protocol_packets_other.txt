@@ -464,10 +464,10 @@ class PacketPlayInUseEntity extends Packet {
     }
 
     public void setInteract(org.bukkit.entity.HumanEntity humanEntity, com.bergerkiller.bukkit.common.wrappers.HumanHand hand) {
-        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
         instance#action = PacketPlayInUseEntity$EnumEntityUseAction.INTERACT;
         instance#offset = null;
   #if version >= 1.9
+        EnumHand hand = (EnumHand) com.bergerkiller.bukkit.common.wrappers.HumanHand.toNMSEnumHand(humanEntity, hand);
         instance#hand = hand;
   #endif
     }
@@ -1349,7 +1349,11 @@ class PacketPlayOutMapChunk extends Packet {
 #endif
 
     public static (PacketPlayOutMapChunkHandle) PacketPlayOutMapChunk createNew() {
+#if version >= 1.17
         return new PacketPlayOutMapChunk(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+#else
+        return new PacketPlayOutMapChunk();
+#endif
     }
 
     // Heightmap data, not available on MC 1.13.2 and before
@@ -1912,7 +1916,7 @@ class PacketPlayOutEntityEquipment extends Packet {
         instance#slot = slot;
     }
   #else
-    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private (org.bukkit.inventory.EquipmentSlot) int slot:b;
+    #require net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment private int slot:b;
     public (org.bukkit.inventory.EquipmentSlot) int getEquipmentSlot(int index) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         return instance#slot;
@@ -1928,7 +1932,7 @@ class PacketPlayOutEntityEquipment extends Packet {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         return instance#itemStack;
     }
-    public void setItemStack(int slot, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
+    public void setItemStack(int index, (org.bukkit.inventory.ItemStack) ItemStack itemStack) {
         if (index != 0) { throw new IndexOutOfBoundsException("Index out of range: " + index); }
         instance#itemStack = itemStack;
     }

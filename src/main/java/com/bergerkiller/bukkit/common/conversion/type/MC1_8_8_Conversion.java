@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.conversion.type;
 
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
 /**
@@ -19,14 +20,14 @@ public class MC1_8_8_Conversion {
         return new com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock(data);
     }
 
-    @ConverterMethod()
-    public static com.bergerkiller.bukkit.common.internal.proxy.MobEffectList createMobEffectListFromId(Integer id) {
-        return new com.bergerkiller.bukkit.common.internal.proxy.MobEffectList(id);
+    @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
+    public static Object createMobEffectListFromId(Integer id) {
+        return MobEffectListHandle.T.fromId.raw.invoker.invoke(null, id);
     }
 
-    @ConverterMethod()
-    public static Integer getMobEffectListId(com.bergerkiller.bukkit.common.internal.proxy.MobEffectList list) {
-        return list.getId();
+    @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
+    public static Integer getMobEffectListId(Object mobEffectListHandle) {
+        return (Integer) MobEffectListHandle.T.getId.raw.invoker.invoke(mobEffectListHandle);
     }
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.WatchableObject")

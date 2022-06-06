@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.world.effect;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import org.bukkit.potion.PotionEffect;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.effect.MobEffect</b>.
@@ -24,6 +25,11 @@ public abstract class MobEffectHandle extends Template.Handle {
         return T.fromNBT.invoke(compound);
     }
 
+    public static MobEffectHandle fromBukkit(PotionEffect effect) {
+        return T.fromBukkit.invoke(effect);
+    }
+
+    public abstract PotionEffect toBukkit();
     public abstract MobEffectListHandle getEffectList();
     public abstract void setEffectList(MobEffectListHandle value);
     public abstract int getDuration();
@@ -49,6 +55,9 @@ public abstract class MobEffectHandle extends Template.Handle {
         public final Template.Field.Boolean particles = new Template.Field.Boolean();
 
         public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
+        public final Template.StaticMethod.Converted<MobEffectHandle> fromBukkit = new Template.StaticMethod.Converted<MobEffectHandle>();
+
+        public final Template.Method<PotionEffect> toBukkit = new Template.Method<PotionEffect>();
 
     }
 

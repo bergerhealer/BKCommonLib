@@ -53,6 +53,7 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandl
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
@@ -80,7 +81,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventor
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryMerchantHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryPlayerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 
@@ -480,7 +480,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.effect.MobEffect")
     public static PotionEffect toPotionEffect(Object nmsMobEffectHandle) {
-        return CraftPotionUtilHandle.toBukkit(nmsMobEffectHandle);
+        return MobEffectHandle.T.toBukkit.invoke(nmsMobEffectHandle);
     }
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcherObject")

@@ -99,11 +99,11 @@ class MapIcon {
 #endif
 
 #if version >= 1.18
-    public byte getTypeid() {
+    public byte getTypeId() {
         return instance.getType().getIcon();
     }
 #elseif version >= 1.14.4
-    public byte getTypeid() {
+    public byte getTypeId() {
         return instance.getType().a();
     }
 #elseif version >= 1.13

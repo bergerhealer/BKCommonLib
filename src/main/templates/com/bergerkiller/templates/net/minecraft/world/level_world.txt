@@ -405,7 +405,11 @@ class World extends IBlockAccess {
     public int getNetherPortalSearchRadius() {
         // Paper per-world configuration
 #if exists com.destroystokyo.paper.PaperWorldConfig public int portalSearchRadius;
+  #if exists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+        return instance.paperSpigotConfig.portalSearchRadius;
+  #else
         return instance.paperConfig.portalSearchRadius;
+  #endif
 #endif
 
         return 128; // Vanilla default
@@ -414,7 +418,11 @@ class World extends IBlockAccess {
     public int getNetherPortalCreateRadius() {
         // Paper per-world configuration
 #if exists com.destroystokyo.paper.PaperWorldConfig public int portalCreateRadius;
+  #if exists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+        return instance.paperSpigotConfig.portalCreateRadius;
+  #else
         return instance.paperConfig.portalCreateRadius;
+  #endif
 #endif
 
         return 16; // Vanilla default

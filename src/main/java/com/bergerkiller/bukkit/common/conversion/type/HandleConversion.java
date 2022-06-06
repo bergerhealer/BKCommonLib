@@ -52,6 +52,7 @@ import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHand
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.util.EntitySliceHandle;
 import com.bergerkiller.generated.net.minecraft.world.EnumDifficultyHandle;
+import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
@@ -71,7 +72,6 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDa
 import com.bergerkiller.generated.org.bukkit.craftbukkit.entity.CraftEntityHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftInventoryHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
-import com.bergerkiller.generated.org.bukkit.craftbukkit.potion.CraftPotionUtilHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
@@ -337,7 +337,7 @@ public class HandleConversion {
 
     @ConverterMethod(output="net.minecraft.world.effect.MobEffect")
     public static Object toMobEffectHandle(PotionEffect potionEffect) {
-        return CraftPotionUtilHandle.fromBukkit(potionEffect);
+        return MobEffectHandle.T.fromBukkit.raw.invoke(potionEffect);
     }
 
     @ConverterMethod(output="net.minecraft.world.level.MobSpawnerAbstract")

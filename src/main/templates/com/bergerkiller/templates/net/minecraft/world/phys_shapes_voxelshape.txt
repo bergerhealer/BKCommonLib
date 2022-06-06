@@ -181,13 +181,24 @@ class VoxelShape {
         java.util.Iterator iter = voxels.iterator();
         while (iter.hasNext()) {
             VoxelShape voxel = (VoxelShape) iter.next();
-            if (axis == EnumDirection$EnumAxis.X) {
+  #if version <= 1.8 && exists net.minecraft.server.EnumAxis;
+            // 1.8 annoyance. The remapper doesn't seem to work for some reason. Bleh.
+            if (axis == net.minecraft.server.EnumAxis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection$EnumAxis.Y) {
+            } else if (axis == net.minecraft.server.EnumAxis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection$EnumAxis.Z) {
+            } else if (axis == net.minecraft.server.EnumAxis.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
+  #else
+            if (axis == EnumDirection.EnumAxis.X) {
+                coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
+            } else if (axis == EnumDirection.EnumAxis.Y) {
+                coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
+            } else if (axis == EnumDirection.EnumAxis.Z) {
+                coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
+            }
+  #endif
 
             // Shortcut, see implementation of 1.13.1
             if (Math.abs(coordinate) <= 1.0E-7D) {

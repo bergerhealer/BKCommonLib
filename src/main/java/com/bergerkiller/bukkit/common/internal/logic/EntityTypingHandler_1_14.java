@@ -194,11 +194,15 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     }
          * #endif
          * 
-         * // PaperSpigot World configuration
+         * // Paper(Spigot) World configuration
          * #if fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
          *     worldserver#paperConfig = paperConfig;
+         * #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+         *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperSpigotConfig;
+         *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
+         *     worldserver#paperSpigotConfig = paperConfig;
          * #endif
          * 
          * // Purpur World configuration

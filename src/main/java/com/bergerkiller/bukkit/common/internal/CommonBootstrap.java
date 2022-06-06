@@ -378,9 +378,15 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.entity.EnumItemSlot", "com.bergerkiller.bukkit.common.internal.proxy.EnumItemSlot");
             remappings.put("net.minecraft.world.level.chunk.DataPaletteBlock", "com.bergerkiller.bukkit.common.internal.proxy.DataPaletteBlock");
             remappings.put("net.minecraft.network.syncher.DataWatcherObject", "com.bergerkiller.bukkit.common.internal.proxy.DataWatcherObject");
-            remappings.put("net.minecraft.world.effect.MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
             remappings.put("net.minecraft.sounds.SoundEffect", "com.bergerkiller.bukkit.common.internal.proxy.SoundEffect_1_8_8");
             remappings.put("net.minecraft.world.level.dimension.DimensionManager", "com.bergerkiller.bukkit.common.internal.proxy.DimensionManager_1_8_8");
+
+            // This one MIGHT exist on some server types (weird!)
+            try {
+                Class.forName(server.getNMSRoot() + ".MobEffectList");
+            } catch (ClassNotFoundException e) {
+                remappings.put("net.minecraft.world.effect.MobEffectList", "com.bergerkiller.bukkit.common.internal.proxy.MobEffectList");
+            }
         }
 
         // On version 1.8, for some reason all child classes were on package level
