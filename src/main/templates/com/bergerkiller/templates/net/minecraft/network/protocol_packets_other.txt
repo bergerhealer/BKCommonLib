@@ -1407,7 +1407,7 @@ class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.18
         net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
         return data#chunkDataBuffer;
-#elseif version >= 1.19
+#elseif version >= 1.9
         return instance#chunkDataBuffer;
 #else
         PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
@@ -1419,7 +1419,7 @@ class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.18
         net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData data = instance.getChunkData();
         data#chunkDataBuffer = buffer;
-#elseif version >= 1.19
+#elseif version >= 1.9
         instance#chunkDataBuffer = buffer;
 #else
         PacketPlayOutMapChunk$ChunkMap data = instance#chunkData;
