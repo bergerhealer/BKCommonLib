@@ -8,9 +8,6 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
-import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 
@@ -47,25 +44,6 @@ public class PacketTest {
         assertTrue(PacketType.OUT_ENTITY_MOVE.isOutGoing());
         assertTrue(PacketType.OUT_MAP.isOutGoing());
         assertTrue(PacketType.OUT_MAP_CHUNK.isOutGoing());
-    }
-
-    @Test
-    public void testPacketIdRegistry() {
-        int id;
-
-        // Test that PacketPlayInBlockPlace has a valid id that can also be converted back
-        // The 'out' lookup should not contain this packet
-        assertEquals(-1, EnumProtocolHandle.PLAY.getPacketIdOut(PacketPlayInBlockPlaceHandle.T.getType()));
-        id = EnumProtocolHandle.PLAY.getPacketIdIn(PacketPlayInBlockPlaceHandle.T.getType());
-        assertNotEquals(-1, id);
-        assertEquals(PacketPlayInBlockPlaceHandle.T.getType(), EnumProtocolHandle.PLAY.getPacketClassIn(id));
-
-        // Test that PacketPlayOutEntityDestroy has a valid id that can also be converted back
-        // The 'in' lookup should not contain this packet
-        assertEquals(-1, EnumProtocolHandle.PLAY.getPacketIdIn(PacketPlayOutEntityDestroyHandle.T.getType()));
-        id = EnumProtocolHandle.PLAY.getPacketIdOut(PacketPlayOutEntityDestroyHandle.T.getType());
-        assertNotEquals(-1, id);
-        assertEquals(PacketPlayOutEntityDestroyHandle.T.getType(), EnumProtocolHandle.PLAY.getPacketClassOut(id));
     }
 
     @Test

@@ -1,8 +1,0 @@
-package net.minecraft.network.protocol;
-
-import com.bergerkiller.generated.net.minecraft.network.protocol.EnumProtocolDirectionHandle;
-
-class EnumProtocolDirection {
-    enum (EnumProtocolDirectionHandle) EnumProtocolDirection SERVERBOUND;
-    enum (EnumProtocolDirectionHandle) EnumProtocolDirection CLIENTBOUND;
-}

@@ -19,6 +19,10 @@ public abstract class PacketHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static boolean isOutgoing(Class<?> packetClass) {
+        return T.isOutgoing.invoker.invoke(null,packetClass);
+    }
+
 
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
@@ -119,6 +123,8 @@ public abstract class PacketHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketClass extends Template.Class<PacketHandle> {
+        public final Template.StaticMethod<Boolean> isOutgoing = new Template.StaticMethod<Boolean>();
+
     }
 
 }

@@ -1,14 +1,12 @@
 package com.bergerkiller.bukkit.common.protocol;
 
 import com.bergerkiller.bukkit.common.Common;
-import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.generated.net.minecraft.network.EnumProtocolHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -22,7 +20,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
     static {
@@ -164,7 +161,6 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayInWindowClick IN_WINDOW_CLICK = new NMSPacketPlayInWindowClick();
 
     private final String name;
-    private final int id;
     private final boolean outgoing;
     private final FieldAccessor<DataWatcher> dataWatcherField;
 
@@ -208,7 +204,6 @@ public class PacketType extends ClassTemplate<Object> {
         if (packetClass == null) {
             //Logging.LOGGER_REFLECTION.warning("Failed to find NMS Packet class type for " + getClass().getSimpleName());
             this.outgoing = false;
-            this.id = -1;
             this.dataWatcherField = null;
             return;
         }
@@ -227,22 +222,7 @@ public class PacketType extends ClassTemplate<Object> {
         this.addImport("net.minecraft.network.protocol.game.*");
 
         // Obtain ID and determine in/outgoing
-        int tmpId;
-        if ((tmpId = EnumProtocolHandle.PLAY.getPacketIdIn(getType())) != -1) {
-            this.outgoing = false;
-            this.id = tmpId;
-        } else if ((tmpId = EnumProtocolHandle.PLAY.getPacketIdOut(getType())) != -1) {
-            this.outgoing = true;
-            this.id = tmpId;
-        } else {
-            this.outgoing = false;
-            this.id = -1;
-            if (!packetClass.equals(PacketHandle.T.getType()) &&
-                packetClass.getName().startsWith("net.minecraft."))
-            {
-                Logging.LOGGER_NETWORK.log(Level.WARNING, "Packet '" + packetClass.getName() + " is not registered!");
-            }
-        }
+        this.outgoing = PacketHandle.isOutgoing(getType());
 
         // Obtain the datawatcher Field
         FieldAccessor<DataWatcher> dataWatcherField = null;
@@ -257,10 +237,6 @@ public class PacketType extends ClassTemplate<Object> {
 
     public boolean isOutGoing() {
         return this.outgoing;
-    }
-
-    public int getId() {
-        return this.id;
     }
 
     @Override
@@ -323,37 +299,6 @@ public class PacketType extends ClassTemplate<Object> {
                 () -> {
                     PacketTypeOptions options = typesByPacketClass.getOrDefault(packetHandleType, NO_TYPE_OPTIONS);
                     PacketType type = options.find(packetHandle);
-                    if (type == null) {
-                        // Register an entirely new PacketType. This also registers it in both maps.
-                        return new PacketType(packetHandleType);
-                    }
-
-                    // Update visible map cache - eliminates use of isAssignable logic in ClassMap
-                    Map<Class<?>, PacketTypeOptions> newMap = new HashMap<Class<?>, PacketTypeOptions>(typesByPacketClassVisible);
-                    newMap.put(packetHandleType, options);
-                    typesByPacketClassVisible = newMap;
-
-                    return type;
-                });
-    }
-
-    @Deprecated
-    public static PacketType getType(int packetId, boolean outGoing) {
-        final Class<?> packetHandleType;
-        if (outGoing) {
-            packetHandleType = EnumProtocolHandle.PLAY.getPacketClassOut(packetId);
-        } else {
-            packetHandleType = EnumProtocolHandle.PLAY.getPacketClassIn(packetId);
-        }
-        if (packetHandleType == null) {
-            return null;
-        }
-
-        return LogicUtil.synchronizeCopyOnWrite(PacketType.class,
-                () -> typesByPacketClassVisible.getOrDefault(packetHandleType, NO_TYPE_OPTIONS).firstRegistered(),
-                () -> {
-                    PacketTypeOptions options = typesByPacketClass.getOrDefault(packetHandleType, NO_TYPE_OPTIONS);
-                    PacketType type = options.firstRegistered();
                     if (type == null) {
                         // Register an entirely new PacketType. This also registers it in both maps.
                         return new PacketType(packetHandleType);

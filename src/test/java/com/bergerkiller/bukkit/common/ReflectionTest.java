@@ -71,7 +71,6 @@ public class ReflectionTest {
             loadClass(NMSEntityTypes.class);
             loadClass(NMSRecipe.class);
             loadClass(NMSMobEffect.class);
-            loadClass(NMSEnumProtocol.class);
             loadClass(NMSMinecraftKey.class);
             loadClass(NMSVector.class);
             loadClass(NMSEntityMinecart.class);
