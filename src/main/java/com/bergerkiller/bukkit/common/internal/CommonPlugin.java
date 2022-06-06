@@ -603,7 +603,16 @@ public class CommonPlugin extends PluginBase {
         config.setHeader("cloudDisableBrigadier", "\nWhether to disable using brigadier for all plugins that use BKCL's cloud command framework");
         config.addHeader("cloudDisableBrigadier", "This might fix problems that occur because of bugs in brigadier, or cloud's handler of it");
         this.cloudDisableBrigadier = config.get("cloudDisableBrigadier", false);
+        config.setHeader("preloadTemplateClasses", "\nWhether to load and initialize ALL template classes when BKCommonLib first loads up.");
+        config.addHeader("preloadTemplateClasses", "This reveals any at-runtime server incompatibility errors early on and eliminates any");
+        config.addHeader("preloadTemplateClasses", "at-runtime lazy initialization lag. It does cause a lot of classes to be loaded into the");
+        config.addHeader("preloadTemplateClasses", "JVM that may never get used, which wastes memory. Only enable this for debugging reasons!");
+        final boolean preloadTemplateClasses = config.get("preloadTemplateClasses", false);
         config.save();
+
+        if (preloadTemplateClasses) {
+            CommonClasses.initializeTemplateClasses();
+        }
 
         // Welcome message
         final List<String> welcomeMessages = Arrays.asList(
@@ -748,6 +757,11 @@ public class CommonPlugin extends PluginBase {
 
         // Server-specific enabling occurs
         Common.SERVER.enable(this);
+
+        // If requested, load some static utility classes up-front
+        if (preloadTemplateClasses) {
+            CommonClasses.initializeLogicClasses(getLogger());
+        }
 
         // Parse BKCommonLib version to int
         int version = this.getVersionNumber();
