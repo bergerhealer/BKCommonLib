@@ -1380,7 +1380,7 @@ class PacketPlayOutMapChunk extends Packet {
         instance#heightmaps = heightmapsData;
 #elseif version >= 1.14
         #require net.minecraft.network.protocol.game.PacketPlayOutMapChunk private NBTTagCompound heightmaps:d;
-        instance#heightmapsField = heightmaps;
+        instance#heightmapsField = heightmapsData;
 #else
         // Not available
 #endif

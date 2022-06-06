@@ -102,7 +102,6 @@ class PortalHandler_1_14 extends PortalHandler {
     @Template.Import("net.minecraft.server.level.WorldServer")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.Entity")
-    @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
     @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
@@ -127,7 +126,7 @@ class PortalHandler_1_14 extends PortalHandler {
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
-         *     return world.getWorldProvider().getDimensionManager().getType() == DimensionManager.THE_END;
+         *     return world.getWorldProvider().getDimensionManager() == DimensionManager.THE_END;
          * }
          */
         @Template.Generated("%IS_MAIN_END_WORLD%")
@@ -139,13 +138,13 @@ class PortalHandler_1_14 extends PortalHandler {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
-         *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
          *     if (result == null) {
          *         return null;
          *     }
-         *     return startBlock.getWorld().getBlockAt(MathHelper.floor(result.position.x),
-         *                                             MathHelper.floor(result.position.y),
-         *                                             MathHelper.floor(result.position.z));
+         *     return startBlock.getWorld().getBlockAt(MathHelper.floor(result.a.x),
+         *                                             MathHelper.floor(result.a.y),
+         *                                             MathHelper.floor(result.a.z));
          * }
          */
         @Template.Generated("%FIND_NETHER_PORTAL%")
@@ -157,7 +156,9 @@ class PortalHandler_1_14 extends PortalHandler {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     Entity dummy = (Entity) dummyEntity;
-         *     dummy.setPositionRaw((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
+         *     dummy.locX = (double) startBlock.getX()+0.5;
+         *     dummy.locY = (double) startBlock.getY();
+         *     dummy.locZ = (double) startBlock.getZ()+0.5;
          *     return agent.a(dummy);
          * }
          */

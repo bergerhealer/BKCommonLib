@@ -191,8 +191,10 @@ class WorldServer extends World {
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getDimensionKey() {
         // If one of the main worlds (world, world_nether, world_the_end), then use the overworld, the_nether or the_end constants
         // Otherwise, create a new resource key using the world name
-    #if version >= 1.13.1
+    #if version >= 1.13.1 && exists net.minecraft.server.level.WorldServer public final net.minecraft.world.level.dimension.DimensionManager dimension;
         int dimension = instance.dimension.getDimensionID();
+    #elseif version >= 1.13.1
+        int dimension = instance.worldProvider.getDimensionManager().getDimensionID();
     #else
         int dimension = instance.dimension;
     #endif
@@ -219,7 +221,11 @@ class WorldServer extends World {
         if (name.equals("overworld")) {
             return server.getWorldServer(DimensionManager.OVERWORLD);
         } else if (name.equals("the_nether")) {
+    #if exists net.minecraft.world.level.dimension.DimensionManager public static final DimensionManager NETHER;
+            return server.getWorldServer(DimensionManager.NETHER);
+    #else
             return server.getWorldServer(DimensionManager.THE_NETHER);
+    #endif
         } else if (name.equals("the_end")) {
             return server.getWorldServer(DimensionManager.THE_END);
         }

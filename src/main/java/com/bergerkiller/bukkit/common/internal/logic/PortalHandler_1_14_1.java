@@ -165,7 +165,6 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.entity.Entity$RemovalReason")
     @Template.Import("net.minecraft.world.level.block.Blocks")
-    @Template.Import("net.minecraft.world.level.block.state.pattern.ShapeDetector")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
     @Template.Import("net.minecraft.world.level.World")
     @Template.Import("net.minecraft.world.level.border.WorldBorder")
@@ -250,16 +249,22 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *   #endif
          * #else
          *   #if version >= 1.15.2
-         *     ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.findPortal(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true, radius);
          *   #else
-         *     ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
+         *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
          *   #endif
          *     if (result == null) {
          *         return null;
          *     }
+         *   #if version >= 1.14.2
          *     return startBlock.getWorld().getBlockAt(MathHelper.floor(result.position.x),
          *                                             MathHelper.floor(result.position.y),
          *                                             MathHelper.floor(result.position.z));
+         *   #else
+         *     return startBlock.getWorld().getBlockAt(MathHelper.floor(result.a.x),
+         *                                             MathHelper.floor(result.a.y),
+         *                                             MathHelper.floor(result.a.z));
+         *   #endif
          * #endif
          * }
          */
@@ -302,11 +307,19 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *         initiator.setPositionRaw((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
          *     }
          *     agent.createPortal(initiator, blockposition, createRadius);
-         * #else
+         * #elseif version >= 1.15
          *     // No blockposition/radius args, use initiator entity at all times to pass coordinates
          *     initiator = (Entity) dummyEntity;
          *     initiator.setPositionRaw((double) startBlock.getX()+0.5, (double) startBlock.getY(), (double) startBlock.getZ()+0.5);
-         *     agent.createPortal(initiator);
+         *     agent.a(initiator);
+         * #else
+         *     // No blockposition/radius args, use initiator entity at all times to pass coordinates
+         *     // setPositionRaw doesn't exist yet, assign locX/Y/Z directly
+         *     initiator = (Entity) dummyEntity;
+         *     initiator.locX = (double) startBlock.getX()+0.5;
+         *     initiator.locY = (double) startBlock.getY();
+         *     initiator.locZ = (double) startBlock.getZ()+0.5;
+         *     agent.a(initiator);
          * #endif
          * }
          */
@@ -419,13 +432,20 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *             }
          *         }
          *     }
+         * 
          *     // Event handling
-         *     org.bukkit.event.world.PortalCreateEvent portalEvent = new org.bukkit.event.world.PortalCreateEvent(blockList.getList(), bworld, (entityInitiator == null) ? null : entityInitiator.getBukkitEntity(), org.bukkit.event.world.PortalCreateEvent$CreateReason.END_PLATFORM);
+         *     java.util.List blocks = blockList.getList(); // List of BlockState!
+         *     org.bukkit.event.world.PortalCreateEvent portalEvent;
+         *   #if version >= 1.14.4 || exists org.bukkit.event.world.PortalCreateEvent public PortalCreateEvent(java.util.List blocks, org.bukkit.World world, org.bukkit.entity.Entity entity, PortalCreateEvent.CreateReason reason);
+         *     org.bukkit.entity.Entity binitiator = (entityInitiator == null) ? null : entityInitiator.getBukkitEntity();
+         *     portalEvent = new org.bukkit.event.world.PortalCreateEvent(blocks, bworld, binitiator, org.bukkit.event.world.PortalCreateEvent$CreateReason.END_PLATFORM);
+         *   #else
+         *     portalEvent = new org.bukkit.event.world.PortalCreateEvent(blocks, bworld, org.bukkit.event.world.PortalCreateEvent$CreateReason.END_PLATFORM);
+         *   #endif
          *     world.getServer().getPluginManager().callEvent(portalEvent);
          *     if (!portalEvent.isCancelled()) {
          *         blockList.updateList();
          *     }
-         * 
          * #endif
          *     return bworld.getBlockAt(platformPos.getX(), platformPos.getY()-2, platformPos.getZ());
          * }
