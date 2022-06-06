@@ -22,33 +22,38 @@ class NetworkManager {
     // Unsafe! May not function under some conditions!
     // Returns true if queuing was successful, false otherwise
     public static boolean queuePacketUnsafe((Object) NetworkManager networkManager, Object packet) {
-#if version >= 1.17
-        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:queue;
-#elseif version >= 1.13.2
-        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue;
-#elseif version >= 1.8.3
-        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:i;
+#if version >= 1.8.3 && version < 1.13.2 && !exists net.minecraft.network.NetworkManager private final readonly java.util.Queue i;
+        // Paper 1.11.2 did away with the queue entirely, so it's not supported
+        return false;
 #else
+        // Should work here
+  #if version >= 1.17
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:queue;
+  #elseif version >= 1.13.2
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue;
+  #elseif version >= 1.8.3
+        #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:i;
+  #else
         #require net.minecraft.network.NetworkManager private final readonly java.util.Queue packetQueue:h;
-#endif
+  #endif
         java.util.Queue queue = networkManager#packetQueue;
 
-#if exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
+  #if exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener listener);
         Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener) null);
-#elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
+  #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener[] listener);
         Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener[]) null);
-#else
+  #else
         #error Cannot queue packets - queued packet constructor not found!
-#endif
+  #endif
 
-#if version >= 1.14.4
+  #if version >= 1.14.4
         // Uses synchronized
         synchronized (queue) {
             queue.add(queuedPacket);
         }
-#elseif version >= 1.8.3
+  #elseif version >= 1.8.3
         // Uses ReentrantReadWriteLock
         #require net.minecraft.network.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
         java.util.concurrent.locks.ReentrantReadWriteLock lock = networkManager#packetQueueRWLock;
@@ -58,10 +63,11 @@ class NetworkManager {
         } finally {
             lock.writeLock().unlock();
         }
-#else
+  #else
         // No lock at all (relies on concurrent queue logic)
         queue.add(queuedPacket);
-#endif
+  #endif
         return true;
+#endif
     }
 }
