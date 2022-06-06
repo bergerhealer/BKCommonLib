@@ -1271,17 +1271,15 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      */
 #if exists net.minecraft.world.entity.Entity public void burn(float dmg);
     public void burn(float dmg);
-#elseif forge
-    public void burn(float dmg) {
-        #require net.minecraft.world.entity.Entity protected void burn(int dmg);
-        instance#burn((int)dmg);
-    }
 #elseif version >= 1.18
     public void burn(float dmg) {
         if (!instance.fireImmune()) {
             instance.hurt(DamageSource.IN_FIRE, dmg);
         }
     }
+#elseif version >= 1.16.5 && forge == mohist
+    // MohistMC remapping bug (I think?)
+    protected void burn:d(float dmg);
 #elseif version >= 1.16
     public void burn(float dmg) {
         if (!instance.isFireProof()) {
@@ -1291,6 +1289,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
             instance.damageEntity(DamageSource.FIRE, dmg);
   #endif
         }
+    }
+#elseif forge
+    public void burn(float dmg) {
+        #require net.minecraft.world.entity.Entity protected void burn(int dmg);
+        instance#burn((int)dmg);
     }
 #else
     protected void burn(float dmg);

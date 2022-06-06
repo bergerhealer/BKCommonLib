@@ -57,7 +57,9 @@ class EntityTracker {
     }
   #elseif exists net.minecraft.server.level.PlayerChunkMap public volatile it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.PlayerChunk> visibleChunks;
     public optional void setVisibleChunksToUpdatingChunks() {
-        instance.visibleChunks = instance.updatingChunks;
+        // Note: field is private on some server types (Mohist)
+        #require net.minecraft.server.level.PlayerChunkMap private final it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap<net.minecraft.server.level.PlayerChunk> updatingChunks;
+        instance.visibleChunks = instance#updatingChunks;
     }
   #else
     public optional void setVisibleChunksToUpdatingChunks:###();

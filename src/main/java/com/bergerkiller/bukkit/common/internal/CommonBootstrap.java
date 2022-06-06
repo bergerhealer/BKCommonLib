@@ -348,6 +348,9 @@ public class CommonBootstrap {
         remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeBase$BiomeMeta");
         remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeBase");
 
+        // Obfuscated class name
+        remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$a");
+
         // Before Minecraft 1.10 EnumGameMode sat inside WorldSettings
         if (evaluateMCVersion("<", "1.10.2")) {
             remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.WorldSettings$EnumGamemode");
@@ -506,6 +509,9 @@ public class CommonBootstrap {
             // To simplify the BKCL API we use the same packet class, since in both cases the buffer, heightmap data
             // and changed block state information is available. We handle the adaptering in template code.
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk", "net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket");
+
+            // Obfuscated class name changed
+            remappings.put("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor", "net.minecraft.server.level.ChunkProviderServer$b");
         } else {
             // TickListServer was moved, migrate past versions
             remappings.put("net.minecraft.world.ticks.TickListServer", "net.minecraft.world.level.TickListServer");

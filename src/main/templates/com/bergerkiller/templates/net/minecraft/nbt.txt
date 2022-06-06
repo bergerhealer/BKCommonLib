@@ -517,7 +517,10 @@ class NBTTagList extends NBTBase {
     public (byte) int getElementTypeId:f();
 #endif
 
-#if version >= 1.13
+#if version >= 1.16.5 && forge == mohist
+    // Mohist 1.16.5+ remapping bug
+    public (NBTBaseHandle) NBTBase get_at:k(int index);
+#elseif version >= 1.13
     public (NBTBaseHandle) NBTBase get_at:get(int index);
 #elseif version >= 1.12
     public (NBTBaseHandle) NBTBase get_at:i(int index);
@@ -529,9 +532,17 @@ class NBTTagList extends NBTBase {
 
 #if version >= 1.14
     public void clear();
+
+  #if version >= 1.16.5 && forge == mohist
+    // Mohist 1.16.5+ remapping bug
+    public (NBTBaseHandle) NBTBase set_at:d(int index, (NBTBaseHandle) NBTBase nbt_value);
+    public (NBTBaseHandle) NBTBase remove_at:c(int index);
+    public void add_at:c(int index, (NBTBaseHandle) NBTBase value);
+  #else
     public (NBTBaseHandle) NBTBase set_at:set(int index, (NBTBaseHandle) NBTBase nbt_value);
     public (NBTBaseHandle) NBTBase remove_at:remove(int index);
     public void add_at:add(int index, (NBTBaseHandle) NBTBase value);
+  #endif
 
     public boolean add((NBTBaseHandle) NBTBase value) {
         instance.add(value);

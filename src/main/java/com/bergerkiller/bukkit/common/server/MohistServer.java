@@ -101,6 +101,32 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
 
     @Override
     public String resolveClassPath(final String path) {
+        // Mohist class name remapping bug
+        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
+            this.evaluateMCVersion(">=", "1.16.5")
+        ) {
+            // Give base remapper a try first.
+            String result = resolveClassPathBase(path);
+            try {
+                MPLType.getClassByName(result);
+                return result;
+            } catch (ClassNotFoundException ex) {}
+
+            // Fallback. We figures this one out manually...
+            return "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor";
+        }
+
+        return resolveClassPathBase(path);
+    }
+
+    private String resolveClassPathBase(final String path) {
+        // Mohist class name remapping bug
+        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
+            this.evaluateMCVersion(">=", "1.16.5")
+        ) {
+            return "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor";
+        }
+
         // Replaces path with proper net.minecraft.server.v1_1_1 path
         String remappedPath = super.resolveClassPath(path);
 

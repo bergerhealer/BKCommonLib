@@ -40,19 +40,14 @@ class ChunkProviderServer {
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
 #endif
 
-#if version >= 1.18
+#if version >= 1.17
     public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.b mainThreadProcessor;
-        return instance#mainThreadProcessor;
-    }
-#elseif version >= 1.17
-    public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a mainThreadProcessor;
+        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.MainThreadExecutor mainThreadProcessor;
         return instance#mainThreadProcessor;
     }
 #elseif version >= 1.14
     public java.util.concurrent.Executor getAsyncExecutor() {
-        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.a serverThreadQueue;
+        #require net.minecraft.server.level.ChunkProviderServer private final (java.util.concurrent.Executor) ChunkProviderServer.MainThreadExecutor serverThreadQueue;
         return instance#serverThreadQueue;
     }
 #else
