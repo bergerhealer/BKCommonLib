@@ -1,10 +1,5 @@
 package net.minecraft.network.protocol;
 
-import com.google.common.collect.BiMap;
-
-import net.minecraft.network.EnumProtocol;
-import net.minecraft.network.protocol.EnumProtocolDirection;
-
 class Packet {
     <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
@@ -104,61 +99,4 @@ class Packet {
         }
     }
     </code>
-
-    // isOutgoing checks whether a packet class is registered to be sent from server to client (true)
-    // or from client to server (false)
-#if version >= 1.15
-    // Is no longer a BiMap on 1.15
-  #if version >= 1.17
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, ? extends net.minecraft.network.EnumProtocol.a<?>> packetMap:flows;
-    #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:classToId;
-  #else
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, ? extends net.minecraft.network.EnumProtocol.a<?>> packetMap:h;
-    #require net.minecraft.network.EnumProtocol.a private final it.unimi.dsi.fastutil.objects.Object2IntMap<Class<? extends net.minecraft.network.protocol.Packet<T extends PacketListener>>> packetToIdMap:a;
-  #endif
-
-  #if version >= 1.18
-    #require net.minecraft.network.EnumProtocol.a public Integer getPacketClassId:getId(Class<?> packetClass);
-  #else
-    #require net.minecraft.network.EnumProtocol.a public Integer getPacketClassId:a(Class<?> packetClass);
-  #endif
-
-    public static boolean isOutgoing(Class<?> packetClass) {
-        EnumProtocol[] protocols = EnumProtocol.values();
-        for (int i = 0; i < protocols.length; i++) {
-            EnumProtocol protocol = protocols[i];
-            Object map = (protocol#packetMap).get(EnumProtocolDirection.CLIENTBOUND);
-            if (map != null) {
-                Integer id = map#getPacketClassId(packetClass);
-                if (id != null) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
-#else
-    // BiMap stores the PacketClass<>ID relationship
-  #if version >= 1.10.2
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.network.protocol.Packet<?>>>> packetMap:h;
-  #elseif version >= 1.9
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.network.protocol.Packet<?>>>> packetMap:j;
-  #elseif version >= 1.8.3
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.network.protocol.Packet>>> packetMap:j;
-  #else
-    #require net.minecraft.network.EnumProtocol private final Map<net.minecraft.network.protocol.EnumProtocolDirection, BiMap<Integer, Class<? extends net.minecraft.network.protocol.Packet>>> packetMap:h;
-  #endif
-
-    public static boolean isOutgoing(Class<?> packetClass) {
-        EnumProtocol[] protocols = EnumProtocol.values();
-        for (int i = 0; i < protocols.length; i++) {
-            EnumProtocol protocol = protocols[i];
-            com.google.common.collect.BiMap map = ((com.google.common.collect.BiMap) (protocol#packetMap).get(EnumProtocolDirection.CLIENTBOUND));
-            if (map != null && map.containsValue(packetClass)) {
-                return true;
-            }
-        }
-        return false;
-    }
-#endif
 }

@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.protocol;
 
 import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
@@ -12,14 +13,18 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandl
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
 import com.bergerkiller.mountiplex.reflection.SafeField;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.reflection.net.minecraft.server.NMSPacketClasses.*;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 public class PacketType extends ClassTemplate<Object> {
     static {
@@ -221,8 +226,8 @@ public class PacketType extends ClassTemplate<Object> {
         this.setClass((Class<Object>) packetClass);
         this.addImport("net.minecraft.network.protocol.game.*");
 
-        // Obtain ID and determine in/outgoing
-        this.outgoing = PacketHandle.isOutgoing(getType());
+        // Determine whether this Packet Class is outgoing, or not
+        this.outgoing = isPacketOutgoing(getType());
 
         // Obtain the datawatcher Field
         FieldAccessor<DataWatcher> dataWatcherField = null;
@@ -311,6 +316,94 @@ public class PacketType extends ClassTemplate<Object> {
 
                     return type;
                 });
+    }
+
+    /**
+     * Determines whether a particular Packet Class is outgoing (packet is sent from server to client).
+     * Includes complicated reflection hacks to properly support esoteric forge hacks (*cough* mohist)
+     *
+     * @param packetClass
+     * @return True if packet class is outgoing
+     */
+    @SuppressWarnings("unchecked")
+    private static boolean isPacketOutgoing(Class<?> packetClass) {
+        if (packetClass == null) {
+            return false;
+        }
+
+        try {
+            Class<?> enumProtocolType = CommonUtil.getClass("net.minecraft.network.EnumProtocol");
+            Class<?> enumProtocolDirectionType = CommonUtil.getClass("net.minecraft.network.protocol.EnumProtocolDirection");
+            Class<?> bimapClass = CommonUtil.getClass("com.google.common.collect.BiMap");
+
+            // Get CLIENTBOUND EnumProtocolDirection constant
+            Object clientBoundDirection;
+            {
+                Field f = Resolver.resolveAndGetDeclaredField(enumProtocolDirectionType, "CLIENTBOUND");
+                clientBoundDirection = f.get(null);
+            }
+
+            // Gets the 'flows' field in EnumProtocol. This is a map by protocol direction.
+            Field flowsField;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.17")) {
+                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "flows");
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.10.2")) {
+                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+            } else if (CommonBootstrap.evaluateMCVersion(">=", "1.8.3")) {
+                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "j");
+            } else {
+                flowsField = Resolver.resolveAndGetDeclaredField(enumProtocolType, "h");
+            }
+            flowsField.setAccessible(true);
+
+            // Find the packet class in the registry
+            Object[] protocols = enumProtocolType.getEnumConstants();
+            for (Object protocol : protocols) {
+                Object directionFlows = ((Map<?, Object>) flowsField.get(protocol)).get(clientBoundDirection);
+                if (directionFlows == null) {
+                    continue;
+                }
+
+                if (bimapClass.isAssignableFrom(directionFlows.getClass())) {
+                    // Use BiMap containsValue to check it exists or not. Used before MC 1.15.
+                    Method containsValueMethod = bimapClass.getMethod("containsValue", Object.class);
+                    Boolean containsValue = (Boolean) containsValueMethod.invoke(directionFlows, packetClass);
+                    if (containsValue.booleanValue()) {
+                        return true;
+                    }
+                } else {
+                    // Hidden class with a getPacketId() method. Used after MC 1.15.
+                    // Try superclasses until we find the method we want.
+                    Method getPacketIdMethod = null;
+                    Class<?> flowType = directionFlows.getClass();
+                    while (flowType != null && flowType != Object.class && getPacketIdMethod == null) {
+                        for (Method m : flowType.getDeclaredMethods()) {
+                            if (m.getParameterCount() == 1 &&
+                                m.getParameterTypes()[0].equals(Class.class) &&
+                                m.getReturnType() == Integer.class
+                            ) {
+                                getPacketIdMethod = m;
+                                break;
+                            }
+                        }
+                        flowType = flowType.getSuperclass();
+                    }
+                    if (getPacketIdMethod == null) {
+                        throw new IllegalStateException("EnumProtocol Flow getPacketId() method not found");
+                    }
+
+                    // Invoke and check
+                    getPacketIdMethod.setAccessible(true);
+                    if (getPacketIdMethod.invoke(directionFlows, packetClass) != null) {
+                        return true;
+                    }
+                }
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to determine outgoing for packet " + packetClass, t);
+        }
+
+        return false;
     }
 
     private static interface PacketTypeOptions {
