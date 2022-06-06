@@ -127,6 +127,7 @@ class PortalHandler_1_8 extends PortalHandler {
     @Template.Import("net.minecraft.core.BlockPosition")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.network.protocol.Packet")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.InstanceType("net.minecraft.server.PortalTravelAgent")
     public static abstract class PortalTravelAgentHandle extends Template.Class<Template.Handle> {
@@ -135,10 +136,10 @@ class PortalHandler_1_8 extends PortalHandler {
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
          *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
-         *     player.world.kill(player);
+         *     player.world.kill((net.minecraft.world.entity.Entity) player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
-         *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
          *     }
          * }
          */

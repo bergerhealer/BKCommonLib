@@ -34,7 +34,7 @@ class ChunkProviderServer {
     }
 #elseif forge
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
-        return instance.getChunkAt(cx, cz, null);
+        return instance.getChunkAt(cx, cz, (Runnable) null);
     }
 #else
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz);
@@ -98,14 +98,17 @@ class ChunkProviderServer {
         // Since 1.14: moved to PlayerChunkMap
         instance.playerChunkMap.saveChunk(chunk);
     }
-#elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk);
-    // <= 1.12
-    public void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
-#else
+#elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk, boolean unloaded);
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        // Since 1.12.1 ish: added unloaded=false parameter
+        // 1.12.1 to 1.12.2 added unloaded=false parameter
         instance.saveChunk(chunk, false);
     }
+#elseif !exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk);
+    // Forge 1.12.2
+    private void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
+#else
+    // <= 1.12
+    public void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
 #endif
 
 #if version >= 1.18

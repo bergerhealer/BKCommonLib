@@ -100,6 +100,7 @@ class PortalHandler_1_14 extends PortalHandler {
     @Template.Import("net.minecraft.core.EnumDirection")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.network.protocol.Packet")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
@@ -115,7 +116,7 @@ class PortalHandler_1_14 extends PortalHandler {
          *     player.getWorldServer().removePlayer(player);
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
-         *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
          *     }
          * }
          */

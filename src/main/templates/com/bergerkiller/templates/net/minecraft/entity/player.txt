@@ -3,6 +3,7 @@ package net.minecraft.server.level;
 import net.minecraft.core.BlockPosition;
 import net.minecraft.network.chat.ChatMessage;
 import net.minecraft.network.chat.IChatBaseComponent;
+import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.PacketPlayOutOpenWindow;
 import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.resources.ResourceKey;
@@ -257,7 +258,14 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         BlockPosition position = instance.getChunkCoordinates();
 #endif
 
+#if exists net.minecraft.server.level.EntityPlayer public int nextContainerCounter();
         int windowId = instance.nextContainerCounter();
+#else
+        // void on forge, requires field reflection to get the counter value
+        instance.nextContainerCounter();
+        #require net.minecraft.server.level.EntityPlayer private int containerCounter;
+        int windowId = instance#containerCounter;
+#endif
 
 #if version >= 1.18
         ContainerAccess access = ContainerAccess.create(world, position);
@@ -266,7 +274,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         ContainerAccess access = ContainerAccess.at(world, position);
         ContainerAnvil container = new ContainerAnvil(windowId, playerInventory, access);
 #else
-        ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, instance);
+        ContainerAnvil container = new ContainerAnvil(playerInventory, world, position, (EntityHuman) instance);
         container.windowId = windowId;
 #endif
         container.checkReachable = false;
@@ -285,19 +293,19 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 #endif
 
 #if version >= 1.18
-        instance.connection.send(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.connection.send((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
 #elseif version >= 1.17
-        instance.connection.sendPacket(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.connection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
 #elseif version >= 1.14
-        instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
+        instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, net.minecraft.world.inventory.Containers.ANVIL, title));
 #else
-        instance.playerConnection.sendPacket(new PacketPlayOutOpenWindow(windowId, "minecraft:anvil", title));
+        instance.playerConnection.sendPacket((Packet) new PacketPlayOutOpenWindow(windowId, "minecraft:anvil", title));
 #endif
 
 #if version >= 1.17
-        instance.initMenu(container);
+        instance.initMenu((net.minecraft.world.inventory.Container) container);
 #else
-        container.addSlotListener(instance);
+        container.addSlotListener((net.minecraft.world.inventory.ICrafting) instance);
 #endif
 
         return container.getBukkitView();

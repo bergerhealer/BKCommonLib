@@ -159,6 +159,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
+    @Template.Import("net.minecraft.network.protocol.Packet")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceType")
@@ -188,7 +189,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     player.getWorldServer().a(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
          *         player.wonGame = true;
-         *         player.connection.sendPacket(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
+         *         player.connection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #else
          *     player.worldChangeInvuln = true;
@@ -197,9 +198,9 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     if (!player.viewingCredits) {
          *         player.viewingCredits = true;
          *   #if version >= 1.16
-         *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.e, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.e, seenCredits ? 0.0F : 1.0F));
          *   #else
-         *         player.playerConnection.sendPacket(new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
+         *         player.playerConnection.sendPacket((Packet) new PacketPlayOutGameStateChange(4, seenCredits ? 0.0F : 1.0F));
          *   #endif
          *     }
          * #endif

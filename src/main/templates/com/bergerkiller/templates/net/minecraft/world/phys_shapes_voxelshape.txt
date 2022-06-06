@@ -191,11 +191,11 @@ class VoxelShape {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #else
-            if (axis == EnumDirection.EnumAxis.X) {
+            if (axis == EnumDirection$EnumAxis.X) {
                 coordinate = voxel.traceXAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection.EnumAxis.Y) {
+            } else if (axis == EnumDirection$EnumAxis.Y) {
                 coordinate = voxel.traceYAxis(boundingBoxHandle, coordinate);
-            } else if (axis == EnumDirection.EnumAxis.Z) {
+            } else if (axis == EnumDirection$EnumAxis.Z) {
                 coordinate = voxel.traceZAxis(boundingBoxHandle, coordinate);
             }
   #endif
