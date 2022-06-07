@@ -1102,21 +1102,16 @@ class PacketPlayOutLogin extends Packet {
     }
 #endif
 
-#if version >= 1.18.2
-    private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-#elseif version >= 1.17
-    private (DimensionType) DimensionManager dimensionType;
-#elseif version >= 1.16.2
-    private (DimensionType) DimensionManager dimensionType:h;
-#elseif version >= 1.16
-    private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
-#elseif version >= 1.15
-    private (DimensionType) DimensionManager dimensionType:e;
-#elseif version >= 1.13.1
-    private (DimensionType) DimensionManager dimensionType:d;
-#else
-    private (DimensionType) int dimensionType:d;
-#endif
+#select version >=
+#case 1.19:     private (DimensionType) ResourceKey<DimensionManager> dimensionType;
+#case 1.18.2:   private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+#case 1.17:     private (DimensionType) DimensionManager dimensionType;
+#case 1.16.2:   private (DimensionType) DimensionManager dimensionType:h;
+#case 1.16:     private (DimensionType) ResourceKey<DimensionManager> dimensionType:h;
+#case 1.15:     private (DimensionType) DimensionManager dimensionType:e;
+#case 1.13.1:   private (DimensionType) DimensionManager dimensionType:d;
+#case else:     private (DimensionType) int dimensionType:d;
+#endselect
 
     // Difficulty field only exists <= 1.13.2
 #if version >= 1.14
@@ -1186,19 +1181,15 @@ class PacketPlayOutLogin extends Packet {
 }
 
 class PacketPlayOutRespawn extends Packet {
-#if version >= 1.18.2
-    private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-#elseif version >= 1.17
-    private (DimensionType) DimensionManager dimensionType;
-#elseif version >= 1.16.2
-    private (DimensionType) DimensionManager dimensionType:a;
-#elseif version >= 1.16
-    private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
-#elseif version >= 1.13.1
-    private (DimensionType) DimensionManager dimensionType:a;
-#else
-    private (DimensionType) int dimensionType:a;
-#endif
+#select version >=
+#case 1.19:    private (DimensionType) ResourceKey<DimensionManager> dimensionType;
+#case 1.18.2:  private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+#case 1.17:    private (DimensionType) DimensionManager dimensionType;
+#case 1.16.2:  private (DimensionType) DimensionManager dimensionType:a;
+#case 1.16:    private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
+#case 1.13.1:  private (DimensionType) DimensionManager dimensionType:a;
+#case else:    private (DimensionType) int dimensionType:a;
+#endselect
 
     // Since Minecraft 1.16: World environment has a resource key, too!
 #if version >= 1.16
