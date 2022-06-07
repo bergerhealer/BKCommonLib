@@ -401,16 +401,21 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     Entity entityInitiator = (Entity) entityInitiatorRaw;
          * 
-         * #if version >= 1.18
+         * #if version >= 1.17
          *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
-         *     WorldServer.makeObsidianPlatform(world, entityInitiator);
-         * #elseif version >= 1.17
-         *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
-         *     WorldServer.a(world, entityInitiator);
          * #elseif version >= 1.16
          *     BlockPosition platformPos = WorldServer.a;
+         * #endif
+         * 
+         * #if version >= 1.18
+         *     WorldServer.makeObsidianPlatform(world, entityInitiator);
+         * #elseif !exists net.minecraft.server.level.WorldServer public static void a(WorldServer world, net.minecraft.world.entity.Entity entity) && exists net.minecraft.server.level.WorldServer public static void a(WorldServer world)
+         *     // Forge lacks an Entity parameter
+         *     WorldServer.a(world);
+         * #elseif version >= 1.16
          *     WorldServer.a(world, entityInitiator);
          * #else
+         *     // Custom code for MC 1.15.2 and before
          *     BlockPosition platformPos = WorldProviderTheEnd.f;
          * 
          *     // Code is embedded deep inside EntityPlayer.a(DimensionManager, TeleportCause)
