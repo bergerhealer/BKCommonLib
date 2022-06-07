@@ -15,7 +15,8 @@ public abstract class BlockDataSerializer implements LazyInitializedObject, Libr
     public static final BlockDataSerializer INSTANCE = LibraryComponentSelector.forModule(BlockDataSerializer.class)
             .runFirst(CommonBootstrap::initServer)
             .addVersionOption(null, "1.12.2", BlockDataSerializer_1_8_to_1_12_2::new)
-            .addVersionOption("1.13", null, BlockDataSerializer_1_13::new)
+            .addVersionOption("1.13", "1.18.2", BlockDataSerializer_1_13_to_1_18_2::new)
+            .addVersionOption("1.19", null, BlockDataSerializer_1_19::new)
             .update();
 
     /**
