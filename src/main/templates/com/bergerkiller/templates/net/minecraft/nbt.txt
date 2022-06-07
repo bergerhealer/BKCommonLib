@@ -520,6 +520,9 @@ class NBTTagList extends NBTBase {
 #if version >= 1.16.5 && forge == mohist
     // Mohist 1.16.5+ remapping bug
     public (NBTBaseHandle) NBTBase get_at:k(int index);
+#elseif version >= 1.16.5 && forge == magma
+    // Magma 1.16.5+ remapping bug
+    public (NBTBaseHandle) NBTBase get_at:k(int index);
 #elseif version >= 1.13
     public (NBTBaseHandle) NBTBase get_at:get(int index);
 #elseif version >= 1.12
@@ -535,6 +538,11 @@ class NBTTagList extends NBTBase {
 
   #if version >= 1.16.5 && forge == mohist
     // Mohist 1.16.5+ remapping bug
+    public (NBTBaseHandle) NBTBase set_at:d(int index, (NBTBaseHandle) NBTBase nbt_value);
+    public (NBTBaseHandle) NBTBase remove_at:c(int index);
+    public void add_at:c(int index, (NBTBaseHandle) NBTBase value);
+  #elseif version >= 1.16.5 && forge == magma
+    // Magma 1.16.5+ remapping bug
     public (NBTBaseHandle) NBTBase set_at:d(int index, (NBTBaseHandle) NBTBase nbt_value);
     public (NBTBaseHandle) NBTBase remove_at:c(int index);
     public void add_at:c(int index, (NBTBaseHandle) NBTBase value);
