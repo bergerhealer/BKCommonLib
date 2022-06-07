@@ -1,7 +1,5 @@
 package com.bergerkiller.reflection.net.minecraft.server;
 
-import java.util.Random;
-
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 
@@ -9,6 +7,7 @@ import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.FieldAccessor;
@@ -65,7 +64,7 @@ public class NMSEntity {
     };
 
     public static final FieldAccessor<Boolean> noclip = EntityHandle.T.noclip.toFieldAccessor();
-    public static final FieldAccessor<Random>  random = EntityHandle.T.random.toFieldAccessor();
+    public static final FieldAccessor<RandomSourceHandle>  random = EntityHandle.T.random.toFieldAccessor();
     public static final TranslatorFieldAccessor<DataWatcher> datawatcher = EntityHandle.T.datawatcherField.toFieldAccessor();
 
     public static final DataWatcher.Key<Byte> DATA_FLAGS = EntityHandle.DATA_FLAGS;

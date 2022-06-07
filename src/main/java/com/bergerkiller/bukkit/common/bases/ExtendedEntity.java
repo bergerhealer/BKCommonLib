@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 
 import org.bukkit.Chunk;
@@ -43,6 +42,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
@@ -480,7 +480,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         return this.handle.isLoadedInWorld();
     }
 
-    public Random getRandom() {
+    public RandomSourceHandle getRandom() {
         return this.handle.getRandom();
     }
 
@@ -514,7 +514,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * @param pitch (average) to play at
      */
     public void makeRandomSound(ResourceKey<SoundEffect> sound, float volume, float pitch) {
-        final Random rand = getRandom();
+        final RandomSourceHandle rand = getRandom();
         makeSound(sound, volume, MathUtil.clamp(pitch + 0.4f * (rand.nextFloat() - rand.nextFloat()), 0.0f, 1.0f));
     }
 

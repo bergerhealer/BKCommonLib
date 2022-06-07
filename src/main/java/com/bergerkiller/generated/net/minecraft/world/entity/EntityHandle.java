@@ -12,6 +12,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
 import com.bergerkiller.bukkit.common.wrappers.InteractionResult;
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -23,7 +24,6 @@ import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 import java.util.List;
-import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -240,8 +240,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setHeightOffset(float value);
     public abstract boolean isNoclip();
     public abstract void setNoclip(boolean value);
-    public abstract Random getRandom();
-    public abstract void setRandom(Random value);
+    public abstract RandomSourceHandle getRandom();
+    public abstract void setRandom(RandomSourceHandle value);
     public abstract int getTicksLived();
     public abstract void setTicksLived(int value);
     public abstract int getFireTicks();
@@ -303,7 +303,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Float fallDistance = new Template.Field.Float();
         public final Template.Field.Float heightOffset = new Template.Field.Float();
         public final Template.Field.Boolean noclip = new Template.Field.Boolean();
-        public final Template.Field<Random> random = new Template.Field<Random>();
+        public final Template.Field.Converted<RandomSourceHandle> random = new Template.Field.Converted<RandomSourceHandle>();
         public final Template.Field.Integer ticksLived = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field.Integer field_maxFireTicks = new Template.Field.Integer();

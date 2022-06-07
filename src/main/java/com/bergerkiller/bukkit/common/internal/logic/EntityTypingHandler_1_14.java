@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.lang.reflect.Modifier;
 import java.util.IdentityHashMap;
-import java.util.Random;
 import java.util.logging.Level;
 
 import org.bukkit.entity.Entity;
@@ -18,7 +17,6 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -57,7 +55,6 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
             }
 
             this._handler.initWorldServer(this.nmsWorldHandle, nmsWorldData);
-            WorldHandle.T.random.set(this.nmsWorldHandle, new Random());
         }
 
         // Pre-register certain classes that cause events to be fired when constructing
@@ -249,6 +246,17 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     // worldData field
          *     #require net.minecraft.world.level.World public final net.minecraft.world.level.storage.WorldData worldData;
          *     worldserver#worldData = worldData;
+         * #endif
+         * 
+         *     // Random field
+         * #if version >= 1.19
+         *     #require net.minecraft.world.level.World public final net.minecraft.util.RandomSource random;
+         *     net.minecraft.util.RandomSource newRandom = net.minecraft.util.RandomSource.create();
+         *     worldserver#random = newRandom;
+         * #else
+         *     #require net.minecraft.world.level.World public final java.util.Random random;
+         *     java.util.Random newRandom = new java.util.Random();
+         *     worldserver#random = newRandom;
          * #endif
          * }
          */

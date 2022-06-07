@@ -26,6 +26,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.PlayerChunkMapHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -277,7 +278,7 @@ public class WorldUtil extends ChunkUtil {
      * @param world to get the Random of
      * @return Random generator of a world
      */
-    public static Random getRandom(org.bukkit.World world) {
+    public static RandomSourceHandle getRandom(org.bukkit.World world) {
         return CommonNMS.getHandle(world).getRandom();
     }
 

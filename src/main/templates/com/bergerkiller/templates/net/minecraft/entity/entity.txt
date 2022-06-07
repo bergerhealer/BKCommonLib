@@ -37,6 +37,7 @@ import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceH
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 
 class Entity {
 #if version >= 1.9
@@ -1034,7 +1035,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public boolean noclip:T;
 #endif
 
-    protected Random random;
+    protected (RandomSourceHandle) net.minecraft.util.RandomSource random;
 
 #if version >= 1.17
     public int ticksLived:tickCount;

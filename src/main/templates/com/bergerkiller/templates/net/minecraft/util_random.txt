@@ -1,0 +1,12 @@
+package net.minecraft.util;
+
+// Is a normal java.util.Random on MC 1.18 and before
+// Is Mojang's RandomSource class on MC 1.19 and later
+class RandomSource {
+    public abstract int nextIntUnbounded:nextInt();
+    public abstract int nextInt(int i);
+    public abstract long nextLong();
+    public abstract boolean nextBoolean();
+    public abstract float nextFloat();
+    public abstract double nextDouble();
+}

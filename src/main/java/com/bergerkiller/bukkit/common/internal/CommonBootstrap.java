@@ -524,6 +524,14 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.ticks.TickList", "net.minecraft.world.level.TickList");
         }
 
+        // 1.19 mappings
+        if (evaluateMCVersion(">=", "1.19")) {
+
+        } else {
+            // Uses a normal java.util.Random on this version
+            remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
+        }
+
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
         {
             boolean craftLegacyIsInUtil;

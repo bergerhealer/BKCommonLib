@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
@@ -13,7 +14,6 @@ import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.util.Vector;
 import java.util.List;
-import java.util.Random;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.level.World</b>.
@@ -77,8 +77,8 @@ public abstract class WorldHandle extends IBlockAccessHandle {
     public static WorldHandle fromBukkit(org.bukkit.World world) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.Conversion.toWorldHandle.convert(world));
     }
-    public abstract Random getRandom();
-    public abstract void setRandom(Random value);
+    public abstract RandomSourceHandle getRandom();
+    public abstract void setRandom(RandomSourceHandle value);
     public abstract World getBukkitWorld();
     public abstract void setBukkitWorld(World value);
     public abstract boolean isKeepSpawnInMemory();
@@ -88,7 +88,7 @@ public abstract class WorldHandle extends IBlockAccessHandle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class WorldClass extends Template.Class<WorldHandle> {
-        public final Template.Field<Random> random = new Template.Field<Random>();
+        public final Template.Field.Converted<RandomSourceHandle> random = new Template.Field.Converted<RandomSourceHandle>();
         @Template.Optional
         public final Template.Field.Converted<Object> field_chunkProvider = new Template.Field.Converted<Object>();
         public final Template.Field.Converted<World> bukkitWorld = new Template.Field.Converted<World>();

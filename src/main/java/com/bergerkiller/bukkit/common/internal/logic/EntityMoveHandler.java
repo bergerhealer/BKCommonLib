@@ -1,7 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.Arrays;
-import java.util.Random;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -27,6 +26,7 @@ import com.bergerkiller.generated.net.minecraft.CrashReportHandle;
 import com.bergerkiller.generated.net.minecraft.CrashReportSystemDetailsHandle;
 import com.bergerkiller.generated.net.minecraft.ReportedExceptionHandle;
 import com.bergerkiller.generated.net.minecraft.core.EnumDirectionHandle.EnumAxisHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
@@ -179,7 +179,7 @@ public abstract class EntityMoveHandler {
         }
         that = EntityHandle.createHandle(entity.getHandle());
 
-        final Random this_random = that.getRandom();
+        final RandomSourceHandle this_random = that.getRandom();
         WorldHandle world = that.getWorld();
 
         //org.bukkit.craftbukkit.SpigotTimings.entityMoveTimer.startTiming(); // Spigot

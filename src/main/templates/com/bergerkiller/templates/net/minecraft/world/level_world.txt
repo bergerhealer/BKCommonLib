@@ -24,9 +24,10 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
 import com.bergerkiller.generated.net.minecraft.world.phys.AxisAlignedBBHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.MovingObjectPositionHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
+import com.bergerkiller.generated.net.minecraft.util.RandomSourceHandle;
 
 class World extends IBlockAccess {
-    public final Random random;
+    public final (RandomSourceHandle) net.minecraft.util.RandomSource random;
     protected optional (Object) IChunkProvider field_chunkProvider:chunkProvider;
     private final (org.bukkit.World) org.bukkit.craftbukkit.CraftWorld bukkitWorld:world;
     public boolean keepSpawnInMemory;
