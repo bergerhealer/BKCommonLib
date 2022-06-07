@@ -103,7 +103,11 @@ class PacketPlayOutScoreboardTeam extends Packet {
     public (ChatText) IChatBaseComponent getDisplayName() {
         PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
         if (parameters == null) {
+#if version >= 1.19
+            return IChatBaseComponent.empty();
+#else
             return ChatComponentText.EMPTY;
+#endif
         } else {
             return parameters#displayName;
         }
@@ -117,7 +121,11 @@ class PacketPlayOutScoreboardTeam extends Packet {
     public (ChatText) IChatBaseComponent getPrefix() {
         PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
         if (parameters == null) {
+#if version >= 1.19
+            return IChatBaseComponent.empty();
+#else
             return ChatComponentText.EMPTY;
+#endif
         } else {
             return parameters#prefix;
         }
@@ -131,7 +139,11 @@ class PacketPlayOutScoreboardTeam extends Packet {
     public (ChatText) IChatBaseComponent getSuffix() {
         PacketPlayOutScoreboardTeam$b parameters = instance#getParameters();
         if (parameters == null) {
+#if version >= 1.19
+            return IChatBaseComponent.empty();
+#else
             return ChatComponentText.EMPTY;
+#endif
         } else {
             return parameters#suffix;
         }

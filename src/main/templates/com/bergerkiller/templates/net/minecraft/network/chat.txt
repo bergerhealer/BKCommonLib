@@ -34,7 +34,19 @@ class IChatBaseComponent {
     #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier:setChatModifier(ChatModifier modifier);
 #endif
 
-#if version >= 1.18
+#if version >= 1.19
+    public String getText() {
+        net.minecraft.network.chat.ComponentContents contents = instance.getContents();
+        if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
+            return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
+        } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
+            // Unsupported / dont care
+            return contents.toString();
+        } else {
+            return "";
+        }
+    }
+#elseif version >= 1.18
     public abstract String getText:getContents();
 #else
     public abstract String getText();

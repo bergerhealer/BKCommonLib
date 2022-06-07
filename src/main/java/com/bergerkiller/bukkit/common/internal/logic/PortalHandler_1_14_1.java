@@ -157,12 +157,14 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.core.BlockPosition$MutableBlockPosition")
     @Template.Import("net.minecraft.core.EnumDirection")
     @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
+    @Template.Import("net.minecraft.core.IRegistry")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
     @Template.Import("net.minecraft.network.protocol.Packet")
     @Template.Import("net.minecraft.network.protocol.game.PacketPlayOutGameStateChange")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlace")
     @Template.Import("net.minecraft.world.entity.ai.village.poi.VillagePlaceType")
+    @Template.Import("net.minecraft.world.entity.ai.village.poi.PoiTypes")
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.world.entity.Entity$RemovalReason")
     @Template.Import("net.minecraft.world.level.block.Blocks")
@@ -338,7 +340,13 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
          *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
-         * #if version >= 1.18
+         * #if version >= 1.19
+         *     VillagePlace villageplace = world.getPoiManager();
+         *     java.util.Optional typeHolderOpt = IRegistry.POINT_OF_INTEREST_TYPE.getHolder(PoiTypes.NETHER_PORTAL);
+         *     if (typeHolderOpt.isPresent()) {
+         *         villageplace.add(blockposition, (net.minecraft.core.Holder) typeHolderOpt.get());
+         *     }
+         * #elseif version >= 1.18
          *     VillagePlace villageplace = world.getPoiManager();
          *     villageplace.add(blockposition, VillagePlaceType.NETHER_PORTAL);
          * #elseif version >= 1.17

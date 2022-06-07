@@ -436,7 +436,11 @@ class Block {
             ItemStack item = (ItemStack) items_iter.next();
             Block.popResource((World) world, blockposition, item);
         }
+    #if version >= 1.19
+        iblockdata.spawnAfterBreak(world, blockposition, EMPTY_ITEM, true);
+    #else
         iblockdata.spawnAfterBreak(world, blockposition, EMPTY_ITEM);
+    #endif
   #else
         net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getTileEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);

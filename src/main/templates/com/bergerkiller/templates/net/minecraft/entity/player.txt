@@ -212,6 +212,14 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
 #if forge_nms_obfuscated
     public void sendMessage:a((ChatText) IChatBaseComponent ichatbasecomponent);
+#elseif version >= 1.19
+    public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
+        net.minecraft.network.chat.PlayerChatMessage playerchatmessage = net.minecraft.network.chat.PlayerChatMessage.unsigned(ichatbasecomponent);
+        IChatBaseComponent systemDisplayName = IChatBaseComponent.literal("");
+        net.minecraft.network.chat.ChatSender chatsender = net.minecraft.network.chat.ChatSender.system(systemDisplayName);
+        net.minecraft.resources.ResourceKey chatMessageType = net.minecraft.network.chat.ChatMessageType.SYSTEM;
+        instance.sendChatMessage(playerchatmessage, chatsender, chatMessageType);
+    }
 #elseif version >= 1.17
     public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
         instance.sendMessage(ichatbasecomponent, net.minecraft.SystemUtils.NIL_UUID);
@@ -242,7 +250,11 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
             title = (IChatBaseComponent) titleText.getRawHandle();
         } else {
             String titleStr = (String) com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
+#if version >= 1.19
+            title = (IChatBaseComponent) IChatBaseComponent.literal(titleStr);
+#else
             title = (IChatBaseComponent) (new ChatMessage(titleStr, new Object[0]));
+#endif
         }
 
 #if version >= 1.17

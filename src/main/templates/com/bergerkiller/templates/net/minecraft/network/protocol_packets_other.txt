@@ -102,7 +102,10 @@ class PacketPlayOutPlayerInfo extends Packet {
 
     class PacketPlayOutPlayerInfo.PlayerInfoData {
         public static (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData createNew((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName) {
-#if version >= 1.17
+#if version >= 1.19
+            net.minecraft.world.entity.player.ProfilePublicKey.a publicKey = null; //TODO: What to do with this?
+            return new PacketPlayOutPlayerInfo$PlayerInfoData(profile, ping, gameMode, listName, publicKey);
+#elseif version >= 1.17
             return new PacketPlayOutPlayerInfo$PlayerInfoData(profile, ping, gameMode, listName);
 #else
             return new PacketPlayOutPlayerInfo$PlayerInfoData(packet, profile, ping, gameMode, listName);
