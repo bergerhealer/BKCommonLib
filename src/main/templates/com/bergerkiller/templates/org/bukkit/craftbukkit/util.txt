@@ -195,7 +195,15 @@ class CraftChatMessage {
                 prev_was_obfuscated = true;
                 out.append(EnumChatFormat.OBFUSCATED);
             }
-#if version >= 1.18
+#if version >= 1.19
+            net.minecraft.network.chat.ComponentContents contents = c.getContents();
+            if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
+                out.append(((net.minecraft.network.chat.contents.LiteralContents) contents).text());
+            } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
+                // Unsupported / dont care
+                out.append(contents.toString());
+            }
+#elseif version >= 1.18
             out.append(c.getContents());
 #else
             out.append(c.getText());

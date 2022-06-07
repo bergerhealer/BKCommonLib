@@ -6,7 +6,15 @@ import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentH
 
 class IChatBaseComponent {
     // Method safely sets a modifier on a IChatBaseComponent, making it mutable if required
-#if version >= 1.18
+#if version >= 1.19
+    #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
+        if (instance instanceof IChatMutableComponent) {
+            return ((IChatMutableComponent) instance).withStyle(modifier);
+        } else {
+            return (IChatBaseComponent.literal("")).append(instance).withStyle(modifier);
+        }
+    }
+#elseif version >= 1.18
     #require net.minecraft.network.chat.IChatBaseComponent public abstract IChatBaseComponent makeMutableAndSetChatModifier(ChatModifier modifier) {
         if (instance instanceof IChatMutableComponent) {
             return ((IChatMutableComponent) instance).withStyle(modifier);
@@ -144,7 +152,11 @@ class IChatBaseComponent {
 #endif
 
         public static (IChatBaseComponentHandle) IChatBaseComponent empty() {
+#if version >= 1.19
+            return IChatBaseComponent.literal("");
+#else
             return new ChatComponentText("");
+#endif
         }
 
         // Gets the immutable EMPTY modifier constant, or creates a new mutable empty modifier
@@ -268,7 +280,9 @@ class IChatBaseComponent {
                 }
             }
 
-#if version >= 1.18
+#if version >= 1.19
+            return IChatBaseComponent.literal("").withStyle(modifier);
+#elseif version >= 1.18
             return new ChatComponentText("").withStyle(modifier);
 #else
             return new ChatComponentText("").setChatModifier(modifier);
