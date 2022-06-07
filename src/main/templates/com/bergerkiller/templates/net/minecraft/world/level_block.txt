@@ -455,7 +455,11 @@ class Block {
             ItemStack item = (ItemStack) items_iter.next();
             Block.a((World) world, blockposition, item);
         }
+      #if version >= 1.16.2
         iblockdata.dropNaturally(world, blockposition, EMPTY_ITEM);
+      #else
+        iblockdata.dropNaturally((World) world, blockposition, EMPTY_ITEM);
+      #endif
     #else
         Block.b(iblockdata, loottableinfo_builder);
     #endif

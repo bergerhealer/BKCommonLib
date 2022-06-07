@@ -440,7 +440,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                 int i2 = k + i1 * 0 - l * 1;
          *                 boolean flag2 = j1 < 0;
          *                 blockposition.d(k1, l1, i2);
-         *                 blockList.setTypeAndData(blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData(), 3);
+         *                 blockList.setTypeAndData((BlockPosition) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData(), 3);
          *             }
          *         }
          *     }

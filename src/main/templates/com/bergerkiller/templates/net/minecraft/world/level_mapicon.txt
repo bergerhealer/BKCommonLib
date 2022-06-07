@@ -26,9 +26,9 @@ class MapIcon {
             title = (IChatBaseComponent) com.bergerkiller.bukkit.common.wrappers.ChatText.fromMessage(cursor.getCaption()).getRawHandle();
         }
   #if version >= 1.18
-        return new MapIcon(MapIcon.Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapIcon(MapIcon$Type.byIcon(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #else
-        return new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
+        return new MapIcon(MapIcon$Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection(), title);
   #endif
     }
 

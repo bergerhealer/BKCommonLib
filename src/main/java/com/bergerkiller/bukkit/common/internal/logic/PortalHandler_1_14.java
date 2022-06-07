@@ -219,7 +219,7 @@ class PortalHandler_1_14 extends PortalHandler {
          *                 int i2 = k + i1 * 0 - l * 1;
          *                 boolean flag2 = j1 < 0;
          *                 blockposition.d(k1, l1, i2);
-         *                 world.setTypeUpdate(blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData());
+         *                 world.setTypeUpdate((BlockPosition) blockposition, flag2 ? Blocks.OBSIDIAN.getBlockData() : Blocks.AIR.getBlockData());
          *             }
          *         }
          *     }
