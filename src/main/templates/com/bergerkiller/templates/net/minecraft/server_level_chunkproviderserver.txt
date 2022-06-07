@@ -32,7 +32,7 @@ class ChunkProviderServer {
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, true, true);
     }
-#elseif forge
+#elseif forge && !exists net.minecraft.server.level.ChunkProviderServer public net.minecraft.world.level.chunk.Chunk getChunkAt(int cx, int cz);
     public (ChunkHandle) Chunk getChunkAt(int cx, int cz) {
         return instance.getChunkAt(cx, cz, (Runnable) null);
     }

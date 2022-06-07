@@ -70,7 +70,7 @@ class MapIcon {
     }
 
     public static (MapIconHandle) MapIcon fromCursor(org.bukkit.map.MapCursor cursor) {
-        return new MapIcon(MapIcon.Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
+        return new MapIcon(MapIcon$Type.a(cursor.getRawType()), cursor.getX(), cursor.getY(), cursor.getDirection());
     }
 
     public org.bukkit.map.MapCursor toCursor() {

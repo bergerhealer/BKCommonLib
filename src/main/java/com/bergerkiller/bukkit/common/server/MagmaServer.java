@@ -7,6 +7,7 @@ import java.util.Map;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.FieldNameResolver;
 import com.bergerkiller.mountiplex.reflection.resolver.MethodNameResolver;
+import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * Magma is a Spigot + Forge implementation
@@ -112,7 +113,19 @@ public class MagmaServer extends SpigotServer implements FieldNameResolver, Meth
 
     @Override
     public String resolveFieldName(Class<?> type, String fieldName) {
-        return remappingUtils.mapFieldName(type, fieldName);
+        String result = remappingUtils.mapFieldName(type, fieldName);
+
+        // Also check superclasses for server types, Object class excluded
+        if (result == fieldName && MPLType.getName(type).startsWith("net.minecraft.")) {
+            while ((type = type.getSuperclass()) != null && type != Object.class) {
+                result = remappingUtils.mapFieldName(type, fieldName);
+                if (result != fieldName) {
+                    break;
+                }
+            }
+        }
+
+        return result;
     }
 
     @Override

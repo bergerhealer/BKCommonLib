@@ -242,7 +242,7 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
             title = (IChatBaseComponent) titleText.getRawHandle();
         } else {
             String titleStr = (String) com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle.T.getTitle.invoke(Blocks.ANVIL);
-            title = new ChatMessage(titleStr, new Object[0]);
+            title = (IChatBaseComponent) (new ChatMessage(titleStr, new Object[0]));
         }
 
 #if version >= 1.17
