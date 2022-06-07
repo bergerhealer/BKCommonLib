@@ -154,8 +154,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.18.1 to MC 1.18.2
         this.register(2865, NO_CONVERSION);
 
+        // From MC 1.18.2 to MC 1.19
+        this.register(2975, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_19.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 2975; // MC 1.18.2
+        this.max_version = 3105; // MC 1.19
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -499,5 +505,28 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "GREEN_CANDLE_CAKE", "RED_CANDLE_CAKE", "BLACK_CANDLE_CAKE",
                 "POWDER_SNOW", "CAVE_VINES", "CAVE_VINES_PLANT",
                 "BIG_DRIPLEAF_STEM",  "POTTED_AZALEA_BUSH", "POTTED_FLOWERING_AZALEA_BUSH"));
+
+        // All material names (Material enum) added Minecraft 1.18.2 -> 1.19
+        public static final Set<String> ADDED_MC_1_19 = new HashSet<String>(Arrays.asList(
+                "MUD", "MANGROVE_PLANKS", "MANGROVE_PROPAGULE",
+                "MANGROVE_LOG", "MANGROVE_ROOTS", "MUDDY_MANGROVE_ROOTS",
+                "STRIPPED_MANGROVE_LOG", "STRIPPED_MANGROVE_WOOD",
+                "MANGROVE_WOOD", "MANGROVE_LEAVES", "MANGROVE_SLAB",
+                "MUD_BRICK_SLAB", "MANGROVE_FENCE", "PACKED_MUD",
+                "MUD_BRICKS", "REINFORCED_DEEPSLATE", "MUD_BRICK_STAIRS",
+                "SCULK", "SCULK_VEIN", "SCULK_CATALYST", "SCULK_SHRIEKER",
+                "MANGROVE_STAIRS", "MUD_BRICK_WALL", "MANGROVE_BUTTON",
+                "MANGROVE_PRESSURE_PLATE", "MANGROVE_DOOR",
+                "MANGROVE_TRAPDOOR", "MANGROVE_FENCE_GATE",
+                "OAK_CHEST_BOAT", "SPRUCE_CHEST_BOAT",
+                "BIRCH_CHEST_BOAT", "JUNGLE_CHEST_BOAT",
+                "ACACIA_CHEST_BOAT", "DARK_OAK_CHEST_BOAT",
+                "MANGROVE_BOAT", "MANGROVE_CHEST_BOAT", "MANGROVE_SIGN",
+                "TADPOLE_BUCKET", "RECOVERY_COMPASS", "ALLAY_SPAWN_EGG",
+                "FROG_SPAWN_EGG", "TADPOLE_SPAWN_EGG", "WARDEN_SPAWN_EGG",
+                "MUSIC_DISC_5", "DISC_FRAGMENT_5", "GOAT_HORN",
+                "OCHRE_FROGLIGHT", "VERDANT_FROGLIGHT", "PEARLESCENT_FROGLIGHT",
+                "FROGSPAWN", "ECHO_SHARD", "MANGROVE_WALL_SIGN",
+                "POTTED_MANGROVE_PROPAGULE"));
     }
 }
