@@ -663,6 +663,8 @@ public class CommonPlugin extends PluginBase {
         this.components.enableCreate(OfflineWorld::initializeComponent);
         this.components.enableForVersions("Dimension resource key tracker", "1.16", "1.16.1",
                 DimensionResourceKeyConversion.Tracker::new);
+        this.components.enableForVersions("Dimension resource key tracker", "1.19", null,
+                DimensionResourceKeyConversion.Tracker::new);
 
         // Timings, if enabled, otherwise no-op
         if (debugTimings) {

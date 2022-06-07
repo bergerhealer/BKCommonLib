@@ -44,6 +44,10 @@ class DimensionManager {
   #endif
     }
 
+    public static Object getDimensionTypeRegistry() {
+        return #getDimensionTypeRegistry();
+    }
+
   #if version >= 1.19
     // deprecated fallback
     public int getId() {
@@ -153,5 +157,9 @@ class DimensionManager {
     // mapped to id on 1.15.2 and before
     public int getId:getDimensionID();
     public static (DimensionManagerHandle) DimensionManager fromId:a(int id);
+
+    public static Object getDimensionTypeRegistry() {
+        throw new IllegalStateException("Not supported");
+    }
 #endif
 }

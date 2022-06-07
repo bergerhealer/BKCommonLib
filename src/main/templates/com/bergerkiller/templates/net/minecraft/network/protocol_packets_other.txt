@@ -1182,9 +1182,9 @@ class PacketPlayOutLogin extends Packet {
 
 class PacketPlayOutRespawn extends Packet {
 #select version >=
-#case 1.19:    private (DimensionType) ResourceKey<DimensionManager> dimensionType;
-#case 1.18.2:  private (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
-#case 1.17:    private (DimensionType) DimensionManager dimensionType;
+#case 1.19:    private final (DimensionType) ResourceKey<DimensionManager> dimensionType;
+#case 1.18.2:  private final (DimensionType) net.minecraft.core.Holder<DimensionManager> dimensionType;
+#case 1.17:    private final (DimensionType) DimensionManager dimensionType;
 #case 1.16.2:  private (DimensionType) DimensionManager dimensionType:a;
 #case 1.16:    private (DimensionType) ResourceKey<DimensionManager> dimensionType:a;
 #case 1.13.1:  private (DimensionType) DimensionManager dimensionType:a;

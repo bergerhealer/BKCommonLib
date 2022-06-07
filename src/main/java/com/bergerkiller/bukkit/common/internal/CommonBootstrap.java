@@ -667,7 +667,7 @@ public class CommonBootstrap {
             MC1_17_Conversion.init();
             Conversion.registerConverters(MC1_17_Conversion.class);
         }
-        if (evaluateMCVersion(">=", "1.16") && evaluateMCVersion("<=", "1.16.1")) {
+        if ((evaluateMCVersion(">=", "1.16") && evaluateMCVersion("<=", "1.16.1")) || evaluateMCVersion(">=", "1.19")) {
             try {
                 DimensionResourceKeyConversion.init();
                 Conversion.registerConverters(DimensionResourceKeyConversion.class);

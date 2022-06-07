@@ -10,15 +10,15 @@ import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
-import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.dimension.DimensionManagerHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
-import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -28,12 +28,10 @@ import com.google.common.collect.HashBiMap;
  * If enabled, makes use of a plugin-tracked cache of these mappings in case
  * dimensions aren't registered.
  *
- * Only used on Minecraft 1.16 and 1.16.1
+ * Only used on Minecraft 1.16 and 1.16.1, and for 1.19+
  */
 public class DimensionResourceKeyConversion {
     private static Tracker TRACKER = null;
-    private static final FastField<Object> serverCustomRegistryField = new FastField<>();
-    private static final FastMethod<Object> registryGetDimensionRegistryMethod = new FastMethod<>();
     private static final FastMethod<Object> registryGetByKeyMethod = new FastMethod<>();
     private static final FastMethod<java.util.Optional<?>> registryGetByValueMethod = new FastMethod<>();
 
@@ -42,23 +40,6 @@ public class DimensionResourceKeyConversion {
         if (minecraftServerType == null) {
             throw new IllegalStateException("MinecraftServer type not found");
         }
-
-        serverCustomRegistryField.init(Resolver.resolveAndGetDeclaredField(minecraftServerType, "f"));
-        serverCustomRegistryField.forceInitialization();
-
-        // Type IRegistryCustom.Dimension
-        Class<?> registryDimensionType = Resolver.loadClass("net.minecraft.core.IRegistryCustom.Dimension", false);
-        if (registryDimensionType == null) {
-            throw new IllegalStateException("IRegistryCustom.Dimension type not found");
-        }
-        if (!registryDimensionType.isAssignableFrom(serverCustomRegistryField.getType())) {
-            throw new IllegalStateException("Server dimension registry field is incorrect type: " + serverCustomRegistryField.getType());
-        }
-
-        // Retrieve the method that we call on serverCustomRegistry
-        // This method gives us the IRegistry<DimensionManager> we need
-        registryGetDimensionRegistryMethod.init(Resolver.resolveAndGetDeclaredMethod(registryDimensionType, "a"));
-        registryGetDimensionRegistryMethod.forceInitialization();
 
         // Methods of IRegistry to get a value by key, or key by value
         Class<?> registryType = Resolver.loadClass("net.minecraft.core.IRegistry", false);
@@ -70,16 +51,20 @@ public class DimensionResourceKeyConversion {
             throw new IllegalStateException("ResourceKey type not found");
         }
 
-        registryGetByKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "a", resourceKeyType));
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
+            registryGetByKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "get", resourceKeyType));
+            registryGetByValueMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "getResourceKey", Object.class));
+        } else {
+            registryGetByKeyMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "a", resourceKeyType));
+            registryGetByValueMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "c", Object.class));
+        }
         registryGetByKeyMethod.forceInitialization();
-        registryGetByValueMethod.init(Resolver.resolveAndGetDeclaredMethod(registryType, "c", Object.class));
         registryGetByValueMethod.forceInitialization();
     }
 
     @ConverterMethod(input="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
     public static DimensionType toDimensionType(Object resourceKeyHandle) {
-        Object customRegistry = serverCustomRegistryField.get(MinecraftServerHandle.instance().getRaw());
-        Object registry = registryGetDimensionRegistryMethod.invoke(customRegistry);
+        Object registry = DimensionManagerHandle.getDimensionTypeRegistry();
         Object dimensionManagerHandle = registryGetByKeyMethod.invoke(registry, resourceKeyHandle);
         if (dimensionManagerHandle == null) {
             // Try cache
@@ -98,8 +83,7 @@ public class DimensionResourceKeyConversion {
     @ConverterMethod(output="net.minecraft.resources.ResourceKey<net.minecraft.world.level.dimension.DimensionManager>")
     public static Object toResourceKey(DimensionType dimensionType) {
         Object dimensionManagerHandle = dimensionType.getDimensionManagerHandle();
-        Object customRegistry = serverCustomRegistryField.get(MinecraftServerHandle.instance().getRaw());
-        Object registry = registryGetDimensionRegistryMethod.invoke(customRegistry);
+        Object registry = DimensionManagerHandle.getDimensionTypeRegistry();
         java.util.Optional<?> resourceKeyHandle = registryGetByValueMethod.invoke(registry, dimensionManagerHandle);
         if (resourceKeyHandle != null && resourceKeyHandle.isPresent()) {
             return resourceKeyHandle.get();
