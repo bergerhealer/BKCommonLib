@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.server;
 
 import java.io.File;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -101,22 +103,36 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
 
     @Override
     public String resolveClassPath(final String path) {
-        // Mohist class name remapping bug
-        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
-            this.evaluateMCVersion(">=", "1.16.5")
-        ) {
-            // Give base remapper a try first.
-            String result = resolveClassPathBase(path);
-            try {
-                MPLType.getClassByName(result);
-                return result;
-            } catch (ClassNotFoundException ex) {}
+        // Mohist class name remapping bugs
 
-            // Fallback. We figures this one out manually...
-            return "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor";
+        if (path.equals("net.minecraft.server.level.PlayerChunkMap$a") &&
+            this.evaluateMCVersion(">=", "1.16.5")) {
+            return tryResolveElse(path, "net.minecraft.world.server.ChunkManager$ProxyTicketManager");
+        }
+
+        if (path.equals("net.minecraft.server.level.ChunkProviderServer$MainThreadExecutor") &&
+            this.evaluateMCVersion(">=", "1.16.5")) {
+            return tryResolveElse(path, "net.minecraft.world.server.ServerChunkProvider$ChunkExecutor");
+        }
+
+        if (path.equals("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate") &&
+                this.evaluateMCVersion(">=", "1.16.5")) {
+            return tryResolveElse(path, "net.minecraft.world.biome.MobSpawnInfo$Spawners");
         }
 
         return resolveClassPathBase(path);
+    }
+
+    private String tryResolveElse(final String path, final String fallback) {
+        // Give base remapper a try first.
+        String result = resolveClassPathBase(path);
+        try {
+            MPLType.getClassByName(result);
+            return result;
+        } catch (ClassNotFoundException ex) {}
+
+        // Fallback. We figures this one out manually...
+        return fallback;
     }
 
     private String resolveClassPathBase(final String path) {
@@ -151,6 +167,73 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     }
 
     @Override
+    public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
+        // Mohist remapping bugs
+
+        // public static RecipeItemStack a(IMaterial... aimaterial)
+        if (methodName.equals("a") &&
+            params.length == 1 &&
+            evaluateMCVersion(">=", "1.16.5") &&
+            MPLType.getName(type).equals("net.minecraft.item.crafting.Ingredient") &&
+            MPLType.getName(params[0]).equals("[Lnet.minecraft.util.IItemProvider;")
+        ) {
+            for (Method m : type.getDeclaredMethods()) {
+                if (Modifier.isStatic(m.getModifiers()) &&
+                    m.getParameterCount() == 1 &&
+                    m.getParameterTypes()[0].equals(params[0]) &&
+                    m.getReturnType() == type
+                ) {
+                    return MPLType.getName(m);
+                }
+            }
+
+            //return "func_199804_a";
+        }
+
+        // public static <E> NonNullList<E> a(E e0, E... ae)
+        if (methodName.equals("a") &&
+            params.length == 2 &&
+            evaluateMCVersion(">=", "1.16.5") &&
+            MPLType.getName(type).equals("net.minecraft.util.NonNullList") &&
+            params[0].equals(Object.class) &&
+            params[1].equals(Object[].class)
+        ) {
+            for (Method m : type.getDeclaredMethods()) {
+                if (m.getParameterCount() == 2 &&
+                    m.getParameterTypes()[0].equals(params[0]) &&
+                    m.getParameterTypes()[1].equals(params[1]) &&
+                    m.getReturnType() == type
+                ) {
+                    return MPLType.getName(m);
+                }
+            }
+
+            //return "func_193580_a";
+        }
+
+        return remapUtils.mapMethodName(type, methodName, params);
+    }
+
+    @Override
+    public String resolveFieldName(Class<?> type, String fieldName) {
+
+        // All fields of this class lack proper spigot remappings. We have to hardcode it.
+        if (MPLType.getName(type).equals("net.minecraft.world.biome.MobSpawnInfo$Spawners") &&
+            evaluateMCVersion("==", "1.16.5")
+        ) {
+            if (fieldName.equals("c")) {
+                return "field_242588_c";
+            } else if (fieldName.equals("d")) {
+                return "field_242589_d";
+            } else if (fieldName.equals("e")) {
+                return "field_242590_e";
+            }
+        }
+
+        return remapUtils.mapFieldName(type, fieldName);
+    }
+
+    @Override
     public boolean canLoadClassPath(String classPath) {
         // The .class data at this path contains obfuscated type information
         // These obfuscated names are deobufscated at runtime
@@ -167,16 +250,6 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
         }
 
         return true;
-    }
-
-    @Override
-    public String resolveMethodName(Class<?> type, String methodName, Class<?>[] params) {
-        return remapUtils.mapMethodName(type, methodName, params);
-    }
-
-    @Override
-    public String resolveFieldName(Class<?> type, String fieldName) {
-        return remapUtils.mapFieldName(type, fieldName);
     }
 
     @Override

@@ -16,7 +16,7 @@ optional class LightEngineThreaded {
   #if version >= 1.18
         mailbox.tell(runnable);
   #else
-        mailbox.a(runnable);
+        mailbox.a((Object) runnable);
   #endif
 #endif
     }

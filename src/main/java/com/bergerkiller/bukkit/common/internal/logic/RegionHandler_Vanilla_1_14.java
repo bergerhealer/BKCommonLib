@@ -184,6 +184,7 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap")
     @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectMap")
     @Template.Import("com.bergerkiller.bukkit.common.bases.IntVector3")
+    @Template.Import("it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap")
     @Template.InstanceType("net.minecraft.world.level.chunk.storage.RegionFileCache")
     public static abstract class RegionHandlerImpl extends Template.Class<Template.Handle> {
 
@@ -262,12 +263,13 @@ class RegionHandler_Vanilla_1_14 extends RegionHandlerVanilla {
 
         /*
          * <FIND_REGION_FILE_CACHE_STORAGE>
-         * public static it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileCache rfc) {
+         * public static Long2ObjectLinkedOpenHashMap findRegionFileCache(RegionFileCache rfc) {
          * #if version >= 1.17
-         *     return rfc.regionCache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache;
          * #else
-         *     return rfc.cache;
+         *     #require net.minecraft.world.level.chunk.storage.RegionFileCache private Long2ObjectLinkedOpenHashMap<RegionFile> regionCache:cache;
          * #endif
+         *     return rfc#regionCache;
          * }
          */
         @Template.Generated("%FIND_REGION_FILE_CACHE_STORAGE%")

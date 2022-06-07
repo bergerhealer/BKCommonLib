@@ -317,7 +317,7 @@ class WorldServer extends World {
         chunkDistanceManager = chunkMap.getDistanceManager();
   #elseif version >= 1.17
         chunkDistanceManager = chunkMap.distanceManager;
-  #elseif exists net.minecraft.server.level.PlayerChunkMap public final PlayerChunkMap.a chunkDistanceManager;
+  #elseif exists net.minecraft.server.level.PlayerChunkMap private net.minecraft.server.level.PlayerChunkMap.a chunkDistanceManager;
         chunkDistanceManager = chunkMap.chunkDistanceManager;
   #else
         chunkDistanceManager = chunkMap.u;
@@ -376,14 +376,21 @@ class WorldServer extends World {
 #if version >= 1.18
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         return (ForcedChunk) instance.getDataStorage().get(
-            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            (java.util.function.Function) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            "chunks"
+        );
+    }
+#elseif version >= 1.17
+    public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
+        return (ForcedChunk) instance.getWorldPersistentData().a(
+            (java.util.function.Function) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
             "chunks"
         );
     }
 #elseif version >= 1.14
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         return (ForcedChunk) instance.getWorldPersistentData().a(
-            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            (java.util.function.Supplier) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
             "chunks"
         );
     }
@@ -391,7 +398,7 @@ class WorldServer extends World {
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         ForcedChunk forcedchunk = (ForcedChunk) instance.a(
             instance.worldProvider.getDimensionManager(),
-            com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            (java.util.function.Supplier) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
             "chunks"
         );
         if (forcedchunk == null) {

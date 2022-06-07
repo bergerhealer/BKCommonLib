@@ -175,8 +175,16 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * <SHOW_END_CREDITS>
          * public static void showEndCredits(Object entityPlayerRaw, boolean seenCredits) {
          *     EntityPlayer player = (EntityPlayer) entityPlayerRaw;
+         * 
+         *     // Using require because field is private on forge
+         * #if version >= 1.17
+         *     #require EntityPlayer private boolean isChangingDimension;
+         * #else
+         *     #require EntityPlayer private boolean isChangingDimension:worldChangeInvuln;
+         * #endif
+         *     player#isChangingDimension = true;
+         * 
          * #if version >= 1.18
-         *     player.isChangingDimension = true;
          *     player.unRide();
          *     player.getLevel().removePlayerImmediately(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
@@ -184,7 +192,6 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *         player.connection.send(new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #elseif version >= 1.17
-         *     player.isChangingDimension = true;
          *     player.decouple();
          *     player.getWorldServer().a(player, Entity$RemovalReason.CHANGED_DIMENSION);
          *     if (!player.wonGame) {
@@ -192,7 +199,6 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *         player.connection.sendPacket((Packet) new PacketPlayOutGameStateChange(PacketPlayOutGameStateChange.WIN_GAME, seenCredits ? 0.0F : 1.0F));
          *     }
          * #else
-         *     player.worldChangeInvuln = true;
          *     player.decouple();
          *     player.getWorldServer().removePlayer(player);
          *     if (!player.viewingCredits) {
@@ -379,10 +385,10 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *                 boolean flag = j1 < 0;
          * #if version >= 1.18
          *                 pos.set(k1, l1, i2);
-         *                 if (world.getBlockState(pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         *                 if (world.getBlockState((BlockPosition) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
          * #else
          *                 pos.d(k1, l1, i2);
-         *                 if (world.getType(pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
+         *                 if (world.getType((BlockPosition) pos).getBlock() != (flag ? Blocks.OBSIDIAN : Blocks.AIR)) {
          * #endif
          *                     return null;
          *                 }

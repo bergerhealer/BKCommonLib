@@ -139,13 +139,13 @@ class Block {
 #elseif version >= 1.14
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
   #if version >= 1.17
-        return instance.g(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.g(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
   #elseif version >= 1.16
-        return instance.f(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.f(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
   #elseif version >= 1.15
-        return instance.l(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.l(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
   #else
-        return instance.k(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.k(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
   #endif
     }
 
@@ -153,7 +153,7 @@ class Block {
         // Forge
   #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
         if (world != null) {
-            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+            return instance.getLightValue(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
         }
   #endif
 
@@ -166,9 +166,9 @@ class Block {
 
     public boolean isOccluding_at((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
     #if version >= 1.16
-        return iblockdata.isOccluding(world, new BlockPosition(x, y, z));
+        return iblockdata.isOccluding((IBlockAccess) world, new BlockPosition(x, y, z));
     #else
-        return instance.isOccluding(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.isOccluding(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
     #endif
     }
 
@@ -186,14 +186,14 @@ class Block {
 #elseif version >= 1.13
     // Since 1.13 getOpacity has a BlockPosition argument
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
-        return iblockdata.b(world, new BlockPosition(x, y, z));
+        return iblockdata.b((IBlockAccess) world, new BlockPosition(x, y, z));
     }
 
     public int getEmission((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
         // Forge
     #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
         if (world != null) {
-            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+            return instance.getLightValue(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
         }
     #endif
 
@@ -248,7 +248,7 @@ class Block {
     public int getOpacity((IBlockDataHandle) IBlockData iblockdata, (org.bukkit.World) World world, int x, int y, int z) {
   #if exists net.minecraft.world.level.block.Block public int getLightOpacity(IBlockData data, IBlockAccess world, BlockPosition pos);
         // Forge
-        return instance.getLightOpacity(iblockdata, world, new BlockPosition(x, y, z));
+        return instance.getLightOpacity(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
   #elseif version >= 1.8.3
         return instance.p();
   #else
@@ -260,7 +260,7 @@ class Block {
         // Forge
   #if exists net.minecraft.world.level.block.Block public int getLightValue(IBlockData data, IBlockAccess world, BlockPosition pos);
         if (world != null) {
-            return instance.getLightValue(iblockdata, world, new BlockPosition(x, y, z));
+            return instance.getLightValue(iblockdata, (IBlockAccess) world, new BlockPosition(x, y, z));
         }
   #endif
 
@@ -427,14 +427,14 @@ class Block {
         net.minecraft.world.level.block.entity.TileEntity tileentity = isTileEntity ? world.getBlockEntity(blockposition) : null;
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.withRandom(((World) world).random);
-        loottableinfo_builder.withParameter(LootContextParameters.ORIGIN, Vec3D.atCenterOf(blockposition));
-        loottableinfo_builder.withParameter(LootContextParameters.TOOL, EMPTY_ITEM);
-        loottableinfo_builder.withOptionalParameter(LootContextParameters.BLOCK_ENTITY, tileentity);
-        loottableinfo_builder.withParameter(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
+        loottableinfo_builder.withParameter(LootContextParameters.ORIGIN, (Object) Vec3D.atCenterOf(blockposition));
+        loottableinfo_builder.withParameter(LootContextParameters.TOOL, (Object) EMPTY_ITEM);
+        loottableinfo_builder.withOptionalParameter(LootContextParameters.BLOCK_ENTITY, (Object) tileentity);
+        loottableinfo_builder.withParameter(LootContextParameters.EXPLOSION_RADIUS, (Object) Float.valueOf(1.0F / yield));
         java.util.Iterator items_iter = iblockdata.getDrops(loottableinfo_builder).iterator();
         while (items_iter.hasNext()) {
             ItemStack item = (ItemStack) items_iter.next();
-            Block.popResource(world, blockposition, item);
+            Block.popResource((World) world, blockposition, item);
         }
         iblockdata.spawnAfterBreak(world, blockposition, EMPTY_ITEM);
   #else
@@ -442,18 +442,18 @@ class Block {
         LootTableInfo$Builder loottableinfo_builder = new LootTableInfo$Builder(world);
         loottableinfo_builder = loottableinfo_builder.a(((World) world).random);
     #if version >= 1.16.2
-        loottableinfo_builder.set(LootContextParameters.ORIGIN, Vec3D.a(blockposition));
+        loottableinfo_builder.set(LootContextParameters.ORIGIN, (Object) Vec3D.a((net.minecraft.core.BaseBlockPosition) blockposition));
     #else
-        loottableinfo_builder.set(LootContextParameters.POSITION, blockposition);
+        loottableinfo_builder.set(LootContextParameters.POSITION, (Object) blockposition);
     #endif
-        loottableinfo_builder.set(LootContextParameters.TOOL, EMPTY_ITEM);
-        loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, tileentity);
-        loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, Float.valueOf(1.0F / yield));
+        loottableinfo_builder.set(LootContextParameters.TOOL, (Object) EMPTY_ITEM);
+        loottableinfo_builder.setOptional(LootContextParameters.BLOCK_ENTITY, (Object) tileentity);
+        loottableinfo_builder.set(LootContextParameters.EXPLOSION_RADIUS, (Object) Float.valueOf(1.0F / yield));
     #if version >= 1.15
         java.util.Iterator items_iter = iblockdata.a(loottableinfo_builder).iterator();
         while (items_iter.hasNext()) {
             ItemStack item = (ItemStack) items_iter.next();
-            Block.a(world, blockposition, item);
+            Block.a((World) world, blockposition, item);
         }
         iblockdata.dropNaturally(world, blockposition, EMPTY_ITEM);
     #else

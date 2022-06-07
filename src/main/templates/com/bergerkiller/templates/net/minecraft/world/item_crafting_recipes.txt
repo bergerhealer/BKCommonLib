@@ -76,14 +76,14 @@ class IRecipe {
             // Shapeless(1 paper + 3 gunpowder) -> Flight 3 firework
             Object[] ingredients = new Object[4];
   #if version >= 1.18
-            ingredients[0] = RecipeItemStack.of(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.PAPER });
-            ingredients[1] = RecipeItemStack.of(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.GUNPOWDER });
+            ingredients[0] = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
+            ingredients[1] = RecipeItemStack.of(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
             ingredients[2] = ingredients[1];
             ingredients[3] = ingredients[1];
             return NonNullList.of((Object) RecipeItemStack.EMPTY, ingredients);
   #else
-            ingredients[0] = RecipeItemStack.a(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.PAPER });
-            ingredients[1] = RecipeItemStack.a(new net.minecraft.world.item.Item[] { net.minecraft.world.item.Items.GUNPOWDER });
+            ingredients[0] = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.PAPER });
+            ingredients[1] = RecipeItemStack.a(new net.minecraft.world.level.IMaterial[] { net.minecraft.world.item.Items.GUNPOWDER });
             ingredients[2] = ingredients[1];
             ingredients[3] = ingredients[1];
     #if version >= 1.17

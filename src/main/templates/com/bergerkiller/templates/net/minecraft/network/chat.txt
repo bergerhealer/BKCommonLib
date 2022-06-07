@@ -1,5 +1,7 @@
 package net.minecraft.network.chat;
 
+import net.minecraft.EnumChatFormat;
+
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 
 class IChatBaseComponent {
@@ -145,97 +147,133 @@ class IChatBaseComponent {
             return new ChatComponentText("");
         }
 
-#if version >= 1.18
-        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
-            ChatModifier initial_modifier = ChatModifier.EMPTY;
-            ChatModifier modifier = initial_modifier;
-            java.util.Iterator iter = colors.iterator();
-            while (iter.hasNext()) {
-                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
-                if (color == org.bukkit.ChatColor.RESET) {
-                    modifier = initial_modifier;
-                } else if (color == org.bukkit.ChatColor.BOLD) {
-                    modifier = modifier.withBold(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.ITALIC) {
-                    modifier = modifier.withItalic(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
-                    modifier = modifier.withStrikethrough(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
-                    modifier = modifier.withUnderlined(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.MAGIC) {
-                    modifier = modifier.withObfuscated(Boolean.TRUE);
-                } else {
-                    modifier = initial_modifier.withColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
-                }
-            }
-            return new ChatComponentText("").withStyle(modifier);
+        // Gets the immutable EMPTY modifier constant, or creates a new mutable empty modifier
+        #require net.minecraft.network.chat.ChatModifier public static ChatModifier emptyFormat() {
+#select version >=
+#case 1.17:    return ChatModifier.EMPTY;
+#case 1.16.2:  return ChatModifier.a;
+#case 1.16:    return ChatModifier.b;
+#case else:    return new ChatModifier();
+#endselect
         }
-#elseif version >= 1.16
-        // ChatModifier is immutable since 1.16
-        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
-  #if version >= 1.17
-            ChatModifier initial_modifier = ChatModifier.EMPTY;
-  #elseif version >= 1.16.2
-            ChatModifier initial_modifier = ChatModifier.a;
-  #else
-            ChatModifier initial_modifier = ChatModifier.b;
-  #endif
 
-            ChatModifier modifier = initial_modifier;
-            java.util.Iterator iter = colors.iterator();
-            while (iter.hasNext()) {
-                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
-                if (color == org.bukkit.ChatColor.RESET) {
-                    modifier = initial_modifier;
-                } else if (color == org.bukkit.ChatColor.BOLD) {
-                    modifier = modifier.setBold(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.ITALIC) {
-                    modifier = modifier.setItalic(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
-                    modifier = modifier.setStrikethrough(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
-                    modifier = modifier.setUnderline(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.MAGIC) {
-                    modifier = modifier.setRandom(Boolean.TRUE);
-                } else {
-                    modifier = initial_modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
-                }
-            }
-            return new ChatComponentText("").setChatModifier(modifier);
-        }
+        // Sets an initial chat color for an EMPTY/new modifier
+        #require net.minecraft.network.chat.ChatModifier public static ChatModifier emptyWithColor(EnumChatFormat format) {
+            ChatModifier modifier = #emptyFormat();
+#if version >= 1.18
+            return modifier.withColor(format);
+#elseif version >= 1.16
+            return modifier.setColor(format);
 #else
-        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
-            ChatModifier modifier = new ChatModifier();
-            java.util.Iterator iter = colors.iterator();
-            while (iter.hasNext()) {
-                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
-                if (color == org.bukkit.ChatColor.RESET) {
-                    modifier = new ChatModifier();
-                } else if (color == org.bukkit.ChatColor.BOLD) {
-                    modifier.setBold(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.ITALIC) {
-                    modifier.setItalic(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
-                    modifier.setStrikethrough(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
-                    modifier.setUnderline(Boolean.TRUE);
-                } else if (color == org.bukkit.ChatColor.MAGIC) {
-                    modifier.setRandom(Boolean.TRUE);
-                } else {
-                    modifier = new ChatModifier();
-  #if version >= 1.12
-                    modifier.setColor(org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color));
-  #else
-                    #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.EnumChatFormat> formatMap;
-                    java.util.Map formats = #formatMap;
-                    Object format = formats.get(Character.valueOf(color.getChar()));
-                    modifier.setColor((EnumChatFormat) format);
-  #endif
-                }
-            }
-            return new ChatComponentText("").setChatModifier(modifier);
+            modifier.setColor(format);
+            return modifier;
+#endif
+        }
+
+        // Sets various properties of the ChatModifier
+        // On MC 1.15.2 where the modifier was mutable, it modifies in the original modifier
+#if version >= 1.18
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold:withBold(Boolean bold);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic:withItalic(Boolean italic);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough:withStrikethrough(Boolean strikethrough);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined:withUnderlined(Boolean underlined);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated:withObfuscated(Boolean obfuscated);
+#elseif version >= 1.16
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold(Boolean bold);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic(Boolean italic);
+
+        // These were added by CraftBukkit and might be missing on some (forge) server types or have broken remapping
+        // This stuff is absolutely awful :(
+
+      #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough);
+      #else
+        #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough) {
+            return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), strikethrough, instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
+        }
+      #endif
+
+      #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setUnderline(Boolean underlined);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined:setUnderline(Boolean underlined);
+      #elseif exists net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined);
+      #else
+        #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined) {
+            return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), underlined, instance.isStrikethrough(), instance.isRandom(), instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
+        }
+      #endif
+
+      #if exists net.minecraft.network.chat.ChatModifier public ChatModifier setRandom(Boolean obfuscated);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated:setRandom(Boolean obfuscated);
+      #elseif exists net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated);
+      #else
+        #require net.minecraft.network.chat.ChatModifier private static ChatModifier create_modifier:<init>(ChatHexColor color, Boolean bold, Boolean italic, Boolean underlined, Boolean strikethrough, Boolean obfuscated, ChatClickable clickEvent, ChatHoverable hoverEvent, String insertion, MinecraftKey font);
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated) {
+            return #create_modifier(instance.getColor(), instance.isBold(), instance.isItalic(), instance.isUnderlined(), instance.isStrikethrough(), obfuscated, instance.getClickEvent(), instance.getHoverEvent(), instance.getInsertion(), instance.getFont());
+        }
+      #endif
+#else
+        // methods modify the original instance. Returns void.
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setBold(Boolean bold) {
+            instance.setBold(bold);
+            return instance;
+        }
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setItalic(Boolean italic) {
+            instance.setItalic(italic);
+            return instance;
+        }
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setStrikethrough(Boolean strikethrough) {
+            instance.setStrikethrough(strikethrough);
+            return instance;
+        }
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setUnderlined(Boolean underlined) {
+            instance.setUnderline(underlined);
+            return instance;
+        }
+        #require net.minecraft.network.chat.ChatModifier public ChatModifier setObfuscated(Boolean obfuscated) {
+            instance.setRandom(obfuscated);
+            return instance;
         }
 #endif
+
+        public static (IChatBaseComponentHandle) IChatBaseComponent modifiersToComponent(java.util.Collection<org.bukkit.ChatColor> colors) {
+            ChatModifier modifier = #emptyFormat();
+            java.util.Iterator iter = colors.iterator();
+            while (iter.hasNext()) {
+                org.bukkit.ChatColor color = (org.bukkit.ChatColor) iter.next();
+                if (color == org.bukkit.ChatColor.RESET) {
+                    modifier = #emptyFormat();
+                } else if (color == org.bukkit.ChatColor.BOLD) {
+                    modifier = modifier#setBold(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.ITALIC) {
+                    modifier = modifier#setItalic(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.STRIKETHROUGH) {
+                    modifier = modifier#setStrikethrough(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.UNDERLINE) {
+                    modifier = modifier#setUnderlined(Boolean.TRUE);
+                } else if (color == org.bukkit.ChatColor.MAGIC) {
+                    modifier = modifier#setObfuscated(Boolean.TRUE);
+                } else {
+#if version >= 1.12
+                    EnumChatFormat format = org.bukkit.craftbukkit.util.CraftChatMessage.getColor(color);
+#else
+                    #require org.bukkit.craftbukkit.util.CraftChatMessage.StringMessage private static final java.util.Map<Character, net.minecraft.server.EnumChatFormat> formatMap;
+                    java.util.Map formats = #formatMap;
+                    EnumChatFormat format = (EnumChatFormat) formats.get(Character.valueOf(color.getChar()));
+#endif
+                    modifier = #emptyWithColor(format);
+                }
+            }
+
+#if version >= 1.18
+            return new ChatComponentText("").withStyle(modifier);
+#else
+            return new ChatComponentText("").setChatModifier(modifier);
+#endif
+        }
     }
 }
 

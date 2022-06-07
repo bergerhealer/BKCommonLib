@@ -87,16 +87,23 @@ class ChunkProviderServer {
 
 #if version >= 1.18
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        instance.chunkMap.save(chunk);
+        instance.chunkMap.save((net.minecraft.world.level.chunk.IChunkAccess) chunk);
     }
 #elseif version >= 1.17
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
-        instance.chunkMap.saveChunk(chunk);
+        instance.chunkMap.saveChunk((net.minecraft.world.level.chunk.IChunkAccess) chunk);
+    }
+#elseif version >= 1.14.1
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        // Since 1.14.1: returns boolean
+        #require net.minecraft.server.level.PlayerChunkMap private boolean saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk);
+        instance.playerChunkMap#saveChunk(chunk);
     }
 #elseif version >= 1.14
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
         // Since 1.14: moved to PlayerChunkMap
-        instance.playerChunkMap.saveChunk(chunk);
+        #require net.minecraft.server.level.PlayerChunkMap private void saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk);
+        instance.playerChunkMap#saveChunk(chunk);
     }
 #elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk, boolean unloaded);
     public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
