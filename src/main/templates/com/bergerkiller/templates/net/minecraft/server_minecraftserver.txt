@@ -8,9 +8,19 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 class MinecraftServer {
     private boolean hasStopped;
 
+#if version >= 1.19
+    public String getResourcePack() {
+        MinecraftServer$ServerResourcePackInfo info = (MinecraftServer$ServerResourcePackInfo) instance.getServerResourcePack().orElse(null);
+        return (info == null) ? "" : info.url();
+    }
+    public String getResourcePackHash() {
+        MinecraftServer$ServerResourcePackInfo info = (MinecraftServer$ServerResourcePackInfo) instance.getServerResourcePack().orElse(null);
+        return (info == null) ? "" : info.hash();
+    }
+#else
     public String getResourcePack();
-
     public String getResourcePackHash();
+#endif
 
     public String getProperty(String key, String defaultValue) {
         DedicatedServer dedicatedServer = (DedicatedServer) instance;
