@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.PacketPlayOutEntityEffect</b>.
@@ -25,8 +26,8 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
 
     /* ============================================================================== */
 
-    public abstract int getEffectId();
-    public abstract void setEffectId(int id);
+    public abstract PotionEffectType getEffect();
+    public abstract void setEffect(PotionEffectType type);
 
     public static final int FLAG_AMBIENT = 1;
     public static final int FLAG_VISIBLE = 2;
@@ -51,8 +52,8 @@ public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
         public final Template.Field.Integer effectDurationTicks = new Template.Field.Integer();
         public final Template.Field.Byte flags = new Template.Field.Byte();
 
-        public final Template.Method<Integer> getEffectId = new Template.Method<Integer>();
-        public final Template.Method<Void> setEffectId = new Template.Method<Void>();
+        public final Template.Method.Converted<PotionEffectType> getEffect = new Template.Method.Converted<PotionEffectType>();
+        public final Template.Method.Converted<Void> setEffect = new Template.Method.Converted<Void>();
 
     }
 

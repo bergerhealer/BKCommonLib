@@ -31,6 +31,8 @@ import net.minecraft.world.level.World;
 import net.minecraft.world.phys.MovingObjectPositionBlock;
 import net.minecraft.world.phys.Vec3D;
 
+import org.bukkit.potion.PotionEffectType;
+
 import com.mojang.authlib.GameProfile;
 
 import it.unimi.dsi.fastutil.ints.IntList;
@@ -2452,11 +2454,17 @@ class PacketPlayOutEntityEffect extends Packet {
     private byte flags:e;
 #endif
 
-#if version >= 1.18.2
-    public int getEffectId();
-    public void setEffectId(int id) {
+#if version >= 1.19
+    public (PotionEffectType) MobEffectList getEffect();
+    public void setEffect((PotionEffectType) MobEffectList type) {
+        #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final MobEffectList effect;
+        instance#effect = type;
+    }
+#elseif version >= 1.18.2
+    public (PotionEffectType) int getEffect:getEffectId();
+    public void setEffect((PotionEffectType) int type) {
         #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private final int effectId;
-        instance#effectId = id;
+        instance#effectId = type;
     }
 #else
   #if version >= 1.17
@@ -2465,12 +2473,12 @@ class PacketPlayOutEntityEffect extends Packet {
     #require net.minecraft.network.protocol.game.PacketPlayOutEntityEffect private byte effectId:b;
   #endif
 
-    public int getEffectId() {
+    public (PotionEffectType) int getEffect() {
         return (int) instance#effectId;
     }
 
-    public void setEffectId(int id) {
-        byte b = (byte) id;
+    public void setEffect((PotionEffectType) int type) {
+        byte b = (byte) type;
         instance#effectId = b;
     }
 #endif

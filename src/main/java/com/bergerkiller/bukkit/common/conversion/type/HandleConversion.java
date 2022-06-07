@@ -327,6 +327,12 @@ public class HandleConversion {
         return section.getRawHandle();
     }
 
+    @ConverterMethod
+    @SuppressWarnings("deprecation")
+    public static int fromPotionEffectTypeToId(PotionEffectType potionEffectType) {
+        return potionEffectType.getId();
+    }
+
     @ConverterMethod(output="net.minecraft.world.effect.MobEffectList")
     public static Object toMobEffectListHandle(PotionEffectType potionEffectType) {
         @SuppressWarnings("deprecation")

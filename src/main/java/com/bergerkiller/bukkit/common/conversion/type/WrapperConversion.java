@@ -464,6 +464,12 @@ public class WrapperConversion {
         return new ChunkSection(ChunkSectionHandle.createHandle(nmsChunkSectionHandle));
     }
 
+    @ConverterMethod
+    @SuppressWarnings("deprecation")
+    public static PotionEffectType toPotionEffectTypeFromId(int id) {
+        return PotionEffectType.getById(id);
+    }
+
     @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
     public static PotionEffectType toPotionEffectType(Object nmsMobEffectListHandle) {
         int id = MobEffectListHandle.T.getId.invoke(nmsMobEffectListHandle);
