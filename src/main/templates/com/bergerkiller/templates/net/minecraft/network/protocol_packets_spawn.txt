@@ -439,13 +439,6 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 
 #if version >= 1.17
     private optional UUID entityUUID:uuid;
-    private int entityTypeId:type;
-    private optional int posX_1_8_8:###;
-    private optional int posY_1_8_8:###;
-    private optional int posZ_1_8_8:###;
-    private optional double posX_1_10_2:x;
-    private optional double posY_1_10_2:y;
-    private optional double posZ_1_10_2:z;
     private optional int motX_raw:xd;
     private optional int motY_raw:yd;
     private optional int motZ_raw:zd;
@@ -454,13 +447,6 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private optional byte headYaw_raw:yHeadRot;
 #elseif version >= 1.9
     private optional UUID entityUUID:b;
-    private int entityTypeId:c;
-    private optional int posX_1_8_8:###;
-    private optional int posY_1_8_8:###;
-    private optional int posZ_1_8_8:###;
-    private optional double posX_1_10_2:d;
-    private optional double posY_1_10_2:e;
-    private optional double posZ_1_10_2:f;
     private optional int motX_raw:g;
     private optional int motY_raw:h;
     private optional int motZ_raw:i;
@@ -469,13 +455,6 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private optional byte headYaw_raw:l;
 #else
     private optional UUID entityUUID:###;
-    private int entityTypeId:b;
-    private optional int posX_1_8_8:c;
-    private optional int posY_1_8_8:d;
-    private optional int posZ_1_8_8:e;
-    private optional double posX_1_10_2:###;
-    private optional double posY_1_10_2:###;
-    private optional double posZ_1_10_2:###;
     private optional int motX_raw:f;
     private optional int motY_raw:g;
     private optional int motZ_raw:h;
@@ -504,6 +483,124 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     }
 
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) net.minecraft.world.entity.EntityLiving entity);
+
+    // Entity type property
+#if version >= 1.19
+    #require PacketPlayOutSpawnEntityLiving private final EntityTypes<?> entityType:type;
+
+    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
+        Object nmsEntityType = instance.getType();
+        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byNMSEntityTypeRaw(nmsEntityType);
+    }
+
+    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            throw new IllegalArgumentException("Input CommonEntityType is null");
+        }
+        instance#entityType = (EntityTypes) commonEntityType.nmsEntityType.getRaw();
+    }
+#else
+  #if version >= 1.17
+    #require PacketPlayOutSpawnEntityLiving private int entityTypeId:type;
+  #elseif version >= 1.9
+    #require PacketPlayOutSpawnEntityLiving private int entityTypeId:c;
+  #else
+    #require PacketPlayOutSpawnEntityLiving private int entityTypeId:b;
+  #endif
+
+    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
+        int typeId = instance#entityTypeId;
+        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(typeId);
+    }
+
+    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
+        if (commonEntityType == null) {
+            throw new IllegalArgumentException("Input CommonEntityType is null");
+        }
+        if (commonEntityType.entityTypeId == -1) {
+            throw new IllegalArgumentException("Input CommonEntityType " + commonEntityType.toString() + " cannot be spawned using this packet");
+        }
+        instance#entityTypeId = commonEntityType.entityTypeId;
+    }
+#endif
+
+    // Position property
+#if version >= 1.17
+    // Has getter accessor methods. Fields are double x/y/z
+  #if version >= 1.18
+    public double getPosX:getX();
+    public double getPosY:getY();
+    public double getPosZ:getZ();
+  #else
+    public double getPosX:e();
+    public double getPosY:f();
+    public double getPosZ:g();
+  #endif
+
+    // Used by setters down below
+    #require PacketPlayOutSpawnEntityLiving private final double posX:x;
+    #require PacketPlayOutSpawnEntityLiving private final double posY:y;
+    #require PacketPlayOutSpawnEntityLiving private final double posZ:z;
+
+#elseif version >= 1.9
+    // Used by getters/setters down below
+    #require PacketPlayOutSpawnEntityLiving private double posX:d;
+    #require PacketPlayOutSpawnEntityLiving private double posY:e;
+    #require PacketPlayOutSpawnEntityLiving private double posZ:f;
+
+    public double getPosX() {
+        return instance#posX;
+    }
+    public double getPosY() {
+        return instance#posY;
+    }
+    public double getPosZ() {
+        return instance#posZ;
+    }
+#else
+    // Uses private int fields, requiring protocol encoding/decoding
+    // Used by getters/setters down below
+    #require PacketPlayOutSpawnEntityLiving private int posX:c;
+    #require PacketPlayOutSpawnEntityLiving private int posY:d;
+    #require PacketPlayOutSpawnEntityLiving private int posZ:e;
+
+    public double getPosX() {
+        int prot = instance#posX;
+        return ProtocolMath.deserializePosition_1_8_8(prot);
+    }
+    public double getPosY() {
+        int prot = instance#posY;
+        return ProtocolMath.deserializePosition_1_8_8(prot);
+    }
+    public double getPosZ() {
+        int prot = instance#posZ;
+        return ProtocolMath.deserializePosition_1_8_8(prot);
+    }
+#endif
+#if version >= 1.9
+    public void setPosX(double x) {
+        instance#posX = x;
+    }
+    public void setPosY(double y) {
+        instance#posY = y;
+    }
+    public void setPosZ(double z) {
+        instance#posZ = z;
+    }
+#else
+    public void setPosX(double x) {
+        int prot = ProtocolMath.serializePosition_1_8_8(x);
+        instance#posX = prot;
+    }
+    public void setPosY(double y) {
+        int prot = ProtocolMath.serializePosition_1_8_8(y);
+        instance#posY = prot;
+    }
+    public void setPosZ(double z) {
+        int prot = ProtocolMath.serializePosition_1_8_8(z);
+        instance#posZ = prot;
+    }
+#endif
 
     <code>
     public boolean hasDataWatcherSupport() {
@@ -545,57 +642,15 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
         return type != null && isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
     }
 
-    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
-        if (commonEntityType == null) {
-            throw new IllegalArgumentException("Input CommonEntityType is null");
-        }
-        if (commonEntityType.entityTypeId == -1) {
-            throw new IllegalArgumentException("Input CommonEntityType " + commonEntityType.toString() + " cannot be spawned using this packet");
-        }
-        setEntityTypeId(commonEntityType.entityTypeId);
-    }
-
-    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
-        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId());
-    }
-
     public void setEntityType(org.bukkit.entity.EntityType type) {
         if (type == null) {
             throw new IllegalArgumentException("Input EntityType is null");
         }
-        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
-        if (typeId == -1) {
-            throw new IllegalArgumentException("Input EntityType " + type.name() + " cannot be spawned using this packet");
-        }
-        setEntityTypeId(typeId);
+        setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
     }
 
     public org.bukkit.entity.EntityType getEntityType() {
         return getCommonEntityType().entityType;
-    }
-
-    public double getPosX() {
-        return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
-    }
-
-    public double getPosY() {
-        return getProtocolPosition(T.posY_1_8_8, T.posY_1_10_2);
-    }
-
-    public double getPosZ() {
-        return getProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2);
-    }
-
-    public void setPosX(double posX) {
-        setProtocolPosition(T.posX_1_8_8, T.posX_1_10_2, posX);
-    }
-
-    public void setPosY(double posY) {
-        setProtocolPosition(T.posY_1_8_8, T.posY_1_10_2, posY);
-    }
-
-    public void setPosZ(double posZ) {
-        setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
 
     public double getMotX() {

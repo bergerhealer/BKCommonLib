@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import com.bergerkiller.bukkit.common.entity.CommonEntityType;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import org.bukkit.entity.LivingEntity;
@@ -31,6 +32,14 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         return T.createNew.invoke();
     }
 
+    public abstract CommonEntityType getCommonEntityType();
+    public abstract void setCommonEntityType(CommonEntityType commonEntityType);
+    public abstract double getPosX();
+    public abstract double getPosY();
+    public abstract double getPosZ();
+    public abstract void setPosX(double x);
+    public abstract void setPosY(double y);
+    public abstract void setPosZ(double z);
 
     public boolean hasDataWatcherSupport() {
         return T.opt_dataWatcher.isAvailable();
@@ -71,57 +80,15 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         return type != null && isCommonEntityTypeSupported(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
     }
 
-    public void setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType commonEntityType) {
-        if (commonEntityType == null) {
-            throw new IllegalArgumentException("Input CommonEntityType is null");
-        }
-        if (commonEntityType.entityTypeId == -1) {
-            throw new IllegalArgumentException("Input CommonEntityType " + commonEntityType.toString() + " cannot be spawned using this packet");
-        }
-        setEntityTypeId(commonEntityType.entityTypeId);
-    }
-
-    public com.bergerkiller.bukkit.common.entity.CommonEntityType getCommonEntityType() {
-        return com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityTypeId(getEntityTypeId());
-    }
-
     public void setEntityType(org.bukkit.entity.EntityType type) {
         if (type == null) {
             throw new IllegalArgumentException("Input EntityType is null");
         }
-        int typeId = com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type).entityTypeId;
-        if (typeId == -1) {
-            throw new IllegalArgumentException("Input EntityType " + type.name() + " cannot be spawned using this packet");
-        }
-        setEntityTypeId(typeId);
+        setCommonEntityType(com.bergerkiller.bukkit.common.entity.CommonEntityType.byEntityType(type));
     }
 
     public org.bukkit.entity.EntityType getEntityType() {
         return getCommonEntityType().entityType;
-    }
-
-    public double getPosX() {
-        return getProtocolPosition(T.posX_1_8_8, T.posX_1_10_2);
-    }
-
-    public double getPosY() {
-        return getProtocolPosition(T.posY_1_8_8, T.posY_1_10_2);
-    }
-
-    public double getPosZ() {
-        return getProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2);
-    }
-
-    public void setPosX(double posX) {
-        setProtocolPosition(T.posX_1_8_8, T.posX_1_10_2, posX);
-    }
-
-    public void setPosY(double posY) {
-        setProtocolPosition(T.posY_1_8_8, T.posY_1_10_2, posY);
-    }
-
-    public void setPosZ(double posZ) {
-        setProtocolPosition(T.posZ_1_8_8, T.posZ_1_10_2, posZ);
     }
 
     public double getMotX() {
@@ -173,8 +140,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract int getEntityTypeId();
-    public abstract void setEntityTypeId(int value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -185,19 +150,6 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();
-        public final Template.Field.Integer entityTypeId = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posX_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posY_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer posZ_1_8_8 = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Double posX_1_10_2 = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double posY_1_10_2 = new Template.Field.Double();
-        @Template.Optional
-        public final Template.Field.Double posZ_1_10_2 = new Template.Field.Double();
         @Template.Optional
         public final Template.Field.Integer motX_raw = new Template.Field.Integer();
         @Template.Optional
@@ -214,6 +166,15 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         public final Template.Field.Converted<DataWatcher> opt_dataWatcher = new Template.Field.Converted<DataWatcher>();
 
         public final Template.StaticMethod.Converted<PacketPlayOutSpawnEntityLivingHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutSpawnEntityLivingHandle>();
+
+        public final Template.Method<CommonEntityType> getCommonEntityType = new Template.Method<CommonEntityType>();
+        public final Template.Method<Void> setCommonEntityType = new Template.Method<Void>();
+        public final Template.Method<Double> getPosX = new Template.Method<Double>();
+        public final Template.Method<Double> getPosY = new Template.Method<Double>();
+        public final Template.Method<Double> getPosZ = new Template.Method<Double>();
+        public final Template.Method<Void> setPosX = new Template.Method<Void>();
+        public final Template.Method<Void> setPosY = new Template.Method<Void>();
+        public final Template.Method<Void> setPosZ = new Template.Method<Void>();
 
     }
 

@@ -526,7 +526,9 @@ public class CommonBootstrap {
 
         // 1.19 mappings
         if (evaluateMCVersion(">=", "1.19")) {
-
+            // Painting / living entity spawn packets were merged into one
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPainting", "net.minecraft.network.protocol.game.PacketPlayOutSpawnEntity");
         } else {
             // Uses a normal java.util.Random on this version
             remappings.put("net.minecraft.util.RandomSource", "java.util.Random");

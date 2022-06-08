@@ -1796,7 +1796,19 @@ public class NMSPacketClasses {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutSpawnEntityLivingHandle.T.entityId.toFieldAccessor();
         public final FieldAccessor<UUID> entityUUID = PacketPlayOutSpawnEntityLivingHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new UUID(0L, 0L));
-        public final FieldAccessor<Integer> entityType = PacketPlayOutSpawnEntityLivingHandle.T.entityTypeId.toFieldAccessor();
+        public final FieldAccessor<EntityType> entityType = new SafeDirectField<EntityType>() {
+
+            @Override
+            public EntityType get(Object instance) {
+                return PacketPlayOutSpawnEntityLivingHandle.createHandle(instance).getEntityType();
+            }
+
+            @Override
+            public boolean set(Object instance, EntityType value) {
+                PacketPlayOutSpawnEntityLivingHandle.createHandle(instance).setEntityType(value);
+                return true;
+            }
+        };
         public final FieldAccessor<Double> posX = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {

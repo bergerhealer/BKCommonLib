@@ -369,20 +369,24 @@ public class CommonEntityType {
         return LogicUtil.fixNull(byEntityTypeId.get(entityTypeId), UNKNOWN);
     }
 
-    public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {
-        if (handle != null) {
-            CommonEntityType type = byNMSEntityType.get(handle.getRaw());
+    public static CommonEntityType byNMSEntityTypeRaw(Object entityTypesHandleRaw) {
+        if (entityTypesHandleRaw != null) {
+            CommonEntityType type = byNMSEntityType.get(entityTypesHandleRaw);
             if (type != null) {
                 return type;
             }
 
             // Try by class instead
             if (EntityTypesHandle.T.getEntityClassInst.isAvailable()) {
-                Class<?> nmsType = EntityTypesHandle.T.getEntityClassInst.invoke(handle.getRaw());
+                Class<?> nmsType = EntityTypesHandle.T.getEntityClassInst.invoke(entityTypesHandleRaw);
                 return byNMSEntityClass(nmsType);
             }
         }
         return UNKNOWN;
+    }
+
+    public static CommonEntityType byNMSEntityType(EntityTypesHandle handle) {
+        return (handle == null) ? UNKNOWN : byNMSEntityTypeRaw(handle.getRaw());
     }
 
     public static EntityTypesHandle getNMSEntityTypeByEntityClass(Class<?> entityClass) {
