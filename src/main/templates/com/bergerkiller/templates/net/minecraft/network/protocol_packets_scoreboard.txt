@@ -86,9 +86,16 @@ class PacketPlayOutScoreboardTeam extends Packet {
 
         // Create new with default values
         PacketPlayOutScoreboardTeam$b parameters = new PacketPlayOutScoreboardTeam$b(com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializer.INSTANCE);
+  #if version >= 1.19
+        parameters#displayName = IChatBaseComponent.empty();
+        parameters#prefix = IChatBaseComponent.empty();
+        parameters#suffix = IChatBaseComponent.empty();
+  #else
         parameters#displayName = ChatComponentText.EMPTY;
         parameters#prefix = ChatComponentText.EMPTY;
         parameters#suffix = ChatComponentText.EMPTY;
+  #endif
+
         parameters#visibility = ScoreboardTeamBase$EnumNameTagVisibility.ALWAYS.name;
         parameters#collisionRule = ScoreboardTeamBase$EnumTeamPush.ALWAYS.name;
         parameters#color = EnumChatFormat.RESET;
