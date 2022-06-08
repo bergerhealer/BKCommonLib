@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
+import java.util.IdentityHashMap;
+
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.generated.net.minecraft.core.IRegistryHandle;
 
@@ -34,6 +36,7 @@ public enum WindowType {
     UNKNOWN(null, null, 0);
 
     private final String name_1_8;
+    private final Object nmsWindowType_1_14;
     private final int id_1_14;
     private final int slotCount;
 
@@ -41,9 +44,22 @@ public enum WindowType {
         this.name_1_8 = name_1_8;
         this.slotCount = slotCount;
         if (CommonCapabilities.HAS_WINDOW_TYPE_REGISTRY) {
-            this.id_1_14 = IRegistryHandle.getWindowIdFromName(name_1_14);
+            this.nmsWindowType_1_14 = IRegistryHandle.getWindowTypeByName(name_1_14);
+            this.id_1_14 = IRegistryHandle.getWindowTypeId(this.nmsWindowType_1_14);
         } else {
+            this.nmsWindowType_1_14 = null;
             this.id_1_14 = this.ordinal();
+        }
+    }
+
+    private static final IdentityHashMap<Object, WindowType> byNMSWindowType = new IdentityHashMap<>();
+    static {
+        if (CommonCapabilities.HAS_WINDOW_TYPE_REGISTRY) {
+            for (WindowType type : values()) {
+                if (type.nmsWindowType_1_14 != null) {
+                    byNMSWindowType.put(type.nmsWindowType_1_14, type);
+                }
+            }
         }
     }
 
@@ -75,6 +91,15 @@ public enum WindowType {
     }
 
     /**
+     * Gets the server's 'Containers' instance. Since MC 1.14.
+     *
+     * @return NMS Window Type
+     */
+    public Object getNMSType() {
+        return this.nmsWindowType_1_14;
+    }
+
+    /**
      * Gets whether this Window Type is supported on the current version of Minecraft
      * 
      * @return True if supported
@@ -85,6 +110,17 @@ public enum WindowType {
         } else {
             return this.name_1_8 != null;
         }
+    }
+
+    /**
+     * Gets the WindowType that refers to the given NMS 'Containers' window type.
+     * Works since MC 1.14.
+     *
+     * @param nmsWindowType Containers instance
+     * @return WindowType, UNKNOWN if not found/supported
+     */
+    public static WindowType fromNMSType(Object nmsWindowType) {
+        return byNMSWindowType.getOrDefault(nmsWindowType, UNKNOWN);
     }
 
     /**

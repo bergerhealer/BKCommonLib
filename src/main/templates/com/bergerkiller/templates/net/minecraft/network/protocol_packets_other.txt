@@ -938,7 +938,21 @@ class PacketPlayOutOpenWindow extends Packet {
 #endif
     }
 
-#if version >= 1.14
+#if version >= 1.19
+    #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private final net.minecraft.world.inventory.Containers<?> windowType:type;
+
+    public WindowType getWindowType() {
+        return com.bergerkiller.bukkit.common.wrappers.WindowType.fromNMSType(instance#windowType);
+    }
+
+    public void setWindowType(WindowType windowType) {
+        Object nmsType = windowType.getNMSType();
+        if (nmsType == null) {
+            throw new IllegalArgumentException("Window type " + windowType.name() + " is not supported");
+        }
+        instance#windowType = (net.minecraft.world.inventory.Containers)nmsType;
+    }
+#elseif version >= 1.14
   #if version >= 1.17
     #require net.minecraft.network.protocol.game.PacketPlayOutOpenWindow private int windowTypeId:type;
   #else

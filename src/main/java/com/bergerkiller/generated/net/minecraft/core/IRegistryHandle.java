@@ -20,8 +20,12 @@ public abstract class IRegistryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public static int getWindowIdFromName(String name) {
-        return T.getWindowIdFromName.invoker.invoke(null,name);
+    public static Object getWindowTypeByName(String name) {
+        return T.getWindowTypeByName.invoker.invoke(null,name);
+    }
+
+    public static int getWindowTypeId(Object windowTypeRaw) {
+        return T.getWindowTypeId.invoker.invoke(null,windowTypeRaw);
     }
 
     /**
@@ -29,7 +33,8 @@ public abstract class IRegistryHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class IRegistryClass extends Template.Class<IRegistryHandle> {
-        public final Template.StaticMethod<Integer> getWindowIdFromName = new Template.StaticMethod<Integer>();
+        public final Template.StaticMethod<Object> getWindowTypeByName = new Template.StaticMethod<Object>();
+        public final Template.StaticMethod<Integer> getWindowTypeId = new Template.StaticMethod<Integer>();
 
     }
 

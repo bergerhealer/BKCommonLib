@@ -29,21 +29,25 @@ class RegistryMaterials {
 
 // Since MC 1.14 has static fields
 optional class IRegistry {
-
 #if version >= 1.14
-    public static int getWindowIdFromName(String name) {
-        if (name == null) return -1;
-        Object item = IRegistry.MENU.get(new MinecraftKey(name));
+    public static Object getWindowTypeByName(String name) {
+        if (name == null) return null;
+        return IRegistry.MENU.get(new MinecraftKey(name));
+    }
+    public static int getWindowTypeId(Object windowTypeRaw) {
+        if (windowTypeRaw == null) return -1;
   #if version >= 1.17
-        return (item == null) ? -1 : IRegistry.MENU.getId(item);
+        return IRegistry.MENU.getId(windowTypeRaw);
   #else
-        return (item == null) ? -1 : IRegistry.MENU.a(item);
+        return IRegistry.MENU.a(windowTypeRaw);
   #endif
     }
 #else
-    public static int getWindowIdFromName(String name) {
+    public static Object getWindowTypeByName(String name) {
+        return null;
+    }
+    public static int getWindowTypeId(Object windowTypeRaw) {
         return -1;
     }
 #endif
-
 }
