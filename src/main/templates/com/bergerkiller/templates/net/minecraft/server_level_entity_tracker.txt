@@ -427,9 +427,15 @@ class EntityTrackerEntryState {
         codec.setBase(new Vec3D(pos.x, pos.y, z));
     }
 #elseif version >= 1.9
+  #if version >= 1.17
+    #require net.minecraft.server.level.EntityTrackerEntryState private long xLoc:xp;
+    #require net.minecraft.server.level.EntityTrackerEntryState private long yLoc:yp;
+    #require net.minecraft.server.level.EntityTrackerEntryState private long zLoc:zp;
+  #else
     #require net.minecraft.server.level.EntityTrackerEntryState private long xLoc;
     #require net.minecraft.server.level.EntityTrackerEntryState private long yLoc;
     #require net.minecraft.server.level.EntityTrackerEntryState private long zLoc;
+  #endif
     public org.bukkit.util.Vector getLoc() {
         double x = instance#xLoc / 4096.0;
         double y = instance#yLoc / 4096.0;

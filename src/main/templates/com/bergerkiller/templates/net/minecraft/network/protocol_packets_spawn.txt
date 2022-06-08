@@ -126,8 +126,8 @@ class PacketPlayOutSpawnEntity extends Packet {
     #require PacketPlayOutSpawnEntity private int xRot:i;
     #require PacketPlayOutSpawnEntity private int yRot:j;
   #else
-    #require PacketPlayOutSpawnEntity public int xRot:h;
-    #require PacketPlayOutSpawnEntity public int yRot:i;
+    #require PacketPlayOutSpawnEntity private int xRot:h;
+    #require PacketPlayOutSpawnEntity private int yRot:i;
   #endif
 
     public float getYaw() {
@@ -142,7 +142,7 @@ class PacketPlayOutSpawnEntity extends Packet {
         int prot = ProtocolMath.serializeRotation(yaw);
         instance#yRot = prot;
     }
-    public void setPitch(pitch pitch) {
+    public void setPitch(float pitch) {
         int prot = ProtocolMath.serializeRotation(pitch);
         instance#xRot = prot;
     }
