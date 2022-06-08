@@ -232,4 +232,10 @@ public class CommonCapabilities {
      * Since Minecraft 1.18 all methods names are de-obfuscated
      */
     public static final boolean MOJANGMAP_METHODS = CommonBootstrap.evaluateMCVersion(">=", "1.18");
+
+    /**
+     * Since Minecraft 1.19 the living/painting entity spawn packets were removed and replaced with
+     * the generic spawn entity packet.
+     */
+    public static final boolean ENTITY_SPAWN_PACKETS_MERGED = CommonBootstrap.evaluateMCVersion(">=", "1.19");
 }

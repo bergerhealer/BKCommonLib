@@ -1921,15 +1921,25 @@ public class NMSPacketClasses {
         public CommonPacket newInstance(LivingEntity livingEntity) {
             return PacketPlayOutSpawnEntityLivingHandle.createNew(livingEntity).toCommonPacket();
         }
+
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            //TODO: Do we actually go through the effort of checking what entity types are for living entities?
+            //      It's not really worth it. Just don't fire events for this type of entity anymore.
+            return !CommonCapabilities.ENTITY_SPAWN_PACKETS_MERGED;
+        }
     }
 
     public static class NMSPacketPlayOutSpawnEntityPainting extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutSpawnEntityPaintingHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<UUID> entityUUID = PacketPlayOutSpawnEntityPaintingHandle.T.entityUUID.toFieldAccessor().ignoreInvalid(new UUID(0L, 0L));
-        public final TranslatorFieldAccessor<IntVector3> postion = PacketPlayOutSpawnEntityPaintingHandle.T.position.toFieldAccessor();
-        public final FieldAccessor<BlockFace> facing = PacketPlayOutSpawnEntityPaintingHandle.T.facing.toFieldAccessor();
-        public final FieldAccessor<org.bukkit.Art> art = PacketPlayOutSpawnEntityPaintingHandle.T.art.toFieldAccessor();
+
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            //TODO: Do we actually go through the effort of checking what entity types are for paintings?
+            //      It's not really worth it. Just don't fire events for this type of entity anymore.
+            return !CommonCapabilities.ENTITY_SPAWN_PACKETS_MERGED;
+        }
     }
 
     public static class NMSPacketPlayOutSpawnEntityWeather extends NMSPacket {

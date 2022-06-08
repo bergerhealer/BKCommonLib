@@ -24,31 +24,35 @@ public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandl
 
     /* ============================================================================== */
 
-
-    public void setEntityUUID(UUID uuid) {
-        if (T.entityUUID.isAvailable()) {
-            T.entityUUID.set(getRaw(), uuid);
-        }
+    public static boolean hasArtField() {
+        return T.hasArtField.invoker.invoke(null);
     }
+
+    public abstract Art getArt();
+    public abstract void setArt(Art art);
+    public abstract IntVector3 getPosition();
+    public abstract void setPosition(IntVector3 position);
+    public abstract BlockFace getFacing();
+    public abstract void setFacing(BlockFace facing);
+    public abstract void setEntityUUID(UUID uuid);
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract IntVector3 getPosition();
-    public abstract void setPosition(IntVector3 value);
-    public abstract BlockFace getFacing();
-    public abstract void setFacing(BlockFace value);
-    public abstract Art getArt();
-    public abstract void setArt(Art value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPainting</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutSpawnEntityPaintingClass extends Template.Class<PacketPlayOutSpawnEntityPaintingHandle> {
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();
-        public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
-        public final Template.Field.Converted<BlockFace> facing = new Template.Field.Converted<BlockFace>();
-        public final Template.Field.Converted<Art> art = new Template.Field.Converted<Art>();
+
+        public final Template.StaticMethod<Boolean> hasArtField = new Template.StaticMethod<Boolean>();
+
+        public final Template.Method.Converted<Art> getArt = new Template.Method.Converted<Art>();
+        public final Template.Method.Converted<Void> setArt = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<IntVector3> getPosition = new Template.Method.Converted<IntVector3>();
+        public final Template.Method.Converted<Void> setPosition = new Template.Method.Converted<Void>();
+        public final Template.Method.Converted<BlockFace> getFacing = new Template.Method.Converted<BlockFace>();
+        public final Template.Method.Converted<Void> setFacing = new Template.Method.Converted<Void>();
+        public final Template.Method<Void> setEntityUUID = new Template.Method<Void>();
 
     }
 

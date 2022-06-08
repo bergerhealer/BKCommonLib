@@ -773,35 +773,98 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
     private int entityId:a;
 #endif
 
-#if version >= 1.17
-    private optional UUID entityUUID:uuid;
-    private (IntVector3) BlockPosition position:pos;
-    private (BlockFace) EnumDirection facing:direction;
-    private (org.bukkit.Art) int art:motive;
-#elseif version >= 1.13
-    private optional UUID entityUUID:b;
-    private (IntVector3) BlockPosition position:c;
-    private (BlockFace) EnumDirection facing:d;
-    private (org.bukkit.Art) int art:e;
-#elseif version >= 1.9
-    private optional UUID entityUUID:b;
-    private (IntVector3) BlockPosition position:c;
-    private (BlockFace) EnumDirection facing:d;
-    private (org.bukkit.Art) String art:e;
+#if version >= 1.19
+    // Art field doesn't exist. Is entity metadata now
+    public static boolean hasArtField() {
+        return false;
+    }
+    public (org.bukkit.Art) Object getArt() {
+        return null;
+    }
+    public void setArt((org.bukkit.Art) Object art) {
+    }
+
+    // Position/Facing integrated in PacketPlayOutSpawnEntity itself as position/data
+    public (IntVector3) BlockPosition getPosition() {
+        return new BlockPosition(instance.getX(), instance.getY(), instance.getZ());
+    }
+    public void setPosition((IntVector3) BlockPosition position) {
+        #require PacketPlayOutSpawnEntityPainting private final double posX:x;
+        #require PacketPlayOutSpawnEntityPainting private final double posY:y;
+        #require PacketPlayOutSpawnEntityPainting private final double posZ:z;
+        instance#posX = (double)position.getX();
+        instance#posY = (double)position.getY();
+        instance#posZ = (double)position.getZ();
+    }
+    public (BlockFace) EnumDirection getFacing() {
+        return EnumDirection.from3DDataValue(instance.getData());
+    }
+    public void setFacing((BlockFace) EnumDirection facing) {
+        #require PacketPlayOutSpawnEntityPainting private final int data;
+        instance#data = facing.get3DDataValue();
+    }
 #else
-    private optional UUID entityUUID:###;
-    private (IntVector3) BlockPosition position:b;
-    private (BlockFace) EnumDirection facing:c;
-    private (org.bukkit.Art) String art:d;
+    // Art field is an int index into a registry
+    public static boolean hasArtField() {
+        return true;
+    }
+  #select version >=
+  #case 1.17:   #require PacketPlayOutSpawnEntityPainting private int artId:motive;
+  #case 1.13:   #require PacketPlayOutSpawnEntityPainting private int artId:e;
+  #case 1.9:    #require PacketPlayOutSpawnEntityPainting private String artName:e;
+  #case else:   #require PacketPlayOutSpawnEntityPainting private String artName:d;
+  #endselect
+  #if version >= 1.13
+    public (org.bukkit.Art) int getArt() {
+        return instance#artId;
+    }
+    public void setArt((org.bukkit.Art) int art) {
+        instance#artId = art;
+    }
+  #else
+    public (org.bukkit.Art) String getArt() {
+        return instance#artName;
+    }
+    public void setArt((org.bukkit.Art) String art) {
+        instance#artName = art;
+    }
+  #endif
+
+    // Position/Facing were fields of their own
+  #if version >= 1.17
+    #require PacketPlayOutSpawnEntityPainting private BlockPosition position:pos;
+    #require PacketPlayOutSpawnEntityPainting private EnumDirection facing:direction;
+  #elseif version >= 1.9
+    #require PacketPlayOutSpawnEntityPainting private BlockPosition position:c;
+    #require PacketPlayOutSpawnEntityPainting private EnumDirection facing:d;
+  #else
+    #require PacketPlayOutSpawnEntityPainting private BlockPosition position:b;
+    #require PacketPlayOutSpawnEntityPainting private EnumDirection facing:c;
+  #endif
+
+    public (IntVector3) BlockPosition getPosition() {
+        return instance#position;
+    }
+    public void setPosition((IntVector3) BlockPosition position) {
+        instance#position = position;
+    }
+    public (BlockFace) EnumDirection getFacing() {
+        return instance#facing;
+    }
+    public void setFacing((BlockFace) EnumDirection facing) {
+        instance#facing = facing;
+    }
 #endif
 
-    <code>
     public void setEntityUUID(UUID uuid) {
-        if (T.entityUUID.isAvailable()) {
-            T.entityUUID.set(getRaw(), uuid);
-        }
+#if version >= 1.17
+        #require PacketPlayOutSpawnEntityPainting private UUID entityUUID:uuid;
+        instance#entityUUID = uuid;
+#elseif version >= 1.9
+        #require PacketPlayOutSpawnEntityPainting private UUID entityUUID:b;
+        instance#entityUUID = uuid;
+#endif
     }
-    </code>
 }
 
 // This class is used from Minecraft 1.8 to 1.15.2
