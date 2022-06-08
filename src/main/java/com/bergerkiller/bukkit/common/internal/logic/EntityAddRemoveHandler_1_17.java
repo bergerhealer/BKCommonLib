@@ -33,6 +33,7 @@ import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -359,14 +360,24 @@ class EntityAddRemoveHandler_1_17 extends EntityAddRemoveHandler {
                 mv.visitEnd();
             }
 
+            // Ask resolver what the method names are that we wish to implement
+            final String entityRemovedMethodName, entityAddedMethodName;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
+                entityRemovedMethodName = Resolver.resolveMethodName(levelCallbackType, "onTrackingEnd", new Class<?>[] { Object.class });
+                entityAddedMethodName = Resolver.resolveMethodName(levelCallbackType, "onTrackingStart", new Class<?>[] { Object.class });
+            } else {
+                entityRemovedMethodName = Resolver.resolveMethodName(levelCallbackType, "a", new Class<?>[] { Object.class });
+                entityAddedMethodName = Resolver.resolveMethodName(levelCallbackType, "b", new Class<?>[] { Object.class });
+            }
+
             // Override all methods defined by the interface that must be implemented
             for (Method method : levelCallbackType.getMethods()) {
                 String name = MPLType.getName(method);
                 Class<?>[] params = method.getParameterTypes();
                 final String callbackMethodName;
-                if (name.equals("b") && params.length == 1 && params[0] == Object.class) {
+                if (name.equals(entityAddedMethodName) && params.length == 1 && params[0] == Object.class) {
                     callbackMethodName = "onEntityAdded";
-                } else if (name.equals("a") && params.length == 1 && params[0] == Object.class) {
+                } else if (name.equals(entityRemovedMethodName) && params.length == 1 && params[0] == Object.class) {
                     callbackMethodName = "onEntityRemoved";
                 } else {
                     callbackMethodName = null;
