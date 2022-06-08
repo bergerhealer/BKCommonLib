@@ -40,7 +40,6 @@ import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
-import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
@@ -78,7 +77,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutChatHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
@@ -698,19 +696,6 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutCamera extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutCameraHandle.T.entityId.toFieldAccessor();
-    }
-
-    public static class NMSPacketPlayOutChat extends NMSPacket {
-        public final FieldAccessor<ChatText> text = PacketPlayOutChatHandle.T.text.toFieldAccessor();
-        public final FieldAccessor<ChatMessageType> type = PacketPlayOutChatHandle.T.type.toFieldAccessor();
-
-        /** Deprecated: use {@link #text} instead */
-        @Deprecated
-        public final FieldAccessor<Object> chatComponent = PacketPlayOutChatHandle.T.text.raw.toFieldAccessor();
-
-        /** Deprecated: this is only available on Spigot servers, and acts as a proxy of {@link #text} */
-        @Deprecated
-        public final FieldAccessor<Object[]> components = PacketPlayOutChatHandle.T.components.toFieldAccessor();
     }
 
     public static class NMSPacketPlayOutCloseWindow extends NMSPacket {

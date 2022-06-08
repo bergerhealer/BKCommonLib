@@ -53,7 +53,7 @@ public class PacketType extends ClassTemplate<Object> {
     public static final NMSPacketPlayOutAdvancements OUT_ADVANCEMENTS = new NMSPacketPlayOutAdvancements();
     public static final NMSPacketPlayOutBed OUT_BED = Common.evaluateMCVersion(">=", "1.14") ? null : new NMSPacketPlayOutBed();
     public static final NMSPacketPlayOutBlockAction OUT_BLOCK_ACTION = new NMSPacketPlayOutBlockAction();
-    public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
+    //public static final NMSPacketPlayOutChat OUT_CHAT = new NMSPacketPlayOutChat();
     public static final NMSPacketPlayOutCollect OUT_COLLECT = new NMSPacketPlayOutCollect();
     public static final NMSPacketPlayOutCustomPayload OUT_CUSTOM_PAYLOAD = new NMSPacketPlayOutCustomPayload();
     public static final NMSPacketPlayOutExperience OUT_EXPERIENCE = new NMSPacketPlayOutExperience();

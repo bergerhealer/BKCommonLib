@@ -28,7 +28,6 @@ import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
-import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
@@ -46,7 +45,6 @@ import com.bergerkiller.generated.net.minecraft.EnumChatFormatHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.NonNullListHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.world.phys.shapes.VoxelShapeHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
@@ -384,16 +382,6 @@ public class HandleConversion {
     @ConverterMethod
     public static String getChatTextMessage(ChatText text) {
         return text.getMessage();
-    }
-
-    @ConverterMethod(output="net.minecraft.network.chat.ChatMessageType", optional=true)
-    public static Object toChatMessageTypeHandle(ChatMessageType chatMessageType) {
-        return ChatMessageTypeHandle.getRawById(chatMessageType.getId());
-    }
-
-    @ConverterMethod()
-    public static byte getChatMessageTypeId(ChatMessageType chatMessageType) {
-        return chatMessageType.getId();
     }
 
     @SuppressWarnings("unchecked")

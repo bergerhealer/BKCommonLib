@@ -302,14 +302,3 @@ class IChatBaseComponent {
         }
     }
 }
-
-// version >= 1.12
-optional class ChatMessageType {
-#if version >= 1.18
-    public byte getId:getIndex();
-    public static (Object) ChatMessageType getRawById:getForIndex(byte id);
-#else
-    public byte getId:a();
-    public static (Object) ChatMessageType getRawById:a(byte id);
-#endif
-}

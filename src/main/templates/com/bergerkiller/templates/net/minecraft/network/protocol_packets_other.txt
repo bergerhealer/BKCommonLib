@@ -876,25 +876,6 @@ class PacketPlayOutTitle extends Packet {
 }
 */
 
-class PacketPlayOutChat extends Packet {
-#if version >= 1.17
-    private (ChatText) IChatBaseComponent text:message;
-#else
-    private (ChatText) IChatBaseComponent text:a;
-#endif
-
-    // Spigot only
-    public optional (Object[]) net.md_5.bungee.api.chat.BaseComponent[] components;
-
-#if version >= 1.17
-    private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) net.minecraft.network.chat.ChatMessageType type;
-#elseif version >= 1.12
-    private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) net.minecraft.network.chat.ChatMessageType type:b;
-#else
-    private (com.bergerkiller.bukkit.common.wrappers.ChatMessageType) byte type:b;
-#endif
-}
-
 class PacketPlayOutCollect extends Packet {
 #if version >= 1.17
     private int collectedItemId:itemId;

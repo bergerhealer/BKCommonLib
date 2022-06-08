@@ -30,7 +30,6 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.ParseUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockStateChange;
-import com.bergerkiller.bukkit.common.wrappers.ChatMessageType;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.ChunkSection;
 import com.bergerkiller.bukkit.common.wrappers.EntityTracker;
@@ -48,7 +47,6 @@ import com.bergerkiller.generated.net.minecraft.core.BaseBlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
 import com.bergerkiller.generated.net.minecraft.core.Vector3fHandle;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTTagCompoundHandle;
-import com.bergerkiller.generated.net.minecraft.network.chat.ChatMessageTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
@@ -537,16 +535,6 @@ public class WrapperConversion {
     @ConverterMethod(output="net.minecraft.world.entity.EnumItemSlot")
     public static Object enumItemSlotFromFilterFlag(int legacyEquipmentIndex) {
         return EnumItemSlotHandle.fromFilterFlagRaw(legacyEquipmentIndex);
-    }
-
-    @ConverterMethod(input="net.minecraft.network.chat.ChatMessageType", optional=true)
-    public static ChatMessageType toChatMessageType(Object nmsChatMessageType) {
-        return ChatMessageType.getById(ChatMessageTypeHandle.T.getId.invoker.invoke(nmsChatMessageType).byteValue());
-    }
-
-    @ConverterMethod()
-    public static ChatMessageType toChatMessageType(byte chatMessageTypeId) {
-        return ChatMessageType.getById(chatMessageTypeId);
     }
 
     @SuppressWarnings({ "unchecked" })
