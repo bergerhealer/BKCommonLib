@@ -36,27 +36,27 @@ public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);

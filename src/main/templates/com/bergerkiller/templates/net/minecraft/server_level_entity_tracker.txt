@@ -2,6 +2,7 @@ package net.minecraft.server.level;
 
 import net.minecraft.world.phys.Vec3D;
 import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.VecDeltaCodec;
 import net.minecraft.server.network.ServerPlayerConnection;
 import net.minecraft.world.entity.Entity;
 
@@ -335,71 +336,31 @@ class EntityTrackerEntry {
 class EntityTrackerEntryState {
 #if version >= 1.17
     private final (EntityHandle) Entity entity;
-
     private final int updateInterval;
     private final boolean isMobile:trackDelta;
-
     private optional final java.util.function.Consumer broadcastMethod:broadcast;
-
-    private optional long long_xLoc:xp;
-    private optional long long_yLoc:yp;
-    private optional long long_zLoc:zp;
-    private optional int int_xLoc:###;
-    private optional int int_yLoc:###;
-    private optional int int_zLoc:###;
-
     public int raw_xRot:yRotp;
     public int raw_yRot:xRotp;
     public int raw_headYaw:yHeadRotp;
 #elseif version >= 1.14
     private final (EntityHandle) Entity entity:tracker;
-
     private final int updateInterval:d;
     private final boolean isMobile:e;
-
     private optional final java.util.function.Consumer broadcastMethod:f;
-
-    private optional long long_xLoc:xLoc;
-    private optional long long_yLoc:yLoc;
-    private optional long long_zLoc:zLoc;
-    private optional int int_xLoc:###;
-    private optional int int_yLoc:###;
-    private optional int int_zLoc:###;
-
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
     public int raw_headYaw:headYaw;
 #elseif version >= 1.9
     private final readonly (EntityHandle) Entity entity:tracker;
-
     private final int updateInterval:g;
-
     private optional final java.util.function.Consumer broadcastMethod:###;
-
-    private optional long long_xLoc:xLoc;
-    private optional long long_yLoc:yLoc;
-    private optional long long_zLoc:zLoc;
-    private optional int int_xLoc:###;
-    private optional int int_yLoc:###;
-    private optional int int_zLoc:###;
-
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
     public int raw_headYaw:headYaw;
 #else
     public final readonly (EntityHandle) Entity entity:tracker;
-
     public int updateInterval:c;
-
     private optional final java.util.function.Consumer broadcastMethod:###;
-
-    public optional long long_xLoc:###;
-    public optional long long_yLoc:###;
-    public optional long long_zLoc:###;
-    public optional int int_xLoc:xLoc;
-    public optional int int_yLoc:yLoc;
-    public optional int int_zLoc:zLoc;
-
     public int raw_xRot:yRot;
     public int raw_yRot:xRot;
   #if nachospigot
@@ -421,6 +382,119 @@ class EntityTrackerEntryState {
     public int tickCounter:tickCount;
 #else
     public int tickCounter:m;
+#endif
+
+#if version >= 1.19
+    #require EntityTrackerEntryState private final VecDeltaCodec positionCodec;
+    #require VecDeltaCodec private Vec3D vecDelta_base:base;
+    #require EntityTrackerEntryState public Vec3D getSyncPos() {
+        VecDeltaCodec codec = instance#positionCodec;
+        return codec#vecDelta_base;
+    }
+    public org.bukkit.util.Vector getLoc() {
+        Vec3D pos = instance#getSyncPos();
+        return new org.bukkit.util.Vector(pos.x, pos.y, pos.z);
+    }
+    public double getLocX() {
+        Vec3D pos = instance#getSyncPos();
+        return pos.x;
+    }
+    public double getLocY() {
+        Vec3D pos = instance#getSyncPos();
+        return pos.y;
+    }
+    public double getLocZ() {
+        Vec3D pos = instance#getSyncPos();
+        return pos.z;
+    }
+    public void setLoc(double x, double y, double z) {
+        VecDeltaCodec codec = instance#positionCodec;
+        codec.setBase(new Vec3D(x, y, z));
+    }
+    public void setLocX(double x) {
+        VecDeltaCodec codec = instance#positionCodec;
+        Vec3D pos = codec#vecDelta_base;
+        codec.setBase(new Vec3D(x, pos.y, pos.z));
+    }
+    public void setLocY(double y) {
+        VecDeltaCodec codec = instance#positionCodec;
+        Vec3D pos = codec#vecDelta_base;
+        codec.setBase(new Vec3D(pos.x, y, pos.z));
+    }
+    public void setLocZ(double z) {
+        VecDeltaCodec codec = instance#positionCodec;
+        Vec3D pos = codec#vecDelta_base;
+        codec.setBase(new Vec3D(pos.x, pos.y, z));
+    }
+#elseif version >= 1.9
+    #require net.minecraft.server.level.EntityTrackerEntryState private long xLoc;
+    #require net.minecraft.server.level.EntityTrackerEntryState private long yLoc;
+    #require net.minecraft.server.level.EntityTrackerEntryState private long zLoc;
+    public org.bukkit.util.Vector getLoc() {
+        double x = instance#xLoc / 4096.0;
+        double y = instance#yLoc / 4096.0;
+        double z = instance#zLoc / 4096.0;
+        return new org.bukkit.util.Vector(x, y, z);
+    }
+    public double getLocX() {
+        return instance#xLoc / 4096.0;
+    }
+    public double getLocY() {
+        return instance#yLoc / 4096.0;
+    }
+    public double getLocZ() {
+        return instance#zLoc / 4096.0;
+    }
+    public void setLoc(double x, double y, double z) {
+        long xEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0);
+        instance#xLoc = xEnc;
+        long yEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0);
+        instance#yLoc = yEnc;
+        long zEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0);
+        instance#zLoc = zEnc;
+    }
+    public void setLocX(double x) {
+        long xEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0);
+        instance#xLoc = xEnc;
+    }
+    public void setLocY(double y) {
+        long yEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0);
+        instance#yLoc = yEnc;
+    }
+    public void setLocZ(double z) {
+        long zEnc = com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0);
+        instance#zLoc = zEnc;
+    }
+#else
+    public org.bukkit.util.Vector getLoc() {
+        double x = instance.xLoc / 32.0;
+        double y = instance.yLoc / 32.0;
+        double z = instance.zLoc / 32.0;
+        return new org.bukkit.util.Vector(x, y, z);
+    }
+    public double getLocX() {
+        return instance.xLoc / 32.0;
+    }
+    public double getLocY() {
+        return instance.yLoc / 32.0;
+    }
+    public double getLocZ() {
+        return instance.zLoc / 32.0;
+    }
+    public void setLoc(double x, double y, double z) {
+        instance.xLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0);
+        instance.yLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0);
+        instance.zLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0);
+    }
+    public void setLocX(double x) {
+        instance.xLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0);
+    }
+    public void setLocY(double y) {
+        instance.yLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0);
+    }
+    public void setLocZ(double z) {
+        instance.zLoc = com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0);
+    }
 #endif
 
 #if version >= 1.14
@@ -614,7 +688,7 @@ class EntityTrackerEntryState {
     public static final float ROTATION_STEP;
     public static final float ROTATION_STEP_INV;
     static {
-        if (T.long_xLoc.isAvailable()) {
+        if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
             POSITION_STEP = 1.0 / 4096.0;
         } else {
             POSITION_STEP = 1.0 / 32.0;
@@ -654,33 +728,6 @@ class EntityTrackerEntryState {
         return (float) protAngle * ROTATION_STEP;
     }
 
-    // Performs protocol translation to set the synchronized x position coordinate
-    public void setLocX(double x) {
-        if (T.long_xLoc.isAvailable()) {
-            T.long_xLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
-        } else {
-            T.int_xLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
-        }
-    }
-
-    // Performs protocol translation to set the synchronized y position coordinate
-    public void setLocY(double y) {
-        if (T.long_yLoc.isAvailable()) {
-            T.long_yLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
-        } else {
-            T.int_yLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
-        }
-    }
-
-    // Performs protocol translation to set the synchronized z position coordinate
-    public void setLocZ(double z) {
-        if (T.long_zLoc.isAvailable()) {
-            T.long_zLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
-        } else {
-            T.int_zLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
-        }
-    }
-
     // Performs protocol translation to set the synchronized yaw rotation
     public void setYaw(float yaw) {
         T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
@@ -694,33 +741,6 @@ class EntityTrackerEntryState {
     // Performs protocol translation to set the synchronized head rotation
     public void setHeadYaw(float headYaw) {
         T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
-    }
-
-    // Performs protocol translation to get the synchronized x position coordinate
-    public double getLocX() {
-        if (T.long_xLoc.isAvailable()) {
-            return (double) T.long_xLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_xLoc.getInteger(getRaw()) / 32.0;
-        }
-    }
-
-    // Performs protocol translation to get the synchronized y position coordinate
-    public double getLocY() {
-        if (T.long_yLoc.isAvailable()) {
-            return (double) T.long_yLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_yLoc.getInteger(getRaw()) / 32.0;
-        }
-    }
-
-    // Performs protocol translation to get the synchronized z position coordinate
-    public double getLocZ() {
-        if (T.long_zLoc.isAvailable()) {
-            return (double) T.long_zLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_zLoc.getInteger(getRaw()) / 32.0;
-        }
     }
 
     // Performs protocol translation to get the synchronized yaw rotation

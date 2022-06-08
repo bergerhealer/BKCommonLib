@@ -25,6 +25,14 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public abstract Vector getLoc();
+    public abstract double getLocX();
+    public abstract double getLocY();
+    public abstract double getLocZ();
+    public abstract void setLoc(double x, double y, double z);
+    public abstract void setLocX(double x);
+    public abstract void setLocY(double y);
+    public abstract void setLocZ(double z);
     public abstract double getXVel();
     public abstract double getYVel();
     public abstract double getZVel();
@@ -46,7 +54,7 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
     public static final float ROTATION_STEP;
     public static final float ROTATION_STEP_INV;
     static {
-        if (T.long_xLoc.isAvailable()) {
+        if (com.bergerkiller.bukkit.common.internal.CommonBootstrap.evaluateMCVersion(">=", "1.9")) {
             POSITION_STEP = 1.0 / 4096.0;
         } else {
             POSITION_STEP = 1.0 / 32.0;
@@ -86,30 +94,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         return (float) protAngle * ROTATION_STEP;
     }
 
-    public void setLocX(double x) {
-        if (T.long_xLoc.isAvailable()) {
-            T.long_xLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(x * 4096.0));
-        } else {
-            T.int_xLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(x * 32.0));
-        }
-    }
-
-    public void setLocY(double y) {
-        if (T.long_yLoc.isAvailable()) {
-            T.long_yLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(y * 4096.0));
-        } else {
-            T.int_yLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(y * 32.0));
-        }
-    }
-
-    public void setLocZ(double z) {
-        if (T.long_zLoc.isAvailable()) {
-            T.long_zLoc.setLong(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.longFloor(z * 4096.0));
-        } else {
-            T.int_zLoc.setInteger(getRaw(), com.bergerkiller.bukkit.common.utils.MathUtil.floor(z * 32.0));
-        }
-    }
-
     public void setYaw(float yaw) {
         T.raw_yRot.setInteger(getRaw(), getProtocolRotation(yaw));
     }
@@ -120,30 +104,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
 
     public void setHeadYaw(float headYaw) {
         T.raw_headYaw.setInteger(getRaw(), getProtocolRotation(headYaw));
-    }
-
-    public double getLocX() {
-        if (T.long_xLoc.isAvailable()) {
-            return (double) T.long_xLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_xLoc.getInteger(getRaw()) / 32.0;
-        }
-    }
-
-    public double getLocY() {
-        if (T.long_yLoc.isAvailable()) {
-            return (double) T.long_yLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_yLoc.getInteger(getRaw()) / 32.0;
-        }
-    }
-
-    public double getLocZ() {
-        if (T.long_zLoc.isAvailable()) {
-            return (double) T.long_zLoc.getLong(getRaw()) / 4096.0;
-        } else {
-            return (double) T.int_zLoc.getInteger(getRaw()) / 32.0;
-        }
     }
 
     public float getYaw() {
@@ -183,18 +143,6 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         public final Template.Field.Boolean isMobile = new Template.Field.Boolean();
         @Template.Optional
         public final Template.Field<Consumer> broadcastMethod = new Template.Field<Consumer>();
-        @Template.Optional
-        public final Template.Field.Long long_xLoc = new Template.Field.Long();
-        @Template.Optional
-        public final Template.Field.Long long_yLoc = new Template.Field.Long();
-        @Template.Optional
-        public final Template.Field.Long long_zLoc = new Template.Field.Long();
-        @Template.Optional
-        public final Template.Field.Integer int_xLoc = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer int_yLoc = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer int_zLoc = new Template.Field.Integer();
         public final Template.Field.Integer raw_xRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_yRot = new Template.Field.Integer();
         public final Template.Field.Integer raw_headYaw = new Template.Field.Integer();
@@ -205,6 +153,14 @@ public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
         @Template.Optional
         public final Template.Field.Converted<Entity> opt_vehicle = new Template.Field.Converted<Entity>();
 
+        public final Template.Method<Vector> getLoc = new Template.Method<Vector>();
+        public final Template.Method<Double> getLocX = new Template.Method<Double>();
+        public final Template.Method<Double> getLocY = new Template.Method<Double>();
+        public final Template.Method<Double> getLocZ = new Template.Method<Double>();
+        public final Template.Method<Void> setLoc = new Template.Method<Void>();
+        public final Template.Method<Void> setLocX = new Template.Method<Void>();
+        public final Template.Method<Void> setLocY = new Template.Method<Void>();
+        public final Template.Method<Void> setLocZ = new Template.Method<Void>();
         public final Template.Method<Double> getXVel = new Template.Method<Double>();
         public final Template.Method<Double> getYVel = new Template.Method<Double>();
         public final Template.Method<Double> getZVel = new Template.Method<Double>();

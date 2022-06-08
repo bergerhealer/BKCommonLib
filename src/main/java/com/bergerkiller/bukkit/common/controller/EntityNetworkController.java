@@ -73,6 +73,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * or written to
      */
     public VectorAbstract velSynched = new VectorAbstract() {
+        public Vector vector() {
+            return state.getVelocity();
+        }
+
         public double getX() {
             return state.getXVel();
         }
@@ -151,6 +155,10 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
             return this;
         }
 
+        public Vector vector() {
+            return state.getLoc();
+        }
+
         public double getX() {
             return state.getLocX();
         }
@@ -161,6 +169,11 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
         public double getZ() {
             return state.getLocZ();
+        }
+
+        public LocationAbstract set(double x, double y, double z) {
+            state.setLoc(x, y, z);
+            return this;
         }
 
         public LocationAbstract setX(double x) {

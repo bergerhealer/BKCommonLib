@@ -6,6 +6,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.world.entity.EntityTypes;
 
+import com.bergerkiller.bukkit.common.internal.logic.ProtocolMath;
+
 import org.bukkit.block.BlockFace;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLivingHandle;
@@ -19,6 +21,9 @@ class PacketPlayOutSpawnEntity extends Packet {
 #if version >= 1.17
     private int entityId:id;
     private optional UUID entityUUID:uuid;
+  #if version >= 1.19
+    private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:type;
+  #endif
     private optional int posX_1_8_8:###;
     private optional int posY_1_8_8:###;
     private optional int posZ_1_8_8:###;
@@ -28,10 +33,19 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional int motX_raw:xa;
     private optional int motY_raw:ya;
     private optional int motZ_raw:za;
-    private optional int pitch_raw:xRot;
-    private optional int yaw_raw:yRot;
+  #if version >= 1.19
+    private unknown byte xRot;
+    private unknown byte yRot;
+    private unknown byte yHeadRot;
+  #else
+    private unknown int xRot;
+    private unknown int yRot;
+  #endif
     private optional int opt_entityTypeId:###;
+
+  #if version <= 1.18.2
     private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:type;
+  #endif
     private int extraData:data;
 #elseif version >= 1.9
     private int entityId:a;
@@ -45,16 +59,16 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional int motX_raw:f;
     private optional int motY_raw:g;
     private optional int motZ_raw:h;
-    private optional int pitch_raw:i;
-    private optional int yaw_raw:j;
+    private unknown int pitch_raw:i;
+    private unknown int yaw_raw:j;
 
-#if version >= 1.14
+  #if version >= 1.14
     private optional int opt_entityTypeId:###;
     private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:k;
-#else
+  #else
     private optional int opt_entityTypeId:k;
     private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:###;
-#endif
+  #endif
 
     private int extraData:l;
 #else
@@ -69,8 +83,8 @@ class PacketPlayOutSpawnEntity extends Packet {
     private optional int motX_raw:e;
     private optional int motY_raw:f;
     private optional int motZ_raw:g;
-    private optional int pitch_raw:h;
-    private optional int yaw_raw:i;
+    private unknown int pitch_raw:h;
+    private unknown int yaw_raw:i;
     private optional int opt_entityTypeId:j;
     private optional (EntityTypesHandle) EntityTypes<?> opt_entityType:###;
     private int extraData:k;
@@ -83,6 +97,56 @@ class PacketPlayOutSpawnEntity extends Packet {
         return new PacketPlayOutSpawnEntity();
 #endif
     }
+
+#if version >= 1.19
+    #require PacketPlayOutSpawnEntity private final byte xRot;
+    #require PacketPlayOutSpawnEntity private final byte yRot;
+
+    public float getYaw() {
+        byte prot = instance#yRot;
+        return ProtocolMath.deserializeRotation((int) prot);
+    }
+    public float getPitch() {
+        byte prot = instance#xRot;
+        return ProtocolMath.deserializeRotation((int) prot);
+    }
+    public void setYaw(float yaw) {
+        byte prot = (byte) ProtocolMath.serializeRotation(yaw);
+        instance#yRot = prot;
+    }
+    public void setPitch(float pitch) {
+        byte prot = (byte) ProtocolMath.serializeRotation(pitch);
+        instance#xRot = prot;
+    }
+#else
+  #if version >= 1.17
+    #require PacketPlayOutSpawnEntity private int xRot;
+    #require PacketPlayOutSpawnEntity private int yRot;
+  #elseif version >= 1.9
+    #require PacketPlayOutSpawnEntity private int xRot:i;
+    #require PacketPlayOutSpawnEntity private int yRot:j;
+  #else
+    #require PacketPlayOutSpawnEntity public int xRot:h;
+    #require PacketPlayOutSpawnEntity public int yRot:i;
+  #endif
+
+    public float getYaw() {
+        int prot = instance#yRot;
+        return ProtocolMath.deserializeRotation(prot);
+    }
+    public float getPitch() {
+        int prot = instance#xRot;
+        return ProtocolMath.deserializeRotation(prot);
+    }
+    public void setYaw(float yaw) {
+        int prot = ProtocolMath.serializeRotation(yaw);
+        instance#yRot = prot;
+    }
+    public void setPitch(pitch pitch) {
+        int prot = ProtocolMath.serializeRotation(pitch);
+        instance#xRot = prot;
+    }
+#endif
 
     <code>
     @Override
@@ -195,43 +259,27 @@ class PacketPlayOutSpawnEntity extends Packet {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
-    }
-
-    public float getYaw() {
-        return deserializeRotation(T.yaw_raw.getInteger(getRaw()));
-    }
-
-    public float getPitch() {
-        return deserializeRotation(T.pitch_raw.getInteger(getRaw()));
-    }
-
-    public void setYaw(float yaw) {
-        T.yaw_raw.setInteger(getRaw(), serializeRotation(yaw));
-    }
-
-    public void setPitch(float pitch) {
-        T.pitch_raw.setInteger(getRaw(), serializeRotation(pitch));
+        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
     </code>
 }
@@ -551,27 +599,27 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
+        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
 
     public float getYaw() {

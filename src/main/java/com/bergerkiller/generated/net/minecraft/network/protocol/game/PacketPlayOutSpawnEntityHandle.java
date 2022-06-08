@@ -26,6 +26,10 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         return T.createNew.invoke();
     }
 
+    public abstract float getYaw();
+    public abstract float getPitch();
+    public abstract void setYaw(float yaw);
+    public abstract void setPitch(float pitch);
 
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
@@ -137,43 +141,27 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
     }
 
     public double getMotX() {
-        return deserializeVelocity(T.motX_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motX_raw.getInteger(getRaw()));
     }
 
     public double getMotY() {
-        return deserializeVelocity(T.motY_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motY_raw.getInteger(getRaw()));
     }
 
     public double getMotZ() {
-        return deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeVelocity(T.motZ_raw.getInteger(getRaw()));
     }
 
     public void setMotX(double motX) {
-        T.motX_raw.setInteger(getRaw(), serializeVelocity(motX));
+        T.motX_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motX));
     }
 
     public void setMotY(double motY) {
-        T.motY_raw.setInteger(getRaw(), serializeVelocity(motY));
+        T.motY_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motY));
     }
 
     public void setMotZ(double motZ) {
-        T.motZ_raw.setInteger(getRaw(), serializeVelocity(motZ));
-    }
-
-    public float getYaw() {
-        return deserializeRotation(T.yaw_raw.getInteger(getRaw()));
-    }
-
-    public float getPitch() {
-        return deserializeRotation(T.pitch_raw.getInteger(getRaw()));
-    }
-
-    public void setYaw(float yaw) {
-        T.yaw_raw.setInteger(getRaw(), serializeRotation(yaw));
-    }
-
-    public void setPitch(float pitch) {
-        T.pitch_raw.setInteger(getRaw(), serializeRotation(pitch));
+        T.motZ_raw.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeVelocity(motZ));
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
@@ -187,6 +175,8 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         public final Template.Field.Integer entityId = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<UUID> entityUUID = new Template.Field<UUID>();
+        @Template.Optional
+        public final Template.Field.Converted<EntityTypesHandle> opt_entityType = new Template.Field.Converted<EntityTypesHandle>();
         @Template.Optional
         public final Template.Field.Integer posX_1_8_8 = new Template.Field.Integer();
         @Template.Optional
@@ -206,16 +196,15 @@ public abstract class PacketPlayOutSpawnEntityHandle extends PacketHandle {
         @Template.Optional
         public final Template.Field.Integer motZ_raw = new Template.Field.Integer();
         @Template.Optional
-        public final Template.Field.Integer pitch_raw = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Integer yaw_raw = new Template.Field.Integer();
-        @Template.Optional
         public final Template.Field.Integer opt_entityTypeId = new Template.Field.Integer();
-        @Template.Optional
-        public final Template.Field.Converted<EntityTypesHandle> opt_entityType = new Template.Field.Converted<EntityTypesHandle>();
         public final Template.Field.Integer extraData = new Template.Field.Integer();
 
         public final Template.StaticMethod.Converted<PacketPlayOutSpawnEntityHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutSpawnEntityHandle>();
+
+        public final Template.Method<Float> getYaw = new Template.Method<Float>();
+        public final Template.Method<Float> getPitch = new Template.Method<Float>();
+        public final Template.Method<Void> setYaw = new Template.Method<Void>();
+        public final Template.Method<Void> setPitch = new Template.Method<Void>();
 
     }
 

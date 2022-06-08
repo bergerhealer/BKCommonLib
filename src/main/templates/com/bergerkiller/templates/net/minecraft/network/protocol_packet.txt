@@ -13,51 +13,19 @@ class Packet {
 
     // Protocol translation functions
     <code>
-    protected static final int serializeVelocity(double velocity) {
-        return (int) (com.bergerkiller.bukkit.common.utils.MathUtil.clamp(velocity, 3.9) * 8000.0);
-    }
-
-    protected static final double deserializeVelocity(int protVelocity) {
-        return (double) protVelocity / 8000.0;
-    }
-
-    protected static final int serializePosition_1_8_8(double position) {
-        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 32.0);
-    }
-
-    protected static final double deserializePosition_1_8_8(int protPosition) {
-        return (double) protPosition / 32.0;
-    }
-
-    protected static final int serializePosition_1_10_2(double position) {
-        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(position * 4096.0);
-    }
-
-    protected static final double deserializePosition_1_10_2(int protPosition) {
-        return (double) protPosition / 4096.0;
-    }
-
-    protected static final int serializeRotation(float rotation) {
-        return com.bergerkiller.bukkit.common.utils.MathUtil.floor(rotation * 256.0f / 360.0f);
-    }
-
-    protected static final float deserializeRotation(int protRotation) {
-        return (float) protRotation * 360.0f / 256.0f;
-    }
-
     protected final double getProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2) {
         if (field_1_10_2.isAvailable()) {
-            return deserializePosition_1_10_2(field_1_10_2.getInteger(getRaw()));
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_10_2(field_1_10_2.getInteger(getRaw()));
         } else {
-            return deserializePosition_1_8_8((int) field_1_8_8.getByte(getRaw()));
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8((int) field_1_8_8.getByte(getRaw()));
         }
     }
 
     protected final void setProtocolPosition(Template.Field.Byte field_1_8_8, Template.Field.Integer field_1_10_2, double position) {
         if (field_1_10_2.isAvailable()) {
-            field_1_10_2.setInteger(getRaw(), serializePosition_1_10_2(position));
+            field_1_10_2.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_10_2(position));
         } else {
-            field_1_8_8.setByte(getRaw(), (byte) serializePosition_1_8_8(position));
+            field_1_8_8.setByte(getRaw(), (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(position));
         }
     }
 
@@ -65,7 +33,7 @@ class Packet {
         if (field_1_10_2.isAvailable()) {
             return field_1_10_2.getDouble(getRaw());
         } else {
-            return deserializePosition_1_8_8(field_1_8_8.getInteger(getRaw()));
+            return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializePosition_1_8_8(field_1_8_8.getInteger(getRaw()));
         }
     }
 
@@ -73,16 +41,16 @@ class Packet {
         if (field_1_10_2.isAvailable()) {
             field_1_10_2.setDouble(getRaw(), position);
         } else {
-            field_1_8_8.setInteger(getRaw(), serializePosition_1_8_8(position));
+            field_1_8_8.setInteger(getRaw(), com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializePosition_1_8_8(position));
         }
     }
 
     protected final float getProtocolRotation(Template.Field.Byte field) {
-        return deserializeRotation((int) field.getByte(getRaw()));
+        return com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.deserializeRotation((int) field.getByte(getRaw()));
     }
 
     protected final void setProtocolRotation(Template.Field.Byte field, float rotation) {
-        field.setByte(getRaw(), (byte) serializeRotation(rotation));
+        field.setByte(getRaw(), (byte) com.bergerkiller.bukkit.common.internal.logic.ProtocolMath.serializeRotation(rotation));
     }
 
     protected final com.bergerkiller.bukkit.common.wrappers.HumanHand internalGetHand(Template.Field.Converted<Object> field, org.bukkit.entity.HumanEntity humanEntity) {
