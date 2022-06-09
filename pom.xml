@@ -25,6 +25,7 @@
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>2.73</mountiplex.version>
         <cloud.version>1.6.2</cloud.version>
+        <regionchangetracker.version>1.0</regionchangetracker.version>
         <junit.version>4.12</junit.version>
     </properties>
 
@@ -147,6 +148,13 @@
                     <artifactId>annotations</artifactId>
                 </exclusion>
             </exclusions>
+        </dependency>
+        <!-- Region change tracker -->
+        <dependency>
+            <groupId>com.bergerkiller.bukkit.regionchangetracker</groupId>
+            <artifactId>BKCommonLib-RegionChangeTracker-Core</artifactId>
+            <version>${regionchangetracker.version}</version>
+            <optional>true</optional>
         </dependency>
         <!-- GSON isn't available in spigot versions prior to 1.8, shade it in order to keep 1.7 compatibility -->
         <dependency>
@@ -463,6 +471,9 @@
                             <include>io.leangen.geantyref</include>
                             <include>me.lucko:commodore</include>
                             <include>net.kyori</include>
+
+                            <!-- Region change tracker -->
+                            <include>com.bergerkiller.bukkit.regionchangetracker</include>
                         </includes>
                     </artifactSet>
                 </configuration>

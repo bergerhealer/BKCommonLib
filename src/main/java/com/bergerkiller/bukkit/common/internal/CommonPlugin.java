@@ -658,6 +658,7 @@ public class CommonPlugin extends PluginBase {
 
         // Enable all components in order
         this.components.enable(this.serverLogRecorder);
+        this.components.enable(new CommonRegionChangeTracker(this));
         this.components.enableForVersions("Dimension to Holder conversion", "1.18.2", null,
                 MC1_18_2_Conversion::initComponent);
         this.components.enableCreate(OfflineWorld::initializeComponent);
