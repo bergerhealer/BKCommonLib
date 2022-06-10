@@ -39,6 +39,15 @@ public class LongHashMapTest {
     }
 
     @Test
+    public void testHashMapMerge() {
+        LongHashMap<String> test = new LongHashMap<String>();
+        assertEquals("First", test.merge(5, "First", (a, b) -> a + b));
+        assertEquals("FirstSecond", test.merge(5, "Second", (a, b) -> a + b));
+        assertEquals("FirstSecond", test.get(5));
+        assertEquals("Other", test.merge(6, "Other", (a, b) -> a + b));
+    }
+
+    @Test
     public void testHashMapClone() {
         LongHashMap<String> test = new LongHashMap<String>();
         test.put(1546464643643436634L, "test_string_a");

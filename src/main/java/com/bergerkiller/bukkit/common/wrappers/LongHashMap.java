@@ -110,9 +110,7 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> implem
     }
 
     /**
-     * Puts a value at the coordinates specified.<br>
-     * <b>Warning: this method was added in v1.54 and is not compatible with MC
-     * 1.5.2.</b>
+     * Puts a value at the coordinates specified
      *
      * @param msw - most significant part of the key
      * @param lsw - least signfificant part of the key
@@ -124,6 +122,42 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> implem
 
     public void put(long key, V value) {
         handle.put(key, value);
+    }
+
+    /**
+     * Puts a value at the coordinates specified and returns the previous value
+     *
+     * @param msw - most significant part of the key
+     * @param lsw - least signfificant part of the key
+     * @param value to put at the coordinates
+     * @return Previous value, or null if none existed
+     */
+    public V getAndPut(int msw, int lsw, V value) {
+        return (V) handle.put(MathUtil.longHashToLong(msw, lsw), value);
+    }
+
+    /**
+     * Puts a value at the key specified and returns the previous value
+     *
+     * @param key Key
+     * @param value to put at the coordinates
+     * @return Previous value, or null if none existed
+     */
+    public V getAndPut(long key, V value) {
+        return (V) handle.put(key, value);
+    }
+
+    /**
+     * Puts a new value at the key specified. If a previous value existed, the remapping function
+     * is called with the old value and new value, and the output of that function is put instead.
+     *
+     * @param key Key
+     * @param value Value to put
+     * @param remappingFunction Function to call to merge the old and new values
+     * @return The put value, which is the input value if no previous value existed, or the merge result otherwise
+     */
+    public V merge(long key, V value, java.util.function.BiFunction<? super V,? super V,? extends V> remappingFunction) {
+        return (V) handle.merge(key, value, remappingFunction);
     }
 
     public Collection<V> getValues() {

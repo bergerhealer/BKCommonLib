@@ -33,12 +33,24 @@ class LongObjectHashMap {
     public abstract (Collection<V>) it.unimi.dsi.fastutil.objects.ObjectCollection<V> values();
     public abstract (Set<Long>) it.unimi.dsi.fastutil.longs.LongSet keySet();
 
+    public V merge(long key, V value, java.util.function.BiFunction<?, ?, ?> remappingFunction);
+
     public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
         return (org.bukkit.craftbukkit.util.LongObjectHashMap) com.bergerkiller.bukkit.common.utils.LogicUtil.clone(instance);
     }
 #else
     public Collection<V> values();
     public Set<Long> keySet();
+
+    // Doesn't exist, must be implemented
+    public V merge(long key, V value, java.util.function.BiFunction<?, ?, ?> remappingFunction) {
+        Object oldValue = instance.get(key);
+        if (oldValue == null) {
+            instance.put(key, value);
+        } else {
+            instance.put(key, remappingFunction.apply(oldValue, value));
+        }
+    }
 
     // Note: the builtin clone() has a runtime error, we can't use it at all :(
     public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {

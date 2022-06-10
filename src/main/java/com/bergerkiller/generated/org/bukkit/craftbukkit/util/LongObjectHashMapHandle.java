@@ -3,6 +3,7 @@ package com.bergerkiller.generated.org.bukkit.craftbukkit.util;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.BiFunction;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
@@ -33,6 +34,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
     public abstract Object put(long key, Object value);
     public abstract Collection<Object> values();
     public abstract Set<Long> keySet();
+    public abstract Object merge(long key, Object value, BiFunction<?, ?, ?> remappingFunction);
     public abstract LongObjectHashMapHandle cloneMap();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
@@ -49,6 +51,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method<Object> put = new Template.Method<Object>();
         public final Template.Method.Converted<Collection<Object>> values = new Template.Method.Converted<Collection<Object>>();
         public final Template.Method.Converted<Set<Long>> keySet = new Template.Method.Converted<Set<Long>>();
+        public final Template.Method<Object> merge = new Template.Method<Object>();
         public final Template.Method.Converted<LongObjectHashMapHandle> cloneMap = new Template.Method.Converted<LongObjectHashMapHandle>();
 
     }
