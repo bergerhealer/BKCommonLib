@@ -34,6 +34,7 @@ class LongObjectHashMap {
     public abstract (Set<Long>) it.unimi.dsi.fastutil.longs.LongSet keySet();
 
     public V merge(long key, V value, java.util.function.BiFunction<?, ?, ?> remappingFunction);
+    public V getOrDefault(long key, V defaultValue);
 
     public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
         return (org.bukkit.craftbukkit.util.LongObjectHashMap) com.bergerkiller.bukkit.common.utils.LogicUtil.clone(instance);
@@ -50,6 +51,10 @@ class LongObjectHashMap {
         } else {
             instance.put(key, remappingFunction.apply(oldValue, value));
         }
+    }
+    public V getOrDefault(long key, V defaultValue) {
+        Object value = instance.get(key);
+        return (value != null) ? value : defaultValue;
     }
 
     // Note: the builtin clone() has a runtime error, we can't use it at all :(

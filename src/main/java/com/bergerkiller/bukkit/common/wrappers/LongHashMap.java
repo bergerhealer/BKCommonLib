@@ -160,6 +160,17 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> implem
         return (V) handle.merge(key, value, remappingFunction);
     }
 
+    /**
+     * Gets the value that exists at a key. If none is mapped, returns the default value instead.
+     *
+     * @param key Key
+     * @param defaultValue Value to return if absent
+     * @return Value at the key, or the Default value otherwise
+     */
+    public V getOrDefault(long key, V defaultValue) {
+        return (V) handle.getOrDefault(key, defaultValue);
+    }
+
     public Collection<V> getValues() {
         return values();
     }

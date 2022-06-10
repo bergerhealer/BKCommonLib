@@ -35,6 +35,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
     public abstract Collection<Object> values();
     public abstract Set<Long> keySet();
     public abstract Object merge(long key, Object value, BiFunction<?, ?, ?> remappingFunction);
+    public abstract Object getOrDefault(long key, Object defaultValue);
     public abstract LongObjectHashMapHandle cloneMap();
     /**
      * Stores class members for <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
@@ -52,6 +53,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method.Converted<Collection<Object>> values = new Template.Method.Converted<Collection<Object>>();
         public final Template.Method.Converted<Set<Long>> keySet = new Template.Method.Converted<Set<Long>>();
         public final Template.Method<Object> merge = new Template.Method<Object>();
+        public final Template.Method<Object> getOrDefault = new Template.Method<Object>();
         public final Template.Method.Converted<LongObjectHashMapHandle> cloneMap = new Template.Method.Converted<LongObjectHashMapHandle>();
 
     }
