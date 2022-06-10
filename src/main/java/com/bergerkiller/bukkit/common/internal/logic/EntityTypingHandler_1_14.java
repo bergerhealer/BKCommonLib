@@ -159,7 +159,7 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         /*
          * <INIT_WORLD>
          * public static void initWorldServer((Object) WorldServer worldserver, (Object) WorldDataServer worldData) {
-         *     String dummyWorldName = "ZZDUMMYZZ";
+         *     String dummyWorldName = "zzdummyzz";
          * 
          * // Spigot World configuration
          * #if fieldexists net.minecraft.world.level.World public final org.spigotmc.SpigotWorldConfig spigotConfig;
@@ -192,7 +192,22 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          * #endif
          * 
          * // Paper(Spigot) World configuration
-         * #if fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
+         * #if fieldexists net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
+         *     #require net.minecraft.world.level.World private final io.papermc.paper.configuration.WorldConfiguration paperConfig;
+         *     #require io.papermc.paper.configuration.WorldConfiguration WorldConfiguration create_paper_wc:<init>(org.spigotmc.SpigotWorldConfig spigotWC, net.minecraft.resources.MinecraftKey worldKey);
+         *     net.minecraft.resources.MinecraftKey worldKey = new net.minecraft.resources.MinecraftKey(dummyWorldName);
+         *     io.papermc.paper.configuration.WorldConfiguration paperWorldConfig = #create_paper_wc(spigotConfig, worldKey);
+         * 
+         *     // God this is awful. Is there no better way to initialize defaults?
+         *     paperWorldConfig.entities = new io.papermc.paper.configuration.WorldConfiguration.Entities(paperWorldConfig);
+         *     paperWorldConfig.entities.armorStands = new io.papermc.paper.configuration.WorldConfiguration.Entities.ArmorStands(paperWorldConfig.entities);
+         *     paperWorldConfig.entities.behavior = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior(paperWorldConfig.entities);
+         *     paperWorldConfig.entities.behavior.doorBreakingDifficulty = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior.DoorBreakingDifficulty(paperWorldConfig.entities.behavior);
+         *     paperWorldConfig.entities.behavior.mobsCanAlwaysPickUpLoot = new io.papermc.paper.configuration.WorldConfiguration.Entities.Behavior.MobsCanAlwaysPickUpLoot(paperWorldConfig.entities.behavior);
+         *     paperWorldConfig.misc = new io.papermc.paper.configuration.WorldConfiguration.Misc(paperWorldConfig);
+         * 
+         *     worldserver#paperConfig = paperWorldConfig;
+         * #elseif fieldexists net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     #require net.minecraft.world.level.World public final com.destroystokyo.paper.PaperWorldConfig paperConfig;
          *     com.destroystokyo.paper.PaperWorldConfig paperConfig = new com.destroystokyo.paper.PaperWorldConfig(dummyWorldName, spigotConfig);
          *     worldserver#paperConfig = paperConfig;
