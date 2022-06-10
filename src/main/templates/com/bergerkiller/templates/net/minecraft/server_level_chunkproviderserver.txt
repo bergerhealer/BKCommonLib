@@ -110,6 +110,11 @@ class ChunkProviderServer {
         // 1.12.1 to 1.12.2 added unloaded=false parameter
         instance.saveChunk(chunk, false);
     }
+#elseif exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.IChunkAccess chunk, boolean unloaded);
+    public void saveLoadedChunk((ChunkHandle) Chunk chunk) {
+        // 1.13 uses IChunkAccess for whatever reason
+        instance.saveChunk((net.minecraft.world.level.chunk.IChunkAccess) chunk, false);
+    }
 #elseif !exists net.minecraft.server.level.ChunkProviderServer public void saveChunk(net.minecraft.world.level.chunk.Chunk chunk);
     // Forge 1.12.2
     private void saveLoadedChunk:saveChunk((ChunkHandle) Chunk chunk);
