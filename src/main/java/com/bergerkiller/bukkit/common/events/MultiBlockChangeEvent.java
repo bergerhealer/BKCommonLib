@@ -18,11 +18,22 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
  */
 public class MultiBlockChangeEvent extends WorldEvent {
     private static final HandlerList handlers = new HandlerList();
+    private final RegionChangeSource source;
     private final Set<IntVector2> chunkCoordinates;
 
-    public MultiBlockChangeEvent(World world, Set<IntVector2> chunkCoordinates) {
+    public MultiBlockChangeEvent(RegionChangeSource source, World world, Set<IntVector2> chunkCoordinates) {
         super(world);
+        this.source = source;
         this.chunkCoordinates = chunkCoordinates;
+    }
+
+    /**
+     * Gets the source that caused all these blocks to change
+     *
+     * @return source
+     */
+    public RegionChangeSource getSource() {
+        return this.source;
     }
 
     /**

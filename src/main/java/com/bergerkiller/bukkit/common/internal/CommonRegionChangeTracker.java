@@ -10,6 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.events.MultiBlockChangeEvent;
+import com.bergerkiller.bukkit.common.events.RegionChangeSource;
 import com.bergerkiller.bukkit.common.internal.regionchangetracker.RegionBlockChangeChunkCoordinate;
 import com.bergerkiller.bukkit.common.internal.regionchangetracker.RegionChangeTracker;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -28,13 +29,13 @@ class CommonRegionChangeTracker extends RegionChangeTracker implements LibraryCo
     }
 
     @Override
-    public void notifyChanges(World world, Collection<RegionBlockChangeChunkCoordinate> chunks) {
+    public void notifyChanges(RegionChangeSource source, World world, Collection<RegionBlockChangeChunkCoordinate> chunks) {
         if (CommonUtil.hasHandlers(MultiBlockChangeEvent.getHandlerList())) {
             Set<IntVector2> conv = new HashSet<IntVector2>(chunks.size());
             for (RegionBlockChangeChunkCoordinate chunk : chunks) {
                 conv.add(new IntVector2(chunk.x, chunk.z));
             }
-            CommonUtil.callEvent(new MultiBlockChangeEvent(world, conv));
+            CommonUtil.callEvent(new MultiBlockChangeEvent(source, world, conv));
         }
     }
 }
