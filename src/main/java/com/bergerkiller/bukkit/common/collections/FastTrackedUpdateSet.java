@@ -102,6 +102,10 @@ public final class FastTrackedUpdateSet<E> {
      * Clears all tracked values so no more updates are set
      */
     public void clear() {
+        trackers.forEach(t -> {
+            t.addedToList = false;
+            t.isSet = false;
+        });
         trackers.clear();
     }
 
