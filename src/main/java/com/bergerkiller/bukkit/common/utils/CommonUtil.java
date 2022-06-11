@@ -1135,7 +1135,18 @@ public class CommonUtil {
      * @return True if overrided, False if not
      */
     public static boolean isMethodOverrided(Class<?> baseClass, Class<?> type, String methodName, Class<?>... parameterTypes) {
-        return new SafeMethod<Void>(baseClass, methodName, parameterTypes).isOverridedIn(type);
+        if (type == null || !baseClass.isAssignableFrom(type)) {
+            throw new IllegalArgumentException("Type " + type + " is not a class extending base " + baseClass);
+        }
+
+        SafeMethod<Void> method = new SafeMethod<Void>(baseClass, methodName, parameterTypes);
+        while (type != baseClass && type != null) {
+            if (method.isOverridedIn(type)) {
+                return true;
+            }
+            type = type.getSuperclass();
+        }
+        return false;
     }
 
     /**
