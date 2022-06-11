@@ -398,7 +398,7 @@ class WorldServer extends World {
     public optional (ForcedChunkHandle) ForcedChunk getForcedChunk() {
         ForcedChunk forcedchunk = (ForcedChunk) instance.a(
             instance.worldProvider.getDimensionManager(),
-            (java.util.function.Supplier) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
+            (java.util.function.Function) com.bergerkiller.bukkit.common.internal.logic.ForcedChunkSupplier.INSTANCE,
             "chunks"
         );
         if (forcedchunk == null) {
