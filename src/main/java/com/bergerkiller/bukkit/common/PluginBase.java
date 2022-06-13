@@ -30,6 +30,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionDefault;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
@@ -66,6 +67,10 @@ public abstract class PluginBase extends JavaPlugin {
 
         // Set hastebin server to use when uploading error reports
         this.startupLogHandler.setHastebinServer(this.pluginYaml.getString("preloader.hastebinServer", "https://hastebin.com"));
+
+        // For all class depends specified in plugin.yml, hack-grant class loader access to them into the server
+        // This prevents 'loaded class from x which is not a depend or softdepend of y' kind of warnings from showing
+        this.grantClassDependAccess();
     }
 
     /**
@@ -1050,6 +1055,105 @@ public abstract class PluginBase extends JavaPlugin {
                 startupLogHandler.stopReadingLogNow();
             }
         }
+    }
+
+    /**
+     * Suppresses warnings about this plugin accessing classes of another plugin that isn't a soft depend
+     * or depend or loadbefore. This is used automatically when a 'classdepend' is put in the plugin.yml.<br>
+     * <br>
+     * This works by filling the PluginClassLoader 'seenIllegalAccess' Set field with the values set in
+     * plugin.yml so it doesn't ever warn. In addition, for more modern servers, it hooks this Set field's
+     * contains() call to also support the 'provides' syntax. That way, if a class dependency is set for
+     * 'WorldEdit', 'FastAsyncWorldEdit' which provides 'WorldEdit' is ignored as well.
+     */
+    @SuppressWarnings("unchecked")
+    private void grantClassDependAccess() {
+        List<String> classDependList = this.pluginYaml.getStringList("classdepend");
+        if (classDependList == null || classDependList.isEmpty()) {
+            return; // Not used
+        }
+
+        // Check whether the 'provides' Bukkit API exists or not. If it does, we can use it
+        // to also resolve forks of existing 'class depends' that provide the same API. Like FAWE -> WorldEdit.
+        final java.lang.reflect.Method getProvidesMethod;
+        {
+            java.lang.reflect.Method tmp = null;
+            try {
+                tmp = PluginDescriptionFile.class.getMethod("getProvides");
+            } catch (Throwable t) {}
+            getProvidesMethod = tmp;
+        }
+
+        // Check whether the 'seenIllegalAccess' Set exists
+        try {
+            java.lang.reflect.Field seenIllegalAccessField = this.getClassLoader().getClass().getDeclaredField("seenIllegalAccess");
+            if (!seenIllegalAccessField.getType().equals(Set.class)) {
+                return; // Not supported. Boo!
+            }
+
+            seenIllegalAccessField.setAccessible(true);
+            final Set<String> seenIllegalAccess = (Set<String>) seenIllegalAccessField.get(this.getClassLoader());
+
+            // Add all values configured to the seenIllegalAccess Set up-front
+            seenIllegalAccess.addAll(classDependList);
+
+            if (getProvidesMethod != null) {
+                // Got to hook the Set as well to properly handle provides during contains()
+                Set<String> hook = new AbstractSet<String>() {
+
+                    @Override
+                    public boolean contains(Object o) {
+                        if (seenIllegalAccess.contains(o))
+                            return true;
+
+                        Plugin pluginByName;
+                        if (o instanceof String && (pluginByName = Bukkit.getPluginManager().getPlugin((String) o)) != null) {
+                            List<String> pluginProvidesList = Collections.emptyList();
+                            try {
+                                pluginProvidesList = (List<String>) getProvidesMethod.invoke(pluginByName.getDescription());
+                            } catch (Throwable t) {
+                                PluginBase.this.getLogger().log(Level.SEVERE, "Error checking provides list", t);
+                            }
+                            for (String provides : pluginProvidesList) {
+                                if (seenIllegalAccess.contains(provides)) {
+                                    seenIllegalAccess.add((String) o);
+                                    System.out.println("ADD: " + o);
+                                    return true;
+                                }
+                            }
+                        }
+
+                        return false;
+                    }
+
+                    @Override
+                    public boolean add(String value) {
+                        return seenIllegalAccess.add(value);
+                    }
+
+                    @Override
+                    public boolean remove(Object value) {
+                        return seenIllegalAccess.remove(value);
+                    }
+
+                    @Override
+                    public Iterator<String> iterator() {
+                        return seenIllegalAccess.iterator();
+                    }
+
+                    @Override
+                    public int size() {
+                        return seenIllegalAccess.size();
+                    }
+
+                    @Override
+                    public void clear() {
+                        seenIllegalAccess.clear();
+                    }
+                };
+                seenIllegalAccessField.set(this.getClassLoader(), hook);
+            }
+        } catch (Throwable t) {}
     }
 
     private String readPluginYamlContent(Plugin plugin, org.bukkit.configuration.file.YamlConfiguration config) {

@@ -157,9 +157,9 @@ public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle 
         @Template.Optional
         public final Template.Field.Integer motZ_raw = new Template.Field.Integer();
         @Template.Optional
-        public final Template.Field.Byte yaw_raw = new Template.Field.Byte();
-        @Template.Optional
         public final Template.Field.Byte pitch_raw = new Template.Field.Byte();
+        @Template.Optional
+        public final Template.Field.Byte yaw_raw = new Template.Field.Byte();
         @Template.Optional
         public final Template.Field.Byte headYaw_raw = new Template.Field.Byte();
         @Template.Optional
