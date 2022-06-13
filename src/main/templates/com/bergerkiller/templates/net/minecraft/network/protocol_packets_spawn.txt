@@ -437,7 +437,15 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
     private int entityId:a;
 #endif
 
-#if version >= 1.17
+#if version >= 1.19
+    private optional UUID entityUUID:uuid;
+    private optional int motX_raw:xa;
+    private optional int motY_raw:ya;
+    private optional int motZ_raw:za;
+    private optional byte pitch_raw:xRot;
+    private optional byte yaw_raw:yRot;
+    private optional byte headYaw_raw:yHeadRot;
+#elseif version >= 1.17
     private optional UUID entityUUID:uuid;
     private optional int motX_raw:xd;
     private optional int motY_raw:yd;
