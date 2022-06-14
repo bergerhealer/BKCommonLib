@@ -33,6 +33,7 @@ public abstract class TileEntityHandle extends Template.Handle {
     public abstract void load(BlockData blockData, CommonTagCompound nbttagcompound);
     public abstract CommonTagCompound save();
     public abstract BlockData getBlockData();
+    public abstract Object getRawBlockData();
     public abstract Material getType();
     public abstract CommonPacket getUpdatePacket();
     public abstract boolean isRemoved();
@@ -63,6 +64,7 @@ public abstract class TileEntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> load = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<CommonTagCompound> save = new Template.Method.Converted<CommonTagCompound>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
+        public final Template.Method<Object> getRawBlockData = new Template.Method<Object>();
         public final Template.Method.Converted<Material> getType = new Template.Method.Converted<Material>();
         @Template.Optional
         public final Template.Method<Integer> getLegacyData = new Template.Method<Integer>();

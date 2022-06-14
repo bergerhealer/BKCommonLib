@@ -106,6 +106,7 @@ class TileEntity {
 
 #if version >= 1.18
     public (BlockData) IBlockData getBlockData:getBlockState();
+    public (Object) IBlockData getRawBlockData:getBlockState();
 
     public (org.bukkit.Material) Block getType() {
         return instance.getBlockState().getBlock();
@@ -116,6 +117,7 @@ class TileEntity {
     public (CommonPacket) Packet<net.minecraft.network.protocol.game.PacketListenerPlayOut> getUpdatePacket();
 #elseif version >= 1.13
     public (BlockData) IBlockData getBlockData:getBlock();
+    public (Object) IBlockData getRawBlockData:getBlock();
 
     public (org.bukkit.Material) Block getType() {
         return instance.getBlock().getBlock();
@@ -126,20 +128,27 @@ class TileEntity {
     public (CommonPacket) PacketPlayOutTileEntityData getUpdatePacket();
 #else
 
-    public (BlockData) IBlockData getBlockData() {
+    #require TileEntity public IBlockData getBlockDataImpl() {
         Block block;
         int rawData;
-    #if version >= 1.11
+  #if version >= 1.11
         rawData = instance.v();
-    #else
+  #else
         rawData = instance.u();
-    #endif
-    #if version >= 1.9
+  #endif
+  #if version >= 1.9
         block = instance.getBlock();
-    #else
+  #else
         block = instance.w();
-    #endif
+  #endif
         return block.fromLegacyData(rawData);
+    }
+
+    public (BlockData) IBlockData getBlockData() {
+        return instance#getBlockDataImpl();
+    }
+    public (Object) IBlockData getRawBlockData() {
+        return instance#getBlockDataImpl();
     }
 
     #if version >= 1.11

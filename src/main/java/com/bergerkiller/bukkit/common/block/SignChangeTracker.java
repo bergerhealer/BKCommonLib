@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.block;
 
 import org.bukkit.World;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
@@ -72,6 +73,56 @@ public class SignChangeTracker {
      */
     public int getZ() {
         return this.block.getZ();
+    }
+
+    /**
+     * Gets the BlockFace the Sign is attached to
+     *
+     * @return Sign attached face
+     */
+    public BlockFace getAttachedFace() {
+        try {
+            return this.blockData.getAttachedFace();
+        } catch (NullPointerException ex) {
+            if (this.isRemoved()) {
+                throw new IllegalStateException("Sign is removed");
+            } else {
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     * Gets the BlockFace the Sign faces. For sign posts, this is the rotation.
+     * For wall signs, it is the opposite of {@link #getAttachedFace()}.
+     *
+     * @return Sign facing
+     */
+    public BlockFace getFacing() {
+        try {
+            return this.blockData.getFacingDirection();
+        } catch (NullPointerException ex) {
+            if (this.isRemoved()) {
+                throw new IllegalStateException("Sign is removed");
+            } else {
+                throw ex;
+            }
+        }
+    }
+
+    /**
+     * Gets whether the Sign is attached to a particular Block
+     *
+     * @param block Block to check
+     * @return True if the Sign is attached to the Block
+     * @see #getAttachedFace()
+     */
+    public boolean isAttachedTo(Block block) {
+        Block signBlock = this.getBlock();
+        BlockFace attachedFace = this.getAttachedFace();
+        return (block.getX() - signBlock.getX()) == attachedFace.getModX() &&
+               (block.getY() - signBlock.getY()) == attachedFace.getModY() &&
+               (block.getZ() - signBlock.getZ()) == attachedFace.getModZ();
     }
 
     /**
@@ -148,10 +199,12 @@ public class SignChangeTracker {
         }
 
         // Check when BlockData changes. This is when a sign is rotated, or changed from wall sign to sign post
-        BlockData newBlockData = tileEntity.getBlockData();
-        if (newBlockData != this.blockData) {
-            this.blockData = newBlockData;
-            return true;
+        {
+            Object newBlockDataRaw = tileEntity.getRawBlockData();
+            if (newBlockDataRaw != this.blockData.getData()) {
+                this.blockData = BlockData.fromBlockData(newBlockDataRaw);
+                return true;
+            }
         }
 
         // Check for sign lines that change. For this, we check the internal IChatBaseComponent contents
