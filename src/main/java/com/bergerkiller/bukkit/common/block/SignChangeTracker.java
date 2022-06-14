@@ -7,8 +7,10 @@ import org.bukkit.block.Sign;
 
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
 
 /**
  * Efficiently detects when the text contents of a Sign change, when the
@@ -34,9 +36,18 @@ public class SignChangeTracker {
     protected SignChangeTracker(Block block, Sign state) {
         this.block = block;
         this.state = state;
-        this.tileEntity = TileEntitySignHandle.fromBukkit(state);
-        this.blockData = this.tileEntity.getBlockData();
-        this.lastRawLines = this.tileEntity.getRawLines().clone();
+        this.loadTileEntity(TileEntitySignHandle.fromBukkit(state));
+    }
+
+    private void loadTileEntity(TileEntitySignHandle tile) {
+        this.tileEntity = tile;
+        this.lastRawLines = tile.getRawLines().clone();
+
+        // Note: it is possible for a TileEntity to be retrieved while it's added to a Chunk,
+        // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
+        // check whether the World was assigned to the tile entity. If not, we cannot use the tile
+        // entity's property method, as it throws a NPE.
+        this.blockData = tile.isRemoved() ? tile.getBlockData() : WorldUtil.getBlockData(this.block);
     }
 
     /**
@@ -199,15 +210,20 @@ public class SignChangeTracker {
         }
 
         // Check when BlockData changes. This is when a sign is rotated, or changed from wall sign to sign post
+        boolean blockDataChanged = false;
         {
             Object newBlockDataRaw = tileEntity.getRawBlockData();
             if (newBlockDataRaw != this.blockData.getData()) {
                 this.blockData = BlockData.fromBlockData(newBlockDataRaw);
-                return true;
+                blockDataChanged = true;
             }
         }
 
         // Check for sign lines that change. For this, we check the internal IChatBaseComponent contents
+        return detectChangedLines(tileEntity) || blockDataChanged;
+    }
+
+    private boolean detectChangedLines(TileEntitySignHandle tileEntity) {
         Object[] oldRawLines = this.lastRawLines;
         Object[] newRawLines = tileEntity.getRawLines();
         int numLines = newRawLines.length;
@@ -238,17 +254,15 @@ public class SignChangeTracker {
 
     private boolean tryLoadFromWorld() {
         Block block = this.block;
-        Sign state;
-        TileEntitySignHandle tileEntity;
-        if (MaterialUtil.ISSIGN.get(block) &&
-            (state = BlockUtil.getSign(block)) != null &&
-            !(tileEntity = TileEntitySignHandle.fromBukkit(state)).isRemoved())
-        {
-            this.state = state;
-            this.tileEntity = tileEntity;
-            this.blockData = tileEntity.getBlockData();
-            this.lastRawLines = tileEntity.getRawLines().clone();
-            return true; // Changed!
+        Object rawTileEntity;
+        if (MaterialUtil.ISSIGN.get(block) && // Initiates sync chunk load if needed
+            (rawTileEntity = CraftBlockHandle.getBlockTileEntity(block)) != null &&
+            TileEntitySignHandle.T.isAssignableFrom(rawTileEntity)
+        ) {
+            TileEntitySignHandle tileEntity = TileEntitySignHandle.createHandle(rawTileEntity);
+            this.state = tileEntity.toBukkit();
+            this.loadTileEntity(tileEntity);
+            return true;
         }
 
         return false;

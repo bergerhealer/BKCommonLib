@@ -85,6 +85,26 @@ class CraftBlock {
     }
 #endif
 
+    public static Object getBlockTileEntity(org.bukkit.block.Block block) {
+        net.minecraft.world.level.World nmsWorld = ((org.bukkit.craftbukkit.CraftWorld) block.getWorld()).getHandle();
+        net.minecraft.core.BlockPosition nmsBlockPos;
+
+#if version >= 1.13.1
+        if (block instanceof org.bukkit.craftbukkit.block.CraftBlock) {
+            nmsBlockPos = ((org.bukkit.craftbukkit.block.CraftBlock) block).getPosition();
+        } else
+#endif
+        {
+            nmsBlockPos = new net.minecraft.core.BlockPosition(block.getX(), block.getY(), block.getZ());
+        }
+
+#if version >= 1.18
+        return nmsWorld.getBlockEntity(nmsBlockPos);
+#else
+        return nmsWorld.getTileEntity(nmsBlockPos);
+#endif
+    }
+
     public static Object getBlockPosition(org.bukkit.block.Block block) {
 #if version >= 1.13.1
         if (block instanceof org.bukkit.craftbukkit.block.CraftBlock) {

@@ -175,8 +175,8 @@ class TileEntity {
 #select version >=
 #case 1.14:  public boolean isRemoved();
 #case 1.13:  public boolean isRemoved:x();
-#case 1.11:  public boolean isRemoved:y();
-#case else:  public boolean isRemoved:x();
+#case 1.11:  public boolean isRemoved() { return instance.y() || !instance.u(); } // Must also validate world isn't null
+#case else:  public boolean isRemoved() { return instance.x() || !instance.t(); } // Must also validate world isn't null
 #endselect
 
     <code>

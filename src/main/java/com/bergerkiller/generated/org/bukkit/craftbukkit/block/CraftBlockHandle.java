@@ -21,6 +21,10 @@ public abstract class CraftBlockHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Object getBlockTileEntity(Block block) {
+        return T.getBlockTileEntity.invoker.invoke(null,block);
+    }
+
     public static Object getBlockPosition(Block block) {
         return T.getBlockPosition.invoker.invoke(null,block);
     }
@@ -35,6 +39,7 @@ public abstract class CraftBlockHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class CraftBlockClass extends Template.Class<CraftBlockHandle> {
+        public final Template.StaticMethod<Object> getBlockTileEntity = new Template.StaticMethod<Object>();
         public final Template.StaticMethod<Object> getBlockPosition = new Template.StaticMethod<Object>();
         public final Template.StaticMethod<Block> createBlockAtTileEntity = new Template.StaticMethod<Block>();
 
