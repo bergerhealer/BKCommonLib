@@ -1,10 +1,12 @@
 package com.bergerkiller.bukkit.common.block;
 
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
 
 /**
@@ -17,6 +19,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEnt
 public class SignChangeTracker {
     private final Block block;
     private Sign state;
+    private BlockData blockData;
     private TileEntitySignHandle tileEntity;
     private Object[] lastRawLines;
 
@@ -31,7 +34,44 @@ public class SignChangeTracker {
         this.block = block;
         this.state = state;
         this.tileEntity = TileEntitySignHandle.fromBukkit(state);
+        this.blockData = this.tileEntity.getBlockData();
         this.lastRawLines = this.tileEntity.getRawLines().clone();
+    }
+
+    /**
+     * Gets the World the Sign is on
+     *
+     * @return World
+     */
+    public World getWorld() {
+        return this.block.getWorld();
+    }
+
+    /**
+     * Gets the X-coordinate where the Sign is located
+     *
+     * @return Sign location X-coordinate
+     */
+    public int getX() {
+        return this.block.getX();
+    }
+
+    /**
+     * Gets the Y-coordinate where the Sign is located
+     *
+     * @return Sign location Y-coordinate
+     */
+    public int getY() {
+        return this.block.getY();
+    }
+
+    /**
+     * Gets the Z-coordinate where the Sign is located
+     *
+     * @return Sign location Z-coordinate
+     */
+    public int getZ() {
+        return this.block.getZ();
     }
 
     /**
@@ -54,7 +94,18 @@ public class SignChangeTracker {
     }
 
     /**
-     * Gets a live-updated Sign instance
+     * Gets the BlockData of the sign. Returns null if {@link #isRemoved()}.
+     * Only {@link #update()} updates the return value of this method.
+     *
+     * @return Sign Block Data
+     */
+    public BlockData getBlockData() {
+        return this.blockData;
+    }
+
+    /**
+     * Gets a live-updated Sign instance.
+     * Only {@link #update()} updates the return value of this method.
      *
      * @return Sign
      */
@@ -90,9 +141,17 @@ public class SignChangeTracker {
             } else {
                 this.state = null;
                 this.tileEntity = null;
+                this.blockData = null;
                 this.lastRawLines = null;
                 return true; // Sign is gone
             }
+        }
+
+        // Check when BlockData changes. This is when a sign is rotated, or changed from wall sign to sign post
+        BlockData newBlockData = tileEntity.getBlockData();
+        if (newBlockData != this.blockData) {
+            this.blockData = newBlockData;
+            return true;
         }
 
         // Check for sign lines that change. For this, we check the internal IChatBaseComponent contents
@@ -134,6 +193,7 @@ public class SignChangeTracker {
         {
             this.state = state;
             this.tileEntity = tileEntity;
+            this.blockData = tileEntity.getBlockData();
             this.lastRawLines = tileEntity.getRawLines().clone();
             return true; // Changed!
         }
