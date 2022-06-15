@@ -436,11 +436,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         public synchronized boolean isKeptLoaded(int x, int z) {
-            return this.chunks.contains(x, z);
-        }
-
-        public synchronized boolean isKeptLoaded(long key) {
-            return this.chunks.contains(key);
+            return this.chunks.contains(makeChunkKey(x, z));
         }
 
         // This method is only called on the main thread!
