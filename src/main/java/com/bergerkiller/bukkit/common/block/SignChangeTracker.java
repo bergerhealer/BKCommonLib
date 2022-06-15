@@ -47,7 +47,7 @@ public class SignChangeTracker {
         // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
         // check whether the World was assigned to the tile entity. If not, we cannot use the tile
         // entity's property method, as it throws a NPE.
-        this.blockData = tile.isRemoved() ? tile.getBlockData() : WorldUtil.getBlockData(this.block);
+        this.blockData = tile.isRemoved() ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
     }
 
     /**
