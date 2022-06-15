@@ -80,6 +80,10 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
             return ExtendedEntity.this.handle.getLocZ();
         }
 
+        public Vector vector() {
+            return ExtendedEntity.this.handle.getLoc();
+        }
+
         public LocationAbstract setX(double x) {
             ExtendedEntity.this.handle.setLocX(x);
             return this;

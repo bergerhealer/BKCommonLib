@@ -192,6 +192,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         instance.setPosRaw(instance.getX(), instance.getY(), z);
     }
 
+    public org.bukkit.util.Vector getLoc() {
+        Vec3D loc = instance.position();
+        return new org.bukkit.util.Vector(loc.x, loc.y, loc.z);
+    }
+
 #elseif version >= 1.15
     // locX/Y/Z fields became private on 1.15
     public double getLocX:locX();
@@ -202,19 +207,29 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
   #if version >= 1.16
     // Since 1.16 they got merged into a 'Vec3D loc' field
     // It is better and safer to just call setPositionRaw
+
     public void setLocX(double x) {
-        instance.setPositionRaw(x, instance.locY(), instance.locZ());
+        Vec3D loc = instance.getPositionVector();
+        instance.setPositionRaw(x, loc.y, loc.z);
     }
 
     public void setLocY(double y) {
-        instance.setPositionRaw(instance.locX(), y, instance.locZ());
+        Vec3D loc = instance.getPositionVector();
+        instance.setPositionRaw(loc.x, y, loc.z);
     }
 
     public void setLocZ(double z) {
-        instance.setPositionRaw(instance.locX(), instance.locY(), z);
+        Vec3D loc = instance.getPositionVector();
+        instance.setPositionRaw(loc.x, loc.y, z);
+    }
+
+    public org.bukkit.util.Vector getLoc() {
+        Vec3D loc = instance.getPositionVector();
+        return new org.bukkit.util.Vector(loc.x, loc.y, loc.z);
     }
   #else
     // We can use reflection to set the individual fields efficiently
+
     public void setLocX(double x) {
         #require net.minecraft.world.entity.Entity private double locX;
         instance#locX = x;
@@ -229,6 +244,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         #require net.minecraft.world.entity.Entity private double locZ;
         instance#locZ = z;
     }
+
+    public org.bukkit.util.Vector getLoc() {
+        return new org.bukkit.util.Vector(instance.locX(), instance.locY(), instance.locZ());
+    }
   #endif
 #else
     public double getLocX() { return instance.locX; }
@@ -238,6 +257,10 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public void setLocX(double x) { instance.locX = x; }
     public void setLocY(double y) { instance.locY = y; }
     public void setLocZ(double z) { instance.locZ = z; }
+
+    public org.bukkit.util.Vector getLoc() {
+        return new org.bukkit.util.Vector(instance.locX, instance.locY, instance.locZ);
+    }
 
     public void setLoc(double x, double y, double z) {
         instance.locX = x;

@@ -59,6 +59,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setLocX(double x);
     public abstract void setLocY(double y);
     public abstract void setLocZ(double z);
+    public abstract Vector getLoc();
     public abstract void setWorld(WorldHandle world);
     public abstract void assignEntityReference();
     public abstract boolean isLastAndCurrentPositionDifferent();
@@ -333,6 +334,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method<Void> setLocX = new Template.Method<Void>();
         public final Template.Method<Void> setLocY = new Template.Method<Void>();
         public final Template.Method<Void> setLocZ = new Template.Method<Void>();
+        public final Template.Method<Vector> getLoc = new Template.Method<Vector>();
         public final Template.Method.Converted<Void> setWorld = new Template.Method.Converted<Void>();
         public final Template.Method<Void> assignEntityReference = new Template.Method<Void>();
         public final Template.Method<Boolean> isLastAndCurrentPositionDifferent = new Template.Method<Boolean>();
