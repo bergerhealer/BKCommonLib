@@ -448,12 +448,12 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @param <V> value type bound to the key
      */
     public static class EntityItem<V> {
-        private final ExtendedEntity<?> owner;
         private final Key<V> key;
+        private final DataWatcherHandle datawatcher;
 
         public EntityItem(ExtendedEntity<?> owner, Key<V> key) {
-            this.owner = owner;
             this.key = key;
+            this.datawatcher = DataWatcherHandle.createHandle(EntityHandle.T.datawatcherField.raw.get(owner.getHandle()));
         }
 
         /**
@@ -463,8 +463,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          */
         @SuppressWarnings("unchecked")
         public V get() {
-            Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
-            return (V) DataWatcherHandle.createHandle(dataWatcher).get(this.key);
+            return (V) this.datawatcher.get(this.key);
         }
 
         /**
@@ -473,8 +472,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          * @param value to set to
          */
         public void set(V value) {
-            Object dataWatcher = EntityHandle.T.datawatcherField.raw.get(owner.getHandle());
-            DataWatcherHandle.createHandle(dataWatcher).set(this.key, value);
+            this.datawatcher.set(this.key, value);
         }
 
         /**
