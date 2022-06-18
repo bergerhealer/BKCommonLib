@@ -2,6 +2,8 @@ package net.minecraft.network.protocol.game;
 
 import net.minecraft.core.EnumDirection;
 import net.minecraft.core.BlockPosition;
+import net.minecraft.core.particles.Particle;
+import net.minecraft.core.particles.ParticleParam;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
@@ -76,6 +78,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -2201,86 +2204,291 @@ class PacketPlayOutWorldParticles extends Packet {
     // Since 1.13 there is a ParticleParam with many different types
     // Best option would be coming up with a proxy similar to this for <= 1.12.2
 #if version >= 1.17
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_x:x;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_y:y;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_z:z;
+    #require PacketPlayOutWorldParticles private double pos_x:x;
+    #require PacketPlayOutWorldParticles private double pos_y:y;
+    #require PacketPlayOutWorldParticles private double pos_z:z;
     private float randomX:xDist;
     private float randomY:yDist;
     private float randomZ:zDist;
     private float speed:maxSpeed;
     private int count;
-    private boolean longDistance:overrideLimiter;
-    private unknown net.minecraft.core.particles.ParticleParam particle;
+    private boolean overrideLimiter;
+    #require PacketPlayOutWorldParticles private ParticleParam particle;
 #elseif version >= 1.15
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_x:a;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_y:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private double pos_z:c;
+    #require PacketPlayOutWorldParticles private double pos_x:a;
+    #require PacketPlayOutWorldParticles private double pos_y:b;
+    #require PacketPlayOutWorldParticles private double pos_z:c;
     private float randomX:d;
     private float randomY:e;
     private float randomZ:f;
     private float speed:g;
     private int count:h;
-    private boolean longDistance:i;
-    private unknown ParticleParam j;
+    private boolean overrideLimiter:i;
+    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private ParticleParam particle:j;
 #elseif version >= 1.13
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_x:a;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_y:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_z:c;
+    #require PacketPlayOutWorldParticles private float pos_x:a;
+    #require PacketPlayOutWorldParticles private float pos_y:b;
+    #require PacketPlayOutWorldParticles private float pos_z:c;
     private float randomX:d;
     private float randomY:e;
     private float randomZ:f;
     private float speed:g;
     private int count:h;
-    private boolean longDistance:i;
-    private unknown ParticleParam j;
+    private boolean overrideLimiter:i;
+    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private ParticleParam particle:j;
 #else
-    private unknown EnumParticle a;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_x:b;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_y:c;
-    #require net.minecraft.network.protocol.game.PacketPlayOutWorldParticles private float pos_z:d;
+    #require PacketPlayOutWorldParticles private Particle particle:a;
+    #require PacketPlayOutWorldParticles private float pos_x:b;
+    #require PacketPlayOutWorldParticles private float pos_y:c;
+    #require PacketPlayOutWorldParticles private float pos_z:d;
     private float randomX:e;
     private float randomY:f;
     private float randomZ:g;
     private float speed:h;
     private int count:i;
-    private boolean longDistance:j;
-    private unknown int[] k;
+    private boolean overrideLimiter:j;
+    #require PacketPlayOutWorldParticles private int[] particleOptions:k;
 #endif
 
-    public double getX() {
+    public static (PacketPlayOutWorldParticlesHandle) PacketPlayOutWorldParticles createNew() {
+#if version >= 1.15
+        return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0, 0.0, 0.0, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+#elseif version >= 1.13
+        return new PacketPlayOutWorldParticles((ParticleParam) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1);
+#else
+        return new PacketPlayOutWorldParticles((Particle) null, false, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1, new int[0]);
+#endif
+    }
+
+    <code>
+    public void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<Void> particleType) {
+        setParticle(particleType, null);
+    }
+
+    public <T> void setParticle(com.bergerkiller.bukkit.common.resources.ParticleType<T> particleType, T value) {
+        T.setParticle.invoker.invoke(getRaw(), particleType.getRawHandle(), value);
+    }
+    </code>
+
+#if version >= 1.13
+    // ParticleParam API
+    public optional void setParticle(Particle<?> particleType, Object options) {
+        ParticleParam param;
+        if (particleType instanceof ParticleParam) {
+            param = (ParticleParam) particleType;
+
+        } else if (particleType == null) {
+            throw new IllegalArgumentException("Particle type is not supported");
+
+        } else if (options == null) {
+            com.bergerkiller.bukkit.common.resources.ParticleType typeHandle;
+            typeHandle = com.bergerkiller.bukkit.common.resources.ParticleType.byNMSParticleHandle(particleType);
+            throw new IllegalArgumentException("Particle type " + typeHandle.toString() + " requires extra options, none specified");
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
+            param = new net.minecraft.core.particles.ParticleParamBlock(particleType,
+                    (IBlockData) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
+
+        } else if (options instanceof org.bukkit.inventory.ItemStack) {
+            net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
+                    .toItemStackHandle((org.bukkit.inventory.ItemStack) options);
+            param = new net.minecraft.core.particles.ParticleParamItem(particleType, itemstack);
+
+  #if version >= 1.19
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions sc = (com.bergerkiller.bukkit.common.resources.ParticleType$SculkChargeOptions) options;
+            param = new net.minecraft.core.particles.SculkChargeParticleOptions(sc.roll);
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions sh = (com.bergerkiller.bukkit.common.resources.ParticleType$ShriekOptions) options;
+            param = new net.minecraft.core.particles.ShriekParticleOption(sh.delay);
+  #endif
+
+  #if version >= 1.17
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions ts = (com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) options;
+            com.mojang.math.Vector3fa color = new com.mojang.math.Vector3fa((float) ts.color.getRed() / 255.0f,
+                                                                            (float) ts.color.getGreen() / 255.0f,
+                                                                            (float) ts.color.getBlue() / 255.0f);
+            com.mojang.math.Vector3fa to_color = new com.mojang.math.Vector3fa((float) ts.endColor.getRed() / 255.0f,
+                                                                               (float) ts.endColor.getGreen() / 255.0f,
+                                                                               (float) ts.endColor.getBlue() / 255.0f);
+            param = new net.minecraft.core.particles.DustColorTransitionOptions(color, to_color, ts.scale);
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions) {
+    #if version >= 1.19
+            #require net.minecraft.world.level.gameevent.EntityPositionSource static EntityPositionSource new_eps:<init>(com.mojang.datafixers.util.Either<net.minecraft.world.entity.Entity, com.mojang.datafixers.util.Either<java.util.UUID, Integer>> either, float f);
+    #endif
+            com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions vo = (com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions) options;
+            net.minecraft.world.level.gameevent.PositionSource source;
+            if (vo.destination instanceof com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption) {
+                com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption dest = (com.bergerkiller.bukkit.common.resources.ParticleType$BlockPositionOption) vo.destination;
+                source = new net.minecraft.world.level.gameevent.BlockPositionSource(new BlockPosition(dest.x, dest.y, dest.z));
+            } else if (vo.destination instanceof com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption) {
+                com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption pos = (com.bergerkiller.bukkit.common.resources.ParticleType$EntityByIdPositionOption) vo.destination;
+    #if version >= 1.19
+                source = #new_eps(com.mojang.datafixers.util.Either.right((Object)com.mojang.datafixers.util.Either.right((Object)Integer.valueOf(pos.entityId))), pos.yOffset);
+    #else
+                source = new net.minecraft.world.level.gameevent.EntityPositionSource(pos.entityId);
+    #endif
+    #if version >= 1.19
+            } else if (vo.destination instanceof com.bergerkiller.bukkit.common.resources.ParticleType$EntityByUUIDPositionOption) {
+                com.bergerkiller.bukkit.common.resources.ParticleType$EntityByUUIDPositionOption pos = (com.bergerkiller.bukkit.common.resources.ParticleType$EntityByUUIDPositionOption) vo.destination;
+                source = #new_eps(com.mojang.datafixers.util.Either.right((Object)com.mojang.datafixers.util.Either.left((Object)pos.entityUUID)), pos.yOffset);
+    #endif
+            } else if (vo.destination == null) {
+                throw new IllegalArgumentException("Vibration option destination is null");
+            } else {
+                throw new IllegalArgumentException("Unknown Vibration position source: " + vo.destination);
+            }
+
+    #if version >= 1.19
+            param = new net.minecraft.core.particles.VibrationParticleOption(source, vo.arrivalInTicks);
+    #else
+            BlockPosition origin = new BlockPosition(vo.origin.x, vo.origin.y, vo.origin.z);
+            net.minecraft.world.level.gameevent.vibrations.VibrationPath path = new net.minecraft.world.level.gameevent.vibrations.VibrationPath(origin, source, vo.arrivalInTicks);
+            param = new net.minecraft.core.particles.VibrationParticleOption(path);
+    #endif
+  #endif
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
+            float r = (float) dust.color.getRed() / 255.0f;
+            float g = (float) dust.color.getGreen() / 255.0f;
+            float b = (float) dust.color.getBlue() / 255.0f;
+  #if version >= 1.17
+            param = new net.minecraft.core.particles.ParticleParamRedstone(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
+  #else
+            param = new net.minecraft.core.particles.ParticleParamRedstone(r, g, b, dust.scale);
+  #endif
+
+        } else {
+            throw new IllegalArgumentException("Unknown particle options: " + options.getClass().getName());
+        }
+        instance#particle = param;
+    }
+
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
+        ParticleParam param = instance#particle;
+        if (param == null) return null;
+  #if version >= 1.18
+        return param.getType();
+  #elseif version >= 1.14.4
+        return param.getParticle();
+  #else
+        return param.b();
+  #endif
+    }
+
+#else
+    // EnumParticle + int[] args
+    public optional void setParticle(Particle particleType, Object options) {
+        int[] data;
+        if (options instanceof com.bergerkiller.bukkit.common.wrappers.BlockData) {
+            data = new int[1];
+            data[0] = net.minecraft.world.level.block.Block.getCombinedId(
+                    (IBlockData) ((com.bergerkiller.bukkit.common.wrappers.BlockData) options).getData());
+
+        } else if (options instanceof org.bukkit.inventory.ItemStack) {
+            net.minecraft.world.item.ItemStack itemstack = (net.minecraft.world.item.ItemStack) com.bergerkiller.bukkit.common.conversion.type.HandleConversion
+                    .toItemStackHandle((org.bukkit.inventory.ItemStack) options);
+            data = new int[1];
+            data[0] = net.minecraft.world.item.Item.getId(itemstack.getItem());
+
+        } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) {
+            com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions dust = (com.bergerkiller.bukkit.common.resources.ParticleType$DustOptions) options;
+
+            // rgb is encoded in the random x/y/z of this packet
+            float r = -1.0f + (float) dust.color.getRed() / 255.0f;
+            float g = (float) dust.color.getGreen() / 255.0f;
+            float b = (float) dust.color.getBlue() / 255.0f;
+            #require PacketPlayOutWorldParticles private float randomX:e;
+            #require PacketPlayOutWorldParticles private float randomY:f;
+            #require PacketPlayOutWorldParticles private float randomZ:g;
+            #require PacketPlayOutWorldParticles private float speed:h;
+            #require PacketPlayOutWorldParticles private int count:i;
+            instance#randomX = r;
+            instance#randomY = g;
+            instance#randomZ = b;
+            instance#speed = 1.0f;
+            instance#count = 0;
+            data = new int[0];
+        } else {
+            data = new int[0];
+        }
+        instance#particle = particleType;
+        instance#particleOptions = data;
+    }
+
+    public (com.bergerkiller.bukkit.common.resources.ParticleType<?>) Particle<?> getParticleType() {
+        return instance#particle;
+    }
+#endif
+
+    <code>
+    public void setPos(double x, double y, double z) {
+        setPosX(x);
+        setPosY(y);
+        setPosZ(z);
+    }
+
+    public void setPos(org.bukkit.util.Vector pos) {
+        setPos(pos.getX(), pos.getY(), pos.getZ());
+    }
+
+    public void setPos(org.bukkit.Location loc) {
+        setPos(loc.getX(), loc.getY(), loc.getZ());
+    }
+
+    public void setRandom(double rx, double ry, double rz) {
+        setRandom((float) rx, (float) ry, (float) rz);
+    }
+
+    public void setRandom(float rx, float ry, float rz) {
+        setRandomX(rx);
+        setRandomY(ry);
+        setRandomZ(rz);
+    }
+
+    public void setRandom(org.bukkit.util.Vector random) {
+        setRandom(random.getX(), random.getY(), random.getZ());
+    }
+    </code>
+
+    public double getPosX() {
         return (double) instance#pos_x;
     }
 
-    public double getY() {
+    public double getPosY() {
         return (double) instance#pos_y;
     }
 
-    public double getZ() {
+    public double getPosZ() {
         return (double) instance#pos_z;
     }
 
 #if version >= 1.15
-    public void setX(double x) {
+    public void setPosX(double x) {
         instance#pos_x = x;
     }
 
-    public void setY(double y) {
+    public void setPosY(double y) {
         instance#pos_y = y;
     }
 
-    public void setZ(double z) {
+    public void setPosZ(double z) {
         instance#pos_z = z;
     }
 #else
-    public void setX(double x) {
+    public void setPosX(double x) {
         instance#pos_x = (float)x;
     }
 
-    public void setY(double y) {
+    public void setPosY(double y) {
         instance#pos_y = (float)y;
     }
 
-    public void setZ(double z) {
+    public void setPosZ(double z) {
         instance#pos_z = (float)z;
     }
 #endif

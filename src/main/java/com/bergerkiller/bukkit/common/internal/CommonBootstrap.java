@@ -454,8 +454,13 @@ public class CommonBootstrap {
         }
 
         // EnumScoreboardAction was moved to a ScoreboardServer class during 1.13
+        // There is now a ParticleType class. For 1.12.2 and before, we refer to EnumParticle instead to simplify API
         if (evaluateMCVersion(">=", "1.13")) {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.server.ScoreboardServer$Action");
+        } else {
+            remappings.put("net.minecraft.core.particles.Particle", "net.minecraft.core.particles.EnumParticle");
+            remappings.put("net.minecraft.core.particles.Particles", "net.minecraft.core.particles.EnumParticle");
+            remappings.put("net.minecraft.core.particles.ParticleType", "net.minecraft.core.particles.EnumParticle");
         }
 
         // Many classes disappeared, merged or moved with MC 1.14

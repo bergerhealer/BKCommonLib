@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.inventory.InventoryBase;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.resources.ParticleType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
@@ -551,5 +552,10 @@ public class HandleConversion {
     @ConverterMethod(output="net.minecraft.server.EnumInteractionResult", optional = true)
     public static Object nmsEnumInteractionResultFromInteractionResult(InteractionResult result) {
         return result.getRawHandle();
+    }
+
+    @ConverterMethod(output="net.minecraft.core.particles.Particle")
+    public static Object toParticleHandle(ParticleType<?> paticleType) {
+        return paticleType.getRawHandle();
     }
 }

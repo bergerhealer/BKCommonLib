@@ -10,11 +10,13 @@ import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
+import com.bergerkiller.bukkit.common.resources.ParticleType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.bukkit.common.wrappers.HumanHand;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.player.EntityHumanHandle;
@@ -27,7 +29,6 @@ import com.bergerkiller.reflection.org.bukkit.craftbukkit.CBCraftPlayer;
 import org.bukkit.Chunk;
 import org.bukkit.Color;
 import org.bukkit.Location;
-import org.bukkit.Particle;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -321,46 +322,17 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * Spawns the REDSTONE particles of a given color and size spread.
-     * 
+     * Spawns REDSTONE particles of a given color
+     *
      * @param player to spawn the particles for
      * @param position to spawn at
      * @param color of the particles
-     * @param size of the particle spread
      */
     public static void spawnDustParticles(Player player, Vector position, Color color) {
-        if (CommonCapabilities.PARTICLE_OPTIONS) {
-            // Official Bukkit API introduced in MC 1.13
-            spawnDustParticles_1_13(player, position, color);
-        } else {
-            // This is a legacy fallback used on Minecraft 1.12.2 and before
-            // The color is a close approximation
-            double red = MathUtil.clamp((double) color.getRed() / 255.0, 0.0, 1.0);
-            double green = MathUtil.clamp((double) color.getGreen() / 255.0, 0.0, 1.0);
-            double blue = MathUtil.clamp((double) color.getBlue() / 255.0, 0.0, 1.0);
-            if (red > 0.5) {
-                red -= 1.0;
-                if (red > -0.01) {
-                    red = -0.01;
-                }
-            } else {
-                red *= 1.7;
-                if (red < 0.00001) {
-                    red = 0.00001;
-                }
-            }
-            player.spawnParticle(Particle.REDSTONE, position.getX(), position.getY(), position.getZ(), 0, red, green, blue, 1.0);
-        }
-    }
-
-    private static void spawnDustParticles_1_13(Player player, Vector position, Color color) {
-        try {
-            // Official Bukkit API introduced in MC 1.13
-            player.spawnParticle(Particle.REDSTONE,
-                    position.getX(), position.getY(), position.getZ(),
-                    1, new Particle.DustOptions(color, 1.0f));
-        } catch (NoClassDefFoundError err) {
-        }
+        PacketPlayOutWorldParticlesHandle packet = PacketPlayOutWorldParticlesHandle.createNew();
+        packet.setParticle(ParticleType.DUST, ParticleType.DustOptions.create(color, 1.0f));
+        packet.setPos(position);
+        PacketUtil.sendPacket(player, packet);
     }
 
     /**

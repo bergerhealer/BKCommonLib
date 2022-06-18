@@ -23,6 +23,7 @@ import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.resources.BlockStateType;
+import com.bergerkiller.bukkit.common.resources.ParticleType;
 import com.bergerkiller.bukkit.common.resources.ResourceCategory;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
 import com.bergerkiller.bukkit.common.resources.SoundEffect;
@@ -686,5 +687,10 @@ public class WrapperConversion {
     @ConverterMethod(input="net.minecraft.server.EnumInteractionResult", optional = true)
     public static InteractionResult interactionResultFromNMSEnumInteractionResult(Object nmsEnumInteractionResultHandle) {
         return InteractionResult.fromHandle(nmsEnumInteractionResultHandle);
+    }
+
+    @ConverterMethod(input="net.minecraft.core.particles.Particle<?>", acceptsNull=true)
+    public static ParticleType<?> toParticleType(Object nmsParticleHandle) {
+        return ParticleType.byNMSParticleHandle(nmsParticleHandle);
     }
 }

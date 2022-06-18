@@ -1,0 +1,99 @@
+package net.minecraft.core.particles;
+
+import net.minecraft.core.IRegistry;
+import net.minecraft.resources.MinecraftKey;
+
+public class Particle {
+    #bootstrap com.bergerkiller.bukkit.common.internal.CommonBootstrap.initServer();
+
+#if version >= 1.13
+    // Particle API added in MC 1.13
+
+    public boolean hasOptions() {
+        return !(instance instanceof ParticleType);
+    }
+
+    public String getName() {
+  #if version >= 1.13.1
+        MinecraftKey key = IRegistry.PARTICLE_TYPE.getKey((Object) instance);
+  #else
+        MinecraftKey key = (MinecraftKey) Particle.REGISTRY.b((Object) instance);
+  #endif
+        if (key == null) return "";
+  #if version >= 1.18
+        return key.getPath();
+  #else
+        return key.getKey();
+  #endif
+    }
+
+    public static (Object) Particle byName(String name) {
+        MinecraftKey key;
+        try {
+            key = new MinecraftKey(name);
+        } catch (net.minecraft.ResourceKeyInvalidException ex) {
+            return null;
+        }
+        return (Particle) IRegistry.PARTICLE_TYPE.get(key);
+    }
+
+    public static java.util.List<?> values() {
+        java.util.ArrayList values = new java.util.ArrayList();
+        java.util.Iterator iter = IRegistry.PARTICLE_TYPE.iterator();
+        while (iter.hasNext())
+            values.add(iter.next());
+        return values;
+    }
+#else
+    // ParticleEnum only, hardcoded stuff
+
+    public boolean hasOptions() {
+        if (instance == Particles.BLOCK_CRACK) return true;
+        if (instance == Particles.BLOCK_DUST) return true;
+        if (instance == Particles.ITEM_CRACK) return true;
+        if (instance == Particles.REDSTONE) return true;
+  #if version >= 1.10
+        if (instance == Particles.FALLING_DUST) return true;
+  #endif
+        return false;
+    }
+
+  #if version >= 1.9
+    public String getName:b();
+  #else
+    public String getName() {
+        String n = instance.b();
+        int len = n.length();
+        if (len > 0 && n.charAt(len-1) == '_') {
+            n = n.substring(0, len-1);
+        }
+        return n;
+    }
+  #endif
+
+  #if version >= 1.9
+    public static (Object) Particle byName:a(String name);
+  #else
+    public static (Object) Particle byName(String name) {
+        Particle[] all_values = Particle.values();
+        int len = all_values.length;
+        for (int i = 0; i < len; ++i) {
+            Particle particle = all_values[i];
+            String n = particle.b();
+            int len = n.length();
+            if (len > 0 && n.charAt(len-1) == '_') {
+                n = n.substring(0, len-1);
+            }
+            if (n.equals(name)) {
+                return particle;
+            }
+        }
+        return null;
+    }
+  #endif
+
+    public static java.util.List<?> values() {
+        return java.util.Arrays.asList(Particle.values());
+    }
+#endif
+}

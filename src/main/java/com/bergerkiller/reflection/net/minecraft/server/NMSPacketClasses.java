@@ -2125,36 +2125,36 @@ public class NMSPacketClasses {
         public final FieldAccessor<Double> x = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return PacketPlayOutWorldParticlesHandle.T.getX.invoke(instance);
+                return PacketPlayOutWorldParticlesHandle.T.getPosX.invoke(instance);
             }
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutWorldParticlesHandle.T.setX.invoke(instance, value);
+                PacketPlayOutWorldParticlesHandle.T.setPosX.invoke(instance, value);
                 return true;
             }
         };
         public final FieldAccessor<Double> y = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return PacketPlayOutWorldParticlesHandle.T.getY.invoke(instance);
+                return PacketPlayOutWorldParticlesHandle.T.getPosY.invoke(instance);
             }
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutWorldParticlesHandle.T.setY.invoke(instance, value);
+                PacketPlayOutWorldParticlesHandle.T.setPosY.invoke(instance, value);
                 return true;
             }
         };
         public final FieldAccessor<Double> z = new SafeDirectField<Double>() {
             @Override
             public Double get(Object instance) {
-                return PacketPlayOutWorldParticlesHandle.T.getZ.invoke(instance);
+                return PacketPlayOutWorldParticlesHandle.T.getPosZ.invoke(instance);
             }
 
             @Override
             public boolean set(Object instance, Double value) {
-                PacketPlayOutWorldParticlesHandle.T.setZ.invoke(instance, value);
+                PacketPlayOutWorldParticlesHandle.T.setPosZ.invoke(instance, value);
                 return true;
             }
         };
@@ -2163,27 +2163,12 @@ public class NMSPacketClasses {
         public final FieldAccessor<Float> randomZ = PacketPlayOutWorldParticlesHandle.T.randomZ.toFieldAccessor();
         public final FieldAccessor<Float> speed = PacketPlayOutWorldParticlesHandle.T.speed.toFieldAccessor();
         public final FieldAccessor<Integer> particleCount = PacketPlayOutWorldParticlesHandle.T.count.toFieldAccessor();
-        public final FieldAccessor<Boolean> longDistance = PacketPlayOutWorldParticlesHandle.T.longDistance.toFieldAccessor();
+        public final FieldAccessor<Boolean> overrideLimiter = PacketPlayOutWorldParticlesHandle.T.overrideLimiter.toFieldAccessor();
 
-        /*
-        public CommonPacket newInstance(String name, int count, Location location, double randomness, double speed) {
-            return newInstance(name, count, location.getX(), location.getY(), location.getZ(), randomness, randomness, randomness, speed);
+        @Override
+        public CommonPacket newInstance() {
+            return new CommonPacket(PacketPlayOutWorldParticlesHandle.T.createNew.raw.invoke(), this);
         }
-
-        public CommonPacket newInstance(String name, int count, double x, double y, double z, double rx, double ry, double rz, double speed) {
-            final CommonPacket packet = newInstance();
-            packet.write(this.particle, EnumParticleHandle.getRaw(EnumParticleHandle.getByName(name)));
-            packet.write(this.particleCount, count);
-            packet.write(this.x, (float) x);
-            packet.write(this.y, (float) y);
-            packet.write(this.z, (float) z);
-            packet.write(this.randomX, (float) rx);
-            packet.write(this.randomY, (float) ry);
-            packet.write(this.randomZ, (float) rz);
-            packet.write(this.speed, (float) speed);
-            return packet;
-        }
-        */
     }
 
     //////////////////////////////////////////////////////////////////////

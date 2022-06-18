@@ -28,6 +28,7 @@
 #include /net/minecraft/core_nonnulllist.txt
 #include /net/minecraft/core_registry.txt
 #include /net/minecraft/core_vector3f.txt
+#include /net/minecraft/core_particles.txt
 #include /net/minecraft/crashreport.txt
 #include /net/minecraft/entity/entity_attributes.txt
 #include /net/minecraft/entity/bat.txt
