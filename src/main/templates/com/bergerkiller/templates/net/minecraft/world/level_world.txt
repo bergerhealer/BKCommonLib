@@ -89,9 +89,9 @@ class World extends IBlockAccess {
 
         // Get chunk of block and it's sections
   #if version >= 1.18
-        net.minecraft.world.level.chunk.Chunk chunk = instance.getChunk(x >> 4, z >> 4);
+        net.minecraft.world.level.chunk.Chunk chunk = (net.minecraft.world.level.chunk.Chunk) instance.getChunk(x >> 4, z >> 4);
   #else
-        net.minecraft.world.level.chunk.Chunk chunk = instance.getChunkAt(x >> 4, z >> 4);
+        net.minecraft.world.level.chunk.Chunk chunk = (net.minecraft.world.level.chunk.Chunk) instance.getChunkAt(x >> 4, z >> 4);
   #endif
         net.minecraft.world.level.chunk.ChunkSection[] sections = chunk.getSections();
 
