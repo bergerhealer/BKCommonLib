@@ -40,14 +40,20 @@ public class SignChangeTracker {
     }
 
     private void loadTileEntity(TileEntitySignHandle tile) {
-        this.tileEntity = tile;
-        this.lastRawLines = tile.getRawLines().clone();
+        if (tile == null) {
+            this.tileEntity = null;
+            this.lastRawLines = null;
+            this.blockData = null;
+        } else {
+            this.tileEntity = tile;
+            this.lastRawLines = tile.getRawLines().clone();
 
-        // Note: it is possible for a TileEntity to be retrieved while it's added to a Chunk,
-        // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
-        // check whether the World was assigned to the tile entity. If not, we cannot use the tile
-        // entity's property method, as it throws a NPE.
-        this.blockData = tile.isRemoved() ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
+            // Note: it is possible for a TileEntity to be retrieved while it's added to a Chunk,
+            // but not yet to a World. Especially on 1.12.2 and before. For that reason, we got to
+            // check whether the World was assigned to the tile entity. If not, we cannot use the tile
+            // entity's property method, as it throws a NPE.
+            this.blockData = tile.isRemoved() ? WorldUtil.getBlockData(this.block) : tile.getBlockData();
+        }
     }
 
     /**
@@ -280,14 +286,10 @@ public class SignChangeTracker {
      * @return Sign change tracker
      */
     public static SignChangeTracker track(Sign sign) {
-        try {
+        if (sign == null) {
+            throw new IllegalArgumentException("Sign is null");
+        } else {
             return new SignChangeTracker(sign.getBlock(), sign);
-        } catch (NullPointerException ex) {
-            if (sign == null) {
-                throw new IllegalArgumentException("Sign is null");
-            } else {
-                throw ex;
-            }
         }
     }
 
