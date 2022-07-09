@@ -477,4 +477,35 @@ public class FaceUtil {
         }
     }
 
+    /**
+     * Converts a 3D Vector into the most appropriate BlockFace. This includes the up and
+     * down blockfaces
+     *
+     * @param vector
+     * @param useSubCardinalDirections
+     * @return BlockFace
+     */
+    public static BlockFace vectorToBlockFace(Vector vector, boolean useSubCardinalDirections) {
+        return vectorToBlockFace(vector.getX(), vector.getY(), vector.getZ(), useSubCardinalDirections);
+    }
+
+    /**
+     * Converts a 3D Vector into the most appropriate BlockFace. This includes the up and
+     * down blockfaces
+     *
+     * @param dx Vector X
+     * @param dy Vector Y
+     * @param dz Vector Z
+     * @param useSubCardinalDirections
+     * @return BlockFace
+     */
+    public static BlockFace vectorToBlockFace(double dx, double dy, double dz, boolean useSubCardinalDirections) {
+        double sqlenxz = dx * dx + dz * dz;
+        double sqleny = dy * dy;
+        if (sqleny > (sqlenxz + 1e-6)) {
+            return FaceUtil.getVertical(dy);
+        } else {
+            return FaceUtil.getDirection(dx, dz, useSubCardinalDirections);
+        }
+    }
 }
