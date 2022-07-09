@@ -79,6 +79,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -2510,6 +2511,19 @@ class PacketPlayOutBlockChange extends Packet {
     private (IntVector3) BlockPosition position:a;
     public (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData:block;
 #endif
+
+    public static (PacketPlayOutBlockChangeHandle) PacketPlayOutBlockChange createNew((IntVector3) BlockPosition position, (com.bergerkiller.bukkit.common.wrappers.BlockData) IBlockData blockData) {
+#if version >= 1.16.2
+        return new PacketPlayOutBlockChange(position, blockData);
+#else
+        PacketPlayOutBlockChange packet = new PacketPlayOutBlockChange();
+        #require PacketPlayOutBlockChange private BlockPosition position:a;
+        #require PacketPlayOutBlockChange public IBlockData blockData:block;
+        packet#position = position;
+        packet#blockData = blockData;
+        return packet;
+#endif
+    }
 }
 
 class PacketPlayOutBlockBreakAnimation extends Packet {

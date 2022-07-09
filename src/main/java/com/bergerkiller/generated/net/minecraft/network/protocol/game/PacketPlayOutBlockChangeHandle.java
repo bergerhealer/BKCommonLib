@@ -22,6 +22,10 @@ public abstract class PacketPlayOutBlockChangeHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutBlockChangeHandle createNew(IntVector3 position, BlockData blockData) {
+        return T.createNew.invoke(position, blockData);
+    }
+
     public abstract IntVector3 getPosition();
     public abstract void setPosition(IntVector3 value);
     public abstract BlockData getBlockData();
@@ -33,6 +37,8 @@ public abstract class PacketPlayOutBlockChangeHandle extends PacketHandle {
     public static final class PacketPlayOutBlockChangeClass extends Template.Class<PacketPlayOutBlockChangeHandle> {
         public final Template.Field.Converted<IntVector3> position = new Template.Field.Converted<IntVector3>();
         public final Template.Field.Converted<BlockData> blockData = new Template.Field.Converted<BlockData>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutBlockChangeHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutBlockChangeHandle>();
 
     }
 

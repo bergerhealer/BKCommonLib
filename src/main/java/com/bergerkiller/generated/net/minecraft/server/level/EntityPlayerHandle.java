@@ -38,6 +38,12 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract void setHasSeenCredits(boolean hasSeen);
     public abstract void sendMessage(ChatText ichatbasecomponent);
     public abstract InventoryView openAnvilWindow(ChatText titleText);
+    public abstract void openSignEditWindow(IntVector3 signPosition);
+
+    public void closeSignEditWindow() {
+        openSignEditWindow(IntVector3.of(Integer.MAX_VALUE, 0, Integer.MAX_VALUE));
+    }
+
 
     public static EntityPlayerHandle fromBukkit(org.bukkit.entity.Player player) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(player));
@@ -72,6 +78,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         @Template.Optional
         public final Template.Method<Collection<Integer>> getRemoveQueue = new Template.Method<Collection<Integer>>();
         public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();
+        public final Template.Method.Converted<Void> openSignEditWindow = new Template.Method.Converted<Void>();
 
     }
 
