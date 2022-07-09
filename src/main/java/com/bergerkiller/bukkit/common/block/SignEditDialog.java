@@ -62,6 +62,16 @@ public abstract class SignEditDialog {
     public abstract void onClosed(Player player, String[] lines);
 
     /**
+     * Called when the player initiates closing of the dialog without
+     * having inputed any lines of text. By default calls {@link #onAborted(Player)}
+     *
+     * @param player Player that closed the dialog
+     */
+    public void onClosedWithoutLines(Player player) {
+        this.onAborted(player);
+    }
+
+    /**
      * Called when this edit dialog is forcibly closed without the player
      * having been able to input lines of text
      *
@@ -193,7 +203,18 @@ public abstract class SignEditDialog {
      * @param lines
      */
     private final void handleClosed(PlayerMetadata metadata, String[] lines) {
-        this.onClosed(metadata.player, lines);
+        boolean isAllEmpty = true;
+        for (String line : lines) {
+            if (!line.isEmpty()) {
+                isAllEmpty = false;
+                break;
+            }
+        }
+        if (isAllEmpty) {
+            this.onClosedWithoutLines(metadata.player);
+        } else {
+            this.onClosed(metadata.player, lines);
+        }
     }
 
     /**
