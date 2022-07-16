@@ -32,6 +32,7 @@ import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerAnvilHandle;
 import com.bergerkiller.generated.net.minecraft.world.inventory.ContainerHandle;
@@ -78,6 +79,16 @@ public class MapWidgetAnvil extends MapWidget {
      */
     public String getText() {
         return this._text;
+    }
+
+    /**
+     * Gets the title to display at the top of the Anvil dialog window. Can be overrided
+     * to change the title. Will default to just showing 'Anvil' if null is returned.
+     *
+     * @return Title text
+     */
+    public ChatText getTitle() {
+        return null;
     }
 
     /**
@@ -172,7 +183,7 @@ public class MapWidgetAnvil extends MapWidget {
                     continue;
                 }
 
-                final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(null);
+                final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
 
                 // Required for handling text changes < MC 1.9
                 if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
@@ -383,6 +394,7 @@ public class MapWidgetAnvil extends MapWidget {
             setWindowOpen(false);
         }
 
+        @SuppressWarnings("deprecation")
         @EventHandler(priority = EventPriority.LOWEST)
         public void onInventoryClick(InventoryClickEvent event) {
             if (!mustHandle(event)) return;

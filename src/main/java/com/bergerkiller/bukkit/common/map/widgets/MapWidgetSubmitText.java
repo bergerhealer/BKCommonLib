@@ -3,6 +3,8 @@ package com.bergerkiller.bukkit.common.map.widgets;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 
+import com.bergerkiller.bukkit.common.wrappers.ChatText;
+
 /**
  * Implementation of {@link MapWidgetAnvil} geared towards allowing
  * the player to input text. To display the input, activate the widget.
@@ -50,6 +52,16 @@ public class MapWidgetSubmitText extends MapWidgetAnvil {
             MIDDLE_BUTTON.setDescription(text);
         }
         return this;
+    }
+
+    @Override
+    public ChatText getTitle() {
+        String desc = MIDDLE_BUTTON.getDescription();
+        if (desc != null && !desc.isEmpty()) {
+            return ChatText.fromMessage(desc);
+        } else {
+            return super.getTitle();
+        }
     }
 
     @Override
