@@ -162,7 +162,7 @@ class EntityTrackerEntry {
   #else
         #require net.minecraft.server.level.PlayerChunkMap private int playerViewDistance:A;
   #endif
-        Object playerChunkMap = instance#entityTracker;
+        net.minecraft.server.level.PlayerChunkMap playerChunkMap = instance#entityTracker;
         return playerChunkMap#playerViewDistance;
     }
 #elseif version >= 1.9
