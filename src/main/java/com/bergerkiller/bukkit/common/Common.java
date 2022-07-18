@@ -34,7 +34,8 @@ public class Common {
             "Common:EntityNetworkController:HasOnPassengersChanged",
             "Common:Localization:InitDefaults",
             "Common:BlockData:EmissionBlockParameter",
-            "Common:SignChangeTracker"
+            "Common:SignChangeTracker",
+            "Common:EntityUtil:GetSetEquipmentSlot"
     ).collect(Collectors.toSet());
 
     /**

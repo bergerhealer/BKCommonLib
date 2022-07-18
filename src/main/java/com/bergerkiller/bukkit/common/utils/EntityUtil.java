@@ -11,11 +11,15 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityLivingHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.GenericAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityHangingHandle;
+import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Hanging;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.inventory.EquipmentSlot;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.UUID;
 
@@ -175,5 +179,27 @@ public class EntityUtil extends EntityPropertyUtil {
      */
     public static DataWatcher getDataWatcher(org.bukkit.entity.Entity entity) {
         return EntityHandle.T.getDataWatcher.invoke(HandleConversion.toEntityHandle(entity));
+    }
+
+    /**
+     * Gets the Item inside a given equipment slot of a HumanEntity/Player Inventory
+     *
+     * @param humanEntity Entity
+     * @param slot EquipmentSlot
+     * @return Item inside this slot
+     */
+    public static ItemStack getEquipment(HumanEntity humanEntity, EquipmentSlot slot) {
+        return PlayerInventoryHandle.T.getItem.invoke(humanEntity.getInventory(), slot);
+    }
+
+    /**
+     * Sets the Item inside a given equipment slot of a HumanEntity/Player Inventory
+     *
+     * @param humanEntity Entity
+     * @param slot EquipmentSlot
+     * @param item Item to set. Null to clear.
+     */
+    public static void setEquipment(HumanEntity humanEntity, EquipmentSlot slot, ItemStack item) {
+        PlayerInventoryHandle.T.setItem.invoke(humanEntity.getInventory(), slot, item);
     }
 }

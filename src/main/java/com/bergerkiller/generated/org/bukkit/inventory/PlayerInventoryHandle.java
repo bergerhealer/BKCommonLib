@@ -1,6 +1,7 @@
 package com.bergerkiller.generated.org.bukkit.inventory;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -22,6 +23,8 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
 
     public abstract ItemStack getItemInMainHand();
     public abstract ItemStack getItemInOffHand();
+    public abstract void setItem(EquipmentSlot slot, ItemStack item);
+    public abstract ItemStack getItem(EquipmentSlot slot);
     /**
      * Stores class members for <b>org.bukkit.inventory.PlayerInventory</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -37,6 +40,8 @@ public abstract class PlayerInventoryHandle extends InventoryHandle {
         public final Template.Method<Void> setItemInHand = new Template.Method<Void>();
         public final Template.Method<ItemStack> getItemInMainHand = new Template.Method<ItemStack>();
         public final Template.Method<ItemStack> getItemInOffHand = new Template.Method<ItemStack>();
+        public final Template.Method<Void> setItem = new Template.Method<Void>();
+        public final Template.Method<ItemStack> getItem = new Template.Method<ItemStack>();
 
     }
 

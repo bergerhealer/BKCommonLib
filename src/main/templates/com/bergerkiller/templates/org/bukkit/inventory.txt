@@ -39,4 +39,50 @@ class PlayerInventory extends Inventory {
         return null;
     }
 #endif
+
+#if version >= 1.16
+    public void setItem(EquipmentSlot slot, ItemStack item);
+    public ItemStack getItem(EquipmentSlot slot);
+#else
+    public void setItem(EquipmentSlot slot, ItemStack item) {
+  #if version >= 1.9
+        if (slot == EquipmentSlot.HAND)
+            instance.setItemInMainHand(item);
+        else if (slot == EquipmentSlot.OFF_HAND)
+            instance.setItemInOffHand(item);
+  #else
+        if (slot == EquipmentSlot.HAND)
+            instance.setItemInHand(item);
+  #endif
+        else if (slot == EquipmentSlot.FEET)
+            instance.setBoots(item);
+        else if (slot == EquipmentSlot.LEGS)
+            instance.setLeggings(item);
+        else if (slot == EquipmentSlot.CHEST)
+            instance.setChestplate(item);
+        else if (slot == EquipmentSlot.HEAD)
+            instance.setHelmet(item);
+    }
+    public ItemStack getItem(EquipmentSlot slot) {
+  #if version >= 1.9
+        if (slot == EquipmentSlot.HAND)
+            return instance.getItemInMainHand();
+        else if (slot == EquipmentSlot.OFF_HAND)
+            return instance.getItemInOffHand();
+  #else
+        if (slot == EquipmentSlot.HAND)
+            return instance.getItemInHand();
+  #endif
+        else if (slot == EquipmentSlot.FEET)
+            return instance.getBoots();
+        else if (slot == EquipmentSlot.LEGS)
+            return instance.getLeggings();
+        else if (slot == EquipmentSlot.CHEST)
+            return instance.getChestplate();
+        else if (slot == EquipmentSlot.HEAD)
+            return instance.getHelmet();
+        else
+            return null;
+    }
+#endif
 }
