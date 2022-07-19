@@ -24,9 +24,13 @@ public class ArclightServer extends SpigotServer {
 
         // Check this is actually a Arclight server, we expect this Class to exist
         try {
-            Class.forName("io.izzel.arclight.common.ArclightMain");
-        } catch (Throwable t) {
-            return false;
+            Class.forName("io.izzel.arclight.server.Launcher");
+        } catch (Throwable t1) {
+            try {
+                Class.forName("io.izzel.arclight.common.ArclightMain");
+            } catch (Throwable t2) {
+                return false;
+            }
         }
 
         // If this class exists, this is a modern version that remaps the nms byte[] source
@@ -65,7 +69,7 @@ public class ArclightServer extends SpigotServer {
             return false;
         }
 
-        return false;
+        return true;
     }
 
     @Override
