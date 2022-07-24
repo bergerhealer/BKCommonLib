@@ -619,6 +619,22 @@ public class LogicUtil {
     }
 
     /**
+     * Copies an array with one extra length and put the element specified in the newly
+     * allocated slot.
+     *
+     * @param <T>
+     * @param input Input array
+     * @param element Element to append to the end
+     * @return New array
+     */
+    public static <T> T[] appendArrayElement(T[] input, T element) {
+        int len = input.length;
+        T[] new_arr = Arrays.copyOf(input, len + 1);
+        new_arr[len] = element;
+        return new_arr;
+    }
+
+    /**
      * Removes or adds an element from/to a Collection, and returns whether something has changed.
      *
      * @param collection to add or remove an element from
