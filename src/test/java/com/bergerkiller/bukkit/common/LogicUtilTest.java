@@ -177,6 +177,23 @@ public class LogicUtilTest {
     }
 
     @Test
+    public void testCloneAll() {
+        @SuppressWarnings("unchecked")
+        ArrayList<String>[] lists = new ArrayList[5];
+        for (int i = 0; i < lists.length; i++) {
+            lists[i] = new ArrayList<String>();
+            lists[i].add("hello" + i);
+            lists[i].add("world" + i);
+        }
+        ArrayList<String>[] lists_copy = LogicUtil.cloneAll(lists);
+        assertEquals(lists.length, lists_copy.length);
+        assertTrue(lists != lists_copy);
+        for (int i = 0; i < lists.length; i++) {
+            assertEquals(lists[i], lists_copy[i]);
+        }
+    }
+
+    @Test
     public void testExceptionallyAsync() throws InterruptedException, ExecutionException {
         Executor executor = r -> {
             Thread t = new Thread(r, "asynchandler");

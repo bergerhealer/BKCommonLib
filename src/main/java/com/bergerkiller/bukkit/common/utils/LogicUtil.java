@@ -20,6 +20,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 
 import org.bukkit.block.Block;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
@@ -28,15 +29,15 @@ import com.bergerkiller.bukkit.common.bases.CheckedSupplier;
 import com.bergerkiller.bukkit.common.bases.DeferredSupplier;
 import com.bergerkiller.bukkit.common.collections.BlockSet;
 import com.bergerkiller.bukkit.common.collections.ImmutableArrayList;
-import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.util.BoxedType;
+import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 import com.google.common.collect.BiMap;
 
 /**
  * Logic operations, such as contains checks and collection-type transformations
  */
 public class LogicUtil {
-    private static Map<Class<?>, Method> _cloneMethodCache = Collections.emptyMap();
+    private static Map<Class<?>, UnaryOperator<Object>> _cloneMethodCache = Collections.emptyMap();
     private static final Consumer<Object> _noopConsumer = obj -> {};
     private static final Predicate<Object> _alwaysTruePredicate = obj -> true;
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
@@ -194,6 +195,20 @@ public class LogicUtil {
     }
 
     /**
+     * Performs an unsafe cast to a generic type. Be sure to check that the
+     * object being cast is actually an instance of the type to cast to. Casting
+     * errors will occur while working with the resulting value, not while
+     * performing the casting in this method.
+     *
+     * @param value to cast
+     * @return value cast in an unsafe way
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T unsafeCast(Object value) {
+        return (T) value;
+    }
+
+    /**
      * Checks whether an element index is within range of a collection
      *
      * @param collection to check
@@ -328,6 +343,36 @@ public class LogicUtil {
     }
 
     /**
+     * Identifies the clone() method of a Class type. Caches the result for fast re-use.
+     *
+     * @param <T>
+     * @param type
+     * @return clone method operator
+     * @throws IllegalArgumentException If the type has no clone method
+     */
+    public static <T> UnaryOperator<T> findCloneMethod(Class<T> type) {
+        return CommonUtil.unsafeCast(synchronizeCopyOnWrite(LogicUtil.class, () -> _cloneMethodCache, type, (map, inType) -> map.get(inType), (map, inType) -> {
+            // Generate new operator
+            Method cloneMethod;
+            try {
+                cloneMethod = type.getMethod("clone");
+            } catch (NoSuchMethodException | SecurityException e) {
+                throw new IllegalArgumentException("Object of type " + type.getName() + " can not be cloned");
+            }
+            final FastMethod<Object> fm = new FastMethod<Object>(cloneMethod);
+            fm.forceInitialization();
+            UnaryOperator<Object> op = fm::invoke;
+
+            // Store in map
+            Map<Class<?>, UnaryOperator<Object>> newMap = new HashMap<>(map);
+            newMap.put(inType, op);
+            _cloneMethodCache = newMap;
+
+            return op;
+        }));
+    }
+
+    /**
      * Clones a single value. Finds the clone() method of the value type,
      * and calls it on the value to clone it. If the value can not be cloned,
      * then an exception is thrown.
@@ -340,31 +385,8 @@ public class LogicUtil {
     public static <T> T clone(T value) {
         if (value == null) {
             return null;
-        }
-
-        Method cloneMethod = _cloneMethodCache.get(value.getClass());
-        if (cloneMethod == null) {
-            synchronized (_cloneMethodCache) {
-                cloneMethod = _cloneMethodCache.get(value.getClass());
-                if (cloneMethod == null) {
-                    try {
-                        cloneMethod = value.getClass().getMethod("clone");
-                    } catch (NoSuchMethodException | SecurityException e) {
-                        throw new IllegalArgumentException("Object of type " + value.getClass().getName() + " can not be cloned");
-                    }
-
-                    // Thread-safety: because we get() outside of synchronized() a copy must be made
-                    HashMap<Class<?>, Method> newCache = new HashMap<Class<?>, Method>(_cloneMethodCache);
-                    newCache.put(value.getClass(), cloneMethod);
-                    _cloneMethodCache = newCache;
-                }
-            }
-        }
-
-        try {
-            return (T) cloneMethod.invoke(value);
-        } catch (Throwable t) {
-            throw MountiplexUtil.uncheckedRethrow(t);
+        } else {
+            return findCloneMethod((Class<T>) value.getClass()).apply(value);
         }
     }
 
@@ -377,22 +399,53 @@ public class LogicUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] cloneAll(T[] values) {
-        if (values == null || values.length == 0) {
-            return values;
+        if (values == null) {
+            return null;
         }
-        try {
-            final Class<T> compType = (Class<T>) values.getClass().getComponentType();
-            final Method cloneMethod = compType.getDeclaredMethod("clone");
-            T[] rval = createArray(compType, values.length);
-            for (int i = 0; i < rval.length; i++) {
-                final T value = values[i];
-                if (value != null) {
-                    rval[i] = (T) cloneMethod.invoke(value);
+        int len = values.length;
+        if (len == 0) {
+            return values;
+        } else {
+            Class<T> componentType = (Class<T>) values.getClass().getComponentType();
+            UnaryOperator<T> cloneFunction = findCloneMethod(componentType);
+            T[] copy = LogicUtil.createArray(componentType, len);
+            for (int i = 0; i < len; i++) {
+                T input = values[i];
+                if (input != null) {
+                    copy[i] = cloneFunction.apply(input);
                 }
             }
-            return rval;
-        } catch (Exception ex) {
-            throw new RuntimeException("Cloning was not possible:", ex);
+            return copy;
+        }
+    }
+
+    /**
+     * Deep-clones an array and all it's elements using the specified clone function.
+     * If the input array is empty, it is returned as-is without creating a new array.
+     *
+     * @param <T>
+     * @param values Array to clone
+     * @param cloneFunction Function to apply to every element to clone it.
+     *                      Null values are not cloned, storing null in the copy.
+     * @return Cloned array with cloned elements, or the input array if empty or null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[] cloneAll(T[] values, UnaryOperator<T> cloneFunction) {
+        if (values == null) {
+            return null;
+        }
+        int len = values.length;
+        if (len == 0) {
+            return values;
+        } else {
+            T[] copy = LogicUtil.createArray((Class<T>) values.getClass().getComponentType(), len);
+            for (int i = 0; i < len; i++) {
+                T input = values[i];
+                if (input != null) {
+                    copy[i] = cloneFunction.apply(input);
+                }
+            }
+            return copy;
         }
     }
 
