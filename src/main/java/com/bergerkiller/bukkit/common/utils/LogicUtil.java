@@ -303,43 +303,16 @@ public class LogicUtil {
     }
 
     /**
-     * Appends one or more elements to an array This method allocates a new Array of the same type as the old array, with
-     * the size of array + values.
-     *
-     * @param array  input array to append to
-     * @param values to append to array
-     * @return new Array with the values from array and values
-     */
-    @SuppressWarnings("unchecked")
-    public static <T> T[] appendArray(T[] array, T... values) {
-        if (nullOrEmpty(array)) {
-            return values;
-        }
-        if (nullOrEmpty(values)) {
-            return array;
-        }
-        T[] rval = createArray((Class<T>) array.getClass().getComponentType(), array.length + values.length);
-        System.arraycopy(array, 0, rval, 0, array.length);
-        System.arraycopy(values, 0, rval, array.length, values.length);
-        return rval;
-    }
-
-    /**
      * Allocates a new array of the same length and writes the contents to this new array. Unlike
      * {@link #cloneAll(Object[])}, this method does not individually clone the elements
      *
      * @param array to re-allocate as a new array
      * @return new array with the contents of the input array
+     * @deprecated Simply use array.clone() instead.
      */
-    @SuppressWarnings("unchecked")
+    @Deprecated
     public static <T> T[] cloneArray(T[] array) {
-        if (array == null) {
-            return null;
-        }
-        final int length = array.length;
-        T[] rval = createArray((Class<T>) array.getClass().getComponentType(), length);
-        System.arraycopy(array, 0, rval, 0, length);
-        return rval;
+        return (array == null) ? null : array.clone();
     }
 
     /**
@@ -609,12 +582,52 @@ public class LogicUtil {
      * @return new array copy of input array, with the element at the index removed
      */
     public static <T> T[] removeArrayElement(T[] input, int index) {
-        if (index < 0 || index >= input.length) {
+        int len = input.length;
+        if (index < 0 || index >= len) {
             return input;
+        } else if (index == 0) {
+            return Arrays.copyOfRange(input, 1, len);
+        } else if (index == (len - 1)) {
+            return Arrays.copyOf(input, len - 1);
         }
+
         T[] rval = CommonUtil.unsafeCast(createArray(input.getClass().getComponentType(), input.length - 1));
         System.arraycopy(input, 0, rval, 0, index);
         System.arraycopy(input, index + 1, rval, index, input.length - index - 1);
+        return rval;
+    }
+
+    /**
+     * Appends one or more elements to an array. This method allocates a new Array of the same type as the old array, with
+     * the size of array + values. Values are appended to the end.
+     *
+     * @param array  input array to append to
+     * @param values to append to array
+     * @return new Array with the values from array and values
+     * @see #appendArrayElement(Object[], Object)
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> T[] appendArray(T[] array, T... values) {
+        if (array == null) {
+            return values;
+        } else if (values == null) {
+            return array;
+        }
+
+        int array_len = array.length;
+        int values_len = values.length;
+        if (array_len == 0) {
+            return values;
+        } else if (values_len == 0) {
+            return array;
+        }
+
+        T[] rval = Arrays.copyOf(array, array_len + values_len);
+        if (values_len == 1) {
+            rval[array_len] = values[0];
+        } else {
+            System.arraycopy(values, 0, rval, array_len, values_len);
+        }
         return rval;
     }
 

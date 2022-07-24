@@ -194,6 +194,25 @@ public class LogicUtilTest {
     }
 
     @Test
+    public void testRemoveArrayElement() {
+        String[] input = new String[] { "1", "2", "3", "4", "5" };
+
+        assertArrayEquals(new String[] { "2", "3", "4", "5" }, LogicUtil.removeArrayElement(input, 0));
+        assertArrayEquals(new String[] { "1", "3", "4", "5" }, LogicUtil.removeArrayElement(input, 1));
+        assertArrayEquals(new String[] { "1", "2", "3", "5" }, LogicUtil.removeArrayElement(input, input.length - 2));
+        assertArrayEquals(new String[] { "1", "2", "3", "4" }, LogicUtil.removeArrayElement(input, input.length - 1));
+    }
+
+    @Test
+    public void testAppendArray() {
+        String[] input = new String[] { "1", "2" };
+
+        assertArrayEquals(new String[] { "1", "2" }, LogicUtil.appendArray(input, new String[0]));
+        assertArrayEquals(new String[] { "1", "2", "3" }, LogicUtil.appendArray(input, "3"));
+        assertArrayEquals(new String[] { "1", "2", "3", "4" }, LogicUtil.appendArray(input, "3", "4"));
+    }
+
+    @Test
     public void testExceptionallyAsync() throws InterruptedException, ExecutionException {
         Executor executor = r -> {
             Thread t = new Thread(r, "asynchandler");
