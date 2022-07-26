@@ -4,10 +4,9 @@ import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
+import java.util.function.UnaryOperator;
 
 /**
  * A list which can be copied without copying the data, performing an actual copy
@@ -27,17 +26,30 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
     /**
      * Creates a new implicitly shared list, backed by an ArrayList
      */
+    @SuppressWarnings("unchecked")
     public ImplicitlySharedList() {
-        super(new ArrayList<E>());
+        super(new ArrayList<E>(), a -> (ArrayList<E>) a.clone());
+    }
+
+    /**
+     * Creates a new implicitly shared list, specifying what underlying list implementation is used.
+     * List must be cloneable. A guarantee is made that the ArrayList, LinkedList and Vector types
+     * are supported.
+     * 
+     * @param list to use internally
+     */
+    public ImplicitlySharedList(List<E> list) {
+        super(list);
     }
 
     /**
      * Creates a new implicitly shared list, specifying what underlying list implementation is used.
      * 
      * @param list to use internally
+     * @param cloneFunction Function to clone the list
      */
-    public ImplicitlySharedList(List<E> list) {
-        super(list);
+    public <V extends List<E>> ImplicitlySharedList(V list, UnaryOperator<V> cloneFunction) {
+        super(list, cloneFunction);
     }
 
     /**
@@ -363,21 +375,6 @@ public class ImplicitlySharedList<E> extends ImplicitlySharedHolder<List<E>> imp
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return createAbstractList().subList(fromIndex, toIndex);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected final List<E> cloneValue(List<E> input) {
-        // Java clone() is poor. Handle the generic cases and hope for the best.
-        if (input instanceof ArrayList) {
-            return (List<E>) ((ArrayList<E>) input).clone();
-        } else if (input instanceof LinkedList) {
-            return new LinkedList<E>(input);
-        } else if (input instanceof Vector) {
-            return (List<E>) ((Vector<E>) input).clone();
-        } else {
-            return new ArrayList<E>(input);
-        }
     }
 
     private final class ReferencedListIterator implements Iterator<E> {

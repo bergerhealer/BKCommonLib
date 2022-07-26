@@ -1,6 +1,9 @@
 package com.bergerkiller.bukkit.common.collections;
 
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.UnaryOperator;
+
+import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Base class for a class that allows multiple instances to hold the same value,
@@ -10,8 +13,29 @@ import java.util.concurrent.atomic.AtomicInteger;
 public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
     protected volatile Reference<T> ref;
 
+    /**
+     * Initializes a new ImplicitlySharedHolder for the initial value specified. Looks up
+     * a most-suitable cloning method for the value specific. If the value is null or
+     * the value type lacks a clone() method, throws an IllegalArgumentException
+     *
+     * @param value Initial value
+     * @throws IllegalArgumentException If the initial value is null or can't be cloned
+     */
     public ImplicitlySharedHolder(T value) {
-        this.ref = new Reference<T>(value, 1);
+        this(value, LogicUtil.findCloneMethod(value));
+    }
+
+    /**
+     * Initializes a new ImplicitlySharedHolder for the initial value and cloning function
+     * specified.
+     *
+     * @param <V> Value type stored/cloned
+     * @param value Initial value
+     * @param cloneFunction Cloning function to make copied of the stored value
+     */
+    @SuppressWarnings("unchecked")
+    public <V extends T> ImplicitlySharedHolder(V value, UnaryOperator<V> cloneFunction) {
+        this.ref = (Reference<T>) new Reference<V>(value, cloneFunction, 1);
     }
 
     protected ImplicitlySharedHolder(Reference<T> reference) {
@@ -108,7 +132,8 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
         old_ref.openRead();
         try {
             // Having gained read access, create a copy of the data and swap the reference in use
-            Reference<T> new_ref = new Reference<T>(this.cloneValue(old_ref.val), Reference.WRITE_TOKEN);
+            UnaryOperator<T> cloneFunc = old_ref.cloneFunction;
+            Reference<T> new_ref = new Reference<T>(cloneFunc.apply(old_ref.val), cloneFunc, Reference.WRITE_TOKEN);
             this.ref = new_ref;
             return new_ref;
         } finally {
@@ -142,14 +167,6 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
     }
 
     /**
-     * Implement the logic for cloning the held value here
-     * 
-     * @param input
-     * @return cloned input
-     */
-    protected abstract T cloneValue(T input);
-
-    /**
      * Base class for implicit sharing logic
      */
     protected static final class Reference<T> implements AutoCloseable {
@@ -163,10 +180,12 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
         /// If this is 0, nobody is using it, and it can be written to without copying
         private final AtomicInteger readers;
         public final T val;
+        public final UnaryOperator<T> cloneFunction;
 
-        private Reference(T value, int initialReaders) {
+        private Reference(T value, UnaryOperator<T> cloneFunction, int initialReaders) {
             this.readers = new AtomicInteger(initialReaders);
             this.val = value;
+            this.cloneFunction = cloneFunction;
         }
 
         /**

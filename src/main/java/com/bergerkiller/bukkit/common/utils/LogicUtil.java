@@ -89,6 +89,16 @@ public class LogicUtil {
         _exceptionallyAsyncHandler = handler;
     }
 
+    static {
+        // Used by ImplicitlySharedSet/List, so it's important these are pre-registered
+        registerCloneMethod(java.util.ArrayList.class, a -> (java.util.ArrayList<?>) a.clone());
+        registerCloneMethod(java.util.LinkedList.class, java.util.LinkedList<Object>::new);
+        registerCloneMethod(java.util.Vector.class, v -> (java.util.Vector<?>) v.clone());
+        registerCloneMethod(java.util.TreeSet.class, t -> (java.util.TreeSet<?>) t.clone());
+        registerCloneMethod(java.util.LinkedHashSet.class, java.util.LinkedHashSet<Object>::new);
+        registerCloneMethod(java.util.HashSet.class, s -> (java.util.HashSet<?>) s.clone());
+    }
+
     /**
      * Obtains the unboxed type (int) from a boxed type (Integer)<br>
      * If the input type has no unboxed type, null is returned
@@ -313,6 +323,46 @@ public class LogicUtil {
     @Deprecated
     public static <T> T[] cloneArray(T[] array) {
         return (array == null) ? null : array.clone();
+    }
+
+    /**
+     * Registers a custom value cloning function for the type specified, overriding any automatically
+     * or previously decided cloning technique. This will be used by clone operations of this class.
+     *
+     * @param <T> Value type
+     * @param type Type
+     * @param op Clone function
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> void registerCloneMethod(Class<T> type, UnaryOperator<T> op) {
+        synchronized (LogicUtil.class) {
+            Map<Class<?>, UnaryOperator<Object>> newMap = new HashMap<>(_cloneMethodCache);
+            newMap.put(type, (UnaryOperator<Object>) op);
+            _cloneMethodCache = newMap;
+        }
+    }
+
+    /**
+     * Identifies the clone() method of a Class type. Caches the result for fast re-use.
+     *
+     * @param <T>
+     * @param value Value to deduce a clone method for using Type
+     * @return clone method operator
+     * @throws IllegalArgumentException If the type has no clone method or input value is null
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> UnaryOperator<T> findCloneMethod(T value) {
+        Class<T> type;
+        try {
+            type = (Class<T>) value.getClass();
+        } catch (NullPointerException ex) {
+            if (value == null) {
+                throw new IllegalArgumentException("Input value is null");
+            } else {
+                throw ex;
+            }
+        }
+        return findCloneMethod(type);
     }
 
     /**

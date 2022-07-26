@@ -3,9 +3,8 @@ package com.bergerkiller.bukkit.common.collections;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
+import java.util.function.UnaryOperator;
 
 /**
  * A set which can be copied without copying the data, performing an actual copy
@@ -25,17 +24,30 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
     /**
      * Creates a new implicitly shared set, backed by a HashSet
      */
+    @SuppressWarnings("unchecked")
     public ImplicitlySharedSet() {
-        super(new HashSet<E>());
+        super(new HashSet<E>(), a -> (HashSet<E>) a.clone());
+    }
+
+    /**
+     * Creates a new implicitly shared set, specifying what underlying set implementation is used.
+     * Set must be cloneable. A guarantee is made that the HashSet, TreeSet and LinkedHashSet types
+     * are supported.
+     *
+     * @param set to use internally
+     */
+    public ImplicitlySharedSet(Set<E> set) {
+        super(set);
     }
 
     /**
      * Creates a new implicitly shared set, specifying what underlying set implementation is used.
      * 
      * @param set to use internally
+     * @param cloneFunction Function to clone the set
      */
-    public ImplicitlySharedSet(Set<E> set) {
-        super(set);
+    public <V extends Set<E>> ImplicitlySharedSet(V set, UnaryOperator<V> cloneFunction) {
+        super(set, cloneFunction);
     }
 
     /**
@@ -169,21 +181,6 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
     @Override
     public ImplicitlySharedSet<E> clone() {
         return new ImplicitlySharedSet<E>(this);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    protected final Set<E> cloneValue(Set<E> input) {
-        // Java clone() is poor. Handle the generic cases and hope for the best.
-        if (input instanceof TreeSet) {
-            return (Set<E>) ((TreeSet<E>) input).clone();
-        } else if (input instanceof LinkedHashSet) {
-            return new LinkedHashSet<E>(input);
-        } else if (input instanceof HashSet) {
-            return (Set<E>) ((HashSet<E>) input).clone();
-        } else {
-            return new HashSet<E>(input);
-        }
     }
 
     private static final class ReferencedSetCopyIterator<E> implements Iterator<E> {

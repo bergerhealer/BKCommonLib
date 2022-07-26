@@ -5,11 +5,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
+import java.util.function.Consumer;
 
 import org.junit.Ignore;
 import org.junit.Test;
@@ -169,11 +173,35 @@ public class LogicUtilTest {
 
     @Test
     public void testClone() {
-        ArrayList<String> list = new ArrayList<String>();
-        list.add("hello");
-        list.add("world");
-        ArrayList<String> list_clone = LogicUtil.clone(list);
-        assertEquals(list, list_clone);
+        // Test clone of all these. Important for ImplicitlySharedSet/List that they work.
+        testClone(new ArrayList<String>(), a -> {
+            a.add("hello");
+            a.add("world");
+        });
+        testClone(new LinkedList<String>(), a -> {
+            a.add("hello");
+            a.add("world");
+        });
+        testClone(new HashSet<String>(), a -> {
+            a.add("hello");
+            a.add("world");
+        });
+        testClone(new LinkedHashSet<String>(), a -> {
+            a.add("hello");
+            a.add("world");
+        });
+        testClone(new TreeSet<String>(), a -> {
+            a.add("hello");
+            a.add("world");
+        });
+    }
+
+    private <T> void testClone(T value, Consumer<T> fillFunc) {
+        fillFunc.accept(value);
+        T clone = LogicUtil.clone(value);
+        assertFalse(value == clone);
+        assertEquals(value, clone);
+        assertEquals(value.getClass(), clone.getClass());
     }
 
     @Test
