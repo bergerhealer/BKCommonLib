@@ -213,6 +213,8 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
 
 #if forge_nms_obfuscated
     public void sendMessage:a((ChatText) IChatBaseComponent ichatbasecomponent);
+#elseif version >= 1.19.1
+    public void sendMessage:sendSystemMessage((ChatText) IChatBaseComponent ichatbasecomponent);
 #elseif version >= 1.19
     public void sendMessage((ChatText) IChatBaseComponent ichatbasecomponent) {
         net.minecraft.network.chat.PlayerChatMessage playerchatmessage = net.minecraft.network.chat.PlayerChatMessage.unsigned(ichatbasecomponent);

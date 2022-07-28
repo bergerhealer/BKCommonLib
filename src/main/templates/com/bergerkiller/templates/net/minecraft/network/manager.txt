@@ -44,6 +44,9 @@ class NetworkManager {
   #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, io.netty.util.concurrent.GenericFutureListener[] listener)
         #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, GenericFutureListener[] listener);
         Object queuedPacket = #createQueuedPacket(packet, (GenericFutureListener[]) null);
+  #elseif exists net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket(net.minecraft.network.protocol.Packet<?> packet, net.minecraft.network.PacketSendListener listener)
+        #require net.minecraft.network.NetworkManager.QueuedPacket public NetworkManager.QueuedPacket createQueuedPacket:<init>((Object) Packet<?> packet, net.minecraft.network.PacketSendListener listener);
+        Object queuedPacket = #createQueuedPacket(packet, (net.minecraft.network.PacketSendListener) null);
   #else
         #error Cannot queue packets - queued packet constructor not found!
   #endif

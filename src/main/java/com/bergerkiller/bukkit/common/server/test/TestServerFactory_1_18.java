@@ -2,12 +2,14 @@ package com.bergerkiller.bukkit.common.server.test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
 import org.bukkit.Bukkit;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
@@ -57,6 +59,13 @@ class TestServerFactory_1_18 extends TestServerFactory {
         setField(server, "logger",  MountiplexUtil.LOGGER);
         setField(server, "console", mc_server);
         setField(mc_server, "serverThread", Thread.currentThread());
+
+        // Initialize the 'registries' cache field. Added in Bukkit 1.19.1
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.1")) {
+            try {
+                setField(server, "registries", new HashMap<Object, Object>());
+            } catch (RuntimeException ex) {}
+        }
 
         // Initialize the dimension root registry for the server
         // this.f = iregistrycustom_dimension; (MinecraftServer.java)
