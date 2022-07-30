@@ -6,7 +6,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.19.1-v1-SNAPSHOT</version>
+    <version>1.19.1-v1</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
@@ -208,7 +208,8 @@
         <dependency>
             <groupId>net.kyori</groupId>
             <artifactId>adventure-platform-bukkit</artifactId>
-            <version>4.1.1</version>
+            <!-- Note: uses Machine Makers pull request fix. Change to 4.1.2 when released -->
+            <version>4.1.2-mmfix</version>
         </dependency>
 
         <!-- Provided dependencies -->
