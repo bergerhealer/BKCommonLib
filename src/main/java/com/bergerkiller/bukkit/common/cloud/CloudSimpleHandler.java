@@ -20,6 +20,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.localization.LocalizationEnum;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -97,14 +98,35 @@ public class CloudSimpleHandler {
         // Register Brigadier mappings
         // Only do this on PaperSpigot. On base Spigot, this breaks command blocks
         boolean brigDisabled = CommonPlugin.hasInstance() && CommonPlugin.getInstance().isCloudBrigadierDisabled();
-        if (!brigDisabled && manager.queryCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
-            try {
-                manager.registerBrigadier();
-                CloudBrigadierManager<?, ?> brig = manager.brigadierManager();
-                brig.setNativeNumberSuggestions(false);
-            } catch (BrigadierFailureException ex) {
-                plugin.getLogger().log(Level.WARNING, "Failed to register commands using brigadier, " +
-                        "using fallback instead. Error:", ex);
+        if (!brigDisabled && manager.hasCapability(CloudBukkitCapabilities.NATIVE_BRIGADIER)) {
+            // Bugfix for 1.19.1+ where brigadier functionality was severely broken
+            // We only use it when legacy command support (Paper) is present
+            boolean isStable;
+            if (Common.evaluateMCVersion(">=", "1.19.1")) {
+                // For future potential fix:
+                /*
+                try {
+                    Class<?> eventClass = Class.forName("com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent");
+                    eventClass.getMethod("getLegacyBehavior");
+                    isStable = true;
+                } catch (Throwable t) {
+                    isStable = false;
+                }
+                */
+
+                isStable = false;
+            } else {
+                isStable = true;
+            }
+            if (isStable) {
+                try {
+                    manager.registerBrigadier();
+                    CloudBrigadierManager<?, ?> brig = manager.brigadierManager();
+                    brig.setNativeNumberSuggestions(false);
+                } catch (BrigadierFailureException ex) {
+                    plugin.getLogger().log(Level.WARNING, "Failed to register commands using brigadier, " +
+                            "using fallback instead. Error:", ex);
+                }
             }
         }
 
@@ -228,7 +250,7 @@ public class CloudSimpleHandler {
             Class<T> type,
             Function<ParserParameters, ArgumentParser<CommandSender, ?>> supplier
     ) {
-        this.manager.getParserRegistry().registerParserSupplier(TypeToken.get(type), supplier);
+        this.manager.parserRegistry().registerParserSupplier(TypeToken.get(type), supplier);
     }
 
     /**
@@ -243,7 +265,7 @@ public class CloudSimpleHandler {
             TypeToken<T> type,
             Function<ParserParameters, ArgumentParser<CommandSender, ?>> supplier
     ) {
-        this.manager.getParserRegistry().registerParserSupplier(type, supplier);
+        this.manager.parserRegistry().registerParserSupplier(type, supplier);
     }
 
     /**
@@ -257,7 +279,7 @@ public class CloudSimpleHandler {
             String name,
             Function<ParserParameters, ArgumentParser<CommandSender, ?>> supplier
     ) {
-        this.manager.getParserRegistry().registerNamedParserSupplier(name, supplier);
+        this.manager.parserRegistry().registerNamedParserSupplier(name, supplier);
     }
 
     /**
@@ -292,7 +314,7 @@ public class CloudSimpleHandler {
             String name,
             BiFunction<CommandContext<CommandSender>, String, List<String>> suggestionsProvider
     ) {
-        manager.getParserRegistry().registerSuggestionProvider(name, suggestionsProvider);
+        manager.parserRegistry().registerSuggestionProvider(name, suggestionsProvider);
     }
 
     /**
@@ -341,7 +363,7 @@ public class CloudSimpleHandler {
             final ParserParameter<T> parameter,
             final T value
     ) {
-        manager.getParserRegistry().registerAnnotationMapper(annotation, (a, typeToken) -> {
+        manager.parserRegistry().registerAnnotationMapper(annotation, (a, typeToken) -> {
             return ParserParameters.single(parameter, value);
         });
     }
@@ -361,7 +383,7 @@ public class CloudSimpleHandler {
             final ParserParameter<T> parameter,
             final Function<A, T> valueMapper
     ) {
-        manager.getParserRegistry().registerAnnotationMapper(annotation, (a, typeToken) -> {
+        manager.parserRegistry().registerAnnotationMapper(annotation, (a, typeToken) -> {
             return ParserParameters.single(parameter, valueMapper.apply(a));
         });
     }
@@ -424,7 +446,7 @@ public class CloudSimpleHandler {
     public <T extends Throwable> void handleMessage(Class<T> exceptionType, String message) {
         final Caption caption = Caption.of(message);
         handle(exceptionType, (sender, exception) -> {
-            String translated = manager.getCaptionRegistry().getCaption(caption, sender);
+            String translated = manager.captionRegistry().getCaption(caption, sender);
             sender.sendMessage(translated);
         });
     }
@@ -457,9 +479,9 @@ public class CloudSimpleHandler {
      * @param messageFactory Factory for producing the desired value for a caption
      */
     public void caption(String regex, BiFunction<Caption, CommandSender, String> messageFactory) {
-        if (manager.getCaptionRegistry() instanceof SimpleCaptionRegistry) {
+        if (manager.captionRegistry() instanceof SimpleCaptionRegistry) {
             final Caption caption = Caption.of(regex);
-            ((SimpleCaptionRegistry<CommandSender>) manager.getCaptionRegistry()).registerMessageFactory(
+            ((SimpleCaptionRegistry<CommandSender>) manager.captionRegistry()).registerMessageFactory(
                     caption, messageFactory
             );
         }
