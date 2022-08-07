@@ -103,18 +103,14 @@ public class CloudSimpleHandler {
             // We only use it when legacy command support (Paper) is present
             boolean isStable;
             if (Common.evaluateMCVersion(">=", "1.19.1")) {
-                // For future potential fix:
-                /*
                 try {
+                    // Paper API added later on to restore legacy behavior. Not present on all versions.
                     Class<?> eventClass = Class.forName("com.destroystokyo.paper.event.brigadier.CommandRegisteredEvent");
-                    eventClass.getMethod("getLegacyBehavior");
+                    eventClass.getMethod("isRawCommand");
                     isStable = true;
                 } catch (Throwable t) {
                     isStable = false;
                 }
-                */
-
-                isStable = false;
             } else {
                 isStable = true;
             }

@@ -24,7 +24,7 @@
         <minecraft.version>1.19.2</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
         <mountiplex.version>2.74</mountiplex.version>
-        <cloud.version>1.7.0</cloud.version>
+        <cloud.version>1.8.0-SNAPSHOT</cloud.version>
         <regionchangetracker.version>1.2</regionchangetracker.version>
         <junit.version>4.12</junit.version>
     </properties>
