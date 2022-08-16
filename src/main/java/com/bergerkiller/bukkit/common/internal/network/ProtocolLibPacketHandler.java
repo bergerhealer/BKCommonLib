@@ -12,9 +12,11 @@ import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionHandle;
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
+import com.bergerkiller.mountiplex.reflection.util.fast.InvalidArgumentCountException;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.*;
@@ -24,6 +26,7 @@ import com.comphenix.protocol.injector.packet.PacketRegistry;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
+import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -56,6 +59,9 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         if (manager == null || packetContainer == null) {
             return false;
         }
+
+        // Forward-initialize this to avoid protocollib loading it
+        CommonUtil.loadClass(InvalidArgumentCountException.class);
 
         // Exception thrown on older protocollib versions
         loggedOutPlayerExceptionType = CommonUtil.getClass(LIB_ROOT + "injector.PlayerLoggedOutException");
@@ -400,7 +406,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         if (manager == null) {
             Logging.LOGGER.log(Level.SEVERE, "Unexpected NPE: ProtocolLibrary.getProtocolManager() is returning null!");
-            Logging.LOGGER.log(Level.SEVERE, "This is caused by other plugins shading in ProtocolLib. Please fix this!");
+            Logging.LOGGER.log(Level.SEVERE, "This is caused by other plugins shading in ProtocolLib");
+            Plugin plugin = CommonUtil.getPluginByClass(ProtocolManager.class);
+            if (plugin != null) {
+                PluginDescriptionFile pfile = plugin.getDescription();
+                if (pfile != null) {
+                    Logging.LOGGER.log(Level.SEVERE, "Please tell the developer(s) of " + pfile.getName() + " (" +
+                            StringUtil.combineNames(pfile.getAuthors()) + ") to fix this problem, or remove the plugin");
+                    Logging.LOGGER.log(Level.SEVERE, "Send the developer(s) the following information:");
+                    Logging.LOGGER.log(Level.SEVERE, "Add <scope>provided</scope> to the protocollib dependency in the plugin's pom.xml");
+                }
+            }
             Logging.LOGGER.log(Level.SEVERE, "Please read: https://www.spigotmc.org/threads/protocollibrary-getprotocolmanager-returns-null.507594/#post-4171682");
             throw new NullPointerException("ProtocolLibrary.getProtocolManager() is null");
         }
