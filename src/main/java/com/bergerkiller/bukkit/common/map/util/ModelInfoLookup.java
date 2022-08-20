@@ -73,6 +73,17 @@ public class ModelInfoLookup {
             options.put("damage", Double.toString((double) item.getDurability() / (double) (ItemUtil.getMaxDurability(item) + 1)));
         }
 
+        // custom model data
+        if (CommonCapabilities.HAS_CUSTOM_MODEL_DATA) {
+            CommonTagCompound nbt = ItemUtil.getMetaTag(item, false);
+            if (nbt != null) {
+                Integer value = nbt.getValue("CustomModelData", Integer.class);
+                if (value != null) {
+                    options.put("custom_model_data", Integer.toString(value));
+                }
+            }
+        }
+
         return options;
     }
 

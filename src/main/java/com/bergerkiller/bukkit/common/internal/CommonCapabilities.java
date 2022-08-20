@@ -181,6 +181,11 @@ public class CommonCapabilities {
     public static final boolean HAS_MATERIAL_SIGN_TYPES = CommonBootstrap.evaluateMCVersion(">=", "1.14");
 
     /**
+     * Since Minecraft 1.14 items can store custom model data
+     */
+    public static final boolean HAS_CUSTOM_MODEL_DATA = CommonBootstrap.evaluateMCVersion(">=", "1.14");
+
+    /**
      * Since Minecraft 1.14 the default constructor for entities includes an EntityTypes<?> instance as a first parameter
      */
     public static final boolean ENTITY_USES_ENTITYTYPES_IN_CONSTRUCTOR = CommonBootstrap.evaluateMCVersion(">=", "1.14");
