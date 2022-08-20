@@ -202,10 +202,11 @@ public class CommonCapabilities {
     public static final boolean ENTITY_FIRE_DAMAGE_IN_MOVE_HANDLER = CommonBootstrap.evaluateMCVersion("<", "1.16");
 
     /**
-     * Since Minecraft 1.16 it is not possible to cancel a vehicle exit event, resulting in the player
+     * Between Minecraft 1.16 and 1.16.5 it is not possible to cancel a vehicle exit event, resulting in the player
      * desynchronizing from the server if attempted.
      */
-    public static final boolean VEHICLE_EXIT_CANCELLABLE = CommonBootstrap.evaluateMCVersion("<", "1.16");
+    public static final boolean VEHICLE_EXIT_CANCELLABLE = CommonBootstrap.evaluateMCVersion("<", "1.16") ||
+                                                           CommonBootstrap.evaluateMCVersion(">=", "1.17");
 
     /**
      * Since Minecraft 1.16 the spawn world is saved as a dimension key in the NBT
