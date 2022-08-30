@@ -5,6 +5,8 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+
 /**
  * A single forced chunk that is kept loaded for as long as this object exists,
  * until {@link #close()} is called.
@@ -36,6 +38,64 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
     }
 
     /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. The chunk is loaded asynchronously
+     * if it is not already loaded.
+     * Loads with a radius of 2, so that entities inside are ticked.
+     * 
+     * @param world
+     * @param chunkX
+     * @param chunkZ
+     * @return forced chunk
+     */
+    public static ForcedChunk load(World world, int chunkX, int chunkZ) {
+        return CommonPlugin.getInstance().getForcedChunkManager().newForcedChunk(world, chunkX, chunkZ);
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. If the provided chunk is currently not
+     * actually loaded, it is loaded asynchronously.
+     * Loads with a radius of 2, so that entities inside are ticked.
+     * 
+     * @param chunk
+     * @return forced chunk
+     */
+    public static ForcedChunk load(org.bukkit.Chunk chunk) {
+        return load(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. The chunk is loaded asynchronously
+     * if it is not already loaded.
+     * 
+     * @param world
+     * @param chunkX
+     * @param chunkZ
+     * @param radius Number of chunks around the chunk to keep loaded.
+     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @return forced chunk
+     */
+    public static ForcedChunk load(World world, int chunkX, int chunkZ, int radius) {
+        return CommonPlugin.getInstance().getForcedChunkManager().newForcedChunk(world, chunkX, chunkZ, radius);
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. If the provided chunk is currently not
+     * actually loaded, it is loaded asynchronously.
+     * 
+     * @param chunk
+     * @param radius Number of chunks around the chunk to keep loaded.
+     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @return forced chunk
+     */
+    public static ForcedChunk load(org.bukkit.Chunk chunk, int radius) {
+        return load(chunk.getWorld(), chunk.getX(), chunk.getZ(), radius);
+    }
+
+    /**
      * Stores the ForcedChunk specified in this one. The original forced
      * chunk stored is closed. The input forced chunk will have the closed state.
      * 
@@ -56,6 +116,17 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      */
     public World getWorld() {
         return this.access().getWorld();
+    }
+
+    /**
+     * Gets the number of chunks around the chunk kept loaded.
+     * If 2 or higher, then entities inside the chunk will be ticked.
+     * Throws an IllegalStateException if this forced chunk was closed.
+     *
+     * @return chunk load radius
+     */
+    public int getRadius() {
+        return this.access().getRadius();
     }
 
     /**
@@ -138,6 +209,7 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
     // Even then it may never be called if the server has sufficient memory and GC never runs
     // This should not be relied upon.
     @Override
+    @SuppressWarnings("deprecation")
     public void finalize() throws Throwable {
         this.close();
         super.finalize();

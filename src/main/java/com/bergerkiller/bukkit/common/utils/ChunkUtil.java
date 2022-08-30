@@ -35,6 +35,7 @@ public class ChunkUtil {
      * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
      * the chunk again to allow it to unload. The chunk is loaded asynchronously
      * if it is not already loaded.
+     * Loads with a radius of 2, so that entities inside are ticked.
      * 
      * @param world
      * @param chunkX
@@ -49,12 +50,43 @@ public class ChunkUtil {
      * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
      * the chunk again to allow it to unload. If the provided chunk is currently not
      * actually loaded, it is loaded asynchronously.
+     * Loads with a radius of 2, so that entities inside are ticked.
      * 
      * @param chunk
      * @return forced chunk
      */
     public static ForcedChunk forceChunkLoaded(org.bukkit.Chunk chunk) {
         return forceChunkLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. The chunk is loaded asynchronously
+     * if it is not already loaded.
+     * 
+     * @param world
+     * @param chunkX
+     * @param chunkZ
+     * @param radius Number of chunks around the chunk to keep loaded.
+     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @return forced chunk
+     */
+    public static ForcedChunk forceChunkLoaded(World world, int chunkX, int chunkZ, int radius) {
+        return CommonPlugin.getInstance().getForcedChunkManager().newForcedChunk(world, chunkX, chunkZ, radius);
+    }
+
+    /**
+     * Forces a chunk to stay loaded. Call {@link ForcedChunk#close()} to release
+     * the chunk again to allow it to unload. If the provided chunk is currently not
+     * actually loaded, it is loaded asynchronously.
+     * 
+     * @param chunk
+     * @param radius Number of chunks around the chunk to keep loaded.
+     *               Radius 2 or higher will make entities inside the chunk get ticked.
+     * @return forced chunk
+     */
+    public static ForcedChunk forceChunkLoaded(org.bukkit.Chunk chunk, int radius) {
+        return forceChunkLoaded(chunk.getWorld(), chunk.getX(), chunk.getZ(), radius);
     }
 
     /**

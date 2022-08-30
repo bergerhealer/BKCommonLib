@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
@@ -35,7 +36,8 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
  * with a reference counter.
  */
 public class CommonForcedChunkManager extends ForcedChunkManager {
-    private IdentityHashMap<World, ForcedWorld> forcedWorlds = new IdentityHashMap<>(); // Cloned on modify
+    private HashMap<WorldRadiusKey, ForcedWorld> forcedWorldsByWorldRadius = new HashMap<>(); // Cloned on modify
+    private IdentityHashMap<World, ForcedWorld[]> forcedWorldsByWorld = new IdentityHashMap<>(); // Cloned on modify
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final WorldUnloadEventListener worldUnloadListener = new WorldUnloadEventListener();
     private final CommonPlugin plugin;
@@ -46,6 +48,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     // After this number of ticks, consider the loading of a chunk to have failed
     private static final int FAIL_LOAD_AFTER_SECONDS = 300;
     private static final int FAIL_LOAD_AFTER_TICKS = (20*FAIL_LOAD_AFTER_SECONDS);
+    private static final ForcedWorld[] NO_WORLDS = new ForcedWorld[0];
 
     public CommonForcedChunkManager(CommonPlugin plugin) {
         this.plugin = plugin;
@@ -58,7 +61,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.pendingHandler = new Task(this.plugin) {
             @Override
             public void run() {
-                forcedWorlds.values().forEach(ForcedWorld::sync);
+                forcedWorldsByWorldRadius.values().forEach(ForcedWorld::sync);
             }
         };
         if (CommonCapabilities.CAN_CANCEL_CHUNK_UNLOAD_EVENT) {
@@ -72,8 +75,9 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.loadTimeoutTracker = null;
         this.pendingHandler.stop();
         this.pendingHandler = null;
-        this.forcedWorlds.values().forEach(f -> f.unload(false));
-        this.forcedWorlds = new IdentityHashMap<>();
+        this.forcedWorldsByWorldRadius.values().forEach(f -> f.unload(false));
+        this.forcedWorldsByWorldRadius = new HashMap<>();
+        this.forcedWorldsByWorld = new IdentityHashMap<>();
         this.asyncLoadCallbackHandler.setExecutorTask(null);
     }
 
@@ -92,24 +96,28 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
     public int getNumberOfForcedLoadedChunks() {
         int count = 0;
-        for (ForcedWorld world : this.forcedWorlds.values()) {
+        for (ForcedWorld world : this.forcedWorldsByWorldRadius.values()) {
             count += world.numKeptLoaded();
         }
         return count;
     }
 
     public boolean isForced(Chunk chunk) {
-        ForcedWorld forced = forcedWorlds.get(chunk.getWorld());
-        return forced != null && forced.isKeptLoaded(chunk.getX(), chunk.getZ());
+        for (ForcedWorld forced : forcedWorldsByWorld.getOrDefault(chunk.getWorld(), NO_WORLDS)) {
+            if (forced.isKeptLoaded(chunk.getX(), chunk.getZ())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
-    public ForcedChunkEntry add(World world, int chunkX, int chunkZ) {
-        return getOrCreateForcedWorld(world).add(chunkX, chunkZ);
+    public ForcedChunkEntry add(World world, int chunkX, int chunkZ, int radius) {
+        return getOrCreateForcedWorld(world, radius).add(chunkX, chunkZ);
     }
 
-    private ForcedWorld getOrCreateForcedWorld(World world) {
-        return LogicUtil.synchronizeCopyOnWrite(this, l -> forcedWorlds, world, IdentityHashMap::get, (fwmap, key) -> {
+    private ForcedWorld getOrCreateForcedWorld(World world, int radius) {
+        return LogicUtil.synchronizeCopyOnWrite(this, l -> forcedWorldsByWorldRadius, new WorldRadiusKey(world, radius), HashMap::get, (fwmap, key) -> {
             // Note: with asynchronous access this could fail spuriously!
             // In those cases, a sync task is scheduled to perform any operations that will follow
             // That task will figure out the world is unloaded, and cancel the request there and then
@@ -118,10 +126,21 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             }
 
             // Register a new ForcedWorld
-            ForcedWorld forcedWorld = new ForcedWorld(world);
-            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(fwmap);
-            newForcedWorlds.put(world, forcedWorld);
-            this.forcedWorlds = newForcedWorlds;
+            ForcedWorld forcedWorld = new ForcedWorld(world, radius);
+            HashMap<WorldRadiusKey, ForcedWorld> newForcedWorldsByWorldRadius = new HashMap<>(fwmap);
+            newForcedWorldsByWorldRadius.put(key, forcedWorld);
+            this.forcedWorldsByWorldRadius = newForcedWorldsByWorldRadius;
+
+            // Add to by world mapping too
+            IdentityHashMap<World, ForcedWorld[]> newForcedWorldsByWorld = new IdentityHashMap<>(this.forcedWorldsByWorld);
+            newForcedWorldsByWorld.compute(world, (w, forcedWorlds) -> {
+                if (forcedWorlds == null) {
+                    return new ForcedWorld[] { forcedWorld };
+                } else {
+                    return LogicUtil.appendArrayElement(forcedWorlds, forcedWorld);
+                }
+            });
+            this.forcedWorldsByWorld = newForcedWorldsByWorld;
 
             // Make sure we run the main update tick at least once. This is so that invalid
             // forced worlds can be removed gracefully if they got created asynchronously.
@@ -133,22 +152,32 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
     private void unloadForcedWorld(World world) {
         // Remove from the by-world lookup. This also prevents anyone from registering new tasks later.
-        ForcedWorld forcedWorld;
+        ForcedWorld[] removedWorlds;
         synchronized (this) {
-            if (!this.forcedWorlds.containsKey(world)) {
+            if (!this.forcedWorldsByWorld.containsKey(world)) {
                 return;
             }
 
-            IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(this.forcedWorlds);
-            forcedWorld = newForcedWorlds.remove(world);
-            this.forcedWorlds = newForcedWorlds;
-            if (forcedWorld == null) {
-                return;
+            IdentityHashMap<World, ForcedWorld[]> newForcedWorldsByWorld = new IdentityHashMap<>(this.forcedWorldsByWorld);
+            HashMap<WorldRadiusKey, ForcedWorld> newForcedWorldsByRadius = new HashMap<>(this.forcedWorldsByWorldRadius);
+
+            removedWorlds = newForcedWorldsByWorld.remove(world);
+            if (removedWorlds != null) {
+                for (ForcedWorld forced : removedWorlds) {
+                    newForcedWorldsByRadius.remove(new WorldRadiusKey(world, forced.radius));
+                }
             }
+
+            this.forcedWorldsByWorld = newForcedWorldsByWorld;
+            this.forcedWorldsByWorldRadius = newForcedWorldsByRadius;
         }
 
         // Undo all chunk tickets we have previously registered
-        forcedWorld.unload(false);
+        if (removedWorlds != null) {
+            for (ForcedWorld forcedWorld : removedWorlds) {
+                forcedWorld.unload(false);
+            }
+        }
     }
 
     private final class Entry implements ForcedChunkEntry, Consumer<Object> {
@@ -234,6 +263,11 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         @Override
         public World getWorld() {
             return this.world.world;
+        }
+
+        @Override
+        public int getRadius() {
+            return this.world.radius;
         }
 
         @Override
@@ -336,15 +370,17 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         // Below fields are set to null when the world unloads to prevent a memory leak
         public World world;
         public WorldServerHandle handle;
+        private final int radius;
         private boolean unloaded;
 
         public final String worldName;
         public final LongHashMap<Entry> chunks = new LongHashMap<Entry>();
         public final LongHashSet pending = new LongHashSet();
 
-        public ForcedWorld(World world) {
+        public ForcedWorld(World world, int radius) {
             this.world = world;
             this.handle = WorldServerHandle.fromBukkit(world);
+            this.radius = radius;
             this.worldName = world.getName();
             this.unloaded = false;
         }
@@ -352,12 +388,23 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         // This is only called on the main thread!
         public void unload(boolean removeFromMapping) {
             if (removeFromMapping) {
-                World key = this.world;
-                if (key != null) {
+                World loadedWorld = this.world;
+                if (loadedWorld != null) {
+                    WorldRadiusKey key = new WorldRadiusKey(loadedWorld, this.radius);
                     synchronized (CommonForcedChunkManager.this) {
-                        IdentityHashMap<World, ForcedWorld> newForcedWorlds = new IdentityHashMap<>(forcedWorlds);
-                        if (newForcedWorlds.remove(key) == this) {
-                            forcedWorlds = newForcedWorlds;
+                        HashMap<WorldRadiusKey, ForcedWorld> newForcedWorldsByRadius = new HashMap<>(forcedWorldsByWorldRadius);
+                        if (newForcedWorldsByRadius.remove(key) == this) {
+                            forcedWorldsByWorldRadius = newForcedWorldsByRadius;
+
+                            IdentityHashMap<World, ForcedWorld[]> newForcedWorldsByWorld = new IdentityHashMap<>(forcedWorldsByWorld);
+                            newForcedWorldsByWorld.computeIfPresent(loadedWorld, (w, forcedWorlds) -> {
+                                if (forcedWorlds.length == 1 && forcedWorlds[0] == ForcedWorld.this) {
+                                    return null;
+                                } else {
+                                    return LogicUtil.removeArrayElement(forcedWorlds, ForcedWorld.this);
+                                }
+                            });
+                            forcedWorldsByWorld = newForcedWorldsByWorld;
                         }
                     }
                 }
@@ -469,7 +516,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             // The ChunkUnloadEvent is not used for this, then
             if (CommonCapabilities.HAS_CHUNK_TICKET_API) {
                 WorldServerHandle.fromBukkit(world).setForceLoadedAsync(
-                        entry.getX(), entry.getZ(), plugin, forced);
+                        entry.getX(), entry.getZ(), plugin, forced, radius);
             }
 
             // Load/unload the chunk
@@ -479,9 +526,13 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                 loadTimeoutTracker.add(entry);
                 entry.startLoadingAsync();
             } else {
-                // Trigger the server to unload the chunk. It will fire a single
-                // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
-                world.unloadChunkRequest(entry.getX(), entry.getZ());
+                if (!CommonCapabilities.HAS_CHUNK_TICKET_API) {
+                    // Trigger the server to unload the chunk. It will fire a single
+                    // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
+                    // Only do this on older MC versions, the ticket system takes care of it
+                    // automatically on more modern MC versions.
+                    world.unloadChunkRequest(entry.getX(), entry.getZ());
+                }
                 entry.resetAsyncLoad();
             }
         }
@@ -564,6 +615,27 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
         public ChunkLoadCallbackExecutor(JavaPlugin plugin) {
             super(plugin);
+        }
+    }
+
+    private static final class WorldRadiusKey {
+        public final World world;
+        public final int radius;
+
+        public WorldRadiusKey(World world, int radius) {
+            this.world = world;
+            this.radius = radius;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            WorldRadiusKey other = (WorldRadiusKey) o;
+            return this.world == other.world && this.radius == other.radius;
+        }
+
+        @Override
+        public int hashCode() {
+            return this.world.hashCode() + this.radius;
         }
     }
 }

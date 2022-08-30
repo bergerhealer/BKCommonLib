@@ -49,7 +49,7 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract ResourceKey<World> getDimensionKey();
     public abstract WorldDataServerHandle getWorldData();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
-    public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded);
+    public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded, int radius);
     public abstract Iterable<Entity> getEntities();
     public abstract void removeEntity(EntityHandle entity);
     public abstract void removeEntityWithoutDeath(EntityHandle entity);
