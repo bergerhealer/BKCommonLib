@@ -7,6 +7,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.Executor;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 
 import org.bukkit.Bukkit;
@@ -72,13 +73,10 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
                     }
 
                     // If any entries remain for this world, clean them up by cancelling them
+                    final World world = event.getWorld();
                     for (Chain chain : new ArrayList<Chain>(entries.values())) {
-                        for (Entry e = chain.first; e != null; e = e.next) {
-                            if (e.world == event.getWorld()) {
-                                chain.remove(e);
-                                cancelFast(e.future);
-                            }
-                        }
+                        chain.process(e -> e.world == world,
+                                      e -> cancelFast(e.future));
                     }
                 } finally {
                     currentlyUnloadingWorld = null;
@@ -130,19 +128,15 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         return future;
     }
 
-    private void handleEvent(Chunk chunk, Mode mode) {
+    private void handleEvent(final Chunk chunk, final Mode mode) {
         Chain chain = entries.get(MathUtil.longHashToLong(chunk.getX(), chunk.getZ()));
         if (chain == null) {
             return;
         }
 
-        World world = chunk.getWorld();
-        for (Entry e = chain.first; e != null; e = e.next) {
-            if (e.world == world && e.mode == mode) {
-                chain.remove(e);
-                e.future.complete(e.passChunkToFuture ? chunk : null);
-            }
-        }
+        final World world = chunk.getWorld();
+        chain.process(e -> e.world == world && e.mode == mode,
+                      e -> e.future.complete(e.passChunkToFuture ? chunk : null));
     }
 
     protected <T> CompletableFuture<T> createEntry(Chunk chunk, Mode mode,
@@ -504,24 +498,39 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
             return entry;
         }
 
-        public void remove(Entry entry) {
-            if (entry == first) {
-                // head
-                first = entry.next;
-                if (first != null) {
-                    first.previous = null;
-                } else {
-                    // Remove chain itself, is empty
-                    handler.entries.remove(key);
+        /**
+         * Consumes all the entries inside this chain. Properly handles concurrent
+         * modification of the chain while consuming. Consumed entries are removed
+         * from the chain.
+         *
+         * @param filter Filter that selects what entries to consume
+         * @param consumer Entry consumer
+         */
+        public void process(Predicate<Entry> filter, Consumer<Entry> consumer) {
+            Entry current;
+            while ((current = this.first) != null) {
+                if (filter.test(current)) {
+                    current.remove();
+                    consumer.accept(current);
+                    continue;
                 }
-            } else if (entry == last) {
-                // tail
-                last = entry.previous;
-                last.next = null;
-            } else if (entry.previous != null && entry.previous.next == entry) {
-                // middle (we do a sanity check in case of double-removal)
-                entry.previous.next = entry.next;
-                entry.next.previous = entry.previous;
+
+                // Now we have a previous entry to anchor on, process all current entries
+                // If we suddenly find that the entry we're anchoring on got removed out of order,
+                // re-iterate from the beginning.
+                Entry previous;
+                do {
+                    previous = current;
+                    current = current.next;
+                    if (current == null) {
+                        return;
+                    }
+                    if (filter.test(current)) {
+                        current.remove();
+                        consumer.accept(current);
+                        current = previous;
+                    }
+                } while (!current.removed);
             }
         }
     }
@@ -530,6 +539,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
         public final Chain chain;
         public final World world;
         public final Mode mode;
+        public boolean removed;
         public Entry previous;
         public Entry next;
         public final boolean passChunkToFuture;
@@ -539,16 +549,44 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
             this.chain = chain;
             this.world = world;
             this.mode = mode;
+            this.removed = false;
             this.previous = null;
             this.next = null;
             this.passChunkToFuture = passChunkToFuture;
             this.future = future;
         }
 
+        public void remove() {
+            removed = true; // Informs of concurrent modification
+            if (this == chain.first) {
+                // head
+                chain.first = next;
+                next = null;
+                if (chain.first != null) {
+                    chain.first.previous = null;
+                } else {
+                    // Remove chain itself, is empty
+                    chain.last = null;
+                    chain.handler.entries.remove(chain.key);
+                }
+            } else if (this == chain.last) {
+                // tail
+                chain.last = previous;
+                chain.last.next = null;
+                previous = null;
+            } else if (previous != null && previous.next == this) {
+                // middle (we do a sanity check in case of double-removal)
+                previous.next = next;
+                next.previous = previous;
+                previous = null;
+                next = null;
+            }
+        }
+
         public void removeWhenFutureCancelled() {
             LogicUtil.exceptionallyAsync(future, err -> {
                 if (err instanceof CompletionException) {
-                    chain.remove(Entry.this);
+                    remove();
                 }
                 return null;
             }, chain.handler);
