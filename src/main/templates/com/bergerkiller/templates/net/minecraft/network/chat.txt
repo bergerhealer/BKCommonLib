@@ -41,17 +41,30 @@ class IChatBaseComponent {
         if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
             return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
         } else if (contents instanceof TranslatableContents) {
+  #if exists io.papermc.paper.adventure.PaperAdventure
+            return io.papermc.paper.adventure.PaperAdventure.asPlain(io.papermc.paper.adventure.PaperAdventure.asAdventure(instance), null);
+  #else
             TranslatableContents trans = (TranslatableContents) contents;
             String key = trans.getKey();
             if (key == null) {
                 return "null";
-            } else if (key.startsWith("block.minecraft.")) {
-                return key.substring(16);
-            } else if (key.startsWith("item.minecraft.")) {
-                return key.substring(15);
-            } else {
-                return key;
             }
+            int namespaceOffset = 0;
+            if (key.startsWith("block.minecraft.")) {
+                namespaceOffset = 16;
+            } else if (key.startsWith("item.minecraft.")) {
+                namespaceOffset = 15;
+            }
+            key = key.substring(namespaceOffset);
+            if (namespaceOffset > 0) {
+                // Replace _ with " ", capitalize first letter
+                key = key.replace('_', ' ');
+                if (!key.isEmpty()) {
+                    key = key.substring(0, 1).toUpperCase(java.util.Locale.ENGLISH) + key.substring(1);
+                }
+            }
+            return key;
+  #endif
         } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
             // Unsupported / dont care
             return contents.toString();
