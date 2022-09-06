@@ -1,6 +1,7 @@
 package net.minecraft.network.chat;
 
 import net.minecraft.EnumChatFormat;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentHandle;
 
@@ -39,6 +40,18 @@ class IChatBaseComponent {
         net.minecraft.network.chat.ComponentContents contents = instance.getContents();
         if (contents instanceof net.minecraft.network.chat.contents.LiteralContents) {
             return ((net.minecraft.network.chat.contents.LiteralContents) contents).text();
+        } else if (contents instanceof TranslatableContents) {
+            TranslatableContents trans = (TranslatableContents) contents;
+            String key = trans.getKey();
+            if (key == null) {
+                return "null";
+            } else if (key.startsWith("block.minecraft.")) {
+                return key.substring(16);
+            } else if (key.startsWith("item.minecraft.")) {
+                return key.substring(15);
+            } else {
+                return key;
+            }
         } else if (contents != null && contents != net.minecraft.network.chat.ComponentContents.EMPTY) {
             // Unsupported / dont care
             return contents.toString();
