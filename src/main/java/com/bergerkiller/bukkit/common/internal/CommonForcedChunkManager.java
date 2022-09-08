@@ -479,15 +479,10 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             }
         }
 
-        public synchronized Entry add(int cx, int cz) {
+        public synchronized Entry add(final int cx, final int cz) {
             checkUnloaded();
 
-            long key = makeChunkKey(cx, cz);
-            Entry entry = this.chunks.get(key);
-            if (entry == null) {
-                entry = new Entry(this, key, cx, cz);
-                this.chunks.put(key, entry);
-            }
+            Entry entry = this.chunks.computeIfAbsent(makeChunkKey(cx, cz), k -> new Entry(this, k, cx, cz));
             entry.add();
             return entry;
         }

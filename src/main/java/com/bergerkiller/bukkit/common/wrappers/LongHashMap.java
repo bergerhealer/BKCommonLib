@@ -5,6 +5,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.LongObjectHashMapH
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.LongFunction;
 
 /**
  * A wrapper around the internal LongHashMap implementation. This type of
@@ -158,6 +159,18 @@ public class LongHashMap<V> extends BasicWrapper<LongObjectHashMapHandle> implem
      */
     public V merge(long key, V value, java.util.function.BiFunction<? super V,? super V,? extends V> remappingFunction) {
         return (V) handle.merge(key, value, remappingFunction);
+    }
+
+    /**
+     * Gets the value that is stored for a key. If none is mapped, calls the mapping function
+     * to create a new value, and then stores and returns it instead.
+     *
+     * @param key Key at which to get or store a value
+     * @param mappingFunction Mapper from key to the value to store
+     * @return Stored or computed value
+     */
+    public V computeIfAbsent(long key, LongFunction<? extends V> mappingFunction) {
+        return (V) handle.computeIfAbsent(key, mappingFunction);
     }
 
     /**

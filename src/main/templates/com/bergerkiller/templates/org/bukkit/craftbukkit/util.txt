@@ -34,6 +34,7 @@ class LongObjectHashMap {
     public abstract (Set<Long>) it.unimi.dsi.fastutil.longs.LongSet keySet();
 
     public V merge(long key, V value, java.util.function.BiFunction<?, ?, ?> remappingFunction);
+    public V computeIfAbsent(long key, java.util.function.LongFunction<?> mappingFunction);
     public V getOrDefault(long key, V defaultValue);
 
     public (LongObjectHashMapHandle) org.bukkit.craftbukkit.util.LongObjectHashMap cloneMap() {
@@ -51,6 +52,14 @@ class LongObjectHashMap {
         } else {
             instance.put(key, remappingFunction.apply(oldValue, value));
         }
+    }
+    public V computeIfAbsent(long key, java.util.function.LongFunction<?> mappingFunction) {
+        Object value = instance.get(key);
+        if (value == null) {
+            value = mappingFunction.apply(key);
+            instance.put(key, value);
+        }
+        return value;
     }
     public V getOrDefault(long key, V defaultValue) {
         Object value = instance.get(key);

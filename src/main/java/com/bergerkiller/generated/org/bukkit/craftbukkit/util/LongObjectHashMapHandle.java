@@ -4,6 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import java.util.Collection;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.LongFunction;
 
 /**
  * Instance wrapper handle for type <b>org.bukkit.craftbukkit.util.LongObjectHashMap</b>.
@@ -35,6 +36,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
     public abstract Collection<Object> values();
     public abstract Set<Long> keySet();
     public abstract Object merge(long key, Object value, BiFunction<?, ?, ?> remappingFunction);
+    public abstract Object computeIfAbsent(long key, LongFunction<?> mappingFunction);
     public abstract Object getOrDefault(long key, Object defaultValue);
     public abstract LongObjectHashMapHandle cloneMap();
     /**
@@ -53,6 +55,7 @@ public abstract class LongObjectHashMapHandle extends Template.Handle {
         public final Template.Method.Converted<Collection<Object>> values = new Template.Method.Converted<Collection<Object>>();
         public final Template.Method.Converted<Set<Long>> keySet = new Template.Method.Converted<Set<Long>>();
         public final Template.Method<Object> merge = new Template.Method<Object>();
+        public final Template.Method<Object> computeIfAbsent = new Template.Method<Object>();
         public final Template.Method<Object> getOrDefault = new Template.Method<Object>();
         public final Template.Method.Converted<LongObjectHashMapHandle> cloneMap = new Template.Method.Converted<LongObjectHashMapHandle>();
 
