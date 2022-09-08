@@ -38,6 +38,7 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 public class CommonForcedChunkManager extends ForcedChunkManager {
     private HashMap<WorldRadiusKey, ForcedWorld> forcedWorldsByWorldRadius = new HashMap<>(); // Cloned on modify
     private IdentityHashMap<World, ForcedWorld[]> forcedWorldsByWorld = new IdentityHashMap<>(); // Cloned on modify
+    private ForcedWorld forcedWorldLastGet = new ForcedWorld(); // Faster lookup for repeated same world (optimization)
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final WorldUnloadEventListener worldUnloadListener = new WorldUnloadEventListener();
     private final CommonPlugin plugin;
@@ -117,7 +118,20 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     private ForcedWorld getOrCreateForcedWorld(World world, int radius) {
-        return LogicUtil.synchronizeCopyOnWrite(this, l -> forcedWorldsByWorldRadius, new WorldRadiusKey(world, radius), HashMap::get, (fwmap, key) -> {
+        // Try last-gotten forced world first. Reduces a HashMap lookup.
+        {
+            ForcedWorld last = forcedWorldLastGet;
+            if (last.world == world && last.radius == radius) {
+                return last;
+            }
+        }
+
+        // Look up in HashMap, generate if absent
+        return forcedWorldLastGet = LogicUtil.synchronizeCopyOnWrite(this,
+                                                                     l -> forcedWorldsByWorldRadius,
+                                                                     new WorldRadiusKey(world, radius),
+                                                                     HashMap::get,
+                                                                     (fwmap, key) -> {
             // Note: with asynchronous access this could fail spuriously!
             // In those cases, a sync task is scheduled to perform any operations that will follow
             // That task will figure out the world is unloaded, and cancel the request there and then
@@ -376,6 +390,14 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         public final String worldName;
         public final LongHashMap<Entry> chunks = new LongHashMap<Entry>();
         public final LongHashSet pending = new LongHashSet();
+
+        public ForcedWorld() {
+            this.world = null;
+            this.handle = null;
+            this.radius = -1;
+            this.worldName = null;
+            this.unloaded = true;
+        }
 
         public ForcedWorld(World world, int radius) {
             this.world = world;
