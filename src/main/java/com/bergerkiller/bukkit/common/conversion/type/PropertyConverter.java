@@ -23,6 +23,8 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 
 import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.UUID;
 
 /**
@@ -108,6 +110,10 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     public static final PropertyConverter<EntityType> toMinecartType = new PropertyConverter<EntityType>(EntityType.class) {
         @Override
         public EntityType convertInput(Object value) {
+            if (value instanceof String) {
+                String key = ((String) value).toUpperCase(Locale.ENGLISH);
+                return MinecartMaterialHelper.matNameToMinecartType.getOrDefault(key, null);
+            }
             if (EntityHandle.T.isAssignableFrom(value)) {
                 value = WrapperConversion.toEntity(value);
             }
@@ -167,8 +173,11 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
     // Material -> EntityType for Minecarts
     private static class MinecartMaterialHelper {
         private static final EnumMap<Material, EntityType> matToMinecartType = new EnumMap<Material, EntityType>(Material.class);
+        private static final HashMap<String, EntityType> matNameToMinecartType = new HashMap<>();
         private static void storeMinecartTypes(EntityType type, String... materialNames) {
             for (String materialName : materialNames) {
+                matNameToMinecartType.put(materialName, type);
+                matNameToMinecartType.put(materialName.replace("_", ""), type);
                 Material mat = MaterialsByName.getMaterial(materialName);
                 if (mat != null) {
                     matToMinecartType.put(mat, type);
