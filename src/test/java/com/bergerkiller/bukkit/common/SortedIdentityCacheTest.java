@@ -4,20 +4,25 @@ import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 
 /**
  * Tests the {@link SortedIdentityCache}
  */
+@RunWith(Parameterized.class)
 public class SortedIdentityCacheTest {
     public static final TestKey[] KEYS = IntStream.range(0, 100).mapToObj(TestKey::new).toArray(TestKey[]::new);
 
@@ -42,9 +47,31 @@ public class SortedIdentityCacheTest {
         }
     }
 
+    private String name;
+    private Supplier<SortedIdentityCache<TestKey, TestValue>> sortedIdentityCacheConstructor;
+
+    public SortedIdentityCacheTest(String name, Supplier<SortedIdentityCache<TestKey, TestValue>> sortedIdentityCacheConstructor) {
+        this.name = name;
+        this.sortedIdentityCacheConstructor = sortedIdentityCacheConstructor;
+    }
+
+    private SortedIdentityCache<TestKey, TestValue> createSortedIdentityCache() {
+        return sortedIdentityCacheConstructor.get();
+    }
+
+    private static Object[] createTestParameters(String name, Supplier<SortedIdentityCache<TestKey, TestValue>> sortedIdentityCacheConstructor) {
+        return new Object[] { name, sortedIdentityCacheConstructor };
+    }
+
+    @Parameterized.Parameters(name="{0}")
+    public static Collection<?> input() {
+        return Arrays.asList(createTestParameters("SortedIdentityCacheList", () -> SortedIdentityCache.create(TestValue::new)),
+                             createTestParameters("SortedIdentityCacheLinkedList", () -> SortedIdentityCache.createLinked(TestValue::new)));
+    }
+
     @Test
     public void testSyncSimple() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
         ArrayList<TestKey> keys = new ArrayList<>(Arrays.asList(KEYS));
 
         // Fill two times, one time in reverse order
@@ -58,7 +85,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testSyncWithElementAddedAndRemoved() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2], KEYS[3], KEYS[5]);
 
         // Remove value and add new value elsewhere
@@ -71,7 +98,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testSyncSwapElementAtBeginning() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
 
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
         syncAndVerifyCache(cache, KEYS[3], KEYS[1], KEYS[2]);
@@ -80,7 +107,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testSyncSwapElementMiddle() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
 
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
         syncAndVerifyCache(cache, KEYS[0], KEYS[3], KEYS[2]);
@@ -89,7 +116,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testSyncSwapElementAtEnd() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
 
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[3]);
@@ -98,7 +125,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testAddFirst() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
         for (TestKey key : KEYS) {
             cache.addFirst(key);
         }
@@ -117,7 +144,7 @@ public class SortedIdentityCacheTest {
 
     @Test
     public void testAddLast() {
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
         for (TestKey key : KEYS) {
             cache.addLast(key);
         }
@@ -149,7 +176,7 @@ public class SortedIdentityCacheTest {
         }
 
         // Create cache, warm it up
-        SortedIdentityCache<TestKey, TestValue> cache = SortedIdentityCache.create(TestValue::new);
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
         cache.sync(initial);
         cache.sync(holes);
 
@@ -161,7 +188,7 @@ public class SortedIdentityCacheTest {
             cache.sync(holes);
         }
         long end = System.currentTimeMillis();
-        System.out.println("TOOK: " + ((double) (end-start) / (double) count) + " millis/cycle");
+        System.out.println("[" + name + "] TOOK: " + ((double) (end-start) / (double) count) + " millis/cycle");
     }
 
     private void syncAndVerifyCache(SortedIdentityCache<TestKey, TestValue> cache, TestKey... keys) {
