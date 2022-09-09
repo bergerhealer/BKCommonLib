@@ -5,16 +5,11 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
-import com.google.common.collect.Iterables;
 
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.CreatureSpawnEvent;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * Processes server happenings and raises events accordingly
@@ -24,21 +19,10 @@ public class CommonEventFactory {
     private final SortedIdentityCache<Object, EntityHandle> entityMoveEntities = SortedIdentityCache.create(EntityHandle::createHandle);
     private final CreaturePreSpawnEvent creaturePreSpawnEvent = new CreaturePreSpawnEvent();
 
-    // Concatenates all world entity lists into one long iterable
-    @SuppressWarnings("unchecked")
-    private Iterable<Object> getAllServerEntities() {
-        Collection<World> worlds = WorldUtil.getWorlds();
-        List<Iterable<Object>> world_entity_lists = new ArrayList<Iterable<Object>>(worlds.size());
-        for (World world : worlds) {
-            Object worldHandle = WorldServerHandle.fromBukkit(world).getRaw();
-            world_entity_lists.add((Iterable<Object>) WorldServerHandle.T.getEntities.raw.invoke(worldHandle));
-        }
-        return Iterables.concat(world_entity_lists);
-    }
-
     /**
      * Fires Entity Move events for all entities that moved on the server
      */
+    @SuppressWarnings("unchecked")
     public void handleEntityMove() {
         if (!CommonUtil.hasHandlers(EntityMoveEvent.getHandlerList())) {
             this.entityMoveEntities.clear();
@@ -46,7 +30,13 @@ public class CommonEventFactory {
         }
 
         // Keeps a list of all raw entity handles synchronized with EntityHandle wrappers
-        this.entityMoveEntities.sync(getAllServerEntities());
+        this.entityMoveEntities.sync(consumer -> {
+            for (World world : WorldUtil.getWorlds()) {
+                Object worldHandle = WorldServerHandle.fromBukkit(world).getRaw();
+                Iterable<Object> worldEntities = (Iterable<Object>) WorldServerHandle.T.getEntities.raw.invoke(worldHandle);
+                worldEntities.forEach(consumer);
+            }
+        });
 
         // Fire all events
         this.entityMoveEntities.forEach(entity -> {
