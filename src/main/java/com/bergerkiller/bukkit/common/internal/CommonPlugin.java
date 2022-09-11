@@ -24,6 +24,7 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveEvent;
 import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
+import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier;
@@ -41,6 +42,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.nbt.NBTBaseHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.CraftServerHandle;
@@ -667,6 +669,9 @@ public class CommonPlugin extends PluginBase {
         this.components.enableForVersions("Dimension resource key tracker", "1.19", null,
                 DimensionResourceKeyConversion.Tracker::new);
 
+        // Enable BlockData hook stuff, we want the initialization error early
+        BlockDataWrapperHook.init();
+
         // Timings, if enabled, otherwise no-op
         if (debugTimings) {
             CommonTimings.QUEUE_PACKET = Timings.create(this, "PacketHandler::queuePacket");
@@ -850,6 +855,14 @@ public class CommonPlugin extends PluginBase {
         // Run any pending tasks in the next tick executor right now, so they are not forgotten
         // Disable the executor so that future attempts to queue tasks aren't handled by BKCommonLib
         CommonNextTickExecutor.INSTANCE.setExecutorTask(null);
+
+        // Get rid of the BlockData hooks registered into the server
+        try {
+            BlockData.values().forEach(b -> BlockDataWrapperHook.INSTANCE.unhook(b.getData()));
+            BlockDataWrapperHook.disableHook(); // Prevents new ones being made
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "Failed to disable the BlockData hook, some stuff might remain");
+        }
 
         // Dereference
         MountiplexUtil.unloadMountiplex();

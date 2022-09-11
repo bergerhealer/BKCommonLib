@@ -1,13 +1,16 @@
 package com.bergerkiller.bukkit.common.wrappers;
 
 import java.util.Collection;
+import java.util.logging.Level;
 
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
+import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
 import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
 import com.bergerkiller.generated.org.bukkit.block.BlockStateHandle;
 
@@ -42,7 +45,30 @@ public class BlockDataRegistry {
      * @return Immutable BlockData
      */
     public static BlockData fromBlockData(Object iBlockData) {
-        return BlockDataImpl.BY_BLOCK_DATA.getOrCreate(iBlockData);
+        final BlockDataWrapperHook hook = BlockDataWrapperHook.INSTANCE;
+
+        // Try to access an already hooked IBlockData first
+        Object accessor;
+        try {
+            accessor = hook.getAccessor(iBlockData);
+            if (accessor instanceof BlockDataWrapperHook.Accessor) {
+                return ((BlockDataWrapperHook.Accessor) accessor).bkcGetBlockData();
+            }
+        } catch (Throwable t) {
+            BlockDataWrapperHook.disableHook(); // Gross. Stop using it.
+            Logging.LOGGER.log(Level.SEVERE, "Failed to read IBlockData accessor field", t);
+            return BlockDataImpl.BY_BLOCK_DATA.getOrCreate(iBlockData);
+        }
+
+        // Got to hook it
+        BlockData blockData = BlockDataImpl.BY_BLOCK_DATA.getOrCreate(iBlockData);
+        try {
+            hook.hook(iBlockData, accessor, blockData);
+        } catch (Throwable t) {
+            BlockDataWrapperHook.disableHook(); // Gross. Stop using it.
+            Logging.LOGGER.log(Level.SEVERE, "Failed to hook IBlockData accessor", t);
+        }
+        return blockData;
     }
 
     /**

@@ -391,6 +391,7 @@ public class CommonBootstrap {
 
         // On version 1.8, for some reason all child classes were on package level
         if (evaluateMCVersion("<=", "1.8")) {
+            remappings.put("net.minecraft.world.level.block.state.BlockStateList$BlockData", "net.minecraft.world.level.block.state.BlockData");
             remappings.put("net.minecraft.world.level.EnumGamemode", "net.minecraft.world.level.EnumGamemode");
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.StepSound");
             remappings.put("net.minecraft.world.level.block.Block$StepSound", "net.minecraft.world.level.block.StepSound");

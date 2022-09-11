@@ -633,23 +633,13 @@ class BlockDataImpl extends BlockData {
     @Override
     public BlockData setState(String key, Object value) {
         IBlockDataHandle updated_data = this.data.set(key, value);
-        BlockData data = BY_BLOCK_DATA.get(updated_data.getRaw());
-        if (data != null) {
-            return data;
-        } else {
-            return BY_BLOCK_DATA.create(updated_data);
-        }
+        return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
     public BlockData setState(BlockState<?> state, Object value) {
         IBlockDataHandle updated_data = this.data.set(state.getBackingHandle(), value);
-        BlockData data = BY_BLOCK_DATA.get(updated_data.getRaw());
-        if (data != null) {
-            return data;
-        } else {
-            return BY_BLOCK_DATA.create(updated_data);
-        }
+        return BlockDataRegistry.fromBlockData(updated_data.getRaw());
     }
 
     @Override
