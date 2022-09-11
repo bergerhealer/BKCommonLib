@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 
 /**
@@ -71,6 +72,13 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
     public boolean isEmpty() {
         try (Reference<Set<E>> ref = read()) {
             return ref.val.isEmpty();
+        }
+    }
+
+    @Override
+    public void forEach(Consumer<? super E> action) {
+        try (Reference<Set<E>> ref = read()) {
+            ref.val.forEach(action);
         }
     }
 
@@ -178,6 +186,19 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
         return () -> new ReferencedSetCopyIterator<E>(ImplicitlySharedSet.this);
     }
 
+    /**
+     * Calls {@link #forEach(Consumer)} on a temporary clone of this implicitly
+     * shared set, automatically closing that clone again. This can be used to
+     * iterate all items of this set in a way to avoid concurrent modification exceptions.
+     *
+     * @param action Consumer to call with all current values
+     */
+    public void cloneAndForEach(Consumer<? super E> action) {
+        try (ImplicitlySharedSet<E> clone = this.clone()) {
+            clone.forEach(action);
+        }
+    }
+
     @Override
     public ImplicitlySharedSet<E> clone() {
         return new ImplicitlySharedSet<E>(this);
@@ -205,6 +226,12 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
         @Override
         public E next() {
             return this.copyIter.next();
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            this.copyIter.forEachRemaining(action);
+            this.copy.close();
         }
 
         @Override
@@ -237,6 +264,12 @@ public class ImplicitlySharedSet<E> extends ImplicitlySharedHolder<Set<E>> imple
             this.lastElement = result;
             this.hasLastElement = true;
             return result;
+        }
+
+        @Override
+        public void forEachRemaining(Consumer<? super E> action) {
+            this.hasLastElement = false; // Too risky
+            this.baseIter.forEachRemaining(action);
         }
 
         @Override
