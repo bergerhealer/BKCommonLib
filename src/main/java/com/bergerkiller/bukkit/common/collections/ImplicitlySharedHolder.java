@@ -88,17 +88,6 @@ public abstract class ImplicitlySharedHolder<T> implements AutoCloseable {
         }
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        // Note: this should not be relied upon
-        // It is here more 'just because we can'
-        try {
-            this.close();
-        } finally {
-            super.finalize();
-        }
-    }
-
     /**
      * Opens exclusive write access, creating a copy of underlying data if required.
      * The returned reference should be closed, preferably using a try-with-resources.<br>
