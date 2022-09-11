@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
@@ -246,9 +247,9 @@ public final class CommonMapController implements PacketListener, Listener {
      * 
      * @param player
      */
-    public synchronized void resendMapData(Player player) {
-        UUID playerUUID = player.getUniqueId();
-        for (MapDisplayInfo display : mapsValues.cloneAsIterable()) {
+    public synchronized void resendMapData(final Player player) {
+        final UUID playerUUID = player.getUniqueId();
+        mapsValues.cloneAndForEach(display -> {
             if (display.getViewStackByPlayerUUID(playerUUID) != null) {
                 for (MapSession session : display.getSessions()) {
                     for (MapSession.Owner owner : session.onlineOwners) {
@@ -258,7 +259,7 @@ public final class CommonMapController implements PacketListener, Listener {
                     }
                 }
             }
-        }
+        });
     }
 
     /**
@@ -517,11 +518,11 @@ public final class CommonMapController implements PacketListener, Listener {
                 }
             });
 
-            for (MapDisplayInfo map : this.mapsValues.cloneAsIterable()) {
+            this.mapsValues.cloneAndForEach(map -> {
                 for (MapSession session : new ArrayList<MapSession>(map.getSessions())) {
                     session.display.setRunning(false);
                 }
-            }
+            });
         }
     }
 
@@ -866,12 +867,12 @@ public final class CommonMapController implements PacketListener, Listener {
     @EventHandler(priority = EventPriority.LOWEST)
     protected synchronized void onPlayerJoin(PlayerJoinEvent event) {
         // Let everyone know we got a player over here!
-        Player player = event.getPlayer();
-        for (MapDisplayInfo map : this.mapsValues.cloneAsIterable()) {
+        final Player player = event.getPlayer();
+        this.mapsValues.cloneAndForEach(map -> {
             for (MapSession session : map.getSessions()) {
                 session.updatePlayerOnline(player);
             }
-        }
+        });
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
