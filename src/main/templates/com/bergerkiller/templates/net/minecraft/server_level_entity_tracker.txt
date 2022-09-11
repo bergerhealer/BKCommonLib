@@ -192,7 +192,11 @@ class EntityTrackerEntry {
     }
 
     public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
+  #if version >= 1.18
         return (org.bukkit.entity.Player) ((ServerPlayerConnection) viewer).getPlayer().getBukkitEntity();
+  #else
+        return (org.bukkit.entity.Player) ((ServerPlayerConnection) viewer).d().getBukkitEntity();
+  #endif
     }
 
     public void clearViewers() {
