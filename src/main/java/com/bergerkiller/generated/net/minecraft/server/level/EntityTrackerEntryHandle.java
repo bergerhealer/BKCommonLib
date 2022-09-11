@@ -23,8 +23,13 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Player convertRawViewer(Object viewer) {
+        return T.convertRawViewer.invoker.invoke(null,viewer);
+    }
+
     public abstract int getPlayerViewDistance();
     public abstract Collection<Player> getViewers();
+    public abstract Collection<Object> getRawViewers();
     public abstract void clearViewers();
     public abstract boolean addViewerToSet(Player viewer);
     public abstract boolean removeViewerFromSet(Player viewer);
@@ -64,8 +69,11 @@ public abstract class EntityTrackerEntryHandle extends Template.Handle {
     public static final class EntityTrackerEntryClass extends Template.Class<EntityTrackerEntryHandle> {
         public final Template.Field.Integer trackingDistance = new Template.Field.Integer();
 
+        public final Template.StaticMethod<Player> convertRawViewer = new Template.StaticMethod<Player>();
+
         public final Template.Method<Integer> getPlayerViewDistance = new Template.Method<Integer>();
         public final Template.Method.Converted<Collection<Player>> getViewers = new Template.Method.Converted<Collection<Player>>();
+        public final Template.Method<Collection<Object>> getRawViewers = new Template.Method<Collection<Object>>();
         public final Template.Method<Void> clearViewers = new Template.Method<Void>();
         public final Template.Method.Converted<Boolean> addViewerToSet = new Template.Method.Converted<Boolean>();
         public final Template.Method.Converted<Boolean> removeViewerFromSet = new Template.Method.Converted<Boolean>();

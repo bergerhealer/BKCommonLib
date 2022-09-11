@@ -187,6 +187,14 @@ class EntityTrackerEntry {
         return instance.seenBy;
     }
 
+    public java.util.Collection<Object> getRawViewers() {
+        return instance.seenBy;
+    }
+
+    public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
+        return (org.bukkit.entity.Player) ((ServerPlayerConnection) viewer).getPlayer().getBukkitEntity();
+    }
+
     public void clearViewers() {
         instance.seenBy.clear();
     }
@@ -204,6 +212,14 @@ class EntityTrackerEntry {
 
     public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
         return instance.trackedPlayerMap.keySet();
+    }
+
+    public java.util.Collection<Object> getRawViewers() {
+        return instance.trackedPlayerMap.keySet();
+    }
+
+    public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
+        return (org.bukkit.entity.Player) ((EntityPlayer) viewer).getBukkitEntity();
     }
 
     public void clearViewers() {
@@ -227,6 +243,14 @@ class EntityTrackerEntry {
 
     public (java.util.Collection<org.bukkit.entity.Player>) Set<EntityPlayer> getViewers() {
         return instance.trackedPlayers;
+    }
+
+    public java.util.Collection<Object> getRawViewers() {
+        return instance.trackedPlayers;
+    }
+
+    public static org.bukkit.entity.Player convertRawViewer(Object viewer) {
+        return (org.bukkit.entity.Player) ((EntityPlayer) viewer).getBukkitEntity();
     }
 
     public void clearViewers() {

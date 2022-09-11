@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.internal.map;
 
+import java.util.function.BiConsumer;
+
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -7,7 +9,6 @@ import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.map.MapShowEvent;
 import com.bergerkiller.bukkit.common.map.binding.ItemFrameInfo;
 import com.bergerkiller.bukkit.common.map.binding.MapDisplayInfo;
-import com.bergerkiller.bukkit.common.utils.LogicUtil;
 
 /**
  * Updates the players viewing item frames and fires events for them
@@ -22,31 +23,16 @@ class MapDisplayFramedMapUpdater extends Task {
     public static final int NUM_IDLE_FRAMES_POLLED_PER_TICK = 50;
 
     private final CommonMapController controller;
-    private ItemFrameInfo currentFrameInfo;
+    private final BiConsumer<ItemFrameInfo, Player> handleMapShowEvent;
     private ItemFrameInfo.UpdateEntry firstEntryUpdated = null;
     private ItemFrameInfo.UpdateEntry lastEntryUpdated = null;
-    private final LogicUtil.ItemSynchronizer<Player, Player> synchronizer = new LogicUtil.ItemSynchronizer<Player, Player>() {
-        @Override
-        public boolean isItem(Player item, Player value) {
-            return item == value;
-        }
-
-        @Override
-        public Player onAdded(Player player) {
-            controller.handleMapShowEvent(new MapShowEvent(player, currentFrameInfo.itemFrame));
-            return player;
-        }
-
-        @Override
-        public void onRemoved(Player player) {
-            //TODO!!!
-            //CommonUtil.callEvent(new HideFramedMapEvent(player, info.itemFrame));
-        }
-    };
 
     public MapDisplayFramedMapUpdater(JavaPlugin plugin, CommonMapController controller) {
         super(plugin);
         this.controller = controller;
+        this.handleMapShowEvent = (currentFrame, newViewer) -> {
+            this.controller.handleMapShowEvent(new MapShowEvent(newViewer, currentFrame.itemFrame));
+        };
     }
 
     @Override
@@ -104,14 +90,12 @@ class MapDisplayFramedMapUpdater extends Task {
             // Clean up
             firstEntryUpdated = null;
             lastEntryUpdated = null;
-            currentFrameInfo = null;
         }
     }
 
     private void updateViewersPassive(ItemFrameInfo.UpdateEntry entry) {
         if (!entry.info.handleRemoved()) {
-            currentFrameInfo = entry.info;
-            entry.info.updateViewers(synchronizer);
+            entry.info.updateViewers(handleMapShowEvent);
             if (!entry.info.handleRemoved()) {
                 return;
             }
@@ -123,9 +107,8 @@ class MapDisplayFramedMapUpdater extends Task {
 
     private void updateItemAndViewers(ItemFrameInfo.UpdateEntry entry) {
         if (!entry.info.handleRemoved()) {
-            currentFrameInfo = entry.info;
             entry.info.updateItem();
-            entry.info.updateViewers(synchronizer);
+            entry.info.updateViewers(handleMapShowEvent);
             if (!entry.info.handleRemoved()) {
                 lastEntryUpdated = entry;
                 if (firstEntryUpdated == null) {

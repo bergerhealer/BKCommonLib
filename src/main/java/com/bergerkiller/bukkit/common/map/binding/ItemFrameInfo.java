@@ -1,8 +1,10 @@
 package com.bergerkiller.bukkit.common.map.binding;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.List;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import org.bukkit.World;
 import org.bukkit.block.BlockFace;
@@ -13,6 +15,7 @@ import org.bukkit.util.Vector;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.collections.FastTrackedUpdateSet;
+import com.bergerkiller.bukkit.common.collections.SortedIdentityCache;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
@@ -39,7 +42,8 @@ public class ItemFrameInfo {
     public final EntityItemFrameHandle itemFrameHandle;
     public final DataWatcher.Item<?> itemFrame_dw_item;
     public final IntVector3 coordinates;
-    public final HashSet<Player> viewers;
+    private final List<Player> viewersAdded; // Avoids concurrent modification problems firing events
+    public final SortedIdentityCache<Object, Player> viewers;
     public MapUUID lastMapUUID; // last known Map UUID (UUID + tile information) of the map shown in this item frame
     public MapUUID preReloadMapUUID; // Map UUID known from before a reload, and if encountered again, will avoid resending the item (popping)
     public boolean removed; // item frame no longer exists on the server (chunk unloaded, or block removed)
@@ -55,7 +59,7 @@ public class ItemFrameInfo {
 
     // These fields are used in the item frame update task to speedup lookup and avoid unneeded garbage
     private EntityTrackerEntryStateHandle entityTrackerEntryState = null; // Entity tracker entry state for resetting tick timer
-    private Collection<Player> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
+    private Collection<Object> entityTrackerViewers = null; // Network synchronization entity tracker entry viewer set
 
     // Tracks whether an item refresh needs to be done
     public final FastTrackedUpdateSet.Tracker<ItemFrameInfo> needsItemRefresh;
@@ -68,7 +72,12 @@ public class ItemFrameInfo {
         this.itemFrameHandle = itemFrame;
         this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
         this.coordinates = this.itemFrameHandle.getBlockPosition();
-        this.viewers = new HashSet<Player>();
+        this.viewersAdded = new ArrayList<>();
+        this.viewers = SortedIdentityCache.create(raw_viewer -> {
+            Player player = EntityTrackerEntryHandle.convertRawViewer(raw_viewer);
+            viewersAdded.add(player);
+            return player;
+        });
         this.removed = false;
         this.lastMapUUID = null;
         this.preReloadMapUUID = null;
@@ -308,11 +317,12 @@ public class ItemFrameInfo {
      * Synchronizes the viewers that view this item frame.
      * For every viewer that is added or removed, the synchronizer callbacks are called.
      *
-     * @param viewerSynchronizer Synchronizer to call callbacks of
+     * @param newPlayerHandler Callback to call for every new viewer that is added
      */
-    public void updateViewers(LogicUtil.ItemSynchronizer<Player, Player> viewerSynchronizer) {
+    public void updateViewers(BiConsumer<ItemFrameInfo, Player> newPlayerHandler) {
         // Update list of players for item frames showing maps
         if (lastMapUUID != null) {
+            // Refresh the tracker entry details
             if (entityTrackerEntryState == null) {
                 EntityTrackerEntryHandle entry = WorldUtil.getTracker(itemFrame.getWorld()).getEntry(itemFrame);
 
@@ -324,13 +334,19 @@ public class ItemFrameInfo {
                 }
 
                 entityTrackerEntryState = entry.getState();
-                entityTrackerViewers = entry.getViewers();
+                entityTrackerViewers = entry.getRawViewers();
             }
 
-            boolean changes = LogicUtil.synchronizeUnordered(viewers, entityTrackerViewers, viewerSynchronizer);
-
-            if (changes && displayInfo != null) {
-                displayInfo.hasFrameViewerChanges.set(true);
+            // Actually synchronize the viewers
+            if (viewers.sync(entityTrackerViewers)) {
+                try {
+                    viewersAdded.forEach(p -> newPlayerHandler.accept(this, p));
+                } finally {
+                    viewersAdded.clear();
+                }
+                if (displayInfo != null) {
+                    displayInfo.hasFrameViewerChanges.set(true);
+                }
             }
 
             // Reset tick counter to 1 so that the normal WorldMap refreshing never occurs
@@ -560,13 +576,14 @@ public class ItemFrameInfo {
             }
             displayInfo = null;
         }
-        if (!this.viewers.isEmpty()) {
-            //for (Player viewer : viewers) {
-                //TODO NEEDS HIDE EVENT
-                //CommonUtil.callEvent(new HideFramedMapEvent(viewer, itemFrame));
-            //}
-            viewers.clear();
-        }
+
+        //for (Player viewer : viewers) {
+        //TODO NEEDS HIDE EVENT
+        //CommonUtil.callEvent(new HideFramedMapEvent(viewer, itemFrame));
+        //}
+        viewers.clear();
+        viewersAdded.clear();
+
         this.requiresFurtherLoading = false;
         this.lastMapUUID = null;
     }

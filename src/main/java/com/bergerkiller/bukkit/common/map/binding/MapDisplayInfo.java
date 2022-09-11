@@ -199,7 +199,7 @@ public class MapDisplayInfo {
         // Recalculate the list of players that can see an item frame
         frameViewers.clear();
         for (ItemFrameInfo itemFrame : itemFrames) {
-            frameViewers.addAll(itemFrame.viewers);
+            itemFrame.viewers.forEach(frameViewers::add);
         }
     }
 
