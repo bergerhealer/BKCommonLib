@@ -75,11 +75,11 @@ public class SortedIdentityCacheTest {
         ArrayList<TestKey> keys = new ArrayList<>(Arrays.asList(KEYS));
 
         // Fill two times, one time in reverse order
-        cache.sync(keys);
+        assertTrue(cache.sync(keys));
         verifyCache(cache, keys);
 
         Collections.reverse(keys);
-        cache.sync(keys);
+        assertFalse(cache.sync(keys));
         verifyCache(cache, keys);
     }
 
@@ -121,6 +121,19 @@ public class SortedIdentityCacheTest {
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[3]);
         syncAndVerifyCache(cache, KEYS[0], KEYS[1], KEYS[2]);
+    }
+
+    @Test
+    public void testSyncElementOrder() {
+        SortedIdentityCache<TestKey, TestValue> cache = createSortedIdentityCache();
+
+        assertTrue(cache.sync(Arrays.asList(KEYS[0], KEYS[1], KEYS[2])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[1], KEYS[0], KEYS[2])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[2], KEYS[0], KEYS[1])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[0], KEYS[1], KEYS[2], KEYS[0])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[0], KEYS[1], KEYS[2], KEYS[1])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[0], KEYS[1], KEYS[2], KEYS[2])));
+        assertFalse(cache.sync(Arrays.asList(KEYS[0], KEYS[2], KEYS[1], KEYS[2])));
     }
 
     @Test
@@ -193,7 +206,7 @@ public class SortedIdentityCacheTest {
 
     private void syncAndVerifyCache(SortedIdentityCache<TestKey, TestValue> cache, TestKey... keys) {
         List<TestKey> keysList = Arrays.asList(keys);
-        cache.sync(keysList);
+        assertTrue(cache.sync(keysList));
         verifyCache(cache, keysList);
     }
 

@@ -117,9 +117,11 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * with the keys found in the specified stream.
      *
      * @param keyStream Stream of keys to sync with
+     * @return True if values were added and/or removed.
+     *         Change of element order is ignored.
      */
-    public final void sync(Stream<K> keyStream) {
-        sync(keyStream::forEachOrdered);
+    public final boolean sync(Stream<K> keyStream) {
+        return sync(keyStream::forEachOrdered);
     }
 
     /**
@@ -129,9 +131,11 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * with the keys found in the specified iterable.
      *
      * @param keys Keys to sync with
+     * @return True if values were added and/or removed.
+     *         Change of element order is ignored.
      */
-    public final void sync(Iterable<K> keys) {
-        sync(keys::forEach);
+    public final boolean sync(Iterable<K> keys) {
+        return sync(keys::forEach);
     }
 
     /**
@@ -141,9 +145,11 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      * with the keys found in the specified iterator.
      *
      * @param keysIterator Iterator of keys to sync with
+     * @return True if values were added and/or removed.
+     *         Change of element order is ignored.
      */
-    public final void sync(Iterator<K> keysIterator) {
-        sync(keysIterator::forEachRemaining);
+    public final boolean sync(Iterator<K> keysIterator) {
+        return sync(keysIterator::forEachRemaining);
     }
 
     /**
@@ -154,8 +160,10 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
      *
      * @param fillMethod Method accepting a consumer, which should call the consumer
      *                   with all keys to be added.
+     * @return True if values were added and/or removed.
+     *         Change of element order is ignored.
      */
-    public abstract void sync(Consumer<Consumer<K>> fillMethod);
+    public abstract boolean sync(Consumer<Consumer<K>> fillMethod);
 
     /**
      * Removes an element from this cache
@@ -280,10 +288,11 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
         }
 
         @Override
-        public void sync(Consumer<Consumer<K>> fillMethod) {
+        public boolean sync(Consumer<Consumer<K>> fillMethod) {
             Syncher syncher = new Syncher();
             fillMethod.accept(syncher);
             syncher.trimRemaining();
+            return syncher.hasChanges;
         }
 
         @Override
@@ -417,12 +426,14 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
             private int numEntries;
             private LinkEntry<K, V> firstCompactedEntry;
             private int numCompacted;
+            public boolean hasChanges;
 
             public Syncher() {
                 this.currentIndex = 0;
                 this.numEntries = entriesByKey.size();
                 this.firstCompactedEntry = null;
                 this.numCompacted = 0;
+                this.hasChanges = false;
             }
 
             @Override
@@ -437,6 +448,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
                         insertAtEnd(newEntry, count);
                         numEntries = count + 1;
                         currentIndex = index + 1;
+                        hasChanges = true;
                     }
                     return;
                 }
@@ -455,6 +467,9 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
 
                 // Wipe and overwrite invalid entries if we can
                 if (!isValidEntry) {
+                    if (newEntry.index == INDEX_NOT_INSERTED) {
+                        hasChanges = true;
+                    }
                     if (newEntry.index == INDEX_NOT_INSERTED || newEntry.index > index) {
                         // Overwrite invalid entry at this position to point to the found entry
                         newEntry.index = index;
@@ -471,6 +486,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
                     // be flattened.
                     // Resizing the array with every insertion is too slow.
                     newEntry.index = INDEX_PENDING_FLATTENING;
+                    hasChanges = true;
                     if (index == 0) {
                         // Got no previous one, a new one is inserted later
                         LinkEntry<K, V> first = firstCompactedEntry;
@@ -617,6 +633,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
                         entries[numEntries] = null;
                         entriesByKey.remove(entry.getKey());
                         synchronizer.onRemoved(entry.getKey(), entry.getValue());
+                        hasChanges = true;
                     }
                 }
             }
@@ -796,10 +813,11 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
         }
 
         @Override
-        public void sync(Consumer<Consumer<K>> fillMethod) {
+        public boolean sync(Consumer<Consumer<K>> fillMethod) {
             Syncher syncher = new Syncher();
             fillMethod.accept(syncher);
             syncher.trimRemaining();
+            return syncher.hasChanges;
         }
 
         @Override
@@ -846,6 +864,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
         private final class Syncher implements Consumer<K> {
             private LinkEntry<K, V> prev = SortedIdentityCacheLinkedList.this.first;
             private LinkEntry<K, V> curr = prev.next;
+            public boolean hasChanges = false;
 
             public Syncher() {
                 // Before we fill, flip the fillState around. All existing entries will
@@ -891,6 +910,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
                     newEntry.bind(prev, curr);
                     newEntry.fillState = fillState;
                     this.prev = newEntry; // Resume with same curr, new prev
+                    this.hasChanges = true;
                 }
             }
 
@@ -906,6 +926,7 @@ public abstract class SortedIdentityCache<K, V> implements Iterable<V> {
                 for (; curr != end; curr = curr.next) {
                     entriesByKey.remove(curr.key);
                     synchronizer.onRemoved(curr.key, curr.value);
+                    hasChanges = true;
                 }
             }
         }
