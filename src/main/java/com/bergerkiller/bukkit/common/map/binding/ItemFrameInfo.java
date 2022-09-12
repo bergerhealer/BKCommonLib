@@ -73,7 +73,7 @@ public class ItemFrameInfo {
         this.itemFrame_dw_item = this.itemFrameHandle.getDataWatcher().getItem(EntityItemFrameHandle.DATA_ITEM);
         this.coordinates = this.itemFrameHandle.getBlockPosition();
         this.viewersAdded = new ArrayList<>();
-        this.viewers = SortedIdentityCache.create(raw_viewer -> {
+        this.viewers = SortedIdentityCache.createLinked(raw_viewer -> {
             Player player = EntityTrackerEntryHandle.convertRawViewer(raw_viewer);
             viewersAdded.add(player);
             return player;
