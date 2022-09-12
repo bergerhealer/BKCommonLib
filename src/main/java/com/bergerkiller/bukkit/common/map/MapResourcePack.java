@@ -33,6 +33,7 @@ import com.bergerkiller.bukkit.common.map.archive.MapResourcePackAutoArchive;
 import com.bergerkiller.bukkit.common.map.archive.MapResourcePackClientArchive;
 import com.bergerkiller.bukkit.common.map.gson.BlockFaceDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.ConditionalDeserializer;
+import com.bergerkiller.bukkit.common.map.gson.NonNullListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.VariantListDeserializer;
 import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
@@ -800,10 +801,11 @@ public class MapResourcePack {
     /**
      * Attempts to open and load a JSON file, deserializing it into a certain class type
      * 
+     * @param <T> Object Type
      * @param objectType to deserialize the JSON as
      * @param type of resource
      * @param path of the resource
-     * @return loaded Gson object, or <i>null</i> if not found or loadable
+     * @return loaded Gson object, or <i>null</i> if not found or not loadable
      */
     protected final <T> T openGsonObject(Class<T> objectType, ResourceType type, String path) {
         InputStream inputStream = this.openFileStream(type, path);
@@ -814,12 +816,7 @@ public class MapResourcePack {
             try {
                 Reader reader = new InputStreamReader(inputStream, "UTF-8");
                 if (this.gson == null) {
-                    GsonBuilder gsonBuilder = new GsonBuilder();
-                    gsonBuilder.registerTypeAdapter(Vector3.class, new Vector3Deserializer());
-                    gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
-                    gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
-                    gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
-                    this.gson = gsonBuilder.create();
+                    this.gson = createGson();
                 }
                 T result = this.gson.fromJson(reader, objectType);
                 if (result == null) {
@@ -836,6 +833,53 @@ public class MapResourcePack {
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
         }
         return null;
+    }
+
+    /**
+     * Reads a resource file stream and deserializes it into a certain class type.
+     * Supports the standard JSON class types like Model.
+     *
+     * @param <T> Object Type
+     * @param objectType to deserialize the JSON as
+     * @param inputStream Stream to read from
+     * @return loaded Gson object, or <i>null</i> if not found or not loadable
+     */
+    public final <T> T readGsonObject(Class<T> objectType, InputStream inputStream) {
+        if (inputStream == null) {
+            return null;
+        }
+        try {
+            try {
+                Reader reader = new InputStreamReader(inputStream, "UTF-8");
+                if (this.gson == null) {
+                    this.gson = createGson();
+                }
+                T result = this.gson.fromJson(reader, objectType);
+                if (result == null) {
+                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName());
+                }
+                return result;
+            } finally {
+                inputStream.close();
+            }
+        } catch (JsonSyntaxException ex) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
+                    ": " + ex.getMessage());
+        } catch (IOException ex) {
+            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
+        }
+        return null;
+    }
+
+    @SuppressWarnings("rawtypes")
+    private Gson createGson() {
+        GsonBuilder gsonBuilder = new GsonBuilder();
+        gsonBuilder.registerTypeAdapter(Vector3.class, new Vector3Deserializer());
+        gsonBuilder.registerTypeAdapter(BlockFace.class, new BlockFaceDeserializer());
+        gsonBuilder.registerTypeAdapter(BlockModelState.VariantList.class, new VariantListDeserializer());
+        gsonBuilder.registerTypeAdapter(BlockModelState.Condition.class, new ConditionalDeserializer());
+        gsonBuilder.registerTypeAdapter(List.class, new NonNullListDeserializer());
+        return gsonBuilder.create();
     }
 
     /**
