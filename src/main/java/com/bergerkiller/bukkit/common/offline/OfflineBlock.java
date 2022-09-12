@@ -151,6 +151,19 @@ public final class OfflineBlock {
         }
     }
 
+    /**
+     * Checks whether this OfflineBlock refers to the same Block as a Bukkit Block
+     *
+     * @param block Block
+     * @return True if this OfflineBlock refers to the same block
+     */
+    public boolean isLoadedBlock(Block block) {
+        return this.position.x == block.getX() &&
+               this.position.y == block.getY() &&
+               this.position.z == block.getZ() &&
+               this.world.getLoadedWorld() == block.getWorld();
+    }
+
     @Override
     public String toString() {
         return "{world=" + this.world + ", x=" + this.position.x + ", y=" +
