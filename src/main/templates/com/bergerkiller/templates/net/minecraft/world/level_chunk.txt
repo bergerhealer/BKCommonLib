@@ -140,7 +140,34 @@ class Chunk {
     </code>
 
     public (List<org.bukkit.entity.Entity>) List<Entity> getEntities() {
-#if version >= 1.17
+#if version >= 1.17 && exists io.papermc.paper.world.ChunkEntitySlices public org.bukkit.entity.Entity[] getChunkEntities();
+        // Paper API for storing entities inside chunk slices can be used
+        WorldServer world = (WorldServer) instance#getChunkWorld();
+
+        #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
+        io.papermc.paper.world.EntitySliceManager manager = world#entitySliceManager;
+        io.papermc.paper.world.ChunkEntitySlices slices = manager.getChunk(instance.getPos().x, instance.getPos().z);
+        if (slices == null) {
+            return java.util.Collections.emptyList();
+        }
+
+        #require io.papermc.paper.world.ChunkEntitySlices protected final com.destroystokyo.paper.util.maplist.EntityList entitySliceChunkEntities:entities;
+        com.destroystokyo.paper.util.maplist.EntityList entities = slices#entitySliceChunkEntities;
+
+        // This replicates the code of getChunkEntities(), but sending it to a List of nms Entity instead of Bukkit entities
+        final Entity[] entitiesArray = entities.getRawData();
+        int size = Math.min(entitiesArray.length, entities.size());
+        java.util.ArrayList result = new java.util.ArrayList(size);
+        for (int i = 0; i < size; ++i) {
+            Entity entity = entitiesArray[i];
+            if (entity != null && entity.valid) {
+                result.add(entity);
+            }
+        }
+        return result;
+
+#elseif version >= 1.17
+        // Down here is for Spigot / old Paper
         // Acquire the EntitySectionStorage instance of the world this Chunk is on
         #require net.minecraft.server.level.WorldServer private final net.minecraft.world.level.entity.PersistentEntitySectionManager entityManager;
         #require net.minecraft.world.level.entity.PersistentEntitySectionManager private final net.minecraft.world.level.entity.EntitySectionStorage sectionStorage;
@@ -159,11 +186,12 @@ class Chunk {
         // Iterate a subset of the sectionIds LongSet to find all vertical slices of this chunk storing entities
   #if version >= 1.18
         long sectionIdsStart = SectionPosition.asLong(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPosition.asLong(instance.getPos().x, -1, instance.getPos().z);
+        long sectionIdsEnd = SectionPosition.asLong(instance.getPos().x, -1, instance.getPos().z) + 1;
   #else
         long sectionIdsStart = SectionPosition.b(instance.getPos().x, 0, instance.getPos().z);
-        long sectionIdsEnd = SectionPosition.b(instance.getPos().x, -1, instance.getPos().z);
+        long sectionIdsEnd = SectionPosition.b(instance.getPos().x, -1, instance.getPos().z) + 1;
   #endif
+
         it.unimi.dsi.fastutil.longs.LongBidirectionalIterator iterator = sectionIds.subSet(sectionIdsStart, sectionIdsEnd).iterator();
         List sliceLists = new java.util.ArrayList();
         while (iterator.hasNext()) {
@@ -186,6 +214,7 @@ class Chunk {
         } else {
             return new List2D(sliceLists);
         }
+
 #elseif exists net.minecraft.world.level.chunk.Chunk public final net.minecraft.util.EntitySlice<net.minecraft.world.entity.Entity>[] entitySlices;
         net.minecraft.util.EntitySlice[] slices = instance.entitySlices;
         int count = slices.length;
