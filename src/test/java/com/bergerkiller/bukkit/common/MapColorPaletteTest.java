@@ -186,6 +186,9 @@ public class MapColorPaletteTest {
         try {
             // Creates a 4096x4096 .png image of all available colors in the palette.
             // This helps to verify correct functioning of color to colormap index conversion
+            MCSDFlat flat = new MCSDFlat();
+            String version = "1_17";
+            flat.readFrom(new FileInputStream("misc/map_" + version + "_flat.dat"));
             BufferedImage img = new BufferedImage(4096, 4096, BufferedImage.TYPE_INT_RGB);
             {
                 for (int y = 0; y < 4096; y++) {
@@ -202,8 +205,8 @@ public class MapColorPaletteTest {
                         }
                         int b = b_2 | (b_1 << 4);
                         
-                        byte c = MapColorPalette.getColor(r, g, b);
-                        Color cc = MapColorPalette.getRealColor(c);
+                        byte c = flat.get(r, g, b);
+                        Color cc = flat.getColor(c);
                         r = cc.getRed();
                         g = cc.getGreen();
                         b = cc.getBlue();
@@ -213,7 +216,7 @@ public class MapColorPaletteTest {
                     }
                 }
             }
-            ImageIO.write(img, "png", new File("misc/map_palette_field.png"));
+            ImageIO.write(img, "png", new File("misc/map_palette_field_" + version + ".png"));
         } catch (Throwable t) {
             throw MountiplexUtil.uncheckedRethrow(t);
         }
