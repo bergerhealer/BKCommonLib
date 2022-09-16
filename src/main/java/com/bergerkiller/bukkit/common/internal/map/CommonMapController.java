@@ -542,8 +542,8 @@ public final class CommonMapController implements PacketListener, Listener {
             // and set to use this plugin for it, re-create the display
             // Not enabled right now because it is kind of slow.
 
-            // InteractiveBoard map id filter
-            if (pluginName.equals("InteractiveBoard")) {
+            // InteractiveBoard map id filter. Only needed for older versions of the plugin.
+            if (pluginName.equals("InteractiveBoard") && CommonUtil.getClass("com.interactiveboard.utility.MapChecker", false) != null) {
                 try {
                     registerMapFilter(plugin, new InteractiveBoardMapIDFilter(plugin));
                 } catch (Throwable t) {
