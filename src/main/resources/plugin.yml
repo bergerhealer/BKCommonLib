@@ -7,7 +7,7 @@ authors: [bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg_
 load: startup
 description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib]
-classdepend: [WorldEdit, FastAsyncWorldEdit, ViaVersion, LuckPerms]
+classdepend: [WorldEdit, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
 dev-url: ${project.url}
 preloader:
   hastebinServer: https://paste.traincarts.net

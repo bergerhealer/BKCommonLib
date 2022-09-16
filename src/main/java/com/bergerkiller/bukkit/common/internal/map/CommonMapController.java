@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 import java.util.UUID;
-import java.util.function.Consumer;
+import java.util.function.IntPredicate;
 import java.util.function.Predicate;
 import java.util.logging.Level;
 
@@ -49,6 +49,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -111,6 +112,8 @@ public final class CommonMapController implements PacketListener, Listener {
     // Bi-directional mapping between map UUID and Map (durability) Id
     private final IntHashMap<MapUUID> mapUUIDById = new IntHashMap<MapUUID>();
     private final HashMap<MapUUID, Integer> mapIdByUUID = new HashMap<MapUUID, Integer>();
+    // Additional detectors for map id's which are allocated by other plugins, and shouldn't be used
+    private final List<StaticMapIdFilter> mapIdFilters = new ArrayList<>();
     // Stores Map Displays, mapped by Map UUID
     protected final HashMap<UUID, MapDisplayInfo> maps = new HashMap<UUID, MapDisplayInfo>();
     protected final ImplicitlySharedSet<MapDisplayInfo> mapsValues = new ImplicitlySharedSet<MapDisplayInfo>();
@@ -538,10 +541,48 @@ public final class CommonMapController implements PacketListener, Listener {
             //TODO: Go through all items on the server, and if lacking a display,
             // and set to use this plugin for it, re-create the display
             // Not enabled right now because it is kind of slow.
+
+            // InteractiveBoard map id filter
+            if (pluginName.equals("InteractiveBoard")) {
+                try {
+                    registerMapFilter(plugin, new InteractiveBoardMapIDFilter(plugin));
+                } catch (Throwable t) {
+                    Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to add InteractiveBoard support", t);
+                }
+            }
         } else {
             // End all map display sessions for this plugin
             MapDisplay.stopDisplaysForPlugin(plugin);
+
+            // If a filter was provided by this plugin, remove it
+            synchronized (this) {
+                for (Iterator<StaticMapIdFilter> iter = mapIdFilters.iterator(); iter.hasNext();) {
+                    if (plugin == iter.next().owner) {
+                        iter.remove();
+                    }
+                }
+            }
         }
+    }
+
+    /**
+     * Registers a map id allocation filter, and the plugin that provides this filter.
+     * The filter is automatically cleaned up when the plugin disables.
+     *
+     * @param plugin Plugin registering this filter
+     * @param filter Map ID filter
+     */
+    public synchronized void registerMapFilter(Plugin plugin, IntPredicate filter) {
+        mapIdFilters.add(new StaticMapIdFilter(plugin, filter));
+    }
+
+    private synchronized boolean isMapIdFiltered(int mapId) {
+        for (StaticMapIdFilter filter : mapIdFilters) {
+            if (filter.filter.test(mapId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -644,6 +685,12 @@ public final class CommonMapController implements PacketListener, Listener {
         final int MAX_IDS = CommonCapabilities.MAP_ID_IN_NBT ? Integer.MAX_VALUE : Short.MAX_VALUE;
         for (int mapidValue = 0; mapidValue < MAX_IDS; mapidValue++) {
             if (!mapUUIDById.contains(mapidValue)) {
+                // Check ID isn't in use by another plugin. If it is, put it aside as a static id.
+                if (this.isMapIdFiltered(mapidValue)) {
+                    this.storeStaticMapId(mapidValue);
+                    continue;
+                }
+
                 // Check if the Map Id was changed compared to before
                 boolean idChanged = mapIdByUUID.containsKey(mapUUID);
 
@@ -668,7 +715,7 @@ public final class CommonMapController implements PacketListener, Listener {
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public synchronized void onPacketSend(PacketSendEvent event) {
         // Check if any virtual single maps are attached to this map
-        if (event.getType() == PacketType.OUT_MAP) {    
+        if (event.getType() == PacketType.OUT_MAP) {
             int itemid = event.getPacket().read(PacketType.OUT_MAP.mapId);
             this.storeStaticMapId(itemid);
 
@@ -1686,5 +1733,19 @@ public final class CommonMapController implements PacketListener, Listener {
     @FunctionalInterface
     public static interface MapDisplayInitializeFunction {
         void initialize(MapDisplay display, JavaPlugin plugin, ItemStack mapItem);
+    }
+
+    /**
+     * Avoids static map ids being used that are used by other plugins.
+     * Required for some plugins which can interfere otherwise.
+     */
+    private static final class StaticMapIdFilter {
+        public final IntPredicate filter;
+        public final Plugin owner;
+
+        public StaticMapIdFilter(Plugin owner, IntPredicate filter) {
+            this.owner = owner;
+            this.filter = filter;
+        }
     }
 }
