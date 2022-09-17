@@ -78,6 +78,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCameraHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCollectHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityEffectHandle;
@@ -732,8 +733,34 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayOutCustomPayload extends NMSPacket {
 
-        // public final FieldAccessor<String> tag = nextField("private String a");
-        // public final FieldAccessor<Object> data = nextFieldSignature("private PacketDataSerializer b");
+        public static final FieldAccessor<String> channel = new SafeDirectField<String>() {
+            @Override
+            public String get(Object instance) {
+                return PacketPlayOutCustomPayloadHandle.createHandle(instance).getChannel();
+            }
+
+            @Override
+            public boolean set(Object instance, String value) {
+                PacketPlayOutCustomPayloadHandle.createHandle(instance).setChannel(value);
+                return true;
+            }
+        };
+
+        public static final FieldAccessor<byte[]> message = new SafeDirectField<byte[]>() {
+            @Override
+            public byte[] get(Object instance) {
+                return PacketPlayOutCustomPayloadHandle.createHandle(instance).getMessage();
+            }
+
+            @Override
+            public boolean set(Object instance, byte[] value) {
+                return false;
+            }
+        };
+
+        public static CommonPacket createNew(String channel, byte[] message) {
+            return PacketPlayOutCustomPayloadHandle.createNew(channel, message).toCommonPacket();
+        }
     }
 
     public static class NMSPacketPlayOutCustomSoundEffect extends NMSPacket {

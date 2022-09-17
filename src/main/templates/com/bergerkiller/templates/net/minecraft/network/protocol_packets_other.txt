@@ -9,6 +9,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
 import net.minecraft.network.syncher.DataWatcher.Item;
 import net.minecraft.network.syncher.DataWatcher.WatchableObject;
+import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.WorldServer;
@@ -80,6 +81,8 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSpectateHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
+import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
@@ -2854,4 +2857,50 @@ optional class PacketPlayOutAdvancements extends Packet {
 #else
     private boolean initial:a;
 #endif
+}
+
+class PacketPlayOutCustomPayload extends Packet {
+    // Channel name
+#select version >=
+#case 1.17:    private final (String) net.minecraft.resources.MinecraftKey channel:identifier;
+#case 1.15:    private (String) net.minecraft.resources.MinecraftKey channel:r;
+#case 1.14.1:  private (String) net.minecraft.resources.MinecraftKey channel:n;
+#case 1.14:    private (String) net.minecraft.resources.MinecraftKey channel:m;
+#case 1.13:    private (String) net.minecraft.resources.MinecraftKey channel:i;
+#case else:    private (String) String channel:a;
+#endselect
+
+    // Read raw payload
+    public byte[] getMessage() {
+#select version >=
+#case 1.17:    #require PacketPlayOutCustomPayload private final PacketDataSerializer payload_data:data;
+#case 1.15:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:s;
+#case 1.14.1:  #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:o;
+#case 1.14:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:n;
+#case 1.13:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:j;
+#case else:    #require PacketPlayOutCustomPayload private PacketDataSerializer payload_data:b;
+#endselect
+        PacketDataSerializer payload = instance#payload_data;
+        return payload.array();
+    }
+
+    // Constructor
+    public static (PacketPlayOutCustomPayloadHandle) PacketPlayOutCustomPayload createNew(String channel, byte[] message) {
+        PacketDataSerializer serializer = new PacketDataSerializer(io.netty.buffer.Unpooled.wrappedBuffer(message));
+
+#if version >= 1.13
+        net.minecraft.resources.MinecraftKey key;
+        key = (net.minecraft.resources.MinecraftKey) MinecraftKeyHandle.createNew(channel).getRaw();
+        return new PacketPlayOutCustomPayload(key, serializer);
+#else
+        return new PacketPlayOutCustomPayload(channel, serializer);
+#endif
+    }
+
+    <code>
+    @Override
+    public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
+        return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_CUSTOM_PAYLOAD;
+    }
+    </code>
 }
