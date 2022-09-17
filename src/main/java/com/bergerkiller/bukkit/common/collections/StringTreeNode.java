@@ -13,7 +13,7 @@ import java.util.List;
 public class StringTreeNode {
     private StringTreeNode _parent;
     private List<StringTreeNode> _children;
-    private final CharArrayBuffer _buffer;
+    private final TreeNodeBuffer _buffer;
     private int _lengthTotal;
     private int _countTotal;
     private boolean _changed;
@@ -27,7 +27,7 @@ public class StringTreeNode {
         this._buffer = new TreeNodeBuffer();
         this._lengthTotal = 0;
         this._countTotal = 1;
-        this._changed = false;
+        this._changed = false; // Is OK if flat children only refers to itself
     }
 
     /**
@@ -41,7 +41,7 @@ public class StringTreeNode {
         this._buffer = new TreeNodeBuffer(value);
         this._lengthTotal = this._buffer.length();
         this._countTotal = 1;
-        this._changed = false;
+        this._changed = false; // Is OK if flat children only refers to itself
     }
 
     /**
@@ -92,7 +92,7 @@ public class StringTreeNode {
             if (oldIndex != -1 && oldIndex != index) {
                 this._parent._children.remove(oldIndex);
                 this._parent._children.add(index, this);
-                this._parent.markChanged();
+                this._parent.markChildrenChanged();
                 return true;
             }
         }
@@ -124,7 +124,7 @@ public class StringTreeNode {
      * @param value
      */
     public void setValue(String value) {
-        this.markChanged(this._buffer.update(value), 0);
+        this.markLengthChanged(this._buffer.update(value));
     }
 
     /**
@@ -133,7 +133,7 @@ public class StringTreeNode {
      * @param value
      */
     public void setValueSequence(CharSequence value) {
-        this.markChanged(this._buffer.update(value), 0);
+        this.markLengthChanged(this._buffer.update(value));
     }
 
     /**
@@ -282,10 +282,11 @@ public class StringTreeNode {
      */
     public char[] toCharArray() {
         if (this._changed) {
-            char[] result = new char[this._lengthTotal];
-            this.toCharArray(result, 0);
-            return result;
+            BufferBuilder builder = new BufferBuilder(this._lengthTotal, this._countTotal);
+            this.toCharArray(builder);
+            return builder.buffer;
         } else {
+            // No need to recalculate flat children for no good reason
             char[] result = new char[this._lengthTotal];
             this._buffer.copyTo(result, 0, this._lengthTotal);
             return result;
@@ -302,78 +303,163 @@ public class StringTreeNode {
     @Override
     public String toString() {
         if (this._changed) {
-            char[] result = new char[this._lengthTotal];
-            this.toCharArray(result, 0);
-            return new String(result);
+            BufferBuilder builder = new BufferBuilder(this._lengthTotal, this._countTotal);
+            this.toCharArray(builder);
+            return new String(builder.buffer);
         } else {
             return this._buffer.copyToString(this._lengthTotal);
         }
     }
 
-    private int toCharArray(char[] buffer, int position) {
-        if (this._changed) {
+    private void toCharArray(BufferBuilder builder) {
+        int flatTotal = this._countTotal;
+
+        // When this node has no children, we can speed this up significantly
+        // Just assign the buffer of this node and that's all
+        // This also works around the initial null flat children array of created leaf nodes
+        if (flatTotal == 1) {
             this._changed = false;
+            this._buffer.moveToBufferAssignFlat(builder);
+            return;
+        }
 
-            // Changed, move original data to the new buffer
-            position = this._buffer.moveToBuffer(buffer, position);
-
-            // Recursively call toString() on the children as well
-            if (!this._children.isEmpty()) {
-                for (StringTreeNode child : this._children) {
-                    position = child.toCharArray(buffer, position);
-                }
-            }
-
-            // Done!
-            return position;
-        } else {
-            // Unchanged, selfBuffer stores the full String contents we need
-            // This means we can perform a single copy for our own buffer
-            // and the buffer contents of all our children.
-            this._buffer.copyTo(buffer, position, this._lengthTotal);
+        // If not changed, instantly copy data into the builder and swap buffers with the builder's buffers
+        if (!this._changed) {
+            this._buffer.copyAllTo(builder, this._lengthTotal, this._countTotal);
 
             // Swap the buffer out for the new buffer, recursively
-            return this.swapBuffer(buffer, position);
-        }
-    }
+            TreeNodeBuffer[] flat = builder.flatBuffers;
+            int flatIndex = builder.flatPosition;
+            int flatEnd = flatIndex + this._countTotal;
+            do {
+                TreeNodeBuffer buffer = flat[flatIndex];
+                builder.position = buffer.swapBuffer(builder.buffer, builder.position);
+                buffer._flatChildren = builder.flatBuffers;
+                buffer._flatOffset = flatIndex;
+            } while (++flatIndex < flatEnd);
+            builder.flatPosition = flatEnd;
 
-    private int swapBuffer(char[] buffer, int position) {
-        position = this._buffer.swapBuffer(buffer, position);
-        for (StringTreeNode node : this._children) {
-            position = node.swapBuffer(buffer, position);
+            return;
         }
-        return position;
+
+        this._changed = false;
+
+        TreeNodeBuffer[] nodeFlat = this._buffer._flatChildren;
+        if (nodeFlat != null) {
+            // If there is a valid flat children array, we can make use of it to optimize iteration
+            // First copy the flat array from the buffer into the builder
+            int flatIndex = builder.flatPosition;
+            int flatEnd = flatIndex + flatTotal;
+            System.arraycopy(nodeFlat, this._buffer._flatOffset, builder.flatBuffers, flatIndex, flatTotal);
+
+            // Then iterate the buffer of the builder and assign the buffer to all recursive children
+            TreeNodeBuffer[] flat = builder.flatBuffers;
+            do {
+                flat[flatIndex].moveToBuffer(builder, flatIndex);
+            } while (++flatIndex < flatEnd);
+            builder.flatPosition = flatEnd;
+        } else {
+            // Nope, got to do it the slow way
+
+            // Changed, move original data to the new buffer
+            this._buffer.moveToBufferAssignFlat(builder);
+
+            // Recursively process the children as well
+            for (StringTreeNode child : this._children) {
+                child.toCharArray(builder);
+            }
+        }
     }
 
     private void markChanged(int length_change, int count_change) {
-        if (length_change != 0 || count_change != 0) {
+        if (count_change == 0) {
+            // Only length changed potentially
+            markLengthChanged(length_change);
+        } else {
+            // Flat children changed, and most certainly the length as well
             StringTreeNode node = this;
             do {
                 node._lengthTotal += length_change;
                 node._countTotal += count_change;
+                node._buffer._flatChildren = null; // Reset!
                 node._changed = true;
             } while ((node = node._parent) != null);
         }
     }
 
-    private void markChanged() {
+    private void markLengthChanged(int length_change) {
+        // Only length of buffers changed
+        if (length_change != 0) {
+            StringTreeNode node = this;
+            do {
+                node._lengthTotal += length_change;
+                node._changed = true;
+            } while ((node = node._parent) != null);
+        }
+    }
+
+    private void markChildrenChanged() {
+        // Only (flat) children changed
         StringTreeNode node = this;
         do {
+            // If null all parents are aleady null too and we can stop
+            TreeNodeBuffer buffer = node._buffer;
+            if (buffer._flatChildren == null) {
+                break;
+            }
+            buffer._flatChildren = null;
             node._changed = true;
-        } while ((node = node._parent) != null && !node._changed);
+        } while ((node = node._parent) != null);
     }
 
     /**
      * Extends the char array buffer to also store a flat array buffer of child nodes
      */
-    public static final class TreeNodeBuffer extends CharArrayBuffer {
+    private static final class TreeNodeBuffer extends CharArrayBuffer {
+        private TreeNodeBuffer[] _flatChildren;
+        private int _flatOffset;
 
         public TreeNodeBuffer() {
             super();
+            this._flatChildren = null;
+            this._flatOffset = 0;
         }
 
         public TreeNodeBuffer(String value) {
             super(value);
+            this._flatChildren = null;
+            this._flatOffset = 0;
+        }
+
+        public void moveToBuffer(BufferBuilder builder, int flatOffset) {
+            builder.position = super.moveToBuffer(builder.buffer, builder.position);
+            this._flatChildren = builder.flatBuffers;
+            this._flatOffset = flatOffset;
+        }
+
+        public void moveToBufferAssignFlat(BufferBuilder builder) {
+            int flatOffset = builder.flatPosition++;
+            this.moveToBuffer(builder, flatOffset);
+            builder.flatBuffers[flatOffset] = this;
+        }
+
+        public void copyAllTo(BufferBuilder builder, int lengthTotal, int countTotal) {
+            super.copyTo(builder.buffer, builder.position, lengthTotal);
+            System.arraycopy(this._flatChildren, this._flatOffset, builder.flatBuffers, builder.flatPosition, countTotal);
+        }
+    }
+
+    private static final class BufferBuilder {
+        public final char[] buffer;
+        public final TreeNodeBuffer[] flatBuffers;
+        public int position;
+        public int flatPosition;
+
+        public BufferBuilder(int lengthTotal, int countTotal) {
+            this.buffer = new char[lengthTotal];
+            this.flatBuffers = new TreeNodeBuffer[countTotal];
+            this.position = 0;
+            this.flatPosition = 0;
         }
     }
 }
