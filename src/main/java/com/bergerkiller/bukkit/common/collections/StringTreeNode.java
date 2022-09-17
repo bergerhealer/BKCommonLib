@@ -14,7 +14,7 @@ public class StringTreeNode {
     private StringTreeNode _parent;
     private List<StringTreeNode> _children;
     private final CharArrayBuffer _buffer;
-    private int _totalLength;
+    private int _lengthTotal;
     private boolean _changed;
 
     /**
@@ -24,7 +24,7 @@ public class StringTreeNode {
         this._parent = null;
         this._children = Collections.emptyList();
         this._buffer = new CharArrayBuffer();
-        this._totalLength = 0;
+        this._lengthTotal = 0;
         this._changed = false;
     }
 
@@ -37,7 +37,7 @@ public class StringTreeNode {
         this._parent = null;
         this._children = Collections.emptyList();
         this._buffer = new CharArrayBuffer(value);
-        this._totalLength = this._buffer.length();
+        this._lengthTotal = this._buffer.length();
         this._changed = false;
     }
 
@@ -149,7 +149,7 @@ public class StringTreeNode {
         } else {
             parent._children.remove(this);
         }
-        parent.markChanged(-this._totalLength);
+        parent.markChanged(-this._lengthTotal);
     }
 
     /**
@@ -218,7 +218,7 @@ public class StringTreeNode {
             this._children.add(index, node);
         }
         node._parent = this;
-        this.markChanged(node._totalLength);
+        this.markChanged(node._lengthTotal);
         return node;
     }
 
@@ -235,7 +235,7 @@ public class StringTreeNode {
 
     private StringTreeNode clone(char[] buffer, int position) {
         StringTreeNode clone = new StringTreeNode();
-        clone._totalLength = this._totalLength;
+        clone._lengthTotal = this._lengthTotal;
         clone._buffer.assign(buffer, position, this._buffer.length());
         position += this._buffer.length();
 
@@ -244,15 +244,16 @@ public class StringTreeNode {
             StringTreeNode childClone = this._children.get(0).clone(buffer, position);
             childClone._parent = clone;
             clone._children = Collections.singletonList(childClone);
-            clone._totalLength += childClone._totalLength;
+            clone._lengthTotal += childClone._lengthTotal;
+            position += childClone._lengthTotal;
         } else if (child_count > 0) {
             clone._children = new ArrayList<StringTreeNode>(child_count);
             for (StringTreeNode child : this._children) {
                 StringTreeNode childClone = child.clone(buffer, position);
                 childClone._parent = clone;
-                childClone._totalLength = child._totalLength;
+                childClone._lengthTotal = child._lengthTotal;
                 clone._children.add(childClone);
-                position += childClone._totalLength;
+                position += childClone._lengthTotal;
             }
         }
 
@@ -279,12 +280,12 @@ public class StringTreeNode {
      */
     public char[] toCharArray() {
         if (this._changed) {
-            char[] result = new char[this._totalLength];
+            char[] result = new char[this._lengthTotal];
             this.toCharArray(result, 0);
             return result;
         } else {
-            char[] result = new char[this._totalLength];
-            this._buffer.copyTo(result, 0, this._totalLength);
+            char[] result = new char[this._lengthTotal];
+            this._buffer.copyTo(result, 0, this._lengthTotal);
             return result;
         }
     }
@@ -299,11 +300,11 @@ public class StringTreeNode {
     @Override
     public String toString() {
         if (this._changed) {
-            char[] result = new char[this._totalLength];
+            char[] result = new char[this._lengthTotal];
             this.toCharArray(result, 0);
             return new String(result);
         } else {
-            return this._buffer.copyToString(this._totalLength);
+            return this._buffer.copyToString(this._lengthTotal);
         }
     }
 
@@ -327,7 +328,7 @@ public class StringTreeNode {
             // Unchanged, selfBuffer stores the full String contents we need
             // This means we can perform a single copy for our own buffer
             // and the buffer contents of all our children.
-            this._buffer.copyTo(buffer, position, this._totalLength);
+            this._buffer.copyTo(buffer, position, this._lengthTotal);
 
             // Swap the buffer out for the new buffer, recursively
             return this.swapBuffer(buffer, position);
@@ -346,7 +347,7 @@ public class StringTreeNode {
         if (length_change != 0) {
             StringTreeNode node = this;
             do {
-                node._totalLength += length_change;
+                node._lengthTotal += length_change;
                 node._changed = true;
             } while ((node = node._parent) != null);
         }
