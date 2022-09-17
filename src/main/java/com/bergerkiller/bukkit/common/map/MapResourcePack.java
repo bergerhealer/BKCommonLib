@@ -300,7 +300,8 @@ public class MapResourcePack {
 
     /**
      * Loads a JSON-syntax model from this resource pack.
-     * 
+     * Path can be prefixed with namespace: to find non-minecraft models.
+     *
      * @param path to the model, e.g. "block/stone"
      * @return the model, a placeholder cube model if it could not be found
      */
@@ -374,7 +375,9 @@ public class MapResourcePack {
     /**
      * Lists all the resources found inside a folder of the given resource type. As some resources
      * like models sit in a specific root directory, the folder path is relative to that directory.
-     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * Lists only default minecraft namespace assets.
      *
      * @param type Type of resources to find
      * @param folder Folder relative to the resource type root to look for files
@@ -383,6 +386,22 @@ public class MapResourcePack {
      *         and {@link #getConfig(String)}.
      */
     public Set<String> listResources(ResourceType type, String folder) {
+        return listResources(type, "minecraft", folder);
+    }
+
+    /**
+     * Lists all the resources found inside a folder of the given resource type. As some resources
+     * like models sit in a specific root directory, the folder path is relative to that directory.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.
+     *
+     * @param type Type of resources to find
+     * @param namespace Namespace, the default is "minecraft" for vanilla assets
+     * @param folder Folder relative to the resource type root to look for files
+     * @return Set of files matching this resource type found in the folder. Without extension.
+     *         These paths can be directly used with methods like {@link #getTexture(String)}
+     *         and {@link #getConfig(String)}.
+     */
+    public Set<String> listResources(ResourceType type, String namespace, String folder) {
         // Must end with / to be a valid zip directory 'file'
         if (!folder.endsWith("/")) {
             folder += "/";
@@ -390,9 +409,9 @@ public class MapResourcePack {
 
         String zipFolderPath;
         if (folder.equals("/")) {
-            zipFolderPath = type.getRoot();
+            zipFolderPath = type.getRoot(namespace);
         } else {
-            zipFolderPath = type.getRoot() + folder;
+            zipFolderPath = type.getRoot(namespace) + folder;
         }
 
         Set<String> result = new HashSet<>();
@@ -401,14 +420,40 @@ public class MapResourcePack {
     }
 
     /**
+     * Lists all namespaces declared by this resource pack and its parents
+     *
+     * @return namespaces
+     */
+    public Set<String> listNamespaces() {
+        Set<String> result = new HashSet<>();
+        this.listResources(null, "", "assets/", result, true);
+        return result;
+    }
+
+    /**
      * Lists all the sub-directories storing resources of a given resource type. The resource
-     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.
+     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.<br>
+     * <br>
+     * Lists only default minecraft namespace assets.
      *
      * @param type Type of resources to list directories of in a folder
      * @param folder Folder relative to the resource type root to look for files
      * @return Set of directory paths that are child of the folder path specified
      */
     public Set<String> listDirectories(ResourceType type, String folder) {
+        return listDirectories(type, "minecraft", folder);
+    }
+
+    /**
+     * Lists all the sub-directories storing resources of a given resource type. The resource
+     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.
+     *
+     * @param type Type of resources to list directories of in a folder
+     * @param namespace Namespace, the default is "minecraft" for vanilla models
+     * @param folder Folder relative to the resource type root to look for files
+     * @return Set of directory paths that are child of the folder path specified
+     */
+    public Set<String> listDirectories(ResourceType type, String namespace, String folder) {
         // Must end with / to be a valid zip directory 'file'
         if (!folder.endsWith("/")) {
             folder += "/";
@@ -416,10 +461,10 @@ public class MapResourcePack {
 
         String zipFolderPath;
         if (folder.equals("/")) {
-            zipFolderPath = type.getRoot();
+            zipFolderPath = type.getRoot(namespace);
             folder = ""; // Don't return results starting with /
         } else {
-            zipFolderPath = type.getRoot() + folder;
+            zipFolderPath = type.getRoot(namespace) + folder;
         }
 
         Set<String> result = new HashSet<>();
@@ -463,6 +508,7 @@ public class MapResourcePack {
 
     /**
      * Loads a texture from this resource pack.
+     * Path can be prefixed with namespace: to find non-minecraft textures.
      * 
      * @param path to the texture, e.g. "blocks/stone"
      * @return the texture, a placeholder texture if it could not be found
@@ -470,6 +516,13 @@ public class MapResourcePack {
     public MapTexture getTexture(String path) {
         MapTexture result = textureCache.get(path);
         if (result == null) {
+            // Shortcut, this happens often for stuff in parents of children defining textures
+            if (path.startsWith("#")) {
+                result = this.createPlaceholderTexture();
+                textureCache.put(path, result);
+                return result;
+            }
+
             try {
                 try (InputStream inputStream = openFileStream(ResourceType.TEXTURES, path)) {
                     if (inputStream != null) {
@@ -481,9 +534,7 @@ public class MapResourcePack {
             }
 
             if (result == null) {
-                if (!path.startsWith("#")) {
-                    Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load texture: " + path);
-                }
+                Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load texture: " + path);
                 result = this.createPlaceholderTexture();
             }
 
@@ -887,15 +938,15 @@ public class MapResourcePack {
      */
     public static enum ResourceType {
         /** Models found in <b>assets/minecraft/models/</b> */
-        MODELS("assets/minecraft/models/", ".json"),
+        MODELS("/models/", ".json"),
         /** Block States found in <b>assets/minecraft/blockstates/</b> */
-        BLOCKSTATES("assets/minecraft/blockstates/", ".json"),
+        BLOCKSTATES("/blockstates/", ".json"),
         /** Textures found in <b>assets/minecraft/textures/</b> */
-        TEXTURES("assets/minecraft/textures/", ".png"),
+        TEXTURES("/textures/", ".png"),
         /** Texture metadata found in <b>assets/minecraft/textures/</b> */
-        TEXTURES_META("assets/minecraft/textures/", ".png.mcmeta"),
+        TEXTURES_META("/textures/", ".png.mcmeta"),
         /** YAML configuration files stored anywhere under <b>assets/</b> */
-        YAML("assets/", ".yml");
+        YAML("/", ".yml");
 
         private final String root;
         private final String ext;
@@ -905,8 +956,8 @@ public class MapResourcePack {
             this.ext = ext;
         }
 
-        public String getRoot() {
-            return this.root;
+        public String getRoot(String namespace) {
+            return "assets/" + namespace + this.root;
         }
 
         public String getExtension() {
@@ -919,11 +970,20 @@ public class MapResourcePack {
         }
 
         public String makePath(String path) {
-            return this.root + stripNS(path) + this.ext;
+            int namespaceIndex = path.indexOf(':');
+            if (namespaceIndex != -1) {
+                String namespace = path.substring(0, namespaceIndex);
+                path = path.substring(namespaceIndex + 1);
+                if (!namespace.isEmpty()) {
+                    return "assets/" + namespace + this.root + path + this.ext;
+                }
+            }
+
+            return "assets/minecraft" + this.root + path + this.ext;
         }
 
         public String makeBKCPath(String path) {
-            return "/com/bergerkiller/bukkit/common/internal/resources/" + this.root + stripNS(path) + this.ext;
+            return "/com/bergerkiller/bukkit/common/internal/resources/assets/minecraft" + this.root + stripNS(path) + this.ext;
         }
 
         private static String stripNS(String path) {
