@@ -11,15 +11,11 @@ public class StringTreeNodeTest {
     @Test
     public void testAddRemove() {
         StringTreeNode node = new StringTreeNode();
-        node.verifyFlatChildren();
         node.setValue("root");
 
         StringTreeNode c1 = node.add();
-        node.verifyFlatChildren();
         StringTreeNode c2 = node.add();
-        node.verifyFlatChildren();
         StringTreeNode c3 = node.add();
-        node.verifyFlatChildren();
 
         c1.setValue("1");
         c2.setValue("2");
@@ -27,49 +23,34 @@ public class StringTreeNodeTest {
         assertEquals("root123", node.toString());
 
         StringTreeNode c1a = c1.add();
-        node.verifyFlatChildren();
         c1a.setValue("A");
         StringTreeNode c1b = c1.add();
-        node.verifyFlatChildren();
         c1b.setValue("B");
         assertEquals("root1AB23", node.toString());
 
         c2.remove();
-        node.verifyFlatChildren();
-        c2.verifyFlatChildren();
         assertEquals("root1AB3", node.toString());
 
         c1.remove();
-        node.verifyFlatChildren();
-        c1.verifyFlatChildren();
         assertEquals("root3", node.toString());
 
         c3.remove();
-        node.verifyFlatChildren();
-        c3.verifyFlatChildren();
         assertEquals("root", node.toString());
     }
 
     @Test
     public void testChangeIndex() {
         StringTreeNode node = new StringTreeNode();
-        node.verifyFlatChildren();
         node.setValue("root");
 
         StringTreeNode c1 = node.add();
-        node.verifyFlatChildren();
         c1.add().setValue("W");
-        node.verifyFlatChildren();
 
         StringTreeNode c2 = node.add();
-        node.verifyFlatChildren();
         c2.add().setValue("W");
-        node.verifyFlatChildren();
 
         StringTreeNode c3 = node.add();
-        node.verifyFlatChildren();
         c3.add().setValue("W");
-        node.verifyFlatChildren();
 
         c1.setValue("1");
         c2.setValue("2");
@@ -77,13 +58,10 @@ public class StringTreeNodeTest {
         assertEquals("root1W2W3W", node.toString());
 
         c1.setIndex(2);
-        node.verifyFlatChildren();
         assertEquals("root2W3W1W", node.toString());
 
         c3.setIndex(0);
-        node.verifyFlatChildren();
         c2.setIndex(1);
-        node.verifyFlatChildren();
         assertEquals("root3W2W1W", node.toString());
     }
 
@@ -179,7 +157,6 @@ public class StringTreeNodeTest {
         child.add().setValue("b");
         child.add().setValue("c");
         child.setValue("A");
-        child.verifyFlatChildren();
         assertEquals("Abc", child.toString());
         assertEquals("rootAbc", root.toString());
     }
@@ -245,17 +222,12 @@ public class StringTreeNodeTest {
         StringTreeNode child_bbb = root.add();
         child_bbb.setValue("bbb");
         assertEquals("rootaaabbb", root.toString());
-        root.verifyFlatChildren();
 
         // Clone the entire tree
         StringTreeNode clone_root = root.clone();
-        root.verifyFlatChildren();
-        clone_root.verifyFlatChildren();
 
         StringTreeNode clone_child_aaa = clone_root.get(0);
         StringTreeNode clone_child_bbb = clone_root.get(1);
-        root.verifyFlatChildren();
-        clone_root.verifyFlatChildren();
 
         // Verify cloned tree has the same values
         assertEquals("root", clone_root.getValue());
