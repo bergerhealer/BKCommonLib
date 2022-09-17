@@ -15,6 +15,7 @@ public class StringTreeNode {
     private List<StringTreeNode> _children;
     private final CharArrayBuffer _buffer;
     private int _lengthTotal;
+    private int _countTotal;
     private boolean _changed;
 
     /**
@@ -23,8 +24,9 @@ public class StringTreeNode {
     public StringTreeNode() {
         this._parent = null;
         this._children = Collections.emptyList();
-        this._buffer = new CharArrayBuffer();
+        this._buffer = new TreeNodeBuffer();
         this._lengthTotal = 0;
+        this._countTotal = 1;
         this._changed = false;
     }
 
@@ -36,8 +38,9 @@ public class StringTreeNode {
     public StringTreeNode(String value) {
         this._parent = null;
         this._children = Collections.emptyList();
-        this._buffer = new CharArrayBuffer(value);
+        this._buffer = new TreeNodeBuffer(value);
         this._lengthTotal = this._buffer.length();
+        this._countTotal = 1;
         this._changed = false;
     }
 
@@ -121,7 +124,7 @@ public class StringTreeNode {
      * @param value
      */
     public void setValue(String value) {
-        this.markChanged(this._buffer.update(value));
+        this.markChanged(this._buffer.update(value), 0);
     }
 
     /**
@@ -130,7 +133,7 @@ public class StringTreeNode {
      * @param value
      */
     public void setValueSequence(CharSequence value) {
-        this.markChanged(this._buffer.update(value));
+        this.markChanged(this._buffer.update(value), 0);
     }
 
     /**
@@ -149,7 +152,7 @@ public class StringTreeNode {
         } else {
             parent._children.remove(this);
         }
-        parent.markChanged(-this._lengthTotal);
+        parent.markChanged(-this._lengthTotal, -this._countTotal);
     }
 
     /**
@@ -218,7 +221,7 @@ public class StringTreeNode {
             this._children.add(index, node);
         }
         node._parent = this;
-        this.markChanged(node._lengthTotal);
+        this.markChanged(node._lengthTotal, node._countTotal);
         return node;
     }
 
@@ -236,6 +239,7 @@ public class StringTreeNode {
     private StringTreeNode clone(char[] buffer, int position) {
         StringTreeNode clone = new StringTreeNode();
         clone._lengthTotal = this._lengthTotal;
+        clone._countTotal = this._countTotal;
         clone._buffer.assign(buffer, position, this._buffer.length());
         position += this._buffer.length();
 
@@ -244,14 +248,12 @@ public class StringTreeNode {
             StringTreeNode childClone = this._children.get(0).clone(buffer, position);
             childClone._parent = clone;
             clone._children = Collections.singletonList(childClone);
-            clone._lengthTotal += childClone._lengthTotal;
             position += childClone._lengthTotal;
         } else if (child_count > 0) {
             clone._children = new ArrayList<StringTreeNode>(child_count);
             for (StringTreeNode child : this._children) {
                 StringTreeNode childClone = child.clone(buffer, position);
                 childClone._parent = clone;
-                childClone._lengthTotal = child._lengthTotal;
                 clone._children.add(childClone);
                 position += childClone._lengthTotal;
             }
@@ -343,11 +345,12 @@ public class StringTreeNode {
         return position;
     }
 
-    private void markChanged(int length_change) {
-        if (length_change != 0) {
+    private void markChanged(int length_change, int count_change) {
+        if (length_change != 0 || count_change != 0) {
             StringTreeNode node = this;
             do {
                 node._lengthTotal += length_change;
+                node._countTotal += count_change;
                 node._changed = true;
             } while ((node = node._parent) != null);
         }
@@ -358,5 +361,19 @@ public class StringTreeNode {
         do {
             node._changed = true;
         } while ((node = node._parent) != null && !node._changed);
+    }
+
+    /**
+     * Extends the char array buffer to also store a flat array buffer of child nodes
+     */
+    public static final class TreeNodeBuffer extends CharArrayBuffer {
+
+        public TreeNodeBuffer() {
+            super();
+        }
+
+        public TreeNodeBuffer(String value) {
+            super(value);
+        }
     }
 }
