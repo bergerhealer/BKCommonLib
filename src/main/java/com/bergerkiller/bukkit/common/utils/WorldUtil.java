@@ -94,6 +94,17 @@ public class WorldUtil extends ChunkUtil {
     }
 
     /**
+     * Creates a new BlockPhysicsEvent
+     *
+     * @param block Block for the event
+     * @param blockData BlockData of the block during the event
+     * @return new BlockPhysicsEvent
+     */
+    public static BlockPhysicsEvent createBlockPhysicsEvent(Block block, BlockData blockData) {
+        return BlockPhysicsEventDataAccessor.INSTANCE.createEvent(block, blockData);
+    }
+
+    /**
      * Gets BlockData for a particular Block
      * 
      * @param block to query

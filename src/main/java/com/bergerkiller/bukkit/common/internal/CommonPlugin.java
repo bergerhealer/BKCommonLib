@@ -25,6 +25,7 @@ import com.bergerkiller.bukkit.common.events.EntityRemoveFromServerEvent;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.internal.hooks.LookupEntityClassMap;
 import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
+import com.bergerkiller.bukkit.common.internal.logic.BlockPhysicsEventDataAccessor;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier;
@@ -614,6 +615,7 @@ public class CommonPlugin extends PluginBase {
 
         if (preloadTemplateClasses) {
             CommonClasses.initializeTemplateClasses();
+            BlockPhysicsEventDataAccessor.init();
         }
 
         // Welcome message
