@@ -77,6 +77,10 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
             return T.empty.invoke();
         }
 
+        public static IChatBaseComponentHandle newLine() {
+            return T.newLine.invoke();
+        }
+
         public static IChatBaseComponentHandle modifiersToComponent(Collection<ChatColor> colors) {
             return T.modifiersToComponent.invoke(colors);
         }
@@ -89,6 +93,7 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
             public final Template.StaticMethod.Converted<String> chatComponentToJson = new Template.StaticMethod.Converted<String>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> jsonToChatComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> empty = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
+            public final Template.StaticMethod.Converted<IChatBaseComponentHandle> newLine = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
             public final Template.StaticMethod.Converted<IChatBaseComponentHandle> modifiersToComponent = new Template.StaticMethod.Converted<IChatBaseComponentHandle>();
 
         }

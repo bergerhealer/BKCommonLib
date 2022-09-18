@@ -95,7 +95,11 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
         }
 
         // Use CraftBukkit util's method of parsing
-        handle = CraftChatMessageHandle.fromString(messageText, true)[0];
+        IChatBaseComponentHandle[] parts = CraftChatMessageHandle.fromString(messageText, true);
+        handle = parts[0];
+        for (int i = 1; i < parts.length; i++) {
+            handle = handle.addSibling(parts[i]);
+        }
 
         // Find trailing color formatting characters in the message that would otherwise be dropped
         ArrayList<ChatColor> trailing_formatting_chars = new ArrayList<ChatColor>(0);
@@ -110,7 +114,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
             break;
         }
         if (!trailing_formatting_chars.isEmpty()) {
-            handle.addSibling(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(trailing_formatting_chars));
+            handle = handle.addSibling(IChatBaseComponentHandle.ChatSerializerHandle.modifiersToComponent(trailing_formatting_chars));
         }
     }
 
@@ -121,7 +125,11 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      * @return this
      */
     public final ChatText append(ChatText text) {
-        handle.addSibling(text.handle);
+        return append(text.handle);
+    }
+
+    private final ChatText append(IChatBaseComponentHandle handle) {
+        this.handle = this.handle.addSibling(handle);
         return this;
     }
 
@@ -161,7 +169,7 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
     }
 
     /**
-     * Appends a  text component that represents a clickable link.
+     * Appends a text component that represents a clickable link.
      * When clicked, the player is asked to copy the content specified
      * to their clipboard.
      * 
@@ -171,6 +179,16 @@ public final class ChatText extends BasicWrapper<IChatBaseComponentHandle> imple
      */
     public final ChatText appendClickableContent(String text, String content) {
         return append(fromClickableContent(text, content));
+    }
+
+    /**
+     * Appends a text component that inserts a newline character at the end.
+     * Further text appended will be on a new line.
+     *
+     * @return this
+     */
+    public final ChatText appendNewLine() {
+        return append(IChatBaseComponentHandle.ChatSerializerHandle.newLine());
     }
 
     /**

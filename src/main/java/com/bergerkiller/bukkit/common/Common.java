@@ -35,7 +35,8 @@ public class Common {
             "Common:Localization:InitDefaults",
             "Common:BlockData:EmissionBlockParameter",
             "Common:SignChangeTracker",
-            "Common:EntityUtil:GetSetEquipmentSlot"
+            "Common:EntityUtil:GetSetEquipmentSlot",
+            "Common:ChatText:MultiLineSupport"
     ).collect(Collectors.toSet());
 
     /**

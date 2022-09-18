@@ -197,6 +197,14 @@ class IChatBaseComponent {
 #endif
         }
 
+        public static (IChatBaseComponentHandle) IChatBaseComponent newLine() {
+#if version >= 1.19
+            return IChatBaseComponent.literal("\n");
+#else
+            return new ChatComponentText("\n");
+#endif
+        }
+
         // Gets the immutable EMPTY modifier constant, or creates a new mutable empty modifier
         #require net.minecraft.network.chat.ChatModifier public static ChatModifier emptyFormat() {
 #select version >=
