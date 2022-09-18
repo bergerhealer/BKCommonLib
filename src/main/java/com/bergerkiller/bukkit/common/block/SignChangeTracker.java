@@ -19,7 +19,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
  *
  * Detecting will actively load the chunk the sign is in.
  */
-public class SignChangeTracker {
+public class SignChangeTracker implements Cloneable {
     private final Block block;
     private Sign state;
     private BlockData blockData;
@@ -277,6 +277,16 @@ public class SignChangeTracker {
     @Override
     public String toString() {
         return "SignChangeTracker{block=" + this.block + ", sign=" + this.getSign() + "}";
+    }
+
+    @Override
+    public SignChangeTracker clone() {
+        SignChangeTracker clone = new SignChangeTracker(this.block);
+        clone.state = this.state;
+        clone.blockData = this.blockData;
+        clone.tileEntity = this.tileEntity;
+        clone.lastRawLines = this.lastRawLines;
+        return clone;
     }
 
     /**
