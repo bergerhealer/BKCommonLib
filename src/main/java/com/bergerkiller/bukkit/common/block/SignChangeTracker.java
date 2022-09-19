@@ -1,16 +1,27 @@
 package com.bergerkiller.bukkit.common.block;
 
+import java.util.List;
+import java.util.function.Function;
+import java.util.logging.Level;
+
 import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.Sign;
 
+import com.bergerkiller.bukkit.common.Common;
+import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
+import com.bergerkiller.bukkit.common.server.MohistServer;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntitySignHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.block.CraftBlockHandle;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 
 /**
  * Efficiently detects when the text contents of a Sign change, when the
@@ -26,6 +37,25 @@ public class SignChangeTracker implements Cloneable {
     private TileEntitySignHandle tileEntity;
     private Object[] lastRawLines;
 
+    // Need to swap what implementation we're using for certain server types
+    private static final Function<Block, SignChangeTracker> constructor;
+    static {
+        Function<Block, SignChangeTracker> constr = SignChangeTracker::new; // Default
+        if (Common.SERVER instanceof MohistServer && Common.evaluateMCVersion("<=", "1.12.2")) {
+            try {
+                final FastField<List<Object>> tileEntityListField = new FastField<>();
+                tileEntityListField.init(Resolver.resolveAndGetDeclaredField(WorldHandle.T.getType(), "tileEntityList"));
+                constr = block -> {
+                    List<Object> worldTileEntities = tileEntityListField.get(HandleConversion.toWorldHandle(block.getWorld()));
+                    return new SignChangeTrackerMohistLegacy(block, worldTileEntities);
+                };
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "[Mohist Compat] Failed to find World tileEntityList field", t);
+            }
+        }
+        constructor = constr;
+    }
+
     protected SignChangeTracker(Block block) {
         this.block = block;
         this.state = null;
@@ -33,8 +63,7 @@ public class SignChangeTracker implements Cloneable {
         this.lastRawLines = null;
     }
 
-    protected SignChangeTracker(Block block, Sign state) {
-        this.block = block;
+    private void initState(Sign state) {
         this.state = state;
         this.loadTileEntity(TileEntitySignHandle.fromBukkit(state));
     }
@@ -203,7 +232,7 @@ public class SignChangeTracker implements Cloneable {
 
         // Ask the TileEntity we already have whether it was removed from the World
         // If it was, we must re-set and re-check for the sign.
-        if (tileEntity.isRemoved()) {
+        if (checkRemoved(tileEntity)) {
             if (tryLoadFromWorld()) {
                 return true; // Backing TileEntity instance changed, so probably changed
             } else {
@@ -227,6 +256,10 @@ public class SignChangeTracker implements Cloneable {
 
         // Check for sign lines that change. For this, we check the internal IChatBaseComponent contents
         return detectChangedLines(tileEntity) || blockDataChanged;
+    }
+
+    protected boolean checkRemoved(TileEntitySignHandle tileEntity) {
+        return tileEntity.isRemoved();
     }
 
     private boolean detectChangedLines(TileEntitySignHandle tileEntity) {
@@ -299,7 +332,9 @@ public class SignChangeTracker implements Cloneable {
         if (sign == null) {
             throw new IllegalArgumentException("Sign is null");
         } else {
-            return new SignChangeTracker(sign.getBlock(), sign);
+            SignChangeTracker tracker = constructor.apply(sign.getBlock());
+            tracker.initState(sign);
+            return tracker;
         }
     }
 
@@ -310,7 +345,37 @@ public class SignChangeTracker implements Cloneable {
      * @return Sign change tracker
      */
     public static SignChangeTracker track(Block signBlock) {
+        SignChangeTracker tracker = constructor.apply(signBlock);
         Sign state = BlockUtil.getSign(signBlock);
-        return (state == null) ? new SignChangeTracker(signBlock) : new SignChangeTracker(signBlock, state);
+        if (state != null) {
+            tracker.initState(state);
+        }
+        return tracker;
+    }
+
+    /**
+     * Some old 1.12.2 versions of the server had a bug that TileEntity isRemoved() didn't work at all.
+     * This tracker checks the index at which a TileEntity is stored in a List, and checks that it
+     * has been removed from it that way.
+     */
+    private static class SignChangeTrackerMohistLegacy extends SignChangeTracker {
+        private final List<Object> worldTileEntities;
+        private int lastIndex = -1;
+ 
+        protected SignChangeTrackerMohistLegacy(Block block, List<Object> worldTileEntities) {
+            super(block);
+            this.worldTileEntities = worldTileEntities;
+        }
+
+        @Override
+        protected boolean checkRemoved(TileEntitySignHandle tileEntity) {
+            List<Object> list = this.worldTileEntities;
+            Object rawTileEntity = tileEntity.getRaw();
+            if (lastIndex >= 0 && lastIndex < list.size() && list.get(lastIndex) == rawTileEntity) {
+                return false;
+            }
+            lastIndex = list.indexOf(rawTileEntity);
+            return lastIndex == -1;
+        }
     }
 }
