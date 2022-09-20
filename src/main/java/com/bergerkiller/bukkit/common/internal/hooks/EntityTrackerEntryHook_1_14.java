@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.internal.hooks;
 
+import java.util.List;
 import java.util.logging.Level;
 
 import org.bukkit.World;
@@ -17,6 +18,7 @@ import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 @ClassHook.HookImport("net.minecraft.server.level.EntityPlayer")
 @ClassHook.HookPackage("net.minecraft.server")
+@ClassHook.HookLoadVariables("com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER")
 public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHook_1_14> implements EntityTrackerEntryHook {
     private EntityNetworkController<?> controller;
     private final StateHook stateHook = new StateHook();
@@ -60,21 +62,60 @@ public class EntityTrackerEntryHook_1_14 extends ClassHook<EntityTrackerEntryHoo
         }
     }
 
+    private void controllerUpdateViewer(Player viewer) {
+        // Add or remove the viewer depending on whether this entity is viewable by the viewer
+        if (controller.isViewable(viewer)) {
+            controller.addViewer(viewer);
+        } else {
+            controller.removeViewer(viewer);
+        }
+    }
+
     @HookMethod("public void updatePlayer(EntityPlayer entityplayer)")
     public void updatePlayer(Object entityplayer) {
-        if (entityplayer != controller.getEntity().getHandle()) {
-            try {
-                // Add or remove the viewer depending on whether this entity is viewable by the viewer
+        try {
+            if (entityplayer != controller.getEntity().getHandle()) {
                 Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
-                if (controller.isViewable(viewer)) {
-                    controller.addViewer(viewer);
-                } else {
+
+                // For paper: check whether player reported as removed from the tracked-set
+                // This does cause a false-positive when the entity is first made visible to players (player joins server)
+                // However, it is quickly rectified the next tick, so this is no big deal.
+                if (EntityTrackerEntryHandle.T.isTrackingStoppedPaper.invoke(instance(), entityplayer)) {
                     controller.removeViewer(viewer);
+                    return;
+                }
+
+                controllerUpdateViewer(viewer);
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer", t);
+        }
+    }
+
+    // Overrided so we don't do the isTrackingStoppedPaper check when this method is called
+    // During this time, the Paper tracked player set isn't initialized yet
+    @SuppressWarnings("rawtypes")
+    @HookMethodCondition("version >= 1.18")
+    @HookMethod("public void updatePlayers(java.util.List list)")
+    public void updatePlayers(List players) {
+        for (Object entityplayer : players) {
+            try {
+                if (entityplayer != controller.getEntity().getHandle()) {
+                    Player viewer = (Player) WrapperConversion.toEntity(entityplayer);
+                    controllerUpdateViewer(viewer);
                 }
             } catch (Throwable t) {
                 Logging.LOGGER_NETWORK.log(Level.SEVERE, "Failed to update viewer", t);
             }
         }
+    }
+
+    // 1.14 - 1.17. For some reason dynamic remapping of the name doesn't work for the List.
+    @SuppressWarnings("rawtypes")
+    @HookMethodCondition("version < 1.18")
+    @HookMethod("public void track(java.util.List list)")
+    public void track(List players) {
+        updatePlayers(players);
     }
 
     @Override
