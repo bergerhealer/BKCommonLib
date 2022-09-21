@@ -996,8 +996,15 @@ public final class CommonMapController implements PacketListener, Listener {
 
     private void onAddItemFrame(EntityItemFrameHandle frame) {
         int entityId = frame.getId();
-        if (itemFrames.containsKey(entityId)) {
-            return;
+        {
+            ItemFrameInfo frameInfo = itemFrames.get(entityId);
+            if (frameInfo != null) {
+                frameInfo.removed = false;
+                if (frameInfo.sentMapInfoToPlayers) {
+                    frameInfo.needsItemRefresh.set(true);
+                }
+                return;
+            }
         }
 
         // Add Item Frame Info
