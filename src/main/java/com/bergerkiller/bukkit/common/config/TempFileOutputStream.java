@@ -122,14 +122,7 @@ public class TempFileOutputStream extends OutputStream {
             return;
         }
 
-        // Try to delete the output file first
-        if (!outputFile.delete() && outputFile.exists()) {
-            throw new IOException("Failed to delete existing output file prior to transfer");
-        }
-
-        // Move the temp file to the output file
-        if (!tempFile.renameTo(outputFile)) {
-            throw new IOException("Failed to transfer temporary file to output file");
-        }
+        // Swap the files. Might fail if output file is open in a program.
+        StreamUtil.atomicReplace(tempFile, outputFile);
     }
 }
