@@ -1250,10 +1250,13 @@ public final class CommonMapController implements PacketListener, Listener {
         if (!this.isFrameDisplaysEnabled || !(event.getEntity() instanceof ItemFrame) || !(event.getDamager() instanceof Player)) {
             return;
         }
-        event.setCancelled(dispatchClickActionApprox(
+        if (dispatchClickActionApprox(
                 (Player) event.getDamager(),
                 (ItemFrame) event.getEntity(),
-                MapAction.LEFT_CLICK));
+                MapAction.LEFT_CLICK))
+        {
+            event.setCancelled(true);
+        }
     }
 
     private Vector lastClickOffset = null;
@@ -1265,12 +1268,13 @@ public final class CommonMapController implements PacketListener, Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     protected void onEntityRightClick(PlayerInteractEntityEvent event) {
         if (!this.isFrameDisplaysEnabled || !(event.getRightClicked() instanceof ItemFrame)) {
             return;
         }
         ItemFrame itemFrame = (ItemFrame) event.getRightClicked();
+        boolean cancelled;
         if (lastClickOffset != null) {
             Location eye = event.getPlayer().getEyeLocation();
             Location pos = itemFrame.getLocation().add(lastClickOffset);
@@ -1282,13 +1286,16 @@ public final class CommonMapController implements PacketListener, Listener {
             double distance = eye.distance(pos);
             pos.subtract(dir.clone().multiply(distance));
 
-            event.setCancelled(dispatchClickAction(event.getPlayer(), itemFrame, pos.toVector(), dir, MapAction.RIGHT_CLICK));
+            cancelled = dispatchClickAction(event.getPlayer(), itemFrame, pos.toVector(), dir, MapAction.RIGHT_CLICK);
         } else {
-            event.setCancelled(dispatchClickActionApprox(event.getPlayer(), itemFrame, MapAction.RIGHT_CLICK));
+            cancelled = dispatchClickActionApprox(event.getPlayer(), itemFrame, MapAction.RIGHT_CLICK);
+        }
+        if (cancelled) {
+            event.setCancelled(true);
         }
     }
 
-    @EventHandler(priority = EventPriority.LOWEST)
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     protected void onBlockInteract(PlayerInteractEvent event) {
         if (event.getClickedBlock() == null) {
             return;
