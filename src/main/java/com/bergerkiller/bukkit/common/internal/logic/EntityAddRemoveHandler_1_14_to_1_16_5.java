@@ -19,6 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
@@ -37,6 +38,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
@@ -54,8 +56,12 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityListMethod = new FastMethod<Object>();
     private final FastMethod<Object> tuinitySwapEntityInWorldEntityIterationSetMethod = new FastMethod<Object>();
     private final ChunkEntitySliceHandler chunkEntitySliceHandler;
+    private final AddRemoveHandlerLogic addRemoveHandler;
 
     public EntityAddRemoveHandler_1_14_to_1_16_5() {
+        // Does some important stuff I guess
+        addRemoveHandler = Template.Class.create(AddRemoveHandlerLogic.class, Common.TEMPLATE_RESOLVER);
+
         //Field 'entitiesById' in class net.minecraft.server.v1_15_R1.WorldServer is of type Int2ObjectLinkedOpenHashMap while we expect type Int2ObjectMap
         try {
             String fieldName = Resolver.resolveFieldName(WorldServerHandle.T.getType(), "entitiesById");
@@ -136,6 +142,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
 
     @Override
     public void forceInitialization() {
+        addRemoveHandler.forceInitialization();
         entitiesByIdField.forceInitialization();
         entitiesByUUIDField.forceInitialization();
         if (tuinitySwapEntityInWorldEntityListMethod.isAvailable()) {
@@ -274,7 +281,7 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
             Chunk loadedUpdatingChunk = (updatingChunk == null) ? null : updatingChunk.getChunkIfLoaded();
             if (loadedUpdatingChunk == null && updatingChunk != null) {
                 // Try hard time! This allows any status the chunk is in.
-                loadedUpdatingChunk = PlayerChunkHandle.T.opt_getChunkTryHard_1_14.invoke(updatingChunk.getRaw());
+                loadedUpdatingChunk = addRemoveHandler.getChunkTryHard(updatingChunk.getRaw());
             }
 
             // Let's go!
@@ -465,5 +472,40 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
             }
         }
         return false;
+    }
+
+    @Template.Optional
+    @Template.Import("net.minecraft.world.level.chunk.Chunk")
+    @Template.InstanceType("net.minecraft.server.level.WorldServer")
+    public static abstract class AddRemoveHandlerLogic extends Template.Class<Template.Handle> {
+
+        /*
+         * <GET_CHUNK_TRY_HARD>
+         * public static org.bukkit.Chunk getChunkTryHard(net.minecraft.server.level.PlayerChunk playerChunk) {
+         *     #require net.minecraft.server.level.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.ChunkStatus> CHUNK_STATUSES;
+         *     java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
+         *     for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
+         *         java.util.concurrent.CompletableFuture future;
+         * #if version >= 1.14.1
+         *         future = instance.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         * #else
+         *         future = instance.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         * #endif
+         *         if (!future.isCompletedExceptionally()) {
+         *             com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);
+         *             if (either != null) {
+         *                 java.util.Optional chunkOpt = either.left();
+         *                 if (chunkOpt != null) {
+         *                     Chunk c = (Chunk) chunkOpt.get();
+         *                     return c.getBukkitChunk();
+         *                 }
+         *             }
+         *         }
+         *     }
+         *     return null;
+         * }
+         */
+        @Template.Generated("%GET_CHUNK_TRY_HARD%")
+        public abstract org.bukkit.Chunk getChunkTryHard(Object playerChunk);
     }
 }

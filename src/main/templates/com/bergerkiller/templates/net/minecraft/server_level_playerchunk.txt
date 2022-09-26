@@ -282,6 +282,7 @@ class PlayerChunk {
     private final (IntVector2) ChunkCoordIntPair location;
 #endif
 
+    /*
 #if version >= 1.17
     private boolean done:wasAccessibleSinceLastSave;
 #elseif version >= 1.14.1
@@ -293,6 +294,7 @@ class PlayerChunk {
 #else
     private boolean done:loaded;
 #endif
+    */
 
     // Moved to PlayerChunkMap in 1.14
     //     public void addPlayer:a((org.bukkit.entity.Player) EntityPlayer player);
@@ -303,36 +305,6 @@ class PlayerChunk {
     // #else
     //     public void sendChunk:b((org.bukkit.entity.Player) EntityPlayer player);
     // #endif
-
-// Only used on 1.14 and onwards to patch up chunks that have unloaded
-#if version >= 1.14
-    public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14() {
-        #require net.minecraft.server.level.PlayerChunk private static final java.util.List<net.minecraft.world.level.chunk.ChunkStatus> CHUNK_STATUSES;
-        java.util.List chunk_statuses = PlayerChunk#CHUNK_STATUSES;
-        for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
-            java.util.concurrent.CompletableFuture future;
-  #if version >= 1.18
-            future = instance.getFutureIfPresentUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
-  #elseif version >= 1.14.1
-            future = instance.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
-  #else
-            future = instance.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
-  #endif
-            if (!future.isCompletedExceptionally()) {
-                com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);
-                if (either != null) {
-                    java.util.Optional chunkOpt = either.left();
-                    if (chunkOpt != null) {
-                        return (Chunk) chunkOpt.get();
-                    }
-                }
-            }
-        }
-        return null;
-    }
-#else
-    public optional (org.bukkit.Chunk) Chunk opt_getChunkTryHard_1_14:###();
-#endif
 
 #if version >= 1.18
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded:getFullChunk();
