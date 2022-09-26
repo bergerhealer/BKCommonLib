@@ -3,25 +3,34 @@ package com.bergerkiller.bukkit.common.config.yaml;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.lang.reflect.Constructor;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.logging.Level;
 
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.LoaderOptions;
 import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.BaseConstructor;
 import org.yaml.snakeyaml.constructor.SafeConstructor;
 import org.yaml.snakeyaml.error.YAMLException;
 import org.yaml.snakeyaml.nodes.Node;
 import org.yaml.snakeyaml.nodes.Tag;
+import org.yaml.snakeyaml.representer.Representer;
+import org.yaml.snakeyaml.resolver.Resolver;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.config.HeaderBuilder;
 import com.bergerkiller.bukkit.common.config.NodeBuilder;
 import com.bergerkiller.bukkit.common.internal.logic.ItemStackDeserializer;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.StringUtil;
+import com.bergerkiller.mountiplex.reflection.SafeMethod;
 
 /**
  * Helper class for deserializing values and headers from YAML-encoded text
@@ -39,7 +48,41 @@ public class YamlDeserializer {
      * Creates a new YamlDeserializer
      */
     public YamlDeserializer() {
-        this.yaml = new Yaml(new YamlConstructor());
+        // This custom constructor is used to properly de-serialize item stacks
+        YamlConstructor yamlConstructor = new YamlConstructor();
+
+        // Check whether the SnakeYAML library currently in use imposes DOS protection
+        // We want to turn this off so that de-serialization cannot break horrible with large files
+        // DOS isn't our concern, so yeet it.
+        Yaml yaml;
+        if (SafeMethod.contains(LoaderOptions.class, "setNestingDepthLimit", int.class)) {
+            try {
+                Constructor<Yaml> constr = Yaml.class.getConstructor(BaseConstructor.class, Representer.class, DumperOptions.class, LoaderOptions.class, Resolver.class);
+
+                Representer representer = new Representer();
+                DumperOptions dumperOptions = new DumperOptions();
+                dumperOptions.setDefaultFlowStyle(representer.getDefaultFlowStyle());
+                dumperOptions.setDefaultScalarStyle(representer.getDefaultScalarStyle());
+                dumperOptions.setAllowReadOnlyProperties(representer.getPropertyUtils().isAllowReadOnlyProperties());
+                dumperOptions.setTimeZone(representer.getTimeZone());
+                LoaderOptions loaderOptions = new LoaderOptions();
+                LoaderOptions.class.getMethod("setNestingDepthLimit", int.class).invoke(loaderOptions, Integer.MAX_VALUE);
+                LoaderOptions.class.getMethod("setCodePointLimit", int.class).invoke(loaderOptions, Integer.MAX_VALUE);
+                LoaderOptions.class.getMethod("setMaxAliasesForCollections", int.class).invoke(loaderOptions, Integer.MAX_VALUE);
+                Resolver resolver = new Resolver();
+                yaml = constr.newInstance(yamlConstructor, representer, dumperOptions, loaderOptions, resolver);
+            } catch (Throwable t) {
+                Logging.LOGGER_CONFIG.log(Level.SEVERE, "Failed to disable SnakeYAML document size limits", t);
+
+                // Fallback
+                yaml = new Yaml(yamlConstructor);
+            }
+        } else {
+            // Default constructor
+            yaml = new Yaml(yamlConstructor);
+        }
+
+        this.yaml = yaml;
         this.preParser = new PreParser();
     }
 
