@@ -144,9 +144,15 @@ class Chunk {
         // Paper API for storing entities inside chunk slices can be used
         WorldServer world = (WorldServer) instance#getChunkWorld();
 
+    #if exists io.papermc.paper.chunk.system.entity.EntityLookup
+        // New Paper Chunk System
+        io.papermc.paper.chunk.system.entity.EntityLookup entityLookup = world.getEntityLookup();
+        io.papermc.paper.world.ChunkEntitySlices slices = entityLookup.getChunk(instance.getPos().x, instance.getPos().z);
+    #else
         #require net.minecraft.world.level.World protected final io.papermc.paper.world.EntitySliceManager entitySliceManager;
         io.papermc.paper.world.EntitySliceManager manager = world#entitySliceManager;
         io.papermc.paper.world.ChunkEntitySlices slices = manager.getChunk(instance.getPos().x, instance.getPos().z);
+    #endif
         if (slices == null) {
             return java.util.Collections.emptyList();
         }

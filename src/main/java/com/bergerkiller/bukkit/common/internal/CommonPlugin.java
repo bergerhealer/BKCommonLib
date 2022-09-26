@@ -655,7 +655,8 @@ public class CommonPlugin extends PluginBase {
                 "Please wait while we get our code ready...",
                 "60% of the time, it works all the time.",
                 "I don't make mistakes. I just find ways not to code this plugin.",
-                "Less complicated than the American election.");
+                "Less complicated than the American election.",
+                "Bless you SpottedLeaf <3");
 
         setEnableMessage(welcomeMessages.get(new Random().nextInt(welcomeMessages.size())));
         setDisableMessage(null);

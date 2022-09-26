@@ -41,6 +41,14 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
     public static final EntityAddRemoveHandler INSTANCE = LibraryComponentSelector.forModule(EntityAddRemoveHandler.class)
             .addVersionOption(null, "1.13.2", EntityAddRemoveHandler_1_8_to_1_13_2::new)
             .addVersionOption("1.14", "1.16.5", EntityAddRemoveHandler_1_14_to_1_16_5::new)
+            .addWhen("Paper ChunkSystem EntityAddRemoveHandler", e -> {
+                try {
+                    Class.forName("io.papermc.paper.chunk.system.entity.EntityLookup");
+                    return true;
+                } catch (Throwable t) {
+                    return false;
+                }
+            }, EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem::new)
             .addVersionOption("1.17", null, EntityAddRemoveHandler_1_17::new)
             .update();
 

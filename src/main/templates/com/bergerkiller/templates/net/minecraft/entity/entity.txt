@@ -819,6 +819,11 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
   #if exists net.minecraft.world.entity.Entity public net.minecraft.world.level.chunk.Chunk getCurrentChunk();
     public (org.bukkit.Chunk) Chunk getCurrentChunk();
+  #elseif exists io.papermc.paper.chunk.system.entity.EntityLookup.EntityCallback
+    // Paper new chunk system does not care about all this
+    public (org.bukkit.Chunk) Chunk getCurrentChunk() {
+        return ((WorldServer) instance.level).getChunkIfLoaded(instance.sectionX, instance.sectionZ);
+    }
   #else
     public (org.bukkit.Chunk) Chunk getCurrentChunk() {
         #require net.minecraft.world.entity.Entity private net.minecraft.world.level.entity.EntityInLevelCallback levelCallback;
