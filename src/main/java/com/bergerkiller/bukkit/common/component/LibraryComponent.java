@@ -1,5 +1,7 @@
 package com.bergerkiller.bukkit.common.component;
 
+import java.util.function.Predicate;
+
 import com.bergerkiller.bukkit.common.bases.CheckedFunction;
 import com.bergerkiller.bukkit.common.bases.CheckedSupplier;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
@@ -56,6 +58,62 @@ public interface LibraryComponent {
          * @return Created library component, is not yet enabled
          */
         L create(E environment) throws Throwable;
+    }
+
+    /**
+     * Creates a conditional library component that is only enabled when the predicate
+     * specified tests true.
+     *
+     * @param <E> Environment type, ignored
+     * @param <L> Library component type
+     * @param identifier Unique identifier for the library component being added
+     * @param isSupported Predicate for testing whether the component should be enabled
+     * @param componentSupplier Constructor for a new instance of the library component. Is
+     *                          called when the current Minecraft version is compatible.
+     * @return Conditional library component
+     */
+    public static <E, L extends LibraryComponent> Conditional<E, L> when(
+            final String identifier,
+            final Predicate<E> isSupported,
+            final CheckedSupplier<L> componentSupplier
+    ) {
+        return when(identifier, isSupported, e -> componentSupplier.get());
+    }
+
+    /**
+     * Creates a conditional library component that is only enabled when the predicate
+     * specified tests true.
+     *
+     * @param <E> Environment type, ignored
+     * @param <L> Library component type
+     * @param identifier Unique identifier for the library component being added
+     * @param isSupported Predicate for testing whether the component should be enabled
+     * @param componentFunction Constructor for a new instance of the library component. Is
+     *                          called when the current Minecraft version is compatible, with
+     *                          the environment as input.
+     * @return Conditional library component
+     */
+    public static <E, L extends LibraryComponent> Conditional<E, L> when(
+            final String identifier,
+            final Predicate<E> isSupported,
+            final CheckedFunction<E, L> componentFunction
+    ) {
+        return new Conditional<E, L>() {
+            @Override
+            public String getIdentifier() {
+                return identifier;
+            }
+
+            @Override
+            public boolean isSupported(E environment) {
+                return isSupported.test(environment);
+            }
+
+            @Override
+            public L create(E environment) throws Throwable {
+                return componentFunction.apply(environment);
+            }
+        };
     }
 
     /**

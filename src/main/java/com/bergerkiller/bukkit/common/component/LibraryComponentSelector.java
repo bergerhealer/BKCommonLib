@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -138,6 +139,47 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
     public LibraryComponentSelector<E, L> addOption(LibraryComponent.Conditional<E, ? extends L> option) {
         this.registered.add(option);
         return this;
+    }
+
+    /**
+     * Adds a conditional library component that is only enabled when the predicate
+     * tests true.
+     *
+     * @param <E> Environment type, ignored
+     * @param <L> Library component type
+     * @param identifier Unique identifier for this optional component
+     * @param isSupported Predicate to test whether the component should be enabled
+     * @param componentSupplier Constructor for a new instance of the library component. Is
+     *                          called when the current Minecraft version is compatible.
+     * @return this
+     */
+    public LibraryComponentSelector<E, L> addWhen(
+            final String identifier,
+            final Predicate<E> isSupported,
+            final CheckedSupplier<L> componentSupplier
+    ) {
+        return this.addOption(LibraryComponent.when(identifier, isSupported, componentSupplier));
+    }
+
+    /**
+     * Adds a conditional library component that is only enabled when the predicate
+     * tests true.
+     *
+     * @param <E> Environment type, ignored
+     * @param <L> Library component type
+     * @param identifier Unique identifier for this optional component
+     * @param isSupported Predicate to test whether the component should be enabled
+     * @param componentFunction Constructor for a new instance of the library component. Is
+     *                          called when the current Minecraft version is compatible, with
+     *                          the environment as input.
+     * @return this
+     */
+    public LibraryComponentSelector<E, L> addWhen(
+            final String identifier,
+            final Predicate<E> isSupported,
+            final CheckedFunction<E, L> componentFunction
+    ) {
+        return this.addOption(LibraryComponent.when(identifier, isSupported, componentFunction));
     }
 
     /**
