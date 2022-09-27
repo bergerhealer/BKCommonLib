@@ -426,6 +426,7 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
     @Template.Import("net.minecraft.world.entity.Entity")
     @Template.Import("net.minecraft.util.EntitySlice")
     @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
+    @Template.Import("net.minecraft.core.BlockPosition")
     @Template.Import("java.util.concurrent.locks.StampedLock")
     @Template.Import("it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap")
     @Template.Import("it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap")
