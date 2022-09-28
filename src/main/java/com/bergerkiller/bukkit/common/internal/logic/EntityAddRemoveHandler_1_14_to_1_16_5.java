@@ -487,9 +487,9 @@ class EntityAddRemoveHandler_1_14_to_1_16_5 extends EntityAddRemoveHandler {
          *     for (int i = chunk_statuses.size() - 1; i >= 0; --i) {
          *         java.util.concurrent.CompletableFuture future;
          * #if version >= 1.14.1
-         *         future = instance.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         *         future = playerChunk.getStatusFutureUnchecked((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
          * #else
-         *         future = instance.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
+         *         future = playerChunk.a((net.minecraft.world.level.chunk.ChunkStatus) chunk_statuses.get(i));
          * #endif
          *         if (!future.isCompletedExceptionally()) {
          *             com.mojang.datafixers.util.Either either = (com.mojang.datafixers.util.Either) future.getNow(null);
