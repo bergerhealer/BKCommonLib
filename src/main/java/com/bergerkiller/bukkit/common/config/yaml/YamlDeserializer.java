@@ -55,7 +55,8 @@ public class YamlDeserializer {
         // We want to turn this off so that de-serialization cannot break horrible with large files
         // DOS isn't our concern, so yeet it.
         Yaml yaml;
-        if (SafeMethod.contains(LoaderOptions.class, "setNestingDepthLimit", int.class)) {
+        Class<?> loaderOptionsType = CommonUtil.getClass("org.yaml.snakeyaml.LoaderOptions");
+        if (loaderOptionsType != null && SafeMethod.contains(loaderOptionsType, "setNestingDepthLimit", int.class)) {
             try {
                 Constructor<Yaml> constr = Yaml.class.getConstructor(BaseConstructor.class, Representer.class, DumperOptions.class, LoaderOptions.class, Resolver.class);
 
