@@ -82,6 +82,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutWorldParticlesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -910,6 +911,22 @@ class PacketPlayOutSetSlot extends Packet {
     private int slot:b;
     private (org.bukkit.inventory.ItemStack) ItemStack item:c;
 #endif
+
+    public static (PacketPlayOutSetSlotHandle) PacketPlayOutSetSlot createNew(int containerId, int slot, (org.bukkit.inventory.ItemStack) ItemStack item) {
+        // Items can't be null since this version
+#if version >= 1.11
+        if (item == null) {
+            item = (ItemStack) com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle.EMPTY_ITEM.getRaw();
+        }
+#endif
+
+        // Added state parameter since MC 1.17.1, default to 0
+#if version >= 1.17.1
+        return new PacketPlayOutSetSlot(containerId, 0, slot, item);
+#else
+        return new PacketPlayOutSetSlot(containerId, slot, item);
+#endif
+    }
 }
 
 class PacketPlayOutWindowItems extends Packet {

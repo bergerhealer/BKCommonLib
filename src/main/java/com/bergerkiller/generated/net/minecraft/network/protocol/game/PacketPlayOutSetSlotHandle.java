@@ -21,6 +21,10 @@ public abstract class PacketPlayOutSetSlotHandle extends PacketHandle {
 
     /* ============================================================================== */
 
+    public static PacketPlayOutSetSlotHandle createNew(int containerId, int slot, ItemStack item) {
+        return T.createNew.invoke(containerId, slot, item);
+    }
+
     public abstract int getWindowId();
     public abstract void setWindowId(int value);
     public abstract int getSlot();
@@ -35,6 +39,8 @@ public abstract class PacketPlayOutSetSlotHandle extends PacketHandle {
         public final Template.Field.Integer windowId = new Template.Field.Integer();
         public final Template.Field.Integer slot = new Template.Field.Integer();
         public final Template.Field.Converted<ItemStack> item = new Template.Field.Converted<ItemStack>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutSetSlotHandle> createNew = new Template.StaticMethod.Converted<PacketPlayOutSetSlotHandle>();
 
     }
 

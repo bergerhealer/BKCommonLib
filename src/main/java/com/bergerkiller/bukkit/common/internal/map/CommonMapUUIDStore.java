@@ -7,6 +7,8 @@ import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
@@ -35,6 +37,22 @@ public class CommonMapUUIDStore {
      */
     public static boolean isMap(ItemStack item) {
         return item != null && item.getType() == FILLED_MAP_TYPE;
+    }
+
+    /**
+     * Checks whether a given ItemStack contains a Map item which is a BKCommonLib
+     * Map Display.
+     *
+     * @param item
+     * @return True if the item is a Map Display item
+     */
+    public static boolean isMapDisplay(ItemStack item) {
+        if (!isMap(item)) {
+            return false;
+        }
+
+        CommonTagCompound tag = ItemUtil.getMetaTag(item, false);
+        return tag != null && tag.getUUID("mapDisplay") != null;
     }
 
     /**

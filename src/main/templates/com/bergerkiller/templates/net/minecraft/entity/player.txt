@@ -247,6 +247,14 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
     public optional Collection<Integer> getRemoveQueue:###();
 #endif
 
+    public int getCurrentWindowId() {
+#if version >= 1.17
+        return ((EntityHuman) instance).containerMenu.containerId;
+#else
+        return instance.activeContainer.windowId;
+#endif
+    }
+
     public org.bukkit.inventory.InventoryView openAnvilWindow(ChatText titleText) {
         IChatBaseComponent title;
         if (titleText != null) {

@@ -37,6 +37,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
     public abstract boolean hasSeenCredits();
     public abstract void setHasSeenCredits(boolean hasSeen);
     public abstract void sendMessage(ChatText ichatbasecomponent);
+    public abstract int getCurrentWindowId();
     public abstract InventoryView openAnvilWindow(ChatText titleText);
     public abstract void openSignEditWindow(IntVector3 signPosition);
 
@@ -77,6 +78,7 @@ public abstract class EntityPlayerHandle extends EntityHumanHandle {
         public final Template.Method.Converted<Void> sendMessage = new Template.Method.Converted<Void>();
         @Template.Optional
         public final Template.Method<Collection<Integer>> getRemoveQueue = new Template.Method<Collection<Integer>>();
+        public final Template.Method<Integer> getCurrentWindowId = new Template.Method<Integer>();
         public final Template.Method<InventoryView> openAnvilWindow = new Template.Method<InventoryView>();
         public final Template.Method.Converted<Void> openSignEditWindow = new Template.Method.Converted<Void>();
 

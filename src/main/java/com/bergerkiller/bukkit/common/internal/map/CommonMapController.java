@@ -33,7 +33,10 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.Event.Result;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.inventory.InventoryAction;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCreativeEvent;
+import org.bukkit.event.inventory.InventoryType.SlotType;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
@@ -85,11 +88,14 @@ import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.ItemUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
+import com.bergerkiller.bukkit.common.utils.PacketUtil;
 import com.bergerkiller.bukkit.common.utils.PlayerUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
 import com.bergerkiller.bukkit.common.wrappers.IntHashMap;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInSteerVehicleHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
+import com.bergerkiller.generated.net.minecraft.server.level.EntityPlayerHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
@@ -754,7 +760,7 @@ public final class CommonMapController implements PacketListener, Listener {
                 event.getPacket().write(PacketType.OUT_WINDOW_SET_SLOT.item, newItem);
             }
         }
- 
+
         // Correct the ItemStack displayed in Item Frames
         if (this.isFrameDisplaysEnabled && event.getType() == PacketType.OUT_ENTITY_METADATA) {
             int entityId = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.entityId);
@@ -920,6 +926,55 @@ public final class CommonMapController implements PacketListener, Listener {
                 session.updatePlayerOnline(player);
             }
         });
+    }
+
+    @EventHandler(priority = EventPriority.MONITOR)
+    public void onInventoryClick(InventoryClickEvent event) {
+        // The below resends a slot update packet one tick delayed to make sure a
+        // map is updated for the Player
+
+        // Dropping a map item onto the quickbar requires refreshing the item a tick later
+        // No need to resent the entire inventory though
+        boolean is_place = event.getAction() == InventoryAction.PLACE_ALL ||
+                           event.getAction() == InventoryAction.PLACE_SOME ||
+                           event.getAction() == InventoryAction.PLACE_ONE;
+        if (is_place &&
+            event.getSlotType() == SlotType.QUICKBAR &&
+            event.getWhoClicked() instanceof Player &&
+            CommonMapUUIDStore.isMapDisplay(event.getCursor())
+        ) {
+            final Player player = (Player) event.getWhoClicked();
+            final int slot = event.getSlot();
+            final int rawSlot = event.getRawSlot();
+            CommonUtil.nextTick(() -> {
+                if (!player.isOnline()) {
+                    return;
+                }
+
+                ItemStack item = player.getInventory().getItem(slot);
+                if (CommonMapUUIDStore.isMapDisplay(item)) {
+                    // Resend the item!
+                    PacketUtil.sendPacket(player, PacketPlayOutSetSlotHandle.createNew(EntityPlayerHandle.fromBukkit(player).getCurrentWindowId(), rawSlot, item));
+                }
+            });
+        }
+
+        // If shift-clicking an item in another inventory, refresh any hotbar items which contain
+        // a map display afterwards
+        if (event.getAction() == InventoryAction.MOVE_TO_OTHER_INVENTORY &&
+            event.getSlotType() != SlotType.QUICKBAR &&
+            event.getWhoClicked() instanceof Player &&
+            CommonMapUUIDStore.isMapDisplay(event.getCurrentItem())
+        ) {
+            final Player player = (Player) event.getWhoClicked();
+            CommonUtil.nextTick(() -> {
+                if (!player.isOnline()) {
+                    return;
+                }
+
+                player.updateInventory();
+            });
+        }
     }
 
     @EventHandler(priority = EventPriority.MONITOR)
