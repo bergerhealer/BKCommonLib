@@ -2,11 +2,15 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.logging.Level;
 
+import org.bukkit.Material;
+
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.component.LibraryComponentSelector;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.generated.net.minecraft.world.level.block.BlockHandle;
+import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
 
 /**
  * Hooks fields inside IBlockData to store a BlockData wrapper
@@ -52,12 +56,7 @@ public abstract class BlockDataWrapperHook implements LibraryComponent {
      * @param blockData BlockData wrapper of IBlockData
      */
     public void hook(Object nmsIBlockData, Object accessor, BlockData blockData) {
-        Object hook = hook(accessor, blockData);
-        setAccessor(nmsIBlockData, hook);
-        if (getAccessor(nmsIBlockData) != hook) {
-            setAccessor(nmsIBlockData, accessor);
-            throw new IllegalStateException("Output of getAccessor() did not change after setting accessor");
-        }
+        setAccessor(nmsIBlockData, hook(accessor, blockData));
     }
 
     /**
@@ -87,6 +86,40 @@ public abstract class BlockDataWrapperHook implements LibraryComponent {
     @Override
     public void disable() {
     }
+
+    @Override
+    public final void enable() throws Throwable {
+        this.baseEnable();
+
+        // Perform a little dry run to verify all the above initialized logic actually works
+        // Operate on BlockData 'AIR' for this
+        // As we're modifying a final non-volatile field, it might not update right away, try with yield()
+        Object airBlockData = BlockHandle.createHandle(CraftMagicNumbersHandle.getBlockFromMaterial(Material.AIR)).getBlockData().getRaw();
+        Object currentAccessor = this.getAccessor(airBlockData);
+        try {
+            // Hook the accessor
+            Object hooked = this.hook(currentAccessor, BlockData.AIR);
+
+            // Verify accessor was updated
+            this.setAccessor(airBlockData, hooked);
+            if (this.getAccessor(airBlockData) != hooked) {
+                Thread.yield();
+                if (this.getAccessor(airBlockData) != hooked) {
+                    throw new IllegalStateException("Output of getAccessor() did not change after setting accessor");
+                }
+            }
+        } finally {
+            // Restore
+            this.setAccessor(airBlockData, currentAccessor);
+        }
+    }
+
+    /**
+     * Enables this implementation. After this all other methods should work.
+     *
+     * @throws Throwable
+     */
+    protected abstract void baseEnable() throws Throwable;
 
     /**
      * Gets the Accessor instance, if the object is hooked it should implement {@link Accessor}

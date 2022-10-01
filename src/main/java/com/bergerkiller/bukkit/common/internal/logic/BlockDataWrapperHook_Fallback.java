@@ -5,7 +5,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 class BlockDataWrapperHook_Fallback extends BlockDataWrapperHook {
 
     @Override
-    public void enable() {
+    protected void baseEnable() {
     }
 
     @Override

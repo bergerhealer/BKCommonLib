@@ -30,7 +30,7 @@ class BlockDataWrapperHook_Impl extends BlockDataWrapperHook {
     private final FastField<BlockData> hookBlockDataField = new FastField<>();
 
     @Override
-    public void enable() throws Throwable {
+    protected void baseEnable() throws Throwable {
         final Class<?> immutableMapType = getClassVerify("com.google.common.collect.ImmutableMap");
 
         // Version-specific field names...
