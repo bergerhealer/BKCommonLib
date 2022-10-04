@@ -1117,7 +1117,6 @@ public abstract class PluginBase extends JavaPlugin {
                             for (String provides : pluginProvidesList) {
                                 if (seenIllegalAccess.contains(provides)) {
                                     seenIllegalAccess.add((String) o);
-                                    System.out.println("ADD: " + o);
                                     return true;
                                 }
                             }
