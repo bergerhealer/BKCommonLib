@@ -1,6 +1,6 @@
 ![Logo](https://github.com/bergerhealer/BKCommonLib/blob/master/misc/BKCommonLib_logo.png?raw=true)
 
-[⤓ Modrinth](https://modrinth.com/mod/BKCommonLib) / [⤓ Spigot](https://www.spigotmc.org/resources/bkcommonlib.39590/) / [⤓ Jenkins  Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/) / [Source on GitHub](https://github.com/bergerhealer/BKCommonLib) / [Javadocs](https://ci.mg-dev.eu/javadocs/BKCommonLib/) / [Discord](https://discord.gg/wvU2rFgSnw)
+[⤓ Modrinth](https://modrinth.com/plugin/bkcommonlib) / [⤓ Spigot](https://www.spigotmc.org/resources/bkcommonlib.39590/) / [⤓ Jenkins  Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/) / [Source on GitHub](https://github.com/bergerhealer/BKCommonLib) / [Javadocs](https://ci.mg-dev.eu/javadocs/BKCommonLib/) / [Discord](https://discord.gg/wvU2rFgSnw)
 
 ## About BKCommonLib
 **BKCommonLib** is a Paper/Spigot/Bukkit server plugin and library which houses a large selection of utilities, API's, frameworks and performance-critical code. It was made to eliminate all use of Minecraft Server Code (aka NMS) from plugins themselves, improving their stability.
