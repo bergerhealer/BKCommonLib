@@ -590,6 +590,74 @@ public class StringUtil {
         return builder.toString();
     }
 
+    /**
+     * Removes  a substring portion of an input text
+     *
+     * @param text Input text
+     * @param beginIndex First index of the character to remove, inclusive
+     * @param endIndex Last index of the characters to remove, exclusive
+     * @return Text with substring removed
+     */
+    public static String removeSubstring(String text, int beginIndex, int endIndex) {
+        return replaceSubstring(text, beginIndex, endIndex, "");
+    }
+
+    /**
+     * Replaces a substring portion of an input text with a replacement text
+     *
+     * @param text Input text
+     * @param beginIndex First index of the character to replace, inclusive
+     * @param endIndex Last index of the characters to replace, exclusive
+     * @param replacement Replacement text. Empty string removed the substring only.
+     * @return Text with substring replaced
+     */
+    public static String replaceSubstring(String text, int beginIndex, int endIndex, String replacement) {
+        try {
+            StringBuilder str = new StringBuilder(text.length() - (endIndex - beginIndex) + replacement.length());
+            str.append(text, 0, beginIndex);
+            str.append(replacement);
+            str.append(text, endIndex, text.length());
+            return str.toString();
+        } catch (RuntimeException ex) {
+            // Just to avoid vagueness, create a proper readable exception
+            if (text == null) throw new IllegalArgumentException("Input text is null");
+            if (replacement == null) throw new IllegalArgumentException("Input replacement string is null");
+            if (beginIndex < 0) throw new IllegalArgumentException("Begin index is negative");
+            if (endIndex > text.length()) throw new IllegalArgumentException("End index is beyond the length of the text");
+            if (endIndex < beginIndex) throw new IllegalArgumentException("End index of " + endIndex + " is before begin index " + beginIndex);
+            throw ex;
+        }
+    }
+
+    /**
+     * More performant version of {@link ChatColor#stripColor(String)}
+     *
+     * @param text Text to strip chat styling characters of
+     * @return Text without any ChatColor style characters
+     */
+    public static String stripChatStyle(String text) {
+        int index = text.indexOf(CHAT_STYLE_CHAR);
+        if (index == -1) {
+            return text; // Shortcut, avoiding StringBuilder
+        }
+
+        int lastIndex = 0;
+        int textLength = text.length();
+        StringBuilder newStr = new StringBuilder(textLength);
+        do {
+            newStr.append(text, lastIndex, index);
+            lastIndex = index + 2;
+            if (lastIndex >= textLength) {
+                // Done! Avoid out of range errors.
+                return newStr.toString();
+            }
+        } while ((index = text.indexOf(CHAT_STYLE_CHAR, lastIndex)) != -1);
+
+        // Last bit
+        newStr.append(text, lastIndex, text.length());
+        return newStr.toString();
+    }
+
     // Used by convertArgsList
     private static final class StringArgTokenizer {
         private final LinkedList<String> result = new LinkedList<String>();
