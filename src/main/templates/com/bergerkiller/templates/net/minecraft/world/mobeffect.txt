@@ -88,7 +88,11 @@ class MobEffect {
 }
 
 class MobEffectList {
-#if version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public final int id;
+#if forge && version >= 1.18
+    public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
+        return net.minecraft.core.IRegistry.MOB_EFFECT.getId((Object) mobeffectlist);
+    }
+#elseif version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public final int id;
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
         return mobeffectlist.id;
     }
@@ -96,17 +100,20 @@ class MobEffectList {
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist);
 #endif
 
-#if version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
+#if forge && version >= 1.18
+    // Forge fallback for 1.18+
+    public static (MobEffectListHandle) MobEffectList fromId(int id) {
+        return (MobEffectList) net.minecraft.core.IRegistry.MOB_EFFECT.fromId(id);
+    }
+#elseif version >= 1.18 || exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
+    // Spigot/Paper 1.18+, Purpur 1.17.1+
+    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
+#elseif version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
     // NachoSpigot 1.8.8 has some weird hack thing
     public static (MobEffectListHandle) MobEffectList fromId(int id) {
         MobEffectList[] byId = MobEffectList.byId;
         return (id >= 0 && id < byId.length) ? byId[id] : null;
     }
-#elseif exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
-    // Purpur 1.17.1+
-    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
-#elseif version >= 1.18
-    public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
 #else
     public static (MobEffectListHandle) MobEffectList fromId(int id);
 #endif

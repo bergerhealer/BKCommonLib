@@ -102,7 +102,7 @@ public class MC1_18_2_Conversion {
         /*
          * <GET_HOLDER_OF_WORLD>
          * public static Object getHolder(CraftWorld world) {
-         *     return world.getHandle().dimensionTypeRegistration();
+         *     return ((net.minecraft.world.level.World) world.getHandle()).dimensionTypeRegistration();
          * }
          */
         @Template.Generated("%GET_HOLDER_OF_WORLD%")
