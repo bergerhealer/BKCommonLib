@@ -65,7 +65,7 @@ public class ArclightServer extends SpigotServer {
         }
 
         // NMS World class 'entitiesById' has different field modifiers in bytecode than loaded class
-        if (classPath.startsWith("net.minecraft.server.")) {
+        if (classPath.startsWith("net.minecraft.")) {
             return false;
         }
 
