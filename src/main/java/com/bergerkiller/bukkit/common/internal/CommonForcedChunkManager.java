@@ -1,12 +1,15 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
+import java.util.logging.Level;
 
 import org.bukkit.Chunk;
 import org.bukkit.World;
@@ -16,8 +19,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import com.bergerkiller.bukkit.common.RunOnceTask;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkLoadTimeoutException;
 import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager;
@@ -39,11 +44,13 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private HashMap<WorldRadiusKey, ForcedWorld> forcedWorldsByWorldRadius = new HashMap<>(); // Cloned on modify
     private IdentityHashMap<World, ForcedWorld[]> forcedWorldsByWorld = new IdentityHashMap<>(); // Cloned on modify
     private ForcedWorld forcedWorldLastGet = new ForcedWorld(); // Faster lookup for repeated same world (optimization)
+    private final List<Entry> pendingChunkUnloadRequests = new ArrayList<>(); // 1.13 and before: must do an unload request for these
     private final ChunkUnloadEventListener chunkUnloadListener = new ChunkUnloadEventListener();
     private final WorldUnloadEventListener worldUnloadListener = new WorldUnloadEventListener();
     private final CommonPlugin plugin;
     private Task pendingHandler = null;
     private final CommonNextTickExecutor asyncLoadCallbackHandler = new CommonNextTickExecutor();
+    private final ChunkUnloadRequestTask chunkUnloadRequestTask;
     private ChunkLoadTimeoutTracker loadTimeoutTracker = null;
 
     // After this number of ticks, consider the loading of a chunk to have failed
@@ -53,6 +60,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
 
     public CommonForcedChunkManager(CommonPlugin plugin) {
         this.plugin = plugin;
+        this.chunkUnloadRequestTask = new ChunkUnloadRequestTask(plugin);
     }
 
     public void enable() {
@@ -104,8 +112,12 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     }
 
     public boolean isForced(Chunk chunk) {
-        for (ForcedWorld forced : forcedWorldsByWorld.getOrDefault(chunk.getWorld(), NO_WORLDS)) {
-            if (forced.isKeptLoaded(chunk.getX(), chunk.getZ())) {
+        return isForced(chunk.getWorld(), chunk.getX(), chunk.getZ());
+    }
+
+    public boolean isForced(World world, int cx, int cz) {
+        for (ForcedWorld forced : forcedWorldsByWorld.getOrDefault(world, NO_WORLDS)) {
+            if (forced.isKeptLoaded(cx, cz)) {
                 return true;
             }
         }
@@ -548,7 +560,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
                     // ChunkUnloadEvent (which we will handle) to make sure the chunk unloads.
                     // Only do this on older MC versions, the ticket system takes care of it
                     // automatically on more modern MC versions.
-                    world.unloadChunkRequest(entry.getX(), entry.getZ());
+                    pendingChunkUnloadRequests.add(entry);
+                    chunkUnloadRequestTask.start();
                 }
                 entry.resetAsyncLoad();
             }
@@ -621,6 +634,48 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
             // This makes sure all chunks are eventually force-loaded
             while (!tasks.isEmpty() && (currentTick-FAIL_LOAD_AFTER_TICKS) >= tasks.peek().tick) {
                 tasks.poll().abortAllIfNotLoaded();
+            }
+        }
+    }
+
+    private final class ChunkUnloadRequestTask extends RunOnceTask {
+
+        public ChunkUnloadRequestTask(Plugin plugin) {
+            super(plugin);
+        }
+
+        @Override
+        public void run() {
+            // Elements might be added to the end during iteration, so protect against that
+            List<Entry> pending = pendingChunkUnloadRequests;
+            try {
+                int size, i = 0, cycle = 0;
+                while (i < (size = pending.size())) {
+                    // Detect some weird-ass infinite recursion going on. This could be if someone is creating/unloading
+                    // a ForcedChunk inside a ChunkUnloadEvent handler or something.
+                    // If that's the case, eliminate all entries already handled from the top
+                    if (++cycle > 10) {
+                        getPlugin().getLogger().log(Level.WARNING,
+                                "[ForcedChunk API] Somebody is loading and then unloading forced chunks " +
+                                "inside the ChunkUnloadEvent. Infinite cycle aborted.");
+                        return;
+                    }
+
+                    do {
+                        Entry e = pending.get(i);
+
+                        // Check world is still around and nobody keeps the chunk loaded
+                        World world;
+                        if (e.world.unloaded || (world = e.world.world) == null || isForced(world, e.getX(), e.getZ())) {
+                            continue;
+                        }
+
+                        // Fire the chunk unload request
+                        world.unloadChunkRequest(e.getX(), e.getZ());
+                    } while (++i < size);
+                }
+            } finally {
+                pending.clear();
             }
         }
     }
