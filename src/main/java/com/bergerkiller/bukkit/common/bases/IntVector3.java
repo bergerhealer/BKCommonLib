@@ -190,9 +190,22 @@ public class IntVector3 implements Comparable<IntVector3> {
     }
 
     /**
+     * Gets a Bukkit double Vector representation of these
+     * int vector coordinates.
+     *
+     * @return vector
+     */
+    public Vector toVector() {
+        return new Vector(x, y, z);
+    }
+
+    /**
      * Gets the position Vector of the middle of 'the' block
      *
      * @return block middle position Vector
+     * @see #midX()
+     * @see #midY()
+     * @see #midZ()
      */
     public Vector midVector() {
         return new Vector(midX(), midY(), midZ());
