@@ -424,14 +424,17 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
     @Template.Import("net.minecraft.world.level.chunk.Chunk")
     @Template.Import("net.minecraft.server.level.ChunkProviderServer")
     @Template.Import("net.minecraft.world.entity.Entity")
+    @Template.Import("net.minecraft.world.level.entity.Visibility")
     @Template.Import("net.minecraft.util.EntitySlice")
     @Template.Import("net.minecraft.world.level.ChunkCoordIntPair")
     @Template.Import("net.minecraft.core.BlockPosition")
+    @Template.Import("net.minecraft.world.entity.Visibility")
     @Template.Import("java.util.concurrent.locks.StampedLock")
     @Template.Import("it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap")
     @Template.Import("it.unimi.dsi.fastutil.ints.Int2IntOpenHashMap")
     @Template.Import("it.unimi.dsi.fastutil.objects.Object2ReferenceOpenHashMap")
     @Template.Import("net.minecraft.world.level.entity.EntityTickList")
+    @Template.Import("io.papermc.paper.world.ChunkEntitySlices")
     @Template.InstanceType("io.papermc.paper.chunk.system.entity.EntityLookup")
     public static abstract class AddRemoveHandlerLogic extends Template.Class<Template.Handle> {
 
@@ -495,6 +498,38 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *         }
          *     }
          * 
+         *     #require EntityLookup private final int minSection;
+         *     #require EntityLookup private final int maxSection;
+         *     final int minSection = entityLookup#minSection;
+         *     final int maxSection = entityLookup#maxSection;
+         * 
+         *     // First check whether the new entity is already stored. If so, no ticking mode changes
+         *     boolean isNewEntityStored = false;
+         *     if (newEntity != null) {
+         *         final BlockPosition pos = newEntity.blockPosition();
+         *         final int sectionX = pos.getX() >> 4;
+         *         final int sectionY = net.minecraft.util.MathHelper.clamp(pos.getY() >> 4, minSection, maxSection);
+         *         final int sectionZ = pos.getZ() >> 4;
+         * 
+         *         // Runs just the chunk-adding logic. ID/UUID is done earlier.
+         *         newEntity.sectionX = sectionX;
+         *         newEntity.sectionY = sectionY;
+         *         newEntity.sectionZ = sectionZ;
+         * 
+         *         ChunkEntitySlices slices = entityLookup.getChunk(sectionX, sectionZ);
+         *         if (slices != null) {
+         *             #require io.papermc.paper.world.ChunkEntitySlices private java.util.List<net.minecraft.world.entity.Entity> getAllEntities();
+         *             java.util.List allEntities = slices#getAllEntities();
+         *             java.util.Iterator iter = allEntities.iterator();
+         *             while (iter.hasNext()) {
+         *                 if (iter.next() == newEntity) {
+         *                     isNewEntityStored = true;
+         *                     break;
+         *                 }
+         *             }
+         *         }
+         *     }
+         * 
          *     // bug: if chunk doesn't exist, error occurs
          *     //entitySliceManager.removeEntity(oldEntity);
          *     io.papermc.paper.world.ChunkEntitySlices slices = entityLookup.getChunk(oldEntity.sectionX, oldEntity.sectionZ);
@@ -508,12 +543,8 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          * 
          *     // Add new entity (might not be the same chunk)
          *     // Note: we cannot call addEntity as this initializes the tracker/other logic/events
+         *     ChunkEntitySlices sectionOfEntity = null;
          *     if (newEntity != null) {
-         *         #require EntityLookup private final int minSection;
-         *         #require EntityLookup private final int maxSection;
-         *         final int minSection = entityLookup#minSection;
-         *         final int maxSection = entityLookup#maxSection;
-         * 
          *         final BlockPosition pos = newEntity.blockPosition();
          *         final int sectionX = pos.getX() >> 4;
          *         final int sectionY = net.minecraft.util.MathHelper.clamp(pos.getY() >> 4, minSection, maxSection);
@@ -523,7 +554,9 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *         newEntity.sectionX = sectionX;
          *         newEntity.sectionY = sectionY;
          *         newEntity.sectionZ = sectionZ;
-         *         entityLookup.getOrCreateChunk(sectionX, sectionZ).addEntity(newEntity, sectionY);
+         * 
+         *         sectionOfEntity = entityLookup.getOrCreateChunk(sectionX, sectionZ);
+         *         sectionOfEntity.addEntity(newEntity, sectionY);
          *     }
          * 
          *     // Update the "all entities" list
@@ -540,6 +573,25 @@ class EntityAddRemoveHandler_1_19_2_Paper_ChunkSystem extends EntityAddRemoveHan
          *         int index = el_entityToIndex.get(newEntity.getId());
          *         if (index >= 0 && index < el_entities.length) {
          *             el_entities[index] = newEntity;
+         *         }
+         *     }
+         * 
+         *     // If isAlwaysTicking() of the old and new entity differs, we may have to stop/start ticking ourselves
+         *     // This is because of a bug in the persistent entity section manager that, if isAlwaysTicking() is true,
+         *     // the updateStatus function does not work anymore to update this state.
+         *     // Only do this when the entity is first replaced. Not the second time around.
+         *     if (!isNewEntityStored && sectionOfEntity != null) {
+         *         boolean wasTicking = EntityLookup.getEntityStatus(oldEntity).isTicking();
+         *         boolean isAlwaysTicking = newEntity.isAlwaysTicking();
+         * 
+         *         // Start ticking when section is not ticking, and we go from not always ticking
+         *         // to always ticking. This is because this 'load' trigger already fired, and so it
+         *         // presumes startTicking() was already performed.
+         *         if (isAlwaysTicking && !wasTicking) {
+         *             // Force a status change from TRACKED to TICKING, which starts ticking the entity
+         *             // Do not cause a change from a visibility below TRACKED, that will break things
+         *             entityLookup.entityStatusChange(newEntity, sectionOfEntity, Visibility.TRACKED, Visibility.TICKING,
+         *                      false, true, false);
          *         }
          *     }
          * }
