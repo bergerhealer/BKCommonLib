@@ -1,5 +1,6 @@
 ![Logo](https://github.com/bergerhealer/BKCommonLib/blob/master/misc/BKCommonLib_logo.png?raw=true)
 
+<!-- rewrite once spigot "[⤓ Modrinth](https://modrinth.com/plugin/bkcommonlib) / [⤓ Spigot](https://www.spigotmc.org/resources/bkcommonlib.39590/) / " "" -->
 [⤓ Modrinth](https://modrinth.com/plugin/bkcommonlib) / [⤓ Spigot](https://www.spigotmc.org/resources/bkcommonlib.39590/) / [⤓ Jenkins  Dev Builds](https://ci.mg-dev.eu/job/BKCommonLib/) / [Source on GitHub](https://github.com/bergerhealer/BKCommonLib) / [Javadocs](https://ci.mg-dev.eu/javadocs/BKCommonLib/) / [Discord](https://discord.gg/wvU2rFgSnw)
 
 ## About BKCommonLib
