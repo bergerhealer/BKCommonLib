@@ -32,10 +32,10 @@ Tutorials and example projects are lacking a bit, but you can ask for API help o
 
 ## Features
 <details>
-<summary>Includes <a href="https://github.com/bergerhealer/Mountiplex">Mountiplex</a> General Purpose Java Reflection Library</summary>
+<summary>Includes Mountiplex General Purpose Java Reflection Library</summary>
 
 #####
-**Mountiplex** is core to BKCommonLib's ability to support so many different Minecraft Server versions and even forge at the same time. It combines the strengths of [ASM](https://github.com/llbit/ow2-asm), [Javassist](https://github.com/jboss-javassist/javassist) and [Objenesis](http://objenesis.org/) with a _Template Engine_ to generate compatible code at runtime. To achieve this it supports template declarations for macros, reflection and remapping and molds this into a compiletime-generated interface.
+[**Mountiplex**](https://github.com/bergerhealer/Mountiplex) is core to BKCommonLib's ability to support so many different Minecraft Server versions and even forge at the same time. It combines the strengths of [ASM](https://github.com/llbit/ow2-asm), [Javassist](https://github.com/jboss-javassist/javassist) and [Objenesis](http://objenesis.org/) with a _Template Engine_ to generate compatible code at runtime. To achieve this it supports template declarations for macros, reflection and remapping and molds this into a compiletime-generated interface.
 
 This means you don't have to compile different classes for every different permutation of paper/spigot/forge/version and the millions of forks people create. If someone changes something, add an _#if - #endif_ block and you're set!
 
@@ -64,10 +64,10 @@ This means you don't have to compile different classes for every different permu
 ******
 </details>
 <details>
-<summary>Includes <a href="https://github.com/bergerhealer/cloud">Cloud Command Framework</a></summary>
+<summary>Includes Cloud Command Framework</summary>
 
 #####
-Write clean commands with annotations or builder pattern, complete with suggestions, permission handling and localization.
+BKCommonLib includes the [**Cloud Command Framework**](https://github.com/bergerhealer/cloud). Write clean commands with annotations or builder pattern, complete with suggestions, permission handling and localization.
 BKCommonLib adds a few default utilities to get set up for Paper/Spigot servers even faster.
 ******
 </details>
@@ -246,9 +246,9 @@ public void doWorkInChunk(Chunk chunk) {
 ******
 </details>
 <details>
-<summary>Interactive Minecraft Maps with <a href="https://wiki.traincarts.net/p/Map_Display">Map Displays</a></summary>
+<summary>Interactive Minecraft Maps with Map Displays</summary>
 
-#####
+#### [**Map Display API**](https://wiki.traincarts.net/p/Map_Display)
 <img src="https://wiki.traincarts.net/images/thumb/9/9e/Mapdisplay_menu.png/800px-Mapdisplay_menu.png" width="30%"/>
 &nbsp;
 <img src="https://wiki.traincarts.net/images/thumb/f/fb/Mapdisplay_maplands.png/800px-Mapdisplay_maplands.png" width="30%"/>
