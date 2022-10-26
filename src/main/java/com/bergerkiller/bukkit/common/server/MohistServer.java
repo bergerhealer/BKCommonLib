@@ -77,6 +77,11 @@ public class MohistServer extends SpigotServer implements FieldNameResolver, Met
     }
 
     @Override
+    public boolean isForgeServer() {
+        return true;
+    }
+
+    @Override
     public Collection<String> getLoadableWorlds() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }

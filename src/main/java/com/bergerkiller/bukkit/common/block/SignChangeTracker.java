@@ -12,7 +12,6 @@ import org.bukkit.block.Sign;
 import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
-import com.bergerkiller.bukkit.common.server.MohistServer;
 import com.bergerkiller.bukkit.common.utils.BlockUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
@@ -41,7 +40,7 @@ public class SignChangeTracker implements Cloneable {
     private static final Function<Block, SignChangeTracker> constructor;
     static {
         Function<Block, SignChangeTracker> constr = SignChangeTracker::new; // Default
-        if (Common.SERVER instanceof MohistServer && Common.evaluateMCVersion("<=", "1.12.2")) {
+        if (Common.evaluateMCVersion("<=", "1.12.2") && Common.SERVER.isForgeServer()) {
             try {
                 final FastField<List<Object>> tileEntityListField = new FastField<>();
                 tileEntityListField.init(Resolver.resolveAndGetDeclaredField(WorldHandle.T.getType(), "tileEntityList"));

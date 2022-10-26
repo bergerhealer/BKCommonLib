@@ -55,6 +55,11 @@ public class ArclightServer extends SpigotServer {
     }
 
     @Override
+    public boolean isForgeServer() {
+        return true;
+    }
+
+    @Override
     public boolean canLoadClassPath(String classPath) {
         // The .class data at this path contains obfuscated type information
         // These obfuscated names are deobufscated at runtime

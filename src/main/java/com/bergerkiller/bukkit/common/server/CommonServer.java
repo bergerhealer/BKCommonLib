@@ -67,6 +67,13 @@ public interface CommonServer {
     public String getServerName();
 
     /**
+     * Gets whether this server is a type of Forge server implementation
+     *
+     * @return True if this is a forge-based server
+     */
+    public boolean isForgeServer();
+
+    /**
      * Gets a more detailed description of the server, excluding the server
      * version
      *

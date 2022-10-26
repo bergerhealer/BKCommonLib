@@ -36,6 +36,11 @@ public class UnknownServer extends CommonServerBase {
     }
 
     @Override
+    public boolean isForgeServer() {
+        return false;
+    }
+
+    @Override
     public String getServerDescription() {
     	if (Bukkit.getServer() == null) {
     		return "NULL";

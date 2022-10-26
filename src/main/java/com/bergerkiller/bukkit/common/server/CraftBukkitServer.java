@@ -292,6 +292,11 @@ public class CraftBukkitServer extends CommonServerBase implements MethodNameRes
     }
 
     @Override
+    public boolean isForgeServer() {
+        return false;
+    }
+
+    @Override
     public String getServerDescription() {
         String desc = Bukkit.getServer().getVersion();
         desc = desc.replace(" (MC: " + MC_VERSION + ")", "");

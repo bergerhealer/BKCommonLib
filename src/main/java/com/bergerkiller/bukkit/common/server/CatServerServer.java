@@ -58,6 +58,11 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
     }
 
     @Override
+    public boolean isForgeServer() {
+        return true;
+    }
+
+    @Override
     public Collection<String> getLoadableWorlds() {
         return ForgeSupport.bukkit().getLoadableWorlds();
     }
