@@ -14,7 +14,7 @@ It made it so that when Minecraft updates, only this library has to be updated. 
   - **Forge Paper hybrids**, with limitations:
     - Mohist 1.12.2 and 1.16.5
     - Magma 1.12.2
-    - Arclight 1.12.2, 1.15.2 and 1.16.5
+    - Arclight 1.12.2, 1.15.2, 1.16.5 and 1.18.2
     - CatServer 1.12.2
 
 ### Backwards-Compatible
