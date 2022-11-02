@@ -14,12 +14,39 @@ The bergerhealer cloud fork is hosted on the same repository as BKCommonLib:
 ```
 Depend on BKCommonLib, and the Cloud library is transitively included:
 ```xml
+    <properties>
+        <project.bkcommonlib.version>1.19.2-v2</project.bkcommonlib.version>
+        <project.cloud.version>1.8.0-SNAPSHOT</project.cloud.version>
+    </properties>
+
+    <dependencies>
         <dependency>
             <groupId>com.bergerkiller.bukkit</groupId>
             <artifactId>BKCommonLib</artifactId>
-            <version>1.18.1-v1</version>
+            <version>${project.bkcommonlib.version}</version>
             <scope>provided</scope>
         </dependency>
+
+        <!-- Cloud Command Framework -->
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-paper</artifactId>
+            <version>${project.cloud.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-annotations</artifactId>
+            <version>${project.cloud.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.bergerhealer.cloud.commandframework</groupId>
+            <artifactId>cloud-minecraft-extras</artifactId>
+            <version>${project.cloud.version}</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 ```
 However, the library and its dependencies are shaded in at a different package than normal. So, you will have to include the maven shade plugin in your project to relocate them. Not doing so will cause a failure at runtime.
 ```xml
