@@ -12,7 +12,7 @@ The bergerhealer cloud fork is hosted on the same repository as BKCommonLib:
         <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
     </repository>
 ```
-Depend on BKCommonLib, and the Cloud library is transitively included:
+Depend on BKCommonLib and the (fork) cloud command framework libraries:
 ```xml
     <properties>
         <project.bkcommonlib.version>1.19.2-v2</project.bkcommonlib.version>
