@@ -17,4 +17,14 @@ public interface CheckedFunction<T, R> {
      * @throws Can throw an exception if the result could not be gotten
      */
     R apply(T t) throws Throwable;
+
+    /**
+     * Turns this CheckedFunction into a CheckedConsumer by discarding
+     * the return value
+     *
+     * @return consumer which calls {@link #apply(Object)} with the consumed value
+     */
+    default CheckedConsumer<T> asConsumer() {
+        return value -> apply(value);
+    }
 }

@@ -15,4 +15,14 @@ public interface CheckedSupplier<T> {
      * @throws Can throw an exception if the result could not be gotten
      */
     T get() throws Throwable;
+
+    /**
+     * Turns this CheckedSupplier into a CheckedRunnable by discarding
+     * the return value
+     *
+     * @return runnable which calls {@link #get()}
+     */
+    default CheckedRunnable asRunnable() {
+        return () -> get();
+    }
 }
