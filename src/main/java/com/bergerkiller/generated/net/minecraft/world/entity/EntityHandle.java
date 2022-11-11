@@ -133,6 +133,7 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void appendEntityCrashDetails(CrashReportSystemDetailsHandle crashreportsystemdetails);
     public abstract void onPush(double d0, double d1, double d2);
     public abstract int getPortalCooldownMaximum();
+    public abstract int getPortalWaitTime();
     public abstract boolean isAlwaysTicked();
     public abstract boolean hasCustomName();
     public abstract ChatText getCustomName();
@@ -255,6 +256,8 @@ public abstract class EntityHandle extends Template.Handle {
     public abstract void setPortalCooldown(int value);
     public abstract boolean isAllowTeleportation();
     public abstract void setAllowTeleportation(boolean value);
+    public abstract int getPortalTime();
+    public abstract void setPortalTime(int value);
     public abstract boolean isValid();
     public abstract void setValid(boolean value);
     /**
@@ -313,6 +316,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Field.Boolean positionChanged = new Template.Field.Boolean();
         public final Template.Field.Integer portalCooldown = new Template.Field.Integer();
         public final Template.Field.Boolean allowTeleportation = new Template.Field.Boolean();
+        public final Template.Field.Integer portalTime = new Template.Field.Integer();
         @Template.Optional
         public final Template.Field<double[]> move_SomeArray = new Template.Field<double[]>();
         @Template.Optional
@@ -416,6 +420,7 @@ public abstract class EntityHandle extends Template.Handle {
         public final Template.Method.Converted<Void> appendEntityCrashDetails = new Template.Method.Converted<Void>();
         public final Template.Method<Void> onPush = new Template.Method<Void>();
         public final Template.Method<Integer> getPortalCooldownMaximum = new Template.Method<Integer>();
+        public final Template.Method<Integer> getPortalWaitTime = new Template.Method<Integer>();
         @Template.Optional
         public final Template.Method<Void> opt_tick_pushToHopper = new Template.Method<Void>();
         @Template.Optional

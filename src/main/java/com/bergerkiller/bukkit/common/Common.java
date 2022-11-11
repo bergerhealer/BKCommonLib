@@ -36,7 +36,8 @@ public class Common {
             "Common:BlockData:EmissionBlockParameter",
             "Common:SignChangeTracker",
             "Common:EntityUtil:GetSetEquipmentSlot",
-            "Common:ChatText:MultiLineSupport"
+            "Common:ChatText:MultiLineSupport",
+            "Common:EntityUtil:PortalWaitDelay"
     ).collect(Collectors.toSet());
 
     /**

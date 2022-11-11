@@ -901,9 +901,41 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * after entering a portal.
      *
      * @return entity maximum portal cooldown ticks
+     * @see #getPortalCooldown()
      */
     public int getPortalCooldownMaximum() {
         return EntityUtil.getPortalCooldownMaximum(entity);
+    }
+
+    /**
+     * Sets the number of ticks this entity spent inside a portal.
+     * This is used for a portal teleport delay.
+     *
+     * @param timeTicks Number of ticks to set to
+     */
+    public void setPortalTime(int timeTicks) {
+        handle.setPortalTime(timeTicks);
+    }
+
+    /**
+     * Gets the number of ticks this entity spent inside a portal.
+     * This is used for a portal teleport delay.
+     *
+     * @return entity portal time duration
+     */
+    public int getPortalTime() {
+        return handle.getPortalTime();
+    }
+
+    /**
+     * Gets the number of ticks this Entity must be inside a portal before
+     * the portal teleports the entity to the other end.
+     *
+     * @return portal wait time
+     * @see #getPortalTime()
+     */
+    public int getPortalWaitTime() {
+        return handle.getPortalWaitTime();
     }
 
     /**

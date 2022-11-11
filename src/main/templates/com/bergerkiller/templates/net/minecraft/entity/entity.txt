@@ -1221,6 +1221,17 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case else:   protected boolean allowTeleportation:ak;
 #endselect
 
+#select version >=
+#case 1.17:   protected int portalTime;
+#case 1.16:   protected int portalTime:portalTicks;
+#case 1.15:   protected int portalTime:ag;
+#case 1.14:   protected int portalTime:aj;
+#case 1.13:   protected int portalTime:ao;
+#case 1.11:   protected int portalTime:al;
+#case 1.10.2: protected int portalTime:am;
+#case else:   protected int portalTime:al;
+#endselect
+
 #if version >= 1.17
     optional private final double[] move_SomeArray:pistonDeltas;
     optional private long move_SomeState:pistonDeltasGameTime;
@@ -1869,6 +1880,28 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #case 1.9:    public int getPortalCooldownMaximum:aC();
 #case 1.8.3:  public int getPortalCooldownMaximum:aq();
 #case else:   public int getPortalCooldownMaximum:ar();
+#endselect
+
+    /*
+     * Entity class:
+     *
+     * public int ##METHODNAME##() {
+     *     return 0; // 1; < 1.16
+     * }
+     *
+     * public void burnFromLava() {}
+     */
+#select version >=
+#case 1.18:   public int getPortalWaitTime();
+#case 1.17:   public int getPortalWaitTime:am();
+#case 1.16.4: public int getPortalWaitTime:aj();
+#case 1.16.2: public int getPortalWaitTime:ai();
+#case 1.16: public int getPortalWaitTime:ae();
+#case 1.14:   public int getPortalWaitTime:ab();
+#case 1.13:   public int getPortalWaitTime:X();
+#case 1.12:   public int getPortalWaitTime:Z();
+#case 1.9:    public int getPortalWaitTime:V();
+#case else:   public int getPortalWaitTime:L();
 #endselect
 
     // On some versions of the server, entities push items into hoppers instead of hoppers pulling from entities

@@ -262,4 +262,37 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
     public static int getPortalCooldownMaximum(Entity entity) {
         return EntityHandle.T.getPortalCooldownMaximum.invoke(h(entity));
     }
+
+    /**
+     * Sets the number of ticks an entity spent inside a portal.
+     * This is used for a portal teleport delay.
+     *
+     * @param entity to set it for
+     * @param timeTicks Number of ticks to set to
+     */
+    public static void setPortalTime(Entity entity, int timeTicks) {
+        EntityHandle.T.portalTime.setInteger(h(entity), timeTicks);
+    }
+
+    /**
+     * Gets the number of ticks an entity spent inside a portal.
+     * This is used for a portal teleport delay.
+     *
+     * @param entity to get it for
+     * @return entity portal time duration
+     */
+    public static int getPortalTime(Entity entity) {
+        return EntityHandle.T.portalTime.getInteger(h(entity));
+    }
+
+    /**
+     * Gets the number of ticks an Entity must be inside a portal before
+     * the portal teleports the entity to the other end.
+     *
+     * @param entity to get it for
+     * @return portal wait time
+     */
+    public static int getPortalWaitTime(Entity entity) {
+        return EntityHandle.T.getPortalWaitTime.invoke(h(entity));
+    }
 }
