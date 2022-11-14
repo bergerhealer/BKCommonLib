@@ -187,7 +187,7 @@ public abstract class PropertyConverter<T> extends Converter<Object, T> {
         static {
             storeMinecartTypes(EntityType.MINECART, "MINECART", "LEGACY_MINECART");
             storeMinecartTypes(EntityType.MINECART_HOPPER, "HOPPER", "HOPPER_MINECART", "LEGACY_HOPPER_MINECART");
-            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
+            storeMinecartTypes(EntityType.MINECART_CHEST, "CHEST", "STORAGE", "STORAGE_MINECART", "CHEST_MINECART", "LEGACY_CHEST", "LEGACY_STORAGE_MINECART");
             storeMinecartTypes(EntityType.MINECART_COMMAND, "COMMAND_BLOCK", "COMMAND_BLOCK_MINECART", "LEGACY_COMMAND", "LEGACY_COMMAND_MINECART");
             storeMinecartTypes(EntityType.MINECART_FURNACE, "FURNACE", "FURNACE_MINECART", "LEGACY_FURNACE", "LEGACY_POWERED_MINECART");
             storeMinecartTypes(EntityType.MINECART_TNT, "TNT", "TNT_MINECART", "LEGACY_TNT", "LEGACY_EXPLOSIVE_MINECART");
