@@ -307,6 +307,13 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         @Override
+        public String toString() {
+            World world = getWorld();
+            String worldName = (world == null) ? "UNLOADED" : world.getName();
+            return "{world=" + worldName + ", cx=" + cx + ", cz=" + cz + "}";
+        }
+
+        @Override
         public Chunk getChunk() {
             if (this.chunkFuture.isDone()) {
                 try {

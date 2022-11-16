@@ -2,9 +2,11 @@ package com.bergerkiller.bukkit.common.chunk;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
 
 import org.bukkit.World;
 
+import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
@@ -159,6 +161,16 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
         return this.access().getChunk();
     }
 
+    @Override
+    public String toString() {
+        ForcedChunkManager.ForcedChunkEntry entry = this.entry.get();
+        if (entry == null) {
+            return "ForcedChunk{None}";
+        } else {
+            return "ForcedChunk" + entry.toString();
+        }
+    }
+
     /**
      * Gets a future resolved once this forced chunk is loaded asynchronously.
      * The moment this Forced Chunk was created, a load was scheduled.
@@ -211,7 +223,13 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
     @Override
     @SuppressWarnings("deprecation")
     public void finalize() throws Throwable {
-        this.close();
+        {
+            ForcedChunkManager.ForcedChunkEntry entry = this.entry.getAndSet(null);
+            if (entry != null) {
+                Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString());
+                entry.remove();
+            }
+        }
         super.finalize();
     }
 }
