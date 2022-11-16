@@ -47,7 +47,7 @@ abstract class ChunkFutureProviderImpl implements ChunkFutureProvider, Listener,
                 handleEvent(event.getChunk(), Mode.CHUNK_LOADED);
             }
 
-            @EventHandler(priority = EventPriority.MONITOR)
+            @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
             public void onChunkUnload(ChunkUnloadEvent event) {
                 handleEvent(event.getChunk(), Mode.CHUNK_UNLOADED);
             }
