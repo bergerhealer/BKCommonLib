@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import org.bukkit.World;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager.ForcedChunkEntry;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
@@ -36,7 +37,11 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
      * @return forced chunk
      */
     public static ForcedChunk none() {
-        return new ForcedChunk(null);
+        if (CommonPlugin.hasInstance()) {
+            return CommonPlugin.getInstance().getForcedChunkManager().newNone();
+        } else {
+            return new ForcedChunk(null); // Fallback at shutdown, can't hurt to create none ones
+        }
     }
 
     /**
@@ -226,10 +231,30 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
         {
             ForcedChunkManager.ForcedChunkEntry entry = this.entry.getAndSet(null);
             if (entry != null) {
-                Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString());
+                if (this instanceof CreationTrackedForcedChunk) {
+                    Throwable stack = ((CreationTrackedForcedChunk) this).creationStack;
+                    Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString() +
+                            ", it was created at:", stack);
+                } else {
+                    Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString());
+                    entry.getManager().setTrackingCreationStack(true);
+                }
                 entry.remove();
             }
         }
         super.finalize();
+    }
+
+    /**
+     * Stores the stack trace of where the ForcedChunk was created. This is used to diagnose
+     * forced chunks that aren't closed by the caller.
+     */
+    protected static class CreationTrackedForcedChunk extends ForcedChunk {
+        public final Throwable creationStack;
+
+        protected CreationTrackedForcedChunk(ForcedChunkEntry entry) {
+            super(entry);
+            creationStack = new Throwable();
+        }
     }
 }

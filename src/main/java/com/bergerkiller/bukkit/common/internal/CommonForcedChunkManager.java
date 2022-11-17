@@ -261,6 +261,11 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         }
 
         @Override
+        public CommonForcedChunkManager getManager() {
+            return CommonForcedChunkManager.this;
+        }
+
+        @Override
         public void add() {
             int new_async = this.asyncCounter.incrementAndGet();
             if (CommonUtil.isMainThread()) {

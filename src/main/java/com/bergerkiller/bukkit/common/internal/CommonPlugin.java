@@ -116,6 +116,7 @@ public class CommonPlugin extends PluginBase {
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
     private boolean cloudDisableBrigadier = false;
+    private boolean trackForcedChunkCreationStack = false;
 
     public CommonPlugin() {
         // Initialize thread pool, might be used pretty early on...
@@ -176,6 +177,10 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isCloudBrigadierDisabled() {
         return cloudDisableBrigadier;
+    }
+
+    public boolean isTrackingForcedChunkCreationStack() {
+        return trackForcedChunkCreationStack;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -611,6 +616,11 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("preloadTemplateClasses", "at-runtime lazy initialization lag. It does cause a lot of classes to be loaded into the");
         config.addHeader("preloadTemplateClasses", "JVM that may never get used, which wastes memory. Only enable this for debugging reasons!");
         final boolean preloadTemplateClasses = config.get("preloadTemplateClasses", false);
+        config.setHeader("trackForcedChunkCreationStack", "\nWhether to track the stack trace of where forced chunks are created");
+        config.addHeader("trackForcedChunkCreationStack", "This is useful to detect ForcedChunk instances that are not closed by the developer.");
+        config.addHeader("trackForcedChunkCreationStack", "Once a missed close is detected, tracking is automatically started anyway.");
+        config.addHeader("trackForcedChunkCreationStack", "As such, this option is primarily useful to diagnose this problem at server startup");
+        this.trackForcedChunkCreationStack = config.get("trackForcedChunkCreationStack", false);
         config.save();
 
         if (preloadTemplateClasses) {

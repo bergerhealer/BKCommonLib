@@ -9,13 +9,30 @@ import org.bukkit.World;
  * make sure chunks stay loaded.
  */
 public abstract class ForcedChunkManager {
+    private boolean trackingCreationStack = false;
+
+    public final ForcedChunk newNone() {
+        if (this.isTrackingCreationStack()) {
+            return new ForcedChunk.CreationTrackedForcedChunk(null);
+        } else {
+            return new ForcedChunk(null);
+        }
+    }
 
     public final ForcedChunk newForcedChunk(World world, int chunkX, int chunkZ) {
-        return new ForcedChunk(this.add(world, chunkX, chunkZ));
+        if (this.isTrackingCreationStack()) {
+            return new ForcedChunk.CreationTrackedForcedChunk(this.add(world, chunkX, chunkZ));
+        } else {
+            return new ForcedChunk(this.add(world, chunkX, chunkZ));
+        }
     }
 
     public final ForcedChunk newForcedChunk(World world, int chunkX, int chunkZ, int radius) {
-        return new ForcedChunk(this.add(world, chunkX, chunkZ, radius));
+        if (this.isTrackingCreationStack()) {
+            return new ForcedChunk.CreationTrackedForcedChunk(this.add(world, chunkX, chunkZ, radius));
+        } else {
+            return new ForcedChunk(this.add(world, chunkX, chunkZ, radius));
+        }
     }
 
     /**
@@ -43,7 +60,30 @@ public abstract class ForcedChunkManager {
      */
     public abstract ForcedChunkEntry add(World world, int chunkX, int chunkZ, int radius);
 
+    /**
+     * Gets whether the stack trace of the creation of forced chunks must be tracked.
+     * This is used to diagnose forced chunks that aren't closed before being garbage
+     * collected.
+     *
+     * @return True to track the creation stack
+     */
+    public boolean isTrackingCreationStack() {
+        return trackingCreationStack;
+    }
+
+    /**
+     * Sets whether the stack trace of the creation of forced chunks must be tracked.
+     *
+     * @param tracking
+     * @see #isTrackingCreationStack()
+     */
+    public void setTrackingCreationStack(boolean tracking) {
+        trackingCreationStack = tracking;
+    }
+
     public static interface ForcedChunkEntry {
+        ForcedChunkManager getManager();
+
         void add();
         void remove();
 
