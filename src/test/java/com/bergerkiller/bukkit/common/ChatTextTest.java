@@ -9,7 +9,9 @@ import org.bukkit.ChatColor;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
+import com.bergerkiller.bukkit.common.utils.StringUtil;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 
 public class ChatTextTest {
@@ -110,6 +112,24 @@ public class ChatTextTest {
         String message = ChatColor.BOLD.toString() + ChatColor.RED + "test";
         ChatText text = ChatText.fromMessage(message);
         System.out.println(text.getJson());
+        assertEquals(message, text.getMessage());
+    }
+
+    @Test
+    public void testHexColor() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.16")) {
+            return; // Skip
+        }
+
+        String message = Character.toString(StringUtil.CHAT_STYLE_CHAR) + "x"
+                + Character.toString(StringUtil.CHAT_STYLE_CHAR) + "1" + StringUtil.CHAT_STYLE_CHAR + "2"
+                + StringUtil.CHAT_STYLE_CHAR + "3" + StringUtil.CHAT_STYLE_CHAR + "4"
+                + StringUtil.CHAT_STYLE_CHAR + "a" + StringUtil.CHAT_STYLE_CHAR + "b"
+                + "message";
+        ChatText text = ChatText.fromMessage(message);
+        //System.out.println(text.getJson());
+        //System.out.println(message);
+        //System.out.println(text.getMessage());
         assertEquals(message, text.getMessage());
     }
 }
