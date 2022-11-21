@@ -24,6 +24,11 @@ public class StringUtil {
             chars.add(Character.toLowerCase(style.getChar()));
             chars.add(Character.toUpperCase(style.getChar()));
         }
+
+        // Used for hex colors. Extension by bungeecord.
+        chars.add('x');
+        chars.add('X');
+
         CHAT_CODES = new char[chars.size()];
         int i = 0;
         for (Character c : chars) {
