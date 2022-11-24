@@ -48,6 +48,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockPlaceHandle;
@@ -190,7 +191,8 @@ public class NMSPacketClasses {
 
     public static class NMSPacketPlayInAbilities extends NMSPacket {
         //TODO: Only has 'isFlying' property since 1.16
-        //      We don't use this packet anywhere so for now, it's empty.
+        //Do we care about the other fields for past versions?
+        public final FieldAccessor<Boolean> isFlying = PacketPlayInAbilitiesHandle.T.isFlying.toFieldAccessor();
     }
 
     public static class NMSPacketPlayInArmAnimation extends NMSPacket {

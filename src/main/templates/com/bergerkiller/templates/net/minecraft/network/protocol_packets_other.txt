@@ -2717,6 +2717,16 @@ class PacketPlayOutEntityEffect extends Packet {
     public (PacketPlayOutEntityEffectHandle) PacketPlayOutEntityEffect(int entityId, (org.bukkit.potion.PotionEffect) MobEffect mobeffect);
 }
 
+class PacketPlayInAbilities extends Packet {
+#if version >= 1.17
+    private final boolean isFlying;
+#elseif version >= 1.16
+    private boolean isFlying:a;
+#else
+    private boolean isFlying:b;
+#endif
+}
+
 class PacketPlayOutAbilities extends Packet {
 #if version >= 1.17
     private final boolean invulnerable;
