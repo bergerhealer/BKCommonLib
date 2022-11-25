@@ -15,6 +15,7 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.mountiplex.reflection.ReflectionUtil;
+import com.bergerkiller.mountiplex.reflection.SafeField;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.ExtendedClassWriter;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
@@ -56,7 +57,12 @@ class BlockDataWrapperHook_Impl extends BlockDataWrapperHook {
         } else {
             // MC 1.8 - 1.12.2: Field is stored in the BlockData class
             Class<?> blockDataType = CommonUtil.getClass("net.minecraft.world.level.block.state.BlockStateList$BlockData");
-            valuesField = Resolver.resolveAndGetDeclaredField(blockDataType, "b");
+            if (SafeField.contains(blockDataType, "bAsImmutableMap", immutableMapType)) {
+                // Optimization on TacoSpigot / BurritoSpigot
+                valuesField = blockDataType.getDeclaredField("bAsImmutableMap");
+            } else {
+                valuesField = Resolver.resolveAndGetDeclaredField(blockDataType, "b");
+            }
         }
 
         // Verify that the values field is of type ImmutableMap and not something else
