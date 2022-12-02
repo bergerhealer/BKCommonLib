@@ -38,6 +38,8 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 public class IBlockDataToMaterialData {
     public static final Map<Object, MaterialData> INTERNAL_IBLOCKDATA_TO_MATERIALDATA = new HashMap<Object, MaterialData>();
     private static final Map<Material, MaterialDataBuilder> materialdata_builders = new EnumMap<Material, MaterialDataBuilder>(Material.class);
+    private static final MaterialDataBuilder DEFAULT_BUILDER = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
+    private static final Byte DEFAULT_DATA = Byte.valueOf((byte) 0);
     private static final Map<Material, Byte> materialdata_default_data = new EnumMap<Material, Byte>(Material.class);
     private static final FastMethod<MaterialData> craftbukkitGetMaterialdata = new FastMethod<MaterialData>();
     private static final EnumMap<Material, Material> materialToLegacyCache;
@@ -60,7 +62,6 @@ public class IBlockDataToMaterialData {
             }
         }
         INTERNAL_IBLOCKDATA_TO_MATERIALDATA.putAll(iblockdataToMaterialdata_map);
-        MaterialDataBuilder default_builder = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
 
         // Generated method for generating MaterialData from IBlockData
         {
@@ -109,16 +110,6 @@ public class IBlockDataToMaterialData {
         storeMaterialDataDefault("BURNING_FURNACE", 2);
         storeMaterialDataDefault("REDSTONE_TORCH_OFF", 5);
         storeMaterialDataDefault("REDSTONE_TORCH_ON", 5);
-
-        // Initialize missing defaults
-        for (Material type : MaterialsByName.getAllMaterials()) {
-            if (!materialdata_builders.containsKey(type)) {
-                materialdata_builders.put(type, default_builder);
-            }
-            if (!materialdata_default_data.containsKey(type)) {
-                materialdata_default_data.put(type, Byte.valueOf((byte) 0));
-            }
-        }
 
         // Special edge cases: some material types don't work so well. Fix those.
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
@@ -629,7 +620,7 @@ public class IBlockDataToMaterialData {
         } else if (MaterialsByName.isLegacy(material)) {
             return material;
         } else {
-            Material legacy = materialdata_builders.get(material).toLegacy(material);
+            Material legacy = materialdata_builders.getOrDefault(material, DEFAULT_BUILDER).toLegacy(material);
             if (legacy == material) {
                 legacy = CraftBukkitToLegacy.toLegacy(material);
             }
@@ -655,7 +646,8 @@ public class IBlockDataToMaterialData {
      * @return MaterialData
      */
     public static MaterialData createMaterialData(Material legacy_data_type) {
-        return createMaterialData(legacy_data_type, legacy_data_type, materialdata_default_data.get(legacy_data_type).byteValue());
+        return createMaterialData(legacy_data_type, legacy_data_type,
+                materialdata_default_data.getOrDefault(legacy_data_type, DEFAULT_DATA).byteValue());
     }
 
     /**
@@ -668,7 +660,7 @@ public class IBlockDataToMaterialData {
      * @return MaterialData
      */
     public static MaterialData createMaterialData(Material material_type, Material legacy_data_type, byte legacy_data_value) {
-        MaterialData result = materialdata_builders.get(legacy_data_type).create(material_type, legacy_data_type, legacy_data_value);
+        MaterialData result = materialdata_builders.getOrDefault(legacy_data_type, DEFAULT_BUILDER).create(material_type, legacy_data_type, legacy_data_value);
 
         // Fix attachable face returning NULL sometimes
         if (result instanceof Attachable) {
