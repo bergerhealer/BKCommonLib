@@ -116,6 +116,11 @@ public class IBlockDataToMaterialData {
             initMaterialDataMap();
         }
 
+        // For null materials, we assume the conversion from NMS to (legacy) Material failed
+        // In that case, we simply cannot represent it as MaterialData, so return some generic placeholder value
+        // This is important for Mohist (mods)
+        materialdata_builders.put(null, (material_type, legacy_data_type, legacy_data_value) -> new MaterialData(Material.AIR));
+
         // Make absolutely sure that IBlockData AIR stays AIR, because Bukkit sends back AIR when materials cannot be resolved
         // This fixes a rather serious issue of some random material data getting mapped to air.
         storeMaterialData(CraftMagicNumbersHandle.getBlockDataFromMaterial(Material.AIR), new MaterialData(CommonLegacyMaterials.getLegacyMaterial("AIR")));
