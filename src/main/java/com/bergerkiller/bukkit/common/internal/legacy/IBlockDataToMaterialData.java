@@ -38,7 +38,16 @@ import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 public class IBlockDataToMaterialData {
     public static final Map<Object, MaterialData> INTERNAL_IBLOCKDATA_TO_MATERIALDATA = new HashMap<Object, MaterialData>();
     private static final Map<Material, MaterialDataBuilder> materialdata_builders = new EnumMap<Material, MaterialDataBuilder>(Material.class);
-    private static final MaterialDataBuilder DEFAULT_BUILDER = (material_type, legacy_data_type, legacy_data_value) -> legacy_data_type.getNewData(legacy_data_value);
+    private static final MaterialDataBuilder DEFAULT_BUILDER = (material_type, legacy_data_type, legacy_data_value) -> {
+        if (legacy_data_type == null) {
+            // For null materials, we assume the conversion from NMS to (legacy) Material failed
+            // In that case, we simply cannot represent it as MaterialData, so return some generic placeholder value
+            // This is important for Mohist (mods)
+            return new MaterialData(Material.AIR);
+        } else {
+            return legacy_data_type.getNewData(legacy_data_value);
+        }
+    };
     private static final Byte DEFAULT_DATA = Byte.valueOf((byte) 0);
     private static final Map<Material, Byte> materialdata_default_data = new EnumMap<Material, Byte>(Material.class);
     private static final FastMethod<MaterialData> craftbukkitGetMaterialdata = new FastMethod<MaterialData>();
@@ -115,11 +124,6 @@ public class IBlockDataToMaterialData {
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
             initMaterialDataMap();
         }
-
-        // For null materials, we assume the conversion from NMS to (legacy) Material failed
-        // In that case, we simply cannot represent it as MaterialData, so return some generic placeholder value
-        // This is important for Mohist (mods)
-        materialdata_builders.put(null, (material_type, legacy_data_type, legacy_data_value) -> new MaterialData(Material.AIR));
 
         // Make absolutely sure that IBlockData AIR stays AIR, because Bukkit sends back AIR when materials cannot be resolved
         // This fixes a rather serious issue of some random material data getting mapped to air.
