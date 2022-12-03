@@ -103,7 +103,9 @@ class BlockDataImpl extends BlockData {
             Material material = CraftMagicNumbersHandle.getMaterialFromBlock(rawBlock);
             BlockDataConstant blockConst = (material == Material.AIR) ? AIR : new BlockDataConstant(block);
             BY_BLOCK.put(rawBlock, blockConst);
-            BY_MATERIAL.put(material, blockConst);
+            if (material != null) {
+                BY_MATERIAL.put(material, blockConst);
+            }
         }
 
         // Create cache
@@ -315,7 +317,7 @@ class BlockDataImpl extends BlockData {
 
     private final void refreshBlock() {
         this.hasRenderOptions = true;
-        this.type = CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw());
+        this.type = LogicUtil.fixNull(CraftMagicNumbersHandle.getMaterialFromBlock(this.block.getRaw()), Material.AIR);
         this.materialData = IBlockDataToMaterialData.getMaterialData(this.data);
         this.legacyType = CommonLegacyMaterials.toLegacy(this.materialData.getItemType());
         this.combinedId = BlockHandle.getCombinedId(this.data);
