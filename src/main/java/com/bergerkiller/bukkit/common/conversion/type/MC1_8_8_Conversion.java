@@ -27,7 +27,7 @@ public class MC1_8_8_Conversion {
 
     @ConverterMethod(input="net.minecraft.world.effect.MobEffectList")
     public static Integer getMobEffectListId(Object mobEffectListHandle) {
-        return (Integer) MobEffectListHandle.T.getId.raw.invoker.invoke(mobEffectListHandle);
+        return (Integer) MobEffectListHandle.T.getId.raw.invoker.invoke(null, mobEffectListHandle);
     }
 
     @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.WatchableObject")
