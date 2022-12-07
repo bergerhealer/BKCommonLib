@@ -24,12 +24,10 @@ class MobEffect {
     private int duration;
     private int amplifier;
     private boolean ambient;
-    private boolean noCounter;
 #else
     private int duration;
     private int amplifier:amplification;
-    private boolean ambient:splash;
-    private boolean noCounter:ambient;
+    private boolean ambient;
 #endif
 
 #if version >= 1.17

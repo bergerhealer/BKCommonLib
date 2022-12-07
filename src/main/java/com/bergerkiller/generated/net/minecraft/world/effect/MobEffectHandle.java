@@ -38,8 +38,6 @@ public abstract class MobEffectHandle extends Template.Handle {
     public abstract void setAmplifier(int value);
     public abstract boolean isAmbient();
     public abstract void setAmbient(boolean value);
-    public abstract boolean isNoCounter();
-    public abstract void setNoCounter(boolean value);
     public abstract boolean isParticles();
     public abstract void setParticles(boolean value);
     /**
@@ -51,7 +49,6 @@ public abstract class MobEffectHandle extends Template.Handle {
         public final Template.Field.Integer duration = new Template.Field.Integer();
         public final Template.Field.Integer amplifier = new Template.Field.Integer();
         public final Template.Field.Boolean ambient = new Template.Field.Boolean();
-        public final Template.Field.Boolean noCounter = new Template.Field.Boolean();
         public final Template.Field.Boolean particles = new Template.Field.Boolean();
 
         public final Template.StaticMethod.Converted<MobEffectHandle> fromNBT = new Template.StaticMethod.Converted<MobEffectHandle>();
