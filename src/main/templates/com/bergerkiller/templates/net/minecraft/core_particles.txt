@@ -1,6 +1,6 @@
 package net.minecraft.core.particles;
 
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.MinecraftKey;
 
 public class Particle {
@@ -15,7 +15,7 @@ public class Particle {
 
     public String getName() {
   #if version >= 1.13.1
-        MinecraftKey key = IRegistry.PARTICLE_TYPE.getKey((Object) instance);
+        MinecraftKey key = BuiltInRegistries.PARTICLE_TYPE.getKey((Object) instance);
   #else
         MinecraftKey key = (MinecraftKey) Particle.REGISTRY.b((Object) instance);
   #endif
@@ -34,12 +34,12 @@ public class Particle {
         } catch (net.minecraft.ResourceKeyInvalidException ex) {
             return null;
         }
-        return (Particle) IRegistry.PARTICLE_TYPE.get(key);
+        return (Particle) BuiltInRegistries.PARTICLE_TYPE.get(key);
     }
 
     public static java.util.List<?> values() {
         java.util.ArrayList values = new java.util.ArrayList();
-        java.util.Iterator iter = IRegistry.PARTICLE_TYPE.iterator();
+        java.util.Iterator iter = BuiltInRegistries.PARTICLE_TYPE.iterator();
         while (iter.hasNext())
             values.add(iter.next());
         return values;

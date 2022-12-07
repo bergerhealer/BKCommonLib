@@ -490,7 +490,11 @@ class PacketPlayOutSpawnEntityLiving extends Packet {
 #endif
     }
 
+#if version >= 1.19.3
+    public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) net.minecraft.world.entity.Entity entity);
+#else
     public (PacketPlayOutSpawnEntityLivingHandle) PacketPlayOutSpawnEntityLiving((org.bukkit.entity.LivingEntity) net.minecraft.world.entity.EntityLiving entity);
+#endif
 
     // Entity type property
 #if version >= 1.19

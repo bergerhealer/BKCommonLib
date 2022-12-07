@@ -1,6 +1,5 @@
 package net.minecraft.sounds;
 
-import net.minecraft.core.IRegistry;
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
 
@@ -37,34 +36,42 @@ optional class SoundCategory {
 }
 
 class SoundEffect {
-#if version >= 1.13.1
-    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry() {
-        return (RegistryMaterials) IRegistry.SOUND_EVENT;
-    }
+#select version >=
+#case 1.17:    private final (MinecraftKeyHandle) MinecraftKey name:location;
+#case 1.16:    private final (MinecraftKeyHandle) MinecraftKey name:b;
+#case 1.13.1:  private final (MinecraftKeyHandle) MinecraftKey name:a;
+#case 1.9:     private final (MinecraftKeyHandle) MinecraftKey name:b;
+#case else:    private final (MinecraftKeyHandle) MinecraftKeyHandle name;
+#endselect
 
-  #if version >= 1.16
-    private final (MinecraftKeyHandle) MinecraftKey name:b;
+#if version >= 1.9
+    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry() {
+  #if version >= 1.13.1
+        return (RegistryMaterials) net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT;
   #else
-    private final (MinecraftKeyHandle) MinecraftKey name:a;
-  #endif
-
-    public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
-#elseif version >= 1.9
-    public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry() {
         return SoundEffect.a;
+  #endif
     }
-
-    private final (MinecraftKeyHandle) MinecraftKey name:b;
-
-    public (SoundEffectHandle) SoundEffect((MinecraftKeyHandle) MinecraftKey minecraftkey);
 #else
     public static final optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, SoundEffect> opt_getRegistry:###();
-    private final (MinecraftKeyHandle) MinecraftKeyHandle name;
+#endif
 
-    public (SoundEffectHandle) SoundEffect(MinecraftKeyHandle minecraftkey);
+#if version >= 1.19.3
+    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey);
+#elseif version >= 1.9
+    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey);
+        return new SoundEffect(minecraftkey);
+    }
+#else
+    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent(MinecraftKeyHandle minecraftkey);
 #endif
 
     <code>
+    @Deprecated
+    public static SoundEffectHandle createNew(MinecraftKeyHandle name) {
+        return createVariableRangeEvent(name);
+    }
+
     public static SoundEffectHandle byName(String name) {
         if (T.opt_getRegistry.isAvailable()) {
             Object mc_key_raw = com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.T.createNew.raw.invoke(name);
@@ -74,7 +81,7 @@ class SoundEffect {
                 return null;
             }
         } else {
-            return createNew(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
+            return createVariableRangeEvent(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
         }
     }
     </code>

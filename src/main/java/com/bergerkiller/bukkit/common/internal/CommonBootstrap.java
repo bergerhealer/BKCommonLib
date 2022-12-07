@@ -540,6 +540,14 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.util.RandomSource", "java.util.Random");
         }
 
+        // 1.19.3 mappings - some classes were split out into their own places
+        if (evaluateMCVersion(">=", "1.19.3")) {
+            // Noop
+        } else {
+            // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
+            remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
+        }
+
         // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
         {
             boolean craftLegacyIsInUtil;

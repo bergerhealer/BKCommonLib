@@ -1,7 +1,7 @@
 package net.minecraft.world.level.block.entity;
 
 import net.minecraft.resources.MinecraftKey;
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import com.bergerkiller.generated.net.minecraft.world.level.block.entity.TileEntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
@@ -11,21 +11,21 @@ class TileEntityTypes {
 
 #if version >= 1.13.1
     public (MinecraftKeyHandle) MinecraftKey getKey() {
-        return (MinecraftKey) IRegistry.BLOCK_ENTITY_TYPE.getKey((Object) instance);
+        return (MinecraftKey) BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey((Object) instance);
     }
 
     public int getId() {
-        Object minecraftKey = IRegistry.BLOCK_ENTITY_TYPE.getKey((Object) instance);
+        Object minecraftKey = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey((Object) instance);
         return com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.getId(minecraftKey);
     }
 
     public static Object getRawByKey((MinecraftKeyHandle) MinecraftKey key) {
-        return IRegistry.BLOCK_ENTITY_TYPE.get(key);
+        return BuiltInRegistries.BLOCK_ENTITY_TYPE.get(key);
     }
 
     public static Object getRawById(int id) {
         MinecraftKey minecraftKey = (MinecraftKey) com.bergerkiller.bukkit.common.internal.proxy.TileEntityTypesSerializedIds_1_8_to_1_17_1.toMinecraftKey(id);
-        return (minecraftKey == null) ? null : IRegistry.BLOCK_ENTITY_TYPE.get(minecraftKey);
+        return (minecraftKey == null) ? null : BuiltInRegistries.BLOCK_ENTITY_TYPE.get(minecraftKey);
     }
 #elseif version >= 1.13
     public (MinecraftKeyHandle) MinecraftKey getKey() {

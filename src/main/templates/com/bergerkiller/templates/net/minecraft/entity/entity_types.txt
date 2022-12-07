@@ -2,7 +2,7 @@ package net.minecraft.world.entity;
 
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
-import net.minecraft.core.IRegistry;
+import net.minecraft.core.registries.BuiltInRegistries;
 
 import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
@@ -41,7 +41,7 @@ class EntityTypes {
 #if version >= 1.11
     public static optional (RegistryMaterialsHandle) RegistryMaterials<MinecraftKey, EntityTypes<?>> opt_getRegistry() {
   #if version >= 1.13.1
-        return (RegistryMaterials) IRegistry.ENTITY_TYPE;
+        return (RegistryMaterials) BuiltInRegistries.ENTITY_TYPE;
   #elseif version >= 1.13
         return (RegistryMaterials) EntityTypes.REGISTRY;
   #else
@@ -59,9 +59,9 @@ class EntityTypes {
 
     public optional int getTypeId() {
   #if version >= 1.17
-        return IRegistry.ENTITY_TYPE.getId((Object) instance);
+        return BuiltInRegistries.ENTITY_TYPE.getId((Object) instance);
   #else
-        return IRegistry.ENTITY_TYPE.a((Object) instance);
+        return BuiltInRegistries.ENTITY_TYPE.a((Object) instance);
   #endif
     }
 #elseif version >= 1.13
@@ -75,7 +75,7 @@ class EntityTypes {
 #if version >= 1.13
     public static optional (EntityTypesHandle) EntityTypes fromEntityClass(Class<?> entityType) {
 #if version >= 1.13.1
-        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+        java.util.Iterator iter = BuiltInRegistries.ENTITY_TYPE.iterator();
 #else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
 #endif
@@ -119,7 +119,7 @@ class EntityTypes {
 
     public static String getEntityInternalName(Class<?> entityType) {
   #if version >= 1.13.1
-        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+        java.util.Iterator iter = BuiltInRegistries.ENTITY_TYPE.iterator();
   #else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
   #endif
@@ -141,7 +141,7 @@ class EntityTypes {
 
     public static int getEntityTypeId(Class<?> entityType) {
   #if version >= 1.13.1
-        java.util.Iterator iter = IRegistry.ENTITY_TYPE.iterator();
+        java.util.Iterator iter = BuiltInRegistries.ENTITY_TYPE.iterator();
   #else
         java.util.Iterator iter = EntityTypes.REGISTRY.iterator();
   #endif
@@ -149,9 +149,9 @@ class EntityTypes {
             EntityTypes type = (EntityTypes) iter.next();
             if (com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler.INSTANCE.getClassFromEntityTypes(type) == entityType) {
   #if version >= 1.17
-                return IRegistry.ENTITY_TYPE.getId((Object) type);
+                return BuiltInRegistries.ENTITY_TYPE.getId((Object) type);
   #elseif version >= 1.13.1
-                return IRegistry.ENTITY_TYPE.a((Object) type);
+                return BuiltInRegistries.ENTITY_TYPE.a((Object) type);
   #else
                 return EntityTypes.REGISTRY.a((Object) type);
   #endif

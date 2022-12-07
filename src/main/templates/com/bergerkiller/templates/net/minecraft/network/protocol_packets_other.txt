@@ -2328,12 +2328,21 @@ class PacketPlayOutWorldParticles extends Packet {
   #if version >= 1.17
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) {
             com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions ts = (com.bergerkiller.bukkit.common.resources.ParticleType$DustColorTransitionOptions) options;
+    #if version >= 1.19.3
+            org.joml.Vector3f color = new org.joml.Vector3f((float) ts.color.getRed() / 255.0f,
+                                                            (float) ts.color.getGreen() / 255.0f,
+                                                            (float) ts.color.getBlue() / 255.0f);
+            org.joml.Vector3f to_color = new org.joml.Vector3f((float) ts.endColor.getRed() / 255.0f,
+                                                               (float) ts.endColor.getGreen() / 255.0f,
+                                                               (float) ts.endColor.getBlue() / 255.0f);
+    #else
             com.mojang.math.Vector3fa color = new com.mojang.math.Vector3fa((float) ts.color.getRed() / 255.0f,
                                                                             (float) ts.color.getGreen() / 255.0f,
                                                                             (float) ts.color.getBlue() / 255.0f);
             com.mojang.math.Vector3fa to_color = new com.mojang.math.Vector3fa((float) ts.endColor.getRed() / 255.0f,
                                                                                (float) ts.endColor.getGreen() / 255.0f,
                                                                                (float) ts.endColor.getBlue() / 255.0f);
+    #endif
             param = new net.minecraft.core.particles.DustColorTransitionOptions(color, to_color, ts.scale);
 
         } else if (options instanceof com.bergerkiller.bukkit.common.resources.ParticleType$VibrationOptions) {
@@ -2377,7 +2386,9 @@ class PacketPlayOutWorldParticles extends Packet {
             float r = (float) dust.color.getRed() / 255.0f;
             float g = (float) dust.color.getGreen() / 255.0f;
             float b = (float) dust.color.getBlue() / 255.0f;
-  #if version >= 1.17
+  #if version >= 1.19.3
+            param = new net.minecraft.core.particles.ParticleParamRedstone(new org.joml.Vector3f(r,g,b), dust.scale);
+  #elseif version >= 1.17
             param = new net.minecraft.core.particles.ParticleParamRedstone(new com.mojang.math.Vector3fa(r,g,b), dust.scale);
   #else
             param = new net.minecraft.core.particles.ParticleParamRedstone(r, g, b, dust.scale);

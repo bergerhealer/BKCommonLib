@@ -116,14 +116,18 @@ optional class RecipeItemStack {
     #require net.minecraft.world.item.crafting.RecipeItemStack public final ItemStack[] choicesRecipeItemStack:choices;
 #endif
 
-    public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices() {
 #if version >= 1.18
-        instance.dissolve();
-#elseif version >= 1.13
+    public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:getItems();
+#elseif version >= 1.17
+    public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices:a();
+#else
+    public (List<org.bukkit.inventory.ItemStack>) ItemStack[] getChoices() {
+  #if version >= 1.13
         instance.buildChoices();
-#endif
+  #endif
         return instance#choicesRecipeItemStack;
     }
+#endif
 
     public void setChoices((List<org.bukkit.inventory.ItemStack>) ItemStack[] choices) {
         instance#choicesRecipeItemStack = choices;

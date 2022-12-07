@@ -1,6 +1,7 @@
 package net.minecraft.core;
 
 import net.minecraft.resources.MinecraftKey;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 
 // Only available >= MC 1.9
@@ -32,14 +33,14 @@ optional class IRegistry {
 #if version >= 1.14
     public static Object getWindowTypeByName(String name) {
         if (name == null) return null;
-        return IRegistry.MENU.get(new MinecraftKey(name));
+        return BuiltInRegistries.MENU.get(new MinecraftKey(name));
     }
     public static int getWindowTypeId(Object windowTypeRaw) {
         if (windowTypeRaw == null) return -1;
   #if version >= 1.17
-        return IRegistry.MENU.getId(windowTypeRaw);
+        return BuiltInRegistries.MENU.getId(windowTypeRaw);
   #else
-        return IRegistry.MENU.a(windowTypeRaw);
+        return BuiltInRegistries.MENU.a(windowTypeRaw);
   #endif
     }
 #else

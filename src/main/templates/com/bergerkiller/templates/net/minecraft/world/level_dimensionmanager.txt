@@ -24,17 +24,22 @@ class DimensionManager {
 #endif
 
 #if version >= 1.16
-  #if version >= 1.17
-    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder;
-  #elseif version >= 1.16.3
-    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder:customRegistry;
-  #else
-    #require net.minecraft.server.MinecraftServer public final net.minecraft.core.IRegistryCustom.Dimension registryHolder:f;
-  #endif
-
     #require net.minecraft.core.IRegistryCustom public static net.minecraft.core.IRegistry getDimensionTypeRegistry() {
         MinecraftServer server = MinecraftServer.getServer();
-        IRegistryCustom$Dimension registry = server#registryHolder;
+
+        // Get registry
+        IRegistryCustom$Dimension registry;
+  #if version >= 1.19.3
+        registry = server.registryAccess();
+  #elseif version >= 1.17
+        registry = server.registryHolder;
+  #elseif version >= 1.16.3
+        registry = server.customRegistry;
+  #else
+        registry = server.f;
+  #endif
+
+        // Find the specific registry for dimension types
   #if version >= 1.18
         return registry.ownedRegistryOrThrow(net.minecraft.core.IRegistry.DIMENSION_TYPE_REGISTRY);
   #elseif version >= 1.17

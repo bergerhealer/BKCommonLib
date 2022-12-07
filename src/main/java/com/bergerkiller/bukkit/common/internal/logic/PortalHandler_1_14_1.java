@@ -157,7 +157,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
     @Template.Import("net.minecraft.core.BlockPosition$MutableBlockPosition")
     @Template.Import("net.minecraft.core.EnumDirection")
     @Template.Import("net.minecraft.core.EnumDirection$EnumAxis")
-    @Template.Import("net.minecraft.core.IRegistry")
+    @Template.Import("net.minecraft.core.registries.BuiltInRegistries")
     @Template.Import("net.minecraft.server.level.EntityPlayer")
     @Template.Import("net.minecraft.server.level.WorldServer")
     @Template.Import("net.minecraft.network.protocol.Packet")
@@ -342,7 +342,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          * #if version >= 1.19
          *     VillagePlace villageplace = world.getPoiManager();
-         *     java.util.Optional typeHolderOpt = IRegistry.POINT_OF_INTEREST_TYPE.getHolder(PoiTypes.NETHER_PORTAL);
+         *     java.util.Optional typeHolderOpt = BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolder(PoiTypes.NETHER_PORTAL);
          *     if (typeHolderOpt.isPresent()) {
          *         villageplace.add(blockposition, (net.minecraft.core.Holder) typeHolderOpt.get());
          *     }

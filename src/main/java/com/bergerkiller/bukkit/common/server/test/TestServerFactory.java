@@ -28,7 +28,9 @@ public abstract class TestServerFactory {
         }
 
         TestServerFactory factory;
-        if (CommonBootstrap.evaluateMCVersion(">=", "1.18.2")) {
+        if (CommonBootstrap.evaluateMCVersion(">=", "1.19.3")) {
+            factory = new TestServerFactory_1_19_3();
+        } else if (CommonBootstrap.evaluateMCVersion(">=", "1.18.2")) {
             factory = new TestServerFactory_1_18_2();
         } else if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
             factory = new TestServerFactory_1_18();
@@ -230,5 +232,7 @@ public abstract class TestServerFactory {
     protected static final class ServerEnvironment {
         public String CB_ROOT = "FAIL";
         public String NMS_ROOT = "FAIL";
+        public Object resourcePackRepository = null;
+        public Object resourceManager = null;
     }
 }

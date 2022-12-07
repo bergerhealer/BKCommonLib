@@ -19,12 +19,17 @@ public abstract class SoundEffectHandle extends Template.Handle {
         return T.createHandle(handleInstance);
     }
 
-    public static final SoundEffectHandle createNew(MinecraftKeyHandle minecraftkey) {
-        return T.constr_minecraftkey.newInstance(minecraftkey);
-    }
-
     /* ============================================================================== */
 
+    public static SoundEffectHandle createVariableRangeEvent(MinecraftKeyHandle minecraftkey) {
+        return T.createVariableRangeEvent.invoke(minecraftkey);
+    }
+
+
+    @Deprecated
+    public static SoundEffectHandle createNew(MinecraftKeyHandle name) {
+        return createVariableRangeEvent(name);
+    }
 
     public static SoundEffectHandle byName(String name) {
         if (T.opt_getRegistry.isAvailable()) {
@@ -35,7 +40,7 @@ public abstract class SoundEffectHandle extends Template.Handle {
                 return null;
             }
         } else {
-            return createNew(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
+            return createVariableRangeEvent(com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle.createNew(name));
         }
     }
     public abstract MinecraftKeyHandle getName();
@@ -45,12 +50,11 @@ public abstract class SoundEffectHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class SoundEffectClass extends Template.Class<SoundEffectHandle> {
-        public final Template.Constructor.Converted<SoundEffectHandle> constr_minecraftkey = new Template.Constructor.Converted<SoundEffectHandle>();
-
         public final Template.Field.Converted<MinecraftKeyHandle> name = new Template.Field.Converted<MinecraftKeyHandle>();
 
         @Template.Optional
         public final Template.StaticMethod.Converted<RegistryMaterialsHandle> opt_getRegistry = new Template.StaticMethod.Converted<RegistryMaterialsHandle>();
+        public final Template.StaticMethod.Converted<SoundEffectHandle> createVariableRangeEvent = new Template.StaticMethod.Converted<SoundEffectHandle>();
 
     }
 

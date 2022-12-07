@@ -21,7 +21,7 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
         resolver.setDeclaredClassName("net.minecraft.commands.arguments.blocks.ArgumentBlock");
         resolver.addImport("net.minecraft.commands.arguments.blocks.ArgumentBlock.a");
         resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
-        resolver.addImport("net.minecraft.core.IRegistry");
+        resolver.addImport("net.minecraft.core.registries.BuiltInRegistries");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static String serialize(IBlockData iblockdata) {\n" +
@@ -31,7 +31,7 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
                 "public static IBlockData deserialize(String text) {\n" +
                 "    ArgumentBlock$a block;\n" +
                 "    try {\n" +
-                "        block = ArgumentBlock.parseForBlock((IRegistry) IRegistry.BLOCK, text, true);\n" +
+                "        block = ArgumentBlock.parseForBlock((IRegistry) BuiltInRegistries.BLOCK, text, true);\n" +
                 "    } catch (com.mojang.brigadier.exceptions.CommandSyntaxException ex) {\n" +
                 "        return null;\n" +
                 "    }\n" +

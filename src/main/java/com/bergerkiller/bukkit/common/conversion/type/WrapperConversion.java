@@ -573,11 +573,11 @@ public class WrapperConversion {
             Object mcKey = soundKey.getName().getRaw();
             Object effect = SoundEffectHandle.T.opt_getRegistry.invoke().get(mcKey);
             if (effect == null) {
-                effect = SoundEffectHandle.T.constr_minecraftkey.raw.newInstance(mcKey);
+                effect = SoundEffectHandle.T.createVariableRangeEvent.raw.invoke(mcKey);
             }
             return effect;
         } else {
-            return SoundEffectHandle.createNew(MinecraftKeyHandle.createNew(soundKey.getPath()));
+            return SoundEffectHandle.createVariableRangeEvent(MinecraftKeyHandle.createNew(soundKey.getPath()));
         }
     }
 

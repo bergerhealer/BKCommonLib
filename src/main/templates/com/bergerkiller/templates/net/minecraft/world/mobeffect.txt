@@ -90,7 +90,7 @@ class MobEffect {
 class MobEffectList {
 #if forge && version >= 1.18
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
-        return net.minecraft.core.IRegistry.MOB_EFFECT.getId((Object) mobeffectlist);
+        return net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getId((Object) mobeffectlist);
     }
 #elseif version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public final int id;
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
@@ -103,7 +103,7 @@ class MobEffectList {
 #if forge && version >= 1.18
     // Forge fallback for 1.18+
     public static (MobEffectListHandle) MobEffectList fromId(int id) {
-        return (MobEffectList) net.minecraft.core.IRegistry.MOB_EFFECT.fromId(id);
+        return (MobEffectList) net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.fromId(id);
     }
 #elseif version >= 1.18 || exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
     // Spigot/Paper 1.18+, Purpur 1.17.1+
