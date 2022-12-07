@@ -13,7 +13,6 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.ChatText;
 import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.item.EntityItemHandle;
-import com.bergerkiller.generated.net.minecraft.world.item.CreativeModeTabHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
@@ -869,7 +868,7 @@ public class ItemUtil {
         if (itemHandle == null) {
             return new ArrayList<ItemStack>(0);
         } else {
-            return ItemHandle.createHandle(itemHandle).getItemVariants(CreativeModeTabHandle.SEARCH);
+            return ItemHandle.createHandle(itemHandle).getItemVariants();
         }
     }
 

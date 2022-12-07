@@ -30,7 +30,7 @@ public abstract class ItemHandle extends Template.Handle {
     public abstract int getMaxDurability();
     public abstract boolean usesDurability();
     public abstract String getInternalName(ItemStack itemstack);
-    public abstract List<ItemStack> getItemVariants(CreativeModeTabHandle creativemodetab);
+    public abstract List<ItemStack> getItemVariants();
     /**
      * Stores class members for <b>net.minecraft.world.item.Item</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
