@@ -1501,7 +1501,11 @@ optional class PacketPlayOutUnloadChunk extends Packet {
 
 class PacketPlayOutNamedSoundEffect extends Packet {
 #if version >= 1.17
+  #if version >= 1.19.3
+    private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect> sound;
+  #else
     private (com.bergerkiller.bukkit.common.resources.ResourceKey<com.bergerkiller.bukkit.common.resources.SoundEffect>) net.minecraft.sounds.SoundEffect sound;
+  #endif
     private optional (String) SoundCategory category_1_10_2:source;
     private int x;
     private int y;

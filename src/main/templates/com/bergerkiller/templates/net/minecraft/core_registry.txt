@@ -26,6 +26,14 @@ class RegistryMaterials {
     public V get((Object) K key);
     public (Object) K getKey:c(V value);
 #endif
+
+#if version >= 1.18.2
+    public optional Object rawResourceKeyToHolder(Object resourceKey) {
+        return instance.getHolderOrThrow((net.minecraft.resources.ResourceKey) resourceKey);
+    }
+#else
+    public optional Object rawResourceKeyToHolder:###(Object resourceKey);
+#endif
 }
 
 // Since MC 1.14 has static fields

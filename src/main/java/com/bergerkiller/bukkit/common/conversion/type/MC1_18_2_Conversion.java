@@ -11,6 +11,10 @@ import org.bukkit.event.world.WorldInitEvent;
 
 import com.bergerkiller.bukkit.common.component.LibraryComponent;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
+import com.bergerkiller.bukkit.common.resources.ResourceKey;
+import com.bergerkiller.bukkit.common.resources.SoundEffect;
+import com.bergerkiller.generated.net.minecraft.core.RegistryMaterialsHandle;
+import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
 import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 
@@ -75,6 +79,17 @@ public class MC1_18_2_Conversion {
         }
     }
 
+    @ConverterMethod(input="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
+    public static ResourceKey<SoundEffect> soundEffectHolderToResourceKey(Object nmsHolderHandle) {
+        return ResourceKey.fromResourceKeyHandle(handler.getResourceKey(nmsHolderHandle));
+    }
+
+    @ConverterMethod(output="net.minecraft.core.Holder<net.minecraft.sounds.SoundEffect>")
+    public static Object soundEffectHolderFromResourceKey(ResourceKey<SoundEffect> soundKey) {
+        Object raw_registry = SoundEffectHandle.T.opt_getRegistry.raw.invoke();
+        return RegistryMaterialsHandle.T.rawResourceKeyToHolder.invoke(raw_registry, soundKey.getRawHandle());
+    }
+
     @Template.Optional
     @Template.Import("org.bukkit.craftbukkit.CraftWorld")
     @Template.Import("net.minecraft.world.level.dimension.DimensionManager")
@@ -89,6 +104,15 @@ public class MC1_18_2_Conversion {
          */
         @Template.Generated("%GET_HOLDER_VALUE%")
         public abstract Object getValue(Object holder);
+
+        /*
+         * <GET_HOLDER_RESOURCEKEY>
+         * public static Object getResourceKey(Holder holder) {
+         *     return holder.unwrapKey().orElse(null);
+         * }
+         */
+        @Template.Generated("%GET_HOLDER_RESOURCEKEY%")
+        public abstract Object getResourceKey(Object holder);
 
         /*
          * <GET_DIMENSION_TYPE_OF_WORLD>

@@ -32,6 +32,8 @@ public abstract class RegistryMaterialsHandle extends Template.Handle {
 
         public final Template.Method.Converted<Object> get = new Template.Method.Converted<Object>();
         public final Template.Method<Object> getKey = new Template.Method<Object>();
+        @Template.Optional
+        public final Template.Method<Object> rawResourceKeyToHolder = new Template.Method<Object>();
 
     }
 
