@@ -3,6 +3,7 @@ package com.bergerkiller.generated.net.minecraft.network.syncher;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import java.util.List;
 
@@ -27,8 +28,9 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
     /* ============================================================================== */
 
-    public abstract List<Item<?>> unwatchAndReturnAllWatched();
-    public abstract List<Item<?>> returnAllWatched();
+    public abstract List<PackedItem<?>> packChanges();
+    public abstract List<PackedItem<?>> packNonDefaults();
+    public abstract List<Item<?>> getCopyOfAllItems();
     public abstract Item<Object> read(Key<?> key);
     public abstract void register(Key<?> key, Object defaultValue);
     public abstract void set(Key<?> key, Object value);
@@ -50,8 +52,9 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         public final Template.Field.Converted<EntityHandle> owner = new Template.Field.Converted<EntityHandle>();
 
-        public final Template.Method.Converted<List<Item<?>>> unwatchAndReturnAllWatched = new Template.Method.Converted<List<Item<?>>>();
-        public final Template.Method.Converted<List<Item<?>>> returnAllWatched = new Template.Method.Converted<List<Item<?>>>();
+        public final Template.Method.Converted<List<PackedItem<?>>> packChanges = new Template.Method.Converted<List<PackedItem<?>>>();
+        public final Template.Method.Converted<List<PackedItem<?>>> packNonDefaults = new Template.Method.Converted<List<PackedItem<?>>>();
+        public final Template.Method.Converted<List<Item<?>>> getCopyOfAllItems = new Template.Method.Converted<List<Item<?>>>();
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         public final Template.Method<Void> register = new Template.Method<Void>();
         public final Template.Method<Void> set = new Template.Method<Void>();
@@ -81,20 +84,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
         public abstract Object getValue();
         public abstract void setValue(Object value);
-
-        public DataWatcherHandle.ItemHandle cloneHandle() {
-            Object clone;
-            if (T.constr_key_value.isAvailable()) {
-                Object rawKey = T.key.raw.get(getRaw());
-                clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
-            } else {
-                int typeId = T.typeId.getInteger(getRaw());
-                int keyId = T.keyId.getInteger(getRaw());
-                clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
-            }
-            T.changed.copy(getRaw(), clone);
-            return createHandle(clone);
-        }
+        public abstract PackedItemHandle pack();
         public abstract boolean isChanged();
         public abstract void setChanged(boolean value);
         /**
@@ -102,11 +92,6 @@ public abstract class DataWatcherHandle extends Template.Handle {
          * Methods, fields, and constructors can be used without using Handle Objects.
          */
         public static final class ItemClass extends Template.Class<ItemHandle> {
-            @Template.Optional
-            public final Template.Constructor.Converted<ItemHandle> constr_key_value = new Template.Constructor.Converted<ItemHandle>();
-            @Template.Optional
-            public final Template.Constructor.Converted<ItemHandle> constr_typeId_keyId_value = new Template.Constructor.Converted<ItemHandle>();
-
             @Template.Optional
             public final Template.Field.Integer typeId = new Template.Field.Integer();
             @Template.Optional
@@ -119,6 +104,41 @@ public abstract class DataWatcherHandle extends Template.Handle {
 
             public final Template.Method<Object> getValue = new Template.Method<Object>();
             public final Template.Method<Void> setValue = new Template.Method<Void>();
+            public final Template.Method.Converted<PackedItemHandle> pack = new Template.Method.Converted<PackedItemHandle>();
+
+        }
+
+    }
+
+
+    /**
+     * Instance wrapper handle for type <b>net.minecraft.network.syncher.DataWatcher.PackedItem</b>.
+     * To access members without creating a handle type, use the static {@link #T} member.
+     * New handles can be created from raw instances using {@link #createHandle(Object)}.
+     */
+    @Template.InstanceType("net.minecraft.network.syncher.DataWatcher.PackedItem")
+    public abstract static class PackedItemHandle extends Template.Handle {
+        /** @See {@link PackedItemClass} */
+        public static final PackedItemClass T = Template.Class.create(PackedItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
+        /* ============================================================================== */
+
+        public static PackedItemHandle createHandle(Object handleInstance) {
+            return T.createHandle(handleInstance);
+        }
+
+        /* ============================================================================== */
+
+        public abstract Object value();
+        public abstract PackedItemHandle cloneWithValue(Object value);
+        public abstract boolean isForKey(Key<?> key);
+        /**
+         * Stores class members for <b>net.minecraft.network.syncher.DataWatcher.PackedItem</b>.
+         * Methods, fields, and constructors can be used without using Handle Objects.
+         */
+        public static final class PackedItemClass extends Template.Class<PackedItemHandle> {
+            public final Template.Method<Object> value = new Template.Method<Object>();
+            public final Template.Method.Converted<PackedItemHandle> cloneWithValue = new Template.Method.Converted<PackedItemHandle>();
+            public final Template.Method.Converted<Boolean> isForKey = new Template.Method.Converted<Boolean>();
 
         }
 

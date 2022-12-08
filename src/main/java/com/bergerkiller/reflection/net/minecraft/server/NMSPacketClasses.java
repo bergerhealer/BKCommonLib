@@ -1080,7 +1080,15 @@ public class NMSPacketClasses {
     public static class NMSPacketPlayOutEntityMetadata extends NMSPacket {
 
         public final FieldAccessor<Integer> entityId = PacketPlayOutEntityMetadataHandle.T.entityId.toFieldAccessor();
-        public final FieldAccessor<List<DataWatcher.Item<Object>>> watchedObjects = PacketPlayOutEntityMetadataHandle.T.metadataItems.toFieldAccessor();
+        public final FieldAccessor<List<DataWatcher.PackedItem<Object>>> watchedObjects = PacketPlayOutEntityMetadataHandle.T.metadataItems.toFieldAccessor();
+
+        public CommonPacket newForSpawn(int entityId, DataWatcher dataWatcher) {
+            return PacketPlayOutEntityMetadataHandle.createForSpawn(entityId, dataWatcher).toCommonPacket();
+        }
+
+        public CommonPacket newForChanges(int entityId, DataWatcher dataWatcher) {
+            return PacketPlayOutEntityMetadataHandle.createForChanges(entityId, dataWatcher).toCommonPacket();
+        }
 
         public CommonPacket newInstance(int entityId, DataWatcher dataWatcher, boolean sendUnchangedData) {
             return PacketPlayOutEntityMetadataHandle.createNew(entityId, dataWatcher, sendUnchangedData).toCommonPacket();

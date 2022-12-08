@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.ItemHandle;
+import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.PackedItemHandle;
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjectHandle;
 
 class DataWatcher {
@@ -26,30 +27,51 @@ class DataWatcher {
     }
     </code>
 
-    /*
-     *  } else if (this.d.containsKey(Integer.valueOf(i))) {
-     *      throw new IllegalArgumentException("Duplicate id value for " + i + "!");
-     #  } else if (DataWatcherRegistry.b(datawatcherobject.##METHODNAME##()) < 0) {
-     *      throw new IllegalArgumentException("Unregistered serializer " + datawatcherobject.b() + " for " + i + "!");
-     *  } else {
-     */
 #if version >= 1.18
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:packDirty();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packChanges:packDirty();
 #elseif version >= 1.9
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> unwatchAndReturnAllWatched:b();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packChanges:b();
 #else
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> unwatchAndReturnAllWatched:b();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packChanges:b();
 #endif
 
-    /*
-     * Same signature as unwatchAndReturnAllWatched, find other function that matches
-     */
-#if version >= 1.17
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:getAll();
+    // Note: only filters non-default elements on 1.19.3 and later, as this mechanism was absent prior
+#if version >= 1.19.3
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:getNonDefaultValues();
+#elseif version >= 1.17
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:getAll();
 #elseif version >= 1.9
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> returnAllWatched:c();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packNonDefaults:c();
 #else
-    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> returnAllWatched:c();
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packNonDefaults:c();
+#endif
+
+#if version >= 1.19.3
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems() {
+        // No method is available on this version, so use reflection to hack something together
+        // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+        it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
+        java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.size());
+        it.unimi.dsi.fastutil.objects.ObjectIterator objectiterator = itemsById.values().iterator();
+        while (objectiterator.hasNext()) {
+            DataWatcher$Item item = (DataWatcher$Item) objectiterator.next();
+            #require DataWatcher.Item private final T itemInitialValue:initialValue;
+            Object initialValue = item#itemInitialValue;
+
+            DataWatcher$Item copy = new DataWatcher$Item(item.getAccessor(), initialValue);
+            copy.setValue(item.getValue());
+            copy.setDirty(item.isDirty());
+            resultItems.add(copy);
+        }
+        return resultItems;
+    }
+#elseif version >= 1.17
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems:getAll();
+#elseif version >= 1.9
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems:c();
+#else
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> getCopyOfAllItems:c();
 #endif
 
 #if version >= 1.18
@@ -146,27 +168,50 @@ class DataWatcher {
         public void setValue:a(Object value);
 #endif
 
-        // constructor for 1.9
-        public optional (DataWatcherHandle.ItemHandle) DataWatcher.Item((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key, T value);
-
-        // constructor for 1.8.8
-        public optional (DataWatcherHandle.ItemHandle) DataWatcher.Item(int typeId, int keyId, Object value);
-
-        <code>
-        public DataWatcherHandle.ItemHandle cloneHandle() {
-            Object clone;
-            if (T.constr_key_value.isAvailable()) {
-                Object rawKey = T.key.raw.get(getRaw());
-                clone = T.constr_key_value.raw.newInstance(rawKey, this.getValue());
-            } else {
-                int typeId = T.typeId.getInteger(getRaw());
-                int keyId = T.keyId.getInteger(getRaw());
-                clone = T.constr_typeId_keyId_value.raw.newInstance(typeId, keyId, this.getValue());
-            }
-            T.changed.copy(getRaw(), clone);
-            return createHandle(clone);
+        // Creates a snapshot of the current value
+#if version >= 1.19.3
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem pack:value();
+#elseif version >= 1.18
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem pack:copy();
+#elseif version >= 1.12
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem pack:d();
+#elseif version >= 1.9
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem pack() {
+            return new DataWatcher$PackedItem(instance.a(), instance.b());
         }
-        </code>
+#else
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem pack() {
+            return new DataWatcher$PackedItem(instance.c(), instance.a(), instance.b());
+        }
+#endif
+    }
+
+    // Note: PackedItem class is the same as Item class internally on 1.19.2 and before
+    class DataWatcher.PackedItem {
+#select version >=
+#case 1.19.3:  public T value();
+#case 1.18:    public T value:getValue();
+#case 1.9:     public T value:b();
+#case else:    public Object value:b();
+#endselect
+
+        public (DataWatcherHandle.PackedItemHandle) DataWatcher.PackedItem cloneWithValue(T value) {
+#select version >=
+#case 1.19.3:  return new DataWatcher$PackedItem(instance.id(), instance.serializer(), value);
+#case 1.18:    return new DataWatcher$PackedItem(instance.getAccessor(), value);
+#case 1.9:     return new DataWatcher$PackedItem(instance.a(), value);
+#case else:    return new DataWatcher$PackedItem(instance.c(), instance.a(), value);
+#endselect
+        }
+
+        public boolean isForKey((com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?>) DataWatcherObject<T> key) {
+#select version >=
+#case 1.19.3:  return key != null && instance.id() == key.getId() && instance.serializer() == key.getSerializer();
+#case 1.18:    return instance.getAccessor() == key;
+#case 1.9:     return instance.a() == key;
+#case else:    return key != null && instance.c() == key.getSerializerId() && instance.a() == key.getId();
+#endselect
+        }
     }
 }
 

@@ -44,13 +44,8 @@ public class TemplateResolver implements ClassDeclarationResolver {
             return allByType.get(0);
         } else {
             // Poor man's method of selecting the right packet using Class Simple Name
-            String name = classPath;
-            int name_endidx = name.lastIndexOf('.');
-            if (name_endidx != -1) {
-                name = name.substring(name_endidx + 1);
-            }
             for (ClassDeclaration dec : allByType) {
-                if (dec.type.typeName.equals(name)) {
+                if (classPath.endsWith(dec.type.typeName)) {
                     return dec;
                 }
             }

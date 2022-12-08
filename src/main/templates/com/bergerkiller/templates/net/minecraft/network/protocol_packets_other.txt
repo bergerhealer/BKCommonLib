@@ -7,7 +7,7 @@ import net.minecraft.core.particles.ParticleParam;
 import net.minecraft.network.chat.IChatBaseComponent;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.DataWatcher;
-import net.minecraft.network.syncher.DataWatcher.Item;
+import net.minecraft.network.syncher.DataWatcher.PackedItem;
 import net.minecraft.network.syncher.DataWatcher.WatchableObject;
 import net.minecraft.network.PacketDataSerializer;
 import net.minecraft.nbt.NBTTagCompound;
@@ -2116,16 +2116,41 @@ class PacketPlayOutEntityMetadata extends Packet {
 #endif
 
 #if version >= 1.17
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> metadataItems:packedItems;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.PackedItem<?>> metadataItems:packedItems;
 #elseif version >= 1.9
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.Item<?>> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.PackedItem<?>> metadataItems:b;
 #else
-    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<Object>>) List<DataWatcher.WatchableObject> metadataItems:b;
+    private (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<Object>>) List<DataWatcher.WatchableObject> metadataItems:b;
 #endif
 
-    public (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher, boolean includeUnchangedData);
+    public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
+#if version >= 1.19.3
+        return new PacketPlayOutEntityMetadata(entityId, datawatcher.getNonDefaultValues());
+#else
+        //TODO: Technically this should not mark all items as no longer changed, because a change
+        //      might also have to be sent to other players. As this is a pre-existing bug,
+        //      I'm not yet addressing it.
+        return new PacketPlayOutEntityMetadata(entityId, datawatcher, true);
+#endif
+    }
+
+    public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForChanges(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
+#if version >= 1.19.3
+        return new PacketPlayOutEntityMetadata(entityId, datawatcher.packDirty());
+#else
+        return new PacketPlayOutEntityMetadata(entityId, datawatcher, false);
+#endif
+    }
 
     <code>
+    public static PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
+        if (includeUnchangedData) {
+            return createForSpawn(entityId, datawatcher);
+        } else {
+            return createForChanges(entityId, datawatcher);
+        }
+    }
+
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_ENTITY_METADATA;

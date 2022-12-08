@@ -2,7 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
-import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import java.util.List;
 
@@ -21,12 +21,24 @@ public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
         return T.createHandle(handleInstance);
     }
 
-    public static final PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
-        return T.constr_entityId_datawatcher_includeUnchangedData.newInstance(entityId, datawatcher, includeUnchangedData);
-    }
-
     /* ============================================================================== */
 
+    public static PacketPlayOutEntityMetadataHandle createForSpawn(int entityId, DataWatcher datawatcher) {
+        return T.createForSpawn.invoke(entityId, datawatcher);
+    }
+
+    public static PacketPlayOutEntityMetadataHandle createForChanges(int entityId, DataWatcher datawatcher) {
+        return T.createForChanges.invoke(entityId, datawatcher);
+    }
+
+
+    public static PacketPlayOutEntityMetadataHandle createNew(int entityId, DataWatcher datawatcher, boolean includeUnchangedData) {
+        if (includeUnchangedData) {
+            return createForSpawn(entityId, datawatcher);
+        } else {
+            return createForChanges(entityId, datawatcher);
+        }
+    }
 
     @Override
     public com.bergerkiller.bukkit.common.protocol.PacketType getPacketType() {
@@ -34,17 +46,18 @@ public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
     }
     public abstract int getEntityId();
     public abstract void setEntityId(int value);
-    public abstract List<Item<Object>> getMetadataItems();
-    public abstract void setMetadataItems(List<Item<Object>> value);
+    public abstract List<PackedItem<Object>> getMetadataItems();
+    public abstract void setMetadataItems(List<PackedItem<Object>> value);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketPlayOutEntityMetadataClass extends Template.Class<PacketPlayOutEntityMetadataHandle> {
-        public final Template.Constructor.Converted<PacketPlayOutEntityMetadataHandle> constr_entityId_datawatcher_includeUnchangedData = new Template.Constructor.Converted<PacketPlayOutEntityMetadataHandle>();
-
         public final Template.Field.Integer entityId = new Template.Field.Integer();
-        public final Template.Field.Converted<List<Item<Object>>> metadataItems = new Template.Field.Converted<List<Item<Object>>>();
+        public final Template.Field.Converted<List<PackedItem<Object>>> metadataItems = new Template.Field.Converted<List<PackedItem<Object>>>();
+
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityMetadataHandle> createForSpawn = new Template.StaticMethod.Converted<PacketPlayOutEntityMetadataHandle>();
+        public final Template.StaticMethod.Converted<PacketPlayOutEntityMetadataHandle> createForChanges = new Template.StaticMethod.Converted<PacketPlayOutEntityMetadataHandle>();
 
     }
 

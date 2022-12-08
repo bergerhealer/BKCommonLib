@@ -499,6 +499,11 @@ public class WrapperConversion {
         return new com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<T>(handle);
     }
 
+    @ConverterMethod(input="net.minecraft.network.syncher.DataWatcher.PackedItem")
+    public static <T> com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<T> toDataWatcherPackedItem(Object nmsDataWatcherPackedItemHandle) {
+        return com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem.fromHandle(nmsDataWatcherPackedItemHandle);
+    }
+
     @ConverterMethod(input="net.minecraft.resources.ResourceKey")
     public static <T> com.bergerkiller.bukkit.common.resources.ResourceKey<T> toResourceKey(Object nmsResourceKeyHandle) {
         return com.bergerkiller.bukkit.common.resources.ResourceKey.fromResourceKeyHandle(nmsResourceKeyHandle);

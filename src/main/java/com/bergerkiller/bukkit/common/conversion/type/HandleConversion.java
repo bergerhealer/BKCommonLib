@@ -360,6 +360,11 @@ public class HandleConversion {
         return itemWrapper.getRawHandle();
     }
 
+    @ConverterMethod(output="net.minecraft.network.syncher.DataWatcher.PackedItem<V>")
+    public static Object toDataWatcherPackedItemHandle(DataWatcher.PackedItem<?> itemWrapper) {
+        return itemWrapper.getRawHandle();
+    }
+
     @ConverterMethod(output="net.minecraft.resources.ResourceKey<V>")
     public static Object toResourceKeyHandle(ResourceKey<?> resourceKeyWrapper) {
         return resourceKeyWrapper.getRawHandle();

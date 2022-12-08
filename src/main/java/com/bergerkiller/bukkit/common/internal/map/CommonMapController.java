@@ -801,17 +801,17 @@ public final class CommonMapController implements PacketListener, Listener {
             // Map Id is dynamically assigned, adjust metadata items to use this new Id
             // Avoid using any Bukkit or Wrapper types here for performance reasons
             int newMapId = this.getMapId(frameInfo.lastMapUUID);
-            List<DataWatcher.Item<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
+            List<DataWatcher.PackedItem<Object>> items = event.getPacket().read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
             if (items != null) {
-                ListIterator<DataWatcher.Item<Object>> itemsIter = items.listIterator();
+                ListIterator<DataWatcher.PackedItem<Object>> itemsIter = items.listIterator();
                 while (itemsIter.hasNext()) {
-                    DataWatcher.Item<ItemStack> item = itemsIter.next().translate(EntityItemFrameHandle.DATA_ITEM);
+                    DataWatcher.PackedItem<ItemStack> item = itemsIter.next().translate(EntityItemFrameHandle.DATA_ITEM);
                     if (item == null) {
                         continue;
                     }
 
                     // Check item is actually a map item and do some logic
-                    ItemStack metaItem = item.getValue();
+                    ItemStack metaItem = item.value();
                     int oldMapId;
                     if (metaItem == null || (oldMapId = CommonMapUUIDStore.getItemMapId(metaItem)) == -1) {
                         break;
@@ -823,9 +823,8 @@ public final class CommonMapController implements PacketListener, Listener {
                         ItemStack newMapItem = ItemUtil.cloneItem(metaItem);
                         CommonMapUUIDStore.setItemMapId(newMapItem, newMapId);
 
-                        item = item.clone();
-                        item.setValue(newMapItem, item.isChanged());
-                        itemsIter.set((DataWatcher.Item<Object>) (DataWatcher.Item) item);
+                        item = item.cloneWithValue(newMapItem);
+                        itemsIter.set((DataWatcher.PackedItem<Object>) (DataWatcher.PackedItem) item);
                     }
 
                     break;
@@ -844,12 +843,12 @@ public final class CommonMapController implements PacketListener, Listener {
     private static boolean hasMapItemInMetadata(CommonPacket entityMetadataPacket) {
         // Verify the Item Frame DATA_ITEM key is inside the metadata of this packet
         // If this is the case, then this is metadata for an item frame and not a different entity
-        List<DataWatcher.Item<Object>> items =entityMetadataPacket.read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
+        List<DataWatcher.PackedItem<Object>> items = entityMetadataPacket.read(PacketType.OUT_ENTITY_METADATA.watchedObjects);
         if (items != null) {
-            for (DataWatcher.Item<Object> dw_item : items) {
-                DataWatcher.Item<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
+            for (DataWatcher.PackedItem<Object> dw_item : items) {
+                DataWatcher.PackedItem<ItemStack> item = dw_item.translate(EntityItemFrameHandle.DATA_ITEM);
                 if (item != null) {
-                    return CommonMapUUIDStore.isMap(item.getValue());
+                    return CommonMapUUIDStore.isMap(item.value());
                 }
             }
         }

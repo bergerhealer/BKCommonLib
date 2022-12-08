@@ -60,6 +60,7 @@ public class DuplexConversion {
     public static final DuplexConverter<Object, DataWatcher> dataWatcher = pair(toDataWatcher, toDataWatcherHandle);
     public static final DuplexConverter<Object, DataWatcher.Key<?>> dataWatcherKey = findByPath("net.minecraft.network.syncher.DataWatcherObject", DataWatcher.Key.class);
     public static final DuplexConverter<Object, DataWatcher.Item<?>> dataWatcherItem = findByPath("net.minecraft.network.syncher.DataWatcher.Item", DataWatcher.Item.class);
+    public static final DuplexConverter<Object, DataWatcher.PackedItem<?>> dataWatcherPackedItem = findByPath("net.minecraft.network.syncher.DataWatcher.PackedItem", DataWatcher.PackedItem.class);
     public static final DuplexConverter<Object, CommonTag> commonTag = pair(toCommonTag, toNBTTagHandle);
     public static final DuplexConverter<Object, CommonTagCompound> commonTagCompound = findByPath("net.minecraft.nbt.NBTTagCompound", CommonTagCompound.class);
     public static final DuplexConverter<Object, CommonTagList> commonTagList = findByPath("net.minecraft.nbt.NBTTagList", CommonTagList.class);

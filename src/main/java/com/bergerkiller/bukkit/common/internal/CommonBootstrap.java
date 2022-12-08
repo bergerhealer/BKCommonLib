@@ -505,6 +505,43 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.server.level.EntityTrackerEntry", "net.minecraft.server.level.PlayerChunkMap$EntityTracker");
         }
 
+        // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
+        {
+            boolean craftLegacyIsInUtil;
+            if (evaluateMCVersion("<", "1.15.2")) {
+                craftLegacyIsInUtil = true;
+            } else if (evaluateMCVersion("==", "1.15.2")) {
+                try {
+                    Class.forName(server.getCBRoot() + ".legacy.CraftLegacy");
+                    craftLegacyIsInUtil = false;
+                } catch (Throwable t) {
+                    craftLegacyIsInUtil = true;
+                }
+            } else {
+                craftLegacyIsInUtil = false;
+            }
+            if (craftLegacyIsInUtil) {
+                remappings.put("org.bukkit.craftbukkit.legacy.CraftLegacy", "org.bukkit.craftbukkit.util.CraftLegacy");
+            }
+        }
+
+        // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
+        if (evaluateMCVersion("<", "1.16")) {
+            remappings.put("net.minecraft.resources.ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
+        }
+
+        // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
+        if (evaluateMCVersion("<", "1.16")) {
+            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.world.level.storage.WorldData");
+        }
+
+        // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
+        // Assume a more human-readable name and remap the name prior to the right place
+        if (evaluateMCVersion(">=", "1.16.2")) {
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
+            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
+        }
+
         // 1.17 mappings
         if (evaluateMCVersion(">=", "1.17")) {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.PacketPlayInUseEntity$b");
@@ -542,47 +579,19 @@ public class CommonBootstrap {
 
         // 1.19.3 mappings - some classes were split out into their own places
         if (evaluateMCVersion(">=", "1.19.3")) {
-            // Noop
+            // PackedItem class lacks naming because spigot is poop
+            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.DataWatcher$b");
+            // Spigot decided to revert back to mojangs name here for some reason
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
+            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$c");
         } else {
             // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
             remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
-        }
-
-        // Remaps CraftLegacy from legacy to util (moved since 1.15.2)
-        {
-            boolean craftLegacyIsInUtil;
-            if (evaluateMCVersion("<", "1.15.2")) {
-                craftLegacyIsInUtil = true;
-            } else if (evaluateMCVersion("==", "1.15.2")) {
-                try {
-                    Class.forName(server.getCBRoot() + ".legacy.CraftLegacy");
-                    craftLegacyIsInUtil = false;
-                } catch (Throwable t) {
-                    craftLegacyIsInUtil = true;
-                }
-            } else {
-                craftLegacyIsInUtil = false;
-            }
-            if (craftLegacyIsInUtil) {
-                remappings.put("org.bukkit.craftbukkit.legacy.CraftLegacy", "org.bukkit.craftbukkit.util.CraftLegacy");
-            }
-        }
-
-        // Maps nms ResourceKey to the internal proxy class replacement pre-1.16
-        if (evaluateMCVersion("<", "1.16")) {
-            remappings.put("net.minecraft.resources.ResourceKey", "com.bergerkiller.bukkit.common.internal.proxy.ResourceKey_1_15_2");
-        }
-
-        // WorldData was changed at 1.16 to WorldDataServer, with WorldData now being an interface with bare properties both server and client contain
-        if (evaluateMCVersion("<", "1.16")) {
-            remappings.put("net.minecraft.world.level.storage.WorldDataServer", "net.minecraft.world.level.storage.WorldData");
-        }
-
-        // BiomeBase.BiomeMeta was removed and replaced with BiomeSettingsMobs.c
-        // Assume a more human-readable name and remap the name prior to the right place
-        if (evaluateMCVersion(">=", "1.16.2")) {
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs$SpawnRate", "net.minecraft.world.level.biome.BiomeSettingsMobs$c");
-            remappings.put("net.minecraft.world.level.biome.BiomeSettingsMobs", "net.minecraft.world.level.biome.BiomeSettingsMobs");
+            // PackedItem class same as Item class on older versions. Watch out for double-remapping!
+            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem",
+                    remappings.getOrDefault("net.minecraft.network.syncher.DataWatcher$Item",
+                                            "net.minecraft.network.syncher.DataWatcher$Item"));
         }
 
         // There have been various locations where starlight was installed

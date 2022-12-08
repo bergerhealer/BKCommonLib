@@ -253,12 +253,20 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
-     * Get all watched items
+     * Gets a state copy of all watched items. The returned items can be modified but will
+     * have no effect on this DataWatcher. To make meaningful changes, use
+     * {@link #set(Key, Object)} with information derived from the items.<br>
+     * <br>
+     * This method is primarily useful for debugging purposes.
      *
      * @return Watched items (immutable)
      */
     public List<Item<?>> getWatchedItems() {
-        return getWatchedItems(false);
+        List<?> itemHandles = (List<?>) DataWatcherHandle.T.getCopyOfAllItems.raw.invoke(handle.getRaw());
+        if (itemHandles == null) {
+            itemHandles = Collections.emptyList();
+        }
+        return new ConvertingList<Item<?>>(itemHandles, DuplexConversion.dataWatcherItem);
     }
 
     /**
@@ -266,18 +274,42 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      *
      * @param unwatch to unwatch all the items before returning them
      * @return Watched objects (immutable)
+     * @deprecated Use {@link #packChanges()} instead to track changes
      */
+    @Deprecated
     public List<Item<?>> getWatchedItems(boolean unwatch) {
-        List<?> itemHandles;
         if (unwatch) {
-            itemHandles = (List<?>) DataWatcherHandle.T.unwatchAndReturnAllWatched.raw.invoke(handle.getRaw());
-        } else {
-            itemHandles = (List<?>) DataWatcherHandle.T.returnAllWatched.raw.invoke(handle.getRaw());
+            packChanges();
         }
+        return getWatchedItems();
+    }
+
+    /**
+     * Detects all metadata items which have changed since the last time it was called, marks
+     * them as not changed, and packs them into immutable PackedItem objects.
+     *
+     * @return List of packed items of all the changes
+     */
+    public List<PackedItem<?>> packChanges() {
+        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packChanges.raw.invoke(handle.getRaw());
         if (itemHandles == null) {
             itemHandles = Collections.emptyList();
         }
-        return new ConvertingList<Item<?>>(itemHandles, DuplexConversion.dataWatcherItem);
+        return new ConvertingList<PackedItem<?>>(itemHandles, DuplexConversion.dataWatcherPackedItem);
+    }
+
+    /**
+     * Detects all metadata items which have a non-default value. Does not mark them as changed.
+     * Only reliably detects non-default values since Minecraft 1.19.3.
+     *
+     * @return List of packed items of all the non-default item values
+     */
+    public List<PackedItem<?>> packNonDefaults() {
+        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packNonDefaults.raw.invoke(handle.getRaw());
+        if (itemHandles == null) {
+            itemHandles = Collections.emptyList();
+        }
+        return new ConvertingList<PackedItem<?>>(itemHandles, DuplexConversion.dataWatcherPackedItem);
     }
 
     /**
@@ -345,7 +377,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
      * @param <V> value type of the item
      */
     public static class Item<V> extends BasicWrapper<DataWatcherHandle.ItemHandle> {
-        private Key<V> key;
+        private final Key<V> key;
 
         protected Item(Key<V> key, DataWatcherHandle.ItemHandle handle) {
             this.key = key;
@@ -417,13 +449,6 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             this.handle.setChanged(true);
         }
 
-        /**
-         * Clones this DataWatcher Item, making sure changes to it does not affect the DataWatcher
-         */
-        public Item<V> clone() {
-            return new Item<V>(this.key, this.handle.cloneHandle());
-        }
-
         @Override
         public String toString() {
             Key<V> key = getKey();
@@ -440,6 +465,97 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
          */
         public static Object getRawValue(Item<?> item) {
             return item.handle.getValue();
+        }
+
+        /**
+         * Creates a snapshot of the current metadata value and packs it into a PackedItem.
+         * The packed item can be used in metadata update packets.
+         *
+         * @return immutable packed item
+         */
+        public PackedItem<V> pack() {
+            return new PackedItem<V>(handle.pack(), key);
+        }
+    }
+
+    /**
+     * A single data watcher metadata value that was packed for transport inside a metadata packet.
+     * Contents are immutable.
+     *
+     * @param <V> Value type of the item
+     */
+    public static class PackedItem<V> extends BasicWrapper<DataWatcherHandle.PackedItemHandle> {
+        private final Key<V> key;
+
+        private PackedItem(DataWatcherHandle.PackedItemHandle handle, Key<V> key) {
+            this.setHandle(handle);
+            this.key = key;
+        }
+
+        /**
+         * Gets a PackedItem from a NMS handle instance
+         *
+         * @param nmsPackedItemHandle Handle
+         * @return PackedItem
+         */
+        public static <T> PackedItem<T> fromHandle(Object nmsPackedItemHandle) {
+            return new PackedItem<T>(DataWatcherHandle.PackedItemHandle.createHandle(nmsPackedItemHandle), null);
+        }
+
+        /**
+         * Gets the value of this packed item. If translated using {@link #translate(Key)}
+         * with a matching key, the value is automatically converted to something legible.
+         * Otherwise, the raw internal data type is returned.
+         *
+         * @return value
+         */
+        @SuppressWarnings("unchecked")
+        public V value() {
+            if (key != null) {
+                return key.getType().getConverter().convert(handle.value());
+            } else {
+                return (V) handle.value();
+            }
+        }
+
+        /**
+         * Creates a new PackedItem instance with the value changed, but everything else kept the same.
+         * Can be used to change the value of a metadata packet.
+         *
+         * @param value New value to set
+         * @return cloned packed item with value changed
+         */
+        public PackedItem<V> cloneWithValue(V value) {
+            if (key != null) {
+                return new PackedItem<V>(handle.cloneWithValue(key.getType().getConverter().convertReverse(value)), key);
+            } else {
+                return new PackedItem<V>(handle.cloneWithValue(value), null);
+            }
+        }
+
+        /**
+         * Creates a new item referencing this item, but using a particular key
+         * for value translation. If the key specified can not be used with this
+         * packed item, null is returned instead.
+         * 
+         * @param key of the packed item
+         * @return translated packed item, or null if incompatible
+         * @see #isForKey(Key)
+         */
+        public <W> PackedItem<W> translate(Key<W> key) {
+            return isForKey(key) ? new PackedItem<W>(this.handle, key) : null;
+        }
+
+        /**
+         * Checks whether this packed item corresponds to something packed for the key specified.
+         * If true, the key can be used with {@link #translate(Key)} to convert it to a
+         * readable value.
+         *
+         * @param key Key to check
+         * @return True if the packed item can be used with the key
+         */
+        public boolean isForKey(Key<?> key) {
+            return handle.isForKey(key);
         }
     }
 
