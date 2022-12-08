@@ -2125,7 +2125,15 @@ class PacketPlayOutEntityMetadata extends Packet {
 
     public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
 #if version >= 1.19.3
-        java.util.List values = datawatcher.getNonDefaultValues();
+        // Cant use these. Breaks plugins that create a new DataWatcher and set values,
+        // because then all set values are the initial ones (and thus not sent)
+        //java.util.List values = datawatcher.getNonDefaultValues();
+
+        java.util.List values = (java.util.List) 
+                ((com.bergerkiller.mountiplex.reflection.declarations.Template.Method)
+                        com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.packAll.raw)
+                        .invoke(datawatcher);
+
         if (values == null) {
             values = java.util.Collections.emptyList();
         }

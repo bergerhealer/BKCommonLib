@@ -47,6 +47,20 @@ class DataWatcher {
 #endif
 
 #if version >= 1.19.3
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packAll() {
+        // No method is available on this version, so use reflection to hack something together
+        // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
+        #require DataWatcher private final it.unimi.dsi.fastutil.ints.Int2ObjectMap<DataWatcher.Item<?>> itemsById;
+        it.unimi.dsi.fastutil.ints.Int2ObjectMap itemsById = instance#itemsById;
+        java.util.ArrayList resultItems = new java.util.ArrayList(itemsById.size());
+        it.unimi.dsi.fastutil.objects.ObjectIterator objectiterator = itemsById.values().iterator();
+        while (objectiterator.hasNext()) {
+            DataWatcher$Item item = (DataWatcher$Item) objectiterator.next();
+            resultItems.add(item.value());
+        }
+        return resultItems;
+    }
+
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems() {
         // No method is available on this version, so use reflection to hack something together
         // Note: vanilla does some locking, doesn't appear to be used on spigot/paper
@@ -67,10 +81,13 @@ class DataWatcher {
         return resultItems;
     }
 #elseif version >= 1.17
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packAll:getAll();
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems:getAll();
 #elseif version >= 1.9
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.PackedItem<?>> packAll:c();
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.Item<?>> getCopyOfAllItems:c();
 #else
+    public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.PackedItem<?>>) List<DataWatcher.WatchableObject> packAll:c();
     public (List<com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item<?>>) List<DataWatcher.WatchableObject> getCopyOfAllItems:c();
 #endif
 

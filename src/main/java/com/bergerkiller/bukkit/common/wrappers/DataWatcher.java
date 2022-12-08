@@ -285,6 +285,20 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     }
 
     /**
+     * Packs all metadata items into packed items, regardless of whether they changed or have non-default
+     * values.
+     *
+     * @return List of all packed items
+     */
+    public List<PackedItem<?>> packAll() {
+        List<?> itemHandles = (List<?>) DataWatcherHandle.T.packAll.raw.invoke(handle.getRaw());
+        if (itemHandles == null) {
+            itemHandles = Collections.emptyList();
+        }
+        return new ConvertingList<PackedItem<?>>(itemHandles, DuplexConversion.dataWatcherPackedItem);
+    }
+
+    /**
      * Detects all metadata items which have changed since the last time it was called, marks
      * them as not changed, and packs them into immutable PackedItem objects.
      *
@@ -301,6 +315,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     /**
      * Detects all metadata items which have a non-default value. Does not mark them as changed.
      * Only reliably detects non-default values since Minecraft 1.19.3.
+     * The first set/watch call sets the initial value of the metadata items.
+     * So when setting the value of a new data watcher, this method will return an empty list.
      *
      * @return List of packed items of all the non-default item values
      */
