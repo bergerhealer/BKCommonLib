@@ -46,7 +46,15 @@ class Item {
 #case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #endselect
 
-#if version >= 1.18
+#if version >= 1.19.3
+    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants() {
+        NonNullList result = NonNullList.create();
+        //TODO: Fix me! Needs filtering for only those items in the creative menu, I guess.
+        //      Also variants should be supported, like beds.
+        result.add(new ItemStack(instance));
+        return result;
+    }
+#elseif version >= 1.18
     public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants() {
         NonNullList result = NonNullList.create();
         instance.fillItemCategory(CreativeModeTab.TAB_SEARCH, result);
