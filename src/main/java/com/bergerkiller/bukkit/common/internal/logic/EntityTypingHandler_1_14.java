@@ -273,6 +273,10 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
          *     java.util.Random newRandom = new java.util.Random();
          *     worldserver#random = newRandom;
          * #endif
+         * 
+         *     // server field (for enabledFeatures() call on 1.19.3+)
+         *     #require net.minecraft.server.level.WorldServer private final net.minecraft.server.MinecraftServer server;
+         *     worldserver#server = net.minecraft.server.MinecraftServer.getServer();
          * }
          */
         @Template.Generated("%INIT_WORLD%")

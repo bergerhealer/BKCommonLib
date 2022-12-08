@@ -203,7 +203,7 @@ public class PacketUtil {
             sendPacket(player, packet);
         } else {
             sendPacket(player, packet);
-            sendPacket(player, PacketPlayOutEntityMetadataHandle.createNew(packet.getEntityId(), metadata, true));
+            sendPacket(player, PacketPlayOutEntityMetadataHandle.createForSpawn(packet.getEntityId(), metadata));
         }
     }
 

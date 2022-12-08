@@ -2125,7 +2125,11 @@ class PacketPlayOutEntityMetadata extends Packet {
 
     public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
 #if version >= 1.19.3
-        return new PacketPlayOutEntityMetadata(entityId, datawatcher.getNonDefaultValues());
+        java.util.List values = datawatcher.getNonDefaultValues();
+        if (values == null) {
+            values = java.util.Collections.emptyList();
+        }
+        return new PacketPlayOutEntityMetadata(entityId, values);
 #else
         //TODO: Technically this should not mark all items as no longer changed, because a change
         //      might also have to be sent to other players. As this is a pre-existing bug,
@@ -2136,7 +2140,11 @@ class PacketPlayOutEntityMetadata extends Packet {
 
     public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForChanges(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
 #if version >= 1.19.3
-        return new PacketPlayOutEntityMetadata(entityId, datawatcher.packDirty());
+        java.util.List values = datawatcher.packDirty();
+        if (values == null) {
+            values = java.util.Collections.emptyList();
+        }
+        return new PacketPlayOutEntityMetadata(entityId, values);
 #else
         return new PacketPlayOutEntityMetadata(entityId, datawatcher, false);
 #endif

@@ -32,7 +32,11 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
                 "public static IBlockData deserialize(String text) {\n" +
                 "    ArgumentBlock$a block;\n" +
                 "    try {\n" +
+                "#if version >= 1.19.3\n" +
+                "        block = ArgumentBlock.parseForBlock(BuiltInRegistries.BLOCK.asLookup(), text, true);\n" +
+                "#else\n" +
                 "        block = ArgumentBlock.parseForBlock((IRegistry) BuiltInRegistries.BLOCK, text, true);\n" +
+                "#endif\n" +
                 "    } catch (com.mojang.brigadier.exceptions.CommandSyntaxException ex) {\n" +
                 "        return null;\n" +
                 "    }\n" +
