@@ -59,7 +59,7 @@ class SoundEffect {
 #if version >= 1.19.3
     public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey);
 #elseif version >= 1.9
-    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey);
+    public static (SoundEffectHandle) SoundEffect createVariableRangeEvent((MinecraftKeyHandle) MinecraftKey minecraftkey) {
         return new SoundEffect(minecraftkey);
     }
 #else

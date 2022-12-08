@@ -22,6 +22,7 @@ class BlockDataSerializer_1_19 extends BlockDataSerializer {
         resolver.addImport("net.minecraft.commands.arguments.blocks.ArgumentBlock.a");
         resolver.addImport("net.minecraft.world.level.block.state.IBlockData");
         resolver.addImport("net.minecraft.core.registries.BuiltInRegistries");
+        resolver.addImport("net.minecraft.core.IRegistry");
         resolver.setAllVariables(Common.TEMPLATE_RESOLVER);
         serializeMethod.init(new MethodDeclaration(resolver, SourceDeclaration.preprocess(
                 "public static String serialize(IBlockData iblockdata) {\n" +

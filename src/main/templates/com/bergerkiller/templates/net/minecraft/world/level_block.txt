@@ -31,7 +31,6 @@ class Block {
 
     public static final Iterable<?> getRegistry() {
 #select version >=
-#if version >= 1.19.3
 #case 1.14:   #require net.minecraft.core.registries.BuiltInRegistries public static final net.minecraft.core.RegistryBlocks<net.minecraft.world.level.block.Block> REGISTRY:BLOCK;
 #case 1.13.1: #require net.minecraft.core.IRegistry public static final net.minecraft.core.IRegistry<net.minecraft.world.level.block.Block> REGISTRY:BLOCK;
 #case else:   #require net.minecraft.world.level.block.Block public static final net.minecraft.core.RegistryBlocks REGISTRY;
