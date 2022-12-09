@@ -60,6 +60,9 @@ ISBUTTON:
 #if version >= 1.19
   MANGROVE_BUTTON
 #endif
+#if version >= 1.19.3
+  BAMBOO_BUTTON
+#endif
 
 ISCOMPARATOR:
   COMPARATOR
@@ -113,6 +116,10 @@ ISSIGN:
   MANGROVE_SIGN
   MANGROVE_WALL_SIGN
 #endif
+#if version >= 1.19.3
+  BAMBOO_SIGN
+  BAMBOO_WALL_SIGN
+#endif
 
 #else
 ISSIGN:
@@ -144,6 +151,9 @@ ISPRESSUREPLATE:
 #endif
 #if version >= 1.19
   MANGROVE_PRESSURE_PLATE
+#endif
+#if version >= 1.19.3
+  BAMBOO_PRESSURE_PLATE
 #endif
 
 ISMINECART:

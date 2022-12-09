@@ -189,6 +189,8 @@ public class IBlockDataToMaterialData {
                        "POLISHED_BLACKSTONE_BUTTON")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19"),
                        "MANGROVE_BUTTON")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
+                       "BAMBOO_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }
@@ -254,6 +256,8 @@ public class IBlockDataToMaterialData {
                        "POLISHED_BLACKSTONE_PRESSURE_PLATE")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19"),
                        "MANGROVE_PRESSURE_PLATE")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
+                       "BAMBOO_PRESSURE_PLATE")
              .setDataValues(0, 1)
              .build();
         }
@@ -457,6 +461,8 @@ public class IBlockDataToMaterialData {
                            "CRIMSON_WALL_SIGN", "WARPED_WALL_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19"),
                            "MANGROVE_WALL_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
+                           "BAMBOO_WALL_SIGN")
                  .setDataValues(2, 3, 4, 5)
                  .build();
             }
@@ -490,6 +496,8 @@ public class IBlockDataToMaterialData {
                            "CRIMSON_SIGN", "WARPED_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19"),
                            "MANGROVE_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
+                           "BAMBOO_SIGN")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();
             }

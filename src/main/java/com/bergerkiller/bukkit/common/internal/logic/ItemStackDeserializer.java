@@ -166,8 +166,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         // From MC 1.19.2 to 1.19.1
         this.register(3117, NO_CONVERSION);
 
+        // From MC 1.19.3 to 1.19.2
+        this.register(3120, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_19_3.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 3120; // MC 1.19.2
+        this.max_version = 3218; // MC 1.19.3
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -534,5 +540,28 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "OCHRE_FROGLIGHT", "VERDANT_FROGLIGHT", "PEARLESCENT_FROGLIGHT",
                 "FROGSPAWN", "ECHO_SHARD", "MANGROVE_WALL_SIGN",
                 "POTTED_MANGROVE_PROPAGULE"));
+
+        // All material names (Material enum) added Minecraft 1.19.2 -> 1.19.3
+        public static final Set<String> ADDED_MC_1_19_3 = new HashSet<String>(Arrays.asList(
+                "BAMBOO_PLANKS", "BAMBOO_MOSAIC", "BAMBOO_BLOCK",
+                "STRIPPED_BAMBOO_BLOCK", "BAMBOO_SLAB", "BAMBOO_MOSAIC_SLAB",
+                "CHISELED_BOOKSHELF", "BAMBOO_FENCE", "SCULK_VEIN",
+                "BAMBOO_STAIRS", "BAMBOO_MOSAIC_STAIRS", "BAMBOO_BUTTON",
+                "BAMBOO_PRESSURE_PLATE", "BAMBOO_DOOR", "BAMBOO_TRAPDOOR",
+                "BAMBOO_FENCE_GATE", "BAMBOO_RAFT", "BAMBOO_CHEST_RAFT",
+                "BAMBOO_SIGN", "BAMBOO_WALL_SIGN",
+                "OAK_HANGING_SIGN", "SPRUCE_HANGING_SIGN",
+                "BIRCH_HANGING_SIGN", "JUNGLE_HANGING_SIGN",
+                "ACACIA_HANGING_SIGN", "DARK_OAK_HANGING_SIGN",
+                "MANGROVE_HANGING_SIGN", "BAMBOO_HANGING_SIGN",
+                "CRIMSON_HANGING_SIGN", "WARPED_HANGING_SIGN",
+                "OAK_WALL_HANGING_SIGN", "SPRUCE_WALL_HANGING_SIGN",
+                "BIRCH_WALL_HANGING_SIGN", "ACACIA_WALL_HANGING_SIGN",
+                "JUNGLE_WALL_HANGING_SIGN", "DARK_OAK_WALL_HANGING_SIGN",
+                "MANGROVE_WALL_HANGING_SIGN", "CRIMSON_WALL_HANGING_SIGN",
+                "WARPED_WALL_HANGING_SIGN", "BAMBOO_WALL_HANGING_SIGN",
+                "CAMEL_SPAWN_EGG", "ENDER_DRAGON_SPAWN_EGG",
+                "IRON_GOLEM_SPAWN_EGG", "SNOW_GOLEM_SPAWN_EGG",
+                "WITHER_SPAWN_EGG", "PIGLIN_HEAD", "PIGLIN_WALL_HEAD"));
     }
 }
