@@ -36,8 +36,6 @@ import net.minecraft.world.phys.Vec3D;
 
 import org.bukkit.potion.PotionEffectType;
 
-import com.mojang.authlib.GameProfile;
-
 import it.unimi.dsi.fastutil.ints.IntList;
 import it.unimi.dsi.fastutil.ints.IntLists;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
@@ -52,12 +50,7 @@ import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 
-import com.bergerkiller.generated.com.mojang.authlib.GameProfileHandle;
-
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityDestroyHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.PlayerInfoDataHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle.EnumPlayerInfoActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInUseEntityHandle.EnumEntityUseActionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle.EnumTitleActionHandle
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
@@ -87,60 +80,6 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
-
-class PacketPlayOutPlayerInfo extends Packet {
-#if version >= 1.17
-    private (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction action;
-    private final (List<PlayerInfoDataHandle>) List<PacketPlayOutPlayerInfo.PlayerInfoData> players:entries;
-#else
-    private (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction action:a;
-    private final (List<PlayerInfoDataHandle>) List<PacketPlayOutPlayerInfo.PlayerInfoData> players:b;
-#endif
-
-    public static (PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo createNew() {
-#if version >= 1.17
-        #require net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo private final List entries;
-        PacketPlayOutPlayerInfo packet = (PacketPlayOutPlayerInfo) PacketPlayOutPlayerInfoHandle.T.newInstanceNull();
-        packet#entries = new java.util.ArrayList();
-        return packet;
-#else
-        return new PacketPlayOutPlayerInfo();
-#endif
-    }
-
-    class PacketPlayOutPlayerInfo.PlayerInfoData {
-        public static (PlayerInfoDataHandle) PacketPlayOutPlayerInfo.PlayerInfoData createNew((PacketPlayOutPlayerInfoHandle) PacketPlayOutPlayerInfo packet, (GameProfileHandle) GameProfile profile, int ping, (org.bukkit.GameMode) EnumGamemode gameMode, (ChatText) IChatBaseComponent listName) {
-#if version >= 1.19
-            net.minecraft.world.entity.player.ProfilePublicKey.a publicKey = null; //TODO: What to do with this?
-            return new PacketPlayOutPlayerInfo$PlayerInfoData(profile, ping, gameMode, listName, publicKey);
-#elseif version >= 1.17
-            return new PacketPlayOutPlayerInfo$PlayerInfoData(profile, ping, gameMode, listName);
-#else
-            return new PacketPlayOutPlayerInfo$PlayerInfoData(packet, profile, ping, gameMode, listName);
-#endif
-        }
-
-#if version >= 1.18
-        public (GameProfileHandle) GameProfile getProfile();
-        public int getPing:getLatency();
-        public (org.bukkit.GameMode) EnumGamemode getGameMode();
-        public (ChatText) IChatBaseComponent getListName:getDisplayName();
-#else
-        public (GameProfileHandle) GameProfile getProfile:a();
-        public int getPing:b();
-        public (org.bukkit.GameMode) EnumGamemode getGameMode:c();
-        public (ChatText) IChatBaseComponent getListName:d();
-#endif
-    }
-
-    class PacketPlayOutPlayerInfo.EnumPlayerInfoAction {
-        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction ADD_PLAYER;
-        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_GAME_MODE;
-        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_LATENCY;
-        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction UPDATE_DISPLAY_NAME;
-        enum (EnumPlayerInfoActionHandle) PacketPlayOutPlayerInfo.EnumPlayerInfoAction REMOVE_PLAYER;    
-    }
-}
 
 class PacketPlayOutEntityDestroy extends Packet {
 #if version >= 1.17.1

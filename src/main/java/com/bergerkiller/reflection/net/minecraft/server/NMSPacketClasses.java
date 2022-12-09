@@ -48,6 +48,7 @@ import com.bergerkiller.bukkit.common.wrappers.PlayerAbilities;
 import com.bergerkiller.bukkit.common.wrappers.ScoreboardAction;
 import com.bergerkiller.bukkit.common.wrappers.WindowType;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInAbilitiesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInArmAnimationHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle;
@@ -100,7 +101,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutNamedSoundEffectHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditorHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerInfoHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooterHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffectHandle;
@@ -1491,10 +1491,28 @@ public class NMSPacketClasses {
         public final FieldAccessor<ChatText> windowTitle = PacketPlayOutOpenWindowHandle.T.windowTitle.toFieldAccessor();
     }
 
-    public static class NMSPacketPlayOutPlayerInfo extends NMSPacket {
+    public static class NMSClientboundPlayerInfoUpdatePacket extends NMSPacket {
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.PLAYER_INFO_PACKET_SPLIT) {
+                return true;
+            } else {
+                // Action must NOT be REMOVE
+                return !ClientboundPlayerInfoUpdatePacketHandle.isPlayerInfoRemovePacket(packetHandle);
+            }
+        }
+    }
 
-        public final FieldAccessor<Object> action = PacketPlayOutPlayerInfoHandle.T.action.raw.toFieldAccessor();
-        public final FieldAccessor<List<?>> playerInfoData = CommonUtil.unsafeCast(PacketPlayOutPlayerInfoHandle.T.players.raw.toFieldAccessor());
+    public static class NMSClientboundPlayerInfoRemovePacket extends NMSPacket {
+        @Override
+        protected boolean matchPacket(Object packetHandle) {
+            if (CommonCapabilities.PLAYER_INFO_PACKET_SPLIT) {
+                return true;
+            } else {
+                // Action must be REMOVE
+                return ClientboundPlayerInfoUpdatePacketHandle.isPlayerInfoRemovePacket(packetHandle);
+            }
+        }
     }
 
     public static class NMSPacketPlayOutPlayerListHeaderFooter extends NMSPacket {

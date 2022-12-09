@@ -366,6 +366,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.Block$StepSound"); // workaround
             remappings.put("net.minecraft.network.syncher.DataWatcher$Item", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
+            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
             remappings.put("net.minecraft.server.level.PlayerChunk", "net.minecraft.server.level.PlayerChunkMap$PlayerChunk"); // nested on 1.8.8
 
             // PacketPlayInUseItem and PacketPlayInBlockPlace were merged as one packet on these versions
@@ -396,10 +397,14 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.StepSound");
             remappings.put("net.minecraft.world.level.block.Block$StepSound", "net.minecraft.world.level.block.StepSound");
             remappings.put("net.minecraft.core.EnumDirection$EnumAxis", "net.minecraft.core.EnumAxis");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.EnumPlayerInfoAction");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInUseEntity$EnumEntityUseAction", "net.minecraft.network.protocol.game.EnumEntityUseAction");
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.block.entity.TileEntityMobSpawnerData");
             remappings.put("net.minecraft.network.syncher.DataWatcher$Item", "net.minecraft.network.syncher.WatchableObject");
+            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.syncher.DataWatcher$WatchableObject", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
@@ -407,7 +412,6 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutTitle$EnumTitleAction", "net.minecraft.network.protocol.game.EnumTitleAction");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent$EnumCombatEventType", "net.minecraft.network.protocol.game.EnumCombatEventType");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder$EnumWorldBorderAction", "net.minecraft.network.protocol.game.EnumWorldBorderAction");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", "net.minecraft.network.protocol.game.PlayerInfoData");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus$EnumResourcePackStatus", "net.minecraft.network.protocol.game.EnumResourcePackStatus");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayInBlockDig$EnumPlayerDigType", "net.minecraft.network.protocol.game.EnumPlayerDigType");
             remappings.put("net.minecraft.world.entity.player.EnumChatVisibility", "net.minecraft.world.entity.player.EnumChatVisibility");
@@ -582,16 +586,21 @@ public class CommonBootstrap {
             // PackedItem class lacks naming because spigot is poop
             remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.DataWatcher$b");
             // Spigot decided to revert back to mojangs name here for some reason
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$c");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$a");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$b");
         } else {
             // BuiltInRegistries class does not exist, but all relevant fields are found in IRegistry instead
             remappings.put("net.minecraft.core.registries.BuiltInRegistries", "net.minecraft.core.IRegistry");
             // PackedItem class same as Item class on older versions. Watch out for double-remapping!
-            remappings.put("net.minecraft.network.syncher.DataWatcher$PackedItem",
-                    remappings.getOrDefault("net.minecraft.network.syncher.DataWatcher$Item",
-                                            "net.minecraft.network.syncher.DataWatcher$Item"));
+            remappings.putIfAbsent("net.minecraft.network.syncher.DataWatcher$PackedItem", "net.minecraft.network.syncher.DataWatcher$Item");
+            // Remap to spigots names. Removing and updating player information was handled by the same packet here.
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
+            remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
+            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
+            remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
         }
 
         // There have been various locations where starlight was installed

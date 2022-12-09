@@ -69,7 +69,8 @@ public class PacketType extends ClassTemplate<Object> {
     //public static final NMSPacketPlayOutMultiBlockChange OUT_MULTI_BLOCK_CHANGE = new NMSPacketPlayOutMultiBlockChange();
     public static final NMSPacketPlayOutNamedSoundEffect OUT_NAMED_SOUND_EFFECT = new NMSPacketPlayOutNamedSoundEffect();
     public static final NMSPacketPlayOutOpenSignEditor OUT_OPEN_SIGN_EDITOR = new NMSPacketPlayOutOpenSignEditor();
-    public static final NMSPacketPlayOutPlayerInfo OUT_PLAYER_INFO = new NMSPacketPlayOutPlayerInfo();
+    public static final NMSClientboundPlayerInfoUpdatePacket OUT_PLAYER_INFO_UPDATE = new NMSClientboundPlayerInfoUpdatePacket();
+    public static final NMSClientboundPlayerInfoRemovePacket OUT_PLAYER_INFO_REMOVE = new NMSClientboundPlayerInfoRemovePacket();
     public static final NMSPacketPlayOutPosition OUT_POSITION = new NMSPacketPlayOutPosition();
     public static final NMSPacketPlayOutRespawn OUT_RESPAWN = new NMSPacketPlayOutRespawn();
     public static final NMSPacketPlayOutSpawnPosition OUT_SPAWN_POSITION = new NMSPacketPlayOutSpawnPosition();

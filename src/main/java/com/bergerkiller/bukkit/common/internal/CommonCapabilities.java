@@ -244,4 +244,10 @@ public class CommonCapabilities {
      * the generic spawn entity packet.
      */
     public static final boolean ENTITY_SPAWN_PACKETS_MERGED = CommonBootstrap.evaluateMCVersion(">=", "1.19");
+
+    /**
+     * Since Minecraft 1.19.3 the player info packet was split into two separate packets.
+     * Before that removal was done using the player info update packet.
+     */
+    public static final boolean PLAYER_INFO_PACKET_SPLIT = CommonBootstrap.evaluateMCVersion(">=", "1.19.3");
 }
