@@ -10,6 +10,7 @@ import java.util.concurrent.Executor;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
+import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -152,6 +153,17 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
             // Construct new ResourcePackRepository
             resourcepackrepository = construct(resourcePackRepositoryType, new Object[] {resourcePackSources});
+        }
+
+        /*
+         * From MinecraftServer configurePackRepository - actually initialize the resource pack repository
+         */
+        {
+            createFromCode(resourcepackrepository.getClass(),
+                    "arg0.reload();\n" +
+                    "arg0.setSelected(java.util.Collections.singleton(\"vanilla\"));\n" +
+                    "return null;",
+                    resourcepackrepository);
         }
 
         /*
