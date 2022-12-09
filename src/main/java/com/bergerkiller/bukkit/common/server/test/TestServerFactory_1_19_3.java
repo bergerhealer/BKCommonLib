@@ -14,6 +14,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 
 class TestServerFactory_1_19_3 extends TestServerFactory {
 
@@ -104,6 +105,24 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
 
         // ResourcePack initialization (makes recipes available)
         initDataPack(env, minecraftServerType, mc_server, registries);
+
+        // Set server worldData field, required by the Entity constructors under test (EntityType)
+        // WorldData enabledFeatures() should return non-null to avoid trouble
+        // To do this, set a valid WorldSettings in the SavedData worldData field
+        // The WorldSettings must have a valid WorldDataConfiguration
+        // The WorldDataConfiguration must have the feature set
+        // Damn mojang, so many nested classes!
+        {
+            Object worldDataConfiguration = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
+                                                           "return WorldDataConfiguration.DEFAULT;");
+
+            Object worldSettings = NullInstantiator.of(Class.forName("net.minecraft.world.level.WorldSettings")).create();
+            setField(worldSettings, "dataConfiguration", worldDataConfiguration);
+
+            Object worldData = NullInstantiator.of(Class.forName("net.minecraft.world.level.storage.WorldDataServer")).create();
+            setField(worldData, "settings", worldSettings);
+            setField(mc_server, "worldData", worldData);
+        }
     }
 
     protected Object initCustomRegistryDimension(Class<?> minecraftServerType) {

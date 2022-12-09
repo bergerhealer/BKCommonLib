@@ -7,6 +7,7 @@ import org.junit.Test;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.entity.CommonEntityType;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 public class EntityRegistryTest {
@@ -19,6 +20,8 @@ public class EntityRegistryTest {
 
     @Test
     public void testEntityTypesConversion() {
+        CommonBootstrap.initCommonServerAssertCompatibility();
+
         // Test EntityTypes <> Class<? extends Entity> conversion logic
         // This applies to MC 1.13 and onwards only
         if (!Common.evaluateMCVersion(">=", "1.13")) {

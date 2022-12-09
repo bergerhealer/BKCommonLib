@@ -9,6 +9,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
 import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
@@ -37,6 +38,10 @@ import java.util.logging.Level;
  */
 @SuppressWarnings({"unchecked", "deprecation"})
 public class CommonEntityType {
+    static {
+        CommonBootstrap.initCommonServerAssertCompatibility();
+    }
+
     private static final StampedLock lock = new StampedLock();
     private static final Map<String, ObjectTypeInfo> objectTypes = new HashMap<String, ObjectTypeInfo>();
     private static final ClassMap<CommonEntityType> byNMS = new ClassMap<CommonEntityType>();
@@ -141,6 +146,11 @@ public class CommonEntityType {
                 nmsName = "net.minecraft.world.entity.projectile.EntityTippedArrow";
             } else if (entityTypeEnumName.equals("LINGERING_POTION")) {
                 nmsName = "net.minecraft.world.entity.projectile.EntityPotion";
+            }
+
+            // Added in >= 1.19.3
+            if (entityTypeEnumName.equals("CAMEL")) {
+                nmsName = "net.minecraft.world.entity.animal.camel.Camel";
             }
 
             // Try retrieving NMS class again

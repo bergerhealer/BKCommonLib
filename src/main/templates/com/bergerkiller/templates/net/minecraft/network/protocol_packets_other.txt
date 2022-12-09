@@ -1163,7 +1163,7 @@ class PacketPlayOutRespawn extends Packet {
     public (com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> getWorldName() {
         return instance#worldName;
     }
-    
+
     public void setWorldName((com.bergerkiller.bukkit.common.resources.ResourceKey<org.bukkit.World>) ResourceKey<World> worldType) {
         instance#worldName = worldType;
     }
@@ -1192,7 +1192,11 @@ class PacketPlayOutRespawn extends Packet {
 
     private unknown boolean isDebugWorld:isDebug;
     private unknown boolean isFlatWorld:isFlat;
+  #if version >= 1.19.3
+    private unknown final byte dataToKeep;
+  #else
     private unknown boolean keepAllPlayerData;
+  #endif
 #elseif version >= 1.16
     //TODO: private ResourceKey<World> b;
 
