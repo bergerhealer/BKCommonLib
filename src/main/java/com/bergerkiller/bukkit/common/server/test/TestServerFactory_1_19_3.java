@@ -191,13 +191,29 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
     @SuppressWarnings("unchecked")
     protected void initDataPack(ServerEnvironment env, Class<?> minecraftServerType, Object mc_server, Object registries) throws Throwable {
         /*
-         * Retrieve composite ICustomRegistry.Dimension instance from the loaded resource pack
+         * Initialize the DIMENSION_REGISTRIES (used for dimension type api)
+         */
+        {
+            createFromCode(minecraftServerType,
+                    "return net.minecraft.resources.RegistryDataLoader.load(arg0,\n" +
+                    "            arg1.getAccessForLoading(net.minecraft.server.RegistryLayer.DIMENSIONS),\n" +
+                    "            net.minecraft.resources.RegistryDataLoader.DIMENSION_REGISTRIES);",
+                    env.resourceManager, registries);
+        }
+
+        /*
+         * Retrieve reloadable ICustomRegistry.Dimension instance from the loaded resource pack
          */
         Object customRegistryDimension;
         {
+            customRegistryDimension = createFromCode(Class.forName("net.minecraft.core.LayeredRegistryAccess"),
+                                                     "return arg0.getAccessForLoading(net.minecraft.server.RegistryLayer.RELOADABLE);",
+                                                     registries);
+            /*
             customRegistryDimension = Resolver.resolveAndGetDeclaredMethod(
                     Class.forName("net.minecraft.core.LayeredRegistryAccess"), "compositeAccess")
                 .invoke(registries);
+            */
         }
 
         /*
@@ -215,7 +231,8 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
         {
             Class<?> serverTypeType = Class.forName("net.minecraft.commands.CommandDispatcher$ServerType");
             Object serverType = getStaticField(serverTypeType, "DEDICATED");
-            Object featureFlagSet = createFromCode(minecraftServerType, "return net.minecraft.world.flag.FeatureFlagSet.of();");
+            Object featureFlagSet = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
+                                                   "return WorldDataConfiguration.DEFAULT.enabledFeatures();");
             int functionPermissionLevel = 2;
             Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
                     "bootstrapExecutor").invoke(null);

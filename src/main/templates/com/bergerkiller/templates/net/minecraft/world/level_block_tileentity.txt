@@ -198,7 +198,11 @@ class TileEntityFurnace extends TileEntity {
             return 0;
         } else {
             Item item = itemstack.getItem();
+  #if version >= 1.18
+            Integer fuelTime = (Integer) TileEntityFurnace.getFuel().get(item);
+  #else
             Integer fuelTime = (Integer) TileEntityFurnace.f().get(item);
+  #endif
             if (fuelTime == null) {
                 return 0;
             } else {
