@@ -2067,25 +2067,40 @@ class PacketPlayOutEntityMetadata extends Packet {
 #endif
 
     public static (PacketPlayOutEntityMetadataHandle) PacketPlayOutEntityMetadata createForSpawn(int entityId, (com.bergerkiller.bukkit.common.wrappers.DataWatcher) DataWatcher datawatcher) {
+        // Pack all datawatcher values, and do NOT reset dirty on the datawatcher or the values
+        // A spawn shouldn't affect the 'dirty' elements that still need to be synchronized to
+        // other players
+        java.util.List values = (java.util.List) 
+                ((com.bergerkiller.mountiplex.reflection.declarations.Template.Method)
+                        com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.packAll.raw)
+                        .invoke(datawatcher);
+        if (values == null) {
+            values = java.util.Collections.emptyList();
+        }
+
 #if version >= 1.19.3
         // Cant use these. Breaks plugins that create a new DataWatcher and set values,
         // because then all set values are the initial ones (and thus not sent)
         //java.util.List values = datawatcher.getNonDefaultValues();
 
-        java.util.List values = (java.util.List) 
-                ((com.bergerkiller.mountiplex.reflection.declarations.Template.Method)
-                        com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.packAll.raw)
-                        .invoke(datawatcher);
-
-        if (values == null) {
-            values = java.util.Collections.emptyList();
-        }
         return new PacketPlayOutEntityMetadata(entityId, values);
 #else
-        //TODO: Technically this should not mark all items as no longer changed, because a change
-        //      might also have to be sent to other players. As this is a pre-existing bug,
-        //      I'm not yet addressing it.
-        return new PacketPlayOutEntityMetadata(entityId, datawatcher, true);
+        // Cannot use the metadata packet constructor, because then it resets dirty on the datawatcher.
+        // This would negatively effect other players who have not yet received the changes.
+        //return new PacketPlayOutEntityMetadata(entityId, datawatcher, true);
+
+  #if version >= 1.17
+        PacketPlayOutEntityMetadata packet = (PacketPlayOutEntityMetadata) PacketPlayOutEntityMetadataHandle.T.newInstanceNull();
+  #else
+        PacketPlayOutEntityMetadata packet = new PacketPlayOutEntityMetadata();
+  #endif
+
+        // Assign id and values list
+        PacketPlayOutEntityMetadataHandle.T.entityId.setInteger(packet, entityId);
+        ((com.bergerkiller.mountiplex.reflection.declarations.Template.Field) PacketPlayOutEntityMetadataHandle.T.metadataItems.raw)
+                .set(packet, values);
+
+        return packet;
 #endif
     }
 
