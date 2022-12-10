@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.internal.logic.ItemVariantListHandler;
 import com.bergerkiller.bukkit.common.inventory.InventoryBaseImpl;
 import com.bergerkiller.bukkit.common.inventory.ItemParser;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
@@ -868,7 +869,7 @@ public class ItemUtil {
         if (itemHandle == null) {
             return new ArrayList<ItemStack>(0);
         } else {
-            return ItemHandle.createHandle(itemHandle).getItemVariants();
+            return ItemVariantListHandler.INSTANCE.getVariants(itemHandle);
         }
     }
 

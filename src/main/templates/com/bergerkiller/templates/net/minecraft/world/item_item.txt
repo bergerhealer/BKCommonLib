@@ -1,6 +1,5 @@
 package net.minecraft.world.item;
 
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryMaterials;
 import net.minecraft.resources.MinecraftKey;
 
@@ -45,37 +44,4 @@ class Item {
 #case 1.8.5:  public String getInternalName:f_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #case else:   public String getInternalName:e_((org.bukkit.inventory.ItemStack) ItemStack itemstack);
 #endselect
-
-#if version >= 1.19.3
-    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants() {
-        NonNullList result = NonNullList.create();
-        //TODO: Fix me! Needs filtering for only those items in the creative menu, I guess.
-        //      Also variants should be supported, like beds.
-        result.add(new ItemStack(instance));
-        return result;
-    }
-#elseif version >= 1.18
-    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants() {
-        NonNullList result = NonNullList.create();
-        instance.fillItemCategory(CreativeModeTab.TAB_SEARCH, result);
-        return result;
-    }
-#elseif version >= 1.12.1
-    public (List<org.bukkit.inventory.ItemStack>) NonNullList<ItemStack> getItemVariants() {
-        NonNullList result = NonNullList.a();
-  #if version >= 1.17
-        instance.a(CreativeModeTab.TAB_SEARCH, result);
-  #else
-        instance.a(CreativeModeTab.g, result);
-  #endif
-        return result;
-    }
-#else
-    public List<org.bukkit.inventory.ItemStack> getItemVariants() {
-        org.bukkit.Material type = com.bergerkiller.bukkit.common.conversion.type.WrapperConversion.toMaterialFromItemHandle(instance);
-        java.util.ArrayList result = new java.util.ArrayList();
-        com.bergerkiller.bukkit.common.internal.proxy.ItemVariants_pre_1_12_1.addVariants(type, result);
-        return result;
-    }
-#endif
 }

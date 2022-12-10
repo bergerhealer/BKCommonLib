@@ -11,6 +11,7 @@ import com.bergerkiller.bukkit.common.internal.logic.BlockDataSerializer;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityMoveHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityTypingHandler;
+import com.bergerkiller.bukkit.common.internal.logic.ItemVariantListHandler;
 import com.bergerkiller.bukkit.common.internal.logic.LightingHandlerSelector;
 import com.bergerkiller.bukkit.common.internal.logic.NullPacketDataSerializerInit;
 import com.bergerkiller.bukkit.common.internal.logic.PlayerFileDataHandler;
@@ -113,5 +114,10 @@ public class InternalLogicInitializeTest {
         assertTrue(serializerType.isAssignableFrom(instanceField.getType()));
         assertNotNull(nullPacketDataSerializer);
         assertTrue(serializerType.isAssignableFrom(nullPacketDataSerializer.getClass()));
+    }
+
+    @Test
+    public void testItemVariantsInit() {
+        assertNotNull(ItemVariantListHandler.INSTANCE);
     }
 }

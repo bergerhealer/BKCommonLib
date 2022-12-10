@@ -1,4 +1,4 @@
-package com.bergerkiller.bukkit.common.internal.proxy;
+package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.HashMap;
 import java.util.List;
@@ -6,16 +6,20 @@ import java.util.List;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
 
 /**
- * Provides item variants (for example, different colors of wool) for MC versions before 1.12.1.
- * The API for this was not available in the server prior.
+ * Before Minecraft 1.12.1 there was no real way to query this in the server. Instead, we implement
+ * a fallback that still shows most of the variants we care about.
  */
-public class ItemVariants_pre_1_12_1 {
-    private static HashMap<Material, VariantProducer> variants = new HashMap<Material, VariantProducer>();
+@SuppressWarnings("deprecation")
+class ItemVariantListHandler_1_8 extends ItemVariantListHandler {
+    private static final VariantProducer DEFAULT_PRODUCER = (type, result) -> result.add(new ItemStack(type));
+    private final HashMap<Material, VariantProducer> variants = new HashMap<Material, VariantProducer>();
 
-    static {
+    @Override
+    public void enable() throws Throwable {
         // Empty variants that don't show up at all
         {
             VariantProducer emptyProducer = (type, result) -> {
@@ -89,20 +93,19 @@ public class ItemVariants_pre_1_12_1 {
         // ENCHANTED_BOOK
     }
 
-    public static void addVariants(Material type, List<ItemStack> result) {
-        VariantProducer producer = variants.get(type);
-        if (producer == null) {
-            result.add(new org.bukkit.inventory.ItemStack(type));
-        } else {
-            producer.addVariants(type, result);
-        }
+    @Override
+    public List<ItemStack> getVariants(Object nmsItem) {
+        org.bukkit.Material type = WrapperConversion.toMaterialFromItemHandle(nmsItem);
+        java.util.ArrayList<ItemStack> result = new java.util.ArrayList<ItemStack>();
+        variants.getOrDefault(type, DEFAULT_PRODUCER).addVariants(type, result);
+        return result;
     }
 
-    private static void registerRange(String name, int start, int end) {
+    private void registerRange(String name, int start, int end) {
         register(name, new StandardVariantRange(start, end));
     }
 
-    private static void register(String name, VariantProducer producer) {
+    private void register(String name, VariantProducer producer) {
         for (Material m : MaterialsByName.getAllMaterials()) {
             if (m.name().equals(name)) {
                 variants.put(m, producer);
@@ -130,5 +133,4 @@ public class ItemVariants_pre_1_12_1 {
             }
         }
     }
-
 }
