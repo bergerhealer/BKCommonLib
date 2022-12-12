@@ -33,7 +33,12 @@ class World extends IBlockAccess {
     public boolean keepSpawnInMemory;
 
     public void method_profiler_begin(String label) {
-#if version >= 1.18
+#if version >= 1.19
+        net.minecraft.util.profiling.GameProfilerFiller profiler = instance.getProfiler();
+        if (profiler != null) {
+            profiler.push(label);
+        }
+#elseif version >= 1.18
         instance.getProfiler().push(label);
 #elseif version >= 1.14
         instance.getMethodProfiler().enter(label);
@@ -45,7 +50,12 @@ class World extends IBlockAccess {
     }
 
     public void method_profiler_end() {
-#if version >= 1.18
+#if version >= 1.19
+        net.minecraft.util.profiling.GameProfilerFiller profiler = instance.getProfiler();
+        if (profiler != null) {
+            profiler.pop();
+        }
+#elseif version >= 1.18
         instance.getProfiler().pop();
 #elseif version >= 1.14
         instance.getMethodProfiler().exit();
