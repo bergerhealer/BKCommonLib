@@ -119,6 +119,12 @@ public class CommonPlugin extends PluginBase {
     private boolean trackForcedChunkCreationStack = false;
 
     public CommonPlugin() {
+        // Before proceeding, make sure the jar file isn't lacking required stuff
+        // If it lacks stuff, throw an error here. This prevents anything more of BKCommonLib from being loaded.
+        if (!CommonBootstrap.verifyShadedAssets(getLogger())) {
+            throw new IllegalStateException("BKCommonLib jar is corrupt! Please redownload.");
+        }
+
         // Initialize thread pool, might be used pretty early on...
         // The IO worker is shut down if no IO occurs for 60 seconds
         // Up to 3 concurrent IO workers can be active at once.

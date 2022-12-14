@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.bukkit.Bukkit;
 
@@ -52,9 +53,11 @@ public class CommonBootstrap {
     private static boolean _hasInitTemplates = false;
     private static boolean _hasInitTestServer = false;
     private static boolean _isSpigotServer = false;
+    private static boolean _isPaperServer = false;
+    private static boolean _isPurpurServer = false;
     private static CommonServer _commonServer = null;
     private static boolean _isInitializingCommonServer = false;
-    private static TemplateResolver _templateResolver = new TemplateResolver();
+    private static TemplateResolver _templateResolver;
     private static boolean _isCompatible = false;
     private static String _incompatibleReason = null;
 
@@ -77,6 +80,48 @@ public class CommonBootstrap {
     public static boolean isSpigotServer() {
         initCommonServer();
         return _isSpigotServer;
+    }
+
+    /**
+     * Gets whether the server we are currently running on is a PaperMC server
+     *
+     * @return True if the current server is a PaperMC server
+     */
+    public static boolean isPaperServer() {
+        initCommonServer();
+        return _isPaperServer;
+    }
+
+    /**
+     * Gets whether the server we are currently running on is a Purpur-based server
+     *
+     * @return True if the current server is a Purpur-based server
+     */
+    public static boolean isPurpurServer() {
+        initCommonServer();
+        return _isPurpurServer;
+    }
+
+    /**
+     * Verifies that everything BKCommonLib needs is available in the jar right now.
+     * If running an unshaded jar or the jar file was partially downloaded, this will
+     * fail early and clearly to indicate so.
+     *
+     * @Param logger Logger to log any errors to
+     * @return True if shaded assets are valid, false if not
+     */
+    public static boolean verifyShadedAssets(Logger logger) {
+        // If MountiplexUtil isn't available, we're running an unshaded jar, and there's no hope of enabling
+        try {
+            Class.forName("com.bergerkiller.mountiplex.MountiplexUtil");
+        } catch (ClassNotFoundException e) {
+            logger.log(Level.SEVERE, "BKCommonLib jar lacks required shaded dependencies. Please redownload the correct jar!");
+            logger.log(Level.SEVERE, "If your BKCommonLib.jar is less than 5 MB then you probably downloaded the wrong file.");
+            logger.log(Level.SEVERE, "If using a FTP client, make sure the file is fully transferred to the server.");
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -116,6 +161,9 @@ public class CommonBootstrap {
             if (_isInitializingCommonServer) {
                 throw new UnsupportedOperationException("CommonServer is already being initialized. Fix your code!");
             }
+
+            // Now we know Mountiplex exists, start loading template stuff
+            _templateResolver = new TemplateResolver();
 
             // Some common packages we KNOW for a fact are packages, and never ever should not be
             // If some plugin decides to include such a package name as a Class, we reject it.
@@ -199,6 +247,8 @@ public class CommonBootstrap {
                 _isCompatible = event.isCompatible();
                 _incompatibleReason = event.getIncompatibleReason();
                 _isSpigotServer = (_commonServer instanceof SpigotServer);
+                _isPaperServer = (_commonServer instanceof SpigotServer && ((SpigotServer) _commonServer).isPaperSpigot());
+                _isPurpurServer = (_commonServer instanceof PurpurServer);
             } finally {
                 _isInitializingCommonServer = false;
             }
