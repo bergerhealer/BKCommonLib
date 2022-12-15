@@ -15,6 +15,9 @@ class RegionFile {
     }
 #elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public void close()
     public void closeStream:close();
+#elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public void closeFile()
+    // WineSpigot
+    public void closeStream:closeFile();
 #else
     public void closeStream:c();
 #endif
@@ -31,6 +34,9 @@ class RegionFile {
     public boolean chunkExists(int cx, int cz) {
         return instance.d(new ChunkCoordIntPair(cx, cz));
     }
+#elseif methodexists net.minecraft.world.level.chunk.storage.RegionFile public boolean chunkExists(int x, int z);
+    // WineSpigot
+    public boolean chunkExists(int cx, int cz);
 #elseif version >= 1.13
     #if pre <= 7
         public boolean chunkExists:c(int cx, int cz);

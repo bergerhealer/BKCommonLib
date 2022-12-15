@@ -4,7 +4,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import org.bukkit.Chunk;
 import org.bukkit.entity.Player;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.server.level.PlayerChunk</b>.
@@ -26,7 +26,7 @@ public abstract class PlayerChunkHandle extends Template.Handle {
     public abstract PlayerChunkMapHandle getPlayerChunkMap();
     public abstract boolean resendChunk();
     public abstract boolean resendAllLighting();
-    public abstract List<Player> getPlayers();
+    public abstract Collection<Player> getPlayers();
     public abstract Chunk getChunkIfLoaded();
     public abstract IntVector2 getLocation();
     public abstract void setLocation(IntVector2 value);
@@ -40,7 +40,7 @@ public abstract class PlayerChunkHandle extends Template.Handle {
         public final Template.Method.Converted<PlayerChunkMapHandle> getPlayerChunkMap = new Template.Method.Converted<PlayerChunkMapHandle>();
         public final Template.Method<Boolean> resendChunk = new Template.Method<Boolean>();
         public final Template.Method<Boolean> resendAllLighting = new Template.Method<Boolean>();
-        public final Template.Method.Converted<List<Player>> getPlayers = new Template.Method.Converted<List<Player>>();
+        public final Template.Method.Converted<Collection<Player>> getPlayers = new Template.Method.Converted<Collection<Player>>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
 
     }

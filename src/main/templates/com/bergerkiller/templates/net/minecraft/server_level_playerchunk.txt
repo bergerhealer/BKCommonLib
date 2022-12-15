@@ -97,7 +97,7 @@ class PlayerChunk {
         }
 #endif
 
-        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
@@ -155,7 +155,7 @@ class PlayerChunk {
         }
 
         // Check there are players to receive data at all
-        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
@@ -214,7 +214,7 @@ class PlayerChunk {
         }
 
         // Check there are players to receive data at all
-        List players = (List) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
+        Collection players = (Collection) ((com.bergerkiller.mountiplex.reflection.declarations.Template$Method) PlayerChunkHandle.T.getPlayers.raw).invoke(instance);
         if (players.isEmpty()) {
             return false;
         }
@@ -245,23 +245,23 @@ class PlayerChunk {
 #endif
 
 #if version >= 1.18
-    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
         return instance.playerProvider.getPlayers(instance.getPos(), false);
     }
 #elseif version >= 1.17
-    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
         return instance.playerProvider.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }
 #elseif version >= 1.14.3
-    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
         return instance.players.a(instance.i(), false).collect(java.util.stream.Collectors.toList());
     }
 #elseif version >= 1.14
-    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
         return instance.players.a(instance.h(), false).collect(java.util.stream.Collectors.toList());
     }
 #else
-    public (List<org.bukkit.entity.Player>) List<EntityPlayer> getPlayers() {
+    public (Collection<org.bukkit.entity.Player>) Collection<EntityPlayer> getPlayers() {
         // Require the player list field
 #if version >= 1.9
   #if fieldexists net.minecraft.server.level.PlayerChunk public final List<EntityPlayer> players
@@ -270,7 +270,12 @@ class PlayerChunk {
         #require net.minecraft.server.level.PlayerChunk public final List<EntityPlayer> pc_playersField:c;
   #endif
 #else
+  #if fieldexists  net.minecraft.server.level.PlayerChunk private final Set<EntityPlayer> b;
+        // WineSpigot
+        #require net.minecraft.server.level.PlayerChunk private final Set<EntityPlayer> pc_playersField:b;
+  #else
         #require net.minecraft.server.level.PlayerChunk private final List<EntityPlayer> pc_playersField:b;
+  #endif
 #endif
         return instance#pc_playersField;
     }
