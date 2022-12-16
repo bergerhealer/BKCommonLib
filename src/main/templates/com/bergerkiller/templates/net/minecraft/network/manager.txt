@@ -56,7 +56,7 @@ class NetworkManager {
         synchronized (queue) {
             queue.add(queuedPacket);
         }
-  #elseif version >= 1.8.3
+  #elseif version >= 1.8.3 && exists net.minecraft.network.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock j;
         // Uses ReentrantReadWriteLock
         #require net.minecraft.network.NetworkManager private final java.util.concurrent.locks.ReentrantReadWriteLock packetQueueRWLock:j;
         java.util.concurrent.locks.ReentrantReadWriteLock lock = networkManager#packetQueueRWLock;
@@ -68,6 +68,7 @@ class NetworkManager {
         }
   #else
         // No lock at all (relies on concurrent queue logic)
+        // Also used on 1.8.8 PandaSpigot
         queue.add(queuedPacket);
   #endif
         return true;
