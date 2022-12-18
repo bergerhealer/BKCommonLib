@@ -512,11 +512,28 @@ public class YamlSerializer {
         }
 
         // Only alphanumeric characters permitted
+        boolean hasDigits = false;
+        boolean hasSpecial = false;
+        boolean hasLetters = false;
         for (; i != len; c = str.charAt(i++)) {
-            if (c >= 'a' && c <= 'z') continue;
-            if (c >= 'A' && c <= 'Z') continue;
-            if (c == '_' || c == '-') continue;
-            if (isKey && c >= '0' && c <= '9') continue;
+            if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
+                hasLetters = true;
+                continue;
+            }
+            if (c == '_' || c == '-') {
+                hasSpecial = true;
+                continue;
+            }
+            if (isKey && c >= '0' && c <= '9') {
+                hasDigits = true;
+                continue;
+            }
+            return false;
+        }
+
+        // Prevent 1_000_000 being written as-is, as YAML decodes it as an int number
+        // This caused problems when someone had a '1_18_2' name. It must be escaped
+        if (hasSpecial && !hasLetters && hasDigits) {
             return false;
         }
 
