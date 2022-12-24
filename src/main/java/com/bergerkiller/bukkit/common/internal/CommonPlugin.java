@@ -632,6 +632,7 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("preloadTemplateClasses", "This reveals any at-runtime server incompatibility errors early on and eliminates any");
         config.addHeader("preloadTemplateClasses", "at-runtime lazy initialization lag. It does cause a lot of classes to be loaded into the");
         config.addHeader("preloadTemplateClasses", "JVM that may never get used, which wastes memory. Only enable this for debugging reasons!");
+        config.addHeader("preloadTemplateClasses", "As loading is done on all CPU cores, this might improve boot performance on multi-core systems");
         final boolean preloadTemplateClasses = config.get("preloadTemplateClasses", false);
         config.setHeader("trackForcedChunkCreationStack", "\nWhether to track the stack trace of where forced chunks are created");
         config.addHeader("trackForcedChunkCreationStack", "This is useful to detect ForcedChunk instances that are not closed by the developer.");

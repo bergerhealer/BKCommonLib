@@ -8,6 +8,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -125,18 +126,43 @@ class CommonClasses {
             return;
         }
 
-        for (String className : classNames) {
-            try {
-                Class<?> templateClass = Class.forName(className, true, CommonClasses.class.getClassLoader());
-                if (Template.Handle.class.isAssignableFrom(templateClass)) {
+        classNames.parallelStream()
+            .map(className -> {
+                try {
+                    // Note: initialize=false, as otherwise it might end up registering converters during
+                    // Class.forName(), which is a synchronized lock. It causes a lot of problems.
+                    Class<?> templateClass = Class.forName(className, false, CommonClasses.class.getClassLoader());
+                    if (Template.Handle.class.isAssignableFrom(templateClass)) {
+                        return templateClass;
+                    }
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to load class " + className, t);
+                    return null;
+                }
+                return null;
+            })
+            .filter(Objects::nonNull)
+            .sequential()
+            .map(templateClass -> {
+                try {
+                    // This causes <cinit> to fire, must be done sequentially to avoid deadlocks
                     Field templateClassInstanceField = templateClass.getDeclaredField("T");
                     Template.Class<?> cls = (Template.Class<?>) templateClassInstanceField.get(null);
-                    cls.forceInitialization();
+                    return cls;
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to load template " + templateClass.getName(), t);
                 }
-            } catch (Throwable t) {
-                Logging.LOGGER.log(Level.SEVERE, "Failed to initialize " + className, t);
-            }
-        }
+                return null;
+            })
+            .parallel()
+            .filter(Objects::nonNull)
+            .forEach(cls -> {
+                try {
+                    cls.forceInitialization();
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.SEVERE, "Failed to initialize " + cls.getHandleType(), t);
+                }
+            });
     }
 
     public static void initializeLogicClasses(Logger logger) {
