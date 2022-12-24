@@ -7,6 +7,7 @@ import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.TypedValue;
+import com.bergerkiller.bukkit.common.bases.CheckedRunnable;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
 import com.bergerkiller.bukkit.common.collections.ImplicitlySharedSet;
 import com.bergerkiller.bukkit.common.collections.ObjectCache;
@@ -73,6 +74,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -151,6 +153,15 @@ public class CommonPlugin extends PluginBase {
             throw new RuntimeException("BKCommonLib is not enabled - Plugin Instance can not be obtained! (disjointed Class state?)");
         }
         return instance;
+    }
+
+    public static CompletableFuture<Void> runIOTaskAsync(CheckedRunnable runnable) {
+        CommonPlugin instance = CommonPlugin.instance;
+        if (instance != null) {
+            return CommonUtil.runCheckedAsync(runnable, instance.getFileIOExecutor());
+        } else {
+            return CommonUtil.runCheckedAsync(runnable); // Unit test or late write - use java's own threadpool
+        }
     }
 
     public void registerMap(EntityMap map) {

@@ -10,12 +10,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import com.bergerkiller.bukkit.common.Logging;
+import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
@@ -105,10 +112,8 @@ public class MojangMappings {
             this.fields_obfuscated_to_name.put(obfuscatedName, mojangName);
         }
 
-        public void addMethod(String obfuscatedName, String mojangName,
-                ClassSignature returnType, List<ClassSignature> parameterTypes
-        ) {
-            this.methods.add(new MethodSignature(this, mojangName, obfuscatedName, returnType, parameterTypes));
+        public void addMethod(MethodSignature methodSig) {
+            this.methods.add(methodSig);
         }
     }
 
@@ -319,7 +324,7 @@ public class MojangMappings {
      * Stores ClassSignature by class name in a cache to avoid creating too many of them
      */
     private static class ClassSignatureCache {
-        private final Map<String, ClassSignature> cache = new HashMap<>();
+        private final Map<String, ClassSignature> cache = new ConcurrentHashMap<>();
         private final Function<String, String> nameTranslator;
 
         public ClassSignatureCache() {
@@ -393,9 +398,12 @@ public class MojangMappings {
         private final ClassSignatureCache classSigCache = new ClassSignatureCache();
 
         public MojangMappings parse(java.io.BufferedReader reader) throws IOException {
+            AsyncLineReader lineReader = new AsyncLineReader(reader);
+            lineReader.start();
+
             ClassMappings currClassMappings = null;
             List<PendingMethod> pendingMethods = new ArrayList<>();
-            for (String line; (line = reader.readLine()) != null; ) {
+            for (String line; (line = lineReader.readLine()) != null; ) {
                 // Skip comments
                 if (line.startsWith("#")) {
                     continue;
@@ -445,7 +453,10 @@ public class MojangMappings {
 
             // After having parsed the entire file and knowing what class name remappings exist,
             // process all the methods. The argument type remapping logic depends on this.
-            pendingMethods.forEach(this::processMethod);
+            pendingMethods.stream()
+                .parallel()
+                .map(m -> m.makeSignature(classSigCache))
+                .forEachOrdered(s -> s.declaring.addMethod(s));
 
             return result;
         }
@@ -467,20 +478,6 @@ public class MojangMappings {
             classMappings.addField(obfuscatedName, mojangName);
         }
 
-        private void processMethod(PendingMethod method) {
-            // Translate the return type if it refers to an obfuscated name
-            ClassSignature returnType = this.classSigCache.get(method.returnTypeName);
-
-            // Translate the argument types if they refer to obfuscated names
-            List<ClassSignature> params = new ArrayList<ClassSignature>(method.paramTypeNames.length);
-            for (String paramTypeName : method.paramTypeNames) {
-                params.add(this.classSigCache.get(paramTypeName));
-            }
-
-            // Add
-            method.classMappings.addMethod(method.obfuscatedName, method.mojangName, returnType, params);
-        }
-
         private static final class PendingMethod {
             public final ClassMappings classMappings;
             public final String obfuscatedName;
@@ -500,6 +497,65 @@ public class MojangMappings {
                 } else {
                     this.paramTypeNames = fullArgsStr.split(",", -1);
                 }
+            }
+
+            public MethodSignature makeSignature(ClassSignatureCache signatureCache) {
+                // Translate the return type if it refers to an obfuscated name
+                ClassSignature returnType = signatureCache.get(returnTypeName);
+
+                // Translate the argument types if they refer to obfuscated names
+                List<ClassSignature> params = new ArrayList<ClassSignature>(paramTypeNames.length);
+                for (String paramTypeName : paramTypeNames) {
+                    params.add(signatureCache.get(paramTypeName));
+                }
+
+                return new MethodSignature(classMappings, mojangName, obfuscatedName, returnType, params);
+            }
+        }
+
+        private static final class AsyncLineReader {
+            private static final String STOP_SIGNAL = "MAPPINGS_DONE_READING";
+            private final java.io.BufferedReader reader;
+            private CompletableFuture<Void> readerFuture;
+            private final BlockingQueue<String> pending = new LinkedBlockingDeque<>();
+
+            public AsyncLineReader(java.io.BufferedReader reader) {
+                this.reader = reader;
+            }
+
+            public String readLine() throws IOException {
+                try {
+                    String line = pending.poll(1000, TimeUnit.MILLISECONDS);
+                    if (line == STOP_SIGNAL) {
+                        try {
+                            readerFuture.join();
+                        } catch (CompletionException ex) {
+                            if (ex.getCause() instanceof IOException) {
+                                throw (IOException) ex.getCause();
+                            } else {
+                                throw ex; // meh
+                            }
+                        }
+                        return null;
+                    } else {
+                        return line;
+                    }
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException("Read interrupted");
+                }
+            }
+
+            public void start() {
+                readerFuture = CommonPlugin.runIOTaskAsync(() -> {
+                    BlockingQueue<String> pending = this.pending;
+                    try {
+                        for (String line; (line = reader.readLine()) != null; ) {
+                            pending.offer(line, 1000, TimeUnit.MILLISECONDS);
+                        }
+                    } finally {
+                        pending.offer(STOP_SIGNAL); // Ends it
+                    }
+                });
             }
         }
     }

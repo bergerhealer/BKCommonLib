@@ -12,9 +12,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-import com.bergerkiller.bukkit.common.bases.CheckedRunnable;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 
 /**
@@ -115,7 +113,7 @@ public class AsyncTextWriter {
                 // Done!
                 return CompletableFuture.completedFuture(null);
             } else {
-                return runIOTaskAsync(() -> {
+                return CommonPlugin.runIOTaskAsync(() -> {
                     // Pick an appropriate buffer size. We don't need a large buffer for small amounts of text.
                     // Use size that is a power of 2 because it might be more performant
                     int bufferSize = 512;
@@ -177,14 +175,6 @@ public class AsyncTextWriter {
             CompletableFuture<Void> future = new CompletableFuture<Void>();
             future.completeExceptionally(t);
             return future;
-        }
-    }
-
-    private static CompletableFuture<Void> runIOTaskAsync(CheckedRunnable runnable) {
-        if (CommonPlugin.hasInstance()) {
-            return CommonUtil.runCheckedAsync(runnable, CommonPlugin.getInstance().getFileIOExecutor());
-        } else {
-            return CommonUtil.runCheckedAsync(runnable); // Unit test or late write - use java's own threadpool
         }
     }
 }
