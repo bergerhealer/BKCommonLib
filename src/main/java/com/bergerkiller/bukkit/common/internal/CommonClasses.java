@@ -129,11 +129,12 @@ class CommonClasses {
         classNames.parallelStream()
             .map(className -> {
                 try {
-                    // Note: initialize=false, as otherwise it might end up registering converters during
-                    // Class.forName(), which is a synchronized lock. It causes a lot of problems.
-                    Class<?> templateClass = Class.forName(className, false, CommonClasses.class.getClassLoader());
+                    // The below code loads the class and calls the static initializer on it
+                    Class<?> templateClass = Class.forName(className, true, CommonClasses.class.getClassLoader());
                     if (Template.Handle.class.isAssignableFrom(templateClass)) {
-                        return templateClass;
+                        Field templateClassInstanceField = templateClass.getDeclaredField("T");
+                        Template.Class<?> cls = (Template.Class<?>) templateClassInstanceField.get(null);
+                        return cls;
                     }
                 } catch (Throwable t) {
                     Logging.LOGGER.log(Level.SEVERE, "Failed to load class " + className, t);
@@ -141,20 +142,6 @@ class CommonClasses {
                 }
                 return null;
             })
-            .filter(Objects::nonNull)
-            .sequential()
-            .map(templateClass -> {
-                try {
-                    // This causes <cinit> to fire, must be done sequentially to avoid deadlocks
-                    Field templateClassInstanceField = templateClass.getDeclaredField("T");
-                    Template.Class<?> cls = (Template.Class<?>) templateClassInstanceField.get(null);
-                    return cls;
-                } catch (Throwable t) {
-                    Logging.LOGGER.log(Level.SEVERE, "Failed to load template " + templateClass.getName(), t);
-                }
-                return null;
-            })
-            .parallel()
             .filter(Objects::nonNull)
             .forEach(cls -> {
                 try {
