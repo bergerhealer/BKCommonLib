@@ -8,6 +8,7 @@ import org.bukkit.Color;
 import org.bukkit.inventory.ItemStack;
 import org.junit.Test;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.resources.ParticleType;
 import com.bergerkiller.bukkit.common.resources.ParticleType.BlockPositionOption;
 import com.bergerkiller.bukkit.common.resources.ParticleType.EntityByIdPositionOption;
@@ -47,8 +48,11 @@ public class ParticleTypeTest {
                     BlockPositionOption.create(1, 2, 3), BlockPositionOption.create(4, 5, 6), 20));
             packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
                     BlockPositionOption.create(1, 2, 3), EntityByIdPositionOption.create(5, 2.0f), 20));
-            packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
-                    BlockPositionOption.create(1, 2, 3), EntityByUUIDPositionOption.create(UUID.randomUUID(), 2.0f), 20));
+
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.19")) {
+                packet.setParticle(ParticleType.VIBRATION, ParticleType.VibrationOptions.create(
+                        BlockPositionOption.create(1, 2, 3), EntityByUUIDPositionOption.create(UUID.randomUUID(), 2.0f), 20));
+            }
             assertEquals(ParticleType.VIBRATION, packet.getParticleType());
         }
 
