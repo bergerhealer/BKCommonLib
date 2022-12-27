@@ -25,6 +25,7 @@ import static com.bergerkiller.bukkit.common.conversion.Conversion.*;
 
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.nbt.CommonTag;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.nbt.CommonTagList;
@@ -45,6 +46,12 @@ import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.reflection.declarations.TypeDeclaration;
 
 public class DuplexConversion {
+    static {
+        if (!CommonBootstrap.isCommonServerInitialized()) {
+            throw new IllegalStateException("CommonBootstrap must be bootstrapped before duplex conversion can be used");
+        }
+    }
+
     @SuppressWarnings({"rawtypes"})
     public static final DuplexConverter NONE = DuplexConverter.createNull(TypeDeclaration.OBJECT);
 

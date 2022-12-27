@@ -125,6 +125,15 @@ public class CommonBootstrap {
     }
 
     /**
+     * Gets whether bootstrapping has completed and CommonServer/templates/resolvers/converters are initialized.
+     *
+     * @return True if common server is initialized
+     */
+    public static boolean isCommonServerInitialized() {
+        return _commonServer != null && _isCompatible;
+    }
+
+    /**
      * Calls {@link #initCommonServer()} to detect the common server implementation
      * that is used, and returns whether that server is compatible or not. if an
      * exception is preferred, use {@link #initCommonServerAssertCompatibility()}

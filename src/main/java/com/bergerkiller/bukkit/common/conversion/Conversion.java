@@ -32,7 +32,9 @@ import java.util.UUID;
 
 public class Conversion {
     static {
-        CommonBootstrap.initCommonServer();
+        if (!CommonBootstrap.isCommonServerInitialized()) {
+            throw new IllegalStateException("CommonBootstrap must be bootstrapped before conversion can be used");
+        }
     }
 
     // Misc
