@@ -18,7 +18,6 @@ import org.bukkit.inventory.ItemStack;
  * designated for invalid (or failed-to-parse) Item Parsers.
  */
 public class ItemParser {
-
     public static final char METADATA_CHAR = '$';
     public static final char STACK_MULTIPLIER = '^';
     public static final char[] MULTIPLIER_SIGNS = {'x', 'X', '*', ' ', '@', STACK_MULTIPLIER};

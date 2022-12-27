@@ -4,6 +4,7 @@ import com.bergerkiller.bukkit.common.StringReplaceBundle;
 import com.bergerkiller.bukkit.common.collections.StringMap;
 import com.bergerkiller.bukkit.common.collections.StringMapCaseInsensitive;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonLegacyMaterials;
 import com.bergerkiller.bukkit.common.internal.legacy.MaterialsByName;
@@ -24,6 +25,9 @@ public class ParseUtil {
     private static final StringMapCaseInsensitive<Boolean> BOOL_NAME_MAP = new StringMapCaseInsensitive<>();
 
     static {
+        // Most converters down below rely on this
+        CommonBootstrap.initCommonServerAssertCompatibility();
+
         // Boolean representing text values
         for (String trueValue : new String[]{"yes", "allow", "allowed", "true", "ye", "y", "t", "on", "enabled", "enable"}) {
             BOOL_NAME_MAP.put(trueValue, Boolean.TRUE);
@@ -480,7 +484,7 @@ public class ParseUtil {
                 }
                 return def;
             } else {
-                MaterialData dat = BlockData.fromMaterialData(material, 0).getMaterialData();
+                MaterialData dat = BlockData.fromMaterialData(material, 0).newMaterialData();
                 if (dat instanceof TexturedMaterial) {
                     TexturedMaterial tdat = (TexturedMaterial) dat;
                     Material mat = parseMaterial(text, null);
