@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common.server.test;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.util.concurrent.Executor;
 
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -160,6 +161,14 @@ public abstract class TestServerFactory {
         FastMethod<Object> m = new FastMethod<Object>();
         m.init(dec);
         return m;
+    }
+
+    protected static Executor newThreadExecutor() {
+        return runnable -> {
+            Thread t = new Thread(runnable, "TestServerWorkerThread");
+            t.setDaemon(true);
+            t.start();
+        };
     }
 
     protected static Object construct(Class<?> type, Object... parameters) {

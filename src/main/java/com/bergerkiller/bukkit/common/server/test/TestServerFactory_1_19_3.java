@@ -10,7 +10,6 @@ import java.util.concurrent.Executor;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
-import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
@@ -237,7 +236,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
          *         CommandDispatcher.ServerType.DEDICATED,
          *         2, //dedicatedserversettings.getProperties().functionPermissionLevel,
          *         SystemUtils.f(),
-         *         Runnable::run);
+         *         newThreadExecutor());
          */
         CompletableFuture<Object> futureDPLoaded;
         {
@@ -248,7 +247,7 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             int functionPermissionLevel = 2;
             Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
                     "bootstrapExecutor").invoke(null);
-            Executor executor2 = Runnable::run;
+            Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
             Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
                     Class.forName("net.minecraft.server.packs.resources.IResourceManager"),

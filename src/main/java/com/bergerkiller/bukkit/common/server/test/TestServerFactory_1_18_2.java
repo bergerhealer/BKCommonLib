@@ -78,7 +78,7 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
          *         CommandDispatcher.ServerType.DEDICATED,
          *         2, //dedicatedserversettings.getProperties().functionPermissionLevel,
          *         SystemUtils.f(),
-         *         Runnable::run);
+         *         newThreadExecutor());
          */
         CompletableFuture<Object> futureDPLoaded;
         {
@@ -87,7 +87,7 @@ class TestServerFactory_1_18_2 extends TestServerFactory_1_18 {
             int functionPermissionLevel = 2;
             Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
                     "bootstrapExecutor").invoke(null);
-            Executor executor2 = Runnable::run;
+            Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
             Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
                     Class.forName("net.minecraft.server.packs.resources.IResourceManager"),
