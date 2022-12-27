@@ -28,6 +28,7 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
 import com.bergerkiller.mountiplex.reflection.SafeMethod;
 import com.bergerkiller.mountiplex.reflection.declarations.ClassResolver;
 import com.bergerkiller.mountiplex.reflection.declarations.MethodDeclaration;
+import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
 
 /**
@@ -58,16 +59,16 @@ public class IBlockDataToMaterialData {
         // Used on MC 1.13 and onwards for legacy conversions
         Map<Object, MaterialData> iblockdataToMaterialdata_map = Collections.emptyMap();
         if (CommonCapabilities.MATERIAL_ENUM_CHANGES) {
-            Class<?> craftLegacyClass = CommonUtil.getClass("org.bukkit.craftbukkit.legacy.CraftLegacy");
-            if (craftLegacyClass != null) {
-                try {
-                    java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
-                    f.setAccessible(true);
-                    iblockdataToMaterialdata_map = CommonUtil.unsafeCast(f.get(null));
-                    f.setAccessible(false);
-                } catch (Throwable t) {
-                    Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize CraftLegacy dataToMaterial", t);
-                }
+            try {
+                Class<?> craftLegacyClass = Class.forName(Resolver.resolveClassPath("org.bukkit.craftbukkit.legacy.CraftLegacy"),
+                        true, IBlockDataToMaterialData.class.getClassLoader());
+
+                java.lang.reflect.Field f = craftLegacyClass.getDeclaredField("dataToMaterial");
+                f.setAccessible(true);
+                iblockdataToMaterialdata_map = CommonUtil.unsafeCast(f.get(null));
+                f.setAccessible(false);
+            } catch (Throwable t) {
+                Logging.LOGGER_REFLECTION.log(Level.SEVERE, "Failed to initialize CraftLegacy dataToMaterial", t);
             }
         }
         INTERNAL_IBLOCKDATA_TO_MATERIALDATA.putAll(iblockdataToMaterialdata_map);
