@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.map.color;
 
 import java.awt.Color;
+import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -8,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.IntPredicate;
 import java.util.logging.Level;
 import java.util.stream.IntStream;
 import java.util.zip.Deflater;
@@ -60,7 +62,7 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
     }
 
     public void readFrom(InputStream stream) throws IOException {
-        BitInputStream bitStream = new BitInputStream(new InflaterInputStream(stream));
+        BitInputStream bitStream = new BitInputStream(new BufferedInputStream(new InflaterInputStream(stream)));
         try {
             // Read all color RGB values
             for (int i = 0; i < 256; i++) {
@@ -352,61 +354,117 @@ public class MCSDBubbleFormat extends MapColorSpaceData {
     }
 
     private void spreadColors() {
-        final boolean[] all_strands = new boolean[1 << 24];
-        for (int z = 0; z < 256; z++) {
-            System.arraycopy(this.strands[z], 0, all_strands, z << 16, 1 << 16);
-        }
-
-        boolean mode = false;
-        boolean hasChanges;
-        do {
-            hasChanges = false;
-
-            // Alternate the direction in which we process every step
-            // This prevents really slow filling when the direction is 'wrong'
-            // The below logic is partially based on the light fixing algorithm in Light Cleaner
-            final int index_end, index_delta;
-            int index;
-            byte color;
-            if (mode = !mode) {
-                index_delta = 1;
-                index = 0;
-                index_end = (1 << 24);
-            } else {
-                index_delta = -1;
-                index = (1 << 24) - 1;
-                index_end = 0;
-            }
-            do {
-                if (!all_strands[index]) {
-                    all_strands[index] = true;
-
-                    if ((index & 0xFF) < 0xFF) {
-                        if ((color = this.get(index + 1)) != 0) {
-                            this.set(index, color);
-                            hasChanges = true;
-                        } else if ((color = this.get(index)) != 0) {
-                            this.set(index + 1, color);
-                            hasChanges = true;
-                        } else {
-                            all_strands[index] = false; // retry
-                        }
-                    }
-
-                    if ((index & 0xFF00) < 0xFF00) {
-                        if ((color = this.get(index + 256)) != 0) {
-                            this.set(index, color);
-                            hasChanges = true;
-                        } else if ((color = this.get(index)) != 0) {
-                            this.set(index + 256, color);
-                            hasChanges = true;
-                        } else {
-                            all_strands[index] = false; // retry
-                        }
+        // As we'll be processing pretty much every element, allocate the full space (60MB)
+        // The range of the buffer we process shrinks as we spread
+        StrandBuffer buf;
+        {
+            final int[] buffer = new int[1 << 24];
+            int count = -1;
+            for (int z = 0; z < 256; z++) {
+                boolean[] layerStrands = this.strands[z];
+                int indexOffset = z << 16;
+                for (int i = 0; i < (1 << 16); i++) {
+                    if (!layerStrands[i]) {
+                        buffer[++count] = indexOffset + i;
                     }
                 }
-            } while ((index += index_delta) != index_end);
-        } while (hasChanges);
+            }
+            count++;
+            buf = new StrandBuffer(buffer, count);
+        }
+
+        // Process all until no more changes remain
+        buf.process(index -> {
+            byte color;
+
+            boolean col = ((index & 0xFF) < 0xFF);
+            boolean row = ((index & 0xFF00) < 0xFF00);
+
+            if (col && row) {
+                if ((color = this.get(index)) != 0) {
+                    this.set(index + 1, color);
+                    this.set(index + 256, color);
+                    return true;
+                } else if ((color = this.get(index + 1)) != 0) {
+                    this.set(index, color);
+                    this.set(index + 256, color);
+                    return true;
+                } else if ((color = this.get(index + 256)) != 0) {
+                    this.set(index, color);
+                    this.set(index + 1, color);
+                    return true;
+                }
+            } else if (col) {
+                if ((color = this.get(index)) != 0) {
+                    this.set(index + 1, color);
+                    return true;
+                } else if ((color = this.get(index + 1)) != 0) {
+                    this.set(index, color);
+                    return true;
+                }
+            } else if (row) {
+                if ((color = this.get(index)) != 0) {
+                    this.set(index + 256, color);
+                    return true;
+                } else if ((color = this.get(index + 256)) != 0) {
+                    this.set(index, color);
+                    return true;
+                }
+            }
+
+            return false;
+        });
+    }
+
+    private static class StrandBuffer {
+        private final int[] buf;
+        private int start, end;
+
+        public StrandBuffer(int[] buffer, int count) {
+            this.buf = buffer;
+            this.start = 0;
+            this.end = count - 1;
+        }
+
+        public void process(IntPredicate strandIndexProc) {
+            while (forward(strandIndexProc) && reverse(strandIndexProc)) {
+                // Process alternating over and over until there are no more changes
+            }
+        }
+
+        public boolean forward(IntPredicate strandIndexProc) {
+            int[] buf = this.buf;
+            int writeIdx = start - 1;
+            int endIdx = end;
+            boolean changed = false;
+            for (int i = start; i <= endIdx; ++i) {
+                int strandIndex = buf[i];
+                if (strandIndexProc.test(strandIndex)) {
+                    changed = true;
+                } else {
+                    buf[++writeIdx] = strandIndex;
+                }
+            }
+            this.end = writeIdx;
+            return changed;
+        }
+
+        public boolean reverse(IntPredicate strandIndexProc) {
+            int[] buf = this.buf;
+            int writeIdx = end + 1;
+            int startIdx = start;
+            boolean changed = false;
+            for (int i = end; i >= startIdx; --i) {
+                int strandIndex = buf[i];
+                if (strandIndexProc.test(strandIndex)) {
+                    changed = true;
+                } else {
+                    buf[--writeIdx] = strandIndex;
+                }
+            }
+            this.start = writeIdx;
+            return changed;
+        }
     }
 
     private MCSDWebbingCodec generateSlice(int z) {
