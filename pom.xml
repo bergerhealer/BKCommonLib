@@ -23,7 +23,7 @@
         <!-- Library versions -->
         <minecraft.version>1.19.3</minecraft.version>
         <minecraft.serverVersion>${minecraft.version}-R0.1-SNAPSHOT</minecraft.serverVersion>
-        <mountiplex.version>2.83</mountiplex.version>
+        <mountiplex.version>2.84</mountiplex.version>
         <cloud.version>1.8.0-SNAPSHOT</cloud.version>
         <regionchangetracker.version>1.2</regionchangetracker.version>
         <junit.version>4.12</junit.version>
