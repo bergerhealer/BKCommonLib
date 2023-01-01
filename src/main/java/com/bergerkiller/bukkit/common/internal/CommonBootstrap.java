@@ -200,6 +200,7 @@ public class CommonBootstrap {
                     List<CommonServer> servers = new ArrayList<>();
                     servers.add(new MohistServer());
                     servers.add(new MagmaServer());
+                    servers.add(new MagmaServerLegacy());
                     servers.add(new ArclightServer());
                     servers.add(new ArclightServerLegacy());
                     servers.add(new CatServerServer());
