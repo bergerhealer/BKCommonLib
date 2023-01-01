@@ -10,6 +10,7 @@ import net.minecraft.network.syncher.DataWatcherObject;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.network.PlayerConnection;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.WorldServer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityLiving;
 import net.minecraft.world.entity.EntityInsentient;
@@ -64,9 +65,9 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         #require net.minecraft.server.level.EntityPlayer private net.minecraft.resources.ResourceKey<net.minecraft.world.level.World> spawnDimension;
   #endif
   #if version >= 1.18
-        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().dimension();
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle()).dimension();
   #else
-        ResourceKey key = (world == null) ? World.OVERWORLD : ((org.bukkit.craftbukkit.CraftWorld) world).getHandle().getDimensionKey();
+        ResourceKey key = (world == null) ? World.OVERWORLD : ((WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle()).getDimensionKey();
   #endif
         instance#spawnDimension = key;
     }

@@ -422,7 +422,12 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
          * #endif
          * 
          * #if version >= 1.18
+         *   #if exists net.minecraft.server.level.WorldServer public static void makeObsidianPlatform(net.minecraft.server.level.WorldServer worldserver, net.minecraft.world.entity.Entity entity);
          *     WorldServer.makeObsidianPlatform(world, entityInitiator);
+         *   #else
+         *     // No-entity arg version I guess? Meh.
+         *     WorldServer.makeObsidianPlatform(world);
+         *   #endif
          * #elseif !exists net.minecraft.server.level.WorldServer public static void a(WorldServer world, net.minecraft.world.entity.Entity entity) && exists net.minecraft.server.level.WorldServer public static void a(WorldServer world)
          *     // Forge lacks an Entity parameter
          *     WorldServer.a(world);
