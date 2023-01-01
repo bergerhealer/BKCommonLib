@@ -282,13 +282,20 @@ class EntityPlayer extends net.minecraft.world.entity.player.EntityHuman {
         BlockPosition position = instance.getChunkCoordinates();
 #endif
 
-#if exists net.minecraft.server.level.EntityPlayer public void nextContainerCounter();
+#if exists net.minecraft.server.level.EntityPlayer public int nextContainerCounter();
+        int windowId = instance.nextContainerCounter();
+#elseif exists net.minecraft.server.level.EntityPlayer public int nextContainerCounterInt();
+        int windowId = instance.nextContainerCounterInt();
+#elseif exists net.minecraft.server.level.EntityPlayer public void nextContainerCounter();
         // void on forge, requires field reflection to get the counter value
         instance.nextContainerCounter();
         #require net.minecraft.server.level.EntityPlayer private int containerCounter;
         int windowId = instance#containerCounter;
 #else
-        int windowId = instance.nextContainerCounter();
+        // use #require so it logs the methods that do exist
+        #require net.minecraft.server.level.EntityPlayer public int nextContainerCounter();
+        int windowId;
+        windowId = instance#nextContainerCounter();
 #endif
 
 #if version >= 1.18

@@ -57,7 +57,10 @@ class MobSpawnerAbstract {
     public void setMobName((MinecraftKeyHandle) MinecraftKey nameKey) {
         // Set NBT directly
         instance.nextSpawnData.getEntityToSpawn().putString("id", nameKey.toString());
-        instance.spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
+
+        // Note: spawnPotentials is private on some forge servers
+        #require MobSpawnerAbstract private net.minecraft.util.random.SimpleWeightedRandomList<MobSpawnerData> spawnPotentials;
+        instance#spawnPotentials = net.minecraft.util.random.SimpleWeightedRandomList.empty();
     }
 #elseif version >= 1.17
     public (MinecraftKeyHandle) MinecraftKey getMobName() {
