@@ -8,7 +8,6 @@ import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -47,7 +46,6 @@ public abstract class WorldServerHandle extends WorldHandle {
     public abstract Object getEntityTrackerHandle();
     public abstract void setEntityTrackerHandle(Object entityTrackerHandle);
     public abstract ResourceKey<World> getDimensionKey();
-    public abstract WorldDataServerHandle getWorldData();
     public abstract Chunk getChunkIfLoaded(int cx, int cz);
     public abstract void setForceLoadedAsync(int x, int z, Plugin plugin, boolean loaded, int radius);
     public abstract Iterable<Entity> getEntities();
@@ -89,7 +87,6 @@ public abstract class WorldServerHandle extends WorldHandle {
         public final Template.Method<Object> getEntityTrackerHandle = new Template.Method<Object>();
         public final Template.Method.Converted<Void> setEntityTrackerHandle = new Template.Method.Converted<Void>();
         public final Template.Method.Converted<ResourceKey<World>> getDimensionKey = new Template.Method.Converted<ResourceKey<World>>();
-        public final Template.Method.Converted<WorldDataServerHandle> getWorldData = new Template.Method.Converted<WorldDataServerHandle>();
         public final Template.Method.Converted<Chunk> getChunkIfLoaded = new Template.Method.Converted<Chunk>();
         public final Template.Method<Void> setForceLoadedAsync = new Template.Method<Void>();
         @Template.Optional

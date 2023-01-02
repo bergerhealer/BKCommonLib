@@ -17,11 +17,11 @@ import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryH
 import com.bergerkiller.generated.net.minecraft.server.level.EntityTrackerEntryStateHandle;
 import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 import com.bergerkiller.mountiplex.MountiplexUtil;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
+import com.bergerkiller.mountiplex.reflection.util.NullInstantiator;
 import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
@@ -48,10 +48,11 @@ class EntityTypingHandler_1_14 extends EntityTypingHandler {
         {
             // Create WorldData instance by null-constructing it
             Object nmsWorldData;
+            Class<?> worldDataServerType = CommonUtil.getClass("net.minecraft.world.level.storage.WorldDataServer");
             if (Common.evaluateMCVersion(">=", "1.16")) {
-                nmsWorldData = WorldDataServerHandle.T.newInstanceNull();
+                nmsWorldData = NullInstantiator.of(worldDataServerType).create();
             } else {
-                nmsWorldData = ClassTemplate.create(WorldDataServerHandle.T.getType()).getConstructor().newInstance();
+                nmsWorldData = ClassTemplate.create(worldDataServerType).getConstructor().newInstance();
             }
 
             this._handler.initWorldServer(this.nmsWorldHandle, nmsWorldData);

@@ -1013,7 +1013,8 @@ public class WorldUtil extends ChunkUtil {
      */
     public static void setWeatherState(org.bukkit.World world, WeatherState state) {
         // reset 'clear' timer, otherwise we can not change weather!
-        CommonNMS.getHandle(world).getWorldData().setClearTimer(0);
+        // this was fixed on MC 1.16.5+ but it doesn't hurt to do anyways
+        com.bergerkiller.generated.org.bukkit.WorldHandle.T.setClearWeatherDuration.invoker.invoke(world, 0);
 
         if (state == WeatherState.CLEAR) {
             if (world.hasStorm()) {

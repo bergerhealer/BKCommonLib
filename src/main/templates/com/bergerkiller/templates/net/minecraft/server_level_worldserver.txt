@@ -10,7 +10,6 @@ import net.minecraft.world.level.ChunkCoordIntPair;
 import net.minecraft.world.level.dimension.DimensionManager;
 import net.minecraft.world.level.ForcedChunk;
 import net.minecraft.world.level.IBlockAccess;
-import net.minecraft.world.level.storage.WorldDataServer;
 import net.minecraft.world.level.World;
 import net.minecraft.world.phys.Vec3D;
 import net.minecraft.world.ticks.TickListServer;
@@ -29,7 +28,6 @@ import com.bergerkiller.generated.net.minecraft.server.level.WorldServerHandle;
 import com.bergerkiller.generated.net.minecraft.server.MinecraftServerHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.level.ForcedChunkHandle;
-import com.bergerkiller.generated.net.minecraft.world.level.storage.WorldDataServerHandle;
 
 class WorldServer extends World {
     public optional (ChunkProviderServerHandle) ChunkProviderServer field_chunkProviderServer:chunkProviderServer;
@@ -243,18 +241,6 @@ class WorldServer extends World {
         // Non-main world, get by name
         return ((org.bukkit.craftbukkit.CraftWorld) server.server.getWorld(name)).getHandle();
     }
-#endif
-
-#if version >= 1.17
-    public (WorldDataServerHandle) WorldDataServer getWorldData() {
-        return instance.serverLevelData;
-    }
-#elseif version >= 1.16
-    public (WorldDataServerHandle) WorldDataServer getWorldData() {
-        return instance.worldDataServer;
-    }
-#else
-    public (WorldDataServerHandle) WorldDataServer getWorldData();
 #endif
 
     public (org.bukkit.Chunk) Chunk getChunkIfLoaded(int cx, int cz) {

@@ -10,4 +10,22 @@ class World {
         return 0;
     }
 #endif
+
+#if version >= 1.16.5
+    public void setClearWeatherDuration(int duration);
+#else
+    public void setClearWeatherDuration(int duration) {
+        // API does not exist yet. Implement a fallback.
+        net.minecraft.world.level.World worldHandle = ((org.bukkit.craftbukkit.CraftWorld) instance).getHandle();
+        net.minecraft.world.level.storage.WorldData worldData = worldHandle.getWorldData();
+
+  #if version >= 1.16.1
+        worldData.a(duration);
+  #elseif version >= 1.13
+        worldData.g(duration);
+  #else
+        worldData.i(duration);
+  #endif
+    }
+#endif
 }

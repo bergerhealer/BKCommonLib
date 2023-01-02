@@ -102,7 +102,6 @@
 #include /net/minecraft/world/level_heightmap.txt
 #include /net/minecraft/world/level_mapicon.txt
 #include /net/minecraft/world/level_mobspawner.txt
-#include /net/minecraft/world/level_storage_worlddata.txt
 #include /net/minecraft/world/level_world.txt
 #include /net/minecraft/world/mobeffect.txt
 #include /net/minecraft/world/phys_axisalignedbb.txt
