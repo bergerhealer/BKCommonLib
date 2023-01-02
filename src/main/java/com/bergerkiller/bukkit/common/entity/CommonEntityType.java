@@ -7,8 +7,7 @@ import com.bergerkiller.bukkit.common.controller.DefaultEntityController;
 import com.bergerkiller.bukkit.common.conversion.Conversion;
 import com.bergerkiller.bukkit.common.conversion.type.HandleConversion;
 import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
-import com.bergerkiller.bukkit.common.entity.type.CommonLivingEntity;
-import com.bergerkiller.bukkit.common.entity.type.CommonMinecart;
+import com.bergerkiller.bukkit.common.entity.type.*;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.hooks.EntityHook;
@@ -16,9 +15,8 @@ import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityTypesHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.vehicle.EntityMinecartAbstractHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
 import com.bergerkiller.mountiplex.reflection.ClassTemplate;
-import com.bergerkiller.mountiplex.reflection.SafeConstructor;
-import com.bergerkiller.reflection.net.minecraft.server.NMSWorld;
 
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -27,10 +25,12 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 
+import java.lang.reflect.Constructor;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.StampedLock;
+import java.util.function.Function;
 import java.util.logging.Level;
 
 /**
@@ -57,7 +57,7 @@ public class CommonEntityType {
     public final ClassTemplate<?> nmsType;
     public final ClassTemplate<?> commonType;
     public final ClassTemplate<?> bukkitType;
-    private final SafeConstructor<?> commonConstructor;
+    private final Function<Entity, CommonEntity<?>> commonConstructor;
     private final boolean hasWorldCoordConstructor;
     public final EntityType entityType;
     public final int entityTypeId;
@@ -75,7 +75,7 @@ public class CommonEntityType {
             this.nmsType = ClassTemplate.create((Class<?>) null);
             this.commonType = ClassTemplate.create(CommonEntity.class);
             this.bukkitType = ClassTemplate.create(Entity.class);
-            this.commonConstructor = this.commonType.getConstructor(Entity.class);
+            this.commonConstructor = CommonEntity::new;
             this.hasWorldCoordConstructor = false;
             this.entityTypeId = -1;
             this.nmsEntityType = null;
@@ -172,46 +172,26 @@ public class CommonEntityType {
         // Obtain Bukkit type
         this.bukkitType = ClassTemplate.create(entityType.getEntityClass());
 
-        // Figure out some name postfix to use
-        String typeName;
-        if (nmsType != null) {
-            typeName = nmsType.getSimpleName();
-        } else if (this.bukkitType.isValid()) {
-            typeName = this.bukkitType.getType().getName();
-        } else {
-            typeName = entityType.toString();
-        }
-        if (typeName.startsWith("Entity")) {
-            typeName = typeName.substring(6);
-        }
-
         // Obtain Common class type and constructor
-        String commonTypeName = Common.COMMON_ROOT + ".entity.type.Common" + typeName;
-        Class<?> commonType = CommonUtil.getClass(commonTypeName);
+        Class<?> commonType = CommonEntity.class;
         Class<?> entityClass = this.bukkitType.getType();
-        if (commonType == null && entityClass != null) {
-            // No specifics - try to find a sub-category
-            CommonPair foundPair = null;
+        Function<Entity, CommonEntity<?>> commonConstructor = CommonEntity::new;
+        if (entityClass != null) {
             for (CommonPair pair : commonPairs) {
                 if (pair.bukkitType.isAssignableFrom(entityClass)) {
-                    foundPair = pair;
+                    commonType = pair.commonType;
+                    entityClass = pair.bukkitType;
+                    commonConstructor = pair.constructor;
                     break;
                 }
-            }
-            if (foundPair != null) {
-                commonType = foundPair.commonType;
-                entityClass = foundPair.bukkitType;
-            } else {
-                commonType = CommonEntity.class;
-                entityClass = Entity.class;
             }
         }
 
         this.nmsType = ClassTemplate.create(nmsType);
         this.commonType = ClassTemplate.create(commonType);
-        this.commonConstructor = this.commonType.getConstructor(entityClass);
+        this.commonConstructor = commonConstructor;
 
-        this.entityTypeId = EntityTypesHandle.getEntityTypeId(this.nmsType.getType());
+        this.entityTypeId = EntityTypesHandle.getEntityTypeId(nmsType);
         if (this.entityTypeId != -1) {
             byEntityTypeId.put(this.entityTypeId, this);
         }
@@ -270,7 +250,7 @@ public class CommonEntityType {
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntity(T entity) {
-        return (CommonEntity<T>) this.commonConstructor.newInstance(entity);
+        return (CommonEntity<T>) this.commonConstructor.apply(entity);
     }
 
     public <T extends Entity> CommonEntity<T> createCommonEntityNull() {
@@ -305,18 +285,18 @@ public class CommonEntityType {
         Object handle;
         if (this.hasWorldCoordConstructor) {
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {NMSWorld.T.getType(), double.class, double.class, double.class},
+                    new Class<?>[] {WorldHandle.T.getType(), double.class, double.class, double.class},
                     new Object[] { Conversion.toWorldHandle.convert(world), x, y, z });
         } else if (CommonCapabilities.ENTITY_USES_ENTITYTYPES_IN_CONSTRUCTOR) {
             if (this.nmsEntityType == null) {
                 throw new IllegalStateException("Type " + this.toString() + " cannot be constructed");
             }
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {EntityTypesHandle.T.getType(), NMSWorld.T.getType()},
+                    new Class<?>[] {EntityTypesHandle.T.getType(), WorldHandle.T.getType()},
                     new Object[] { this.nmsEntityType.getRaw(), Conversion.toWorldHandle.convert(world) });
         } else {
             handle = hook.constructInstance(this.nmsType.getType(),
-                    new Class<?>[] {NMSWorld.T.getType()},
+                    new Class<?>[] {WorldHandle.T.getType()},
                     new Object[] { Conversion.toWorldHandle.convert(world) });
         }
 
@@ -438,10 +418,30 @@ public class CommonEntityType {
     private static class CommonPair {
         public final Class<? extends Entity> bukkitType;
         public final Class<? extends CommonEntity> commonType;
+        public final Function<Entity, CommonEntity<?>> constructor;
 
-        public CommonPair(Class<? extends Entity> bukkitType, Class<? extends CommonEntity> commonType) {
+        private CommonPair(Class<? extends Entity> bukkitType, Class<? extends CommonEntity> commonType, Function<Entity, CommonEntity<?>> constructor) {
             this.bukkitType = bukkitType;
             this.commonType = commonType;
+            this.constructor = constructor;
+        }
+
+        public static <B extends Entity> CommonPair create(
+                final Class<? extends CommonEntity> commonType,
+                final Function<B, ? extends CommonEntity<?>> constructor
+        ) {
+            // Find constructor and derive bukkit type from that
+            for (Constructor<?> c : commonType.getDeclaredConstructors()) {
+                if (c.getParameterCount() == 1) {
+                    Class<?> inputType = c.getParameterTypes()[0];
+                    if (Entity.class.isAssignableFrom(inputType)) {
+                        return new CommonPair((Class<? extends Entity>) inputType, commonType,
+                                (Function<Entity, CommonEntity<?>>) constructor);
+                    }
+                }
+            }
+
+            throw new IllegalStateException("CommonType has no valid constructor: " + commonType.getSimpleName());
         }
     }
 
@@ -488,8 +488,18 @@ public class CommonEntityType {
         // Order is important, the first pair that can be used is selected
         // Since humans are living entities, they must be put before living entities
         commonPairs = new CommonPair[] {
-                new CommonPair(LivingEntity.class, CommonLivingEntity.class),
-                new CommonPair(Minecart.class, CommonMinecart.class)
+                CommonPair.create(CommonPlayer.class, CommonPlayer::new),
+                CommonPair.create(CommonMinecartChest.class, CommonMinecartChest::new),
+                CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
+                CommonPair.create(CommonMinecartFurnace.class, CommonMinecartFurnace::new),
+                CommonPair.create(CommonMinecartHopper.class, CommonMinecartHopper::new),
+                CommonPair.create(CommonMinecartMobSpawner.class, CommonMinecartMobSpawner::new),
+                CommonPair.create(CommonMinecartTNT.class, CommonMinecartTNT::new),
+                CommonPair.create(CommonMinecartRideable.class, CommonMinecartRideable::new),
+                CommonPair.create(CommonMinecartCommandBlock.class, CommonMinecartCommandBlock::new),
+                CommonPair.create(CommonItem.class, CommonItem::new),
+                CommonPair.<Minecart>create(CommonMinecart.class, CommonMinecart::new),
+                CommonPair.<LivingEntity>create(CommonLivingEntity.class, CommonLivingEntity::new)
         };
 
         // Register all entity types and verify them
