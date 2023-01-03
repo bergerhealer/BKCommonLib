@@ -131,6 +131,18 @@ class Entity {
                instance.getPassenger() != passenger;
     }
 #endif
+
+    public boolean isSeenBy(org.bukkit.entity.Player player) {
+#if version >= 1.18
+        return player.canSee(instance);
+#else
+        if (instance instanceof org.bukkit.entity.Player) {
+            return player.canSee((org.bukkit.entity.Player) instance);
+        } else {
+            return true; // No hide api for non-player entities
+        }
+#endif
+    }
 }
 
 class HumanEntity extends Entity {

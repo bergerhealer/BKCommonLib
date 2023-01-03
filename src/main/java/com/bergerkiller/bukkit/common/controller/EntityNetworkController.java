@@ -476,6 +476,9 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     }
 
     private boolean isViewable_self_or_passenger(Player viewer) {
+        if (!com.bergerkiller.generated.org.bukkit.entity.EntityHandle.T.isSeenBy.invoker.invoke(entity.getEntity(), viewer)) {
+            return false;
+        }
         if (isViewable_self(viewer)) {
             return true;
         }
