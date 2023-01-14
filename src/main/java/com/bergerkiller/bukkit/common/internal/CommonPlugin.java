@@ -432,6 +432,11 @@ public class CommonPlugin extends PluginBase {
 
     @Override
     protected void onCriticalStartupFailure(String reason) {
+        try {
+            if (CommonBootstrap.isCommonServerInitialized()) {
+                log(Level.INFO, "Failed to initialize for server " + CommonBootstrap.initCommonServer().getServerDetails());
+            }
+        } catch (Throwable t) { /* ignore */ }
         log(Level.SEVERE, "BKCommonLib and all depending plugins will now disable...");
         super.onCriticalStartupFailure(reason);
 
