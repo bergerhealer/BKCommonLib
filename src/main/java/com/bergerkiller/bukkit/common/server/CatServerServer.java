@@ -153,7 +153,7 @@ public class CatServerServer extends SpigotServer implements FieldNameResolver, 
         /*
          * <MAP_CLASS_NAME>
          * public static String mapClassName(String className) {
-         *     if (className.startsWith("net.minecraft.server.")) {
+         *     if (className.startsWith("net.minecraft.")) {
          *         String internalClassName = className.replace('.', '/');
          *         String mapping_name = (String) ReflectionTransformer.jarMapping.classes.get(internalClassName);
          *         if (mapping_name != null) {
