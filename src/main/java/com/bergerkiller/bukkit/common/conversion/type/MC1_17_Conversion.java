@@ -10,7 +10,6 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
 import com.bergerkiller.mountiplex.reflection.resolver.Resolver;
 import com.bergerkiller.mountiplex.reflection.util.FastField;
 import com.bergerkiller.mountiplex.reflection.util.FastMethod;
-import com.bergerkiller.mountiplex.reflection.util.asm.MPLType;
 
 /**
  * Handles type conversion for Minecraft 1.17 and later
@@ -26,13 +25,13 @@ public class MC1_17_Conversion {
         try {
             String methodName = "d"; // 1.17
             if (CommonBootstrap.evaluateMCVersion(">=", "1.18")) {
-                methodName = Resolver.resolveMethodName(spcType, "getPlayer", new Class[0]);
+                methodName = "getPlayer";
             }
 
             if (spcType == null) {
                 throw new IllegalStateException("ServerPlayerConnection class not found");
             }
-            spcGetEntityPlayerMethod.init(spcType.getDeclaredMethod(methodName));
+            spcGetEntityPlayerMethod.init(Resolver.resolveAndGetDeclaredMethod(spcType, methodName, new Class[0]));
             if (spcGetEntityPlayerMethod.getMethod().getReturnType() != entityPlayerType) {
                 throw new IllegalStateException("Method does not return EntityPlayer, method not found");
             }
@@ -43,12 +42,10 @@ public class MC1_17_Conversion {
 
         try {
             String fieldName = "connection"; // 1.17
-            fieldName = Resolver.resolveFieldName(entityPlayerType, fieldName);
-
             if (spcType == null) {
                 throw new IllegalStateException("ServerPlayerConnection class not found");
             }
-            epConnectionField.init(MPLType.getDeclaredField(entityPlayerType, fieldName));
+            epConnectionField.init(Resolver.resolveAndGetDeclaredField(entityPlayerType, fieldName));
             if (!spcType.isAssignableFrom(epConnectionField.getType())) {
                 throw new IllegalStateException("Field not assignable to ServerPlayerConnection");
             }
