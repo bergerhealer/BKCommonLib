@@ -58,7 +58,8 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
     private static final int FAIL_LOAD_AFTER_TICKS = (20*FAIL_LOAD_AFTER_SECONDS);
     private static final ForcedWorld[] NO_WORLDS = new ForcedWorld[0];
 
-    public CommonForcedChunkManager(CommonPlugin plugin) {
+    public CommonForcedChunkManager(CommonPlugin plugin, boolean trackForcedChunkCreationStack) {
+        super.setTrackingCreationStack(trackForcedChunkCreationStack);
         this.plugin = plugin;
         this.chunkUnloadRequestTask = new ChunkUnloadRequestTask(plugin);
     }
@@ -88,6 +89,7 @@ public class CommonForcedChunkManager extends ForcedChunkManager {
         this.forcedWorldsByWorldRadius = new HashMap<>();
         this.forcedWorldsByWorld = new IdentityHashMap<>();
         this.asyncLoadCallbackHandler.setExecutorTask(null);
+        super.shutdown();
     }
 
     /**

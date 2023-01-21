@@ -9,30 +9,18 @@ import org.bukkit.World;
  * make sure chunks stay loaded.
  */
 public abstract class ForcedChunkManager {
-    private boolean trackingCreationStack = false;
+    private ForcedChunkCreator creator = new ForcedChunkCreatorUntracked(ForcedChunkCleaner.create());
 
     public final ForcedChunk newNone() {
-        if (this.isTrackingCreationStack()) {
-            return new ForcedChunk.CreationTrackedForcedChunk(null);
-        } else {
-            return new ForcedChunk(null);
-        }
+        return creator.create(null);
     }
 
     public final ForcedChunk newForcedChunk(World world, int chunkX, int chunkZ) {
-        if (this.isTrackingCreationStack()) {
-            return new ForcedChunk.CreationTrackedForcedChunk(this.add(world, chunkX, chunkZ));
-        } else {
-            return new ForcedChunk(this.add(world, chunkX, chunkZ));
-        }
+        return creator.create(this.add(world, chunkX, chunkZ));
     }
 
     public final ForcedChunk newForcedChunk(World world, int chunkX, int chunkZ, int radius) {
-        if (this.isTrackingCreationStack()) {
-            return new ForcedChunk.CreationTrackedForcedChunk(this.add(world, chunkX, chunkZ, radius));
-        } else {
-            return new ForcedChunk(this.add(world, chunkX, chunkZ, radius));
-        }
+        return creator.create(this.add(world, chunkX, chunkZ, radius));
     }
 
     /**
@@ -68,7 +56,7 @@ public abstract class ForcedChunkManager {
      * @return True to track the creation stack
      */
     public boolean isTrackingCreationStack() {
-        return trackingCreationStack;
+        return creator.isTrackingCreationStack();
     }
 
     /**
@@ -78,7 +66,14 @@ public abstract class ForcedChunkManager {
      * @see #isTrackingCreationStack()
      */
     public void setTrackingCreationStack(boolean tracking) {
-        trackingCreationStack = tracking;
+        creator = creator.updateTrackingCreationStack(tracking);
+    }
+
+    /**
+     * Should be called after the plugin shuts down to clean up any background processes
+     */
+    protected void shutdown() {
+        creator.shutdown();
     }
 
     public static interface ForcedChunkEntry {
@@ -93,5 +88,70 @@ public abstract class ForcedChunkManager {
         int getZ();
         org.bukkit.Chunk getChunk();
         CompletableFuture<org.bukkit.Chunk> getChunkAsync();
+    }
+
+    // Generates and stores stack traces.
+    private static class ForcedChunkCreatorTracked implements ForcedChunkCreator {
+        private final ForcedChunkCleaner cleaner;
+
+        private ForcedChunkCreatorTracked(ForcedChunkCleaner cleaner) {
+            this.cleaner = cleaner;
+        }
+
+        @Override
+        public boolean isTrackingCreationStack() {
+            return true;
+        }
+
+        @Override
+        public ForcedChunkCreator updateTrackingCreationStack(boolean tracking) {
+            return tracking ? this : new ForcedChunkCreatorUntracked(cleaner);
+        }
+
+        @Override
+        public ForcedChunk create(ForcedChunkEntry entry) {
+            return cleaner.createAndTrackStack(entry, new Throwable());
+        }
+
+        @Override
+        public void shutdown() {
+            cleaner.shutdown();
+        }
+    }
+
+    // Does not generate or store stack traces.
+    private static class ForcedChunkCreatorUntracked implements ForcedChunkCreator {
+        private final ForcedChunkCleaner cleaner;
+
+        private ForcedChunkCreatorUntracked(ForcedChunkCleaner cleaner) {
+            this.cleaner = cleaner;
+        }
+
+        @Override
+        public boolean isTrackingCreationStack() {
+            return false;
+        }
+
+        @Override
+        public ForcedChunkCreator updateTrackingCreationStack(boolean tracking) {
+            return tracking ? new ForcedChunkCreatorTracked(cleaner) : this;
+        }
+
+        @Override
+        public ForcedChunk create(ForcedChunkEntry entry) {
+            return cleaner.createDefault(entry);
+        }
+
+        @Override
+        public void shutdown() {
+            cleaner.shutdown();
+        }
+    }
+
+    private static interface ForcedChunkCreator {
+        void shutdown();
+        boolean isTrackingCreationStack();
+        ForcedChunkCreator updateTrackingCreationStack(boolean tracking);
+        ForcedChunk create(ForcedChunkEntry entry);
     }
 }

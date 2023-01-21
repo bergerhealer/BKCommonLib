@@ -118,7 +118,6 @@ public class CommonPlugin extends PluginBase {
     private boolean forceSynchronousSaving = false;
     private boolean isDebugCommandRegistered = false;
     private boolean cloudDisableBrigadier = false;
-    private boolean trackForcedChunkCreationStack = false;
 
     public CommonPlugin() {
         // Before proceeding, make sure the jar file isn't lacking required stuff
@@ -194,10 +193,6 @@ public class CommonPlugin extends PluginBase {
 
     public boolean isCloudBrigadierDisabled() {
         return cloudDisableBrigadier;
-    }
-
-    public boolean isTrackingForcedChunkCreationStack() {
-        return trackForcedChunkCreationStack;
     }
 
     public <T> TypedValue<T> getDebugVariable(String name, Class<T> type, T value) {
@@ -643,7 +638,7 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("trackForcedChunkCreationStack", "This is useful to detect ForcedChunk instances that are not closed by the developer.");
         config.addHeader("trackForcedChunkCreationStack", "Once a missed close is detected, tracking is automatically started anyway.");
         config.addHeader("trackForcedChunkCreationStack", "As such, this option is primarily useful to diagnose this problem at server startup");
-        this.trackForcedChunkCreationStack = config.get("trackForcedChunkCreationStack", false);
+        boolean trackForcedChunkCreationStack = config.get("trackForcedChunkCreationStack", false);
         config.save();
 
         if (preloadTemplateClasses) {
@@ -742,7 +737,7 @@ public class CommonPlugin extends PluginBase {
         vehicleMountManager.enable();
 
         // Initialize forced chunk manager
-        forcedChunkManager = new CommonForcedChunkManager(this);
+        forcedChunkManager = new CommonForcedChunkManager(this, trackForcedChunkCreationStack);
         forcedChunkManager.enable();
 
         // Initialize permissions

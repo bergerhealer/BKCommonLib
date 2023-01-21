@@ -2,12 +2,9 @@ package com.bergerkiller.bukkit.common.chunk;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
 
 import org.bukkit.World;
 
-import com.bergerkiller.bukkit.common.Logging;
-import com.bergerkiller.bukkit.common.chunk.ForcedChunkManager.ForcedChunkEntry;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 
 /**
@@ -15,7 +12,7 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
  * until {@link #close()} is called.
  */
 public class ForcedChunk implements AutoCloseable, Cloneable {
-    private final AtomicReference<ForcedChunkManager.ForcedChunkEntry> entry;
+    final AtomicReference<ForcedChunkManager.ForcedChunkEntry> entry;
 
     protected ForcedChunk(ForcedChunkManager.ForcedChunkEntry entry) {
         this.entry = new AtomicReference<ForcedChunkManager.ForcedChunkEntry>(entry);
@@ -196,19 +193,6 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
     }
 
     /**
-     * Closes this forced chunk, making it no longer keep the chunk loaded,
-     * unless another Forced Chunk exists that still does. This method can
-     * safely be called multiple times.
-     */
-    @Override
-    public void close() {
-        ForcedChunkManager.ForcedChunkEntry entry = this.entry.getAndSet(null);
-        if (entry != null) {
-            entry.remove();
-        }
-    }
-
-    /**
      * Clones this ForcedChunk. This causes the returned forced chunk instance to also
      * keep the chunk loaded, and if this forced chunk is closed, the chunk will not unload.
      * The returned forced chunk should be closed when no longer used.
@@ -222,39 +206,16 @@ public class ForcedChunk implements AutoCloseable, Cloneable {
         return new ForcedChunk(entry);
     }
 
-    // Just a safeguard in case the plugin never calls close() itself to prevent memory leaks
-    // Even then it may never be called if the server has sufficient memory and GC never runs
-    // This should not be relied upon.
-    @Override
-    @SuppressWarnings("deprecation")
-    public void finalize() throws Throwable {
-        {
-            ForcedChunkManager.ForcedChunkEntry entry = this.entry.getAndSet(null);
-            if (entry != null) {
-                if (this instanceof CreationTrackedForcedChunk) {
-                    Throwable stack = ((CreationTrackedForcedChunk) this).creationStack;
-                    Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString() +
-                            ", it was created at:", stack);
-                } else {
-                    Logging.LOGGER_DEBUG.log(Level.WARNING, "ForcedChunk.close() was not called for " + entry.toString());
-                    entry.getManager().setTrackingCreationStack(true);
-                }
-                entry.remove();
-            }
-        }
-        super.finalize();
-    }
-
     /**
-     * Stores the stack trace of where the ForcedChunk was created. This is used to diagnose
-     * forced chunks that aren't closed by the caller.
+     * Closes this forced chunk, making it no longer keep the chunk loaded,
+     * unless another Forced Chunk exists that still does. This method can
+     * safely be called multiple times.
      */
-    protected static class CreationTrackedForcedChunk extends ForcedChunk {
-        public final Throwable creationStack;
-
-        protected CreationTrackedForcedChunk(ForcedChunkEntry entry) {
-            super(entry);
-            creationStack = new Throwable();
+    @Override
+    public void close() {
+        ForcedChunkManager.ForcedChunkEntry entry = this.entry.getAndSet(null);
+        if (entry != null) {
+            entry.remove();
         }
     }
 }
