@@ -184,6 +184,16 @@ public class MapResourcePack {
     }
 
     /**
+     * Gets the base (parent) resource pack that this resource pack extends. If this resource pack
+     * is the lowest level, such as {@link #VANILLA}, then null is returned.
+     *
+     * @return Base resource pack of this resource pack, or null if this is the lowest layer
+     */
+    public MapResourcePack getBase() {
+        return this.baseResourcePack;
+    }
+
+    /**
      * Initializes the resource pack and all underlying resource packs.
      * This is called automatically once the resource packs are first accessed.
      * To initialize up-front and avoid lazy initialization at runtime, call this method
@@ -377,7 +387,7 @@ public class MapResourcePack {
      * like models sit in a specific root directory, the folder path is relative to that directory.
      * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
      * <br>
-     * Lists only default minecraft namespace assets.
+     * Lists only default minecraft namespace assets. Also lists resources of parent resource packs.
      *
      * @param type Type of resources to find
      * @param folder Folder relative to the resource type root to look for files
@@ -386,13 +396,34 @@ public class MapResourcePack {
      *         and {@link #getConfig(String)}.
      */
     public Set<String> listResources(ResourceType type, String folder) {
-        return listResources(type, "minecraft", folder);
+        return listResources(type, folder, true);
     }
 
     /**
      * Lists all the resources found inside a folder of the given resource type. As some resources
      * like models sit in a specific root directory, the folder path is relative to that directory.
-     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * Lists only default minecraft namespace assets. If recurse is true, also lists resources
+     * of parent resource packs.
+     *
+     * @param type Type of resources to find
+     * @param folder Folder relative to the resource type root to look for files
+     * @param recurse Whether to include resources found in parent resource packs in the results
+     * @return Set of files matching this resource type found in the folder. Without extension.
+     *         These paths can be directly used with methods like {@link #getTexture(String)}
+     *         and {@link #getConfig(String)}.
+     */
+    public Set<String> listResources(ResourceType type, String folder, boolean recurse) {
+        return listResources(type, "minecraft", folder, recurse);
+    }
+
+    /**
+     * Lists all the resources found inside a folder of the given resource type. As some resources
+     * like models sit in a specific root directory, the folder path is relative to that directory.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * Also lists resources found in the parent resource packs.
      *
      * @param type Type of resources to find
      * @param namespace Namespace, the default is "minecraft" for vanilla assets
@@ -402,6 +433,25 @@ public class MapResourcePack {
      *         and {@link #getConfig(String)}.
      */
     public Set<String> listResources(ResourceType type, String namespace, String folder) {
+        return listResources(type, namespace, folder, true);
+    }
+
+    /**
+     * Lists all the resources found inside a folder of the given resource type. As some resources
+     * like models sit in a specific root directory, the folder path is relative to that directory.
+     * For example, to list textures, the <i>assets/minecraft/textures</i> prefix can be omitted.<br>
+     * <br>
+     * If recurse is true, also lists resources found in the parent resource packs.
+     *
+     * @param type Type of resources to find
+     * @param namespace Namespace, the default is "minecraft" for vanilla assets
+     * @param folder Folder relative to the resource type root to look for files
+     * @param recurse Whether to also list resources found in parent resource packs
+     * @return Set of files matching this resource type found in the folder. Without extension.
+     *         These paths can be directly used with methods like {@link #getTexture(String)}
+     *         and {@link #getConfig(String)}.
+     */
+    public Set<String> listResources(ResourceType type, String namespace, String folder, boolean recurse) {
         // Must end with / to be a valid zip directory 'file'
         if (!folder.endsWith("/")) {
             folder += "/";
@@ -415,7 +465,7 @@ public class MapResourcePack {
         }
 
         Set<String> result = new HashSet<>();
-        this.listResources(type, folder, zipFolderPath, result, false);
+        this.listResources(type, folder, zipFolderPath, result, false, recurse);
         return result;
     }
 
@@ -425,8 +475,19 @@ public class MapResourcePack {
      * @return namespaces
      */
     public Set<String> listNamespaces() {
+        return listNamespaces(true);
+    }
+
+    /**
+     * Lists all namespaces declared by this resource pack. If recurse is true,
+     * also lists namespaces of parent resource packs.
+     *
+     * @param recurse Whether to recursively check parent resource packs as well for namespaces
+     * @return namespaces
+     */
+    public Set<String> listNamespaces(boolean recurse) {
         Set<String> result = new HashSet<>();
-        this.listResources(null, "", "assets/", result, true);
+        this.listResources(null, "", "assets/", result, true, recurse);
         return result;
     }
 
@@ -434,14 +495,44 @@ public class MapResourcePack {
      * Lists all the sub-directories storing resources of a given resource type. The resource
      * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.<br>
      * <br>
-     * Lists only default minecraft namespace assets.
+     * Lists only default minecraft namespace assets. Also lists directories found in parent resource packs.
      *
      * @param type Type of resources to list directories of in a folder
      * @param folder Folder relative to the resource type root to look for files
      * @return Set of directory paths that are child of the folder path specified
      */
     public Set<String> listDirectories(ResourceType type, String folder) {
-        return listDirectories(type, "minecraft", folder);
+        return listDirectories(type, folder, true);
+    }
+
+    /**
+     * Lists all the sub-directories storing resources of a given resource type. The resource
+     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.<br>
+     * <br>
+     * Lists only default minecraft namespace assets. If recurse is true also lists directories
+     * found in parent resource packs.
+     *
+     * @param type Type of resources to list directories of in a folder
+     * @param folder Folder relative to the resource type root to look for files
+     * @param recurse Whether to include directories found in parent resource packs
+     * @return Set of directory paths that are child of the folder path specified
+     */
+    public Set<String> listDirectories(ResourceType type, String folder, boolean recurse) {
+        return listDirectories(type, "minecraft", folder, recurse);
+    }
+
+    /**
+     * Lists all the sub-directories storing resources of a given resource type. The resource
+     * type is used to decide the root path, same as {@link #listResources(ResourceType, String)}.
+     * Includes directories found in parent resource packs.
+     *
+     * @param type Type of resources to list directories of in a folder
+     * @param namespace Namespace, the default is "minecraft" for vanilla models
+     * @param folder Folder relative to the resource type root to look for files
+     * @return Set of directory paths that are child of the folder path specified
+     */
+    public Set<String> listDirectories(ResourceType type, String namespace, String folder) {
+        return listDirectories(type, namespace, folder, true);
     }
 
     /**
@@ -451,9 +542,10 @@ public class MapResourcePack {
      * @param type Type of resources to list directories of in a folder
      * @param namespace Namespace, the default is "minecraft" for vanilla models
      * @param folder Folder relative to the resource type root to look for files
+     * @param recurse Whether to include directories found in parent resource packs
      * @return Set of directory paths that are child of the folder path specified
      */
-    public Set<String> listDirectories(ResourceType type, String namespace, String folder) {
+    public Set<String> listDirectories(ResourceType type, String namespace, String folder, boolean recurse) {
         // Must end with / to be a valid zip directory 'file'
         if (!folder.endsWith("/")) {
             folder += "/";
@@ -468,7 +560,7 @@ public class MapResourcePack {
         }
 
         Set<String> result = new HashSet<>();
-        this.listResources(type, folder, zipFolderPath, result, true);
+        this.listResources(type, folder, zipFolderPath, result, true, recurse);
         return result;
     }
 
@@ -671,12 +763,10 @@ public class MapResourcePack {
         }
 
         // Handle overrides first
-        if (model.overrides != null && !model.overrides.isEmpty()) {
-            for (Model.ModelOverride override : model.overrides) {
-                if (override.matches(options) && !override.model.equals(path)) {
-                    //System.out.println("MATCH " + override.model + "  " + options);
-                    return this.loadModel(override.model, options);
-                }
+        for (Model.ModelOverride override : model.getOverrides()) {
+            if (override.matches(options) && !override.model.equals(path)) {
+                //System.out.println("MATCH " + override.model + "  " + options);
+                return this.loadModel(override.model, options);
             }
         }
 
@@ -764,8 +854,9 @@ public class MapResourcePack {
      * @param rootRelFolder
      * @param result
      * @param directories Whether to list directories instead of files
+     * @param recurse Whether to also look at base resource packs of this resource pack
      */
-    protected void listResources(ResourceType type, String folder, String rootRelFolder, Set<String> result, boolean directories) {
+    protected void listResources(ResourceType type, String folder, String rootRelFolder, Set<String> result, boolean directories, boolean recurse) {
         // =null: failed to load resource pack file
         this.handleLoad(true, false);
         if (this.archive != null) {
@@ -788,8 +879,8 @@ public class MapResourcePack {
         }
 
         // Ask base pack as well!
-        if (this.baseResourcePack != null) {
-            this.baseResourcePack.listResources(type, folder, rootRelFolder, result, directories);
+        if (recurse && this.baseResourcePack != null) {
+            this.baseResourcePack.listResources(type, folder, rootRelFolder, result, directories, recurse);
         }
     }
 

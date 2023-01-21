@@ -2,12 +2,14 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.bukkit.block.BlockFace;
+import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.map.MapBlendMode;
@@ -17,7 +19,10 @@ import com.bergerkiller.bukkit.common.map.MapTexture;
 import com.bergerkiller.bukkit.common.map.util.Model.Element.Face;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
+import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.FaceUtil;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
@@ -31,10 +36,15 @@ public class Model {
     public Map<String, Display> display = new HashMap<String, Display>();
     public Map<String, String> textures = new HashMap<String, String>();
     public List<Element> elements = new ArrayList<Element>();
-    public List<ModelOverride> overrides = new ArrayList<ModelOverride>();
+    private List<ModelOverride> overrides = new ArrayList<ModelOverride>();
 
     public final String getParentName() {
         return this.parent;
+    }
+
+    public final List<ModelOverride> getOverrides() {
+        List<ModelOverride> overrides = this.overrides;
+        return (overrides == null || overrides.isEmpty()) ? Collections.emptyList() : overrides;
     }
 
     public void loadParent(Model parentModel) {
@@ -506,19 +516,147 @@ public class Model {
                     if (opt == null) {
                         return false;
                     }
-                    if (opt.equals(pred.getValue())) {
-                        continue;
+                    if (!PredicateType.get(pred.getKey()).matches(opt, pred.getValue())) {
+                        return false;
                     }
-                    try {
-                        final double RANGE = 0.0000001;
-                        double diff = Double.parseDouble(opt) - Double.parseDouble(pred.getValue());
-                        return diff >= -RANGE && diff <= RANGE;
-                    } catch (NumberFormatException ex) {}
-
-                    return false; // No rounding for non-numeric values
                 }
             }
             return true;
+        }
+
+        /**
+         * Creates a copy of an item with the predicate requirements of this model override
+         * applied to it. This will apply options such custom model data, unbreakable and damage
+         * value.
+         *
+         * @param item Item to apply the predicates to
+         * @return Updated item (clone)
+         */
+        public ItemStack applyToItem(ItemStack item) {
+            ItemStack copy = ItemUtil.createItem(item);
+            if (this.predicate != null) {
+                for (Map.Entry<String, String> predicate : this.predicate.entrySet()) {
+                    PredicateType.get(predicate.getKey()).applyToItem(copy, predicate.getValue());
+                }
+            }
+            return copy;
+        }
+
+        /**
+         * Type of predicate supported by Minecraft
+         */
+        private static enum PredicateType {
+            CUSTOM_MODEL_DATA("custom_model_data") {
+                @Override
+                public void applyToItem(ItemStack item, String value) {
+                    int cmd;
+                    try {
+                        cmd = Integer.parseInt(value);
+                    } catch (NumberFormatException ex) {
+                        return;
+                    }
+
+                    CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
+                    if (tag != null) {
+                        tag.putValue("CustomModelData", cmd);
+                    }
+                }
+
+                @Override
+                public boolean matches(String a, String b) {
+                    return a.equals(b); // Integer comparison works with str equals. No decimals.
+                }
+            },
+            UNBREAKABLE("damaged") {
+                @Override
+                public void applyToItem(ItemStack item, String value) {
+                    CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
+                    if (tag != null) {
+                        tag.putValue("Unbreakable", !value.equals("0"));
+                    }
+                }
+
+                @Override
+                public boolean matches(String a, String b) {
+                    return a.equals(b); // integer comparison works with str equals. No decimals.
+                }
+            },
+            DAMAGE("damage") {
+                @Override
+                @SuppressWarnings("deprecation")
+                public void applyToItem(ItemStack item, String value) {
+                    int maxDurability = ItemUtil.getMaxDurability(item);
+                    if (maxDurability <= 0) {
+                        return;
+                    }
+
+                    double damageDbl;
+                    try {
+                        damageDbl = Double.parseDouble(value);
+                        damageDbl = MathUtil.clamp(damageDbl, 0.0, 1.0);
+                    } catch (NumberFormatException ex) {
+                        return;
+                    }
+
+                    item.setDurability((short) (damageDbl * maxDurability));
+                }
+
+                @Override
+                public boolean matches(String a, String b) {
+                    // Floating point damage values must equal
+                    return compareNumberStr(a, b);
+                }
+            },
+            DEFAULT(null) {
+                @Override
+                public void applyToItem(ItemStack item, String value) {
+                    // No-Op
+                }
+
+                @Override
+                public boolean matches(String a, String b) {
+                    // Assume its a floating point number and compare
+                    return compareNumberStr(a, b);
+                }
+            };
+
+            private static final Map<String, PredicateType> byKey = new HashMap<>();
+            private final String key;
+
+            static {
+                for (PredicateType type : PredicateType.values()) {
+                    byKey.put(type.getKey(), type);
+                }
+            }
+
+            private PredicateType(String key) {
+                this.key = key;
+            }
+
+            public String getKey() {
+                return key;
+            }
+
+            public abstract void applyToItem(ItemStack item, String value);
+            public abstract boolean matches(String a, String b);
+
+            public static PredicateType get(String key) {
+                return byKey.getOrDefault(key, DEFAULT);
+            }
+
+            private static boolean compareNumberStr(String a, String b) {
+                if (a.equals(b)) {
+                    return true;
+                }
+
+                try {
+                    final double RANGE = 0.0000001;
+                    double diff = Double.parseDouble(a) - Double.parseDouble(b);
+                    return diff >= -RANGE && diff <= RANGE;
+                } catch (NumberFormatException ex) {}
+
+                return false;
+            }
         }
     }
 
