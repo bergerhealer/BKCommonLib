@@ -318,28 +318,25 @@ public class ItemUtil {
      * False if not
      */
     public static boolean equalsIgnoreAmount(org.bukkit.inventory.ItemStack item1, org.bukkit.inventory.ItemStack item2) {
-        if (item1 == null || item2 == null) {
-            return false;
-        }
-        if (item1.getType() != item2.getType() || MaterialUtil.getRawData(item1) != MaterialUtil.getRawData(item2)) {
-            return false;
-        }
-        // Metadata checks
-        boolean hasMeta = hasMetaTag(item1);
-        if (hasMeta != hasMetaTag(item2)) {
-            return false;
-        } else if (!hasMeta) {
-            // No further data to test
-            return true;
-        }
-        if (!item1.getItemMeta().equals(item2.getItemMeta())) {
+        //TODO: This can be done trivially with ItemStack.isSimilar by itself. But some code is included here that
+        //      Bukkit doesn't seem to do (AttributeModifiers). Is this important? We probably wanna get rid of this,
+        //      because isSimilar exists on MC 1.8 and appears to work fine.
+        //      This original patch dates back to 2013...
+
+        if (item1 == null || item2 == null || !item1.isSimilar(item2)) {
             return false;
         }
 
         // Not included in metadata checks: Item attributes (Bukkit needs to update)
-        CommonTagList item1Attr = getMetaTag(item1).get("AttributeModifiers", CommonTagList.class);
-        CommonTagList item2Attr = getMetaTag(item2).get("AttributeModifiers", CommonTagList.class);
-        return LogicUtil.bothNullOrEqual(item1Attr, item2Attr);
+        CommonTagCompound item1NBT = getMetaTag(item1);
+        CommonTagCompound item2NBT = getMetaTag(item2);
+        if (item1NBT != null && item2NBT != null) {
+            CommonTagList item1Attr = item1NBT.get("AttributeModifiers", CommonTagList.class);
+            CommonTagList item2Attr = item2NBT.get("AttributeModifiers", CommonTagList.class);
+            return LogicUtil.bothNullOrEqual(item1Attr, item2Attr);
+        } else {
+            return true; // Assume good.
+        }
     }
 
     /**
