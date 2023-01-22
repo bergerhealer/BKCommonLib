@@ -5,7 +5,6 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.MessageBuilder;
 import com.bergerkiller.bukkit.common.PluginBase;
 import com.bergerkiller.bukkit.common.Task;
-import com.bergerkiller.bukkit.common.Timings;
 import com.bergerkiller.bukkit.common.TypedValue;
 import com.bergerkiller.bukkit.common.bases.CheckedRunnable;
 import com.bergerkiller.bukkit.common.collections.EntityMap;
@@ -621,10 +620,6 @@ public class CommonPlugin extends PluginBase {
         config.addHeader("forceSynchronousSaving", "Synchronous saving (such as YAML) may hurt server performance for large files,");
         config.addHeader("forceSynchronousSaving", "but will prevent these issues from happening.");
         this.forceSynchronousSaving = config.get("forceSynchronousSaving", false);
-        config.setHeader("debugTimings", "\nWhether to instrument additional Timings for some of the core BKCommonLib components");
-        config.addHeader("debugTimings", "These timings might be useful to identify performance problems, or their causes");
-        config.addHeader("debugTimings", "They may cause a slight performance hit, so leave this option disabled unless you need them");
-        final boolean debugTimings = config.get("debugTimings", false);
         config.setHeader("cloudDisableBrigadier", "\nWhether to disable using brigadier for all plugins that use BKCL's cloud command framework");
         config.addHeader("cloudDisableBrigadier", "This might fix problems that occur because of bugs in brigadier, or cloud's handler of it");
         this.cloudDisableBrigadier = config.get("cloudDisableBrigadier", false);
@@ -702,12 +697,6 @@ public class CommonPlugin extends PluginBase {
 
         // Enable BlockData hook stuff, we want the initialization error early
         BlockDataWrapperHook.init();
-
-        // Timings, if enabled, otherwise no-op
-        if (debugTimings) {
-            CommonTimings.QUEUE_PACKET = Timings.create(this, "PacketHandler::queuePacket");
-            CommonTimings.SEND_PACKET = Timings.create(this, "PacketHandler::sendPacket");
-        }
 
         // Setup next tick executor
         CommonNextTickExecutor.INSTANCE.setExecutorTask(new CommonNextTickExecutor.ExecutorTask(this));
