@@ -20,8 +20,10 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStac
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import org.bukkit.Material;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 
@@ -29,6 +31,35 @@ import org.bukkit.inventory.ItemStack;
  * Contains item stack, item and inventory utilities
  */
 public class ItemUtil {
+    private static final Function<InventoryClickEvent, Inventory> getClickedInventoryFunc = findGetClickedInventoryFunc();
+
+    /**
+     * Gets the clicked inventory from an InventoryClickEvent. Here for backwards-compatibility
+     * reasons, as this method was added in Bukkit for MC 1.13.2. Defaults back to Bukkit's
+     * own method if it is available.
+     *
+     * @param event Click Event
+     * @return clicked inventory
+     */
+    public static Inventory getClickedInventory(InventoryClickEvent event) {
+        return getClickedInventoryFunc.apply(event);
+    }
+
+    private static Function<InventoryClickEvent, Inventory> findGetClickedInventoryFunc() {
+        try {
+            InventoryClickEvent.class.getDeclaredMethod("getClickedInventory");
+            return InventoryClickEvent::getClickedInventory;
+        } catch (Throwable t) {}
+
+        // Fallback for mc 1.8 - 1.13.1/2
+        return event -> {
+            if (event.getRawSlot() == event.getSlot()) {
+                return event.getView().getTopInventory();
+            } else {
+                return event.getView().getBottomInventory();
+            }
+        };
+    }
 
     /**
      * Creates a new player head item with the game profile information specified.
