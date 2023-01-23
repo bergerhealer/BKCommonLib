@@ -52,6 +52,7 @@ public class InputDialogAnvil {
     private final Set<InventoryView> _openInventories;
     private final Listener _listener;
     private boolean _isWindowOpen = false;
+    private String _initialText = "";
     private String _text = "";
 
     public InputDialogAnvil(Plugin plugin, Player player) {
@@ -75,12 +76,34 @@ public class InputDialogAnvil {
     }
 
     /**
+     * Sets the initial text in the input text field. Must be called before the dialog is shown.
+     *
+     * @param text Text
+     * @return this
+     */
+    public InputDialogAnvil setInitialText(String text) {
+        this._initialText = text;
+        return this;
+    }
+
+    /**
      * Gets the title to display for the window
      *
      * @return title
      */
     public ChatText getTitle() {
         return null;
+    }
+
+    /**
+     * Sets the title of the middle button item
+     *
+     * @param title
+     * @return this
+     */
+    public InputDialogAnvil setMiddleButtonTitle(String title) {
+        MIDDLE_BUTTON.setTitleAndRefresh(title);
+        return this;
     }
 
     /**
@@ -118,10 +141,18 @@ public class InputDialogAnvil {
     private void handleTextChange(InventoryView view) {
         // String new_text = view.getInventory().getRenameText(); // Not backwards-compatible
         String new_text = ContainerAnvilHandle.fromBukkit(view).getRenameText();
-        new_text = LogicUtil.fixNull(new_text, "");
-        if (!CommonCapabilities.EMPTY_ITEM_NAME) {
-            new_text = new_text.replace("\0", "");
+        new_text = LogicUtil.fixNull(new_text, "").replace("\0", "");
+        if (!new_text.startsWith(" ") && !new_text.isEmpty()) {
+            // User inputed something new without the space in front. Insert our space!
+            // Then remove the text again. MC doesn't consider it a rename if text is empty.
+            LEFT_BUTTON._title = ChatColor.BLACK + " " + new_text;
+        } else {
+            // Omit whitespace in front
+            while (new_text.startsWith(" ")) {
+                new_text = new_text.substring(1);
+            }
         }
+
         if (!_text.equals(new_text)) {
             _text = new_text;
             onTextChanged();
@@ -157,14 +188,16 @@ public class InputDialogAnvil {
             Bukkit.getPluginManager().registerEvents(this._listener, plugin);
 
             // Reset text
-            this._text = "";
+            _text = _initialText;
+            LEFT_BUTTON._title = ChatColor.BLACK + " " + _initialText;
 
             // Open windows for all viewing players
             final InventoryView view = EntityPlayerHandle.fromBukkit(player).openAnvilWindow(getTitle());
 
             // Required for handling text changes < MC 1.9
+            ContainerAnvilHandle container = ContainerAnvilHandle.fromBukkit(view);
+            container.setRenameText(_initialText);
             if (!CommonCapabilities.HAS_PREPARE_ANVIL_EVENT) {
-                ContainerAnvilHandle container = ContainerAnvilHandle.fromBukkit(view);
                 LegacyContainerAnvilHook hook = ClassHook.get(container.getRaw(), LegacyContainerAnvilHook.class);
                 hook.textChangeCallback = () -> handleTextChange(view);
             }
@@ -172,9 +205,13 @@ public class InputDialogAnvil {
             this._openInventories.add(view);
             this.refreshButtons(view);
 
+            //LEFT_BUTTON.setTitle(oldTitle);
+
             // If it couldn't be opened for anyone, close itself
             if (this._openInventories.isEmpty()) {
                 setWindowOpen(false);
+            } else {
+                //LEFT_BUTTON.refresh(view);
             }
 
         } else {
@@ -220,7 +257,7 @@ public class InputDialogAnvil {
          * 
          * @return title
          */
-        public String getTitle() {
+        private String getTitle() {
             return this._title;
         }
 
@@ -230,7 +267,7 @@ public class InputDialogAnvil {
          * 
          * @param title to set
          */
-        public void setTitle(String title) {
+        private void setTitleAndRefresh(String title) {
             if (!LogicUtil.bothNullOrEqual(this._title, title)) {
                 this._title = title;
                 this.refresh();

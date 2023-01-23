@@ -17,6 +17,7 @@ import com.bergerkiller.bukkit.common.wrappers.ChatText;
  */
 public class InputDialogSubmitText extends InputDialogAnvil {
     private boolean _accepted = false;
+    private boolean _acceptEmptyText = false;
 
     public InputDialogSubmitText(Plugin plugin, Player player) {
         super(plugin, player);
@@ -47,15 +48,34 @@ public class InputDialogSubmitText extends InputDialogAnvil {
      * what this dialog is about.
      * 
      * @param text
+     * @return this
      */
     public InputDialogSubmitText setDescription(String text) {
         if (text == null || text.isEmpty()) {
             MIDDLE_BUTTON.setMaterial(null);
         } else {
             MIDDLE_BUTTON.setMaterial(Material.PAPER);
-            MIDDLE_BUTTON.setTitle(ChatColor.YELLOW + "About");
+            setMiddleButtonTitle(ChatColor.YELLOW + "About");
             MIDDLE_BUTTON.setDescription(text);
         }
+        return this;
+    }
+
+    @Override
+    public InputDialogSubmitText setInitialText(String text) {
+        super.setInitialText(text);
+        return this;
+    }
+
+    /**
+     * Sets whether {@link #onAccept(String)} is called when the Player did not
+     * enter any text and pressed accept
+     *
+     * @param accept Whether empty text is accepted
+     * @return this
+     */
+    public InputDialogSubmitText setAcceptEmptyText(boolean accept) {
+        _acceptEmptyText = accept;
         return this;
     }
 
@@ -72,7 +92,7 @@ public class InputDialogSubmitText extends InputDialogAnvil {
     @Override
     public void onClick(Button button) {
         if (button == RIGHT_BUTTON) {
-            if (this.getText() != null && !this.getText().isEmpty()) {
+            if (this.getText() != null && (_acceptEmptyText || !this.getText().isEmpty())) {
                 this._accepted = true;
                 this.close();
             }
