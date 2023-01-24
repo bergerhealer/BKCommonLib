@@ -39,11 +39,11 @@ import com.bergerkiller.bukkit.common.map.gson.Vector3Deserializer;
 import com.bergerkiller.bukkit.common.map.util.ModelInfoLookup;
 import com.bergerkiller.bukkit.common.map.util.BlockModelState;
 import com.bergerkiller.bukkit.common.map.util.Model;
+import com.bergerkiller.bukkit.common.map.util.ModelInfo;
 import com.bergerkiller.bukkit.common.map.util.VanillaResourcePack;
 import com.bergerkiller.bukkit.common.math.Matrix4x4;
 import com.bergerkiller.bukkit.common.math.Vector3;
 import com.bergerkiller.bukkit.common.utils.DebugUtil;
-import com.bergerkiller.bukkit.common.utils.FaceUtil;
 import com.bergerkiller.bukkit.common.utils.WorldUtil;
 import com.bergerkiller.bukkit.common.wrappers.BlockData;
 import com.bergerkiller.bukkit.common.wrappers.BlockRenderOptions;
@@ -301,11 +301,43 @@ public class MapResourcePack {
                 model = this.loadBlockModel(blockRenderOptions);
             }
             if (model == null) {
-                model = this.createPlaceholderModel(blockRenderOptions);
+                model = Model.createPlaceholderModel(blockRenderOptions);
             }
             blockModelCache.put(blockRenderOptions, model);
         }
         return model;
+    }
+
+    /**
+     * Loads a JSON-syntax model from this resource pack and decodes only the
+     * metadata of the model. No information is loaded that is needed for rendering,
+     * such as textures and boxes. This can be used to display information about
+     * models stored in this resource pack.<br>
+     * <br>
+     *  If the model could not be found or failed to be decoded, a placeholder
+     *  is returned which can be checked with {@link ModelInfo#isPlaceholder()}
+     *
+     * @param path Path to the model
+     * @return the model information
+     */
+    public ModelInfo getModelInfo(String path) {
+        // Try cache first, just in case
+        // Makes stuff easier
+        {
+            Model model = modelCache.get(path);
+            if (model != null) {
+                return model;
+            }
+        }
+
+        // Load from resource pack. Do not cache (?)
+        ModelInfo info = openGsonObject(ModelInfo.class, ResourceType.MODELS, path);
+        if (info != null) {
+            info.setName(path);
+            return info;
+        } else {
+            return ModelInfo.createPlaceholder(path);
+        }
     }
 
     /**
@@ -323,8 +355,8 @@ public class MapResourcePack {
 
         model = this.loadModel(path);
         if (model == null) {
-            model = this.createPlaceholderModel(BlockData.AIR.getDefaultRenderOptions()); // failed to load or find
-            model.name = path;
+            model = Model.createPlaceholderModel(BlockData.AIR.getDefaultRenderOptions()); // failed to load or find
+            model.setName(path);
         }
         modelCache.put(path, model);
         return model;
@@ -346,7 +378,7 @@ public class MapResourcePack {
             m.buildQuads();
         }
         if (m == null) {
-            m = this.createPlaceholderModel(options);
+            m = Model.createPlaceholderModel(options);
         }
         return m;
     }
@@ -361,8 +393,8 @@ public class MapResourcePack {
      */
     public MapTexture getItemTexture(ItemStack item, int width, int height) {
         Model model = this.getItemModel(item);
-        if (model == null || model.placeholder) {
-            return createPlaceholderTexture(width, height);
+        if (model == null || model.isPlaceholder()) {
+            return Model.createPlaceholderTexture(width, height);
         }
 
         MapTexture texture = MapTexture.createEmpty(width, height);
@@ -610,7 +642,7 @@ public class MapResourcePack {
         if (result == null) {
             // Shortcut, this happens often for stuff in parents of children defining textures
             if (path.startsWith("#")) {
-                result = this.createPlaceholderTexture();
+                result = Model.createPlaceholderTexture();
                 textureCache.put(path, result);
                 return result;
             }
@@ -627,7 +659,7 @@ public class MapResourcePack {
 
             if (result == null) {
                 Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load texture: " + path);
-                result = this.createPlaceholderTexture();
+                result = Model.createPlaceholderTexture();
             }
 
             // Animated textures: when height is a multiple of width
@@ -638,7 +670,7 @@ public class MapResourcePack {
                 InputStream metaStream = openFileStream(ResourceType.TEXTURES_META, path);
                 if (metaStream == null) {
                     Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Failed to load animated texture (missing mcmeta): " + path);
-                    result = this.createPlaceholderTexture();
+                    result = Model.createPlaceholderTexture();
                 } else {
                     result = result.getView(0, 0, result.getWidth(), result.getWidth()).clone();
                     try {
@@ -783,7 +815,7 @@ public class MapResourcePack {
         // Insert the parent model as required
         if (parentModelName != null) {
             Model parentModel = this.loadModel(parentModelName, options);
-            if (parentModel == null || parentModel.placeholder) {
+            if (parentModel == null || parentModel.isPlaceholder()) {
                 Logging.LOGGER_MAPDISPLAY.once(Level.WARNING, "Parent of model " + path + " not found: " + model.getParentName());
                 return null;
             }
@@ -793,56 +825,6 @@ public class MapResourcePack {
         // Make all texture paths absolute
         model.build(this, options);
         return model;
-    }
-
-    /**
-     * Creates a placeholder model. Used when models can not be loaded.
-     * 
-     * @return placeholder model
-     */
-    protected final Model createPlaceholderModel(RenderOptions renderOptions) {
-        Model model = new Model();
-        Model.Element element = new Model.Element();
-        for (BlockFace face : FaceUtil.BLOCK_SIDES) {
-            element.faces.put(face, createPlaceholderFace());
-        }
-        element.buildQuads();
-        model.placeholder = true;
-        model.elements.add(element);
-        model.name = renderOptions.lookupModelName();
-        return model;
-    }
-
-    private final Model.Element.Face createPlaceholderFace() {
-        Model.Element.Face face = new Model.Element.Face();
-        face.texture = this.createPlaceholderTexture();
-        return face;
-    }
-
-    /**
-     * Creates a placeholder 16x16 texture. Used when textures can not be loaded.
-     * 
-     * @return placeholder texture
-     */
-    protected final MapTexture createPlaceholderTexture() {
-        return createPlaceholderTexture(16, 16);
-    }
-
-    /**
-     * Creates a placeholder 16x16 texture. Used when textures can not be loaded.
-     * 
-     * @param width
-     * @param height
-     * @return placeholder texture
-     */
-    protected final MapTexture createPlaceholderTexture(int width, int height) {
-        int wd2 = width / 2;
-        int hd2 = height / 2;
-        MapTexture result = MapTexture.createEmpty(width, height);
-        result.fill(MapColorPalette.COLOR_PURPLE);
-        result.fillRectangle(0, 0, wd2, hd2, MapColorPalette.COLOR_BLUE);
-        result.fillRectangle(wd2, hd2, width - wd2, height - hd2, MapColorPalette.COLOR_BLUE);
-        return result;
     }
 
     /**

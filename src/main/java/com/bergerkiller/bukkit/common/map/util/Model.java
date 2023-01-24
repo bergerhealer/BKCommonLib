@@ -2,7 +2,6 @@ package com.bergerkiller.bukkit.common.map.util;
 
 import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -26,26 +25,17 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.bukkit.common.wrappers.RenderOptions;
 import com.google.gson.annotations.SerializedName;
 
-public class Model {
-    public transient String name = "unknown";
-    private String parent = null;
+/**
+ * A fully loaded model from a resource pack. Stores information about predicates (variants)
+ * and all textures and cubes that the model uses have been decoded.
+ */
+public class Model extends ModelInfo {
     private int totalQuadCount = 0;
-    public transient boolean placeholder = false;
     protected transient BuiltinType builtinType = BuiltinType.DEFAULT;
     public boolean ambientocclusion = true;
     public Map<String, Display> display = new HashMap<String, Display>();
     public Map<String, String> textures = new HashMap<String, String>();
     public List<Element> elements = new ArrayList<Element>();
-    private List<ModelOverride> overrides = new ArrayList<ModelOverride>();
-
-    public final String getParentName() {
-        return this.parent;
-    }
-
-    public final List<ModelOverride> getOverrides() {
-        List<ModelOverride> overrides = this.overrides;
-        return (overrides == null || overrides.isEmpty()) ? Collections.emptyList() : overrides;
-    }
 
     public void loadParent(Model parentModel) {
         for (Map.Entry<String, String> textureEntry : parentModel.textures.entrySet()) {
@@ -69,7 +59,7 @@ public class Model {
 
     public void build(MapResourcePack resourcePack, RenderOptions options) {
         // Mostly for debug, but can be useful elsewhere perhaps?
-        this.name = options.lookupModelName();
+        this.setName(options.lookupModelName());
 
         // Build all textures, turning paths into absolute paths
         boolean hasChanges;
@@ -94,7 +84,7 @@ public class Model {
             if (--loop_limit <= 0) {
                 if (loop_last_changed != null) {
                     Logging.LOGGER_MAPDISPLAY.warning("Texture loop error for model " +
-                        this.name + " texture " + loop_last_changed);
+                        this.getName() + " texture " + loop_last_changed);
                 }
                 break;
             }
@@ -213,7 +203,7 @@ public class Model {
     @Override
     public Model clone() {
         Model clone = new Model();
-        clone.name = this.name;
+        clone.setName(this.getName());
         clone.ambientocclusion = this.ambientocclusion;
         clone.textures.putAll(this.textures);
         for (Map.Entry<String, Display> displayEntry : this.display.entrySet()) {
@@ -243,6 +233,56 @@ public class Model {
         } catch (NumberFormatException ex) {
         }
         return input;
+    }
+
+    /**
+     * Creates a placeholder model. Used when models can not be loaded.
+     * 
+     * @return placeholder model
+     */
+    public static final Model createPlaceholderModel(RenderOptions renderOptions) {
+        Model model = new Model();
+        Model.Element element = new Model.Element();
+        for (BlockFace face : FaceUtil.BLOCK_SIDES) {
+            element.faces.put(face, createPlaceholderFace());
+        }
+        element.buildQuads();
+        model.placeholder = true;
+        model.elements.add(element);
+        model.setName(renderOptions.lookupModelName());
+        return model;
+    }
+
+    private static final Model.Element.Face createPlaceholderFace() {
+        Model.Element.Face face = new Model.Element.Face();
+        face.texture = createPlaceholderTexture();
+        return face;
+    }
+
+    /**
+     * Creates a placeholder 16x16 texture. Used when textures can not be loaded.
+     * 
+     * @return placeholder texture
+     */
+    public static final MapTexture createPlaceholderTexture() {
+        return createPlaceholderTexture(16, 16);
+    }
+
+    /**
+     * Creates a placeholder 16x16 texture. Used when textures can not be loaded.
+     * 
+     * @param width
+     * @param height
+     * @return placeholder texture
+     */
+    public static final MapTexture createPlaceholderTexture(int width, int height) {
+        int wd2 = width / 2;
+        int hd2 = height / 2;
+        MapTexture result = MapTexture.createEmpty(width, height);
+        result.fill(MapColorPalette.COLOR_PURPLE);
+        result.fillRectangle(0, 0, wd2, hd2, MapColorPalette.COLOR_BLUE);
+        result.fillRectangle(wd2, hd2, width - wd2, height - hd2, MapColorPalette.COLOR_BLUE);
+        return result;
     }
 
     /**

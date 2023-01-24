@@ -139,11 +139,11 @@ public class MapResourcePackTest {
         for (Material type : ItemUtil.getItemTypes()) {
             for (ItemStack variant : ItemUtil.getItemVariants(type)) {
                 Model model = resourcePack.getItemModel(variant);
-                if (model.placeholder && !ignore.contains(model.name)) {
+                if (model.isPlaceholder() && !ignore.contains(model.getName())) {
                     hasLoadErrors = true;
                     System.err.println("Failed to load model of item " + 
                             variant.getType() + ":" + variant.getDurability() +  " " +
-                            model.name);
+                            model.getName());
                 }
             }
         }
@@ -193,7 +193,7 @@ public class MapResourcePackTest {
         for (BlockData block : BlockData.values()) {
             Model model = resourcePack.getBlockModel(block);
             String name = block.getBlockName();
-            if (model.placeholder && !ignore.contains(name)) {
+            if (model.isPlaceholder() && !ignore.contains(name)) {
                 hasLoadErrors = true;
                 System.err.println("Failed to load model of block " + block.toString());
             }
