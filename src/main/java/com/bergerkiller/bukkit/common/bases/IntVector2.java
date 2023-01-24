@@ -126,10 +126,7 @@ public class IntVector2 {
 
     @Override
     public int hashCode() {
-        long i = (long) this.x & 4294967295L | ((long) this.z & 4294967295L) << 32;
-        int j = (int) i;
-        int k = (int) (i >> 32);
-        return j ^ k;
+        return 31 * x + z;
     }
 
     @Override
