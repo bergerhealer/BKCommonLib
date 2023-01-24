@@ -950,31 +950,7 @@ public class MapResourcePack {
      * @return loaded Gson object, or <i>null</i> if not found or not loadable
      */
     protected final <T> T openGsonObject(Class<T> objectType, ResourceType type, String path) {
-        InputStream inputStream = this.openFileStream(type, path);
-        if (inputStream == null) {
-            return null;
-        }
-        try {
-            try {
-                Reader reader = new InputStreamReader(inputStream, "UTF-8");
-                if (this.gson == null) {
-                    this.gson = createGson();
-                }
-                T result = this.gson.fromJson(reader, objectType);
-                if (result == null) {
-                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName() + " at " + path);
-                }
-                return result;
-            } finally {
-                inputStream.close();
-            }
-        } catch (JsonSyntaxException ex) {
-            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
-                    " at " + path + ": " + ex.getMessage());
-        } catch (IOException ex) {
-            Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
-        }
-        return null;
+        return readGsonObject(objectType, this.openFileStream(type, path), path);
     }
 
     /**
@@ -987,6 +963,10 @@ public class MapResourcePack {
      * @return loaded Gson object, or <i>null</i> if not found or not loadable
      */
     public final <T> T readGsonObject(Class<T> objectType, InputStream inputStream) {
+        return readGsonObject(objectType, inputStream, null);
+    }
+
+    private final <T> T readGsonObject(Class<T> objectType, InputStream inputStream, String optPath) {
         if (inputStream == null) {
             return null;
         }
@@ -998,15 +978,17 @@ public class MapResourcePack {
                 }
                 T result = this.gson.fromJson(reader, objectType);
                 if (result == null) {
-                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName());
+                    String s = (optPath == null) ? "" : (" at " + optPath);
+                    throw new IOException("Failed to parse JSON for " + objectType.getSimpleName() + s);
                 }
                 return result;
             } finally {
                 inputStream.close();
             }
         } catch (JsonSyntaxException ex) {
+            String s = (optPath == null) ? "" : (" at " + optPath);
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Failed to parse GSON for " + objectType.getSimpleName() +
-                    ": " + ex.getMessage());
+                    s + ": " + ex.getMessage());
         } catch (IOException ex) {
             Logging.LOGGER_MAPDISPLAY.log(Level.SEVERE, "Unhandled IO Exception", ex);
         }
