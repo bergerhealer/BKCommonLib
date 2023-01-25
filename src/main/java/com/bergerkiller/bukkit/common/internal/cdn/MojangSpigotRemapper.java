@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.internal.cdn;
 
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.logging.Level;
@@ -156,20 +156,22 @@ public class MojangSpigotRemapper {
             }
         }
 
-        // While synchronized, try to load a new remapper if this is possible
-        synchronized (this) {
-            ClassRemapper remapper = initRemapper(declaringClass);
-            if (remapper == null) {
-                return NO_REMAPPERS;
-            }
+        // Prepare a Remapper. If no remapping is done, return no remappers
+        ClassRemapper remapper = initRemapper(declaringClass);
+        if (remapper == null) {
+            return NO_REMAPPERS;
+        }
 
-            // Store it in the recurse map too!
-            ClassRemapper[] result = remapper.recurse(this::initRemapper);
+        // Store it in the recurse map too! We might be overwriting prior results, but that doesn't hurt.
+        ClassRemapper[] result = remapper.recurse(this::initRemapper);
+
+        synchronized (this) {
             Map<Class<?>, ClassRemapper[]> newRecurseMap = new IdentityHashMap<>(recurseRemappersByDeclaringClassName);
             newRecurseMap.put(declaringClass, result);
             recurseRemappersByDeclaringClassName = newRecurseMap;
-            return result;
         }
+
+        return result;
     }
 
     private ClassRemapper initRemapper(Class<?> declaringClass) {
@@ -180,10 +182,27 @@ public class MojangSpigotRemapper {
             return null;
         }
 
-        // Compute a new remapper if needed
-        return this.remappersByDeclaringClassName.computeIfAbsent(declaringClass, c -> {
-            return ClassRemapper.create(mappings, classLookup);
-        });
+        // Generate new (recurse) remapper for this declaring class
+        // It might be another thread did the same, in which case we are wasting our time
+        // But that's okay!
+        // This must be done this way, because during initialization it can load new classes.
+        // Having this in a synchronized block risks a deadlock.
+
+        ClassRemapper remapper;
+        synchronized (remappersByDeclaringClassName) {
+            remapper = remappersByDeclaringClassName.get(declaringClass);
+        }
+        if (remapper == null) {
+            remapper = ClassRemapper.create(mappings, classLookup);
+            synchronized (remappersByDeclaringClassName) {
+                ClassRemapper prev = remappersByDeclaringClassName.putIfAbsent(declaringClass, remapper);
+                if (prev != null) {
+                    remapper = prev; // Another thread did the work for us. Use that.
+                }
+            }
+        }
+
+        return remapper;
     }
 
     /**
@@ -380,7 +399,7 @@ public class MojangSpigotRemapper {
      * in the mapping details.
      */
     private static final class LazyClassLookup {
-        private final Map<String, Supplier<Class<?>>> map = new HashMap<>();
+        private final Map<String, Supplier<Class<?>>> map = new ConcurrentHashMap<>();
 
         public void reset() {
             map.clear();
