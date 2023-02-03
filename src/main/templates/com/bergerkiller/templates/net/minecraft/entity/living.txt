@@ -319,6 +319,14 @@ class EntityLiving extends Entity {
 
     public final float getMaxHealth();
 
+#if version >= 1.18
+    public float getAbsorptionAmount();
+    public void setAbsorptionAmount(float extraHealth);
+#else
+    public float getAbsorptionAmount:getAbsorptionHearts();
+    public void setAbsorptionAmount:setAbsorptionHearts(float extraHealth);
+#endif
+
     <code>
     public static EntityLivingHandle fromBukkit(org.bukkit.entity.LivingEntity livingEntity) {
         return createHandle(com.bergerkiller.bukkit.common.conversion.type.HandleConversion.toEntityHandle(livingEntity));

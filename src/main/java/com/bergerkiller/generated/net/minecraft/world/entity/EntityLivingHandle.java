@@ -36,6 +36,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
     public abstract ItemStack getEquipment(EquipmentSlot paramEnumItemSlot);
     public abstract float getHealth();
     public abstract float getMaxHealth();
+    public abstract float getAbsorptionAmount();
+    public abstract void setAbsorptionAmount(float extraHealth);
 
     public static final Key<Byte> DATA_LIVING_FLAGS = Key.Type.BYTE.createKey(T.DATA_LIVING_FLAGS, -1);
     public static final Key<Float> DATA_HEALTH = Key.Type.FLOAT.createKey(T.DATA_HEALTH, 6);
@@ -89,6 +91,8 @@ public abstract class EntityLivingHandle extends EntityHandle {
         public final Template.Method.Converted<ItemStack> getEquipment = new Template.Method.Converted<ItemStack>();
         public final Template.Method<Float> getHealth = new Template.Method<Float>();
         public final Template.Method<Float> getMaxHealth = new Template.Method<Float>();
+        public final Template.Method<Float> getAbsorptionAmount = new Template.Method<Float>();
+        public final Template.Method<Void> setAbsorptionAmount = new Template.Method<Void>();
 
     }
 
