@@ -148,7 +148,7 @@ class ItemStack {
 
 #if version >= 1.18
     public (ItemStackHandle) ItemStack cloneAndSubtract:split(int n);
-#elseif version >= 1.8.8
+#elseif version > 1.9
     public (ItemStackHandle) ItemStack cloneAndSubtract(int n);
 #else
     public (ItemStackHandle) ItemStack cloneAndSubtract:a(int n);

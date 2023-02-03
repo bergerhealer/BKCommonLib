@@ -90,7 +90,7 @@ class MobEffectList {
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
         return net.minecraft.core.registries.BuiltInRegistries.MOB_EFFECT.getId((Object) mobeffectlist);
     }
-#elseif version <= 1.8.8 && exists net.minecraft.world.effect.MobEffectList public final int id;
+#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffectList public final int id;
     public static int getId((MobEffectListHandle) MobEffectList mobeffectlist) {
         return mobeffectlist.id;
     }
