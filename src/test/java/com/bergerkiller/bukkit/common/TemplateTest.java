@@ -208,7 +208,7 @@ public class TemplateTest {
                 genClassPath = "com.bergerkiller.generated.net.minecraft.server." + genClassPath.substring(73);
             }
 
-            // MC 1.8.8 class translation fixes
+            // MC 1.8.9 class translation fixes
             {
                 if (genClassPath.equals("com.bergerkiller.generated.net.minecraft.server.MobSpawnerAbstractHandle.a")) {
                     genClassPath = "com.bergerkiller.generated.net.minecraft.server.MobSpawnerDataHandle";

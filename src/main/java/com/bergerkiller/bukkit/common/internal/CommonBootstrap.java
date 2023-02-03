@@ -422,7 +422,7 @@ public class CommonBootstrap {
         }
 
         // Botched deobfuscation of class names on 1.8.8 / proxy missing classes to simplify API
-        if (evaluateMCVersion("<=", "1.8.8")) {
+        if (evaluateMCVersion("<", "1.9")) {
             remappings.put("net.minecraft.world.level.MobSpawnerData", "net.minecraft.world.level.MobSpawnerAbstract$a");
             remappings.put("net.minecraft.world.level.block.SoundEffectType", "net.minecraft.world.level.block.Block$StepSound"); // workaround
             remappings.put("net.minecraft.network.syncher.DataWatcher$Item", "net.minecraft.network.syncher.DataWatcher$WatchableObject");
@@ -754,7 +754,7 @@ public class CommonBootstrap {
                 Conversion.registerConverters(ItemSlotConversion.class);
             }
         }
-        if (evaluateMCVersion("<=", "1.8.8")) {
+        if (evaluateMCVersion("<", "1.9")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
         }
         if (evaluateMCVersion(">=", "1.17")) {

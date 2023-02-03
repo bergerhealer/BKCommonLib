@@ -1167,7 +1167,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
         private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_NO_GRAVITY:###;
     #endif
 #else
-    /* === MC 1.8.8: These constants do not exist == */
+    /* === MC 1.8.9: These constants do not exist == */
     protected static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_FLAGS:###;
     private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_AIR_TICKS:###;
     private static optional final (DataWatcher.Key<?>) DataWatcherObject<String> DATA_CUSTOM_NAME:###;
@@ -1260,8 +1260,8 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
     public boolean valid;
 
-// For some reason was down here on 1.8.8 and earlier
-#if version <= 1.8.8
+// For some reason was down here on 1.8.9 and earlier
+#if version <= 1.8.9
     protected (org.bukkit.entity.Entity) CraftEntity bukkitEntityField:bukkitEntity;
 #endif
 
@@ -1940,7 +1940,7 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
     public optional boolean onInteractBy_1_9:###((org.bukkit.entity.HumanEntity) EntityHuman human, (org.bukkit.inventory.ItemStack) ItemStack itemstack, (org.bukkit.inventory.MainHand) EnumHand enumhand);
 #endif
 
-    // Since MC 1.8.8
+    // Since MC 1.8.9
 #if version < 1.9
     public optional boolean onInteractBy_1_8_8:e((org.bukkit.entity.HumanEntity) EntityHuman entityhuman);
 #else
