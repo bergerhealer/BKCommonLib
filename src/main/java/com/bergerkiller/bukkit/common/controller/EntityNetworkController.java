@@ -637,7 +637,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
         }
 
         if (EntityTrackerEntryStateHandle.T.opt_vehicle.isAvailable()) {
-            // On <= MC 1.8.8 we must update the vehicle of this Entity
+            // On <= MC 1.8.9 we must update the vehicle of this Entity
             org.bukkit.entity.Entity vehicle = EntityTrackerEntryStateHandle.T.opt_vehicle.get(state.getRaw());
             if (vehicle != null) {
                 PacketUtil.sendPacket(viewer, PacketType.OUT_ENTITY_ATTACH.newInstanceMount(entity.getEntity(), vehicle));
@@ -778,7 +778,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
 
     /**
      * Gets a list of passengers that have last been synchronized to the viewers.
-     * On MC 1.8.8 this will return the last known passenger entity.
+     * On MC 1.8.9 this will return the last known passenger entity.
      * 
      * @return list of last known passengers (not modifiable)
      */
@@ -796,7 +796,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
     /**
      * Checks whether there are any passenger changes pending.<br>
      * <br>
-     * Checks whether passengers have changed since the last sync. On MC 1.8.8, this method
+     * Checks whether passengers have changed since the last sync. On MC 1.8.9, this method
      * checks whether the vehicle of this Entity has changed instead.
      * 
      * @return True if changed, False if not
@@ -938,7 +938,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
                 onPassengersChanged(old_passengers_bu, new_passengers);
             }
         } else if (EntityTrackerEntryStateHandle.T.opt_vehicle.isAvailable()) {
-            // On MC <= 1.8.8 we must update the vehicle of this Entity
+            // On MC <= 1.8.9 we must update the vehicle of this Entity
 
             Entity old_vehicle = EntityTrackerEntryStateHandle.T.opt_vehicle.get(state.getRaw());
             Entity new_vehicle = this.entity.getVehicle();

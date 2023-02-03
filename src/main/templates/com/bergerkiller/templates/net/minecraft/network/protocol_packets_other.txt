@@ -499,7 +499,7 @@ class PacketPlayInBlockPlace extends Packet {
     </code>
 }
 
-// PacketPlayInBlockPlace on MC 1.8.8 and before when int direction == 255
+// PacketPlayInBlockPlace on MC 1.8.9 and before when int direction == 255
 class PacketPlayInUseItem extends Packet {
     // Hand since 1.9
 #if version >= 1.9
@@ -603,7 +603,7 @@ class PacketPlayInUseItem extends Packet {
     }
 #endif
 
-    // Direction index value of 255 was used for the 'block place' packet on 1.8.8 and before
+    // Direction index value of 255 was used for the 'block place' packet on 1.8.9 and before
 #if version >= 1.9
     public boolean isBlockPlacePacket() {
         return false;
@@ -1295,7 +1295,7 @@ class PacketPlayOutPlayerListHeaderFooter extends Packet {
 //
 //TODO: Shortly a BitSet/int of a mask of sections stored was used
 //      Add it? Same for 'biome storage' and 'has biome data'
-//      On 1.18 and later light data is also stored (also 1.8.8 and before)
+//      On 1.18 and later light data is also stored (also 1.8.9 and before)
 //      I don't use it, so if anyone wants it, PR it.
 class PacketPlayOutMapChunk extends Packet {
 #if version >= 1.17
@@ -1431,7 +1431,7 @@ class PacketPlayOutMapChunk extends Packet {
     </code>
 }
 
-// Only >= MC 1.9 (MC 1.8.8 relies on clients themselves to unload as needed, for some reason)
+// Only >= MC 1.9 (MC 1.8.9 relies on clients themselves to unload as needed, for some reason)
 optional class PacketPlayOutUnloadChunk extends Packet {
 #if version >= 1.17
     private int cx:x;
@@ -1496,7 +1496,7 @@ class PacketPlayOutNamedSoundEffect extends Packet {
     </code>
 
     // Accessor function for sound category (by name)
-    // On MC 1.8.8 this does nothing (always returns "master")
+    // On MC 1.8.9 this does nothing (always returns "master")
     <code>
     public String getCategory() {
         if (T.category_1_10_2.isAvailable()) {
@@ -2216,7 +2216,7 @@ optional class PacketPlayInTeleportAccept extends Packet {
 #endif
 }
 
-// Only <= MC 1.8.8
+// Only <= MC 1.8.9
 optional class PacketPlayOutUpdateSign extends Packet {
     private (org.bukkit.World) World world:a;
     private (IntVector3) BlockPosition position:b;

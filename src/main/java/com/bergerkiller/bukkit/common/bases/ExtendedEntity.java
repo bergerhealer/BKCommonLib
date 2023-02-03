@@ -1013,7 +1013,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
      * 
      * <ul>
      * <li>Returns False if this passenger was already added
-     * <li>Returns False if another passenger is already present on MC 1.8.8 or before
+     * <li>Returns False if another passenger is already present on MC 1.8.9 or before
      * <li>Returns False if a plugin cancelled the VehicleEnterEvent
      * </ul>
      *
@@ -1116,7 +1116,7 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
                 EntityTrackerEntryStateHandle.T.opt_passengers.set(entry.getState().getRaw(), newPassengers);
             }
         } else if (EntityTrackerEntryStateHandle.T.opt_vehicle.isAvailable()) {
-            // On <= MC 1.8.8 we must synchronize the vehicle of this Entity
+            // On <= MC 1.8.9 we must synchronize the vehicle of this Entity
 
             // Detach all removed passengers
             for (EntityHandle passengerHandle : removedPassengers) {
