@@ -10,7 +10,7 @@ import com.bergerkiller.generated.org.bukkit.inventory.PlayerInventoryHandle;
 
 /**
  * HumanHand is a mirror of Bukkit's {@link org.bukkit.inventory.MainHand}.
- * It is here for backwards compatibility with MC 1.8.8.
+ * It is here for backwards compatibility with MC 1.8.9.
  */
 public enum HumanHand {
     LEFT, RIGHT;
@@ -26,7 +26,7 @@ public enum HumanHand {
 
     /**
      * Converts this HumanHand to Bukkit's MainHand. This method always returns null
-     * on versions before and including 1.8.8.
+     * on versions before and including 1.8.9.
      * 
      * @param hand to convert
      * @return {@link org.bukkit.inventory.MainHand}
@@ -40,7 +40,7 @@ public enum HumanHand {
      * whether LEFT/RIGHT is the MAIN or OFF hand. When <i>null</i> is used for {@code humanEntity}
      * it is assumed the player's main hand is RIGHT.<br>
      * <br>
-     * On versions before and including MC 1.8.8 this method always returns <i>null</i>.
+     * On versions before and including MC 1.8.9 this method always returns <i>null</i>.
      * 
      * @param humanEntity to query for main hand information
      * @param humanHand to convert
@@ -52,8 +52,8 @@ public enum HumanHand {
 
     /**
      * Converts Bukkit's MainHand property to the HumanHand LEFT/RIGHT constants.
-     * This wrapper is required for backwards compatibility with MC 1.8.8.
-     * On versions before and including MC 1.8.8 this method always returns RIGHT.
+     * This wrapper is required for backwards compatibility with MC 1.8.9.
+     * On versions before and including MC 1.8.9 this method always returns RIGHT.
      * 
      * @param human the main hand is for
      * @param mainHand of the human ({@link org.bukkit.inventory.MainHand})
@@ -75,7 +75,7 @@ public enum HumanHand {
 
     /**
      * Gets the main hand in use by a human. This will always return RIGHT on versions before
-     * and including MC 1.8.8. When <i>null</i> is used for the {@code humanEntity} parameter,
+     * and including MC 1.8.9. When <i>null</i> is used for the {@code humanEntity} parameter,
      * this method will always return RIGHT as well.
      * 
      * @param humanEntity to get the main hand for
@@ -87,7 +87,7 @@ public enum HumanHand {
 
     /**
      * Gets the off hand in use by a human. This will always return LEFT on versions before
-     * and including MC 1.8.8. When <i>null</i> is used for the {@code humanEntity} parameter,
+     * and including MC 1.8.9. When <i>null</i> is used for the {@code humanEntity} parameter,
      * this method will always return LEFT as well.
      * 
      * @param humanEntity to get the off hand for
@@ -99,7 +99,7 @@ public enum HumanHand {
 
     /**
      * Converts a HumanHand to Bukkit's MainHand. This method always returns null
-     * on versions before and including MC 1.8.8.
+     * on versions before and including MC 1.8.9.
      * 
      * @param hand to convert
      * @return {@link org.bukkit.inventory.MainHand}
@@ -120,7 +120,7 @@ public enum HumanHand {
      * whether LEFT/RIGHT is the MAIN or OFF hand. When <i>null</i> is used for {@code humanEntity}
      * it is assumed the player's main hand is RIGHT.<br>
      * <br>
-     * On versions before and including MC 1.8.8 this method always returns <i>null</i>.
+     * On versions before and including MC 1.8.9 this method always returns <i>null</i>.
      * 
      * @param humanEntity to query for main hand information
      * @param nmsEnumHand to convert into a HumanHand
@@ -143,7 +143,7 @@ public enum HumanHand {
      * whether LEFT/RIGHT is the MAIN or OFF hand. When <i>null</i> is used for {@code humanEntity}
      * it is assumed the player's main hand is RIGHT.<br>
      * <br>
-     * On versions before and including MC 1.8.8 this method always returns <i>null</i>.
+     * On versions before and including MC 1.8.9 this method always returns <i>null</i>.
      * 
      * @param humanEntity to query for main hand information
      * @param humanHand to convert
@@ -164,7 +164,7 @@ public enum HumanHand {
     /**
      * Gets the item held in a given hand for a human entity.<br>
      * <br>
-     * On versions before and including MC 1.8.8 this method always returns <i>null</i> for the LEFT hand,
+     * On versions before and including MC 1.8.9 this method always returns <i>null</i> for the LEFT hand,
      * and will return the held item for the RIGHT hand.
      * 
      * @param humanEntity to query the held item
@@ -185,7 +185,7 @@ public enum HumanHand {
     /**
      * Sets the item held in a given hand for a human entity.<br>
      * <br>
-     * On versions before and including MC 1.8.8 this method silently fails for the LEFT hand,
+     * On versions before and including MC 1.8.9 this method silently fails for the LEFT hand,
      * and will instead set the held item only for the RIGHT hand.
      * 
      * @param humanEntity to set the held item for
@@ -215,7 +215,7 @@ public enum HumanHand {
 
     /**
      * Gets the item held in the off hand of the human. This method will always return
-     * <i>null</i> on versions before and including MC 1.8.8.
+     * <i>null</i> on versions before and including MC 1.8.9.
      * 
      * @param humanEntity to get the off hand held item
      * @return held item
@@ -245,7 +245,7 @@ public enum HumanHand {
 
     /**
      * Sets the item held in the off hand of the human. This method will silently fail
-     * on versions before and including MC 1.8.8.
+     * on versions before and including MC 1.8.9.
      * 
      * @param humanEntity to set the off hand held item
      * @param item to set to
@@ -257,7 +257,7 @@ public enum HumanHand {
         if (PlayerInventoryHandle.T.setItemInOffHand.isAvailable()) {
             PlayerInventoryHandle.T.setItemInOffHand.invoke(humanEntity.getInventory(), item);
         } else {
-            // Silent fail, No OFF hand item holding <= MC 1.8.8
+            // Silent fail, No OFF hand item holding <= MC 1.8.9
         }
     }
 }

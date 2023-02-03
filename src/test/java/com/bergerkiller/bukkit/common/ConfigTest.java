@@ -25,8 +25,8 @@ public class ConfigTest {
 
     @Test
     public void testYAMLLoadSave() {
-        // Don't run <= 1.8.8
-        if (Common.evaluateMCVersion("<=", "1.8.8")) {
+        // Don't run <= 1.8.9
+        if (Common.evaluateMCVersion("<", "1.9")) {
             return;
         }
 

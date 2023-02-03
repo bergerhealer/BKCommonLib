@@ -65,7 +65,7 @@ public class DataWatcherTest {
         dataWatcher.set(EntityHandle.DATA_AIR_TICKS, 200);
         assertEquals(200, dataWatcher.get(EntityHandle.DATA_AIR_TICKS).intValue());
 
-        // This might fail on 1.8.8! Test Boolean type.
+        // This might fail on 1.8.9! Test Boolean type.
         dataWatcher.watch(EntityHandle.DATA_CUSTOM_NAME_VISIBLE, false);
         assertEquals(false, dataWatcher.get(EntityHandle.DATA_CUSTOM_NAME_VISIBLE).booleanValue());
         dataWatcher.set(EntityHandle.DATA_CUSTOM_NAME_VISIBLE, true);

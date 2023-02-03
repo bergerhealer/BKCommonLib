@@ -6,20 +6,20 @@ package com.bergerkiller.bukkit.common.internal;
  */
 public class CommonCapabilities {
     /**
-     * Minecraft 1.8.8 and before there was a bug in the World Entity collision handler.
+     * Minecraft 1.8.9 and before there was a bug in the World Entity collision handler.
      * This caused passengers to collide with their vehicle at random. Fun times!
      */
-    public static final boolean VEHICLES_COLLIDE_WITH_PASSENGERS = CommonBootstrap.evaluateMCVersion("<=", "1.8.8");
+    public static final boolean VEHICLES_COLLIDE_WITH_PASSENGERS = CommonBootstrap.evaluateMCVersion("<", "1.9");
 
     /**
-     * Minecraft 1.8-1.8.8 had PacketPlayInUseItem and PacketPlayInBlockPlace merged as one
+     * Minecraft 1.8-1.8.9 had PacketPlayInUseItem and PacketPlayInBlockPlace merged as one
      */
-    public static final boolean PLACE_PACKETS_MERGED = CommonBootstrap.evaluateMCVersion("<=", "1.8.8");
+    public static final boolean PLACE_PACKETS_MERGED = CommonBootstrap.evaluateMCVersion("<", "1.9");
 
     /**
      * Minecraft 1.9 and later specifies block/block as parent for block models,
      * which stores the transformations in different display modes. This is missing
-     * on 1.8-1.8.8.
+     * on 1.8-1.8.9.
      */
     public static final boolean RESOURCE_PACK_MODEL_BASE_TRANSFORMS = CommonBootstrap.evaluateMCVersion(">=", "1.9");
 
@@ -64,7 +64,7 @@ public class CommonCapabilities {
     public static final boolean WORLD_LIGHT_DARK_INVERTED = CommonBootstrap.evaluateMCVersion(">=", "1.11.2");
 
     /**
-     * Since Minecraft 1.11 ItemStacks could be 'empty' using the empty constant introduced in 1.8.8.
+     * Since Minecraft 1.11 ItemStacks could be 'empty' using the empty constant introduced in 1.8.9.
      * The player inventory 'dirty' state uses this new empty state, among others.
      */
     public static final boolean ITEMSTACK_EMPTY_STATE = CommonBootstrap.evaluateMCVersion(">=", "1.11");

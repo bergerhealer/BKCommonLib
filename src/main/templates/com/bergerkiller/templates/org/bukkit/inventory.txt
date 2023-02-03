@@ -26,7 +26,7 @@ class PlayerInventory extends Inventory {
     public optional abstract void setItemInMainHand(ItemStack item);
     public optional abstract void setItemInOffHand(ItemStack item)
 
-    // Deprecated <= 1.8.8
+    // Deprecated <= 1.8.9
     public optional abstract ItemStack getItemInHand()
     public optional abstract void setItemInHand(ItemStack stack)
 

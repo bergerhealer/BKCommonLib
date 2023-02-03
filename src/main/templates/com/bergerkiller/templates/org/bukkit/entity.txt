@@ -23,7 +23,7 @@ class Entity {
         }
     }
 #else
-    // Only one passenger on 1.8.8 and before
+    // Only one passenger on 1.8.9 and before
     public List<Entity> getPassengers() {
         org.bukkit.entity.Entity p = instance.getPassenger();
         if (p == null) {
@@ -112,10 +112,10 @@ class Entity {
     }
 
 #else
-    // On 1.8.8 and before we use a custom implementation that simulates the same behavior
+    // On 1.8.9 and before we use a custom implementation that simulates the same behavior
     // Adding more than one passenger is impossible
     public boolean addPassenger(Entity passenger) {
-        // Return code means nothing on 1.8.8 and prior
+        // Return code means nothing on 1.8.9 and prior
         // There is also only one passenger possible, so if there is one, this fails
         // Correct all that
         com.google.common.base.Preconditions.checkArgument(passenger != null, "passenger == null");

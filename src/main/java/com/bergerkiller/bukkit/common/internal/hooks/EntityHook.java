@@ -80,7 +80,7 @@ public class EntityHook extends ClassHook<EntityHook> {
     }
 
     @Deprecated
-    @HookMethodCondition("version <= 1.8.8")
+    @HookMethodCondition("version < 1.9")
     @HookMethod(value="public boolean onInteractBy_1_8_8:???(EntityHuman entityhuman)")
     public boolean onInteractBy_1_8_8(Object entityHuman) {
         return onInteractBy((HumanEntity) WrapperConversion.toEntity(entityHuman), HumanHand.RIGHT).isTruthy();
