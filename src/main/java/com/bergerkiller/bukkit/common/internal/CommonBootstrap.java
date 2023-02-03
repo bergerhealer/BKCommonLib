@@ -754,7 +754,7 @@ public class CommonBootstrap {
                 Conversion.registerConverters(ItemSlotConversion.class);
             }
         }
-        if (evaluateMCVersion("<=", "1.8.9")) {
+        if (evaluateMCVersion("<", "1.9")) {
             Conversion.registerConverters(MC1_8_8_Conversion.class);
         }
         if (evaluateMCVersion(">=", "1.17")) {
