@@ -106,7 +106,7 @@ class MobEffectList {
 #elseif version >= 1.18 || exists net.minecraft.world.effect.MobEffectList public static MobEffectList byId(int id);
     // Spigot/Paper 1.18+, Purpur 1.17.1+
     public static (MobEffectListHandle) MobEffectList fromId:byId(int id);
-#elseif version <= 1.8.9 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
+#elseif version < 1.9 && exists net.minecraft.world.effect.MobEffectList public static final MobEffectList[] byId;
     // NachoSpigot 1.8.8 has some weird hack thing
     public static (MobEffectListHandle) MobEffectList fromId(int id) {
         MobEffectList[] byId = MobEffectList.byId;
