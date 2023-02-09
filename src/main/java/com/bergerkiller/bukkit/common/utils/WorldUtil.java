@@ -872,9 +872,9 @@ public class WorldUtil extends ChunkUtil {
      * Queue a chunk for resending to all players that are in range of it.
      * Use this method to update chunk data after doing changes to its raw structure.
      *
-     * @param player to send chunk data for
-     * @param chunkX - coordinate of the chunk
-     * @param chunkZ - coordinate of the chunk
+     * @param world World the chunk is in
+     * @param chunkX X - coordinate of the chunk
+     * @param chunkZ Z - coordinate of the chunk
      * @return True if players were nearby, False if not
      */
     public static boolean queueChunkSend(org.bukkit.World world, int chunkX, int chunkZ) {
@@ -1038,7 +1038,7 @@ public class WorldUtil extends ChunkUtil {
      * Sets the weather duration of the current weather state, until it switches to a future state.
      * To make the current weather state last forever, specify a duration of Integer.MAX_VALUE.<br><br>
      * 
-     * The future weather state will always go from clear <> rain/storm.
+     * The future weather state will always go from clear &lt;&gt; rain/storm.
      * 
      * @param world to set the weather duration for
      * @param durationInTicks to set the duration to

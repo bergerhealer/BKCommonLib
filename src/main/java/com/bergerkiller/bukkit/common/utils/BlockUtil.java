@@ -417,9 +417,9 @@ public class BlockUtil extends MaterialUtil {
      * @param blockState to get the update packet for
      * @return update packet
      */
-    public static CommonPacket getUpdatePacket(BlockState state) {
-        if (state == null) return null;
-        Object tileEntity = HandleConversion.toTileEntityHandle(state);
+    public static CommonPacket getUpdatePacket(BlockState blockState) {
+        if (blockState == null) return null;
+        Object tileEntity = HandleConversion.toTileEntityHandle(blockState);
         return (tileEntity == null) ? null : TileEntityHandle.T.getUpdatePacket.invoke(tileEntity);
     }
 

@@ -16,7 +16,7 @@ import java.util.Map;
  * An NBT Tag wrapper implementation to safely operate on tags<br><br>
  * <p/>
  * <b>Data</b> represents actual data stored by the tag. This can be:<br>
- * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float,
+ * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long, float,
  * double, byte[], int[], String</u>
  */
 public class CommonTag extends BasicWrapper<NBTBaseHandle> implements Cloneable {

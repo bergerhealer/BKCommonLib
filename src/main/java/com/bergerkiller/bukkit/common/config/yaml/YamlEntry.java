@@ -127,7 +127,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
 
     /**
      * Removes a change listener from this node that was previously added
-     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * using {@link #addChangeListener(YamlChangeListener)}. To find the listener,
      * {@link Object#equals(Object)} is used.
      * 
      * @param listener The listener to remove
@@ -162,7 +162,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * Removes all previously registered change listeners from
      * this node.
      * 
-     * @see #addChangeListener(Runnable)
+     * @see #addChangeListener(YamlChangeListener) 
      */
     public void clearChangeListeners() {
         this.listeners = NO_LISTENERS;

@@ -40,8 +40,7 @@ public class MessageBuilder {
 
     /**
      * Resets the internal state to the defaults
-     * 
-     * @param builder StringBuilder containing the initial text
+     *
      * @return This MessageBuilder
      */
     public MessageBuilder reset() {

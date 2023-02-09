@@ -23,7 +23,7 @@ public class EntityMoveEvent extends EntityEvent {
      * Sets the Entity represented by this move event<br>
      * <b>Only called internally by the event creator!</b>
      *
-     * @param entity to set to
+     * @param entityHandle Handle of the Entity to set to
      */
     public void setEntity(EntityHandle entityHandle) {
         this.entityHandle = entityHandle;

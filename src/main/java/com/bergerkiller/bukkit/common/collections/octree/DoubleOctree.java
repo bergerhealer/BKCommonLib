@@ -306,7 +306,6 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * for other uses to reduce the memory footprint, since it is immutable.
      * 
      * @param value
-     * @return previous entry at the coordinates of the entry, if one existed
      */
     @SuppressWarnings("unchecked")
     public void addEntry(Entry<? extends T> value) {
@@ -798,7 +797,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
          * Gets whether the value of this entry equals the value in the entry specified.
          * Also returns true if both are null.
          * 
-         * @param value
+         * @param entry
          * @return True if equals
          */
         public boolean valueEquals(Entry<?> entry) {

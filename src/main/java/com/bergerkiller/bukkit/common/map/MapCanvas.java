@@ -989,10 +989,8 @@ public abstract class MapCanvas {
     /**
      * Draws a line connecting two points
      * 
-     * @param x1 coordinate of the first point
-     * @param y1 coordinate of the first point
-     * @param x2 coordinate of the second point
-     * @param y2 coordinate of the second point
+     * @param p1 First point
+     * @param p2 Second point
      * @param color to draw the line as
      * @return this canvas
      */

@@ -81,7 +81,7 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * this selector is specified, where for example {@link #getLastError()} can be used
      * for initialization.
      *
-     * @param defaultLibraryComponentSupplier Supplies a new instance of the library
+     * @param defaultLibraryComponentFunc Constructs a new instance of the library
      *        component.
      * @return this
      */
@@ -99,8 +99,7 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * If this is never called, then {@link #get()} will simply return null when
      * none of the options are enabled.
      *
-     * @param defaultLibraryComponentSupplier Supplies a new instance of the library
-     *        component.
+     * @param defaultLibraryComponent Instance of the library component
      * @return this
      */
     public LibraryComponentSelector<E, L> setDefaultComponent(L defaultLibraryComponent) {
@@ -145,8 +144,6 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * Adds a conditional library component that is only enabled when the predicate
      * tests true.
      *
-     * @param <E> Environment type, ignored
-     * @param <L> Library component type
      * @param identifier Unique identifier for this optional component
      * @param isSupported Predicate to test whether the component should be enabled
      * @param componentSupplier Constructor for a new instance of the library component. Is
@@ -165,8 +162,6 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * Adds a conditional library component that is only enabled when the predicate
      * tests true.
      *
-     * @param <E> Environment type, ignored
-     * @param <L> Library component type
      * @param identifier Unique identifier for this optional component
      * @param isSupported Predicate to test whether the component should be enabled
      * @param componentFunction Constructor for a new instance of the library component. Is
@@ -186,8 +181,6 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * Adds a conditional library component that is only enabled when the current server
      * Minecraft version falls between the two versions specified, inclusive.
      *
-     * @param <E> Environment type, ignored
-     * @param <L> Library component type
      * @param minimumMinecraftVersion Minimum supported Minecraft version. Null or empty String
      *                                if there is no minimum.
      * @param maximumMinecraftVersion Maximum supported Minecraft version. Null or empty String
@@ -210,8 +203,6 @@ public class LibraryComponentSelector<E, L extends LibraryComponent> extends Lib
      * Adds a conditional library component that is only enabled when the current server
      * Minecraft version falls between the two versions specified, inclusive.
      *
-     * @param <E> Environment type, ignored
-     * @param <L> Library component type
      * @param minimumMinecraftVersion Minimum supported Minecraft version. Null or empty String
      *                                if there is no minimum.
      * @param maximumMinecraftVersion Maximum supported Minecraft version. Null or empty String

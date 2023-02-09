@@ -209,10 +209,7 @@ public class MojangSpigotRemapper {
      * Loads the mappings directly. Mappings can be loaded/generated manually.
      * Previous mapping data is wiped.
      *
-     * @param mojangMappings Mojang<>Obfuscated mapping data
-     * @param spigotMappings Spigot<>Mojang class name mapping data
-     * @param classPathResolver Resolver for the 'true' class path of class names
-     * @param minecraftVersion Minecraft version for which to remap
+     * @param mappings Mojang&lt;&gt;Obfuscated mapping data
      */
     protected synchronized void loadMappings(
             final MojangMappings mappings

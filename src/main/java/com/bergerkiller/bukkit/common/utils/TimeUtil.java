@@ -27,7 +27,7 @@ public class TimeUtil {
     /**
      * Returns the time value based on a name<br>
      * Returns -1 if no time format was detected<br>
-     * Some credits go to CommandBook for their name<>time table!
+     * Some credits go to CommandBook for their name&lt;&gt;time table!
      *
      * @param timeName
      */

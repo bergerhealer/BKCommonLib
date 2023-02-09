@@ -191,7 +191,7 @@ public interface VehicleMountController {
          * Spawns the Entity again
          * 
          * @param viewer Player to which to send the spawn packets
-         * @param entityId The ID of the Entity to respawn
+         * @param entity The Entity to respawn
          */
         public void respawn(Player viewer, T entity);
     }

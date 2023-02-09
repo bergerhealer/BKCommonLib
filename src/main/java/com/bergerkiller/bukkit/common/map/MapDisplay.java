@@ -628,7 +628,7 @@ public class MapDisplay implements MapDisplayEvents {
      * Sets whether this Virtual Map's {@link #onTick()} method is called when no players
      * are currently viewing this map. By default this is set to true.
      * 
-     * @param updateWithoutViewers option
+     * @param updateWhenNotViewing New option
      */
     public void setUpdateWithoutViewers(boolean updateWhenNotViewing) {
         this._updateWhenNotViewing = updateWhenNotViewing;
@@ -697,7 +697,7 @@ public class MapDisplay implements MapDisplayEvents {
      * in the world that show this display are checked. If no item frame is found,
      * returns null.
      *
-     * @param player The player whose eye location to use
+     * @param viewer The player whose eye location to use
      * @return MapLookPosition if found, otherwise null
      */
     public MapLookPosition findLookPosition(Player viewer) {
@@ -889,7 +889,8 @@ public class MapDisplay implements MapDisplayEvents {
     }
 
     /**
-     * Sets the master volume. All sounds played using {@link #playSound()} will be pre-multiplied with this factor.
+     * Sets the master volume. All sounds played using {@link #playSound(ResourceKey)}
+     * will be pre-multiplied with this factor.
      * 
      * @param masterVolume to set to, 1.0 for defaults
      */

@@ -273,7 +273,7 @@ public final class CommonMapController implements PacketListener, Listener {
 
     /**
      * Gets the Map display information for a map item displayed in an item frame.
-     * All frames showing the same map will return the same {@link #MapDisplayInfo}.
+     * All frames showing the same map will return the same {@link MapDisplayInfo}.
      * If the item frame does not show a map, null is returned.
      * 
      * @param itemFrame to get the map information for
@@ -298,7 +298,7 @@ public final class CommonMapController implements PacketListener, Listener {
 
     /**
      * Gets the Map display information for a certain map item.
-     * All items showing the same map will return the same {@link #MapDisplayInfo}.
+     * All items showing the same map will return the same {@link MapDisplayInfo}.
      * If the item does not represent a map, null is returned.
      * 
      * @param mapItem to get the map information for
@@ -1479,7 +1479,6 @@ public final class CommonMapController implements PacketListener, Listener {
     /**
      * Looks up all item frame information loaded of a particular item frame cluster
      *
-     * @param world World the cluster is in
      * @param cluster Item frame cluster
      * @return List of item frame info
      */

@@ -149,7 +149,7 @@ public class BlockDataRegistry {
     /**
      * This function is only used internally on MC 1.8.8 to translate from char[] block Ids to BlockData.
      * 
-     * @param typeId
+     * @param combinedId
      * @return block data
      */
     @Deprecated

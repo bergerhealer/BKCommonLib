@@ -434,7 +434,7 @@ public class ItemParser {
      * Creates a new ItemParser with the type, data and amount of this parser, but with
      * different metadata rules.
      * 
-     * @param metadata rules
+     * @param rules List of item parser metadata rules
      */
     public ItemParser setMetaRules(List<ItemParserMetaRule> rules) {
         ItemParser clone = this.cloneParser();

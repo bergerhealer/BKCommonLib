@@ -27,7 +27,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
 /**
- * Communicates with hub.spigotmc.org to generate spigot <> mojang class
+ * Communicates with hub.spigotmc.org to generate spigot &lt;&gt; mojang class
  * name mappings. These can also be efficiently saved/read from a file resource.
  */
 public class SpigotMappings {
@@ -45,10 +45,10 @@ public class SpigotMappings {
     });
 
     /**
-     * Gets the spigot <> mojang class mappings on the specified Minecraft version
+     * Gets the spigot &lt;&gt; mojang class mappings on the specified Minecraft version
      *
      * @param minecraftVersion
-     * @return spigot <> mojang class name mappings
+     * @return spigot &lt;&gt; mojang class name mappings
      */
     public ClassMappings get(String minecraftVersion) {
         return byVersion.get(minecraftVersion);
@@ -131,7 +131,7 @@ public class SpigotMappings {
      * Downloads all the mappings for versions specified, if they aren't
      * already included inside these mappings
      *
-     * @param version
+     * @param versions Versions that should be available
      * @return True if these mappings changed as a result
      */
     public boolean assertMappings(String... versions) throws IOException {
@@ -222,7 +222,7 @@ public class SpigotMappings {
     }
 
     /**
-     * Loads the spigot<>mojang class name mappings for a certain version of Minecraft, by reading
+     * Loads the spigot&lt;&gt;mojang class name mappings for a certain version of Minecraft, by reading
      * from the jar-included cache file. If missing or corrupted, or lacks support for this version
      * of Minecraft, downloads the spigot mappings from the spigotmc hub.
      *

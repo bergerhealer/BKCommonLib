@@ -27,9 +27,8 @@ public enum HumanHand {
     /**
      * Converts this HumanHand to Bukkit's MainHand. This method always returns null
      * on versions before and including 1.8.9.
-     * 
-     * @param hand to convert
-     * @return {@link org.bukkit.inventory.MainHand}
+     *
+     * @return {@link org.bukkit.inventory.MainHand} as a safe Object
      */
     public Object toMainHand() {
         return toMainHand(this);
@@ -43,7 +42,6 @@ public enum HumanHand {
      * On versions before and including MC 1.8.9 this method always returns <i>null</i>.
      * 
      * @param humanEntity to query for main hand information
-     * @param humanHand to convert
      * @return <i>net.minecraft.server.EnumHand</i>
      */
     public Object toNMSEnumHand(HumanEntity humanEntity) {
@@ -54,9 +52,8 @@ public enum HumanHand {
      * Converts Bukkit's MainHand property to the HumanHand LEFT/RIGHT constants.
      * This wrapper is required for backwards compatibility with MC 1.8.9.
      * On versions before and including MC 1.8.9 this method always returns RIGHT.
-     * 
-     * @param human the main hand is for
-     * @param mainHand of the human ({@link org.bukkit.inventory.MainHand})
+     *
+     * @param mainHand The Bukkit {@link org.bukkit.inventory.MainHand} MainHand) of the human
      * @return HumanHand
      */
     public static HumanHand fromMainHand(Object mainHand) {

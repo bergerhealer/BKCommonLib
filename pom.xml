@@ -344,7 +344,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.4.1</version>
                 <configuration>
                     <minimizeJar>false</minimizeJar>
                     <shadedArtifactAttached>true</shadedArtifactAttached>
@@ -411,6 +411,16 @@
                             <include>com.bergerkiller.bukkit.regionchangetracker</include>
                         </includes>
                     </artifactSet>
+                    <filters>
+                        <filter>
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>module-info.class</exclude>
+                                <exclude>META-INF/*.MF</exclude>
+                                <exclude>META-INF/versions/*/module-info.class</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
                 </configuration>
                 <executions>
                     <execution>
@@ -420,7 +430,7 @@
                 </executions>
             </plugin>
 
-            <!-- Clean up original artifacts (this is to make testing easier) -->
+            <!-- Clean up original-prefixed leftovers (this is to make testing easier) -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-clean-plugin</artifactId>
@@ -444,7 +454,7 @@
                 </executions>
             </plugin>
 
-            <!-- Generate a jar containing classes and resources -->
+            <!-- Generate a jar that does not yet contain the shaded-in resources -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

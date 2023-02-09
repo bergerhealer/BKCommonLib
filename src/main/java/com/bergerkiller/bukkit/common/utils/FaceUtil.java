@@ -279,7 +279,7 @@ public class FaceUtil {
      * Gets the BlockFace.UP or BlockFace.DOWN based on the delta-y parameter
      *
      * @param dy parameter
-     * @return UP if dy >= 0, DOWN if dy < 0
+     * @return UP if dy &gt;= 0, DOWN if dy &lt; 0
      */
     public static BlockFace getVertical(double dy) {
         return getVertical(dy >= 0.0);
@@ -290,7 +290,7 @@ public class FaceUtil {
      *
      * @param face1 to check
      * @param face2 to check
-     * @return True if the difference <= 45 degrees
+     * @return True if the difference &lt;= 45 degrees
      */
     public static boolean hasSubDifference(final BlockFace face1, final BlockFace face2) {
         return getFaceYawDifference(face1, face2) <= 45;

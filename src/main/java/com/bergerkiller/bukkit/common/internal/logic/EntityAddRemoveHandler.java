@@ -158,8 +158,8 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
      * To remove the entity and not replace it with anything new, specify a null
      * newEntity.
      * 
-     * @param oldInstance to replace
-     * @param newInstance to replace with, null to remove only
+     * @param oldEntity Previous entity to replace
+     * @param newEntity The entity to replace the previous one with, null to remove only
      */
     public abstract void replace(EntityHandle oldEntity, EntityHandle newEntity);
 
@@ -404,7 +404,7 @@ public abstract class EntityAddRemoveHandler implements LazyInitializedObject, L
         /**
          * Adds an entity to the relevant fields of a chunk
          *
-         * @param chunkHandle
+         * @param chunk
          * @param entity
          */
         public void addToChunk(Chunk chunk, EntityHandle entity) {

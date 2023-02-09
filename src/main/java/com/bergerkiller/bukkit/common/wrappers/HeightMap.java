@@ -4,7 +4,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.levelgen.HeightMapHa
 
 /**
  * Heightmap information of a single chunk. There are different possible heightmap
- * configurations since MC 1.13. See {@link Type}
+ * configurations since MC 1.13.
  */
 public class HeightMap extends BasicWrapper<HeightMapHandle> {
 

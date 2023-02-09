@@ -66,7 +66,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param key of the element to remove
@@ -178,7 +178,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -197,7 +197,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * null to remove the data at the key.<br>
      * <br>
      * Supported data types:<br>
-     * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte, boolean,
+     * <u>CommonTag, NBTBase, List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean,
      * short, int, long, float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -216,7 +216,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * null to remove the data at the key.<br>
      * <br>
      * Supported data types:<br>
-     * <u>CommonTag, NBTBase, List<CommonTag>, Map<String, CommonTag>, byte,
+     * <u>CommonTag, NBTBase, List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte,
      * boolean, short, int, long, float, double, byte[], int[],
      * String, UUID*, BlockLocation*, IntVector3*, other**</u><br>
      * <br>
@@ -249,7 +249,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * <br>
      * Possible returned
      * types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[],
      * String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
@@ -268,7 +268,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param key to get
@@ -283,7 +283,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself. Returns the default value if no tag is contained.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
      * <i>** these types are serialized from/to a stored String type.</i>
@@ -303,7 +303,7 @@ public class CommonTagCompound extends CommonTag implements Map<String, CommonTa
      * the tag itself. Returns the default value if no tag is contained.<br>
      * <br>
      * Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, boolean, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, boolean, short, int, long,
      * float, double, byte[], int[], String, UUID, BlockLocation, IntVector3, other**</u><br>
      * <br>
      * <i>** these types are serialized from/to a stored String type.</i>

@@ -39,7 +39,7 @@ public final class ResourceCategory<T> {
      * Constructs a new Resource Key taking information from a backing minecraft key token.
      * Returns null if the input minecraft key is null.
      * 
-     * @param minecraftKey
+     * @param name Name to turn into a resource key
      * @return resource key, null if minecraftkey is null
      */
     public ResourceKey<T> createKey(MinecraftKeyHandle name) {
@@ -52,8 +52,8 @@ public final class ResourceCategory<T> {
      * The key may only contain the characters: [a-z0-9/._-]<br>
      * No uppercase characters are allowed in the path.
      * If the input key is invalid, null is returned.
-     * 
-     * @param key
+     *
+     * @param name Name to turn into a resource key
      * @return resource key, null if the key contains invalid characters
      */
     public ResourceKey<T> createKey(String name) {

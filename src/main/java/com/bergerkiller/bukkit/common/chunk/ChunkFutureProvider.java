@@ -233,7 +233,6 @@ public interface ChunkFutureProvider {
      * If the chunk isn't loaded, or the entities of the chunk aren't currently loaded,
      * then an already-completed future is returned.
      *
-     * @param world World of the chunk
      * @param chunk The chunk
      * @return Future completed (with null) when the entities of a chunk unload
      */

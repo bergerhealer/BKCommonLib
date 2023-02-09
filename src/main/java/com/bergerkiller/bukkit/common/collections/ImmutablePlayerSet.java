@@ -157,8 +157,8 @@ public final class ImmutablePlayerSet extends ImmutableCachedSet<Player> {
      * Conditionally adds or removes a player based on a boolean state.
      * If no changes occur, the same immutable set instance is returned.
      * 
-     * @param player to add or remove
-     * @param add option, True to add, False to remove
+     * @param value Player to add or remove
+     * @param add True to add, False to remove
      * @return changed immutable set of players
      */
     @Override

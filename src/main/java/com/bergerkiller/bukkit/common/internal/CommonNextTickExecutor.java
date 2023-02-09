@@ -36,8 +36,6 @@ public final class CommonNextTickExecutor implements Executor {
     /**
      * Creates new next-tick executor handler. Call
      * {@link #setExecutorTask(ExecutorTask)} to make it functional.
-     *
-     * @return next-tick executor
      */
     protected CommonNextTickExecutor() {
     }

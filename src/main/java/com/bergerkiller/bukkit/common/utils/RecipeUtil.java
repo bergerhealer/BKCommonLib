@@ -160,10 +160,10 @@ public class RecipeUtil {
     /**
      * Crafts items specified in an Inventory
      *
-     * @param itemid of the item to craft
-     * @param data of the item to craft (-1 for any data)
-     * @param source inventory to craft in
-     * @param limit amount of items to craft
+     * @param type Material type of the item to craft
+     * @param data Legacy data of the item to craft (-1 for any data)
+     * @param source Source inventory to craft in
+     * @param limit Maximum amount of items to craft
      */
     public static void craftItems(Material type, int data, Inventory source, int limit) {
         for (CraftRecipe rec : getCraftingRequirements(type, data)) {

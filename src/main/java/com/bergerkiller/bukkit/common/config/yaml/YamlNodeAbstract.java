@@ -166,7 +166,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
     /**
      * Removes a change listener from this node that was previously added
-     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * using {@link #addChangeListener(YamlChangeListener)}. To find the listener,
      * {@link Object#equals(Object)} is used.
      * 
      * @param listener The listener to remove
@@ -180,7 +180,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * Removes all previously registered change listeners from
      * this node.
      * 
-     * @see #addChangeListener(Runnable)
+     * @see #addChangeListener(YamlChangeListener)
      */
     public void clearChangeListeners() {
         this._entry.clearChangeListeners();
@@ -207,7 +207,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
 
     /**
      * Removes a change listener from this node that was previously added
-     * using {@link #addChangeListener(Runnable)}. To find the listener,
+     * using {@link #addChangeListener(YamlChangeListener)}. To find the listener,
      * {@link Object#equals(Object)} is used.
      * 
      * @param path The path to the value to remove a listener of
@@ -225,7 +225,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * 
      * @param path The path to the value to clear listeners of
      * @return True if a value exists at this path, False otherwise
-     * @see #addChangeListener(Runnable)
+     * @see #addChangeListener(YamlChangeListener)
      */
     public boolean clearChangeListeners(String path) {
         YamlEntry entry = this.getEntryIfExists(path);
@@ -579,9 +579,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * then the original key names will be replaced with an index incrementing
      * starting at 1.
      *
-     * @param path       The path to get a list
-     * @param valueType  The type of values the list should contain
-     * @param def        The default values to store if the list does not exist
+     * @param path The path to get a list
+     * @param type The type of values the list should contain
+     * @param def  The default values to store if the list does not exist
      * @return the list storing values of valueType, is modifiable
      */
     public <T> List<T> getList(String path, Class<T> type, List<T> def) {
@@ -883,7 +883,6 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * entries added to the target node and vice-versa.
      * 
      * @param source Source node from which to copy the values
-     * @param filter Filter for paths of entries being cloned, test true to include them
      */
     public void setTo(N source) {
         source.cloneChildrenTo(this, null, null, true);
@@ -911,7 +910,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     /**
      * Assigns all the child nodes and entries of another node to this node.
      * Removes all entries that were in this node but are not in the source node.
-     * To preserve these, use {@link #cloneInto(YamlNodeAbstract, Collection)} instead.
+     * To preserve these, use {@link #cloneInto(YamlNodeAbstract, Predicate)} instead.
      * This node and the source node end up storing the exact same details.
      * Further changes to the source node's children will not affect the new
      * entries added to the target node and vice-versa.<br>

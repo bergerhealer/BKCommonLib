@@ -36,7 +36,7 @@ public class BitInputStream extends InputStream {
 
     /**
      * Checks whether the end of the stream has been reached.
-     * This returns True when a past {@link #read(int)} returned -1.
+     * This returns True when a past {@link #read()} returned -1.
      * 
      * @return True if end of stream
      */

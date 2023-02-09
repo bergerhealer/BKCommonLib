@@ -86,17 +86,17 @@ public class StackTraceFilter {
     /**
      * Filters the elements based on this Stack Trace Filter
      *
-     * @param throwable containing the stack trace elements to filter
+     * @param throwable Throwable containing the stack trace elements to filter
      * @return input throwable
      */
-    public Throwable filter(Throwable t) {
-    	if (t != null) {
-        	LinkedList<StackTraceElement> trace = new LinkedList<StackTraceElement>(Arrays.asList(t.getStackTrace()));
+    public Throwable filter(Throwable throwable) {
+    	if (throwable != null) {
+        	LinkedList<StackTraceElement> trace = new LinkedList<StackTraceElement>(Arrays.asList(throwable.getStackTrace()));
         	if (filter(trace) > 0) {
-        		t.setStackTrace(trace.toArray(new StackTraceElement[0]));
+                throwable.setStackTrace(trace.toArray(new StackTraceElement[0]));
         	}
     	}
-    	return t;
+    	return throwable;
     }
 
     /**

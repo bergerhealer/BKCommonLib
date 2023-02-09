@@ -13,7 +13,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 
 /**
- * Keeps track of map UUID <> Map Id conversion
+ * Keeps track of map UUID &lt;&gt; Map Id conversion
  */
 public class CommonMapUUIDStore {
     /**

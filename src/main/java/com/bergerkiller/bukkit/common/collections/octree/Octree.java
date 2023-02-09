@@ -264,7 +264,7 @@ public class Octree<T> implements OctreeIterable<T> {
     }
 
     /**
-     * Puts a new value at a value index previously returned by {@link #getValueIndex(x, y, z)}.
+     * Puts a new value at a value index previously returned by {@link #getValueIndex(int, int, int, boolean)}.
      * 
      * @param index of the value data entry
      * @param value to set to
@@ -277,7 +277,7 @@ public class Octree<T> implements OctreeIterable<T> {
     }
 
     /**
-     * Gets the value stored at a value index previously returned by {@link #getValueIndex(x, y, z)}.
+     * Gets the value stored at a value index previously returned by {@link #getValueIndex(int, int, int, boolean)}.
      * Returns null for index 0.
      * 
      * @param index of the value data entry

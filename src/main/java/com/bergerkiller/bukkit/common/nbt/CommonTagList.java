@@ -18,7 +18,7 @@ import java.util.Map.Entry;
 
 /**
  * <b>Data</b> represents actual data stored by the tag. This can be:<br>
- * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long, float,
+ * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long, float,
  * double, byte[], int[], String</u><br><br>
  * <p/>
  * Data can be retrieved using <b>getValue()</b>, set using <b>setValue()</b>
@@ -88,7 +88,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     /**
      * Gets the value contained at a given index. Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param index of the element value to get
@@ -100,7 +100,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     /**
      * Gets the value contained at a given index. Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param index of the element value to get
@@ -113,7 +113,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     /**
      * Gets the value contained at a given index. Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param index of the element value to get
@@ -126,7 +126,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
 
     /**
      * Gets the value contained at a given index. Possible returned types:<br>
-     * <u>List<CommonTag>, Map<String, CommonTag>, byte, short, int, long,
+     * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long,
      * float, double, byte[], int[], String</u>
      *
      * @param index of the element value to get

@@ -282,12 +282,31 @@ public class LogicUtil {
      * Checked exceptions are handled too, this method primarily exists to support
      * the java Supplier type directly.
      * 
-     * @param <T>
-     * @param constructor Main supplier of the result, that can throw an exception
+     * @param <T> Type of value supplied
+     * @param supplier Main supplier of the result, that can throw an exception
      * @param errorHandler Function that produces an alternative value, with the error as input
      * @return supplied value, or the error handler output if an exception occurs
      */
     public static <T> T tryCreateUsingSupplier(Supplier<T> supplier, Function<Throwable, T> errorHandler) {
+        try {
+            return supplier.get();
+        } catch (Throwable t) {
+            return errorHandler.apply(t);
+        }
+    }
+
+    /**
+     * Tries to create an object using a supplier that can possibly throw an exception.
+     * If this happens, the error handler is used to construct a value, instead.
+     * Checked exceptions are handled too, this method primarily exists to support
+     * the java Supplier type directly.
+     *
+     * @param <T> Type of value supplied
+     * @param supplier Main checked supplier of the result, that can throw an exception
+     * @param errorHandler Function that produces an alternative value, with the error as input
+     * @return supplied value, or the error handler output if an exception occurs
+     */
+    public static <T> T tryCreateUsingCheckedSupplier(CheckedSupplier<T> supplier, Function<Throwable, T> errorHandler) {
         try {
             return supplier.get();
         } catch (Throwable t) {

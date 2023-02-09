@@ -83,7 +83,7 @@ public abstract class PortalHandler implements LazyInitializedObject {
     /**
      * On versions of Minecraft where this is needed, marks the block specified
      * as a nether portal block, allowing it to be found again in the future
-     * using {@link #findNetherPortal(Block)}.
+     * using {@link #findNetherPortal(Block, int)}.
      * 
      * @param netherPortalBlock Block to mark as a useful nether portal
      */

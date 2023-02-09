@@ -210,9 +210,7 @@ public class OctreeIterator<T> implements Iterator<T> {
 
     /**
      * Performs a search operation for the next node
-     * 
-     * @param operation to perform
-     * @param depth from which to start
+     *
      * @return found data index, or 0 if no more results are available
      */
     protected int search() {

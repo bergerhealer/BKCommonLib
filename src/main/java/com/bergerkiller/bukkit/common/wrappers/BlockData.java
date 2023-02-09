@@ -54,9 +54,8 @@ public abstract class BlockData extends BlockDataRegistry {
 
     /**
      * Applies legacy Material and data to this BlockData
-     * 
-     * @param material to apply
-     * @param data for the material to apply
+     *
+     * @param materialdata Material and legacy data to load
      */
     @Deprecated
     public abstract void loadMaterialData(MaterialData materialdata);
@@ -287,8 +286,8 @@ public abstract class BlockData extends BlockDataRegistry {
      * Gets whether this BlockData is one of the provided Material types.
      * This method keeps legacy and non-legacy materials into account.
      * 
-     * @param type to check
-     * @return True if matches
+     * @param types Material types to check
+     * @return True if any of the types match
      */
     public final boolean isType(org.bukkit.Material... types) {
         for (org.bukkit.Material type : types) {
@@ -535,9 +534,12 @@ public abstract class BlockData extends BlockDataRegistry {
     public abstract boolean canSupportOnFace(Block block, BlockFace face);
 
     /**
-     * Gets the bounding box of a block of this Block Data type/
-     * For convenience it is better to use {@link BlockUtil#getBoundingBox} instead.
-     * 
+     * Gets the bounding box of a block of this Block Data type.
+     * For convenience it is better to use
+     * {@link com.bergerkiller.bukkit.common.utils.BlockUtil#getBoundingBox(Block)
+     *        BlockUtil.getBoundingBox(Block)}
+     * instead.
+     *
      * @param block
      * @return bounding box of the block (relative to block coordinates)
      */

@@ -16,7 +16,6 @@ public final class DimensionType extends BasicWrapper<DimensionManagerHandle> {
 
     /**
      * The resource keys used to refer to different dimension types.
-     * Is more efficient than using {@link DimensionType#getKey()}.
      */
     public static final class Key {
         public static final ResourceKey<DimensionType> OVERWORLD = ResourceCategory.dimension_type.createKey("overworld");

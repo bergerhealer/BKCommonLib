@@ -383,10 +383,10 @@ public class ItemUtil {
     /**
      * Removes certain kinds of items from an inventory
      *
-     * @param inventory to remove items from
-     * @param itemid of the items to remove
-     * @param data of the items to remove, -1 for any data
-     * @param amount of items to remove, -1 for infinite amount
+     * @param inventory Inventory to remove items from
+     * @param type Type of the items to remove
+     * @param data Legacy data value of the items to remove, -1 for any data
+     * @param amount Amount of items to remove, -1 for infinite amount
      */
     public static void removeItems(Inventory inventory, Material type, int data, int amount) {
         int countToRemove = amount < 0 ? Integer.MAX_VALUE : amount;
@@ -593,9 +593,9 @@ public class ItemUtil {
     /**
      * Gets the total item count of a given type and data
      *
-     * @param inventory to look in
-     * @param typeid of the items to look for, null for any item
-     * @param data of the items to look for, -1 for any data
+     * @param inventory Inventory to look in
+     * @param type Type of the items to look for, null for any item
+     * @param data Legacy data of the items to look for, -1 for any data
      * @return Amount of items in the inventory
      */
     public static int getItemCount(Inventory inventory, Material type, int data) {

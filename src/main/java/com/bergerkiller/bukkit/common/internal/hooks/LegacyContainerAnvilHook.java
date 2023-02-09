@@ -3,7 +3,7 @@ package com.bergerkiller.bukkit.common.internal.hooks;
 import com.bergerkiller.mountiplex.reflection.ClassHook;
 
 /**
- * Special hook class used on < MC 1.9, to 'catch' the missing Prepare Anvil Event
+ * Special hook class used on &lt; MC 1.9, to 'catch' the missing Prepare Anvil Event
  */
 public class LegacyContainerAnvilHook extends ClassHook<LegacyContainerAnvilHook> {
     public Runnable textChangeCallback = null;

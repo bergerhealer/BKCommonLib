@@ -228,7 +228,6 @@ public class CloudSimpleHandler {
      * are called in FIFO order. This is called before the command handler is executed.
      *
      * @param processor Processor to register
-     * @see #preprocessContext(CommandContext, LinkedList) Preprocess a context
      */
     public void postProcess(final CommandPostprocessor<CommandSender> processor) {
         this.manager.registerCommandPostProcessor(processor);
@@ -498,7 +497,6 @@ public class CloudSimpleHandler {
      * 
      * @param filterPrefix Command filter prefix, for commands shown in the menu
      * @param helpDescription Description of the help command
-     * @param modifier Modifier for the command applied before registering
      * @return minecraft help command
      */
     public Command<CommandSender> helpCommand(

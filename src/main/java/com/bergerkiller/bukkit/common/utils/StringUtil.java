@@ -556,7 +556,7 @@ public class StringUtil {
     }
 
     /**
-     * Converts color codes such as &5 to the Color code representation
+     * Converts color codes such as &amp;5 to the Color code representation
      *
      * @param line to work on
      * @return converted line
@@ -566,7 +566,7 @@ public class StringUtil {
     }
 
     /**
-     * Converts color codes to the ampersand representation, such as &5
+     * Converts color codes to the ampersand representation, such as &amp;5
      *
      * @param line to work on
      * @return converted line

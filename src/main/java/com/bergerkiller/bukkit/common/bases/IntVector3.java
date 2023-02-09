@@ -307,7 +307,7 @@ public class IntVector3 implements Comparable<IntVector3> {
      * Creates an IntVector3 of the Block coordinates of the specified
      * Location position
      *
-     * @param position Position Location
+     * @param location Position Location
      * @return new IntVector3
      */
     public static IntVector3 blockOf(Location location) {

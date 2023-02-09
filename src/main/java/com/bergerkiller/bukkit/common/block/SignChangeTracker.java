@@ -340,7 +340,7 @@ public class SignChangeTracker implements Cloneable {
     /**
      * Tracks the changes done to a Sign
      *
-     * @param sign The sign to track
+     * @param signBlock The block of the sign to track
      * @return Sign change tracker
      */
     public static SignChangeTracker track(Block signBlock) {

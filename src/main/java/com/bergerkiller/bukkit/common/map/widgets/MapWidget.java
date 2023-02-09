@@ -112,8 +112,11 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
-     * Called every tick to refresh this widget.
-     * The base {@link #update()} automatically calls onDraw() when the widget is invalidated.
+     * Called every tick to refresh this widget.<br>
+     * <br>
+     * <p>Note:</p>
+     * The {@link MapDisplay#update()} method automatically calls {@link #onDraw()}
+     * when the widget is invalidated, so no actual drawing should occur here.
      */
     public void onTick() {
     }
@@ -577,7 +580,7 @@ public class MapWidget implements MapDisplayEvents {
     /**
      * Removes a child widget from this widget. The old area the widget occupied is cleared.
      * 
-     * @param child to remove
+     * @param widget Child widget to remove
      * @return True if the child widget was removed
      */
     public final boolean removeWidget(MapWidget widget) {

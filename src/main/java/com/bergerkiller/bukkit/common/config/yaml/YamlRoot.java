@@ -28,8 +28,7 @@ public class YamlRoot {
      * root. The entry is not removed from the parent node, which is the responsibility
      * of the caller. After detaching the input entry will not refer to anything.
      * 
-     * @param entry        The entry to detach
-     * @param removeEntry  Whether to remove the entry itself, or only remove node descendants
+     * @param entry The entry to detach
      */
     public void detach(YamlEntry entry) {
         this.removeEntry(entry);

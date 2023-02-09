@@ -726,7 +726,7 @@ public class Quaternion implements Cloneable {
      * The vector does not have to be a unit vector for this function to work.
      * If the 'up' axis is important, use {@link #fromLookDirection(dir, up)} instead.
      * 
-     * @param v expected output vector (to)
+     * @param dir Expected output forward vector (to)
      * @return quaternion that rotates (0,0,1) to become v
      */
     public static Quaternion fromLookDirection(Vector dir) {

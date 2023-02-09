@@ -678,7 +678,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * @param controller to assign to the Entity after spawning
      * @param networkController to assign to the Entity after spawning
      * @return True if spawning occurred, False if not
-     * @see #spawn(Location)
+     * @see #spawn(EntityType, Location, EntityController, EntityNetworkController) 
      */
     @SuppressWarnings({"rawtypes", "unchecked"})
     public static final CommonEntity spawn(EntityType entityType, Location location, EntityController controller, EntityNetworkController networkController) {
@@ -738,7 +738,8 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
 
     /**
      * Creates a new Entity instance by calling its default World constructor, and initialized position.
-     * Unlike {@link #spawn()} this does not spawn the entity in the world, and it will stay detached.
+     * Unlike {@link #spawn(EntityType, Location, EntityController, EntityNetworkController)}
+     * this does not spawn the entity in the world, and it will stay detached.
      * 
      * @param entityType to create
      * @param location of the entity

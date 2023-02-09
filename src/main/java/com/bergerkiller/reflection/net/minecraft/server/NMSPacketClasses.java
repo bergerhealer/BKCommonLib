@@ -984,7 +984,7 @@ public class NMSPacketClasses {
         /**
          * <b>Warning: </b>Multiple entity id's only supported on Minecraft 1.16 and earlier!
          *
-         * @param entityIds
+         * @param entities Entities to be destroyed
          * @return packet
          */
         public CommonPacket newInstanceMultiple(org.bukkit.entity.Entity... entities) {

@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * structure is multi-thread safe.<br>
  * <br>
  * This class is characterized by a very fast {@link #add(Object)} method,
- * and a slower {@link #get()} method to read a snapshot of the contents. As such,
+ * and a slower {@link #values()} method to read a snapshot of the contents. As such,
  * this class should only be used when reading the contents happens sparingly.
  *
  * @param <E> Element type

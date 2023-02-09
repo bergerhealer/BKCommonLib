@@ -513,9 +513,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     /**
      * Plays a sound for the Entity, but with a slightly random pitch
      *
-     * @param soundName to play
-     * @param volume to play at
-     * @param pitch (average) to play at
+     * @param sound Sound effect key to play
+     * @param volume Sound volume to play at
+     * @param pitch (Average) sound pitch to play at
      */
     public void makeRandomSound(ResourceKey<SoundEffect> sound, float volume, float pitch) {
         final RandomSourceHandle rand = getRandom();
@@ -526,10 +526,24 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
         makeSound(CraftSoundHandle.getSoundEffect(sound), volume, pitch);
     }
 
+    /**
+     * Plays a sound for the Entity
+     *
+     * @param soundName Sound effect name to play
+     * @param volume Sound volume to play at
+     * @param pitch (Average) sound pitch to play at
+     */
     public void makeSound(String soundName, float volume, float pitch) {
         makeSound(ResourceCategory.sound_effect.createKey(soundName), volume, pitch);
     }
 
+    /**
+     * Plays a sound for the Entity
+     *
+     * @param sound Sound effect key to play
+     * @param volume Sound volume to play at
+     * @param pitch (Average) sound pitch to play at
+     */
     public void makeSound(ResourceKey<SoundEffect> sound, float volume, float pitch) {
         if (sound != null) {
             handle.makeSound(sound, volume, pitch);
@@ -1041,18 +1055,9 @@ public class ExtendedEntity<T extends org.bukkit.entity.Entity> {
     }
 
     /**
-     * Use setPassengersSilent instead!
-     */
-    @Deprecated
-    @SuppressWarnings("unchecked")
-    public void setPassengerSilent(org.bukkit.entity.Entity newPassenger) {
-        setPassengersSilent((newPassenger == null) ? Collections.EMPTY_LIST : Arrays.asList(newPassenger));
-    }
-
-    /**
-     * Sets the passengers of this Vehicle without raising any events
+     * Sets the passengers of this Vehicle without calling any events
      *
-     * @param newPassenger to set to
+     * @param newPassengers List of new passengers to set to
      */
     public void setPassengersSilent(List<org.bukkit.entity.Entity> newPassengers) {
         final EntityHandle handle = this.handle;

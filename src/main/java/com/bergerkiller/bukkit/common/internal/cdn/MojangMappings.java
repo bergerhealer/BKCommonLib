@@ -211,9 +211,9 @@ public class MojangMappings {
     }
 
     /**
-     * Attempts to download the mappings from mojangs servers for the current
+     * Attempts to download the mappings from Mojangs servers for the current
      * minecraft version. The contents are saved in a location that can be read
-     * using {@link #fromCache(String)} in the future.
+     * using {@link #fromCacheOrDownload(String)} in the future.
      *
      * @return mojang mappings
      */
