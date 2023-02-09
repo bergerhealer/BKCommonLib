@@ -49,7 +49,7 @@
              - Myles ViaVersion
         -->
         <repository>
-            <id>mg-repo</id>
+            <id>mg-dev-repo</id>
             <url>https://ci.mg-dev.eu/plugin/repository/everything</url>
         </repository>
 
