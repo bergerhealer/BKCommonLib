@@ -1,6 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://maven.apache.org/POM/4.0.0"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
@@ -460,12 +458,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <source>${jdk.version.release}</source>
                     <target>${jdk.version.release}</target>
+
+                    <!-- IntelliJ IDEA breaks completely with these two -->
+                    <!-- You might need it for Eclipse though... -->
+                    <!-- https://youtrack.jetbrains.com/issue/IDEA-85478/ -->
+                    <!--
                     <testSource>${jdk.version.test}</testSource>
                     <testTarget>${jdk.version.test}</testTarget>
+                    -->
                 </configuration>
             </plugin>
 
