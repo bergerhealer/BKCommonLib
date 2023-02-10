@@ -111,6 +111,8 @@
             <groupId>com.bergerkiller.bukkit.regionchangetracker</groupId>
             <artifactId>BKCommonLib-RegionChangeTracker-Core</artifactId>
             <version>${regionchangetracker.version}</version>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <!-- GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility -->
         <dependency>
