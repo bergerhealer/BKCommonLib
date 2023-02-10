@@ -77,27 +77,20 @@
             <version>4.1.42.Final</version>
             <scope>provided</scope>
         </dependency>
-
-        <!-- ViaVersion API -->
-        <dependency>
-            <groupId>us.myles</groupId>
-            <artifactId>viaversion</artifactId>
-            <version>3.2.1</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <!-- Included dependencies -->
-        <!-- Reflection library-->
+        <!-- Mountiplex is included in BKCommonLib at the same package -->
         <dependency>
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
             <version>${mountiplex.version}</version>
         </dependency>
+
+        <!-- Dependencies shaded into the library for internal use -->
         <!-- Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings -->
         <dependency>
             <groupId>co.aikar</groupId>
             <artifactId>minecraft-timings</artifactId>
             <version>1.0.4</version>
+            <scope>compile</scope>
             <optional>true</optional>
             <exclusions>
                 <exclusion>
@@ -119,9 +112,19 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.9</version>
+            <scope>compile</scope>
             <optional>true</optional>
         </dependency>
 
+        <!-- Optional provided dependencies that BKCommonLib can talk with -->
+        <!-- ViaVersion API -->
+        <dependency>
+            <groupId>us.myles</groupId>
+            <artifactId>viaversion</artifactId>
+            <version>3.2.1</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
         <!-- Log4j that is used inside the server -->
         <!-- https://mvnrepository.com/artifact/log4j/log4j -->
         <dependency>
@@ -129,12 +132,46 @@
             <artifactId>log4j-api</artifactId>
             <version>2.17.0</version>
             <scope>provided</scope>
+            <scope>optional</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>2.17.0</version>
             <scope>provided</scope>
+            <scope>optional</scope>
+        </dependency>
+        <!-- Vault hook for special permissions handling -->
+        <dependency>
+            <groupId>com.github.MilkBowl</groupId>
+            <artifactId>VaultAPI</artifactId>
+            <version>1.7</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.bukkit</groupId>
+                    <artifactId>bukkit</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <!-- ProtocolLib hook for protocol handling -->
+        <dependency>
+            <groupId>com.comphenix.protocol</groupId>
+            <artifactId>ProtocolLib-API</artifactId>
+            <version>4.4.0</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>cglib</groupId>
+                    <artifactId>cglib-nodep</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>com.comphenix.executors</groupId>
+                    <artifactId>BukkitExecutors</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <!-- Cloud command framework -->
@@ -180,39 +217,6 @@
             <version>4.2.0</version>
             <scope>compile</scope>
             <optional>true</optional>
-        </dependency>
-
-        <!-- Provided dependencies -->
-        <!-- Vault hook for special permissions handling -->
-        <dependency>
-            <groupId>com.github.MilkBowl</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.7</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.bukkit</groupId>
-                    <artifactId>bukkit</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
-
-        <!-- ProtocolLib hook for protocol handling -->
-        <dependency>
-            <groupId>com.comphenix.protocol</groupId>
-            <artifactId>ProtocolLib-API</artifactId>
-            <version>4.4.0</version>
-            <scope>provided</scope>
-            <exclusions>
-                <exclusion>
-                    <groupId>cglib</groupId>
-                    <artifactId>cglib-nodep</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>com.comphenix.executors</groupId>
-                    <artifactId>BukkitExecutors</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
 
         <!-- Test dependencies -->
