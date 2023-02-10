@@ -82,6 +82,14 @@
             <groupId>com.bergerkiller.mountiplex</groupId>
             <artifactId>Mountiplex</artifactId>
             <version>${mountiplex.version}</version>
+            <scope>compile</scope>
+        </dependency>
+        <!-- Region change tracker is included in BKCommonLib for the region block change event -->
+        <dependency>
+            <groupId>com.bergerkiller.bukkit.regionchangetracker</groupId>
+            <artifactId>BKCommonLib-RegionChangeTracker-Core</artifactId>
+            <version>${regionchangetracker.version}</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Dependencies shaded into the library for internal use -->
@@ -98,14 +106,6 @@
                     <artifactId>annotations</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <!-- Region change tracker -->
-        <dependency>
-            <groupId>com.bergerkiller.bukkit.regionchangetracker</groupId>
-            <artifactId>BKCommonLib-RegionChangeTracker-Core</artifactId>
-            <version>${regionchangetracker.version}</version>
-            <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
         <!-- GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility -->
         <dependency>
