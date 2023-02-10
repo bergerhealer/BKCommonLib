@@ -12,7 +12,6 @@
 
     <properties>
         <!-- Project build properties -->
-        <project.finalNameBase>${project.name}-${project.version}</project.finalNameBase>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.number>NO-CI</project.build.number>
         <jdk.version.release>8</jdk.version.release>
@@ -238,8 +237,6 @@
 
     <!-- Build -->
     <build>
-        <!-- Export artifact with name that includes the build number -->
-        <finalName>${project.finalNameBase}</finalName>
         <defaultGoal>clean package</defaultGoal>
 
         <!-- Resources (the filtering allows us to use project properties in plugin.yml) -->
@@ -455,7 +452,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <finalName>${project.finalNameBase}-noshade</finalName>
+                    <finalName>${project.name}-${project.version}-noshade</finalName>
                 </configuration>
             </plugin>
 
