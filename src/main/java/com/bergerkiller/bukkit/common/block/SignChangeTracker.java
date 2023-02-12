@@ -308,7 +308,35 @@ public class SignChangeTracker implements Cloneable {
 
     @Override
     public String toString() {
-        return "SignChangeTracker{block=" + this.block + ", sign=" + this.getSign() + "}";
+        StringBuilder str = new StringBuilder();
+        str.append("SignChangeTracker{block=");
+        if (block == null) {
+            str.append("null");
+        } else {
+            str.append("{world=").append(block.getWorld().getName())
+                    .append(", x=").append(block.getX())
+                    .append(", y=").append(block.getY())
+                    .append(", z=").append(block.getZ())
+                    .append('}');
+        }
+
+        str.append(", lines=");
+
+        Sign sign = this.getSign();
+        if (sign == null) {
+            str.append("<REMOVED>");
+        } else {
+            str.append('[');
+            for (int i = 0; i < 4; i++) {
+                if (i > 0) {
+                    str.append(", ");
+                }
+                str.append(sign.getLine(i));
+            }
+            str.append(']');
+        }
+        str.append('}');
+        return str.toString();
     }
 
     @Override
