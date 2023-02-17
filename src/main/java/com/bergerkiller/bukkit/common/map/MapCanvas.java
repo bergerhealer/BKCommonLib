@@ -1514,7 +1514,7 @@ public abstract class MapCanvas {
     /**
      * Obtains a view into this canvas for a viewport area.
      * Drawing operations are done relative to these coordinates and only
-     * inside the view portarea.
+     * inside the view port area.
      * 
      * @param x - coordinate of the top-left corner of the viewport
      * @param y - coordinate of the top-left corner of the viewport
@@ -1522,7 +1522,7 @@ public abstract class MapCanvas {
      * @param h - height of the viewport
      * @return view
      */
-    public final MapCanvas getView(int x, int y, int w, int h) {
+    public MapCanvas getView(int x, int y, int w, int h) {
         if (x == 0 && y == 0 && w == this.getWidth() && h == this.getHeight()) {
             return this;
         } else {
@@ -1538,7 +1538,43 @@ public abstract class MapCanvas {
      * @return view
      */
     public final MapCanvas getView(int offset_x, int offset_y) {
-        return new View(this, offset_x, offset_y, getWidth() - offset_x, getHeight() - offset_y);
+        return getView(offset_x, offset_y, getWidth() - offset_x, getHeight() - offset_y);
+    }
+
+    /**
+     * If this canvas is a {@link #getView(int, int, int, int) View} of another canvas,
+     * returns the absolute x-offset relative to the root canvas. This method can
+     * be used to compare the overlap area of two views.
+     *
+     * @return Absolute x-offset of this canvas relative to root, or 0 if it is
+     *         the root canvas.
+     */
+    public int getViewAbsoluteX() {
+        return 0;
+    }
+
+    /**
+     * If this canvas is a {@link #getView(int, int, int, int) View} of another canvas,
+     * returns the absolute y-offset relative to the root canvas. This method can
+     * be used to compare the overlap area of two views.
+     *
+     * @return Absolute y-offset of this canvas relative to root, or 0 if it is
+     *         the root canvas.
+     */
+    public int getViewAbsoluteY() {
+        return 0;
+    }
+
+    /**
+     * Gets whether this canvas is the same {@link #getView(int, int, int, int) View}
+     * transformation as another one. If both this view and the other view were the
+     * result of the same clipping/viewport operations, this method returns True.
+     *
+     * @param otherView Other canvas view to compare against
+     * @return True if this view and the other view are the same
+     */
+    public boolean isSameView(MapCanvas otherView) {
+        return otherView == this;
     }
 
     /**
@@ -1591,6 +1627,7 @@ public abstract class MapCanvas {
     private static final class View extends MapCanvas {
         private final MapCanvas parent;
         private final int x, y, w, h;
+        private final int xAbs, yAbs;
 
         public View(MapCanvas parent, int x, int y, int w, int h) {
             this.parent = parent;
@@ -1598,6 +1635,8 @@ public abstract class MapCanvas {
             this.y = y;
             this.w = w;
             this.h = h;
+            this.xAbs = parent.getViewAbsoluteX() + x;
+            this.yAbs = parent.getViewAbsoluteY() + y;
         }
 
         @Override
@@ -1608,6 +1647,46 @@ public abstract class MapCanvas {
         @Override
         public int getHeight() {
             return this.h;
+        }
+
+        @Override
+        public int getViewAbsoluteX() {
+            return this.xAbs;
+        }
+
+        @Override
+        public int getViewAbsoluteY() {
+            return this.yAbs;
+        }
+
+        @Override
+        public boolean isSameView(MapCanvas otherView) {
+            if (otherView == this) {
+                return true;
+            } else if (otherView instanceof View) {
+                View v = (View) otherView;
+                return this.parent.isSameView(v.parent) &&
+                        this.x == v.x && this.y == v.y &&
+                        this.w == v.w && this.h == v.h;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public MapCanvas getView(int x, int y, int w, int h) {
+            // If the bounds fall perfectly within this view, use this views parent instead
+            // of this view itself as the parent for the new view created.
+            // Just a minor optimization
+            if (x >= 0 && y >= 0 && (x + w) <= this.getWidth() && (y + h) <= this.getHeight()) {
+                if (x == 0 && y == 0 && w == this.getWidth() && h == this.getHeight()) {
+                    return this;
+                } else {
+                    return new View(this.parent, this.x + x, this.y + y, w, h);
+                }
+            } else {
+                return new View(this, x, y, w, h);
+            }
         }
 
         @Override
@@ -1669,6 +1748,7 @@ public abstract class MapCanvas {
     private static final class Clip extends MapCanvas {
         private final MapCanvas parent;
         private final int x0, y0, x1, y1;
+        private final int xAbs, yAbs;
 
         public Clip(MapCanvas parent, int x, int y, int w, int h) {
             this.parent = parent;
@@ -1676,6 +1756,32 @@ public abstract class MapCanvas {
             this.y0 = y;
             this.x1 = x + w;
             this.y1 = y + h;
+            this.xAbs = parent.getViewAbsoluteX();
+            this.yAbs = parent.getViewAbsoluteY();
+        }
+
+        @Override
+        public int getViewAbsoluteX() {
+            return this.xAbs;
+        }
+
+        @Override
+        public int getViewAbsoluteY() {
+            return this.yAbs;
+        }
+
+        @Override
+        public boolean isSameView(MapCanvas otherView) {
+            if (otherView == this) {
+                return true;
+            } else if (otherView instanceof Clip) {
+                Clip c = (Clip) otherView;
+                return this.parent.isSameView(c.parent) &&
+                        this.x0 == c.x0 && this.y0 == c.y0 &&
+                        this.x1 == c.x1 && this.y1 == c.y1;
+            } else {
+                return false;
+            }
         }
 
         @Override

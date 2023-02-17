@@ -31,7 +31,7 @@ public class MapWidget implements MapDisplayEvents {
     protected MapCanvas view;
     private int _z; // depth value can be changed if desired
     private int _x, _y, _width, _height; // live bounds (relative to parent)
-    private int _lastX, _lastY, _lastWidth, _lastHeight; // last drawn bounds (absolute)
+    private MapCanvas _lastView; // last drawn view (absolute)
     private boolean _positionAbsolute;
     private boolean _enabled;
     private boolean _invalidated;
@@ -61,10 +61,7 @@ public class MapWidget implements MapDisplayEvents {
         this.parent = null;
         this.root = null;
         this._z = 0;
-        this._lastX = this._x = 0;
-        this._lastY = this._y = 0;
-        this._lastWidth = this._width = 0;
-        this._lastHeight = this._height = 0;
+        this._lastView = null;
     }
 
     /**
@@ -306,7 +303,7 @@ public class MapWidget implements MapDisplayEvents {
     public final void setClipParent(boolean clipParent) {
         if (this._clipParent != clipParent) {
             this._clipParent = clipParent;
-            this.refreshView();
+            this.refreshView(true);
         }
     }
 
@@ -408,7 +405,7 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     /**
-     * Gets whether this widget is currently enabled using {@link #setEnabled(enabled)}.
+     * Gets whether this widget is currently enabled using {@link #setEnabled(boolean)}.
      * If the parent of this widget is not enabled, this method returns false as well.
      * 
      * @return True if this widget and the parent widgets are enabled
@@ -632,8 +629,9 @@ public class MapWidget implements MapDisplayEvents {
      * @return this widget
      */
     public final MapWidget clear() {
-        if (this.view != null) {
-            this.view.clear();
+        if (this._lastView != null) {
+            this._lastView.clear();
+            this._lastView = null;
         }
         return this;
     }
@@ -734,9 +732,9 @@ public class MapWidget implements MapDisplayEvents {
      */
     void performTickUpdates() {
         this.handleAttach();
-        this.clearInvalidatedAreas();
+        this.clearInvalidatedAreas(false);
         this.handleTick();
-        this.clearInvalidatedAreas();
+        this.clearInvalidatedAreas(true);
         this.handleDraw();
     }
 
@@ -765,8 +763,7 @@ public class MapWidget implements MapDisplayEvents {
         if (this._positionAbsolute != absolute) {
             this._positionAbsolute = absolute;
             this._boundsChanged = true;
-            this.refreshView();
-            this.invalidate();
+            this.refreshView(true);
         }
         return this;
     }
@@ -807,19 +804,40 @@ public class MapWidget implements MapDisplayEvents {
         this._width = width;
         this._height = height;
         this._boundsChanged = true;
-        this.refreshView();
-        this.invalidate();
+        this.refreshView(true);
         return this;
     }
 
-    private final void refreshView() {
+    private final void refreshView(boolean refreshChildren) {
         if (this.layer != null) {
-            this.refreshView(this.getAbsoluteX(), this.getAbsoluteY());
+            if (refreshChildren) {
+                this.refreshViewRecurse(this.getAbsoluteX(), this.getAbsoluteY());
+            } else {
+                this.refreshViewSelf(this.getAbsoluteX(), this.getAbsoluteY());
+            }
         }
     }
 
-    private final void refreshView(int absoluteX, int absoluteY) {
+    private final void refreshViewRecurse(int absoluteX, int absoluteY) {
+        if (this.layer == null) {
+            return;
+        }
+
+        this.refreshViewSelf(absoluteX, absoluteY);
+        for (MapWidget child : this._children) {
+            int childX = child.getX();
+            int childY = child.getY();
+            if (!child.isPositionAbsolute()) {
+                childX += absoluteX;
+                childY += absoluteY;
+            }
+            child.refreshViewRecurse(childX, childY);
+        }
+    }
+
+    private final void refreshViewSelf(int absoluteX, int absoluteY) {
         this.view = this.createParentClip(this.layer).getView(absoluteX, absoluteY, this._width, this._height);
+        this.invalidate();
     }
 
     // Creates the view of the layer canvas, clipping parent areas if enabled
@@ -845,20 +863,32 @@ public class MapWidget implements MapDisplayEvents {
     }
 
     // Convenience method, see below
-    private final void clearInvalidatedAreas() {
+    private final void clearInvalidatedAreas(boolean checkOverlappingChildren) {
         if (this.parent != null) {
-            this.clearInvalidatedAreas(this.parent.getAbsoluteX(), this.parent.getAbsoluteY());
+            this.clearInvalidatedAreas(this.parent.getAbsoluteX(), this.parent.getAbsoluteY(),
+                    checkOverlappingChildren);
         } else {
-            this.clearInvalidatedAreas(0, 0);
+            this.clearInvalidatedAreas(0, 0, checkOverlappingChildren);
         }
     }
 
-    /*
+    /**
      * Walks down the widget tree, clearing the areas behind widgets that have been
      * invalidated and were previously drawn. The absolute x/y is an optimization
      * to make it easier to calculate the new bounds.
+     *
+     * @param absoluteX Absolute X-coordinate of this widget
+     * @param absoluteY Absolute Y-coordinate of this widget
+     * @param checkOverlappingChildren Whether to check for all invalidated child widgets whether
+     *                                 they have an area overlapping with another child. If so, the
+     *                                 other child is also invalidated.
      */
-    private final void clearInvalidatedAreas(int absoluteX, int absoluteY) {
+    private final void clearInvalidatedAreas(int absoluteX, int absoluteY, boolean checkOverlappingChildren) {
+        // If not bound to a layer yet, there's nothing to do here
+        if (this.layer == null) {
+            return;
+        }
+
         // Add position of this widget to absoluteX/Y
         if (this._positionAbsolute) {
             absoluteX = this._x;
@@ -868,28 +898,78 @@ public class MapWidget implements MapDisplayEvents {
             absoluteY += this._y;
         }
 
+        // Ensure the view area is up-to-date with current bounds
+        MapCanvas currentView = this.view;
+        if (currentView == null ||
+            currentView.getViewAbsoluteX() != absoluteX ||
+            currentView.getViewAbsoluteY() != absoluteY ||
+            currentView.getWidth() != this._width ||
+            currentView.getHeight() != this._height
+        ) {
+            this.refreshViewRecurse(absoluteX, absoluteY);
+            currentView = this.view;
+        }
+
         // Only do this when the widget has been drawn before (and is not root)
-        if (this != this.root && this.layer != null && this._lastWidth > 0 && this._lastHeight > 0) {
+        if (this != this.root && this._lastView != null) {
 
             // Detect changes in bounds and invalidate when it happens
-            if (this._lastWidth != this._width ||
-                this._lastHeight != this._height ||
-                this._lastX != absoluteX ||
-                this._lastY != absoluteY) {
+            if (currentView == null || this._lastView.isSameView(currentView)) {
                 this.invalidate();
             }
 
             // Clear old region when invalidated
             if (this._invalidated) {
-                this.createParentClip(this.layer).clearRectangle(this._lastX, this._lastY, this._lastWidth, this._lastHeight);
-                this._lastWidth = 0;
-                this._lastHeight = 0;
+                this._lastView.clear();
+                this._lastView = null;
+            }
+        }
+
+        // For all invalidated children, if their bounding box intersects with another widget,
+        // invalidate the intersected widgets too to enable proper overlay. This is a work-around
+        // for an annoying to use z-buffer...
+        if (checkOverlappingChildren) {
+            for (MapWidget child : this._children) {
+                if (!child._invalidated) {
+                    continue;
+                }
+
+                // Get absolute position of child (efficiently)
+                int childX = child.getX();
+                int childY = child.getY();
+                if (!child.isPositionAbsolute()) {
+                    childX += absoluteX;
+                    childY += absoluteY;
+                }
+
+                for (MapWidget otherChild : this._children) {
+                    if (otherChild == child || otherChild._invalidated) {
+                        continue;
+                    }
+
+                    // Get absolute position of other child (efficiently)
+                    int otherChildX = otherChild.getX();
+                    int otherChildY = otherChild.getY();
+                    if (!otherChild.isPositionAbsolute()) {
+                        otherChildX += absoluteX;
+                        otherChildY += absoluteY;
+                    }
+
+                    if (
+                            (otherChildX + otherChild.getWidth()) >= childX &&
+                                    otherChildX <= (childX + child.getWidth()) &&
+                                    (otherChildY + otherChild.getHeight()) >= childY &&
+                                    otherChildY <= (childY + child.getHeight())
+                    ) {
+                        otherChild.invalidate();
+                    }
+                }
             }
         }
 
         // Repeat for children of this widget
         for (MapWidget child : this._children) {
-            child.clearInvalidatedAreas(absoluteX, absoluteY);
+            child.clearInvalidatedAreas(absoluteX, absoluteY, checkOverlappingChildren);
         }
     }
 
@@ -918,9 +998,9 @@ public class MapWidget implements MapDisplayEvents {
                     this.layer = this.layer.previous();
                     n++;
                 }
-            }
 
-            this.refreshView();
+                this.refreshView(false);
+            }
 
             this.onAttached();
 
@@ -978,26 +1058,17 @@ public class MapWidget implements MapDisplayEvents {
                 tmp = tmp.parent;
             } while (tmp != null);
 
-            this.handleDraw(this.parent.getAbsoluteX(), this.parent.getAbsoluteY(), parentVisible);
+            this.handleDraw(parentVisible);
         } else {
-            this.handleDraw(0, 0, true);
+            this.handleDraw(true);
         }
     }
 
     // Handles the drawing of this widget (if invalidated) and all children
-    private final void handleDraw(int absoluteX, int absoluteY, boolean visible) {
+    private final void handleDraw(boolean visible) {
         // If not attached yet, don't draw
         if (!this._attached) {
             return;
-        }
-
-        // Add own coordinates, unless absolute
-        if (this._positionAbsolute) {
-            absoluteX = this._x;
-            absoluteY = this._y;
-        } else {
-            absoluteX += this._x;
-            absoluteY += this._y;
         }
 
         // If self is not visible, don't draw
@@ -1005,60 +1076,16 @@ public class MapWidget implements MapDisplayEvents {
 
         // If invalidated, redraw
         if (this._invalidated) {
-            this.refreshView(absoluteX, absoluteY);
+            this._lastView = this.view;
             if (this != this.root && visible) {
                 this.onDraw();
             }
-            this._lastX = absoluteX;
-            this._lastY = absoluteY;
-            this._lastWidth = this._width;
-            this._lastHeight = this._height;
             this._invalidated = false;
-        }
-
-        // For all invalidated children, if their bounding box intersects with another widget,
-        // invalidate the intersected widgets too to enable proper overlay. This is a work-around
-        // for an annoying to use z-buffer...
-        for (MapWidget child : this._children) {
-            if (!child._invalidated) {
-                continue;
-            }
-
-            // Get absolute position of child (efficiently)
-            int childX = child.getX();
-            int childY = child.getY();
-            if (!child.isPositionAbsolute()) {
-                childX += absoluteX;
-                childY += absoluteY;
-            }
-
-            for (MapWidget otherChild : this._children) {
-                if (otherChild == child || otherChild._invalidated) {
-                    continue;
-                }
-
-                // Get absolute position of other child (efficiently)
-                int otherChildX = otherChild.getX();
-                int otherChildY = otherChild.getY();
-                if (!otherChild.isPositionAbsolute()) {
-                    otherChildX += absoluteX;
-                    otherChildY += absoluteY;
-                }
-
-                if (
-                    (otherChildX + otherChild.getWidth()) >= childX &&
-                    otherChildX <= (childX + child.getWidth()) &&
-                    (otherChildY + otherChild.getHeight()) >= childY &&
-                    otherChildY <= (childY + child.getHeight())
-                ) {
-                    otherChild.invalidate();
-                }
-            }
         }
 
         // Draw children of this widget, relative to the current coordinates
         for (MapWidget child : this._children) {
-            child.handleDraw(absoluteX, absoluteY, visible);
+            child.handleDraw(visible);
         }
     }
 
@@ -1092,6 +1119,7 @@ public class MapWidget implements MapDisplayEvents {
             this.view = null;
             this.layer = null;
             this.root = null;
+            this._lastView = null;
         }
     }
 

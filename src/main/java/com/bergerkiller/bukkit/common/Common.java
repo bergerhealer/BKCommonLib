@@ -37,7 +37,8 @@ public class Common {
             "Common:SignChangeTracker",
             "Common:EntityUtil:GetSetEquipmentSlot",
             "Common:ChatText:MultiLineSupport",
-            "Common:EntityUtil:PortalWaitDelay"
+            "Common:EntityUtil:PortalWaitDelay",
+            "Common:MapDisplay:BoundsChangeViewFix"
     ).collect(Collectors.toSet());
 
     /**
