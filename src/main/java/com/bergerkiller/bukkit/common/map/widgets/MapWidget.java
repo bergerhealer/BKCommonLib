@@ -629,9 +629,8 @@ public class MapWidget implements MapDisplayEvents {
      * @return this widget
      */
     public final MapWidget clear() {
-        if (this._lastView != null) {
-            this._lastView.clear();
-            this._lastView = null;
+        if (this.view != null) {
+            this.view.clear();
         }
         return this;
     }
@@ -1111,8 +1110,10 @@ public class MapWidget implements MapDisplayEvents {
             // Fire onDetached
             this.onDetached();
 
-            // Clear our occupied area on the canvas
-            this.clear();
+            // Clear our occupied area on the canvas, if this widget was drawn
+            if (this._lastView != null) {
+                this._lastView.clear();
+            }
 
             // Detach ourselves completely
             this.display = null;
