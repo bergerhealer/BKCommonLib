@@ -48,6 +48,7 @@
 #include /net/minecraft/entity/vehicles.txt
 #include /net/minecraft/entity/entity.txt
 #include /net/minecraft/entity/ageable.txt
+#include /net/minecraft/entity/slime.txt
 #include /net/minecraft/enums.txt
 #include /net/minecraft/locale_language.txt
 #include /net/minecraft/network/chat.txt

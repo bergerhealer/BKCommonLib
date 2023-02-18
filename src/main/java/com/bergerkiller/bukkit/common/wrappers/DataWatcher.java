@@ -763,6 +763,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<BlockFace> DIRECTION = getForType(BlockFace.class);
             public static final Type<java.util.OptionalInt> ENTITY_ID = new Type<java.util.OptionalInt>(INTEGER._token, new EntityIdTypeConverter());
             public static final Type<BoatWoodType> BOAT_WOOD_TYPE = new Type<BoatWoodType>(INTEGER._token, new BoatWoodTypeIdConverter());
+            public static final Type<Integer> SLIME_SIZE_TYPE = CommonCapabilities.DATAWATCHER_OBJECTS
+                    ? INTEGER : new Type<Integer>(BYTE._token, new SlimeSizeByteConverter());
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
                 if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
@@ -1065,6 +1067,23 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
         @Override
         public boolean acceptsNullOutput() {
             return true;
+        }
+    }
+
+    private static final class SlimeSizeByteConverter extends DuplexConverter<Object, Integer> {
+
+        public SlimeSizeByteConverter() {
+            super(byte.class, int.class);
+        }
+
+        @Override
+        public Integer convertInput(Object value) {
+            return Integer.valueOf(((Number) value).byteValue() & 0xFF);
+        }
+
+        @Override
+        public Object convertOutput(Integer integer) {
+            return Byte.valueOf(integer.byteValue());
         }
     }
 

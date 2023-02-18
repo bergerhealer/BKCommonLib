@@ -1,0 +1,40 @@
+package net.minecraft.world.entity.monster;
+
+import net.minecraft.world.entity.EntityInsentient;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+class EntitySlime extends EntityInsentient {
+#if version >= 1.17
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:ID_SIZE;
+#elseif version >= 1.16.2
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bo;
+#elseif version >= 1.16
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bv;
+#elseif version >= 1.15
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bw;
+#elseif version >= 1.14
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bz;
+#elseif version >= 1.13
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bC;
+#elseif version >= 1.12
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bv;
+#elseif version >= 1.11
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bu;
+#elseif version >= 1.10
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bv;
+#elseif version >= 1.9.4
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bu;
+#elseif version >= 1.9
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:bt;
+#else
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_SIZE:###;
+#endif
+
+    <code>
+    public static final Key<Integer> DATA_SIZE = Key.Type.SLIME_SIZE_TYPE.createKey(T.DATA_SIZE, 16);
+    </code>
+}

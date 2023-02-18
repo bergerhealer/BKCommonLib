@@ -38,7 +38,8 @@ public class Common {
             "Common:EntityUtil:GetSetEquipmentSlot",
             "Common:ChatText:MultiLineSupport",
             "Common:EntityUtil:PortalWaitDelay",
-            "Common:MapDisplay:BoundsChangeViewFix"
+            "Common:MapDisplay:BoundsChangeViewFix",
+            "Common:EntitySlimeHandle"
     ).collect(Collectors.toSet());
 
     /**
