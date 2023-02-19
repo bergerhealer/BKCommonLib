@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.utils;
 
-import com.bergerkiller.bukkit.common.Common;
 import com.bergerkiller.bukkit.common.bases.IntVector2;
 import com.bergerkiller.bukkit.common.controller.VehicleMountController;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
@@ -9,6 +8,7 @@ import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
+import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
 import com.bergerkiller.bukkit.common.resources.DimensionType;
 import com.bergerkiller.bukkit.common.resources.ParticleType;
 import com.bergerkiller.bukkit.common.resources.ResourceKey;
@@ -205,7 +205,7 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, chunkX, chunkZ)} instead
+     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, int, int)} instead
      */
     @Deprecated
     public static boolean isChunkEntered(Player player, int chunkX, int chunkZ) {
@@ -213,7 +213,7 @@ public class PlayerUtil extends EntityUtil {
     }
 
     /**
-     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, chunk)} instead
+     * <b>Deprecated: </b>use {@link #isChunkVisible(Player, Chunk)} instead
      */
     @Deprecated
     public static boolean isChunkEntered(Player player, Chunk chunk) {
@@ -397,13 +397,10 @@ public class PlayerUtil extends EntityUtil {
      *
      * @param player The player to get the (maximum) game version of
      * @return Game version string, e.g. "1.12.2"
+     * @see PlayerGameInfo
      */
     public static String getGameVersion(Player player) {
-        if (CommonPlugin.hasInstance()) {
-            return CommonPlugin.getInstance().getGameVersionSupplier().getVersion(player);
-        } else {
-            return Common.MC_VERSION;
-        }
+        return PlayerGameInfo.of(player).version();
     }
 
     /**
@@ -414,12 +411,9 @@ public class PlayerUtil extends EntityUtil {
      * @param operand to evaluate (>, >=, ==, etc.)
      * @param rightSide value on the right side of the operand
      * @return True if the evaluation succeeds, False if not
+     * @see PlayerGameInfo
      */
     public static boolean evaluateGameVersion(Player player, String operand, String rightSide) {
-        if (CommonPlugin.hasInstance()) {
-            return CommonPlugin.getInstance().getGameVersionSupplier().evaluateVersion(player, operand, rightSide);
-        } else {
-            return Common.evaluateMCVersion(operand, rightSide);
-        }
+        return PlayerGameInfo.of(player).evaluateVersion(operand, rightSide);
     }
 }

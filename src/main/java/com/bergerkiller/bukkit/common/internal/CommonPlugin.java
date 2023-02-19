@@ -28,9 +28,7 @@ import com.bergerkiller.bukkit.common.internal.logic.BlockDataWrapperHook;
 import com.bergerkiller.bukkit.common.internal.logic.BlockPhysicsEventDataAccessor;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
-import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier;
-import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_Vanilla;
-import com.bergerkiller.bukkit.common.internal.logic.PlayerGameVersionSupplier_ViaVersion;
+import com.bergerkiller.bukkit.common.internal.logic.PlayerGameInfoSupplier_ViaVersion;
 import com.bergerkiller.bukkit.common.internal.logic.PortalHandler;
 import com.bergerkiller.bukkit.common.internal.map.CommonMapController;
 import com.bergerkiller.bukkit.common.internal.network.CommonPacketHandler;
@@ -39,6 +37,7 @@ import com.bergerkiller.bukkit.common.map.MapColorPalette;
 import com.bergerkiller.bukkit.common.metrics.MyDependingPluginsGraph;
 import com.bergerkiller.bukkit.common.metrics.SoftDependenciesGraph;
 import com.bergerkiller.bukkit.common.offline.OfflineWorld;
+import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.PacketUtil;
@@ -78,6 +77,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -109,7 +109,7 @@ public class CommonPlugin extends PluginBase {
     private CommonMapController mapController = null;
     private CommonForcedChunkManager forcedChunkManager = null;
     private CommonVehicleMountManager vehicleMountManager = null;
-    private PlayerGameVersionSupplier gameVersionSupplier = null;
+    private Function<Player, PlayerGameInfo> gameInfoSupplier = p -> PlayerGameInfo.SERVER;
     private boolean isFrameTilingSupported = true;
     private boolean isFrameDisplaysEnabled = true;
     private boolean isMapDisplaysEnabled = true;
@@ -360,12 +360,12 @@ public class CommonPlugin extends PluginBase {
     }
 
     /**
-     * Gets the player game version supplier
+     * Gets the game information of a Player
      *
-     * @return game version supplier
+     * @return game info
      */
-    public PlayerGameVersionSupplier getGameVersionSupplier() {
-        return this.gameVersionSupplier;
+    public PlayerGameInfo getGameInfo(Player player) {
+        return this.gameInfoSupplier.apply(player);
     }
 
     /**
@@ -508,10 +508,10 @@ public class CommonPlugin extends PluginBase {
         // ViaVersion detection
         if (pluginName.equals("ViaVersion")) {
             if (enabled) {
-                this.gameVersionSupplier = new PlayerGameVersionSupplier_ViaVersion();
+                this.gameInfoSupplier = new PlayerGameInfoSupplier_ViaVersion();
                 log(Level.INFO, "ViaVersion detected, will use it to detect player game versions");
             } else {
-                this.gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
+                this.gameInfoSupplier = p -> PlayerGameInfo.SERVER;
                 log(Level.INFO, "ViaVersion was disabled, will no longer use it to detect player game versions");
             }
         }
@@ -538,7 +538,7 @@ public class CommonPlugin extends PluginBase {
             }
 
             // Must be loaded early
-            gameVersionSupplier = new PlayerGameVersionSupplier_Vanilla();
+            gameInfoSupplier = p -> PlayerGameInfo.SERVER;
 
             // Load the classes contained in this library
             CommonClasses.init();

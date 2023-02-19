@@ -79,7 +79,7 @@ public interface VehicleMountController {
 
     /**
      * Despawns an Entity and prevents the Entity from being spawned by the server until
-     * {@link #respawn(int, RespawnFunction)} is called. If the Entity was already spawned,
+     * {@link #respawn(int, RespawnFunctionWithEntityId)} is called. If the Entity was already spawned,
      * the entity is despawned right away.
      * 
      * @param entityId

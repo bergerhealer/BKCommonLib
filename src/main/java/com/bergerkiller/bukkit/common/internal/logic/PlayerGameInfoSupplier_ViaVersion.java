@@ -2,8 +2,10 @@ package com.bergerkiller.bukkit.common.internal.logic;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.bergerkiller.bukkit.common.protocol.PlayerGameInfo;
 import org.bukkit.entity.Player;
 
 import com.bergerkiller.mountiplex.logic.TextValueSequence;
@@ -16,12 +18,12 @@ import us.myles.ViaVersion.api.protocol.ProtocolVersion;
  * Detects the game version of the player by communicating with the ViaVersion API.
  * Only used when the ViaVersion plugin is enabled.
  */
-public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSupplier {
+public class PlayerGameInfoSupplier_ViaVersion implements Function<Player, PlayerGameInfo> {
     @SuppressWarnings("unchecked")
     private final ViaAPI<Player> api = (ViaAPI<Player>) Via.getAPI();
     private final Entry[] entries;
 
-    public PlayerGameVersionSupplier_ViaVersion() {
+    public PlayerGameInfoSupplier_ViaVersion() {
         // Initialize mapping with enough room to spare
         entries = new Entry[ProtocolVersion.getProtocols().stream()
                 .mapToInt(ProtocolVersion::getVersion)
@@ -47,16 +49,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
     }
 
     @Override
-    public String getVersion(Player player) {
-        return getEntry(player).maximum.toString();
-    }
-
-    @Override
-    public boolean evaluateVersion(Player player, String operand, TextValueSequence rightSide) {
-        return getEntry(player).evaluate(operand, rightSide);
-    }
-
-    private Entry getEntry(Player player) {
+    public PlayerGameInfo apply(Player player) {
         int protocolVersion = api.getPlayerVersion(player);
         try {
             return entries[protocolVersion];
@@ -67,7 +60,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
         }
     }
 
-    private static class Entry {
+    private static class Entry implements PlayerGameInfo {
         public final int protocolVersion;
         public final TextValueSequence minimum;
         public final TextValueSequence maximum;
@@ -90,7 +83,13 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
             }
         }
 
-        public boolean evaluate(String operand, TextValueSequence value) {
+        @Override
+        public String version() {
+            return this.maximum.toString();
+        }
+
+        @Override
+        public boolean evaluateVersion(String operand, TextValueSequence rightSide) {
             int len = operand.length();
             if (len == 0 || len > 2) {
                 return false;
@@ -99,7 +98,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
             char second = (len == 2) ? operand.charAt(1) : ' ';
             if (first == '>') {
                 // [1.12.1, 1.12.2] > 1.12.1 = true
-                int comp = this.minimum.compareTo(value);
+                int comp = this.minimum.compareTo(rightSide);
                 if (second == '=') {
                     return comp >= 0;
                 } else {
@@ -107,7 +106,7 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
                 }
             } else if (first == '<') {
                 // [1.12.1, 1.12.2] < 1.12.2 = true
-                int comp = this.maximum.compareTo(value);
+                int comp = this.maximum.compareTo(rightSide);
                 if (second == '=') {
                     return comp <= 0;
                 } else {
@@ -115,17 +114,17 @@ public class PlayerGameVersionSupplier_ViaVersion extends PlayerGameVersionSuppl
                 }
             } else if (first == '=' && second == '=') {
                 if (this.minimum == this.maximum) {
-                    return this.minimum.equals(value);
+                    return this.minimum.equals(rightSide);
                 } else {
-                    return this.minimum.compareTo(value) >= 0
-                            && this.maximum.compareTo(value) <= 0;
+                    return this.minimum.compareTo(rightSide) >= 0
+                            && this.maximum.compareTo(rightSide) <= 0;
                 }
             } else if (first == '!' && second == '=') {
                 if (this.minimum == this.maximum) {
-                    return !this.minimum.equals(value);
+                    return !this.minimum.equals(rightSide);
                 } else {
-                    return this.minimum.compareTo(value) < 0
-                            || this.maximum.compareTo(value) > 0;
+                    return this.minimum.compareTo(rightSide) < 0
+                            || this.maximum.compareTo(rightSide) > 0;
                 }
             } else {
                 return false;
