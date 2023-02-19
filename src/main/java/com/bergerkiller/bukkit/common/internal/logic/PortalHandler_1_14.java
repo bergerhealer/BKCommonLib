@@ -126,7 +126,7 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          *     return world.getWorldProvider().getDimensionManager() == DimensionManager.THE_END;
          * }
          */
@@ -136,7 +136,7 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     net.minecraft.world.level.block.state.pattern.ShapeDetector$Shape result = agent.a(blockposition, Vec3D.a, EnumDirection.NORTH, 0.5, 1.0, true);
@@ -154,7 +154,7 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static void createNetherPortal(org.bukkit.block.Block startBlock, Object dummyEntity) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     Entity dummy = (Entity) dummyEntity;
          *     dummy.locX = (double) startBlock.getX()+0.5;
@@ -169,7 +169,7 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <FIND_END_PLATFORM>
          * public static org.bukkit.block.Block findEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     BlockPosition platformPos = WorldProviderTheEnd.f;
          *     int i = platformPos.getX();
          *     int j = platformPos.getY() - 1;
@@ -200,7 +200,7 @@ class PortalHandler_1_14 extends PortalHandler {
         /*
          * <CREATE_END_PLATFORM>
          * public static org.bukkit.block.Block createEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     BlockPosition platformPos = WorldProviderTheEnd.f;
          * 
          *     // Code is embedded deep inside EntityPlayer.a(DimensionManager, TeleportCause)

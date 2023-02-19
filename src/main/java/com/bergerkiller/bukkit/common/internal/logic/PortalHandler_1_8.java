@@ -149,7 +149,7 @@ class PortalHandler_1_8 extends PortalHandler {
         /*
          * <IS_MAIN_END_WORLD>
          * public static boolean isMainEndWorld(org.bukkit.World world) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) world).getHandle();
          *     return world.dimension == 1;
          * }
          */
@@ -159,7 +159,7 @@ class PortalHandler_1_8 extends PortalHandler {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock, int createRadius) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     BlockPosition result = agent.findPortal((double) startBlock.getX(),
@@ -178,7 +178,7 @@ class PortalHandler_1_8 extends PortalHandler {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static boolean createNetherPortal(org.bukkit.block.Block startBlock, int createRadius) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     return agent.createPortal((double) startBlock.getX() + 0.5,
          *                               (double) startBlock.getY(),
@@ -195,7 +195,7 @@ class PortalHandler_1_8 extends PortalHandler {
          *     #require net.minecraft.server.PortalTravelAgent private BlockPosition findEndPortal(BlockPosition portal);
          *     #require net.minecraft.server.PortalTravelAgent private BlockPosition createEndPortal(double x, double y, double z);
          * 
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          * 
          *     World the_end_world = MinecraftServer.getServer().getWorldServer(1);

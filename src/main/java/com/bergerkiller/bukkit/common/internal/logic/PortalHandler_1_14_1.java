@@ -238,7 +238,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <FIND_NETHER_PORTAL>
          * public static org.bukkit.block.Block findNetherPortal(org.bukkit.block.Block startBlock, int radius) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          * #if version >= 1.16.2
@@ -283,7 +283,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <CREATE_NETHER_PORTAL>
          * public static void createNetherPortal(org.bukkit.block.Block startBlock, org.bukkit.block.BlockFace orientation, Object entityInitiator, Object dummyEntity, int createRadius) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          *     PortalTravelAgent agent = new PortalTravelAgent(world);
          *     Entity initiator = (Entity) entityInitiator;
@@ -338,7 +338,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <STORE_NETHER_PORTAL>
          * public static void storeNetherPortal(org.bukkit.block.Block startBlock) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) startBlock.getWorld()).getHandle();
          *     BlockPosition blockposition = new BlockPosition(startBlock.getX(), startBlock.getY(), startBlock.getZ());
          * #if version >= 1.19
          *     VillagePlace villageplace = world.getPoiManager();
@@ -370,7 +370,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <FIND_END_PLATFORM>
          * public static org.bukkit.block.Block findEndPlatform(org.bukkit.World bworld) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          * #if version >= 1.17
          *     BlockPosition platformPos = WorldServer.END_SPAWN_POINT;
          * #elseif version >= 1.16
@@ -412,7 +412,7 @@ class PortalHandler_1_14_1 extends PortalHandler implements Listener {
         /*
          * <CREATE_END_PLATFORM>
          * public static org.bukkit.block.Block createEndPlatform(org.bukkit.World bworld, Object entityInitiatorRaw) {
-         *     WorldServer world = ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
+         *     WorldServer world = (WorldServer) ((org.bukkit.craftbukkit.CraftWorld) bworld).getHandle();
          *     Entity entityInitiator = (Entity) entityInitiatorRaw;
          * 
          * #if version >= 1.17
