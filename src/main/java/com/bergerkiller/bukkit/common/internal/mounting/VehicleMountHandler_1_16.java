@@ -7,7 +7,6 @@ import org.bukkit.util.Vector;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
-import com.bergerkiller.bukkit.common.utils.DebugUtil;
 import com.bergerkiller.bukkit.common.utils.MathUtil;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInFlyingHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutEntityTeleportHandle;
@@ -164,7 +163,7 @@ public class VehicleMountHandler_1_16 extends VehicleMountHandler_1_9_to_1_15_2 
 
         if (in_pos != null) {
             Vector diff = curr_pos.clone().subtract(in_pos);
-            diff.setY(diff.getY() + DebugUtil.getDoubleValue("f", 0.01));
+            diff.setY(diff.getY() + 0.01);
             MathUtil.setVector(in_pos, curr_pos);
 
             if (diff.lengthSquared() > (2.0*2.0)) {
