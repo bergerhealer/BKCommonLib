@@ -37,6 +37,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -52,6 +53,7 @@ public abstract class PluginBase extends JavaPlugin {
     private FileConfiguration permissionconfig, localizationconfig;
     private final String pluginYamlText;
     private final org.bukkit.configuration.file.YamlConfiguration pluginYaml = new org.bukkit.configuration.file.YamlConfiguration();
+    private final List<String> classDependPlugins;
     private BasicConfiguration pluginYamlBKCL = null; // Cached and re-used, instantiated on first use
     private final CommonDependencyStartupLogHandler.PluginBaseHandler startupLogHandler;
     private boolean enabled = false;
@@ -67,6 +69,15 @@ public abstract class PluginBase extends JavaPlugin {
 
         // Set hastebin server to use when uploading error reports
         this.startupLogHandler.setHastebinServer(this.pluginYaml.getString("preloader.hastebinServer", "https://hastebin.com"));
+
+        // Get a List of plugins class-depended upon
+        {
+            List<String> classDepend = this.pluginYaml.getStringList("classdepend");
+            if (classDepend == null) {
+                classDepend = Collections.emptyList();
+            }
+            this.classDependPlugins = classDepend;
+        }
 
         // For all class depends specified in plugin.yml, hack-grant class loader access to them into the server
         // This prevents 'loaded class from x which is not a depend or softdepend of y' kind of warnings from showing
@@ -869,7 +880,7 @@ public abstract class PluginBase extends JavaPlugin {
         CommonPlugin.getInstance().plugins.add(this);
         for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
             if (plugin.isEnabled()) {
-                this.updateDependency(plugin, plugin.getName(), true);
+                PluginBaseInternalHelper.handleUpdateDependency(this, plugin, plugin.getName(), true);
             }
         }
 
@@ -927,7 +938,7 @@ public abstract class PluginBase extends JavaPlugin {
      * Performs a soft disabling, disabling the plugin but leaving it capable of
      * hosting event handlers / tasks.
      * 
-     * @param sendDisableMessage Whether to force a disable message, if configured
+     * @param forceDisableMessage Whether to force a disable message, if configured
      */
     private void softDisable(boolean forceDisableMessage) {
         this.wasDisableRequested = true;
@@ -1057,6 +1068,40 @@ public abstract class PluginBase extends JavaPlugin {
         }
     }
 
+    // This crap is needed to support older versions of the server
+    private static final boolean hasProvidesMethod;
+    private static Function<Plugin, List<String>> providesMethod;
+    static {
+        java.lang.reflect.Method getProvidesMethodTmp = null;
+        try {
+            getProvidesMethodTmp = PluginDescriptionFile.class.getMethod("getProvides");
+        } catch (Throwable t) {}
+        hasProvidesMethod = (getProvidesMethodTmp != null);
+        if (hasProvidesMethod) {
+            final java.lang.reflect.Method getProvidesMethod = getProvidesMethodTmp;
+            providesMethod = p -> {
+                try {
+                    return (List<String>) getProvidesMethod.invoke(p.getDescription());
+                } catch (Throwable t) {
+                    // Egh.
+                    Bukkit.getLogger().log(Level.SEVERE, "Error checking provides list", t);
+                    return Collections.emptyList();
+                }
+            };
+        } else {
+            providesMethod = p -> Collections.emptyList();
+        }
+    }
+
+    private boolean isUsingPaperClassLoader() {
+        try {
+            Class<?> paperLoaderType = Class.forName("io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader");
+            return paperLoaderType.isInstance(this.getClassLoader());
+        } catch (Throwable t) { /* ignore */ }
+
+        return false;
+    }
+
     /**
      * Suppresses warnings about this plugin accessing classes of another plugin that isn't a soft depend
      * or depend or loadbefore. This is used automatically when a 'classdepend' is put in the plugin.yml.<br>
@@ -1068,20 +1113,14 @@ public abstract class PluginBase extends JavaPlugin {
      */
     @SuppressWarnings("unchecked")
     private void grantClassDependAccess() {
-        List<String> classDependList = this.pluginYaml.getStringList("classdepend");
-        if (classDependList == null || classDependList.isEmpty()) {
+        if (classDependPlugins.isEmpty()) {
             return; // Not used
         }
 
-        // Check whether the 'provides' Bukkit API exists or not. If it does, we can use it
-        // to also resolve forks of existing 'class depends' that provide the same API. Like FAWE -> WorldEdit.
-        final java.lang.reflect.Method getProvidesMethod;
-        {
-            java.lang.reflect.Method tmp = null;
-            try {
-                tmp = PluginDescriptionFile.class.getMethod("getProvides");
-            } catch (Throwable t) {}
-            getProvidesMethod = tmp;
+        // Check for Paper's plugin system to properly add the class loader there as well
+        // Otherwise this plugin can't even load the classes from the classdepend plugin
+        if (isUsingPaperClassLoader()) {
+            addAccessToClassloadersPaper();
         }
 
         // Check whether the 'seenIllegalAccess' Set exists
@@ -1095,9 +1134,9 @@ public abstract class PluginBase extends JavaPlugin {
             final Set<String> seenIllegalAccess = (Set<String>) seenIllegalAccessField.get(this.getClassLoader());
 
             // Add all values configured to the seenIllegalAccess Set up-front
-            seenIllegalAccess.addAll(classDependList);
+            seenIllegalAccess.addAll(classDependPlugins);
 
-            if (getProvidesMethod != null) {
+            if (hasProvidesMethod) {
                 // Got to hook the Set as well to properly handle provides during contains()
                 Set<String> hook = new AbstractSet<String>() {
 
@@ -1108,13 +1147,7 @@ public abstract class PluginBase extends JavaPlugin {
 
                         Plugin pluginByName;
                         if (o instanceof String && (pluginByName = Bukkit.getPluginManager().getPlugin((String) o)) != null) {
-                            List<String> pluginProvidesList = Collections.emptyList();
-                            try {
-                                pluginProvidesList = (List<String>) getProvidesMethod.invoke(pluginByName.getDescription());
-                            } catch (Throwable t) {
-                                PluginBase.this.getLogger().log(Level.SEVERE, "Error checking provides list", t);
-                            }
-                            for (String provides : pluginProvidesList) {
+                            for (String provides : providesMethod.apply(pluginByName)) {
                                 if (seenIllegalAccess.contains(provides)) {
                                     seenIllegalAccess.add((String) o);
                                     return true;
@@ -1153,6 +1186,152 @@ public abstract class PluginBase extends JavaPlugin {
                 seenIllegalAccessField.set(this.getClassLoader(), hook);
             }
         } catch (Throwable t) {}
+    }
+
+    private Object unwrapLockingClassLoaderPaper(Object loader) {
+        try {
+            Class<?> lockingType = Class.forName("io.papermc.paper.plugin.entrypoint.classloader.group.LockingClassLoaderGroup");
+            if (lockingType.isInstance(loader)) {
+                return lockingType.getMethod("getParent").invoke(loader);
+            }
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "Failed to unwrap LockingClassLoaderGroup", t);
+        }
+        return loader;
+    }
+
+    private void addAccessToClassloadersPaper() {
+        try {
+            // All this to find a List of all class loaders available on the server...
+            Class<?> paperClassLoaderStorageType = Class.forName("io.papermc.paper.plugin.provider.classloader.PaperClassLoaderStorage");
+            Object paperClassLoaderStorage = paperClassLoaderStorageType.getMethod("instance").invoke(null);
+            Object globalGroup = paperClassLoaderStorage.getClass().getMethod("getGlobalGroup").invoke(paperClassLoaderStorage);
+            globalGroup = unwrapLockingClassLoaderPaper(globalGroup);
+            Class<?> simpleListPluginGroupType = Class.forName("io.papermc.paper.plugin.entrypoint.classloader.group.SimpleListPluginClassLoaderGroup");
+            java.lang.reflect.Method getClassLoadersMethod = simpleListPluginGroupType.getMethod("getClassLoaders");
+            List<Object> classloaders = (List<Object>) getClassLoadersMethod.invoke(globalGroup);
+
+            // These we want to collect
+            ArrayList<Object> loadersToAdd = new ArrayList<>();
+
+            // For all loaders, see if they are part of the depend list of provide one of the depend lists
+            Class<?> configuredPluginClassLoaderType = Class.forName("io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader");
+            java.lang.reflect.Method pluginMetaMethod = configuredPluginClassLoaderType.getMethod("getConfiguration");
+            Class<?> pluginMetaType = Class.forName("io.papermc.paper.plugin.configuration.PluginMeta");
+            java.lang.reflect.Method pluginMetaGetNameMethod = pluginMetaType.getMethod("getName");
+            java.lang.reflect.Method pluginMetaGetProvidesMethod = pluginMetaType.getMethod("getProvidedPlugins");
+            for (Object loader : classloaders) {
+                Object config = pluginMetaMethod.invoke(loader);
+
+                // Decode name, check if we depend
+                String name = (String) pluginMetaGetNameMethod.invoke(config);
+                if (classDependPlugins.contains(name)) {
+                    loadersToAdd.add(loader);
+                    continue;
+                }
+
+                // Decode provides, check any of them are contained
+                List<String> provides = (List<String>) pluginMetaGetProvidesMethod.invoke(config);
+                if (provides != null && !provides.isEmpty()) {
+                    boolean hasProvideDependedOn = false;
+                    for (String provide : provides) {
+                        if (classDependPlugins.contains(provide)) {
+                            hasProvideDependedOn = true;
+                            break;
+                        }
+                    }
+                    if (hasProvideDependedOn) {
+                        loadersToAdd.add(loader);
+                        continue;
+                    }
+                }
+            }
+
+            // Add all already-found loaders to this plugin's group
+            loadersToAdd.forEach(this::addPluginClassLoaderPaper);
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "Failed to grant access to dependency classes using Paper API", t);
+        }
+    }
+
+    /**
+     * If we class-depend on this plugin, or something this plugin provides, AND we are
+     * on Paper where this must be handled. Handle it.
+     *
+     * @param plugin Plugin to check
+     */
+    void handleClassDependencyLoaded(Plugin plugin) {
+        // Used at all?
+        if (classDependPlugins.isEmpty() || !isUsingPaperClassLoader()) {
+            return;
+        }
+
+        // Do we care about this plugin?
+        if (!classDependPlugins.contains(plugin.getName())) {
+            boolean isProvided = false;
+            for (String provides : providesMethod.apply(plugin)) {
+                if (classDependPlugins.contains(provides)) {
+                    isProvided = true;
+                    break;
+                }
+            }
+            if (!isProvided) {
+                return;
+            }
+        }
+
+        // Add its loader!
+        addPluginClassLoaderPaper(plugin.getClass().getClassLoader());
+    }
+
+    private void addPluginClassLoaderPaper(Object configuredPluginClassLoader) {
+        try {
+            // Check applicable
+            Class<?> configuredPluginClassLoaderType = Class.forName("io.papermc.paper.plugin.provider.classloader.ConfiguredPluginClassLoader");
+            if (!configuredPluginClassLoaderType.isInstance(configuredPluginClassLoader)) {
+                throw new IllegalStateException("Invalid plugin class loader type: " + configuredPluginClassLoader.getClass());
+            }
+
+            // Retrieve this plugin's Plugin Class Loader group
+            // io.papermc.paper.plugin.provider.classloader.PluginClassLoaderGroup
+            Class<?> pluginClassLoaderType = Class.forName("org.bukkit.plugin.java.PluginClassLoader");
+            Class<?> paperPluginLoaderType = Class.forName("io.papermc.paper.plugin.entrypoint.classloader.PaperPluginClassLoader");
+            Object pluginClassLoaderGroup;
+            if (pluginClassLoaderType.isInstance(this.getClassLoader())) {
+                java.lang.reflect.Field classLoaderGroupField = pluginClassLoaderType.getDeclaredField("classLoaderGroup");
+                classLoaderGroupField.setAccessible(true);
+                pluginClassLoaderGroup = classLoaderGroupField.get(this.getClassLoader());
+            } else if (paperPluginLoaderType.isInstance(this.getClassLoader())) {
+                java.lang.reflect.Field classLoaderGroupField = paperPluginLoaderType.getDeclaredField("group");
+                classLoaderGroupField.setAccessible(true);
+                pluginClassLoaderGroup = classLoaderGroupField.get(this.getClassLoader());
+            } else {
+                throw new IllegalStateException("Unknown loader type: " + this.getClassLoader().getClass().getName());
+            }
+
+            // Ugh
+            pluginClassLoaderGroup = unwrapLockingClassLoaderPaper(pluginClassLoaderGroup);
+
+            // Check this group is a SimpleListPluginClassLoaderGroup
+            Class<?> simpleListPluginGroupType = Class.forName("io.papermc.paper.plugin.entrypoint.classloader.group.SimpleListPluginClassLoaderGroup");
+            if (!simpleListPluginGroupType.isInstance(pluginClassLoaderGroup)) {
+                throw new IllegalStateException("Unsupported class loader group type: " + pluginClassLoaderGroup.getClass().getName());
+            }
+
+            // Check not already contained in the group
+            java.lang.reflect.Method getClassLoadersMethod = simpleListPluginGroupType.getMethod("getClassLoaders");
+            List<Object> existingLoaders = (List<Object>) getClassLoadersMethod.invoke(pluginClassLoaderGroup);
+            if (existingLoaders.contains(configuredPluginClassLoader)) {
+                return;
+            }
+
+            // Add the loader
+            System.out.println("ADDING " + configuredPluginClassLoader);
+            java.lang.reflect.Method addMethod = simpleListPluginGroupType.getMethod("add", configuredPluginClassLoaderType);
+            addMethod.invoke(pluginClassLoaderGroup, configuredPluginClassLoader);
+        } catch (Throwable t) {
+            getLogger().log(Level.SEVERE, "Failed to grant access to dependency classes using Paper API", t);
+        }
     }
 
     private String readPluginYamlContent(Plugin plugin, org.bukkit.configuration.file.YamlConfiguration config) {
@@ -1216,8 +1395,8 @@ public abstract class PluginBase extends JavaPlugin {
     /**
      * Called when a command is postfixed with 'ver' or 'version'. By default displays
      * the version information of the plugin and BKCommonLib.
-     * If those commands should be handled by {@link #command(sender, cmd, arg)}, override
-     * this method and return false.
+     * If those commands should be handled by {@link #command(CommandSender, String, String[])},
+     * override this method and return false.
      * 
      * @param sender to send version information to
      * @return True if the version command was handled
@@ -1232,8 +1411,8 @@ public abstract class PluginBase extends JavaPlugin {
     /**
      * Called when a command is postfixed with 'startuplog'. By default uploads the
      * startup log of this plugin to Hastebin and makes it available through a hyperlink.
-     * If those commands should be handled by {@link #command(sender, cmd, arg)}, override
-     * this method and return false.
+     * If those commands should be handled by {@link #command(CommandSender, String, String[])},
+     * override this method and return false.
      *
      * @param sender
      * @param command

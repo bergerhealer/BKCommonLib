@@ -1,11 +1,16 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
-api-version: 1.13
+api-version: 1.19
 version: ${project.version}
 build: ${project.build.number}
 authors: [${project.authors}]
 load: startup
 description: Is used in all of my plugins to re-use common functions
+dependencies:
+  - name: Vault
+    required: false
+  - name: ProtocolLib
+    required: false
 softdepend: [Vault, ProtocolLib]
 classdepend: [WorldEdit, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
 dev-url: ${project.url}

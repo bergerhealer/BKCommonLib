@@ -24,6 +24,9 @@
         <cloud.version>1.8.0-SNAPSHOT</cloud.version>
         <regionchangetracker.version>1.2</regionchangetracker.version>
         <junit.version>4.12</junit.version>
+
+        <!-- Miscellaneous properties -->
+        <project.authors>bergerkiller, lenis0012, timstans, bubba1234119, KamikazePlatypus, mg_1999, Friwi</project.authors>
     </properties>
 
     <profiles>
@@ -260,12 +263,14 @@
                 <filtering>true</filtering>
                 <includes>
                     <include>plugin.yml</include>
+                    <include>paper-plugin.yml</include>
                 </includes>
             </resource>
             <resource>
                 <directory>src/main/resources</directory>
                 <excludes>
                     <exclude>plugin.yml</exclude>
+                    <exclude>paper-plugin.yml</exclude>
                 </excludes>
             </resource>
             <resource>

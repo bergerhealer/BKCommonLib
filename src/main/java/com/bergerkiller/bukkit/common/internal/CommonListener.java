@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
+import com.bergerkiller.bukkit.common.PluginBaseInternalHelper;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.collections.ImmutableCachedSet;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
@@ -61,7 +62,7 @@ public class CommonListener implements Listener {
     protected void onPluginEnable(final PluginEnableEvent event) {
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            pb.updateDependency(event.getPlugin(), name, true);
+            PluginBaseInternalHelper.handleUpdateDependency(pb, event.getPlugin(), name, true);
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());
     }
@@ -70,7 +71,7 @@ public class CommonListener implements Listener {
     protected void onPluginDisable(PluginDisableEvent event) {
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            pb.updateDependency(event.getPlugin(), name, false);
+            PluginBaseInternalHelper.handleUpdateDependency(pb, event.getPlugin(), name, false);
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());
     }
