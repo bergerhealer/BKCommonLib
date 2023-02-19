@@ -39,7 +39,8 @@ public class Common {
             "Common:ChatText:MultiLineSupport",
             "Common:EntityUtil:PortalWaitDelay",
             "Common:MapDisplay:BoundsChangeViewFix",
-            "Common:EntitySlimeHandle"
+            "Common:EntitySlimeHandle",
+            "Common:PlayerGameInfo"
     ).collect(Collectors.toSet());
 
     /**
