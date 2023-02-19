@@ -53,6 +53,7 @@ public class CommonUtil {
     public static final int VIEWWIDTH;
     public static final int CHUNKAREA;
     public static final int BLOCKVIEW;
+    private static final boolean IS_PAPER_PLUGIN_MANAGER;
     public static final Thread MAIN_THREAD = Thread.currentThread();
 
     private static final Map<String, Class<?>> classMap = new HashMap<String, Class<?>>();
@@ -68,6 +69,15 @@ public class CommonUtil {
     	BLOCKVIEW = 32 + (VIEW << 4);
     	
     	classMap.put("double", double.class);
+
+        {
+            boolean isPaperPluginManager = false;
+            try {
+                SimplePluginManager.class.getDeclaredField("paperPluginManager");
+                isPaperPluginManager = true;
+            } catch (Throwable t) {}
+            IS_PAPER_PLUGIN_MANAGER = isPaperPluginManager;
+        }
     }
 
     /**
@@ -730,7 +740,7 @@ public class CommonUtil {
      */
     public static Collection<Plugin> getPluginsUnsafe() {
         final PluginManager man = Bukkit.getPluginManager();
-        if (man instanceof SimplePluginManager) {
+        if (!IS_PAPER_PLUGIN_MANAGER && man instanceof SimplePluginManager) {
             return BSimplePluginManager.plugins.get(man);
         } else {
             return Arrays.asList(man.getPlugins());
@@ -780,10 +790,18 @@ public class CommonUtil {
             return null;
         }
         ClassLoader loader = clazz.getClassLoader();
-        synchronized (Bukkit.getServer().getPluginManager()) {
-            for (Plugin plugin : getPluginsUnsafe()) {
+        if (IS_PAPER_PLUGIN_MANAGER) {
+            for (Plugin plugin : Bukkit.getPluginManager().getPlugins()) {
                 if (plugin.getClass().getClassLoader() == loader) {
                     return plugin;
+                }
+            }
+        } else {
+            synchronized (Bukkit.getServer().getPluginManager()) {
+                for (Plugin plugin : getPluginsUnsafe()) {
+                    if (plugin.getClass().getClassLoader() == loader) {
+                        return plugin;
+                    }
                 }
             }
         }
