@@ -68,6 +68,9 @@ public abstract class PluginBase extends JavaPlugin {
         // Set hastebin server to use when uploading error reports
         this.startupLogHandler.setHastebinServer(this.pluginLoaderHandler.getPluginConfig()
                 .getString("preloader.hastebinServer", "https://hastebin.com"));
+
+        // Bootstrap!
+        this.pluginLoaderHandler.bootstrap();
     }
 
     /**
