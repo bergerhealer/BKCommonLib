@@ -1,11 +1,11 @@
 package com.bergerkiller.bukkit.common.internal;
 
 import com.bergerkiller.bukkit.common.PluginBase;
-import com.bergerkiller.bukkit.common.PluginBaseInternalHelper;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.collections.ImmutableCachedSet;
 import com.bergerkiller.bukkit.common.internal.logic.CreaturePreSpawnHandler;
 import com.bergerkiller.bukkit.common.internal.logic.EntityAddRemoveHandler;
+import com.bergerkiller.bukkit.common.internal.logic.PluginLoaderHandler;
 import com.bergerkiller.bukkit.common.map.MapDisplay;
 import com.bergerkiller.bukkit.common.scoreboards.CommonScoreboard;
 import com.bergerkiller.bukkit.common.scoreboards.CommonTeam;
@@ -19,7 +19,9 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
 
+import com.bergerkiller.mountiplex.reflection.util.FastField;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.Vehicle;
@@ -51,6 +53,17 @@ public class CommonListener implements Listener {
      * Stores all caches of immutable player sets created
      */
     private static final List<WeakReference<ImmutableCachedSet<Player>>> CACHED_IMMUTABLE_PLAYER_SETS = new ArrayList<>();
+    /**
+     * Reach deep into our own code!
+     */
+    private static final FastField<PluginLoaderHandler> pluginLoaderHandlerField = new FastField<>();
+    static {
+        try {
+            pluginLoaderHandlerField.init(PluginBase.class.getDeclaredField("pluginLoaderHandler"));
+        } catch (NoSuchFieldException e) {
+            pluginLoaderHandlerField.initUnavailable("Field pluginLoaderHandler isn't there. This can't be!");
+        }
+    }
 
     public static void registerImmutablePlayerSet(ImmutableCachedSet<Player> set) {
         synchronized (CACHED_IMMUTABLE_PLAYER_SETS) {
@@ -60,9 +73,18 @@ public class CommonListener implements Listener {
 
     @EventHandler(priority = EventPriority.MONITOR)
     protected void onPluginEnable(final PluginEnableEvent event) {
+        if (!PluginLoaderHandler.isPluginFullyEnabled(event.getPlugin())) {
+            return;
+        }
+
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            PluginBaseInternalHelper.handleUpdateDependency(pb, event.getPlugin(), name, true);
+            try {
+                pluginLoaderHandlerField.get(pb).onPluginLoaded(event.getPlugin());
+                pb.updateDependency(event.getPlugin(), name, true);
+            } catch (Throwable t) {
+                pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+            }
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());
     }
@@ -71,7 +93,11 @@ public class CommonListener implements Listener {
     protected void onPluginDisable(PluginDisableEvent event) {
         String name = LogicUtil.fixNull(event.getPlugin().getName(), "");
         for (PluginBase pb : CommonPlugin.getInstance().plugins) {
-            PluginBaseInternalHelper.handleUpdateDependency(pb, event.getPlugin(), name, false);
+            try {
+                pb.updateDependency(event.getPlugin(), name, false);
+            } catch (Throwable t) {
+                pb.getLogger().log(Level.SEVERE, "Failed to handle updateDependency", t);
+            }
         }
         CommonPlugin.flushSaveOperations(event.getPlugin());
     }

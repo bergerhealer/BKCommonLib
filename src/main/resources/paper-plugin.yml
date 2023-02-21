@@ -11,8 +11,19 @@ dependencies:
     required: false
   - name: ProtocolLib
     required: false
-softdepend: [Vault, ProtocolLib]
-classdepend: [WorldEdit, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
+  - name: WorldEdit
+    required: false
+  - name: FastAsyncWorldEdit
+    required: false
+  - name: ViaVersion
+    required: false
+  - name: LuckPerms
+    required: false
+  - name: InteractiveBoard
+    required: false
+load-after:
+  - name: Vault
+  - name: ProtocolLib
 dev-url: ${project.url}
 preloader:
   hastebinServer: https://paste.traincarts.net
