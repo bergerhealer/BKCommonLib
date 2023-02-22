@@ -5,10 +5,11 @@ plugins {
     id("maven-publish")
 }
 
+val minecraftVersion = "1.19.3"
+val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
+
 group = "com.bergerkiller.bukkit"
 version = "1.19.3-v3-SNAPSHOT"
-
-val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
 
 repositories {
     mavenLocal {
@@ -44,7 +45,7 @@ dependencies {
     //
 
     // Spigot API includes the Bukkit API and is what plugins generally use
-    compileOnly("org.spigotmc:spigot-api:1.19.3-R0.1-SNAPSHOT")
+    compileOnly("org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT")
     // We also depend on netty for the network logic, which is available in public repo
     compileOnly("io.netty:netty-all:4.1.42.Final")
     // Log4j that is used inside the server
@@ -94,15 +95,9 @@ dependencies {
     // Test dependencies
     //
 
-    testImplementation("org.spigotmc:spigot:1.19.3-R0.1-SNAPSHOT")
+    testImplementation("org.spigotmc:spigot:$minecraftVersion-R0.1-SNAPSHOT")
     testImplementation("org.mockito:mockito-core:2.22.0")
     testImplementation("junit:junit:4.13")
-}
-
-mountiplex {
-    source.set("com/bergerkiller/templates/init.txt")
-    generated.set("com/bergerkiller/generated")
-    variables.put("version", "1.19.3")
 }
 
 java {
@@ -128,7 +123,18 @@ publishing {
     }
 }
 
+mountiplex {
+    generateTemplateHandles()
+    remapAnnotationStrings()
+}
+
 tasks {
+    generateTemplateHandles {
+        source.set("com/bergerkiller/templates/init.txt")
+        target.set("com/bergerkiller/generated")
+        variables.put("version", minecraftVersion)
+    }
+
     assemble {
         dependsOn(shadowJar)
     }
