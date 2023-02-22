@@ -15,7 +15,7 @@ import com.bergerkiller.bukkit.common.utils.MathUtil;
 public class OrientedBoundingBox {
     private final Vector position = new Vector();
     private final Vector radius = new Vector();
-    private final Quaternion orientation_inv = new Quaternion();
+    private final Quaternion orientation = new Quaternion();
     private boolean is_orientation_set = false;
 
     /**
@@ -85,9 +85,7 @@ public class OrientedBoundingBox {
      * @return orientation
      */
     public Quaternion getOrientation() {
-        Quaternion q = this.orientation_inv.clone();
-        q.invert();
-        return q;
+        return this.orientation;
     }
 
     /**
@@ -139,11 +137,52 @@ public class OrientedBoundingBox {
     public void setOrientation(Quaternion orientation) {
         if (orientation == null) {
             this.is_orientation_set = false;
-            this.orientation_inv.setIdentity();
+            this.orientation.setIdentity();
         } else {
-            this.orientation_inv.setTo(orientation);
-            this.orientation_inv.invert();
+            this.is_orientation_set = true;
+            this.orientation.setTo(orientation);
         }
+    }
+
+    /**
+     * Performs a hit test to see whether this collision box is hit when
+     * looked at from a known position into a certain direction.
+     *
+     * @param startX Start position of the ray, X-coordinate
+     * @param startY Start position of the ray, Y-coordinate
+     * @param startZ Start position of the ray, Z-coordinate
+     * @param dirX Ray direction unit vector, X-coordinate
+     * @param dirY Ray direction unit vector, Y-coordinate
+     * @param dirZ Ray direction unit vector, Z-coordinate
+     * @return distance to the box, Double.MAX_VALUE when not touching.
+     */
+    public double hitTest(double startX, double startY, double startZ,
+                          double dirX, double dirY, double dirZ
+    ) {
+        return performHitTest(startX, startY, startZ, dirX, dirY, dirZ).distance();
+    }
+
+    /**
+     * Performs a hit test to see whether this collision box is hit when
+     * looked at from a known position into a certain direction.
+     *
+     * @param startPosition Start position coordinates
+     * @param startDirection Direction of the ray
+     * @return distance to the box, Double.MAX_VALUE when not touching.
+     */
+    public double hitTest(Vector startPosition, Vector startDirection) {
+        return performHitTest(startPosition, startDirection).distance();
+    }
+
+    /**
+     * Performs a hit test to see whether this collision box is hit when
+     * looked at from a known eye location
+     *
+     * @param eyeLocation
+     * @return distance to the box, Double.MAX_VALUE when not touching.
+     */
+    public double hitTest(Location eyeLocation) {
+        return performHitTest(eyeLocation).distance();
     }
 
     /**
@@ -156,15 +195,15 @@ public class OrientedBoundingBox {
      * @param dirX Ray direction unit vector, X-coordinate
      * @param dirY Ray direction unit vector, Y-coordinate
      * @param dirZ Ray direction unit vector, Z-coordinate
-     * @return distance to the box, Double.MAX_VALUE when not touching.
+     * @return hit test results, including the distance, position and surface normal
      */
-    public double hitTest(double startX, double startY, double startZ,
-                          double dirX, double dirY, double dirZ
+    public HitTestResult performHitTest(double startX, double startY, double startZ,
+                                        double dirX, double dirY, double dirZ
     ) {
         if (this.is_orientation_set) {
             // Easier to handle all that stuff with actual bukkit vectors
             // Quaternion makes us lose performance anyway so micro-optimizing isn't needed.
-            return hitTest(new Vector(startX, startY, startZ), new Vector(dirX, dirY, dirZ));
+            return performHitTest(new Vector(startX, startY, startZ), new Vector(dirX, dirY, dirZ));
         }
 
         // Compute start point
@@ -176,10 +215,26 @@ public class OrientedBoundingBox {
         // Check start point already inside box
         Vector rad = this.radius;
         if (Math.abs(px) <= rad.getX() && Math.abs(py) <= rad.getY() && Math.abs(pz) <= rad.getZ()) {
-            return 0.0;
+            return HitTestResult.inside(new Vector(startX, startY, startZ));
         }
 
-        return hitTestBase(px, py, pz, dirX, dirY, dirZ);
+        // Perform the actual hit-test, then compute the non-localized position if it hit
+        HitTestResult result = hitTestBase(px, py, pz, dirX, dirY, dirZ);
+        if (result.success()) {
+            if (result.inside()) {
+                result.position.setX(startX);
+                result.position.setY(startY);
+                result.position.setZ(startZ);
+            } else {
+                result.position.setX(startX + result.distance() * dirX);
+                result.position.setY(startY + result.distance() * dirY);
+                result.position.setZ(startZ + result.distance() * dirZ);
+                if (this.is_orientation_set) {
+                    this.orientation.transformPoint(result.normal);
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -188,29 +243,43 @@ public class OrientedBoundingBox {
      * 
      * @param startPosition Start position coordinates
      * @param startDirection Direction of the ray
-     * @return distance to the box, Double.MAX_VALUE when not touching.
+     * @return hit test results, including the distance, position and surface normal
      */
-    public double hitTest(Vector startPosition, Vector startDirection) {
+    public HitTestResult performHitTest(Vector startPosition, Vector startDirection) {
         // Compute start point
         Vector p = startPosition.clone().subtract(this.position);
         if (this.is_orientation_set) {
-            this.orientation_inv.transformPoint(p);
+            this.orientation.invTransformPoint(p);
         }
 
         // Check start point already inside box
         Vector rad = this.radius;
         if (Math.abs(p.getX()) <= rad.getX() && Math.abs(p.getY()) <= rad.getY() && Math.abs(p.getZ()) <= rad.getZ()) {
-            return 0.0;
+            return HitTestResult.inside(startPosition);
         }
 
         // Compute direction after rotation
         Vector d = startDirection;
         if (this.is_orientation_set) {
             d = d.clone();
-            this.orientation_inv.transformPoint(d);
+            this.orientation.invTransformPoint(d);
         }
 
-        return hitTestBase(p, d);
+        // Perform the actual hit-test, then compute the non-localized position if it hit
+        HitTestResult result = hitTestBase(p, d);
+        if (result.success()) {
+            if (result.inside()) {
+                result.position.copy(startPosition);
+            } else {
+                result.position.setX(startPosition.getX() + result.distance() * startDirection.getX());
+                result.position.setY(startPosition.getY() + result.distance() * startDirection.getY());
+                result.position.setZ(startPosition.getZ() + result.distance() * startDirection.getZ());
+                if (this.is_orientation_set) {
+                    this.orientation.transformPoint(result.normal);
+                }
+            }
+        }
+        return result;
     }
 
     /**
@@ -218,43 +287,26 @@ public class OrientedBoundingBox {
      * looked at from a known eye location
      * 
      * @param eyeLocation
-     * @return distance to the box, Double.MAX_VALUE when not touching.
+     * @return hit test results, including the distance, position and surface normal
      */
-    public double hitTest(Location eyeLocation) {
-        // Compute start point
-        Vector p = eyeLocation.toVector().subtract(this.position);
-        if (this.is_orientation_set) {
-            this.orientation_inv.transformPoint(p);
-        }
-
-        // Check start point already inside box
-        Vector rad = this.radius;
-        if (Math.abs(p.getX()) <= rad.getX() && Math.abs(p.getY()) <= rad.getY() && Math.abs(p.getZ()) <= rad.getZ()) {
-            return 0.0;
-        }
-
-        // Compute direction after rotation
-        Vector d = eyeLocation.getDirection();
-        if (this.is_orientation_set) {
-            this.orientation_inv.transformPoint(d);
-        }
-
-        return hitTestBase(p, d);
+    public HitTestResult performHitTest(Location eyeLocation) {
+        return performHitTest(eyeLocation.toVector(), eyeLocation.getDirection());
     }
 
-    private double hitTestBase(Vector localPos, Vector localDir) {
+    private HitTestResult hitTestBase(Vector localPos, Vector localDir) {
         return hitTestBase(localPos.getX(), localPos.getY(), localPos.getZ(),
                            localDir.getX(), localDir.getY(), localDir.getZ());
     }
 
-    private double hitTestBase(double localPosX, double localPosY, double localPosZ,
-                               double localDirX, double localDirY, double localDirZ
+    private HitTestResult hitTestBase(double localPosX, double localPosY, double localPosZ,
+                                      double localDirX, double localDirY, double localDirZ
     ) {
         // Check all 6 faces and find the intersection point with this axis
         // Then check whether these points are within the range of the box
         // If true, compute the distance from the start point and track the smallest value
         final double ERR = 1e-6;
         double min_distance = Double.MAX_VALUE;
+        BlockFace min_dir = null;
         Vector rad = this.radius;
         for (BlockFace dir : FaceUtil.BLOCK_SIDES) {
             double a, b, c;
@@ -302,7 +354,101 @@ public class OrientedBoundingBox {
 
             // Since d is a unit vector, f is now the distance we need
             min_distance = f;
+            min_dir = dir;
         }
-        return min_distance;
+
+        // Not hit the box at all?
+        if (min_distance == Double.MAX_VALUE) {
+            return HitTestResult.MISSED;
+        }
+
+        // Inside?
+        if (min_distance <= 0.0) {
+            return HitTestResult.inside(new Vector());
+        }
+
+        // Compute exact position and normal vector from the distance and face
+        return new HitTestResult(new Vector(), FaceUtil.faceToVector(min_dir), min_distance);
+    }
+
+    /**
+     * The results from firing a point ray at an oriented bounding box.
+     * The vectors contained inside are copies and can be safely modified,
+     * but will modify this hit test result.
+     */
+    public static class HitTestResult {
+        /**
+         * A constant result for if the ray misses
+         */
+        public static final HitTestResult MISSED = new HitTestResult(null, null, Double.MAX_VALUE);
+
+        private final Vector position;
+        private final Vector normal;
+        private final double distance;
+
+        public HitTestResult(Vector position, Vector normal, double distance) {
+            this.position = position;
+            this.normal = normal;
+            this.distance = distance;
+        }
+
+        /**
+         * Gets whether the hit test was a success. If true, then a hit position
+         * , normal vector and distance are available. If false, then these
+         * properties are null or set to Double.MAX_VALUE.
+         *
+         * @return True if successful
+         */
+        public boolean success() {
+            return distance != Double.MAX_VALUE;
+        }
+
+        /**
+         * Gets whether the hit test result was inside the bounding box itself.
+         *
+         * @return True if inside the bounding box
+         */
+        public boolean inside() {
+            return distance == 0.0;
+        }
+
+        /**
+         * The exact position coordinates on the box where the ray hit
+         *
+         * @return hit position. Null if it missed the box.
+         */
+        public Vector position() {
+            return position;
+        }
+
+        /**
+         * Normal vector of the surface of the box where the ray hit.
+         * Is {0, 0, 0} if inside the bounding box itself.
+         *
+         * @return normal vector at ray collision. Null if it missed the box.
+         */
+        public Vector normal() {
+            return normal;
+        }
+
+        /**
+         * The distance between the ray origin and the surface of the
+         * box hit. Is 0 if the ray started inside the box.
+         *
+         * @return distance between ray origin and box
+         */
+        public double distance() {
+            return distance;
+        }
+
+        /**
+         * Creates a new hit test result that is inside the bounding box
+         *
+         * @param position Position of the start of the ray
+         * @return inside result
+         */
+        public static HitTestResult inside(Vector position) {
+            return new HitTestResult(position, new Vector(), 0.0);
+        }
     }
 }

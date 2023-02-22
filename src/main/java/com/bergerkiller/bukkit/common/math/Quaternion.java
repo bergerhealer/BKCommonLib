@@ -99,6 +99,22 @@ public class Quaternion implements Cloneable {
     }
 
     /**
+     * Transforms a point, applying the inverse rotation of this quaternion with
+     * 0,0,0 as origin.
+     *
+     * @param point to rotate using this quaternion
+     * @see #invert()
+     */
+    public void invTransformPoint(Vector point) {
+        double px = point.getX();
+        double py = point.getY();
+        double pz = point.getZ();
+        point.setX( px + 2.0 * (px*(-y*y-z*z) + py*(x*y+z*w) + pz*(x*z-y*w)) );
+        point.setY( py + 2.0 * (px*(x*y-z*w) + py*(-x*x-z*z) + pz*(y*z+x*w)) );
+        point.setZ( pz + 2.0 * (px*(x*z+y*w) + py*(y*z-x*w) + pz*(-x*x-y*y)) );
+    }
+
+    /**
      * Retrieves the right vector, which is the result of transforming a (1,0,0) point
      * with this Quaternion.
      * 
