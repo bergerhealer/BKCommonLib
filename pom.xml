@@ -4,7 +4,7 @@
 
     <groupId>com.bergerkiller.bukkit</groupId>
     <artifactId>BKCommonLib</artifactId>
-    <version>1.19.3-v2-SNAPSHOT</version>
+    <version>1.19.3-v2</version>
     <packaging>jar</packaging>
 
     <name>BKCommonLib</name>
