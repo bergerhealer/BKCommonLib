@@ -177,15 +177,19 @@ public abstract class PluginLoaderHandler {
             return false;
         }
 
-        // Plugin might be a 'Preloader' instance. Check if a preloader section is
-        // included in the plugin's plugin.yml and, if so, check if this plugin main class
-        // matches the main defined there. If any of this is not true, then the plugin
-        // is in preloader state (loading failed), and didn't (actuallly) enable!
-        try {
-            if (PluginLoaderHandler.createFor(plugin).hasPreloadingFailed()) {
-                return false;
-            }
-        } catch (Throwable t) { /* Quench! */ }
+        // Check plugin instance is a 'Preloader' instance
+        // If so, check this main class called "Preloader" is coupled with a config
+        if (plugin instanceof JavaPlugin && plugin.getClass().getSimpleName().equals("Preloader")) {
+            // Plugin might be a 'Preloader' instance. Check if a preloader section is
+            // included in the plugin's plugin.yml and, if so, check if this plugin main class
+            // matches the main defined there. If any of this is not true, then the plugin
+            // is in preloader state (loading failed), and didn't (actually) enable!
+            try {
+                if (PluginLoaderHandler.createFor(plugin).hasPreloadingFailed()) {
+                    return false;
+                }
+            } catch (Throwable t) { /* Quench! */ }
+        }
 
         return true;
     }
