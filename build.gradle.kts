@@ -5,7 +5,6 @@ plugins {
     id("maven-publish")
 }
 
-val minecraftVersion = "1.19.3"
 val buildNumber = System.getenv("BUILD_NUMBER") ?: "NO-CI"
 
 group = "com.bergerkiller.bukkit"
@@ -45,59 +44,59 @@ dependencies {
     //
 
     // Spigot API includes the Bukkit API and is what plugins generally use
-    compileOnly("org.spigotmc:spigot-api:$minecraftVersion-R0.1-SNAPSHOT")
+    compileOnly(libs.spigot.api)
     // We also depend on netty for the network logic, which is available in public repo
-    compileOnly("io.netty:netty-all:4.1.42.Final")
+    compileOnly(libs.netty.all)
     // Log4j that is used inside the server
-    compileOnly("org.apache.logging.log4j:log4j-api:2.17.0")
-    compileOnly("org.apache.logging.log4j:log4j-core:2.17.0")
+    compileOnly(libs.log4j.api)
+    compileOnly(libs.log4j.core)
 
     //
     // Dependencies shaded into the library for internal use
     //
 
     // Mountiplex is included in BKCommonLib at the same package
-    api("com.bergerkiller.mountiplex:Mountiplex:2.92-SNAPSHOT")
+    api(libs.mountiplex)
     // Region change tracker is included in BKCommonLib for the region block change event
-    internal("com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core:1.2")
+    internal(libs.regionchangetracker)
     // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings
-    internal("co.aikar:minecraft-timings:1.0.4") {
+    internal(libs.timings) {
         isTransitive = false
     }
     // GSON isn't available in spigot versions prior to 1.8.1, shade it in order to keep 1.8 compatibility
-    internal("com.google.code.gson:gson:2.8.9")
+    internal(libs.gson)
 
     //
     // Optional provided dependencies that BKCommonLib can talk with
     //
 
     // ViaVersion API
-    compileOnly("us.myles:viaversion:3.2.1")
+    compileOnly(libs.viaversion)
     // Vault hook for special permissions handling
-    compileOnly("com.github.MilkBowl:VaultAPI:1.7")
+    compileOnly(libs.vault)
     // ProtocolLib hook for protocol handling
-    compileOnly("com.comphenix.protocol:ProtocolLib-API:4.4.0")
+    compileOnly(libs.protocollib)
 
     //
     // Cloud command framework
     // Is relocated - requires appropriate relocation in plugins using it
     //
-    internal("org.bergerhealer.cloud.commandframework:cloud-paper:1.8.0-SNAPSHOT")
-    internal("org.bergerhealer.cloud.commandframework:cloud-annotations:1.8.0-SNAPSHOT")
-    internal("org.bergerhealer.cloud.commandframework:cloud-minecraft-extras:1.8.0-SNAPSHOT")
-    internal("me.lucko:commodore:1.13") {
+    internal(libs.cloud.paper)
+    internal(libs.cloud.annotations)
+    internal(libs.cloud.minecraft.extras)
+    internal(libs.commodore) {
         isTransitive = false
     }
-    internal("net.kyori:adventure-api:4.12.0")
-    internal("net.kyori:adventure-platform-bukkit:4.2.0")
+    internal(libs.adventure.api)
+    internal(libs.adventure.platform.bukkit)
 
     //
     // Test dependencies
     //
 
-    testImplementation("org.spigotmc:spigot:$minecraftVersion-R0.1-SNAPSHOT")
-    testImplementation("org.mockito:mockito-core:2.22.0")
-    testImplementation("junit:junit:4.13")
+    testImplementation(libs.spigot)
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.junit)
 }
 
 java {
@@ -132,7 +131,7 @@ tasks {
     generateTemplateHandles {
         source.set("com/bergerkiller/templates/init.txt")
         target.set("com/bergerkiller/generated")
-        variables.put("version", minecraftVersion)
+        variables.put("version", libs.versions.minecraft)
     }
 
     assemble {
