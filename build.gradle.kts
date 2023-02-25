@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    id("com.bergerkiller.mountiplex") version "2.92-SNAPSHOT"
+    id("com.bergerkiller.mountiplex") version "2.92"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("maven-publish")
 }
