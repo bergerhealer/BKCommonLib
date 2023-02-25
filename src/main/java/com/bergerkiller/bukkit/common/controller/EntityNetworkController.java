@@ -667,7 +667,7 @@ public abstract class EntityNetworkController<T extends CommonEntity<?>> extends
      * Synchronizes all Entity Meta Data including Entity Attributes and other
      * specific flags. Movement and positioning information is not
      * updated.<br><br>
-     * <p/>
+     * <p>
      * This should be called when making this Entity visible to a viewer.
      *
      * @param viewer to send the meta data to

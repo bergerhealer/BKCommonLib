@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.core.RegistryBlockID")
 public abstract class RegistryBlockIDHandle extends Template.Handle {
-    /** @See {@link RegistryBlockIDClass} */
+    /** @see RegistryBlockIDClass */
     public static final RegistryBlockIDClass T = Template.Class.create(RegistryBlockIDClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

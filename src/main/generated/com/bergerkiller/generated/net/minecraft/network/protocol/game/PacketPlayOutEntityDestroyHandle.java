@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityDestroy")
 public abstract class PacketPlayOutEntityDestroyHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityDestroyClass} */
+    /** @see PacketPlayOutEntityDestroyClass */
     public static final PacketPlayOutEntityDestroyClass T = Template.Class.create(PacketPlayOutEntityDestroyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

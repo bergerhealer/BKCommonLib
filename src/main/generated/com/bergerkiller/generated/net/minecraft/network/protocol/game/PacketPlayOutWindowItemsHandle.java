@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutWindowItems")
 public abstract class PacketPlayOutWindowItemsHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutWindowItemsClass} */
+    /** @see PacketPlayOutWindowItemsClass */
     public static final PacketPlayOutWindowItemsClass T = Template.Class.create(PacketPlayOutWindowItemsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

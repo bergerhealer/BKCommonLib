@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.world.IInventory")
 public abstract class IInventoryHandle extends Template.Handle {
-    /** @See {@link IInventoryClass} */
+    /** @see IInventoryClass */
     public static final IInventoryClass T = Template.Class.create(IInventoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

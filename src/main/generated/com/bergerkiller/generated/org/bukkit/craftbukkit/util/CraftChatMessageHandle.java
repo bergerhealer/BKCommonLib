@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.chat.IChatBaseComponentH
  */
 @Template.InstanceType("org.bukkit.craftbukkit.util.CraftChatMessage")
 public abstract class CraftChatMessageHandle extends Template.Handle {
-    /** @See {@link CraftChatMessageClass} */
+    /** @see CraftChatMessageClass */
     public static final CraftChatMessageClass T = Template.Class.create(CraftChatMessageClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

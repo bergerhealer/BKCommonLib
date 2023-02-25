@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.phys.AxisAlignedBB")
 public abstract class AxisAlignedBBHandle extends Template.Handle {
-    /** @See {@link AxisAlignedBBClass} */
+    /** @see AxisAlignedBBClass */
     public static final AxisAlignedBBClass T = Template.Class.create(AxisAlignedBBClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

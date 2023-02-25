@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.IBlockAccess")
 public abstract class IBlockAccessHandle extends Template.Handle {
-    /** @See {@link IBlockAccessClass} */
+    /** @see IBlockAccessClass */
     public static final IBlockAccessClass T = Template.Class.create(IBlockAccessClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

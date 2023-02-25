@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 @Template.InstanceType("net.minecraft.server.level.PlayerChunk")
 public abstract class PlayerChunkHandle extends Template.Handle {
-    /** @See {@link PlayerChunkClass} */
+    /** @see PlayerChunkClass */
     public static final PlayerChunkClass T = Template.Class.create(PlayerChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

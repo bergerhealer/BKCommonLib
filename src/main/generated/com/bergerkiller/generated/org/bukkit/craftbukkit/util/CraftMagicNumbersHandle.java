@@ -10,7 +10,7 @@ import org.bukkit.Material;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.util.CraftMagicNumbers")
 public abstract class CraftMagicNumbersHandle extends Template.Handle {
-    /** @See {@link CraftMagicNumbersClass} */
+    /** @see CraftMagicNumbersClass */
     public static final CraftMagicNumbersClass T = Template.Class.create(CraftMagicNumbersClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

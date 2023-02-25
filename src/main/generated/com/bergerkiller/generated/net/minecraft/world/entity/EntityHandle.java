@@ -34,7 +34,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 @Template.InstanceType("net.minecraft.world.entity.Entity")
 public abstract class EntityHandle extends Template.Handle {
-    /** @See {@link EntityClass} */
+    /** @see EntityClass */
     public static final EntityClass T = Template.Class.create(EntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

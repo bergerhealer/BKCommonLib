@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutMapChunk")
 public abstract class PacketPlayOutMapChunkHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutMapChunkClass} */
+    /** @see PacketPlayOutMapChunkClass */
     public static final PacketPlayOutMapChunkClass T = Template.Class.create(PacketPlayOutMapChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

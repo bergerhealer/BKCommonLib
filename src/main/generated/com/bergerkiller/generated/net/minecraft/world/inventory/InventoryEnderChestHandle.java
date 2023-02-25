@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
  */
 @Template.InstanceType("net.minecraft.world.inventory.InventoryEnderChest")
 public abstract class InventoryEnderChestHandle extends IInventoryHandle {
-    /** @See {@link InventoryEnderChestClass} */
+    /** @see InventoryEnderChestClass */
     public static final InventoryEnderChestClass T = Template.Class.create(InventoryEnderChestClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

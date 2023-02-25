@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityPainting")
 public abstract class PacketPlayOutSpawnEntityPaintingHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSpawnEntityPaintingClass} */
+    /** @see PacketPlayOutSpawnEntityPaintingClass */
     public static final PacketPlayOutSpawnEntityPaintingClass T = Template.Class.create(PacketPlayOutSpawnEntityPaintingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

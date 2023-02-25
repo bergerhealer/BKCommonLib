@@ -366,7 +366,7 @@ public class CommonEntity<T extends org.bukkit.entity.Entity> extends ExtendedEn
      * Checks whether this particular Entity supports the use of Entity
      * Controllers. If this method returns True,
      * {@link #setController(EntityController)} can be used.<br><br>
-     * <p/>
+     * <p>
      * Note that Entity Network Controllers are always supported.
      *
      * @return True if Entity Controllers are supported, False if not

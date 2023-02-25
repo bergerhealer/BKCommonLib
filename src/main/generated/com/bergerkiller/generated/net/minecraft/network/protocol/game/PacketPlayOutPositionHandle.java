@@ -11,7 +11,7 @@ import java.util.Set;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutPosition")
 public abstract class PacketPlayOutPositionHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutPositionClass} */
+    /** @see PacketPlayOutPositionClass */
     public static final PacketPlayOutPositionClass T = Template.Class.create(PacketPlayOutPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -111,7 +111,7 @@ public abstract class PacketPlayOutPositionHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutPosition.EnumPlayerTeleportFlags")
     public abstract static class EnumPlayerTeleportFlagsHandle extends Template.Handle {
-        /** @See {@link EnumPlayerTeleportFlagsClass} */
+        /** @see EnumPlayerTeleportFlagsClass */
         public static final EnumPlayerTeleportFlagsClass T = Template.Class.create(EnumPlayerTeleportFlagsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerTeleportFlagsHandle X = T.X.getSafe();
         public static final EnumPlayerTeleportFlagsHandle Y = T.Y.getSafe();

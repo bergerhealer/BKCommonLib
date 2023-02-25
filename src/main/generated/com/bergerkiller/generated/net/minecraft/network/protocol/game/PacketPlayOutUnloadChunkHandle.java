@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutUnloadChunk")
 public abstract class PacketPlayOutUnloadChunkHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutUnloadChunkClass} */
+    /** @see PacketPlayOutUnloadChunkClass */
     public static final PacketPlayOutUnloadChunkClass T = Template.Class.create(PacketPlayOutUnloadChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

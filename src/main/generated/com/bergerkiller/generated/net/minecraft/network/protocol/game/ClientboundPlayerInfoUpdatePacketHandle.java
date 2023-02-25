@@ -15,7 +15,7 @@ import java.util.Set;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket")
 public abstract class ClientboundPlayerInfoUpdatePacketHandle extends PacketHandle {
-    /** @See {@link ClientboundPlayerInfoUpdatePacketClass} */
+    /** @see ClientboundPlayerInfoUpdatePacketClass */
     public static final ClientboundPlayerInfoUpdatePacketClass T = Template.Class.create(ClientboundPlayerInfoUpdatePacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -62,7 +62,7 @@ public abstract class ClientboundPlayerInfoUpdatePacketHandle extends PacketHand
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.PlayerInfoData")
     public abstract static class PlayerInfoDataHandle extends Template.Handle {
-        /** @See {@link PlayerInfoDataClass} */
+        /** @see PlayerInfoDataClass */
         public static final PlayerInfoDataClass T = Template.Class.create(PlayerInfoDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -108,7 +108,7 @@ public abstract class ClientboundPlayerInfoUpdatePacketHandle extends PacketHand
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.EnumPlayerInfoAction")
     public abstract static class EnumPlayerInfoActionHandle extends Template.Handle {
-        /** @See {@link EnumPlayerInfoActionClass} */
+        /** @see EnumPlayerInfoActionClass */
         public static final EnumPlayerInfoActionClass T = Template.Class.create(EnumPlayerInfoActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerInfoActionHandle ADD_PLAYER = T.ADD_PLAYER.getSafe();
         public static final EnumPlayerInfoActionHandle UPDATE_GAME_MODE = T.UPDATE_GAME_MODE.getSafe();

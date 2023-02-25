@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityWeather")
 public abstract class PacketPlayOutSpawnEntityWeatherHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSpawnEntityWeatherClass} */
+    /** @see PacketPlayOutSpawnEntityWeatherClass */
     public static final PacketPlayOutSpawnEntityWeatherClass T = Template.Class.create(PacketPlayOutSpawnEntityWeatherClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

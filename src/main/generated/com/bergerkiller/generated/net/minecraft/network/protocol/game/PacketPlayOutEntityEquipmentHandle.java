@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityEquipment")
 public abstract class PacketPlayOutEntityEquipmentHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityEquipmentClass} */
+    /** @see PacketPlayOutEntityEquipmentClass */
     public static final PacketPlayOutEntityEquipmentClass T = Template.Class.create(PacketPlayOutEntityEquipmentClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

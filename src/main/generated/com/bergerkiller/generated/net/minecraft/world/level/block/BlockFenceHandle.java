@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.block.BlockFence")
 public abstract class BlockFenceHandle extends Template.Handle {
-    /** @See {@link BlockFenceClass} */
+    /** @see BlockFenceClass */
     public static final BlockFenceClass T = Template.Class.create(BlockFenceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

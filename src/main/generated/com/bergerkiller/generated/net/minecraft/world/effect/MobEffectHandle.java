@@ -11,7 +11,7 @@ import org.bukkit.potion.PotionEffect;
  */
 @Template.InstanceType("net.minecraft.world.effect.MobEffect")
 public abstract class MobEffectHandle extends Template.Handle {
-    /** @See {@link MobEffectClass} */
+    /** @see MobEffectClass */
     public static final MobEffectClass T = Template.Class.create(MobEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

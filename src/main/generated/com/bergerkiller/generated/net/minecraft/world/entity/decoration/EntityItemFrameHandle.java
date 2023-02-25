@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.world.entity.decoration.EntityItemFrame")
 public abstract class EntityItemFrameHandle extends EntityHangingHandle {
-    /** @See {@link EntityItemFrameClass} */
+    /** @see EntityItemFrameClass */
     public static final EntityItemFrameClass T = Template.Class.create(EntityItemFrameClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import org.bukkit.block.BlockFace;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.entity.monster.EntityShulker")
 public abstract class EntityShulkerHandle extends EntityInsentientHandle {
-    /** @See {@link EntityShulkerClass} */
+    /** @see EntityShulkerClass */
     public static final EntityShulkerClass T = Template.Class.create(EntityShulkerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

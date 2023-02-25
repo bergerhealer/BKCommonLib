@@ -20,7 +20,7 @@ import java.util.Map.Entry;
  * <b>Data</b> represents actual data stored by the tag. This can be:<br>
  * <u>List&lt;CommonTag&gt;, Map&lt;String, CommonTag&gt;, byte, short, int, long, float,
  * double, byte[], int[], String</u><br><br>
- * <p/>
+ * <p>
  * Data can be retrieved using <b>getValue()</b>, set using <b>setValue()</b>
  * and added using <b>addValue()</b><br>
  * The value setting and adding methods also accept tags, both NBTBase and
@@ -258,7 +258,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * Collections, arrays (also primitive) and maps are supported for data
      * types. Other data types are added as a single element, and may cause an
      * exception if not supported.<br><br>
-     * <p/>
+     * <p>
      * The individual elements can be collections or arrays as well, which
      * allows adding multiple arrays at once.
      *
@@ -273,7 +273,7 @@ public class CommonTagList extends CommonTag implements List<CommonTag> {
      * Adds all the values to this list. Collections, arrays (also primitive)
      * and maps are supported for data types. Other data types are added as a
      * single element, and may cause an exception if not supported.<br><br>
-     * <p/>
+     * <p>
      * The individual elements can be collections or arrays as well, which
      * allows adding multiple arrays at once.
      *

@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutAdvancements")
 public abstract class PacketPlayOutAdvancementsHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutAdvancementsClass} */
+    /** @see PacketPlayOutAdvancementsClass */
     public static final PacketPlayOutAdvancementsClass T = Template.Class.create(PacketPlayOutAdvancementsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

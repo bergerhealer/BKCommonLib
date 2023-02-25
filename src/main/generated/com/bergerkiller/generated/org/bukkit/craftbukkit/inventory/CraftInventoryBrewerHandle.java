@@ -10,7 +10,7 @@ import org.bukkit.inventory.BrewerInventory;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryBrewer")
 public abstract class CraftInventoryBrewerHandle extends Template.Handle {
-    /** @See {@link CraftInventoryBrewerClass} */
+    /** @see CraftInventoryBrewerClass */
     public static final CraftInventoryBrewerClass T = Template.Class.create(CraftInventoryBrewerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

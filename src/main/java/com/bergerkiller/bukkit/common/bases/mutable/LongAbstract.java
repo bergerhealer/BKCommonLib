@@ -76,7 +76,7 @@ public abstract class LongAbstract {
      * - {12}.isMod(6) == True<br>
      * - {11}.isMod(2) == False<br>
      * - {0}.isMod(6) == True<br><br>
-     * <p/>
+     * <p>
      * This functionality can be used to perform something on an interval using
      * a given time. For example, {timesecond}.isMod(60) would trigger whenever
      * a new minute is passed.

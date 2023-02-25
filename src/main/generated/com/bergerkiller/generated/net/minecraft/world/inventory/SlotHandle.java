@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("net.minecraft.world.inventory.Slot")
 public abstract class SlotHandle extends Template.Handle {
-    /** @See {@link SlotClass} */
+    /** @see SlotClass */
     public static final SlotClass T = Template.Class.create(SlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

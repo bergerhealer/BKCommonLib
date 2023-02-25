@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHan
  */
 @Template.InstanceType("net.minecraft.world.entity.ambient.EntityBat")
 public abstract class EntityBatHandle extends EntityInsentientHandle {
-    /** @See {@link EntityBatClass} */
+    /** @see EntityBatClass */
     public static final EntityBatClass T = Template.Class.create(EntityBatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

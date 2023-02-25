@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.resources.ResourceKey")
 public abstract class ResourceKeyHandle extends Template.Handle {
-    /** @See {@link ResourceKeyClass} */
+    /** @see ResourceKeyClass */
     public static final ResourceKeyClass T = Template.Class.create(ResourceKeyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.inventory.CraftInputSlot;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.item.crafting.FurnaceRecipe")
 public abstract class FurnaceRecipeHandle extends IRecipeHandle {
-    /** @See {@link FurnaceRecipeClass} */
+    /** @see FurnaceRecipeClass */
     public static final FurnaceRecipeClass T = Template.Class.create(FurnaceRecipeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

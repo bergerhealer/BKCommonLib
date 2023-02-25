@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutBlockChange")
 public abstract class PacketPlayOutBlockChangeHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutBlockChangeClass} */
+    /** @see PacketPlayOutBlockChangeClass */
     public static final PacketPlayOutBlockChangeClass T = Template.Class.create(PacketPlayOutBlockChangeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

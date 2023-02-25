@@ -19,7 +19,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.world.level.block.Block")
 public abstract class BlockHandle extends Template.Handle {
-    /** @See {@link BlockClass} */
+    /** @see BlockClass */
     public static final BlockClass T = Template.Class.create(BlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     @SuppressWarnings("rawtypes")
     public static final Iterable REGISTRY_ID = T.REGISTRY_ID.getSafe();

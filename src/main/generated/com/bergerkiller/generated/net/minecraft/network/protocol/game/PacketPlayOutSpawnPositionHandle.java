@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnPosition")
 public abstract class PacketPlayOutSpawnPositionHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSpawnPositionClass} */
+    /** @see PacketPlayOutSpawnPositionClass */
     public static final PacketPlayOutSpawnPositionClass T = Template.Class.create(PacketPlayOutSpawnPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -224,7 +224,7 @@ public class FilteredCollection<E> implements Collection<E> {
      * Constructs a new Filtered Collection using the base Collection and
      * Filters specified. If any of the Filters filter an element, that element
      * is not exposed.<br><br>
-     * <p/>
+     * <p>
      * The Filter element types can not be checked, so be sure to only use
      * Filters that can accept the element type of the base Collection.
      *
@@ -240,7 +240,7 @@ public class FilteredCollection<E> implements Collection<E> {
      * Constructs a new Filtered Collection using the base Collection and
      * Filters specified. If any of the Filters filter an element, that element
      * is not exposed.<br><br>
-     * <p/>
+     * <p>
      * The Filter element types can not be checked, so be sure to only use
      * Filters that can accept the element type of the base Collection.
      *

@@ -12,7 +12,7 @@ import java.util.HashMap;
  */
 @Template.InstanceType("org.bukkit.inventory.Inventory")
 public abstract class InventoryHandle extends Template.Handle {
-    /** @See {@link InventoryClass} */
+    /** @see InventoryClass */
     public static final InventoryClass T = Template.Class.create(InventoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

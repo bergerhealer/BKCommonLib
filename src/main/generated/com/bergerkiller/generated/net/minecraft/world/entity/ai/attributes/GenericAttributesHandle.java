@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.ai.attributes.GenericAttributes")
 public abstract class GenericAttributesHandle extends Template.Handle {
-    /** @See {@link GenericAttributesClass} */
+    /** @see GenericAttributesClass */
     public static final GenericAttributesClass T = Template.Class.create(GenericAttributesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final Object FOLLOW_RANGE = T.FOLLOW_RANGE.getSafe();
     public static final Object MOVEMENT_SPEED = T.MOVEMENT_SPEED.getSafe();

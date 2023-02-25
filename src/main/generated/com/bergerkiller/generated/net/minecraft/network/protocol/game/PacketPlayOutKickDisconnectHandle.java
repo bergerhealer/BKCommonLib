@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutKickDisconnect")
 public abstract class PacketPlayOutKickDisconnectHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutKickDisconnectClass} */
+    /** @see PacketPlayOutKickDisconnectClass */
     public static final PacketPlayOutKickDisconnectClass T = Template.Class.create(PacketPlayOutKickDisconnectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

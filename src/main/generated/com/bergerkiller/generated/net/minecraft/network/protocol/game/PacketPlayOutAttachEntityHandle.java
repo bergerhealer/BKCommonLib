@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutAttachEntity")
 public abstract class PacketPlayOutAttachEntityHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutAttachEntityClass} */
+    /** @see PacketPlayOutAttachEntityClass */
     public static final PacketPlayOutAttachEntityClass T = Template.Class.create(PacketPlayOutAttachEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

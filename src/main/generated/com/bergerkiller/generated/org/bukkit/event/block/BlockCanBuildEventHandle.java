@@ -12,7 +12,7 @@ import org.bukkit.event.block.BlockCanBuildEvent;
  */
 @Template.InstanceType("org.bukkit.event.block.BlockCanBuildEvent")
 public abstract class BlockCanBuildEventHandle extends Template.Handle {
-    /** @See {@link BlockCanBuildEventClass} */
+    /** @see BlockCanBuildEventClass */
     public static final BlockCanBuildEventClass T = Template.Class.create(BlockCanBuildEventClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

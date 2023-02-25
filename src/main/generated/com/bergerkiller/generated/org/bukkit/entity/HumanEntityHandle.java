@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  */
 @Template.InstanceType("org.bukkit.entity.HumanEntity")
 public abstract class HumanEntityHandle extends EntityHandle {
-    /** @See {@link HumanEntityClass} */
+    /** @see HumanEntityClass */
     public static final HumanEntityClass T = Template.Class.create(HumanEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

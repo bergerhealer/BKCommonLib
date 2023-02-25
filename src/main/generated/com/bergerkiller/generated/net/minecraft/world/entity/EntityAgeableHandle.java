@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  */
 @Template.InstanceType("net.minecraft.world.entity.EntityAgeable")
 public abstract class EntityAgeableHandle extends EntityInsentientHandle {
-    /** @See {@link EntityAgeableClass} */
+    /** @see EntityAgeableClass */
     public static final EntityAgeableClass T = Template.Class.create(EntityAgeableClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

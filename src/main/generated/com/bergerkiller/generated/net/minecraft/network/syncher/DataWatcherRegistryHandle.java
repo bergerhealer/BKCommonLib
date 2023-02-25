@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.syncher.DataWatcherRegistry")
 public abstract class DataWatcherRegistryHandle extends Template.Handle {
-    /** @See {@link DataWatcherRegistryClass} */
+    /** @see DataWatcherRegistryClass */
     public static final DataWatcherRegistryClass T = Template.Class.create(DataWatcherRegistryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

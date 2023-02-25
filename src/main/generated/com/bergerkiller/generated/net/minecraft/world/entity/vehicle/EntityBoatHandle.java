@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityBoat")
 public abstract class EntityBoatHandle extends EntityHandle {
-    /** @See {@link EntityBoatClass} */
+    /** @see EntityBoatClass */
     public static final EntityBoatClass T = Template.Class.create(EntityBoatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

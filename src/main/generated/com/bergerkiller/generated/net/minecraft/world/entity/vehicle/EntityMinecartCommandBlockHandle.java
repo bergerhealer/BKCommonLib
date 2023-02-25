@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartCommandBlock")
 public abstract class EntityMinecartCommandBlockHandle extends EntityMinecartAbstractHandle {
-    /** @See {@link EntityMinecartCommandBlockClass} */
+    /** @see EntityMinecartCommandBlockClass */
     public static final EntityMinecartCommandBlockClass T = Template.Class.create(EntityMinecartCommandBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

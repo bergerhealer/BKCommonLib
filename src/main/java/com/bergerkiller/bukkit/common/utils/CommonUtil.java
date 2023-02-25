@@ -1008,7 +1008,7 @@ public class CommonUtil {
      *
      * @param eventClass to get the HandlerList of
      * @return the HandlerList
-     * @throws RuntimeException: Event class has no handler list
+     * @throws RuntimeException Event class has no handler list
      */
     public static HandlerList getEventHandlerList(Class<?> eventClass) {
         Class<?> classWithHandlerList = eventClass;

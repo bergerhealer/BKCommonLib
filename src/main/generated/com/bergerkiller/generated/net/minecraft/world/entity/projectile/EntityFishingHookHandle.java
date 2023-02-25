@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.projectile.EntityFishingHook")
 public abstract class EntityFishingHookHandle extends EntityHandle {
-    /** @See {@link EntityFishingHookClass} */
+    /** @see EntityFishingHookClass */
     public static final EntityFishingHookClass T = Template.Class.create(EntityFishingHookClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

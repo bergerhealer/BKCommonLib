@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.EnumGamemode")
 public abstract class EnumGamemodeHandle extends Template.Handle {
-    /** @See {@link EnumGamemodeClass} */
+    /** @see EnumGamemodeClass */
     public static final EnumGamemodeClass T = Template.Class.create(EnumGamemodeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

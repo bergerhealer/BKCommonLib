@@ -13,7 +13,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.world.level.MobSpawnerAbstract")
 public abstract class MobSpawnerAbstractHandle extends Template.Handle {
-    /** @See {@link MobSpawnerAbstractClass} */
+    /** @see MobSpawnerAbstractClass */
     public static final MobSpawnerAbstractClass T = Template.Class.create(MobSpawnerAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

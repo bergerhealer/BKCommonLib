@@ -42,7 +42,7 @@ import java.util.stream.Collectors;
 
 /**
  * The extended javaPlugin base used to communicate with BKCommonLib<br><br>
- * <p/>
+ * <p>
  * Handles dependencies, command registration, event listener registration,
  * permissions and permission defaults, logging, error handling and
  * localization.
@@ -121,7 +121,7 @@ public abstract class PluginBase extends JavaPlugin {
      * with separate parts not exceeding 100.<br>
      * <b>REVISION and BUILD will not be contained in this version
      * number!</b><br><br>
-     * <p/>
+     * <p>
      * Examples:<br>
      * - v1.0 = 10000<br>
      * - v8.6 = 86000<br>
@@ -656,7 +656,7 @@ public abstract class PluginBase extends JavaPlugin {
      * To make use of this functionality, first add the following line to the
      * <b>plugin.yml</b>:<br>
      * <pre>metrics: true</pre>
-     * <p/>
+     * <p>
      * To avoid issues, call {@link #hasMetrics()} before using this method to
      * check whether Metrics is available.
      *

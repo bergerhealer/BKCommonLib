@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSetSlot")
 public abstract class PacketPlayOutSetSlotHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSetSlotClass} */
+    /** @see PacketPlayOutSetSlotClass */
     public static final PacketPlayOutSetSlotClass T = Template.Class.create(PacketPlayOutSetSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

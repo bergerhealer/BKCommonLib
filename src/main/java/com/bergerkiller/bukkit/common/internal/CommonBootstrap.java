@@ -107,7 +107,7 @@ public class CommonBootstrap {
      * If running an unshaded jar or the jar file was partially downloaded, this will
      * fail early and clearly to indicate so.
      *
-     * @Param logger Logger to log any errors to
+     * @param logger Logger to log any errors to
      * @return True if shaded assets are valid, false if not
      */
     public static boolean verifyShadedAssets(Logger logger) {
@@ -151,7 +151,7 @@ public class CommonBootstrap {
      * that is used, and then checks whether this version is compatible with this
      * library. Throws an exception if it is not.
      * 
-     * @throw UnsupportedOperationException If the server is not supported
+     * @throws UnsupportedOperationException If the server is not supported
      */
     public static void initCommonServerAssertCompatibility() {
         if (!initCommonServerCheckCompatibility()) {

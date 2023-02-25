@@ -11,7 +11,7 @@ import java.util.List;
 @Template.Optional
 @Template.InstanceType("net.minecraft.core.NonNullList")
 public abstract class NonNullListHandle extends Template.Handle {
-    /** @See {@link NonNullListClass} */
+    /** @see NonNullListClass */
     public static final NonNullListClass T = Template.Class.create(NonNullListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

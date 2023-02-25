@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutOpenSignEditor")
 public abstract class PacketPlayOutOpenSignEditorHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutOpenSignEditorClass} */
+    /** @see PacketPlayOutOpenSignEditorClass */
     public static final PacketPlayOutOpenSignEditorClass T = Template.Class.create(PacketPlayOutOpenSignEditorClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

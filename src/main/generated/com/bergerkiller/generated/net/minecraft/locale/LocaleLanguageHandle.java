@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.locale.LocaleLanguage")
 public abstract class LocaleLanguageHandle extends Template.Handle {
-    /** @See {@link LocaleLanguageClass} */
+    /** @see LocaleLanguageClass */
     public static final LocaleLanguageClass T = Template.Class.create(LocaleLanguageClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Template.InstanceType("org.bukkit.plugin.SimplePluginManager")
 public abstract class SimplePluginManagerHandle extends Template.Handle {
-    /** @See {@link SimplePluginManagerClass} */
+    /** @see SimplePluginManagerClass */
     public static final SimplePluginManagerClass T = Template.Class.create(SimplePluginManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

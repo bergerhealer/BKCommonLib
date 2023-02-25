@@ -10,7 +10,7 @@ import java.util.Map;
  */
 @Template.InstanceType("net.minecraft.core.RegistryMaterials")
 public abstract class RegistryMaterialsHandle extends Template.Handle {
-    /** @See {@link RegistryMaterialsClass} */
+    /** @see RegistryMaterialsClass */
     public static final RegistryMaterialsClass T = Template.Class.create(RegistryMaterialsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.scheduler.CraftTask")
 public abstract class CraftTaskHandle extends Template.Handle {
-    /** @See {@link CraftTaskClass} */
+    /** @see CraftTaskClass */
     public static final CraftTaskClass T = Template.Class.create(CraftTaskClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

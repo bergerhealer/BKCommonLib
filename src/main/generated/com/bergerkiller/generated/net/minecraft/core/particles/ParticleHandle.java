@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.core.particles.Particle")
 public abstract class ParticleHandle extends Template.Handle {
-    /** @See {@link ParticleClass} */
+    /** @see ParticleClass */
     public static final ParticleClass T = Template.Class.create(ParticleClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

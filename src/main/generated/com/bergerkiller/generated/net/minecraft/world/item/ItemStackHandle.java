@@ -15,7 +15,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.world.item.ItemStack")
 public abstract class ItemStackHandle extends Template.Handle {
-    /** @See {@link ItemStackClass} */
+    /** @see ItemStackClass */
     public static final ItemStackClass T = Template.Class.create(ItemStackClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

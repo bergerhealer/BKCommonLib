@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutExplosion")
 public abstract class PacketPlayOutExplosionHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutExplosionClass} */
+    /** @see PacketPlayOutExplosionClass */
     public static final PacketPlayOutExplosionClass T = Template.Class.create(PacketPlayOutExplosionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import java.util.Map;
  */
 @Template.InstanceType("net.minecraft.world.level.block.state.IBlockData")
 public abstract class IBlockDataHandle extends Template.Handle {
-    /** @See {@link IBlockDataClass} */
+    /** @see IBlockDataClass */
     public static final IBlockDataClass T = Template.Class.create(IBlockDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

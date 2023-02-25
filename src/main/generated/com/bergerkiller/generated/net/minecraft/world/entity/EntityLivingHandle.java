@@ -19,7 +19,7 @@ import java.util.Map;
  */
 @Template.InstanceType("net.minecraft.world.entity.EntityLiving")
 public abstract class EntityLivingHandle extends EntityHandle {
-    /** @See {@link EntityLivingClass} */
+    /** @see EntityLivingClass */
     public static final EntityLivingClass T = Template.Class.create(EntityLivingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityExperienceOrb")
 public abstract class PacketPlayOutSpawnEntityExperienceOrbHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSpawnEntityExperienceOrbClass} */
+    /** @see PacketPlayOutSpawnEntityExperienceOrbClass */
     public static final PacketPlayOutSpawnEntityExperienceOrbClass T = Template.Class.create(PacketPlayOutSpawnEntityExperienceOrbClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

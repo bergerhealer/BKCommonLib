@@ -15,7 +15,7 @@ import org.bukkit.World;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutRespawn")
 public abstract class PacketPlayOutRespawnHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutRespawnClass} */
+    /** @see PacketPlayOutRespawnClass */
     public static final PacketPlayOutRespawnClass T = Template.Class.create(PacketPlayOutRespawnClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

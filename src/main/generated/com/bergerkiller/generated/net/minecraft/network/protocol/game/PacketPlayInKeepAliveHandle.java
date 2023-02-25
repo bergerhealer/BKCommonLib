@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInKeepAlive")
 public abstract class PacketPlayInKeepAliveHandle extends PacketHandle {
-    /** @See {@link PacketPlayInKeepAliveClass} */
+    /** @see PacketPlayInKeepAliveClass */
     public static final PacketPlayInKeepAliveClass T = Template.Class.create(PacketPlayInKeepAliveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

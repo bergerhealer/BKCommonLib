@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
  */
 @Template.InstanceType("net.minecraft.world.phys.Vec3D")
 public abstract class Vec3DHandle extends Template.Handle {
-    /** @See {@link Vec3DClass} */
+    /** @see Vec3DClass */
     public static final Vec3DClass T = Template.Class.create(Vec3DClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

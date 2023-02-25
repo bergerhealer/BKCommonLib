@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("com.mojang.authlib.properties.Property")
 public abstract class PropertyHandle extends Template.Handle {
-    /** @See {@link PropertyClass} */
+    /** @see PropertyClass */
     public static final PropertyClass T = Template.Class.create(PropertyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

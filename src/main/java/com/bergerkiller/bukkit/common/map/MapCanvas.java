@@ -598,7 +598,6 @@ public abstract class MapCanvas {
      * 
      * @param color to fill
      * @return this canvas
-     * @return this canvas
      */
     public final MapCanvas fill(byte color) {
         return this.fillRectangle(0, 0, getWidth(), getHeight(), color);

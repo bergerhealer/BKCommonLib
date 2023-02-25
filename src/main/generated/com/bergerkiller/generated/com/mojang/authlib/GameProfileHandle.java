@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("com.mojang.authlib.GameProfile")
 public abstract class GameProfileHandle extends Template.Handle {
-    /** @See {@link GameProfileClass} */
+    /** @see GameProfileClass */
     public static final GameProfileClass T = Template.Class.create(GameProfileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

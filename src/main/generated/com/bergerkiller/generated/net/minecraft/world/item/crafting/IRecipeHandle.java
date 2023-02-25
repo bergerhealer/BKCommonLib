@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.world.item.crafting.IRecipe")
 public abstract class IRecipeHandle extends Template.Handle {
-    /** @See {@link IRecipeClass} */
+    /** @see IRecipeClass */
     public static final IRecipeClass T = Template.Class.create(IRecipeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

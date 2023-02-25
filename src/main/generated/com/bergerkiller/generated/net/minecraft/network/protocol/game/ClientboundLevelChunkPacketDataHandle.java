@@ -13,7 +13,7 @@ import com.bergerkiller.bukkit.common.resources.BlockStateType;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData")
 public abstract class ClientboundLevelChunkPacketDataHandle extends Template.Handle {
-    /** @See {@link ClientboundLevelChunkPacketDataClass} */
+    /** @see ClientboundLevelChunkPacketDataClass */
     public static final ClientboundLevelChunkPacketDataClass T = Template.Class.create(ClientboundLevelChunkPacketDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -39,7 +39,7 @@ public abstract class ClientboundLevelChunkPacketDataHandle extends Template.Han
     @Template.Optional
     @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundLevelChunkPacketData.BlockEntityData")
     public abstract static class BlockEntityDataHandle extends Template.Handle {
-        /** @See {@link BlockEntityDataClass} */
+        /** @see BlockEntityDataClass */
         public static final BlockEntityDataClass T = Template.Class.create(BlockEntityDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

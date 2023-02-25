@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutCustomPayload")
 public abstract class PacketPlayOutCustomPayloadHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutCustomPayloadClass} */
+    /** @see PacketPlayOutCustomPayloadClass */
     public static final PacketPlayOutCustomPayloadClass T = Template.Class.create(PacketPlayOutCustomPayloadClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

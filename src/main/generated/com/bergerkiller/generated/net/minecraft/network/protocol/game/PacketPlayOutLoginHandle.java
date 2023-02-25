@@ -14,7 +14,7 @@ import org.bukkit.World;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutLogin")
 public abstract class PacketPlayOutLoginHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutLoginClass} */
+    /** @see PacketPlayOutLoginClass */
     public static final PacketPlayOutLoginClass T = Template.Class.create(PacketPlayOutLoginClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

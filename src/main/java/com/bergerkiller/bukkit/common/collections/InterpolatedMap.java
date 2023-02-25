@@ -12,11 +12,11 @@ import java.util.ListIterator;
  * - (key = 2.0; value = 5.0)<br>
  * - (key = 3.0; value = 12.0)<br>
  * Performing get(2.5) would result in a value of 8.5 to be returned.<br><br>
- * <p/>
+ * <p>
  * If a key is out of bounds (lower than the minimum, higher than the maximum)
  * the value is clamped. Performing get(4.0) would result in a value of 12.0 to
  * be returned.<br><br>
- * <p/>
+ * <p>
  * No get operations should be performed on an empty map, the behaviour is
  * unspecified.
  */

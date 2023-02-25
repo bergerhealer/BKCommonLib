@@ -10,7 +10,7 @@ import org.bukkit.inventory.BeaconInventory;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryBeacon")
 public abstract class CraftInventoryBeaconHandle extends Template.Handle {
-    /** @See {@link CraftInventoryBeaconClass} */
+    /** @see CraftInventoryBeaconClass */
     public static final CraftInventoryBeaconClass T = Template.Class.create(CraftInventoryBeaconClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

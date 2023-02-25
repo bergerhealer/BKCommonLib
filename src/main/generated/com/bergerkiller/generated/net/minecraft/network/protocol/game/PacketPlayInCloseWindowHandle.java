@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInCloseWindow")
 public abstract class PacketPlayInCloseWindowHandle extends PacketHandle {
-    /** @See {@link PacketPlayInCloseWindowClass} */
+    /** @see PacketPlayInCloseWindowClass */
     public static final PacketPlayInCloseWindowClass T = Template.Class.create(PacketPlayInCloseWindowClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

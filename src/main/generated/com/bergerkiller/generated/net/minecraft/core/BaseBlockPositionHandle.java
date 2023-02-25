@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector3;
  */
 @Template.InstanceType("net.minecraft.core.BaseBlockPosition")
 public abstract class BaseBlockPositionHandle extends Template.Handle {
-    /** @See {@link BaseBlockPositionClass} */
+    /** @see BaseBlockPositionClass */
     public static final BaseBlockPositionClass T = Template.Class.create(BaseBlockPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -91,7 +91,7 @@ public class MapResourcePack {
      * <b>Before using, call {@link MapResourcePack#load() SERVER.load()} when enabling your plugin to download
      * and install this Minecraft client jar, and the resource pack of the server if it is defined.
      * This downloading is only performed once. Doing this here prevents long lag pauses the first time
-     * your plugin accesses this resource pack.
+     * your plugin accesses this resource pack.</b>
      */
     public static final MapResourcePack SERVER = new MapResourcePack("server");
 

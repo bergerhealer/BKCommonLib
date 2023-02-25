@@ -10,7 +10,7 @@ import java.util.Iterator;
  */
 @Template.InstanceType("com.bergerkiller.bukkit.common.internal.LongHashSet")
 public abstract class LongHashSetHandle extends Template.Handle {
-    /** @See {@link LongHashSetClass} */
+    /** @see LongHashSetClass */
     public static final LongHashSetClass T = Template.Class.create(LongHashSetClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

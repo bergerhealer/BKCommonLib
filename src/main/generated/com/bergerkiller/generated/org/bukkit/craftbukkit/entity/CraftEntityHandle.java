@@ -12,7 +12,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.entity.CraftEntity")
 public abstract class CraftEntityHandle extends Template.Handle {
-    /** @See {@link CraftEntityClass} */
+    /** @see CraftEntityClass */
     public static final CraftEntityClass T = Template.Class.create(CraftEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

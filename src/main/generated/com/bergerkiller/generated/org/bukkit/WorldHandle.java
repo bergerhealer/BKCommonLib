@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("org.bukkit.World")
 public abstract class WorldHandle extends Template.Handle {
-    /** @See {@link WorldClass} */
+    /** @see WorldClass */
     public static final WorldClass T = Template.Class.create(WorldClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutWorldParticles")
 public abstract class PacketPlayOutWorldParticlesHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutWorldParticlesClass} */
+    /** @see PacketPlayOutWorldParticlesClass */
     public static final PacketPlayOutWorldParticlesClass T = Template.Class.create(PacketPlayOutWorldParticlesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

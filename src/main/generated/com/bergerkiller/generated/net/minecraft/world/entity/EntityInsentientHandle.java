@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  */
 @Template.InstanceType("net.minecraft.world.entity.EntityInsentient")
 public abstract class EntityInsentientHandle extends EntityLivingHandle {
-    /** @See {@link EntityInsentientClass} */
+    /** @see EntityInsentientClass */
     public static final EntityInsentientClass T = Template.Class.create(EntityInsentientClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

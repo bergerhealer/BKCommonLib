@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.chunk.storage.RegionFile")
 public abstract class RegionFileHandle extends Template.Handle {
-    /** @See {@link RegionFileClass} */
+    /** @see RegionFileClass */
     public static final RegionFileClass T = Template.Class.create(RegionFileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

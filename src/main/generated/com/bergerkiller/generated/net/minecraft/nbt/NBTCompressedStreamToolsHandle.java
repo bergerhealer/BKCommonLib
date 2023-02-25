@@ -13,7 +13,7 @@ import java.io.OutputStream;
  */
 @Template.InstanceType("net.minecraft.nbt.NBTCompressedStreamTools")
 public abstract class NBTCompressedStreamToolsHandle extends Template.Handle {
-    /** @See {@link NBTCompressedStreamToolsClass} */
+    /** @see NBTCompressedStreamToolsClass */
     public static final NBTCompressedStreamToolsClass T = Template.Class.create(NBTCompressedStreamToolsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

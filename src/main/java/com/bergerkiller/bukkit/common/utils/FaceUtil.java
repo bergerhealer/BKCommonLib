@@ -432,7 +432,8 @@ public class FaceUtil {
     }
 
     /**
-     * Gets the angle from a horizontal Block Face. The following mapping is used:<br>
+     * Gets the angle from a horizontal Block Face. The following mapping is used:
+     * <ul>
      * <li>BlockFace.WEST = 0
      * <li>BlockFace.NORTH_WEST = 45
      * <li>BlockFace.NORTH = 90
@@ -442,6 +443,7 @@ public class FaceUtil {
      * <li>BlockFace.SOUTH = -90
      * <li>BlockFace.SOUTH_WEST = -45
      * <li>Invalid = 0
+     * </ul>
      *
      * @param face to get the angle for
      * @return face angle

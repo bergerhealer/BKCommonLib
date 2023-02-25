@@ -15,7 +15,7 @@ import java.util.function.Consumer;
  */
 @Template.InstanceType("net.minecraft.server.level.EntityTrackerEntryState")
 public abstract class EntityTrackerEntryStateHandle extends Template.Handle {
-    /** @See {@link EntityTrackerEntryStateClass} */
+    /** @see EntityTrackerEntryStateClass */
     public static final EntityTrackerEntryStateClass T = Template.Class.create(EntityTrackerEntryStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

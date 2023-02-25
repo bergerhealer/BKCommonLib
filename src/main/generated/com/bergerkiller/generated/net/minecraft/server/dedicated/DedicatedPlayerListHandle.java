@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.server.players.PlayerListHandle;
  */
 @Template.InstanceType("net.minecraft.server.dedicated.DedicatedPlayerList")
 public abstract class DedicatedPlayerListHandle extends PlayerListHandle {
-    /** @See {@link DedicatedPlayerListClass} */
+    /** @see DedicatedPlayerListClass */
     public static final DedicatedPlayerListClass T = Template.Class.create(DedicatedPlayerListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

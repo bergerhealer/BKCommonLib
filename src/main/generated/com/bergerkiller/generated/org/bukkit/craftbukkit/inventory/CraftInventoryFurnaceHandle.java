@@ -10,7 +10,7 @@ import org.bukkit.inventory.FurnaceInventory;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryFurnace")
 public abstract class CraftInventoryFurnaceHandle extends Template.Handle {
-    /** @See {@link CraftInventoryFurnaceClass} */
+    /** @see CraftInventoryFurnaceClass */
     public static final CraftInventoryFurnaceClass T = Template.Class.create(CraftInventoryFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

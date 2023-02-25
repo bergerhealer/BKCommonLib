@@ -10,7 +10,7 @@ import org.bukkit.plugin.EventExecutor;
  */
 @Template.InstanceType("org.bukkit.plugin.RegisteredListener")
 public abstract class RegisteredListenerHandle extends Template.Handle {
-    /** @See {@link RegisteredListenerClass} */
+    /** @see RegisteredListenerClass */
     public static final RegisteredListenerClass T = Template.Class.create(RegisteredListenerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -14,7 +14,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.world.entity.player.EntityHuman")
 public abstract class EntityHumanHandle extends EntityLivingHandle {
-    /** @See {@link EntityHumanClass} */
+    /** @see EntityHumanClass */
     public static final EntityHumanClass T = Template.Class.create(EntityHumanClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

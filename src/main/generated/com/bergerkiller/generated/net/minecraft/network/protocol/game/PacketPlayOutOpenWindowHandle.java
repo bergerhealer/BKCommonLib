@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutOpenWindow")
 public abstract class PacketPlayOutOpenWindowHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutOpenWindowClass} */
+    /** @see PacketPlayOutOpenWindowClass */
     public static final PacketPlayOutOpenWindowClass T = Template.Class.create(PacketPlayOutOpenWindowClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -10,7 +10,7 @@ import java.util.Map;
  */
 @Template.InstanceType("org.bukkit.plugin.PluginDescriptionFile")
 public abstract class PluginDescriptionFileHandle extends Template.Handle {
-    /** @See {@link PluginDescriptionFileClass} */
+    /** @see PluginDescriptionFileClass */
     public static final PluginDescriptionFileClass T = Template.Class.create(PluginDescriptionFileClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

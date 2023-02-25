@@ -386,7 +386,7 @@ public class CommonDependencyStartupLogHandler extends java.util.logging.Handler
         }
 
         /**
-         * Command handler for the /<command> startuplog command
+         * Command handler for the /&lt;command&gt; startuplog command
          *
          * @param sender
          */

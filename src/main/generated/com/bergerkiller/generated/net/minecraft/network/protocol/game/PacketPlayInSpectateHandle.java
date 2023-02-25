@@ -11,7 +11,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInSpectate")
 public abstract class PacketPlayInSpectateHandle extends PacketHandle {
-    /** @See {@link PacketPlayInSpectateClass} */
+    /** @see PacketPlayInSpectateClass */
     public static final PacketPlayInSpectateClass T = Template.Class.create(PacketPlayInSpectateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

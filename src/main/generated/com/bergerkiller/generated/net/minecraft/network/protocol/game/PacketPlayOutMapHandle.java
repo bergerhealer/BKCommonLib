@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutMap")
 public abstract class PacketPlayOutMapHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutMapClass} */
+    /** @see PacketPlayOutMapClass */
     public static final PacketPlayOutMapClass T = Template.Class.create(PacketPlayOutMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

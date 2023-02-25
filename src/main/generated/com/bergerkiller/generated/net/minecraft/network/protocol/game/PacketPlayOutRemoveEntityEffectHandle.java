@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutRemoveEntityEffect")
 public abstract class PacketPlayOutRemoveEntityEffectHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutRemoveEntityEffectClass} */
+    /** @see PacketPlayOutRemoveEntityEffectClass */
     public static final PacketPlayOutRemoveEntityEffectClass T = Template.Class.create(PacketPlayOutRemoveEntityEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

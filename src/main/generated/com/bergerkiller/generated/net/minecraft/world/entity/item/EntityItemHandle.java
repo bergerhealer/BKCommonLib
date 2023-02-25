@@ -13,7 +13,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.WorldHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.item.EntityItem")
 public abstract class EntityItemHandle extends EntityHandle {
-    /** @See {@link EntityItemClass} */
+    /** @see EntityItemClass */
     public static final EntityItemClass T = Template.Class.create(EntityItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

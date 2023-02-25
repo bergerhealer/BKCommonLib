@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInChat")
 public abstract class PacketPlayInChatHandle extends PacketHandle {
-    /** @See {@link PacketPlayInChatClass} */
+    /** @see PacketPlayInChatClass */
     public static final PacketPlayInChatClass T = Template.Class.create(PacketPlayInChatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

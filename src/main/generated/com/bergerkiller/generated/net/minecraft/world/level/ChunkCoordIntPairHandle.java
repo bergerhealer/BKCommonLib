@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.bases.IntVector2;
  */
 @Template.InstanceType("net.minecraft.world.level.ChunkCoordIntPair")
 public abstract class ChunkCoordIntPairHandle extends Template.Handle {
-    /** @See {@link ChunkCoordIntPairClass} */
+    /** @see ChunkCoordIntPairClass */
     public static final ChunkCoordIntPairClass T = Template.Class.create(ChunkCoordIntPairClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

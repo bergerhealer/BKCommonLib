@@ -11,7 +11,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
 @Template.Optional
 @Template.InstanceType("org.bukkit.craftbukkit.block.data.CraftBlockData")
 public abstract class CraftBlockDataHandle extends Template.Handle {
-    /** @See {@link CraftBlockDataClass} */
+    /** @see CraftBlockDataClass */
     public static final CraftBlockDataClass T = Template.Class.create(CraftBlockDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

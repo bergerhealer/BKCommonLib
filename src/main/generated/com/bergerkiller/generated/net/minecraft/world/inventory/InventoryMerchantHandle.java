@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
  */
 @Template.InstanceType("net.minecraft.world.inventory.InventoryMerchant")
 public abstract class InventoryMerchantHandle extends IInventoryHandle {
-    /** @See {@link InventoryMerchantClass} */
+    /** @see InventoryMerchantClass */
     public static final InventoryMerchantClass T = Template.Class.create(InventoryMerchantClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

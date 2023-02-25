@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutWorldEvent")
 public abstract class PacketPlayOutWorldEventHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutWorldEventClass} */
+    /** @see PacketPlayOutWorldEventClass */
     public static final PacketPlayOutWorldEventClass T = Template.Class.create(PacketPlayOutWorldEventClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

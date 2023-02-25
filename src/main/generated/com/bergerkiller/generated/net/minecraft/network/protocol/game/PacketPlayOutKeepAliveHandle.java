@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutKeepAlive")
 public abstract class PacketPlayOutKeepAliveHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutKeepAliveClass} */
+    /** @see PacketPlayOutKeepAliveClass */
     public static final PacketPlayOutKeepAliveClass T = Template.Class.create(PacketPlayOutKeepAliveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

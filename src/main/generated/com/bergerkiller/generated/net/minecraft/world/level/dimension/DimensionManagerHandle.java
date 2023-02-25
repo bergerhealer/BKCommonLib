@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.dimension.DimensionManager")
 public abstract class DimensionManagerHandle extends Template.Handle {
-    /** @See {@link DimensionManagerClass} */
+    /** @see DimensionManagerClass */
     public static final DimensionManagerClass T = Template.Class.create(DimensionManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

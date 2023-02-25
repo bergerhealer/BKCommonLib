@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.server.MinecraftServer")
 public abstract class MinecraftServerHandle extends Template.Handle {
-    /** @See {@link MinecraftServerClass} */
+    /** @see MinecraftServerClass */
     public static final MinecraftServerClass T = Template.Class.create(MinecraftServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

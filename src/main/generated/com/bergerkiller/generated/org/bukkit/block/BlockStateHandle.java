@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  */
 @Template.InstanceType("org.bukkit.block.BlockState")
 public abstract class BlockStateHandle extends Template.Handle {
-    /** @See {@link BlockStateClass} */
+    /** @see BlockStateClass */
     public static final BlockStateClass T = Template.Class.create(BlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

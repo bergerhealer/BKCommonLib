@@ -48,7 +48,7 @@ public class EntityGroupingUtil {
     }
 
     /**
-     * @deprecated Use Set<EntityCategory> getCategories(name)
+     * @deprecated Use Set&lt;EntityCategory&gt; getCategories(name)
      */
     @Deprecated
     public static EntityCategory getCategory(String name) {
@@ -62,7 +62,7 @@ public class EntityGroupingUtil {
     }
 
     /**
-     * @deprecated Use Set<EntityCategory> getCategories(entityType)
+     * @deprecated Use Set&lt;EntityCategory&gt; getCategories(entityType)
      */
     @Deprecated
     public static EntityCategory getCategory(EntityType type) {
@@ -70,7 +70,7 @@ public class EntityGroupingUtil {
     }
 
     /**
-     * @deprecated Use Set<EntityCategory> getCategories(entityClass)
+     * @deprecated Use Set&lt;EntityCategory&gt; getCategories(entityClass)
      */
     @Deprecated
     public static EntityCategory getCategory(Class<? extends Entity> entityClass) {
@@ -219,7 +219,7 @@ public class EntityGroupingUtil {
      * Returns true if an entity is a killer bunny
      *
      * @param entity The entity to check
-     * @result Returns true if an entity is a killer bunny
+     * @return Returns true if an entity is a killer bunny
      */
     public static boolean isKillerBunny(Entity entity) {
         if (isEntityTypeClass(entity, Rabbit.class)) {
@@ -232,7 +232,7 @@ public class EntityGroupingUtil {
      * Returns true if an entity is tamed
      *
      * @param entity The entity to check
-     * @result Returns true if an entity is tamed
+     * @return Returns true if an entity is tamed
      */
     public static boolean isTamed(Entity entity) {
         if (isEntityType(entity, EntityCategory.TAMEABLE)) {
@@ -247,7 +247,7 @@ public class EntityGroupingUtil {
      * - Zombie riding chicken
      *
      * @param entity The entity to check
-     * @result Returns true if the entity is a jockey
+     * @return Returns true if the entity is a jockey
      */
     public static boolean isJockey(Entity entity) {
         if (isEntityTypeClass(entity, Spider.class)) {
@@ -276,7 +276,7 @@ public class EntityGroupingUtil {
      * Returns a set of all matching categories
      *
      * @param name The name of the entity type
-     * @return Set<EntityCategory> of all matching categories
+     * @return Set&lt;EntityCategory&gt; of all matching categories
      */
     public static Set<EntityCategory> getCategories(String name) {
         Set<EntityCategory> x = new HashSet<EntityCategory>();
@@ -288,7 +288,7 @@ public class EntityGroupingUtil {
      * Returns a set of all matching categories
      *
      * @param type The EntityType
-     * @return Set<EntityCategory> of all matching categories
+     * @return Set&lt;EntityCategory&gt; of all matching categories
      */
     public static Set<EntityCategory> getCategories(EntityType type) {
         return getCategories(type.getEntityClass());
@@ -298,7 +298,7 @@ public class EntityGroupingUtil {
      * Returns a set of all matching categories
      *
      * @param entity The Entity
-     * @return Set<EntityCategory> of all matching categories
+     * @return Set&lt;EntityCategory&gt; of all matching categories
      */
     public static Set<EntityCategory> getCategories(Entity entity) {
         Set<EntityCategory> resultSet = new HashSet<EntityCategory>();
@@ -327,7 +327,7 @@ public class EntityGroupingUtil {
      * Returns a set of all matching categories
      *
      * @param entityClass The Entity class
-     * @return Set<EntityCategory> of all matching categories
+     * @return Set&lt;EntityCategory&gt; of all matching categories
      */
     public static Set<EntityCategory> getCategories(Class<? extends Entity> entityClass) {
         Set<EntityCategory> resultSet = new HashSet<EntityCategory>();

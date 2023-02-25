@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.item.crafting.CraftingManager")
 public abstract class CraftingManagerHandle extends Template.Handle {
-    /** @See {@link CraftingManagerClass} */
+    /** @see CraftingManagerClass */
     public static final CraftingManagerClass T = Template.Class.create(CraftingManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

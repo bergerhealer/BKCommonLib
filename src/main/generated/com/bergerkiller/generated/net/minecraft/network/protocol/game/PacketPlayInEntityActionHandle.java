@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInEntityAction")
 public abstract class PacketPlayInEntityActionHandle extends PacketHandle {
-    /** @See {@link PacketPlayInEntityActionClass} */
+    /** @see PacketPlayInEntityActionClass */
     public static final PacketPlayInEntityActionClass T = Template.Class.create(PacketPlayInEntityActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

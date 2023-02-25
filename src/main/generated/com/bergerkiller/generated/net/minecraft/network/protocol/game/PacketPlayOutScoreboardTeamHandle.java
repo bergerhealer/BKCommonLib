@@ -13,7 +13,7 @@ import java.util.Collection;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutScoreboardTeam")
 public abstract class PacketPlayOutScoreboardTeamHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutScoreboardTeamClass} */
+    /** @see PacketPlayOutScoreboardTeamClass */
     public static final PacketPlayOutScoreboardTeamClass T = Template.Class.create(PacketPlayOutScoreboardTeamClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

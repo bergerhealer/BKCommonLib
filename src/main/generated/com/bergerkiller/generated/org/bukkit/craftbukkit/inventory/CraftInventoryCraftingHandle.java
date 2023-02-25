@@ -10,7 +10,7 @@ import org.bukkit.inventory.CraftingInventory;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftInventoryCrafting")
 public abstract class CraftInventoryCraftingHandle extends Template.Handle {
-    /** @See {@link CraftInventoryCraftingClass} */
+    /** @see CraftInventoryCraftingClass */
     public static final CraftInventoryCraftingClass T = Template.Class.create(CraftInventoryCraftingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

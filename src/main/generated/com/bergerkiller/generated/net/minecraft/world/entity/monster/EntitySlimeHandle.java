@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityInsentientHan
  */
 @Template.InstanceType("net.minecraft.world.entity.monster.EntitySlime")
 public abstract class EntitySlimeHandle extends EntityInsentientHandle {
-    /** @See {@link EntitySlimeClass} */
+    /** @see EntitySlimeClass */
     public static final EntitySlimeClass T = Template.Class.create(EntitySlimeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

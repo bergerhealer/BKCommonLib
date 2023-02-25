@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.biome.BiomeSettingsMobs")
 public abstract class BiomeSettingsMobsHandle extends Template.Handle {
-    /** @See {@link BiomeSettingsMobsClass} */
+    /** @see BiomeSettingsMobsClass */
     public static final BiomeSettingsMobsClass T = Template.Class.create(BiomeSettingsMobsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -34,7 +34,7 @@ public abstract class BiomeSettingsMobsHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.world.level.biome.BiomeSettingsMobs.SpawnRate")
     public abstract static class SpawnRateHandle extends Template.Handle {
-        /** @See {@link SpawnRateClass} */
+        /** @see SpawnRateClass */
         public static final SpawnRateClass T = Template.Class.create(SpawnRateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

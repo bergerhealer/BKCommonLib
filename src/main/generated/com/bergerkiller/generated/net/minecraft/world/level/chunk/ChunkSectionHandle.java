@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
  */
 @Template.InstanceType("net.minecraft.world.level.chunk.ChunkSection")
 public abstract class ChunkSectionHandle extends Template.Handle {
-    /** @See {@link ChunkSectionClass} */
+    /** @see ChunkSectionClass */
     public static final ChunkSectionClass T = Template.Class.create(ChunkSectionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

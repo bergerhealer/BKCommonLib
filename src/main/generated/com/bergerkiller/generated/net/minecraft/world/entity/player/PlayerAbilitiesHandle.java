@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.player.PlayerAbilities")
 public abstract class PlayerAbilitiesHandle extends Template.Handle {
-    /** @See {@link PlayerAbilitiesClass} */
+    /** @see PlayerAbilitiesClass */
     public static final PlayerAbilitiesClass T = Template.Class.create(PlayerAbilitiesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

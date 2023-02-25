@@ -11,7 +11,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("org.bukkit.inventory.PlayerInventory")
 public abstract class PlayerInventoryHandle extends InventoryHandle {
-    /** @See {@link PlayerInventoryClass} */
+    /** @see PlayerInventoryClass */
     public static final PlayerInventoryClass T = Template.Class.create(PlayerInventoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

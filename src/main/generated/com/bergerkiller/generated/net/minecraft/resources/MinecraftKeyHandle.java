@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.resources.MinecraftKey")
 public abstract class MinecraftKeyHandle extends Template.Handle {
-    /** @See {@link MinecraftKeyClass} */
+    /** @see MinecraftKeyClass */
     public static final MinecraftKeyClass T = Template.Class.create(MinecraftKeyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

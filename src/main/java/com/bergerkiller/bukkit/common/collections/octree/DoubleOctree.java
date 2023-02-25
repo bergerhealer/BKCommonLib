@@ -223,7 +223,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param newZ      The Z-coordinate of the desired new position
      * @param newValue  The value to store at the new position
      * @return True if the old value was found and moved, False otherwise
-     * @see {@link #moveEntry(Entry, Entry)}
+     * @see #moveEntry(Entry, Entry)
      */
     public boolean move(double oldX, double oldY, double oldZ, T oldValue, double newX, double newY, double newZ, T newValue) {
         return moveEntry(new Entry<T>(oldX, oldY, oldZ, oldValue), new Entry<T>(newX, newY, newZ, newValue));
@@ -246,7 +246,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
      * @param newY      The Y-coordinate of the desired new position
      * @param newZ      The Z-coordinate of the desired new position
      * @return True if the old value was found and moved, False otherwise
-     * @see {@link #moveEntry(Entry, Entry)}
+     * @see #moveEntry(Entry, Entry)
      */
     public boolean move(double oldX, double oldY, double oldZ, T value, double newX, double newY, double newZ) {
         return moveEntry(new Entry<T>(oldX, oldY, oldZ, value), new Entry<T>(newX, newY, newZ, value));
@@ -816,7 +816,7 @@ public class DoubleOctree<T> implements DoubleOctreeIterable<T> {
          * @param y The Y-coordinate
          * @param z The Z-coordinate
          * @return 0, less than 0 or greater than 0 depending on order
-         * @see {@link #compareTo(Entry)}
+         * @see #compareTo(Entry)
          */
         public int compareTo(double x, double y, double z) {
             int comp;

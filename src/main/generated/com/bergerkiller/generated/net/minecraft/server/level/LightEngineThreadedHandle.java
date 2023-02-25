@@ -11,7 +11,7 @@ import org.bukkit.World;
 @Template.Optional
 @Template.InstanceType("net.minecraft.server.level.LightEngineThreaded")
 public abstract class LightEngineThreadedHandle extends Template.Handle {
-    /** @See {@link LightEngineThreadedClass} */
+    /** @see LightEngineThreadedClass */
     public static final LightEngineThreadedClass T = Template.Class.create(LightEngineThreadedClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

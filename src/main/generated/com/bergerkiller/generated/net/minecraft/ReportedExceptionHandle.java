@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.ReportedException")
 public abstract class ReportedExceptionHandle extends Template.Handle {
-    /** @See {@link ReportedExceptionClass} */
+    /** @see ReportedExceptionClass */
     public static final ReportedExceptionClass T = Template.Class.create(ReportedExceptionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

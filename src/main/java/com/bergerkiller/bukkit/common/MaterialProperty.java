@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
 /**
  * Represents a property for a given material<br>
  * If a material container is null, air (0) is used<br><br>
- * <p/>
+ * <p>
  * It is <b>required</b> to implement {@link #get(Material)}.
  * To better handle Block materials, {@link #get(BlockData)} should also be implemented.
  */

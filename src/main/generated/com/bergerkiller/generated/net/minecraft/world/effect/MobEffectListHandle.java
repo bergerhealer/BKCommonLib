@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.effect.MobEffectList")
 public abstract class MobEffectListHandle extends Template.Handle {
-    /** @See {@link MobEffectListClass} */
+    /** @see MobEffectListClass */
     public static final MobEffectListClass T = Template.Class.create(MobEffectListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

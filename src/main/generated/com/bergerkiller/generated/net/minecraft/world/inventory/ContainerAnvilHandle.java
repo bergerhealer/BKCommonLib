@@ -10,7 +10,7 @@ import org.bukkit.inventory.InventoryView;
  */
 @Template.InstanceType("net.minecraft.world.inventory.ContainerAnvil")
 public abstract class ContainerAnvilHandle extends ContainerHandle {
-    /** @See {@link ContainerAnvilClass} */
+    /** @see ContainerAnvilClass */
     public static final ContainerAnvilClass T = Template.Class.create(ContainerAnvilClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

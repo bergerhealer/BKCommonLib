@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.ai.attributes.AttributeModifiable")
 public abstract class AttributeModifiableHandle extends Template.Handle {
-    /** @See {@link AttributeModifiableClass} */
+    /** @see AttributeModifiableClass */
     public static final AttributeModifiableClass T = Template.Class.create(AttributeModifiableClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

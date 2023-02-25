@@ -50,14 +50,15 @@ import com.bergerkiller.bukkit.common.wrappers.HumanHand;
  * around while input is intercepted.<br>
  * <br>
  * To use this class, it should be further implemented to add custom functionality:
+ * <ul>
  * <li>{@link #onAttached()} is called after the map display is initialized</li>
  * <li>{@link #onDetached()} is called right before the map display is de-initialized</li>
  * <li>{@link #onTick()} is called every tick, do logic updates and drawing here</li>
- * <li>{@link #onKeyPressed(Event)} is called whenever an owner presses a key (down)</li>
- * <li>{@link #onKeyReleased(Event)} is called whenever an owner releases a key (up)</li>
- * <li>{@link #onKey(event)} is called every tick while the owner is holding down a key</li>
- * <li>{@link #onLeftClick(event)} is called when a player left-clicks on the map</li>
- * <li>{@link #onRightClick(event)} is called when a player right-clicks on the map</li>
+ * <li>{@link #onKeyPressed(MapKeyEvent)} is called whenever an owner presses a key (down)</li>
+ * <li>{@link #onKeyReleased(MapKeyEvent)} is called whenever an owner releases a key (up)</li>
+ * <li>{@link #onKey(MapKeyEvent)} is called every tick while the owner is holding down a key</li>
+ * <li>{@link #onLeftClick(MapClickEvent)} is called when a player left-clicks on the map</li>
+ * <li>{@link #onRightClick(MapClickEvent)} is called when a player right-clicks on the map</li>
  * </ul>
  */
 public class MapDisplay implements MapDisplayEvents {

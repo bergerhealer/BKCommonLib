@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
  */
 @Template.InstanceType("net.minecraft.world.level.block.entity.TileEntityFurnace")
 public abstract class TileEntityFurnaceHandle extends TileEntityHandle {
-    /** @See {@link TileEntityFurnaceClass} */
+    /** @see TileEntityFurnaceClass */
     public static final TileEntityFurnaceClass T = Template.Class.create(TileEntityFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

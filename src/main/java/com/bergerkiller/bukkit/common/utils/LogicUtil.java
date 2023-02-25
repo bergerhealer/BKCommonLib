@@ -1118,7 +1118,7 @@ public class LogicUtil {
      * 
      * @param array
      * @return List
-     * @throw NullPointerException if input array is null
+     * @throws NullPointerException if input array is null
      */
     @SuppressWarnings("unchecked")
     public static <E> List<E> asImmutableList(E... array) {

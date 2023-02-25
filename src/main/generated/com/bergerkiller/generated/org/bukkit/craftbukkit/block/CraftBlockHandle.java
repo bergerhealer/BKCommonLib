@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.block.CraftBlock")
 public abstract class CraftBlockHandle extends Template.Handle {
-    /** @See {@link CraftBlockClass} */
+    /** @see CraftBlockClass */
     public static final CraftBlockClass T = Template.Class.create(CraftBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

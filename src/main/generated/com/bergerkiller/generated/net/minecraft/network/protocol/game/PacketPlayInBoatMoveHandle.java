@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInBoatMove")
 public abstract class PacketPlayInBoatMoveHandle extends Template.Handle {
-    /** @See {@link PacketPlayInBoatMoveClass} */
+    /** @see PacketPlayInBoatMoveClass */
     public static final PacketPlayInBoatMoveClass T = Template.Class.create(PacketPlayInBoatMoveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

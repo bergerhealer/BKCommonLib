@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.block.entity.TileEntitySign")
 public abstract class TileEntitySignHandle extends TileEntityHandle {
-    /** @See {@link TileEntitySignClass} */
+    /** @see TileEntitySignClass */
     public static final TileEntitySignClass T = Template.Class.create(TileEntitySignClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.EnumItemSlot")
 public abstract class EnumItemSlotHandle extends Template.Handle {
-    /** @See {@link EnumItemSlotClass} */
+    /** @see EnumItemSlotClass */
     public static final EnumItemSlotClass T = Template.Class.create(EnumItemSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

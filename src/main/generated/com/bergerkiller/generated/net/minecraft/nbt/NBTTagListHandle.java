@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.nbt.NBTTagList")
 public abstract class NBTTagListHandle extends NBTBaseHandle {
-    /** @See {@link NBTTagListClass} */
+    /** @see NBTTagListClass */
     public static final NBTTagListClass T = Template.Class.create(NBTTagListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

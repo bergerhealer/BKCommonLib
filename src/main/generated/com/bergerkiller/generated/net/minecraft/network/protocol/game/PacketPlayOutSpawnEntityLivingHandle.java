@@ -14,7 +14,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSpawnEntityLiving")
 public abstract class PacketPlayOutSpawnEntityLivingHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSpawnEntityLivingClass} */
+    /** @see PacketPlayOutSpawnEntityLivingClass */
     public static final PacketPlayOutSpawnEntityLivingClass T = Template.Class.create(PacketPlayOutSpawnEntityLivingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

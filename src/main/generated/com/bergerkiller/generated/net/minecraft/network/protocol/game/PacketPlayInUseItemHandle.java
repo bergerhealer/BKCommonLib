@@ -14,7 +14,7 @@ import org.bukkit.entity.HumanEntity;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInUseItem")
 public abstract class PacketPlayInUseItemHandle extends PacketHandle {
-    /** @See {@link PacketPlayInUseItemClass} */
+    /** @see PacketPlayInUseItemClass */
     public static final PacketPlayInUseItemClass T = Template.Class.create(PacketPlayInUseItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

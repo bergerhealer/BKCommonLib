@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
  */
 @Template.InstanceType("net.minecraft.sounds.SoundEffect")
 public abstract class SoundEffectHandle extends Template.Handle {
-    /** @See {@link SoundEffectClass} */
+    /** @see SoundEffectClass */
     public static final SoundEffectClass T = Template.Class.create(SoundEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

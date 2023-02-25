@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.chunk.NibbleArray")
 public abstract class NibbleArrayHandle extends Template.Handle {
-    /** @See {@link NibbleArrayClass} */
+    /** @see NibbleArrayClass */
     public static final NibbleArrayClass T = Template.Class.create(NibbleArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -13,7 +13,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutTileEntityData")
 public abstract class PacketPlayOutTileEntityDataHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutTileEntityDataClass} */
+    /** @see PacketPlayOutTileEntityDataClass */
     public static final PacketPlayOutTileEntityDataClass T = Template.Class.create(PacketPlayOutTileEntityDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

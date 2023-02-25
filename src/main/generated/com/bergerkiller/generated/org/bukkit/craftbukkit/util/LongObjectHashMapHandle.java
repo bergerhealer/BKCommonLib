@@ -13,7 +13,7 @@ import java.util.function.LongFunction;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.util.LongObjectHashMap")
 public abstract class LongObjectHashMapHandle extends Template.Handle {
-    /** @See {@link LongObjectHashMapClass} */
+    /** @see LongObjectHashMapClass */
     public static final LongObjectHashMapClass T = Template.Class.create(LongObjectHashMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

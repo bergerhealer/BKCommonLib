@@ -10,7 +10,7 @@ import com.bergerkiller.generated.org.bukkit.WorldHandle;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.CraftWorld")
 public abstract class CraftWorldHandle extends WorldHandle {
-    /** @See {@link CraftWorldClass} */
+    /** @see CraftWorldClass */
     public static final CraftWorldClass T = Template.Class.create(CraftWorldClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

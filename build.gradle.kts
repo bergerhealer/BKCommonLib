@@ -1,6 +1,6 @@
 plugins {
     id("java-library")
-    id("com.bergerkiller.mountiplex") version "2.92"
+    id("com.bergerkiller.mountiplex") version "2.93"
     id("com.github.johnrengelman.shadow") version "7.1.2"
     id("maven-publish")
 }
@@ -145,8 +145,7 @@ tasks {
 
     javadoc {
         options.encoding = "UTF-8"
-        // TODO fix those errors
-        isFailOnError = false
+        isFailOnError = true
         (options as StandardJavadocDocletOptions).addStringOption("Xdoclint:all,-missing", "-quiet")
     }
 

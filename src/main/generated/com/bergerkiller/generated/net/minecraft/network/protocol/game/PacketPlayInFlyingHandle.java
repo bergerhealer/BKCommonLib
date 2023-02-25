@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInFlying")
 public abstract class PacketPlayInFlyingHandle extends PacketHandle {
-    /** @See {@link PacketPlayInFlyingClass} */
+    /** @see PacketPlayInFlyingClass */
     public static final PacketPlayInFlyingClass T = Template.Class.create(PacketPlayInFlyingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

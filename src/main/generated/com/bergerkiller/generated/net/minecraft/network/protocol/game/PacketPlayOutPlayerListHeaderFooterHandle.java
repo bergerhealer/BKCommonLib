@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutPlayerListHeaderFooter")
 public abstract class PacketPlayOutPlayerListHeaderFooterHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutPlayerListHeaderFooterClass} */
+    /** @see PacketPlayOutPlayerListHeaderFooterClass */
     public static final PacketPlayOutPlayerListHeaderFooterClass T = Template.Class.create(PacketPlayOutPlayerListHeaderFooterClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

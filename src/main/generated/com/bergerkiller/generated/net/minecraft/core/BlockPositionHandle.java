@@ -11,7 +11,7 @@ import org.bukkit.block.Block;
  */
 @Template.InstanceType("net.minecraft.core.BlockPosition")
 public abstract class BlockPositionHandle extends BaseBlockPositionHandle {
-    /** @See {@link BlockPositionClass} */
+    /** @see BlockPositionClass */
     public static final BlockPositionClass T = Template.Class.create(BlockPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

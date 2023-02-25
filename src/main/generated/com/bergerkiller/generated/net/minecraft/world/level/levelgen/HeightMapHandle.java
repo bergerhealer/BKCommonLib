@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.world.level.chunk.ChunkHandle;
  */
 @Template.InstanceType("net.minecraft.world.level.levelgen.HeightMap")
 public abstract class HeightMapHandle extends Template.Handle {
-    /** @See {@link HeightMapClass} */
+    /** @see HeightMapClass */
     public static final HeightMapClass T = Template.Class.create(HeightMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

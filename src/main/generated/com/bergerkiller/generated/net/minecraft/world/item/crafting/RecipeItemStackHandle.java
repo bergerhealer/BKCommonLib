@@ -12,7 +12,7 @@ import java.util.List;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.item.crafting.RecipeItemStack")
 public abstract class RecipeItemStackHandle extends Template.Handle {
-    /** @See {@link RecipeItemStackClass} */
+    /** @see RecipeItemStackClass */
     public static final RecipeItemStackClass T = Template.Class.create(RecipeItemStackClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

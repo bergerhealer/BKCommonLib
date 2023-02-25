@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.MobSpawner;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartMobSpawner")
 public abstract class EntityMinecartMobSpawnerHandle extends EntityMinecartAbstractHandle {
-    /** @See {@link EntityMinecartMobSpawnerClass} */
+    /** @see EntityMinecartMobSpawnerClass */
     public static final EntityMinecartMobSpawnerClass T = Template.Class.create(EntityMinecartMobSpawnerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

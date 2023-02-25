@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInSteerVehicle")
 public abstract class PacketPlayInSteerVehicleHandle extends PacketHandle {
-    /** @See {@link PacketPlayInSteerVehicleClass} */
+    /** @see PacketPlayInSteerVehicleClass */
     public static final PacketPlayInSteerVehicleClass T = Template.Class.create(PacketPlayInSteerVehicleClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

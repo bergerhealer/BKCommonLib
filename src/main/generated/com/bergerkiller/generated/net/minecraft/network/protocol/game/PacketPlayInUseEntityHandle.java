@@ -13,7 +13,7 @@ import org.bukkit.util.Vector;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInUseEntity")
 public abstract class PacketPlayInUseEntityHandle extends PacketHandle {
-    /** @See {@link PacketPlayInUseEntityClass} */
+    /** @see PacketPlayInUseEntityClass */
     public static final PacketPlayInUseEntityClass T = Template.Class.create(PacketPlayInUseEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

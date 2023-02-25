@@ -20,7 +20,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.world.level.chunk.Chunk")
 public abstract class ChunkHandle extends Template.Handle {
-    /** @See {@link ChunkClass} */
+    /** @see ChunkClass */
     public static final ChunkClass T = Template.Class.create(ChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

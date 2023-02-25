@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityTeleport")
 public abstract class PacketPlayOutEntityTeleportHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityTeleportClass} */
+    /** @see PacketPlayOutEntityTeleportClass */
     public static final PacketPlayOutEntityTeleportClass T = Template.Class.create(PacketPlayOutEntityTeleportClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

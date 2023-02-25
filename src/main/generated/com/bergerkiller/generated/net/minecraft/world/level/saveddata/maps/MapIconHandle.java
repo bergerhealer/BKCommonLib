@@ -11,7 +11,7 @@ import org.bukkit.map.MapCursor;
  */
 @Template.InstanceType("net.minecraft.world.level.saveddata.maps.MapIcon")
 public abstract class MapIconHandle extends Template.Handle {
-    /** @See {@link MapIconClass} */
+    /** @see MapIconClass */
     public static final MapIconClass T = Template.Class.create(MapIconClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -63,7 +63,7 @@ public abstract class MapIconHandle extends Template.Handle {
     @Template.Optional
     @Template.InstanceType("net.minecraft.world.level.saveddata.maps.MapIcon.Type")
     public abstract static class TypeHandle extends Template.Handle {
-        /** @See {@link TypeClass} */
+        /** @see TypeClass */
         public static final TypeClass T = Template.Class.create(TypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import org.bukkit.block.BlockFace;
  */
 @Template.InstanceType("net.minecraft.world.entity.decoration.EntityHanging")
 public abstract class EntityHangingHandle extends EntityHandle {
-    /** @See {@link EntityHangingClass} */
+    /** @see EntityHangingClass */
     public static final EntityHangingClass T = Template.Class.create(EntityHangingClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.core.EnumDirection")
 public abstract class EnumDirectionHandle extends Template.Handle {
-    /** @See {@link EnumDirectionClass} */
+    /** @see EnumDirectionClass */
     public static final EnumDirectionClass T = Template.Class.create(EnumDirectionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumDirectionHandle DOWN = T.DOWN.getSafe();
     public static final EnumDirectionHandle UP = T.UP.getSafe();
@@ -47,7 +47,7 @@ public abstract class EnumDirectionHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.core.EnumDirection.EnumAxis")
     public abstract static class EnumAxisHandle extends Template.Handle {
-        /** @See {@link EnumAxisClass} */
+        /** @see EnumAxisClass */
         public static final EnumAxisClass T = Template.Class.create(EnumAxisClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumAxisHandle X = T.X.getSafe();
         public static final EnumAxisHandle Y = T.Y.getSafe();

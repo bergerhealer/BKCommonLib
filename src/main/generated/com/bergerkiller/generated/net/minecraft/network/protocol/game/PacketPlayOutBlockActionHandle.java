@@ -12,7 +12,7 @@ import org.bukkit.Material;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutBlockAction")
 public abstract class PacketPlayOutBlockActionHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutBlockActionClass} */
+    /** @see PacketPlayOutBlockActionClass */
     public static final PacketPlayOutBlockActionClass T = Template.Class.create(PacketPlayOutBlockActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.network.protocol.Packet")
 public abstract class PacketHandle extends Template.Handle {
-    /** @See {@link PacketClass} */
+    /** @see PacketClass */
     public static final PacketClass T = Template.Class.create(PacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
  */
 @Template.InstanceType("net.minecraft.world.level.block.entity.TileEntityTypes")
 public abstract class TileEntityTypesHandle extends Template.Handle {
-    /** @See {@link TileEntityTypesClass} */
+    /** @see TileEntityTypesClass */
     public static final TileEntityTypesClass T = Template.Class.create(TileEntityTypesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

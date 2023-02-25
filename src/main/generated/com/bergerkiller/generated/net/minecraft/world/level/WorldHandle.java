@@ -22,7 +22,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.world.level.World")
 public abstract class WorldHandle extends IBlockAccessHandle {
-    /** @See {@link WorldClass} */
+    /** @see WorldClass */
     public static final WorldClass T = Template.Class.create(WorldClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

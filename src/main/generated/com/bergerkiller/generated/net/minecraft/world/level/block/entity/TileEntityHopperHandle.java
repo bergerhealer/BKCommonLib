@@ -10,7 +10,7 @@ import org.bukkit.World;
  */
 @Template.InstanceType("net.minecraft.world.level.block.entity.TileEntityHopper")
 public abstract class TileEntityHopperHandle extends TileEntityHandle {
-    /** @See {@link TileEntityHopperClass} */
+    /** @see TileEntityHopperClass */
     public static final TileEntityHopperClass T = Template.Class.create(TileEntityHopperClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

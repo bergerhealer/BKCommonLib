@@ -10,7 +10,7 @@ import org.bukkit.util.Vector;
  */
 @Template.InstanceType("net.minecraft.core.Vector3f")
 public abstract class Vector3fHandle extends Template.Handle {
-    /** @See {@link Vector3fClass} */
+    /** @see Vector3fClass */
     public static final Vector3fClass T = Template.Class.create(Vector3fClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

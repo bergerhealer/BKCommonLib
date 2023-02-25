@@ -218,7 +218,7 @@ public abstract class EntityController<T extends CommonEntity<?>> extends Common
      * box helps fixing significant stress on the server handling a lot more block collision
      * events than usual.
      * 
-     * @param bounds size vector to set to, <i>null<i/> for defaults
+     * @param bounds size vector to set to, <i>null</i> for defaults
      */
     public void setBlockCollisionBounds(Vector bounds) {
         this.moveHandler.setCustomBlockCollisionBounds(bounds);

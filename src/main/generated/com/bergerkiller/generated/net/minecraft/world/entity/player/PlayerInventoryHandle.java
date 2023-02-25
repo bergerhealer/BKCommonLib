@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.IInventoryHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.player.PlayerInventory")
 public abstract class PlayerInventoryHandle extends IInventoryHandle {
-    /** @See {@link PlayerInventoryClass} */
+    /** @see PlayerInventoryClass */
     public static final PlayerInventoryClass T = Template.Class.create(PlayerInventoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

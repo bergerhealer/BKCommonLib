@@ -920,8 +920,8 @@ public class NMSPacketClasses {
         };
 
         /**
-         * <b>Warning: </b>Getting this field on Minecraft 1.16 and earlier may raise an
-         * exception if multiple entity id's are stored. Setting is always safe.</b>
+         * <b>Warning:</b> Getting this field on Minecraft 1.16 and earlier may raise an
+         * exception if multiple entity id's are stored. Setting is always safe.
          */
         public final FieldAccessor<Integer> entityId = new SafeDirectField<Integer>() {
             @Override

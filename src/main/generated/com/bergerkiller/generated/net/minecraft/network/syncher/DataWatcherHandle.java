@@ -14,7 +14,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.syncher.DataWatcher")
 public abstract class DataWatcherHandle extends Template.Handle {
-    /** @See {@link DataWatcherClass} */
+    /** @see DataWatcherClass */
     public static final DataWatcherClass T = Template.Class.create(DataWatcherClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -74,7 +74,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.network.syncher.DataWatcher.Item")
     public abstract static class ItemHandle extends Template.Handle {
-        /** @See {@link ItemClass} */
+        /** @see ItemClass */
         public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -120,7 +120,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.network.syncher.DataWatcher.PackedItem")
     public abstract static class PackedItemHandle extends Template.Handle {
-        /** @See {@link PackedItemClass} */
+        /** @see PackedItemClass */
         public static final PackedItemClass T = Template.Class.create(PackedItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

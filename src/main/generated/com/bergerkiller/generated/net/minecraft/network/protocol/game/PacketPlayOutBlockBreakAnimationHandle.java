@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutBlockBreakAnimation")
 public abstract class PacketPlayOutBlockBreakAnimationHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutBlockBreakAnimationClass} */
+    /** @see PacketPlayOutBlockBreakAnimationClass */
     public static final PacketPlayOutBlockBreakAnimationClass T = Template.Class.create(PacketPlayOutBlockBreakAnimationClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

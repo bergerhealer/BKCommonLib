@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.sounds.SoundEffectHandle;
  */
 @Template.InstanceType("net.minecraft.world.level.block.SoundEffectType")
 public abstract class SoundEffectTypeHandle extends Template.Handle {
-    /** @See {@link SoundEffectTypeClass} */
+    /** @see SoundEffectTypeClass */
     public static final SoundEffectTypeClass T = Template.Class.create(SoundEffectTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

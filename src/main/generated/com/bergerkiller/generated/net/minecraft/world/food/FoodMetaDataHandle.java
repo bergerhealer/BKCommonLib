@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
  */
 @Template.InstanceType("net.minecraft.world.food.FoodMetaData")
 public abstract class FoodMetaDataHandle extends Template.Handle {
-    /** @See {@link FoodMetaDataClass} */
+    /** @see FoodMetaDataClass */
     public static final FoodMetaDataClass T = Template.Class.create(FoodMetaDataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInSettings")
 public abstract class PacketPlayInSettingsHandle extends PacketHandle {
-    /** @See {@link PacketPlayInSettingsClass} */
+    /** @see PacketPlayInSettingsClass */
     public static final PacketPlayInSettingsClass T = Template.Class.create(PacketPlayInSettingsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

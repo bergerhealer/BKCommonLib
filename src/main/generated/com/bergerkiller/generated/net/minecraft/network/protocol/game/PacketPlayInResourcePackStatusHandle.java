@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInResourcePackStatus")
 public abstract class PacketPlayInResourcePackStatusHandle extends PacketHandle {
-    /** @See {@link PacketPlayInResourcePackStatusClass} */
+    /** @see PacketPlayInResourcePackStatusClass */
     public static final PacketPlayInResourcePackStatusClass T = Template.Class.create(PacketPlayInResourcePackStatusClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

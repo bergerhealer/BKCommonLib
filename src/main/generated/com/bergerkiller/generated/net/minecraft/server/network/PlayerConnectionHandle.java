@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.server.network.PlayerConnection")
 public abstract class PlayerConnectionHandle extends Template.Handle {
-    /** @See {@link PlayerConnectionClass} */
+    /** @see PlayerConnectionClass */
     public static final PlayerConnectionClass T = Template.Class.create(PlayerConnectionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

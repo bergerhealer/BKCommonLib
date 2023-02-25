@@ -11,7 +11,7 @@ import org.bukkit.util.Vector;
  */
 @Template.InstanceType("net.minecraft.world.phys.MovingObjectPosition")
 public abstract class MovingObjectPositionHandle extends Template.Handle {
-    /** @See {@link MovingObjectPositionClass} */
+    /** @see MovingObjectPositionClass */
     public static final MovingObjectPositionClass T = Template.Class.create(MovingObjectPositionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

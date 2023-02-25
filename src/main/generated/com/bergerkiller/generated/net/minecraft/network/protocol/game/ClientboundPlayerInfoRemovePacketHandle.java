@@ -12,7 +12,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket")
 public abstract class ClientboundPlayerInfoRemovePacketHandle extends PacketHandle {
-    /** @See {@link ClientboundPlayerInfoRemovePacketClass} */
+    /** @see ClientboundPlayerInfoRemovePacketClass */
     public static final ClientboundPlayerInfoRemovePacketClass T = Template.Class.create(ClientboundPlayerInfoRemovePacketClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

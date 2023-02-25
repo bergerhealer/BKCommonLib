@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.level.ForcedChunk")
 public abstract class ForcedChunkHandle extends Template.Handle {
-    /** @See {@link ForcedChunkClass} */
+    /** @see ForcedChunkClass */
     public static final ForcedChunkClass T = Template.Class.create(ForcedChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -371,7 +371,7 @@ public class MathUtil {
      * 
      * @param x the dividend
      * @param y the divisor
-     * @returnthe floor modulus x
+     * @return the floor modulus x
      */
     public static int floorMod(int x, int y) {
         return Math.floorMod(x, y);
@@ -382,7 +382,7 @@ public class MathUtil {
      * 
      * @param x the dividend
      * @param y the divisor
-     * @returnthe floor modulus x
+     * @return the floor modulus x
      */
     public static long floorMod(long x, long y) {
         return Math.floorMod(x, y);

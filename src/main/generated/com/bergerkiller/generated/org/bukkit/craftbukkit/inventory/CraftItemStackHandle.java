@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.inventory.CraftItemStack")
 public abstract class CraftItemStackHandle extends Template.Handle {
-    /** @See {@link CraftItemStackClass} */
+    /** @see CraftItemStackClass */
     public static final CraftItemStackClass T = Template.Class.create(CraftItemStackClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

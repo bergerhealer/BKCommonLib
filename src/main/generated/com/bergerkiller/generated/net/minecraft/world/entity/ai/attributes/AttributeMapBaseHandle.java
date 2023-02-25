@@ -12,7 +12,7 @@ import java.util.Set;
  */
 @Template.InstanceType("net.minecraft.world.entity.ai.attributes.AttributeMapBase")
 public abstract class AttributeMapBaseHandle extends Template.Handle {
-    /** @See {@link AttributeMapBaseClass} */
+    /** @see AttributeMapBaseClass */
     public static final AttributeMapBaseClass T = Template.Class.create(AttributeMapBaseClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

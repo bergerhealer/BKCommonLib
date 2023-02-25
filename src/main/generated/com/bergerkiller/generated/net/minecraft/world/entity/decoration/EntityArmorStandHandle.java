@@ -12,7 +12,7 @@ import org.bukkit.util.Vector;
  */
 @Template.InstanceType("net.minecraft.world.entity.decoration.EntityArmorStand")
 public abstract class EntityArmorStandHandle extends EntityLivingHandle {
-    /** @See {@link EntityArmorStandClass} */
+    /** @see EntityArmorStandClass */
     public static final EntityArmorStandClass T = Template.Class.create(EntityArmorStandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

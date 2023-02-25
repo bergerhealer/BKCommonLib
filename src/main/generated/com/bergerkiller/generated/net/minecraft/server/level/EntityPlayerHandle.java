@@ -16,7 +16,7 @@ import java.util.Collection;
  */
 @Template.InstanceType("net.minecraft.server.level.EntityPlayer")
 public abstract class EntityPlayerHandle extends EntityHumanHandle {
-    /** @See {@link EntityPlayerClass} */
+    /** @see EntityPlayerClass */
     public static final EntityPlayerClass T = Template.Class.create(EntityPlayerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

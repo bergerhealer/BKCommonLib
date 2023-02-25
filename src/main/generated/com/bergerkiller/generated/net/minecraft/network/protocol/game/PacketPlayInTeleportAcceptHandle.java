@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInTeleportAccept")
 public abstract class PacketPlayInTeleportAcceptHandle extends PacketHandle {
-    /** @See {@link PacketPlayInTeleportAcceptClass} */
+    /** @see PacketPlayInTeleportAcceptClass */
     public static final PacketPlayInTeleportAcceptClass T = Template.Class.create(PacketPlayInTeleportAcceptClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

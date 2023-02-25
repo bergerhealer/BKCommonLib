@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.block.Blocks")
 public abstract class BlocksHandle extends Template.Handle {
-    /** @See {@link BlocksClass} */
+    /** @see BlocksClass */
     public static final BlocksClass T = Template.Class.create(BlocksClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final Object AIR = T.AIR.getSafe();
     public static final Object LADDER = T.LADDER.getSafe();

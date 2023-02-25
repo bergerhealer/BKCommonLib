@@ -17,7 +17,7 @@ import org.bukkit.World;
  */
 @Template.InstanceType("net.minecraft.world.level.block.entity.TileEntity")
 public abstract class TileEntityHandle extends Template.Handle {
-    /** @See {@link TileEntityClass} */
+    /** @see TileEntityClass */
     public static final TileEntityClass T = Template.Class.create(TileEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

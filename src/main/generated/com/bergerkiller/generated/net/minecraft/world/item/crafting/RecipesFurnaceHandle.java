@@ -13,7 +13,7 @@ import java.util.Map;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.item.crafting.RecipesFurnace")
 public abstract class RecipesFurnaceHandle extends Template.Handle {
-    /** @See {@link RecipesFurnaceClass} */
+    /** @see RecipesFurnaceClass */
     public static final RecipesFurnaceClass T = Template.Class.create(RecipesFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

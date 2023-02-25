@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore")
 public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutScoreboardScoreClass} */
+    /** @see PacketPlayOutScoreboardScoreClass */
     public static final PacketPlayOutScoreboardScoreClass T = Template.Class.create(PacketPlayOutScoreboardScoreClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -49,7 +49,7 @@ public abstract class PacketPlayOutScoreboardScoreHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore.EnumScoreboardAction")
     public abstract static class EnumScoreboardActionHandle extends Template.Handle {
-        /** @See {@link EnumScoreboardActionClass} */
+        /** @see EnumScoreboardActionClass */
         public static final EnumScoreboardActionClass T = Template.Class.create(EnumScoreboardActionClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumScoreboardActionHandle CHANGE = T.CHANGE.getSafe();
         public static final EnumScoreboardActionHandle REMOVE = T.REMOVE.getSafe();

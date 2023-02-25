@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.util.RandomSource")
 public abstract class RandomSourceHandle extends Template.Handle {
-    /** @See {@link RandomSourceClass} */
+    /** @see RandomSourceClass */
     public static final RandomSourceClass T = Template.Class.create(RandomSourceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

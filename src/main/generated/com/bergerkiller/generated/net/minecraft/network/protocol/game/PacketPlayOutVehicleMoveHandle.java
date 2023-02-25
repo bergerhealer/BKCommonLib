@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutVehicleMove")
 public abstract class PacketPlayOutVehicleMoveHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutVehicleMoveClass} */
+    /** @see PacketPlayOutVehicleMoveClass */
     public static final PacketPlayOutVehicleMoveClass T = Template.Class.create(PacketPlayOutVehicleMoveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

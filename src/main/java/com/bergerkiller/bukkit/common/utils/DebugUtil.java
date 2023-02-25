@@ -80,7 +80,7 @@ public class DebugUtil {
      * <b>#x</b> = <i>Block X</i><br>
      * <b>#y</b> = <i>Block Y</i><br>
      * <b>#z</b> = <i>Block Z</i><br>
-     * <b>#world</b> = <i>World name<i/><br>
+     * <b>#world</b> = <i>World name</i><br>
      * <b>#type</b> = <i>Block Type</i>
      *
      * @param block to format

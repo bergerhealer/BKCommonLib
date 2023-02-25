@@ -38,7 +38,7 @@ public final class BlockFaceSet {
      * 
      * @param mask
      * @return BlockFaceSet
-     * @see {@link #mask()}
+     * @see #mask()
      */
     public static BlockFaceSet byMask(int mask) {
         return cache[mask];

@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.server.level.EntityTrackerEntry")
 public abstract class EntityTrackerEntryHandle extends Template.Handle {
-    /** @See {@link EntityTrackerEntryClass} */
+    /** @see EntityTrackerEntryClass */
     public static final EntityTrackerEntryClass T = Template.Class.create(EntityTrackerEntryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

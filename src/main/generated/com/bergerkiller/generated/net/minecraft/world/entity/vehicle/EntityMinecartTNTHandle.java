@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartTNT")
 public abstract class EntityMinecartTNTHandle extends EntityMinecartAbstractHandle {
-    /** @See {@link EntityMinecartTNTClass} */
+    /** @see EntityMinecartTNTClass */
     public static final EntityMinecartTNTClass T = Template.Class.create(EntityMinecartTNTClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

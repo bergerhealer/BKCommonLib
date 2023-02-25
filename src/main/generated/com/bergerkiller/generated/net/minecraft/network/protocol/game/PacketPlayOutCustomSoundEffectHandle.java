@@ -13,7 +13,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutCustomSoundEffect")
 public abstract class PacketPlayOutCustomSoundEffectHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutCustomSoundEffectClass} */
+    /** @see PacketPlayOutCustomSoundEffectClass */
     public static final PacketPlayOutCustomSoundEffectClass T = Template.Class.create(PacketPlayOutCustomSoundEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

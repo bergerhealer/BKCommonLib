@@ -11,7 +11,7 @@ import java.util.Collection;
  */
 @Template.InstanceType("net.minecraft.network.chat.IChatBaseComponent")
 public abstract class IChatBaseComponentHandle extends Template.Handle {
-    /** @See {@link IChatBaseComponentClass} */
+    /** @see IChatBaseComponentClass */
     public static final IChatBaseComponentClass T = Template.Class.create(IChatBaseComponentClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -55,7 +55,7 @@ public abstract class IChatBaseComponentHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.network.chat.IChatBaseComponent.ChatSerializer")
     public abstract static class ChatSerializerHandle extends Template.Handle {
-        /** @See {@link ChatSerializerClass} */
+        /** @see ChatSerializerClass */
         public static final ChatSerializerClass T = Template.Class.create(ChatSerializerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

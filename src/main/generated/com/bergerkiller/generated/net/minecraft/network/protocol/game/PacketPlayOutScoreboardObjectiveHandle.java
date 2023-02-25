@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutScoreboardObjective")
 public abstract class PacketPlayOutScoreboardObjectiveHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutScoreboardObjectiveClass} */
+    /** @see PacketPlayOutScoreboardObjectiveClass */
     public static final PacketPlayOutScoreboardObjectiveClass T = Template.Class.create(PacketPlayOutScoreboardObjectiveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

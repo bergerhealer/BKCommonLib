@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("org.bukkit.entity.Entity")
 public abstract class EntityHandle extends Template.Handle {
-    /** @See {@link EntityClass} */
+    /** @see EntityClass */
     public static final EntityClass T = Template.Class.create(EntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

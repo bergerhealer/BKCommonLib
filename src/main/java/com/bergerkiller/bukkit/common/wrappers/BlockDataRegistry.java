@@ -176,7 +176,7 @@ public class BlockDataRegistry {
      * Example input:
      * <pre>minecraft:furnace[facing=east,lit=true]</pre>
      * 
-     * @param serializedString Input serialized text</i>
+     * @param serializedString Input serialized text
      * @return deserialized BlockData, or null if deserialization failed
      */
     public static BlockData fromString(String serializedString) {

@@ -11,7 +11,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartAbstract")
 public abstract class EntityMinecartAbstractHandle extends EntityHandle {
-    /** @See {@link EntityMinecartAbstractClass} */
+    /** @see EntityMinecartAbstractClass */
     public static final EntityMinecartAbstractClass T = Template.Class.create(EntityMinecartAbstractClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

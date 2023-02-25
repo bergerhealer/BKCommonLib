@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.block.BlockCobbleWall")
 public abstract class BlockCobbleWallHandle extends Template.Handle {
-    /** @See {@link BlockCobbleWallClass} */
+    /** @see BlockCobbleWallClass */
     public static final BlockCobbleWallClass T = Template.Class.create(BlockCobbleWallClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

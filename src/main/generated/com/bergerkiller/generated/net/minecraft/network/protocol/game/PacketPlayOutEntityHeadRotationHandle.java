@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityHeadRotation")
 public abstract class PacketPlayOutEntityHeadRotationHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityHeadRotationClass} */
+    /** @see PacketPlayOutEntityHeadRotationClass */
     public static final PacketPlayOutEntityHeadRotationClass T = Template.Class.create(PacketPlayOutEntityHeadRotationClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

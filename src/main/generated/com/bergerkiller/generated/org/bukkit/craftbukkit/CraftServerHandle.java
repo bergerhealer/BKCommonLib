@@ -13,7 +13,7 @@ import java.io.File;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.CraftServer")
 public abstract class CraftServerHandle extends Template.Handle {
-    /** @See {@link CraftServerClass} */
+    /** @see CraftServerClass */
     public static final CraftServerClass T = Template.Class.create(CraftServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

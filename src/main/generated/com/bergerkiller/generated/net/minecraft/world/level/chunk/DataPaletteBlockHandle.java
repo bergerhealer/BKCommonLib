@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.BlockData;
  */
 @Template.InstanceType("net.minecraft.world.level.chunk.DataPaletteBlock")
 public abstract class DataPaletteBlockHandle extends Template.Handle {
-    /** @See {@link DataPaletteBlockClass} */
+    /** @see DataPaletteBlockClass */
     public static final DataPaletteBlockClass T = Template.Class.create(DataPaletteBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

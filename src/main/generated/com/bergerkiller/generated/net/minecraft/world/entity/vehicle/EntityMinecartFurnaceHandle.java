@@ -10,7 +10,7 @@ import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartFurnace")
 public abstract class EntityMinecartFurnaceHandle extends EntityMinecartAbstractHandle {
-    /** @See {@link EntityMinecartFurnaceClass} */
+    /** @see EntityMinecartFurnaceClass */
     public static final EntityMinecartFurnaceClass T = Template.Class.create(EntityMinecartFurnaceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

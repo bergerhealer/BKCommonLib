@@ -23,7 +23,7 @@ import java.util.UUID;
  */
 @Template.InstanceType("net.minecraft.server.level.WorldServer")
 public abstract class WorldServerHandle extends WorldHandle {
-    /** @See {@link WorldServerClass} */
+    /** @see WorldServerClass */
     public static final WorldServerClass T = Template.Class.create(WorldServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

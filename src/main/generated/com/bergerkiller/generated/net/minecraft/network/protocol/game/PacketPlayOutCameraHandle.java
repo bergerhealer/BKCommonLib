@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutCamera")
 public abstract class PacketPlayOutCameraHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutCameraClass} */
+    /** @see PacketPlayOutCameraClass */
     public static final PacketPlayOutCameraClass T = Template.Class.create(PacketPlayOutCameraClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

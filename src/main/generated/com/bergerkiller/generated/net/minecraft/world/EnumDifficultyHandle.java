@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.EnumDifficulty")
 public abstract class EnumDifficultyHandle extends Template.Handle {
-    /** @See {@link EnumDifficultyClass} */
+    /** @see EnumDifficultyClass */
     public static final EnumDifficultyClass T = Template.Class.create(EnumDifficultyClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

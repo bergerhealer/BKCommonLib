@@ -12,7 +12,7 @@ import java.util.List;
 @Template.Optional
 @Template.InstanceType("net.minecraft.util.EntitySlice")
 public abstract class EntitySliceHandle extends Template.Handle {
-    /** @See {@link EntitySliceClass} */
+    /** @see EntitySliceClass */
     public static final EntitySliceClass T = Template.Class.create(EntitySliceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

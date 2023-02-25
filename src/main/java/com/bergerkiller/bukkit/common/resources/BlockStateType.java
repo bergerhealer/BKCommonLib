@@ -53,7 +53,7 @@ public class BlockStateType extends BasicWrapper<TileEntityTypesHandle> {
      *
      * @param id Serialized id
      * @return Block state type
-     * @see {@link #getSerializedId()}
+     * @see #getSerializedId()
      */
     public static BlockStateType bySerializedId(int id) {
         return fromTileEntityTypesHandle(TileEntityTypesHandle.getRawById(id));

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.CraftChunk")
 public abstract class CraftChunkHandle extends Template.Handle {
-    /** @See {@link CraftChunkClass} */
+    /** @see CraftChunkClass */
     public static final CraftChunkClass T = Template.Class.create(CraftChunkClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

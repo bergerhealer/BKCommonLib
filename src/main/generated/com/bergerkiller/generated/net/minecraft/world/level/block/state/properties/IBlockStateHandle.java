@@ -10,7 +10,7 @@ import java.util.Collection;
  */
 @Template.InstanceType("net.minecraft.world.level.block.state.properties.IBlockState")
 public abstract class IBlockStateHandle extends Template.Handle {
-    /** @See {@link IBlockStateClass} */
+    /** @see IBlockStateClass */
     public static final IBlockStateClass T = Template.Class.create(IBlockStateClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

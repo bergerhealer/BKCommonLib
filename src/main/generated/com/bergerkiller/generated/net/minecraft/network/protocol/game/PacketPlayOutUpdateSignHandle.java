@@ -14,7 +14,7 @@ import org.bukkit.World;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutUpdateSign")
 public abstract class PacketPlayOutUpdateSignHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutUpdateSignClass} */
+    /** @see PacketPlayOutUpdateSignClass */
     public static final PacketPlayOutUpdateSignClass T = Template.Class.create(PacketPlayOutUpdateSignClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

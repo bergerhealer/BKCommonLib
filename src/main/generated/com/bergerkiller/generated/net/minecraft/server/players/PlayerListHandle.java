@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.server.players.PlayerList")
 public abstract class PlayerListHandle extends Template.Handle {
-    /** @See {@link PlayerListClass} */
+    /** @see PlayerListClass */
     public static final PlayerListClass T = Template.Class.create(PlayerListClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

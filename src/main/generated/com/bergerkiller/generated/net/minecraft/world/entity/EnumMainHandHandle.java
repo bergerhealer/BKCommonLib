@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.entity.EnumMainHand")
 public abstract class EnumMainHandHandle extends Template.Handle {
-    /** @See {@link EnumMainHandClass} */
+    /** @see EnumMainHandClass */
     public static final EnumMainHandClass T = Template.Class.create(EnumMainHandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumMainHandHandle LEFT = T.LEFT.getSafe();
     public static final EnumMainHandHandle RIGHT = T.RIGHT.getSafe();

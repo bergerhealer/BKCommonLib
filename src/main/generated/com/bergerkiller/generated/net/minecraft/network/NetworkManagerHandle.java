@@ -10,7 +10,7 @@ import io.netty.channel.Channel;
  */
 @Template.InstanceType("net.minecraft.network.NetworkManager")
 public abstract class NetworkManagerHandle extends Template.Handle {
-    /** @See {@link NetworkManagerClass} */
+    /** @see NetworkManagerClass */
     public static final NetworkManagerClass T = Template.Class.create(NetworkManagerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import java.io.OutputStream;
  * closing the stream and flushing the data to the official output file. It can
  * be used to safely write data to disk without resulting in partially-written
  * data when writing is interrupted.<br><br>
- * <p/>
+ * <p>
  * Flushing this stream does <b>NOT</b> flush data to the output file, only to
  * the temporary file. If the temporary file stream needs to be closed without
  * replacing the original output file, use {@link #close(boolean) close(false)}.

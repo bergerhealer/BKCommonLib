@@ -12,7 +12,7 @@ import org.bukkit.Sound;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.CraftSound")
 public abstract class CraftSoundHandle extends Template.Handle {
-    /** @See {@link CraftSoundClass} */
+    /** @see CraftSoundClass */
     public static final CraftSoundClass T = Template.Class.create(CraftSoundClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

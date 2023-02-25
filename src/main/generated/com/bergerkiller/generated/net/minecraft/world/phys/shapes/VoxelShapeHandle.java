@@ -12,7 +12,7 @@ import java.util.stream.Stream;
  */
 @Template.InstanceType("net.minecraft.world.phys.shapes.VoxelShape")
 public abstract class VoxelShapeHandle extends Template.Handle {
-    /** @See {@link VoxelShapeClass} */
+    /** @see VoxelShapeClass */
     public static final VoxelShapeClass T = Template.Class.create(VoxelShapeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -84,7 +84,7 @@ public class ItemParser {
 
     /**
      * Supported formats: typedata: [type]:[data] [typeid]:[data] [typeid]
-     * <p/>
+     * <p>
      * Amount/name relationship: [amount]x[typedata] [amount]*[typedata]
      * [amount] [typedata] [amount]@[typedata] [typedata]
      */

@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.world.entity.EnumMoveType")
 public abstract class EnumMoveTypeHandle extends Template.Handle {
-    /** @See {@link EnumMoveTypeClass} */
+    /** @see EnumMoveTypeClass */
     public static final EnumMoveTypeClass T = Template.Class.create(EnumMoveTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumMoveTypeHandle SELF = T.SELF.getSafe();
     public static final EnumMoveTypeHandle PLAYER = T.PLAYER.getSafe();

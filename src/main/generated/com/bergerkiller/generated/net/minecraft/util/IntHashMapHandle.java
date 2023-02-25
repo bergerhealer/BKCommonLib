@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.util.IntHashMap")
 public abstract class IntHashMapHandle extends Template.Handle {
-    /** @See {@link IntHashMapClass} */
+    /** @see IntHashMapClass */
     public static final IntHashMapClass T = Template.Class.create(IntHashMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -63,7 +63,7 @@ public abstract class IntHashMapHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.util.IntHashMap.IntHashMapEntry")
     public abstract static class IntHashMapEntryHandle extends Template.Handle {
-        /** @See {@link IntHashMapEntryClass} */
+        /** @see IntHashMapEntryClass */
         public static final IntHashMapEntryClass T = Template.Class.create(IntHashMapEntryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

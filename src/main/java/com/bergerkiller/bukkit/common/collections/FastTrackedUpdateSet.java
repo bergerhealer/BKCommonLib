@@ -92,7 +92,7 @@ public final class FastTrackedUpdateSet<E> {
      * consumer with them, and when done iterating, clears it.
      *
      * @param action
-     * @see {@link #iterateAndClear()}
+     * @see #iterateAndClear()
      */
     public void forEachAndClear(Consumer<? super E> action) {
         this.iterable.forEach(action);

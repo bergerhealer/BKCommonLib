@@ -12,7 +12,7 @@ import java.util.Map;
  */
 @Template.InstanceType("net.minecraft.world.entity.EntityTypes")
 public abstract class EntityTypesHandle extends Template.Handle {
-    /** @See {@link EntityTypesClass} */
+    /** @see EntityTypesClass */
     public static final EntityTypesClass T = Template.Class.create(EntityTypesClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

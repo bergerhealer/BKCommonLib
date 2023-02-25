@@ -10,7 +10,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("net.minecraft.world.item.Item")
 public abstract class ItemHandle extends Template.Handle {
-    /** @See {@link ItemClass} */
+    /** @see ItemClass */
     public static final ItemClass T = Template.Class.create(ItemClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

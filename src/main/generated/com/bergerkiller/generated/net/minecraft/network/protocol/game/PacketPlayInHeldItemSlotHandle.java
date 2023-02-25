@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInHeldItemSlot")
 public abstract class PacketPlayInHeldItemSlotHandle extends PacketHandle {
-    /** @See {@link PacketPlayInHeldItemSlotClass} */
+    /** @see PacketPlayInHeldItemSlotClass */
     public static final PacketPlayInHeldItemSlotClass T = Template.Class.create(PacketPlayInHeldItemSlotClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

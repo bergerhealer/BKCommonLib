@@ -14,7 +14,7 @@ public interface CheckedFunction<T, R> {
      *
      * @param t the function argument
      * @return the function result
-     * @throws Can throw an exception if the result could not be gotten
+     * @throws Throwable Can throw a checked exception
      */
     R apply(T t) throws Throwable;
 

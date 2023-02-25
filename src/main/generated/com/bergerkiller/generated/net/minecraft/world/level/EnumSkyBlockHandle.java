@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.level.EnumSkyBlock")
 public abstract class EnumSkyBlockHandle extends Template.Handle {
-    /** @See {@link EnumSkyBlockClass} */
+    /** @see EnumSkyBlockClass */
     public static final EnumSkyBlockClass T = Template.Class.create(EnumSkyBlockClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumSkyBlockHandle SKY = T.SKY.getSafe();
     public static final EnumSkyBlockHandle BLOCK = T.BLOCK.getSafe();

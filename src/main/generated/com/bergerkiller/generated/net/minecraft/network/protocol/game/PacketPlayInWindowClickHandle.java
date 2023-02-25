@@ -12,7 +12,7 @@ import org.bukkit.inventory.ItemStack;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInWindowClick")
 public abstract class PacketPlayInWindowClickHandle extends PacketHandle {
-    /** @See {@link PacketPlayInWindowClickClass} */
+    /** @see PacketPlayInWindowClickClass */
     public static final PacketPlayInWindowClickClass T = Template.Class.create(PacketPlayInWindowClickClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

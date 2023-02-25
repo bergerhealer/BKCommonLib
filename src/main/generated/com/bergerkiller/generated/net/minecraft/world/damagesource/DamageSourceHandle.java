@@ -13,7 +13,7 @@ import org.bukkit.entity.LivingEntity;
  */
 @Template.InstanceType("net.minecraft.world.damagesource.DamageSource")
 public abstract class DamageSourceHandle extends Template.Handle {
-    /** @See {@link DamageSourceClass} */
+    /** @see DamageSourceClass */
     public static final DamageSourceClass T = Template.Class.create(DamageSourceClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInUpdateSign")
 public abstract class PacketPlayInUpdateSignHandle extends PacketHandle {
-    /** @See {@link PacketPlayInUpdateSignClass} */
+    /** @see PacketPlayInUpdateSignClass */
     public static final PacketPlayInUpdateSignClass T = Template.Class.create(PacketPlayInUpdateSignClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

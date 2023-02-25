@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.world.entity.vehicle.EntityMinecartHopper")
 public abstract class EntityMinecartHopperHandle extends EntityMinecartAbstractHandle {
-    /** @See {@link EntityMinecartHopperClass} */
+    /** @see EntityMinecartHopperClass */
     public static final EntityMinecartHopperClass T = Template.Class.create(EntityMinecartHopperClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

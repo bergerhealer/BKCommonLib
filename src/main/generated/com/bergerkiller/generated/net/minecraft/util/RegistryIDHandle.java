@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.util.RegistryID")
 public abstract class RegistryIDHandle extends Template.Handle {
-    /** @See {@link RegistryIDClass} */
+    /** @see RegistryIDClass */
     public static final RegistryIDClass T = Template.Class.create(RegistryIDClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

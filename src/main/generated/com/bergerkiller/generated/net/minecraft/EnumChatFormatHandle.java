@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.EnumChatFormat")
 public abstract class EnumChatFormatHandle extends Template.Handle {
-    /** @See {@link EnumChatFormatClass} */
+    /** @see EnumChatFormatClass */
     public static final EnumChatFormatClass T = Template.Class.create(EnumChatFormatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final EnumChatFormatHandle RESET = T.RESET.getSafe();
     /* ============================================================================== */

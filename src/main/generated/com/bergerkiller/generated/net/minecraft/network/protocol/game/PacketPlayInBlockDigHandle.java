@@ -12,7 +12,7 @@ import org.bukkit.block.BlockFace;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInBlockDig")
 public abstract class PacketPlayInBlockDigHandle extends PacketHandle {
-    /** @See {@link PacketPlayInBlockDigClass} */
+    /** @see PacketPlayInBlockDigClass */
     public static final PacketPlayInBlockDigClass T = Template.Class.create(PacketPlayInBlockDigClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -47,7 +47,7 @@ public abstract class PacketPlayInBlockDigHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayInBlockDig.EnumPlayerDigType")
     public abstract static class EnumPlayerDigTypeHandle extends Template.Handle {
-        /** @See {@link EnumPlayerDigTypeClass} */
+        /** @see EnumPlayerDigTypeClass */
         public static final EnumPlayerDigTypeClass T = Template.Class.create(EnumPlayerDigTypeClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         public static final EnumPlayerDigTypeHandle START_DESTROY_BLOCK = T.START_DESTROY_BLOCK.getSafe();
         public static final EnumPlayerDigTypeHandle ABORT_DESTROY_BLOCK = T.ABORT_DESTROY_BLOCK.getSafe();

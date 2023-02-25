@@ -10,7 +10,7 @@ import org.bukkit.Art;
  */
 @Template.InstanceType("org.bukkit.craftbukkit.CraftArt")
 public abstract class CraftArtHandle extends Template.Handle {
-    /** @See {@link CraftArtClass} */
+    /** @see CraftArtClass */
     public static final CraftArtClass T = Template.Class.create(CraftArtClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

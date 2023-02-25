@@ -10,7 +10,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntity")
 public abstract class PacketPlayOutEntityHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityClass} */
+    /** @see PacketPlayOutEntityClass */
     public static final PacketPlayOutEntityClass T = Template.Class.create(PacketPlayOutEntityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -87,7 +87,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntity.PacketPlayOutEntityLook")
     public abstract static class PacketPlayOutEntityLookHandle extends PacketPlayOutEntityHandle {
-        /** @See {@link PacketPlayOutEntityLookClass} */
+        /** @see PacketPlayOutEntityLookClass */
         public static final PacketPlayOutEntityLookClass T = Template.Class.create(PacketPlayOutEntityLookClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -134,7 +134,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntity.PacketPlayOutRelEntityMove")
     public abstract static class PacketPlayOutRelEntityMoveHandle extends PacketPlayOutEntityHandle {
-        /** @See {@link PacketPlayOutRelEntityMoveClass} */
+        /** @see PacketPlayOutRelEntityMoveClass */
         public static final PacketPlayOutRelEntityMoveClass T = Template.Class.create(PacketPlayOutRelEntityMoveClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -182,7 +182,7 @@ public abstract class PacketPlayOutEntityHandle extends PacketHandle {
      */
     @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntity.PacketPlayOutRelEntityMoveLook")
     public abstract static class PacketPlayOutRelEntityMoveLookHandle extends PacketPlayOutEntityHandle {
-        /** @See {@link PacketPlayOutRelEntityMoveLookClass} */
+        /** @see PacketPlayOutRelEntityMoveLookClass */
         public static final PacketPlayOutRelEntityMoveLookClass T = Template.Class.create(PacketPlayOutRelEntityMoveLookClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

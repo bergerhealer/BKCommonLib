@@ -403,7 +403,7 @@ public abstract class BlockData extends BlockDataRegistry {
      *
      * @param block
      * @return the opacity
-     * @see {@link #getOpaqueFaces()}
+     * @see #getOpaqueFaces(Block) 
      */
     public abstract int getOpacity(Block block);
 
@@ -425,7 +425,6 @@ public abstract class BlockData extends BlockDataRegistry {
      *
      * @param block
      * @return the opacity
-     * @see {@link #getOpaqueFaces()}
      */
     public abstract BlockFaceSet getOpaqueFaces(Block block);
 

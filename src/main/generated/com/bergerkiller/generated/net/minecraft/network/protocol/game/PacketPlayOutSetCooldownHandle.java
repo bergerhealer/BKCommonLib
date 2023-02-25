@@ -12,7 +12,7 @@ import org.bukkit.Material;
 @Template.Optional
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutSetCooldown")
 public abstract class PacketPlayOutSetCooldownHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutSetCooldownClass} */
+    /** @see PacketPlayOutSetCooldownClass */
     public static final PacketPlayOutSetCooldownClass T = Template.Class.create(PacketPlayOutSetCooldownClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

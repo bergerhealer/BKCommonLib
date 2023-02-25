@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.core.IRegistry")
 public abstract class IRegistryHandle extends Template.Handle {
-    /** @See {@link IRegistryClass} */
+    /** @see IRegistryClass */
     public static final IRegistryClass T = Template.Class.create(IRegistryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

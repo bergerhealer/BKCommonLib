@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.server.level.PlayerChunkMap")
 public abstract class PlayerChunkMapHandle extends Template.Handle {
-    /** @See {@link PlayerChunkMapClass} */
+    /** @see PlayerChunkMapClass */
     public static final PlayerChunkMapClass T = Template.Class.create(PlayerChunkMapClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -103,7 +103,7 @@ public class DoubleOctreeIterator<T> implements Iterator<T> {
      * Gets the next entry storing the next value and coordinates
      * 
      * @return next entry
-     * @see {@link #next()}
+     * @see #next()
      */
     public DoubleOctree.Entry<T> nextEntry() {
         if (this.last_returned == null) {

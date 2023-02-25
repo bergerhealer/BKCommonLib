@@ -12,7 +12,7 @@ import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
  */
 @Template.InstanceType("net.minecraft.world.entity.boss.enderdragon.EntityEnderCrystal")
 public abstract class EntityEnderCrystalHandle extends EntityHandle {
-    /** @See {@link EntityEnderCrystalClass} */
+    /** @see EntityEnderCrystalClass */
     public static final EntityEnderCrystalClass T = Template.Class.create(EntityEnderCrystalClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

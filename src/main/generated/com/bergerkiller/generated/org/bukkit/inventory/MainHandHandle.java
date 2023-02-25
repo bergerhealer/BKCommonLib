@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("org.bukkit.inventory.MainHand")
 public abstract class MainHandHandle extends Template.Handle {
-    /** @See {@link MainHandClass} */
+    /** @see MainHandClass */
     public static final MainHandClass T = Template.Class.create(MainHandClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     public static final MainHandHandle LEFT = T.LEFT.getSafe();
     public static final MainHandHandle RIGHT = T.RIGHT.getSafe();

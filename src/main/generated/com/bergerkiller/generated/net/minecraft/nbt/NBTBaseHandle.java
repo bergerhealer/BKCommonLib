@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.nbt.NBTBase")
 public abstract class NBTBaseHandle extends Template.Handle {
-    /** @See {@link NBTBaseClass} */
+    /** @see NBTBaseClass */
     public static final NBTBaseClass T = Template.Class.create(NBTBaseClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
@@ -174,7 +174,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagString")
     public abstract static class NBTTagStringHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagStringClass} */
+        /** @see NBTTagStringClass */
         public static final NBTTagStringClass T = Template.Class.create(NBTTagStringClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -218,7 +218,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagByte")
     public abstract static class NBTTagByteHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagByteClass} */
+        /** @see NBTTagByteClass */
         public static final NBTTagByteClass T = Template.Class.create(NBTTagByteClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -263,7 +263,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagShort")
     public abstract static class NBTTagShortHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagShortClass} */
+        /** @see NBTTagShortClass */
         public static final NBTTagShortClass T = Template.Class.create(NBTTagShortClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -309,7 +309,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagInt")
     public abstract static class NBTTagIntHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagIntClass} */
+        /** @see NBTTagIntClass */
         public static final NBTTagIntClass T = Template.Class.create(NBTTagIntClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -354,7 +354,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagLong")
     public abstract static class NBTTagLongHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagLongClass} */
+        /** @see NBTTagLongClass */
         public static final NBTTagLongClass T = Template.Class.create(NBTTagLongClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -399,7 +399,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagFloat")
     public abstract static class NBTTagFloatHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagFloatClass} */
+        /** @see NBTTagFloatClass */
         public static final NBTTagFloatClass T = Template.Class.create(NBTTagFloatClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -444,7 +444,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagDouble")
     public abstract static class NBTTagDoubleHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagDoubleClass} */
+        /** @see NBTTagDoubleClass */
         public static final NBTTagDoubleClass T = Template.Class.create(NBTTagDoubleClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -489,7 +489,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagByteArray")
     public abstract static class NBTTagByteArrayHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagByteArrayClass} */
+        /** @see NBTTagByteArrayClass */
         public static final NBTTagByteArrayClass T = Template.Class.create(NBTTagByteArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -529,7 +529,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
      */
     @Template.InstanceType("net.minecraft.nbt.NBTTagIntArray")
     public abstract static class NBTTagIntArrayHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagIntArrayClass} */
+        /** @see NBTTagIntArrayClass */
         public static final NBTTagIntArrayClass T = Template.Class.create(NBTTagIntArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 
@@ -570,7 +570,7 @@ public abstract class NBTBaseHandle extends Template.Handle {
     @Template.Optional
     @Template.InstanceType("net.minecraft.nbt.NBTTagLongArray")
     public abstract static class NBTTagLongArrayHandle extends NBTBaseHandle {
-        /** @See {@link NBTTagLongArrayClass} */
+        /** @see NBTTagLongArrayClass */
         public static final NBTTagLongArrayClass T = Template.Class.create(NBTTagLongArrayClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
         /* ============================================================================== */
 

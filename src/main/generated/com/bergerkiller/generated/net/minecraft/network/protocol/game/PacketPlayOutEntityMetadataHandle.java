@@ -13,7 +13,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityMetadata")
 public abstract class PacketPlayOutEntityMetadataHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityMetadataClass} */
+    /** @see PacketPlayOutEntityMetadataClass */
     public static final PacketPlayOutEntityMetadataClass T = Template.Class.create(PacketPlayOutEntityMetadataClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

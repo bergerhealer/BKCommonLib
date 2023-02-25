@@ -75,7 +75,7 @@ public class ImmutableCachedSet<E> implements Iterable<E> {
      * up.
      *
      * @return New empty immutable player set backed by it's own cache
-     * @see {@link #createNew()}
+     * @see #createNew()
      */
     public static ImmutableCachedSet<Player> createNewPlayerSet() {
         ImmutableCachedSet<Player> set = createNew();

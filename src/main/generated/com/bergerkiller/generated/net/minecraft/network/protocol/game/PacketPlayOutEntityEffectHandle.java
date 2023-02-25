@@ -12,7 +12,7 @@ import org.bukkit.potion.PotionEffectType;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityEffect")
 public abstract class PacketPlayOutEntityEffectHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityEffectClass} */
+    /** @see PacketPlayOutEntityEffectClass */
     public static final PacketPlayOutEntityEffectClass T = Template.Class.create(PacketPlayOutEntityEffectClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

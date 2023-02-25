@@ -11,7 +11,7 @@ import org.bukkit.entity.Entity;
  */
 @Template.InstanceType("net.minecraft.network.protocol.game.PacketPlayOutEntityVelocity")
 public abstract class PacketPlayOutEntityVelocityHandle extends PacketHandle {
-    /** @See {@link PacketPlayOutEntityVelocityClass} */
+    /** @see PacketPlayOutEntityVelocityClass */
     public static final PacketPlayOutEntityVelocityClass T = Template.Class.create(PacketPlayOutEntityVelocityClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -9,7 +9,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
  */
 @Template.InstanceType("net.minecraft.CrashReportSystemDetails")
 public abstract class CrashReportSystemDetailsHandle extends Template.Handle {
-    /** @See {@link CrashReportSystemDetailsClass} */
+    /** @see CrashReportSystemDetailsClass */
     public static final CrashReportSystemDetailsClass T = Template.Class.create(CrashReportSystemDetailsClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

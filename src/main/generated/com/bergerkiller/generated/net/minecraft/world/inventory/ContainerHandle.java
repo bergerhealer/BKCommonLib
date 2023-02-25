@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Template.InstanceType("net.minecraft.world.inventory.Container")
 public abstract class ContainerHandle extends Template.Handle {
-    /** @See {@link ContainerClass} */
+    /** @see ContainerClass */
     public static final ContainerClass T = Template.Class.create(ContainerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

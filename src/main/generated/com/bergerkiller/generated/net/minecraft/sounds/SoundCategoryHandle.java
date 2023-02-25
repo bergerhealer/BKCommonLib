@@ -10,7 +10,7 @@ import com.bergerkiller.mountiplex.reflection.declarations.Template;
 @Template.Optional
 @Template.InstanceType("net.minecraft.sounds.SoundCategory")
 public abstract class SoundCategoryHandle extends Template.Handle {
-    /** @See {@link SoundCategoryClass} */
+    /** @see SoundCategoryClass */
     public static final SoundCategoryClass T = Template.Class.create(SoundCategoryClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

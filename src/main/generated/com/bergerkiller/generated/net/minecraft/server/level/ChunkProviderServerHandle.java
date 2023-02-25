@@ -13,7 +13,7 @@ import java.util.function.Consumer;
  */
 @Template.InstanceType("net.minecraft.server.level.ChunkProviderServer")
 public abstract class ChunkProviderServerHandle extends Template.Handle {
-    /** @See {@link ChunkProviderServerClass} */
+    /** @see ChunkProviderServerClass */
     public static final ChunkProviderServerClass T = Template.Class.create(ChunkProviderServerClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 

@@ -11,7 +11,7 @@ import java.util.Set;
  */
 @Template.InstanceType("net.minecraft.nbt.NBTTagCompound")
 public abstract class NBTTagCompoundHandle extends NBTBaseHandle {
-    /** @See {@link NBTTagCompoundClass} */
+    /** @see NBTTagCompoundClass */
     public static final NBTTagCompoundClass T = Template.Class.create(NBTTagCompoundClass.class, com.bergerkiller.bukkit.common.Common.TEMPLATE_RESOLVER);
     /* ============================================================================== */
 
