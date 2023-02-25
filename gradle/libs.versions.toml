@@ -1,0 +1,40 @@
+[versions]
+minecraft = "1.19.3"
+spigot = "1.19.3-R0.1-SNAPSHOT"
+netty = "4.1.42.Final"
+log4j = "2.17.0"
+mountiplex = "2.92"
+regionchangetracker = "1.2"
+timings = "1.0.4"
+gson = "2.8.9"
+viaversion = "3.2.1"
+vault = "1.7"
+protocollib = "4.4.0"
+cloud = "1.8.0-SNAPSHOT"
+commodore = "1.13"
+adventure = "4.12.0"
+adventure-platform-bukkit = "4.2.0"
+mockito = "2.22.0"
+junit = "4.13"
+
+[libraries]
+spigot = { module = "org.spigotmc:spigot", version.ref = "spigot" }
+spigot-api = { module = "org.spigotmc:spigot-api", version.ref = "spigot" }
+netty-all = { module = "io.netty:netty-all", version.ref = "netty" }
+log4j-api = { module = "org.apache.logging.log4j:log4j-api", version.ref = "log4j" }
+log4j-core = { module = "org.apache.logging.log4j:log4j-core", version.ref = "log4j" }
+mountiplex = { module = "com.bergerkiller.mountiplex:Mountiplex", version.ref = "mountiplex" }
+regionchangetracker = { module = "com.bergerkiller.bukkit.regionchangetracker:BKCommonLib-RegionChangeTracker-Core", version.ref = "regionchangetracker" }
+timings = { module = "co.aikar:minecraft-timings", version.ref = "timings" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+viaversion = { module = "us.myles:viaversion", version.ref = "viaversion" }
+vault = { module = "com.github.MilkBowl:VaultAPI", version.ref = "vault" }
+protocollib = { module = "com.comphenix.protocol:ProtocolLib-API", version.ref = "protocollib" }
+cloud-paper = { module = "org.bergerhealer.cloud.commandframework:cloud-paper", version.ref = "cloud" }
+cloud-annotations = { module = "org.bergerhealer.cloud.commandframework:cloud-annotations", version.ref = "cloud" }
+cloud-minecraft-extras = { module = "org.bergerhealer.cloud.commandframework:cloud-minecraft-extras", version.ref = "cloud" }
+commodore = { module = "me.lucko:commodore", version.ref = "commodore" }
+adventure-api = { module = "net.kyori:adventure-api", version.ref = "adventure" }
+adventure-platform-bukkit = { module = "net.kyori:adventure-platform-bukkit", version.ref = "adventure-platform-bukkit" }
+mockito-core = { module = "org.mockito:mockito-core", version.ref = "mockito" }
+junit = { module = "junit:junit", version.ref = "junit" }

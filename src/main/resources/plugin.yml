@@ -1,14 +1,14 @@
 name: BKCommonLib
 main: com.bergerkiller.bukkit.common.internal.CommonPlugin
 api-version: 1.13
-version: ${project.version}
-build: ${project.build.number}
-authors: [${project.authors}]
-load: startup
+version: ${version}
+build: ${build}
+authors: [${authors}]
+load: STARTUP
 description: Is used in all of my plugins to re-use common functions
 softdepend: [Vault, ProtocolLib]
 classdepend: [WorldEdit, FastAsyncWorldEdit, ViaVersion, LuckPerms, InteractiveBoard]
-dev-url: ${project.url}
+dev-url: ${url}
 preloader:
   hastebinServer: https://paste.traincarts.net
 permissions:
