@@ -58,7 +58,7 @@ dependencies {
     // Mountiplex is included in BKCommonLib at the same package
     api(libs.mountiplex)
     // Region change tracker is included in BKCommonLib for the region block change event
-    internal(libs.regionchangetracker)
+    api(libs.regionchangetracker)
     // Aikar's minecraft timings library, https://github.com/aikar/minecraft-timings
     internal(libs.timings) {
         isTransitive = false
