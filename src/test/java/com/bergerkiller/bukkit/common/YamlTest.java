@@ -1,6 +1,7 @@
 package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -1254,6 +1255,34 @@ public class YamlTest {
             }
             assertEquals(numLines, lines.size());
         }
+    }
+
+    @Test
+    public void testYamlPathMakeRelative() {
+        // Simple case
+        assertEquals(YamlPath.create("three.four"),
+                YamlPath.create("one.two.three.four")
+                        .makeRelative(YamlPath.create("one.two")));
+
+        // Root result
+        assertEquals(YamlPath.ROOT, YamlPath.create("one.two")
+                .makeRelative(YamlPath.create("one.two")));
+
+        // Single word result
+        assertEquals(YamlPath.create("three"),
+                YamlPath.create("one.two.three")
+                        .makeRelative(YamlPath.create("one.two")));
+
+        // Invalid / null result
+        assertEquals(null, YamlPath.create("one.two.three")
+                .makeRelative(YamlPath.create("six.two")));
+        assertEquals(null, YamlPath.create("one.two.three")
+                .makeRelative(YamlPath.create("one.seven")));
+
+        // Just in case, also check relative list indices
+        assertEquals(YamlPath.create("three.four[4]"),
+                YamlPath.create("one.two[2].three.four[4]")
+                        .makeRelative(YamlPath.create("one.two[2]")));
     }
 
     @Test

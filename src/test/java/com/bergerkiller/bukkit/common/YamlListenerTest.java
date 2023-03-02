@@ -94,7 +94,7 @@ public class YamlListenerTest {
 
         // Changing value should trigger an event
         root.set("key", "new_value");
-        listener.testOne("key");
+        listener.testOne("");
 
         // Changing to the same value should not trigger an event
         root.set("key", "new_value");
@@ -339,11 +339,11 @@ public class YamlListenerTest {
 
         // Changes when done on the original node
         newNode.set("key", "new_value");
-        listener.testOne("child.key");
+        listener.testOne("key");
         child.set("cc", "ee");
-        listener.testOne("child.childnode.cc");
+        listener.testOne("childnode.cc");
         child.set("kk", "ll");
-        listener.testMany("child.childnode", "child.childnode.kk");
+        listener.testMany("childnode", "childnode.kk");
     }
 
     /*

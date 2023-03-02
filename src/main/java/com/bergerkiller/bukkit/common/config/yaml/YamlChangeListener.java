@@ -12,7 +12,9 @@ public interface YamlChangeListener {
      * the parent node holding the children.
      *
      * @param path Yaml Path to the node or value that changed. This path
-     *             is relative to the root of the Yaml tree.
+     *             is relative to the node the listener was registered on.
+     *             If a path was specified when adding the listener, it
+     *             will be relative to that path.
      */
     void onNodeChanged(YamlPath path);
 }

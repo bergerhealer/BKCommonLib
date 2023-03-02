@@ -13,12 +13,14 @@ public class YamlPath {
 
     private final YamlPath parent;
     private final String name;
+    private final int depth;
     private final int hashcode;
 
     // Constructor for ROOT
     private YamlPath() {
         this.parent = null;
         this.name = "";
+        this.depth = 0;
         this.hashcode = 0;
     }
 
@@ -26,6 +28,7 @@ public class YamlPath {
     private YamlPath(YamlPath parent, String name) {
         this.parent = parent;
         this.name = name;
+        this.depth = parent.depth + 1;
         this.hashcode = this.name.hashCode() + 31 * this.parent.hashcode;
     }
 
@@ -189,6 +192,48 @@ public class YamlPath {
     }
 
     /**
+     * Creates a YamlPath which is this path, but relative to the absolute
+     * path specified. If no such path is possible, returns null. This
+     * method can also be used to check whether this path starts with
+     * the absolute path.<br>
+     * <br>
+     * If this path and the absolute path are equal, then
+     * {@link YamlPath#ROOT} is returned.
+     *
+     * @param absolutePath Absolute YamlPath relative to which a path
+     *                     must be found
+     * @return This path relative to absolutePath, or null if not possible
+     */
+    public YamlPath makeRelative(YamlPath absolutePath) {
+        // Number of elements this path is deeper than the absolute path
+        int depthDiff = this.depth() - absolutePath.depth();
+        if (depthDiff < 0) {
+            return null; // Impossible
+        } else if (depthDiff == 0) {
+            return this.equals(absolutePath) ? ROOT : null;
+        }
+
+        // Find the common parent which must be equal to the absolute path
+        // Collect all nodes in-between
+        YamlPath[] relativeParts = new YamlPath[depthDiff];
+        YamlPath commonParent = this;
+        do {
+            relativeParts[--depthDiff] = commonParent;
+            commonParent = commonParent.parent;
+        } while (depthDiff > 0);
+        if (!commonParent.equals(absolutePath)) {
+            return null;
+        }
+
+        // Okay! Create a new path with just the elements beyond commonParent
+        YamlPath result = YamlPath.ROOT;
+        for (YamlPath relativePart : relativeParts) {
+            result = relativePart.appendNameTo(result);
+        }
+        return result;
+    }
+
+    /**
      * Creates a child path of this path to a list element
      * 
      * @param listIndex The index of the element in the list
@@ -219,7 +264,7 @@ public class YamlPath {
      * @return depth, 0 if {@link #parent()} == null
      */
     public int depth() {
-        return (this.parent == null) ? 0 : this.parent.depth()+1;
+        return this.depth;
     }
 
     @Override
@@ -308,5 +353,18 @@ public class YamlPath {
             str.insert(0, this.name());
             str.insert(0, '[');
         }
+    }
+
+    /**
+     * Provides a yaml path
+     */
+    @FunctionalInterface
+    public interface Supplier {
+        /**
+         * Gets the path location of this entry or node
+         *
+         * @return yaml path
+         */
+        YamlPath getYamlPath();
     }
 }

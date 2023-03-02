@@ -19,7 +19,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
  * Stores the name, value, header and cached serialized YAML String.
  * Automatically regenerates the yaml when required.
  */
-public class YamlEntry implements Map.Entry<String, Object> {
+public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     private static final YamlChangeListener[] NO_LISTENERS = new YamlChangeListener[0];
     private final YamlNodeAbstract<?> parent;
     private YamlPath path;
@@ -63,6 +63,7 @@ public class YamlEntry implements Map.Entry<String, Object> {
      * 
      * @return path
      */
+    @Override
     public YamlPath getYamlPath() {
         return this.path;
     }

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 /**
  * Can handle node formatting lines to keep track of the currently active node
  */
-public class NodeBuilder {
+public class NodeBuilder implements YamlPath.Supplier {
 
     private LinkedList<String> nodes = new LinkedList<String>();
     private int indent;
@@ -157,6 +157,7 @@ public class NodeBuilder {
      * 
      * @return current path
      */
+    @Override
     public YamlPath getYamlPath() {
         YamlPath p = YamlPath.ROOT;
         for (String name : this.nodes) {

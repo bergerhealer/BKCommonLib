@@ -36,7 +36,7 @@ import com.bergerkiller.bukkit.common.utils.StringUtil;
  * 
  * @param <N> - Type of YamlNodeAbstract implementation
  */
-public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements Cloneable {
+public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements YamlPath.Supplier, Cloneable {
     protected YamlRoot _root;
     protected YamlEntry _entry;
     protected List<YamlEntry> _children;
@@ -118,6 +118,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * 
      * @return path
      */
+    @Override
     public YamlPath getYamlPath() {
         return this._entry.getYamlPath();
     }
@@ -161,6 +162,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @throws IllegalArgumentException if listener is null
      */
     public void addChangeListener(YamlChangeListener listener) {
+        listener = YamlChangeListenerRelative.create(this, listener);
         this._entry.addChangeListener(listener);
     }
 
@@ -173,6 +175,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @return True if the listener was removed, False otherwise
      */
     public boolean removeChangeListener(YamlChangeListener listener) {
+        listener = YamlChangeListenerRelative.create(this, listener);
         return this._entry.removeChangeListener(listener);
     }
 
@@ -199,6 +202,11 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     public boolean addChangeListener(String path, YamlChangeListener listener) {
         YamlEntry entry = this.getEntryIfExists(path);
         if (entry != null) {
+            if (entry.isAbstractNode()) {
+                listener = YamlChangeListenerRelative.create(entry.getAbstractNode(), listener);
+            } else {
+                listener = YamlChangeListenerRelative.create(entry, listener);
+            }
             entry.addChangeListener(listener);
             return true;
         }
@@ -216,7 +224,15 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      */
     public boolean removeChangeListener(String path, YamlChangeListener listener) {
         YamlEntry entry = this.getEntryIfExists(path);
-        return entry != null && entry.removeChangeListener(listener);
+        if (entry != null) {
+            if (entry.isAbstractNode()) {
+                listener = YamlChangeListenerRelative.create(entry.getAbstractNode(), listener);
+            } else {
+                listener = YamlChangeListenerRelative.create(entry, listener);
+            }
+            return entry.removeChangeListener(listener);
+        }
+        return false;
     }
 
     /**
