@@ -82,12 +82,20 @@ public class YamlRoot {
         return this._entries.get(parent.child(path));
     }
 
+    public YamlEntry getEntryIfExists(YamlPath parent, YamlPath relativePath) {
+        return this._entries.get(YamlPath.join(parent, relativePath));
+    }
+
     public YamlEntry getEntryIfExists(YamlPath path) {
         return this._entries.get(path);
     }
 
     public YamlEntry getEntry(YamlPath parent, String path) {
         return getEntry(parent.child(path));
+    }
+
+    public YamlEntry getEntry(YamlPath parent, YamlPath relativePath) {
+        return getEntry(YamlPath.join(parent, relativePath));
     }
 
     public YamlEntry getEntry(YamlPath path) {

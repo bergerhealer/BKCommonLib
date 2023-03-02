@@ -234,6 +234,43 @@ public class YamlPath {
     }
 
     /**
+     * Joins two YAML paths together, making the second path be parented
+     * to the first path. If either path is {@link YamlPath#ROOT}, returns
+     * the other path in full.
+     *
+     * @param firstPath First path
+     * @param secondPath Second path to append to first path
+     * @return Joined path
+     * @see #makeRelative(YamlPath)
+     */
+    public static YamlPath join(YamlPath firstPath, YamlPath secondPath) {
+        if (firstPath.isRoot()) {
+            return secondPath;
+        } else if (secondPath.isRoot()) {
+            return firstPath;
+        }
+
+        // Convert second path into path parts
+        // This avoids having to do nasty slow recursion to reverse-iterate
+        int depth = secondPath.depth;
+        YamlPath[] parts = new YamlPath[depth];
+        {
+            YamlPath p = secondPath;
+            while (--depth >= 0) {
+                parts[depth] = p;
+                p = p.parent;
+            }
+        }
+
+        // Make a new path
+        YamlPath result = firstPath;
+        for (YamlPath p : parts) {
+            result = result.childWithName(p);
+        }
+        return result;
+    }
+
+    /**
      * Creates a child path of this path to a list element
      * 
      * @param listIndex The index of the element in the list

@@ -456,6 +456,23 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Checks if a node is contained at the relative YamlPath specified
+     *
+     * @param relativePath Relative YamlPath
+     * @return True if it is a node, False if not
+     */
+    public boolean isNode(YamlPath relativePath) {
+        YamlEntry entryAtPath = this.getEntryIfExists(relativePath);
+        if (entryAtPath != null) {
+            Object value = entryAtPath.getValue();
+            if (value instanceof YamlNodeAbstract && !(value instanceof YamlListNode)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Gets the node at the path specified, creates one if not present
      *
      * @param path to get a node
@@ -464,6 +481,17 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     @SuppressWarnings("unchecked")
     public N getNode(String path) {
         return (N) this.getEntry(path).createNodeValue();
+    }
+
+    /**
+     * Gets the node at the relative YamlPath specified, creates one if not present
+     *
+     * @param relativePath Relative YamlPath to get or create a node at
+     * @return the node
+     */
+    @SuppressWarnings("unchecked")
+    public N getNode(YamlPath relativePath) {
+        return (N) this.getEntry(relativePath).createNodeValue();
     }
 
     /**
@@ -1260,8 +1288,16 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
         return this._root.getEntryIfExists(this._entry.getYamlPath(), path);
     }
 
+    protected YamlEntry getEntryIfExists(YamlPath relativePath) {
+        return this._root.getEntryIfExists(this._entry.getYamlPath(), relativePath);
+    }
+
     protected YamlEntry getEntry(String path) {
         return this._root.getEntry(this._entry.getYamlPath(), path);
+    }
+
+    protected YamlEntry getEntry(YamlPath relativePath) {
+        return this._root.getEntry(this._entry.getYamlPath(), relativePath);
     }
 
     protected void removeChildEntry(YamlEntry entry) {

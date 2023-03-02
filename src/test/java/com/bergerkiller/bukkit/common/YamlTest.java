@@ -28,6 +28,27 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 
 public class YamlTest {
 
+    @Test
+    public void testYamlNodeAtRelativeYamlPath() {
+        YamlNode root = new YamlNode();
+        YamlNode child = root.getNode("one");
+        YamlNode subchild = child.getNode("two");
+        subchild.set("three", "value");
+
+        // ROOT
+        assertTrue(root.isNode(YamlPath.ROOT));
+        assertEquals(root, root.getNode(YamlPath.ROOT));
+        // Level one
+        assertTrue(root.isNode(YamlPath.create("one")));
+        assertEquals(child, root.getNode(YamlPath.create("one")));
+        // Level two
+        assertTrue(root.isNode(YamlPath.create("one.two")));
+        assertEquals(subchild, root.getNode(YamlPath.create("one.two")));
+        // Level two from one
+        assertTrue(child.isNode(YamlPath.create("two")));
+        assertEquals(subchild, child.getNode(YamlPath.create("two")));
+    }
+
     public static enum TestEnum {
         VALUE_ONE,
         VALUE_TWO_WITH_SUBCLASS {
@@ -1255,6 +1276,25 @@ public class YamlTest {
             }
             assertEquals(numLines, lines.size());
         }
+    }
+
+    @Test
+    public void testYamlPathJoin() {
+        // Simple case
+        assertEquals(YamlPath.create("one.two.three.four"), YamlPath.join(
+                YamlPath.create("one.two"),
+                YamlPath.create("three.four")));
+
+        // Single words
+        assertEquals(YamlPath.create("one.two"), YamlPath.join(
+                YamlPath.create("one"),
+                YamlPath.create("two")));
+
+        // With ROOT
+        assertEquals(YamlPath.create("one.two"), YamlPath.join(
+                YamlPath.create("one.two"), YamlPath.ROOT));
+        assertEquals(YamlPath.create("one.two"), YamlPath.join(
+                YamlPath.ROOT, YamlPath.create("one.two")));
     }
 
     @Test

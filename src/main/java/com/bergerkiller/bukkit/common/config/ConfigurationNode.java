@@ -86,6 +86,11 @@ public class ConfigurationNode extends YamlNodeAbstract<ConfigurationNode> {
     }
 
     @Override
+    public ConfigurationNode getNode(YamlPath relativePath) {
+        return super.getNode(relativePath);
+    }
+
+    @Override
     public ConfigurationNode clone() {
         return super.clone();
     }
