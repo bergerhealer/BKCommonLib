@@ -40,7 +40,8 @@ public class Common {
             "Common:EntityUtil:PortalWaitDelay",
             "Common:MapDisplay:BoundsChangeViewFix",
             "Common:EntitySlimeHandle",
-            "Common:PlayerGameInfo"
+            "Common:PlayerGameInfo",
+            "Common:Yaml:BetterChangeListeners"
     ).collect(Collectors.toSet());
 
     /**
