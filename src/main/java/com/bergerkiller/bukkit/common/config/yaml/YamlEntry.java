@@ -127,6 +127,19 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
     }
 
     /**
+     * Adds multiple change listeners
+     *
+     * @param listeners Listeners to add
+     */
+    public void addChangeListeners(YamlChangeListener[] listeners) {
+        if (listeners != NO_LISTENERS) {
+            for (YamlChangeListener listener : listeners) {
+                addChangeListener(listener);
+            }
+        }
+    }
+
+    /**
      * Removes a change listener from this node that was previously added
      * using {@link #addChangeListener(YamlChangeListener)}. To find the listener,
      * {@link Object#equals(Object)} is used.
@@ -383,6 +396,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
             }
         }
 
+        YamlChangeListener[] listenersToSet = NO_LISTENERS;
         YamlNodeAbstract<?> newNode;
         if (value instanceof YamlNodeAbstract<?> && ((newNode = (YamlNodeAbstract<?>) value)._entry != this)) {
             // Assigning to the root node doesn't work very well
@@ -401,6 +415,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                     value = newNode;
                 } else {
                     // Replace original entry with a clone for the original parent
+                    // This will NOT keep listeners, which are tightly coupled with the value still
                     newNode.getYamlParent().cloneChildEntry(index);
                 }
             }
@@ -410,6 +425,12 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
 
             // Take over certain properties of the new node
             this.assignProperties(newNode._entry);
+
+            // Listeners must be kept, but shouldn't be around while the value
+            // change callback fires. From the POV of the node set, nothing changed.
+            // But previous (parent) listeners do see this value change.
+            // So, defer it to later
+            listenersToSet = newNode._entry.listeners;
 
             // Re-assign the node's entry and root to refer to ourself
             newNode._entry = this;
@@ -422,7 +443,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                     YamlEntry childEntry = iter.next();
                     YamlPath newChildPath = this.path.child(childEntry.path.name());
                     StringTreeNode newChildYaml = this.yaml.add();
-                    iter.set(childEntry.copyToParent(newNode, newNode._root, newChildPath, newChildYaml));
+                    iter.set(childEntry.copyToParent(newNode, newNode._root, newChildPath, newChildYaml, true));
                 }
             }
         } else {
@@ -434,6 +455,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
         this.value = value;
         this.markYamlChanged();
         this.callChangeListeners();
+        this.addChangeListeners(listenersToSet);
         return oldValue;
     }
 
@@ -444,7 +466,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
         if (this.isAbstractNode()) {
             YamlNodeAbstract<?> node = this.getAbstractNode();
             node._root.removeChildEntries(node);
-            this.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
+            this.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode(), false);
         }
     }
 
@@ -454,22 +476,28 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
      * All nodes and values get a new entry with the updated path and yaml.<br>
      * <br>
      * <b>Note: </b>this entry is not removed from the original root and parent, so the entry can be repurposed
-     * to store different data. Call {@link YamlRoot#removeEntry(entry)} to remove this entry before
-     * calling this function if this is desired, or use {@link YamlRoot#detach(entry)}.
+     * to store different data. Call {@link YamlRoot#removeEntry(YamlEntry)} to remove this entry before
+     * calling this function if this is desired, or use {@link YamlRoot#detach(YamlEntry)}.
      * 
      * @param newParent  The new parent node for the entry, null if it is a root node
      * @param newRoot    The new root to store the entry in
      * @param newPath    The new (root) path of the entry
      * @param newYaml    The new yaml String tree node for the entry
+     * @param copyListeners  Whether to copy registered change listeners from this entry to the new entry
      * @return The new entry. It is up to the caller to assign the entry to the new parent node's children.
      */
-    protected YamlEntry copyToParent(YamlNodeAbstract<?> newParent, YamlRoot newRoot, YamlPath newPath, StringTreeNode newYaml) {
+    protected YamlEntry copyToParent(YamlNodeAbstract<?> newParent, YamlRoot newRoot, YamlPath newPath, StringTreeNode newYaml, boolean copyListeners) {
         // Create the replacement entry, which is at a new path
         // Preserve certain properties from the original entry, such as the header
         YamlEntry newEntry = new YamlEntry(newParent, newPath, newYaml);
         newEntry.assignProperties(this);
         newEntry.value = this.value;
         newRoot.putEntry(newEntry);
+
+        // Listeners, if any
+        if (copyListeners) {
+            newEntry.addChangeListeners(this.listeners);
+        }
 
         // Special handling for nodes
         if (this.isAbstractNode()) {
@@ -484,7 +512,7 @@ public class YamlEntry implements Map.Entry<String, Object>, YamlPath.Supplier {
                 YamlEntry childEntry = iter.next();
                 YamlPath newChildPath = newPath.child(childEntry.getKey());
                 StringTreeNode newChildYaml = newYaml.add();
-                iter.set(childEntry.copyToParent(node, newRoot, newChildPath, newChildYaml));
+                iter.set(childEntry.copyToParent(node, newRoot, newChildPath, newChildYaml, copyListeners));
             }
         }
 

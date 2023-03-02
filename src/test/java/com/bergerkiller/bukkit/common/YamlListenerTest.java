@@ -19,6 +19,42 @@ public class YamlListenerTest {
     private final Listener listener = new Listener();
 
     @Test
+    public void testYamlListenerOnParentMigration() {
+        YamlNode root = new YamlNode();
+        YamlNode child = root.getNode("node");
+        child.set("key", "valueA");
+
+        child.addChangeListener(listener);
+        listener.reset();
+
+        // Make the child node its own node, detached from root
+        // It should still fire events
+        child.remove();
+        listener.testNone();
+        child.set("key", "valueB");
+        listener.testOne("key");
+
+        // Assign the node to root again, but under a different node name
+        // It should still fire events
+        root.set("newnode", child);
+        listener.testNone();
+        child.set("key", "valueC");
+        listener.testOne("key");
+
+        // Hard-assign the node to a new root
+        // Listeners should now work for the new root, but the leftover copy
+        // at the original location should no longer fire events.
+        YamlNode newRoot = new YamlNode();
+        newRoot.set("mynode", child);
+        listener.testNone();
+        child.set("key", "valueD");
+        listener.testOne("key");
+        assertEquals("valueC", root.get("newnode.key"));
+        root.set("newnode.key", "wah!");
+        listener.testNone();
+    }
+
+    @Test
     public void testYamlListenerOnSetToRemoveField() {
         YamlNode root = new YamlNode();
         YamlNode node = root.getNode("node");
@@ -284,7 +320,7 @@ public class YamlListenerTest {
     }
 
     /*
-     * Tests that a listener added to a node is removed
+     * Tests that a listener added to a node is KEPT
      * once added to a new (root) node
      */
     @Test
@@ -302,13 +338,13 @@ public class YamlListenerTest {
         listener.testNone();
 
         newNode.set("key", "new_value");
-        listener.testNone();
+        listener.testOne("key");
 
         child.set("cc", "ee");
-        listener.testNone();
+        listener.testOne("childnode.cc");
 
         child.set("kk", "ll");
-        listener.testNone();
+        listener.testMany("childnode", "childnode.kk");
     }
 
     /*

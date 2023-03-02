@@ -26,7 +26,9 @@ public class YamlRoot {
     /**
      * Detaches an entry from this root. If the entry is a node, the node is given a new
      * root. The entry is not removed from the parent node, which is the responsibility
-     * of the caller. After detaching the input entry will not refer to anything.
+     * of the caller. After detaching the input entry will not refer to anything.<br>
+     * <br>
+     * Listeners registered on this entry or its children are migrated to the new copy.
      * 
      * @param entry The entry to detach
      */
@@ -34,7 +36,7 @@ public class YamlRoot {
         this.removeEntry(entry);
         if (entry.isAbstractNode()) {
             this.removeChildEntries(entry.getAbstractNode());
-            entry.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode());
+            entry.copyToParent(null, new YamlRoot(), YamlPath.ROOT, new StringTreeNode(), true);
         }
     }
 
