@@ -19,6 +19,73 @@ public class YamlListenerTest {
     private final Listener listener = new Listener();
 
     @Test
+    public void testYamlListenerOnSetToRemoveField() {
+        YamlNode root = new YamlNode();
+        YamlNode node = root.getNode("node");
+        node.set("one", "valueA");
+        node.set("two", "valueB");
+
+        root.addChangeListener(listener);
+        listener.reset();
+
+        // Set only one, leave out two. The removal of two should be notified
+        // as a change to 'node's children
+        YamlNode repl = new YamlNode();
+        repl.set("one", "valueA");
+        node.setTo(repl);
+
+        listener.testOne("node");
+    }
+
+    @Test
+    public void testYamlListenerOnSetToOverwriteDeep() {
+        YamlNode root = new YamlNode();
+        YamlNode sub = root.getNode("sub");
+        YamlNode node = sub.getNode("node");
+        node.set("one", "valueA");
+        node.set("two", "valueB");
+        node.set("three", "valueC");
+
+        root.addChangeListener(listener);
+        listener.reset();
+
+        // Set to will change value of 'one', remove 'three' and create 'four'
+        // The changed value and the created value should be notified
+        // The removal should not be, as that's part of notifying the parent children changed
+        YamlNode subrepl = new YamlNode();
+        YamlNode repl = subrepl.getNode("node");
+        repl.set("one", "valueD");
+        repl.set("two", "valueB");
+        repl.set("four", "valueE");
+        sub.setTo(subrepl);
+
+        listener.testMany("sub.node.one", "sub.node.four", "sub.node");
+    }
+
+    @Test
+    public void testYamlListenerOnSetToOverwrite() {
+        YamlNode root = new YamlNode();
+        YamlNode node = root.getNode("node");
+        node.set("one", "valueA");
+        node.set("two", "valueB");
+        node.set("three", "valueC");
+
+        root.addChangeListener(listener);
+        listener.reset();
+
+        // Set to will change value of 'one', remove 'three' and create 'four'
+        // The changed value and the created value should be notified
+        // The removal should not be, as that's part of notifying the parent children changed
+        YamlNode repl = new YamlNode();
+        repl.set("one", "valueD");
+        repl.set("two", "valueB");
+        repl.set("four", "valueE");
+        node.setTo(repl);
+
+        listener.testMany("node.one", "node.four", "node");
+    }
+
+    @Test
     public void testYamlListenerOnValue() {
         YamlNode root = new YamlNode();
         root.set("key", "value");

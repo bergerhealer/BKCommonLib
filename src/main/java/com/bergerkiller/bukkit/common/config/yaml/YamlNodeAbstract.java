@@ -1007,6 +1007,9 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                     .collect(Collectors.toCollection(HashSet::new));
         }
 
+        // Got to notify the parent changed when a new node is inserted / nodes are removed
+        boolean parentChanged = false;
+
         // Perform copying of data
         for (YamlEntry child : this._children) {
             if (removeOthers) {
@@ -1031,6 +1034,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             if (isCloneEmpty || (childClone = clone._root.getEntryIfExists(childPath)) == null) {
                 childClone = clone.createChildEntry(clone._children.size(), childPath);
                 isNewNode = true;
+                parentChanged = true;
             }
 
             childClone.assignProperties(child);
@@ -1051,6 +1055,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             } else if (isNewNode) {
                 // Can set instantly, is a new node and yaml will regen
                 childClone.value = child.value;
+                childClone.callChangeListeners();
             } else {
                 // Use setValue, must refresh
                 childClone.setValue(child.value);
@@ -1069,9 +1074,14 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
                     int index = clone._children.indexOf(childCloneToRemove);
                     if (index != -1) {
                         clone.removeChildEntryAtWithoutEvent(index);
+                        parentChanged = true;
                     }
                 }
             }
+        }
+
+        // If parent (this node) has any child nodes/keys added or removed, notify that too
+        if (parentChanged) {
             clone._entry.callChangeListeners();
         }
     }
