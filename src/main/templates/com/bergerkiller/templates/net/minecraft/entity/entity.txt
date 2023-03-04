@@ -343,12 +343,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 
 #if version >= 1.18
     public boolean isLastAndCurrentPositionDifferent() {
-        return instance.getX() != instance.xo || instance.getY() != instance.yo || instance.getZ() != instance.zo ||
+        return instance.getX() != instance.xOld || instance.getY() != instance.yOld || instance.getZ() != instance.zOld ||
                instance.getYRot() != instance.yRotO || instance.getXRot() != instance.xRotO;
     }
 #elseif version >= 1.17
     public boolean isLastAndCurrentPositionDifferent() {
-        return instance.locX() != instance.xo || instance.locY() != instance.yo || instance.locZ() != instance.zo ||
+        return instance.locX() != instance.xOld || instance.locY() != instance.yOld || instance.locZ() != instance.zOld ||
                instance.getYRot() != instance.yRotO || instance.getXRot() != instance.xRotO;
     }
 #elseif version >= 1.15
