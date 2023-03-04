@@ -165,9 +165,9 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
 #endif
 
 #if version >= 1.17
-    public double lastX:xo;
-    public double lastY:yo;
-    public double lastZ:zo;
+    public double lastX:xOld;
+    public double lastY:yOld;
+    public double lastZ:zOld;
 #else
     public double lastX;
     public double lastY;
