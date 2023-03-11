@@ -5,7 +5,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
@@ -469,53 +471,35 @@ public class YamlSerializer {
         }
     }
 
+    // These are various words that have special meaning in the YAML spec
+    // Unfortunately snakeyaml has many versions of booleans supported as well
+    private static final HashSet<String> SPECIAL_WORDS = new HashSet<>(Arrays.asList(
+            "", /* exports as '' */
+            "inf", "Inf", "INF", /* float infinity */
+            "nan", "NaN", "NAN", /* float not-a-number */
+            "null", "Null", "NULL", /* null */
+            "y", "Y", "yes", "Yes", "YES",
+            "n", "N", "no", "No", "NO", /* <robotnik>NO!</robotnik> */
+            "on", "On", "ON",
+            "off", "Off", "OFF",
+            "true", "True", "TRUE",
+            "false", "False", "FALSE"
+    ));
+
     // Checks whether a String can be written as a String literal, without ' or "
     // This is a fast check for the most common case of only a-zA-Z key names
     private boolean canWriteStringLiteral(String str, boolean isKey) {
-        int len = str.length();
-        if (len == 0) {
-            return false; // ''
-        }
-
-        int i = 0;
-        char c = str.charAt(i);
-        if (len == 3 && (c == 'i' || c == 'I')) {
-            // Check for 'inf'
-            c = str.charAt(++i);
-            if (c == 'n' || c == 'N') {
-                c = str.charAt(++i);
-                if (c == 'f' || c == 'F') {
-                    return false; // 'inf'
-                }
-            }
-        } else if (len == 3 && (c == 'n' || c == 'N')) {
-            // Check for 'nan'
-            c = str.charAt(++i);
-            if (c == 'a' || c == 'A') {
-                c = str.charAt(++i);
-                if (c == 'n' || c == 'N') {
-                    return false; // 'nan'
-                }
-            }
-        } else if (len == 4 && (c == 'n' || c == 'N')) {
-            // Check for 'null'
-            c = str.charAt(++i);
-            if (c == 'u' || c == 'U') {
-                c = str.charAt(++i);
-                if (c == 'l' || c == 'L') {
-                    c = str.charAt(++i);
-                    if (c == 'l' || c == 'L') {
-                        return false; // 'null'
-                    }
-                }
-            }
+        if (SPECIAL_WORDS.contains(str)) {
+            return false;
         }
 
         // Only alphanumeric characters permitted
         boolean hasDigits = false;
         boolean hasSpecial = false;
         boolean hasLetters = false;
-        for (; i != len; c = str.charAt(i++)) {
+        int len = str.length();
+        for (int i = 0; i < len; i++) {
+            char c = str.charAt(i);
             if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')) {
                 hasLetters = true;
                 continue;

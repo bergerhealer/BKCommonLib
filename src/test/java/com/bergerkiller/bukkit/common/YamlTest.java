@@ -29,6 +29,35 @@ import com.bergerkiller.mountiplex.MountiplexUtil;
 public class YamlTest {
 
     @Test
+    public void testSpecialStringValues() {
+        List<String> specialValues = Arrays.asList(
+                "",
+                "inf", "Inf", "INF",
+                "nan", "NaN", "NAN",
+                "null", "Null", "NULL",
+                "y", "Y", "yes", "Yes", "YES",
+                "n", "N", "no", "No", "NO",
+                "on", "On", "ON",
+                "off", "Off", "OFF",
+                "true", "True", "TRUE",
+                "false", "False", "FALSE",
+                "0", "-1", "1e-5", "1.0005", "1_000_000");
+        for (String specialValue : specialValues) {
+            YamlNode root = new YamlNode();
+            root.set("field", specialValue);
+            Object value = root.get("field");
+            assertEquals(String.class, value.getClass());
+            assertEquals(specialValue, value);
+
+            YamlNode a = new YamlNode();
+            a.loadFromString(root.toString());
+            value = a.get("field");
+            assertEquals("Type failure for '" + specialValue + "'", String.class, value.getClass());
+            assertEquals(specialValue, value);
+        }
+    }
+
+    @Test
     public void testYamlNodeAtRelativeYamlPath() {
         YamlNode root = new YamlNode();
         YamlNode child = root.getNode("one");
