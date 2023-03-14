@@ -638,7 +638,7 @@ public class Model extends ModelInfo {
                         return;
                     }
 
-                    item.setDurability((short) (damageDbl * maxDurability));
+                    item.setDurability((short) ((int) (damageDbl * maxDurability) + 1));
                 }
 
                 @Override
