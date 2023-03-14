@@ -190,7 +190,7 @@ public class MapResourcePackDownloadedArchive implements MapResourcePackArchive 
                 } else {
                     con.addRequestProperty("User-Agent", "BKCommonLib/" + CommonPlugin.getInstance().getVersion());
                 }
-                con.setReadTimeout(10000);
+                con.setReadTimeout(60000);
 
                 // Check for redirects
                 if (con instanceof HttpURLConnection) {
