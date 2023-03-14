@@ -17,6 +17,7 @@ class MinecraftVersionDiscovery {
     private final String NMS_ROOT_VERSIONED;
     private final String CB_ROOT_VERSIONED;
     private Class<?> typeMinecraftServer;
+    private Class<?> typeWorldVersion;
     private Class<?> typeMinecraftVersion;
     private Class<?> typeSharedConstants;
     private Class<?> typeGameVersion;
@@ -49,6 +50,8 @@ class MinecraftVersionDiscovery {
         } catch (ClassNotFoundException ex) {
             typeSharedConstants = tryLoadClass(NMS_ROOT_VERSIONED + ".SharedConstants");
         }
+
+        typeWorldVersion = tryLoadClass("net.minecraft.WorldVersion");
 
         if (typeMinecraftServer != null) {
             try {
@@ -118,7 +121,7 @@ class MinecraftVersionDiscovery {
         // But we do know what the return type is, so it's pretty easy to find.
         // If there is no server instance it cannot be used, because then the shared constants class static
         // fields aren't initialized yet (all null) and this will just fail.
-        if (Bukkit.getServer() != null && typeSharedConstants != null && typeGameVersion != null) {
+        if (Bukkit.getServer() != null && typeSharedConstants != null && (typeGameVersion != null || typeWorldVersion != null)) {
             Method m = findStaticGetGameVersionMethod(typeSharedConstants); // getGameVersion()
             if (m != null) {
                 Bukkit.getVersion(); // This might initialize some stuff, just in case!
@@ -141,7 +144,7 @@ class MinecraftVersionDiscovery {
         // This method, called 'tryDetectVersion', does all the work of reading from a stored json
         // file and decode it into a GameVersion. If it succeeds, all is well. This method will also
         // work if no server instance is initialized yet (under test), but it is slower.
-        if (typeMinecraftVersion != null && typeGameVersion != null) {
+        if (typeMinecraftVersion != null && (typeGameVersion != null || typeWorldVersion != null)) {
             Method m = findStaticGetGameVersionMethod(typeMinecraftVersion); // tryDetectVersion()
             if (m != null) {
                 Object gameVersion = null;
@@ -154,7 +157,7 @@ class MinecraftVersionDiscovery {
                 if (gameVersion != null) {
                     return getGameVersionName(gameVersion);
                 }
-            } else {
+            } else if (typeGameVersion == null) {
                 Logging.LOGGER.log(Level.WARNING, "Failed to find MinecraftVersion::tryDetectVersion()");
             }
         }
@@ -224,35 +227,69 @@ class MinecraftVersionDiscovery {
     }
 
     private Method findStaticGetGameVersionMethod(Class<?> type) {
+        Method alternative = null;
         for (Method m : type.getDeclaredMethods()) {
-            if (m.getParameterCount() == 0 &&
-                    typeGameVersion.isAssignableFrom(m.getReturnType()) &&
-                Modifier.isStatic(m.getModifiers())
-            ) {
-                return m;
+            // Only check for static methods without any arguments (getters)
+            if (m.getParameterCount() != 0 || !Modifier.isStatic(m.getModifiers())) {
+                continue;
+            }
+
+            // Must either return GameVersion (ideal) or WorldVersion
+            Class<?> rtype = m.getReturnType();
+            if (typeGameVersion != null && typeGameVersion.isAssignableFrom(rtype)) {
+                return m; // Ideal! Use this right away.
+            } else if (typeWorldVersion != null && typeWorldVersion.isAssignableFrom(rtype)) {
+                alternative = m; // WorldVersion is more annoying to use, fallback.
             }
         }
-        return null;
+        return alternative;
     }
 
     private String getGameVersionName(Object gameVersion) throws VersionIdentificationFailureException {
-        Method getNameMethod = null;
-        try {
-            getNameMethod = Resolver.resolveAndGetDeclaredMethod(this.typeGameVersion, "getName");
-            if (!getNameMethod.getReturnType().equals(String.class)) {
-                getNameMethod = null;
+        if (typeGameVersion != null && typeGameVersion.isInstance(gameVersion)) {
+            // bridge GameVersion getName() - this isn't obfuscated anymore which is nice
+            Method getNameMethod = null;
+            try {
+                getNameMethod = Resolver.resolveAndGetDeclaredMethod(this.typeGameVersion, "getName");
+                if (!getNameMethod.getReturnType().equals(String.class)) {
+                    getNameMethod = null;
+                }
+            } catch (NoSuchMethodException ex) {
+                /* Failed */
             }
-        } catch (NoSuchMethodException ex) {
-            /* Failed */
-        }
-        if (getNameMethod == null) {
-            throw new VersionIdentificationFailureException("Method String GameVersion::getName() does not exist");
-        }
+            if (getNameMethod == null) {
+                throw new VersionIdentificationFailureException("Method String GameVersion::getName() does not exist");
+            }
 
-        try {
-            return (String) getNameMethod.invoke(gameVersion);
-        } catch (Throwable t) {
-            throw new VersionIdentificationFailureException(t);
+            try {
+                return (String) getNameMethod.invoke(gameVersion);
+            } catch (Throwable t) {
+                throw new VersionIdentificationFailureException(t);
+            }
+        } else if (typeWorldVersion != null && typeWorldVersion.isInstance(gameVersion)) {
+            // 1.19.4+ doesn't implement GameVersion anymore, instead having two (or more) obfuscated String getters
+            for (Method m : typeWorldVersion.getMethods()) {
+                if (m.getReturnType() != String.class || m.getParameterCount() > 0) {
+                    continue;
+                }
+                int mod = m.getModifiers();
+                if (Modifier.isStatic(mod) || !Modifier.isPublic(mod)) {
+                    continue;
+                }
+
+                // Candidate method. Just call it and see if it outputs something we expect can can use
+                try {
+                    String version = (String) m.invoke(gameVersion);
+                    if (version.contains(".")) {
+                        return version;
+                    }
+                } catch (Throwable t) {
+                    Logging.LOGGER.log(Level.WARNING, "Failed to invoke " + m.getName() + " to get version", t);
+                }
+            }
+            throw new VersionIdentificationFailureException("Could not identify version name getter in WorldVersion");
+        } else {
+            throw new VersionIdentificationFailureException("Unknown game version type: " + gameVersion.getClass().getName());
         }
     }
 

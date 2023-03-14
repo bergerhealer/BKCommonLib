@@ -1,6 +1,6 @@
 [versions]
-minecraft = "1.19.3"
-spigot = "1.19.3-R0.1-SNAPSHOT"
+minecraft = "1.19.4"
+spigot = "1.19.4-R0.1-SNAPSHOT"
 netty = "4.1.42.Final"
 log4j = "2.17.0"
 mountiplex = "2.93"

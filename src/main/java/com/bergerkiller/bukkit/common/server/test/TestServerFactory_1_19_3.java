@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.server.CommonServerBase;
@@ -245,8 +246,14 @@ class TestServerFactory_1_19_3 extends TestServerFactory {
             Object featureFlagSet = createFromCode(Class.forName("net.minecraft.world.level.WorldDataConfiguration"),
                                                    "return WorldDataConfiguration.DEFAULT.enabledFeatures();");
             int functionPermissionLevel = 2;
-            Executor executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
-                    "bootstrapExecutor").invoke(null);
+            Executor executor1;
+            if (CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
+                // They now have some hidden threadpool crap going on. So just don't bother.
+                executor1 = newThreadExecutor();
+            } else {
+                executor1 = (Executor) Resolver.resolveAndGetDeclaredMethod(Class.forName("net.minecraft.SystemUtils"),
+                        "bootstrapExecutor").invoke(null);
+            }
             Executor executor2 = newThreadExecutor();
             Class<?> dataPackResourcesType = Class.forName("net.minecraft.server.DataPackResources");
             Method startLoadingMethod = Resolver.resolveAndGetDeclaredMethod(dataPackResourcesType, "loadResources",
