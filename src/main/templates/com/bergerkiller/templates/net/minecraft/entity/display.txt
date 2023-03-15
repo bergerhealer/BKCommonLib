@@ -1,0 +1,78 @@
+package net.minecraft.world.entity;
+
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+// Since 1.19.4
+optional class Display extends Entity {
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_START_DELTA_TICKS_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_INTERPOLATION_DURATION_ID;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Vector3f> DATA_TRANSLATION_ID;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Vector3f> DATA_SCALE_ID;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Quaternionf> DATA_LEFT_ROTATION_ID;
+    private static optional final (DataWatcher.Key<Object>) DataWatcherObject<Quaternionf> DATA_RIGHT_ROTATION_ID;
+    private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_BILLBOARD_RENDER_CONSTRAINTS_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BRIGHTNESS_OVERRIDE_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_VIEW_RANGE_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHADOW_RADIUS_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_SHADOW_STRENGTH_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_WIDTH_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEIGHT_ID;
+    private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_GLOW_COLOR_OVERRIDE_ID;
+
+    <code>
+    public static final Key<Integer> DATA_INTERPOLATION_START_DELTA_TICKS = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_START_DELTA_TICKS_ID, -1);
+    public static final Key<Integer> DATA_INTERPOLATION_DURATION = Key.Type.INTEGER.createKey(T.DATA_INTERPOLATION_DURATION_ID, -1);
+    public static final Key<org.bukkit.util.Vector> DATA_TRANSLATION = Key.Type.JOML_VECTOR3F.createKey(T.DATA_TRANSLATION_ID, -1);
+    public static final Key<org.bukkit.util.Vector> DATA_SCALE = Key.Type.JOML_VECTOR3F.createKey(T.DATA_SCALE_ID, -1);
+    public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_LEFT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_LEFT_ROTATION_ID, -1);
+    public static final Key<com.bergerkiller.bukkit.common.math.Quaternion> DATA_RIGHT_ROTATION = Key.Type.JOML_QUATERNIONF.createKey(T.DATA_RIGHT_ROTATION_ID, -1);
+    public static final Key<Byte> DATA_BILLBOARD_RENDER_CONSTRAINTS = Key.Type.BYTE.createKey(T.DATA_BILLBOARD_RENDER_CONSTRAINTS_ID, -1);
+    public static final Key<Integer> DATA_BRIGHTNESS_OVERRIDE = Key.Type.INTEGER.createKey(T.DATA_BRIGHTNESS_OVERRIDE_ID, -1);
+    public static final Key<Float> DATA_VIEW_RANGE = Key.Type.FLOAT.createKey(T.DATA_VIEW_RANGE_ID, -1);
+    public static final Key<Float> DATA_SHADOW_RADIUS = Key.Type.FLOAT.createKey(T.DATA_SHADOW_RADIUS_ID, -1);
+    public static final Key<Float> DATA_SHADOW_STRENGTH = Key.Type.FLOAT.createKey(T.DATA_SHADOW_STRENGTH_ID, -1);
+    public static final Key<Float> DATA_WIDTH = Key.Type.FLOAT.createKey(T.DATA_WIDTH_ID, -1);
+    public static final Key<Float> DATA_HEIGHT = Key.Type.FLOAT.createKey(T.DATA_HEIGHT_ID, -1);
+    public static final Key<Integer> DATA_GLOW_COLOR_OVERRIDE = Key.Type.INTEGER.createKey(T.DATA_GLOW_COLOR_OVERRIDE_ID, -1);
+    </code>
+
+    public static class Display.TextDisplay extends Display {
+        private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IChatBaseComponent> DATA_TEXT_ID;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_LINE_WIDTH_ID;
+        private static optional final (DataWatcher.Key<Integer>) DataWatcherObject<Integer> DATA_BACKGROUND_COLOR_ID;
+        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_TEXT_OPACITY_ID;
+        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_STYLE_FLAGS_ID;
+
+        <code>
+        public static final Key<com.bergerkiller.bukkit.common.wrappers.ChatText> DATA_TEXT = Key.Type.CHAT_TEXT.createKey(T.DATA_TEXT_ID, -1);
+        public static final Key<Integer> DATA_LINE_WIDTH = Key.Type.INTEGER.createKey(T.DATA_LINE_WIDTH_ID, -1);
+        public static final Key<Integer> DATA_BACKGROUND_COLOR = Key.Type.INTEGER.createKey(T.DATA_BACKGROUND_COLOR_ID, -1);
+        public static final Key<Byte> DATA_TEXT_OPACITY = Key.Type.BYTE.createKey(T.DATA_TEXT_OPACITY_ID, -1);
+        public static final Key<Byte> DATA_STYLE_FLAGS = Key.Type.BYTE.createKey(T.DATA_STYLE_FLAGS_ID, -1);
+        </code>
+    }
+
+    public static class Display.BlockDisplay extends Display {
+        private static optional final (DataWatcher.Key<Object>) DataWatcherObject<IBlockData> DATA_BLOCK_STATE_ID;
+
+        <code>
+        public static final Key<com.bergerkiller.bukkit.common.wrappers.BlockData> DATA_BLOCK_STATE = Key.Type.BLOCK_DATA.createKey(T.DATA_BLOCK_STATE_ID, -1);
+        </code>
+    }
+
+    public static class Display.ItemDisplay extends Display {
+        private static optional final (DataWatcher.Key<Object>) DataWatcherObject<ItemStack> DATA_ITEM_STACK_ID;
+        private static optional final (DataWatcher.Key<Byte>) DataWatcherObject<Byte> DATA_ITEM_DISPLAY_ID;
+
+        <code>
+        public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM_STACK = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM_STACK_ID, -1);
+        public static final Key<Byte> DATA_ITEM_DISPLAY = Key.Type.BYTE.createKey(T.DATA_ITEM_DISPLAY_ID, -1);
+        </code>
+    }
+}

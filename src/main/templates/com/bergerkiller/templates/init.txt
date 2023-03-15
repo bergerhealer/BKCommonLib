@@ -38,6 +38,7 @@
 #include /net/minecraft/entity/fishinghook.txt
 #include /net/minecraft/entity/insentient.txt
 #include /net/minecraft/entity/item.txt
+#include /net/minecraft/entity/display.txt
 #include /net/minecraft/entity/living.txt
 #include /net/minecraft/entity/player.txt
 #include /net/minecraft/entity/player_abilities.txt

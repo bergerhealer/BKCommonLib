@@ -250,4 +250,9 @@ public class CommonCapabilities {
      * Before that removal was done using the player info update packet.
      */
     public static final boolean PLAYER_INFO_PACKET_SPLIT = CommonBootstrap.evaluateMCVersion(">=", "1.19.3");
+
+    /**
+     * Since Minecraft 1.19.4 BlockData can be serialized in entity metadata
+     */
+    public static final boolean HAS_BLOCKDATA_METADATA = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
 }

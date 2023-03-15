@@ -2,8 +2,12 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.math.Quaternion;
+import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.util.Vector;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -144,5 +148,29 @@ public class DataWatcherTest {
         ItemStack stored = metadata.get(EntityItemHandle.DATA_ITEM);
         assertNotNull(stored);
         assertEquals(itemType, stored.getType());
+    }
+
+    @Test
+    public void testDisplayEntityMeta() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
+            return;
+        }
+
+        Quaternion leftRotation = new Quaternion(1.0, 0.5, 0.3, 0.6);
+        Quaternion rightRotation = new Quaternion(0.9, 0.2, -0.3, 0.3);
+        Vector scale = new Vector(1.0, 2.0, 3.0);
+        Vector translation = new Vector(0.0, 50.0, 70.0);
+
+        DataWatcher metadata = new DataWatcher();
+        metadata.set(DisplayHandle.DATA_LEFT_ROTATION, leftRotation);
+        metadata.set(DisplayHandle.DATA_RIGHT_ROTATION, rightRotation);
+        metadata.set(DisplayHandle.DATA_SCALE, scale);
+        metadata.set(DisplayHandle.DATA_TRANSLATION, translation);
+
+        // Test we read the same. Has floating point precision so it won't be exactly equal.
+        MathUtilTest.testQuaternionsEqual(leftRotation, metadata.get(DisplayHandle.DATA_LEFT_ROTATION), 0.01);
+        MathUtilTest.testQuaternionsEqual(rightRotation, metadata.get(DisplayHandle.DATA_RIGHT_ROTATION), 0.01);
+        MathUtilTest.testVectorsEqual(scale, metadata.get(DisplayHandle.DATA_SCALE), 0.001);
+        MathUtilTest.testVectorsEqual(translation, metadata.get(DisplayHandle.DATA_TRANSLATION), 0.001);
     }
 }

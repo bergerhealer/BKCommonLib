@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -782,6 +783,17 @@ public class CommonBootstrap {
         if (evaluateMCVersion(">=", "1.18.2")) {
             MC1_18_2_Conversion.init();
             Conversion.registerConverters(MC1_18_2_Conversion.class);
+        }
+
+        // JOML was introduced later
+        try {
+            if (JOMLConversion.available()) {
+                JOMLConversion.init();
+                Conversion.registerConverters(JOMLConversion.class);
+            }
+        } catch (Throwable t) {
+            Logging.LOGGER_REFLECTION.log(Level.SEVERE,
+                    "Failed to register JOML converters", t);
         }
 
         // Initialize the 'Conversion' classes right after to catch errors happening here

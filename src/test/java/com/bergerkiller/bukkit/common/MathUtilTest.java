@@ -513,9 +513,15 @@ public class MathUtilTest {
     }
 
     // checks that two quaternions have the same forward/up vector
-    private static void testQuaternionsEqual(Quaternion expected, Quaternion actual) {
+    public static void testQuaternionsEqual(Quaternion expected, Quaternion actual) {
         testVectorsEqual(expected.forwardVector(), actual.forwardVector());
         testVectorsEqual(expected.upVector(), actual.upVector());
+    }
+
+    // checks that two quaternions have the same forward/up vector
+    public static void testQuaternionsEqual(Quaternion expected, Quaternion actual, double delta) {
+        testVectorsEqual(expected.forwardVector(), actual.forwardVector(), delta);
+        testVectorsEqual(expected.upVector(), actual.upVector(), delta);
     }
 
     // checks that the output of getYawPitchRoll matches getYaw, getPitch and getRoll
@@ -527,12 +533,12 @@ public class MathUtilTest {
     }
 
     // checks that two vectors are equal
-    private static void testVectorsEqual(Vector expected, Vector actual) {
+    public static void testVectorsEqual(Vector expected, Vector actual) {
         testVectorsEqual(expected, actual, 1e-8);
     }
 
     // checks that two vectors are equal
-    private static void testVectorsEqual(Vector expected, Vector actual, double delta) {
+    public static void testVectorsEqual(Vector expected, Vector actual, double delta) {
         try {
             assertEquals(expected.getX(), actual.getX(), delta);
             assertEquals(expected.getY(), actual.getY(), delta);

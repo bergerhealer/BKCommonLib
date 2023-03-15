@@ -43,7 +43,9 @@ public class LogicUtil {
     private static final Predicate<Object> _alwaysFalsePredicate = obj -> false;
     private static final Supplier<Object> _nullSupplier = () -> null;
     private static final WeakReference<Object> _nullWeakReference = new WeakReference<Object>(null);
-    private static final ItemSynchronizer<Object, Object> _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
+
+    @SuppressWarnings("unchecked")
+    private static final ItemSynchronizer _identityItemSynchronizer = new ItemSynchronizer<Object, Object>() {
         @Override
         public boolean isItem(Object item, Object value) {
             return Objects.equals(item, value);
@@ -1060,11 +1062,12 @@ public class LogicUtil {
     /**
      * Synchronizes the contents of a collection by taking over the items in another collection of values. The items will
      * not necessarily be inserted into the collection in the same order as the collection. Unlike
-     * {@link #synchronizeList(list, values, synchronizer)} this method will not call the values
+     * {@link #synchronizeList(List, Collection, ItemSynchronizer)} this method will not call the values
      * {@link Collection#iterator()} method unless absolutely needed.<br>
      * <br>
-     * Because this logic depends on the {@link Collection#contains(o)} method, the {@link ItemSynchronizer#isItem(o1, o2)}
-     * is not used. The input collection and values collection must hold the same value types.
+     * Because this logic depends on the {@link Collection#contains(Object)} method, the
+     * {@link ItemSynchronizer#isItem(Object, Object)} is not used. The input collection and values
+     * collection must hold the same value types.
      * 
      * @param collection   to synchronize
      * @param values       to synchronize in the collection, iterator() call is avoided when possible
@@ -1339,5 +1342,35 @@ public class LogicUtil {
             }
         }
         return result;
+    }
+
+    /**
+     * Calls {@link Supplier#get()} on a supplier. Useful for initializing fields
+     * using a lambda.
+     *
+     * @param supplier Supplier
+     * @return Result of get()
+     * @param <T> Supplier type
+     */
+    public static <T> T make(Supplier<T> supplier) {
+        return supplier.get();
+    }
+
+    /**
+     * Tries to call {@link CheckedSupplier#get()} on a supplier. If this throws an
+     * exception, returns the default value instead. Use case is trying to find classes
+     * by name, for example.
+     *
+     * @param supplier Supplier
+     * @param defaultValue Default value to return if get() throws
+     * @return Supplier result of get(), or the default value
+     * @param <T> Supplier type
+     */
+    public static <T> T tryMake(CheckedSupplier<T> supplier, T defaultValue) {
+        try {
+            return supplier.get();
+        } catch (Throwable t) {
+            return defaultValue;
+        }
     }
 }

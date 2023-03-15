@@ -4,10 +4,12 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.bases.ExtendedEntity;
 import com.bergerkiller.bukkit.common.bases.IntVector3;
 import com.bergerkiller.bukkit.common.conversion.DuplexConversion;
+import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonDisabledEntity;
 import com.bergerkiller.bukkit.common.internal.CommonNMS;
+import com.bergerkiller.bukkit.common.math.Quaternion;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.generated.net.minecraft.core.BlockPositionHandle;
@@ -19,6 +21,7 @@ import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherObjec
 import com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherRegistryHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.EntityHandle;
 import com.bergerkiller.generated.net.minecraft.world.item.ItemStackHandle;
+import com.bergerkiller.generated.net.minecraft.world.level.block.state.IBlockDataHandle;
 import com.bergerkiller.mountiplex.conversion.Conversion;
 import com.bergerkiller.mountiplex.conversion.type.DuplexConverter;
 import com.bergerkiller.mountiplex.conversion.util.ConvertingList;
@@ -756,7 +759,11 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<Integer> INTEGER = getForType(Integer.class);
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
-            public static final Type<Vector> VECTOR = getForType(Vector.class);
+            public static final Type<Vector> ROTATION_VECTOR = new Type<>(Vector3fHandle.T.getType(), Vector.class);
+            public static final Type<Vector> JOML_VECTOR3F = JOMLConversion.available()
+                    ? new Type<>(JOMLConversion.JOML_VECTOR3F_TYPE, Vector.class) : missing();
+            public static final Type<Quaternion> JOML_QUATERNIONF = JOMLConversion.available()
+                    ? new Type<>(JOMLConversion.JOML_QUATERNIONF_TYPE, Quaternion.class) : missing();
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
             public static final Type<ItemStack> ITEMSTACK = getForType(ItemStack.class);
@@ -765,6 +772,24 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<BoatWoodType> BOAT_WOOD_TYPE = new Type<BoatWoodType>(INTEGER._token, new BoatWoodTypeIdConverter());
             public static final Type<Integer> SLIME_SIZE_TYPE = CommonCapabilities.DATAWATCHER_OBJECTS
                     ? INTEGER : new Type<Integer>(BYTE._token, new SlimeSizeByteConverter());
+            public static final Type<BlockData> BLOCK_DATA = CommonCapabilities.HAS_BLOCKDATA_METADATA
+                    ? getForType(BlockData.class) : missing();
+
+            // Used by missing() only
+            private Type() {
+                this._token = null;
+                this._converter = new DuplexConverter<Object, T>(Object.class, Object.class) {
+                    @Override
+                    public T convertInput(Object value) {
+                        return null;
+                    }
+
+                    @Override
+                    public Object convertOutput(Object value) {
+                        return null;
+                    }
+                };
+            }
 
             private Type(Object token, DuplexConverter<Object, T> converter) {
                 if (!CommonCapabilities.DATAWATCHER_OBJECTS && !(token instanceof Integer)) {
@@ -963,6 +988,33 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     byTypeMapping.put(externalType, result);
                 }
                 return (Type<V>) result;
+            }
+
+            // Placeholder for Types that are missing (on this version of the server)
+            // Keys created using this type behave like a no-op and always return null.
+            private static final Type<Object> MISSING_TYPE = new Type<Object>() {
+                private final Key<Object> disabled_key = new Key.Disabled<>(this);
+
+                @Override
+                public Key<Object> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
+                    return disabled_key;
+                }
+
+                @Override
+                public <C> Type<C> translate(DuplexConverter<Object, C> converter) {
+                    return LogicUtil.unsafeCast(this);
+                }
+            };
+
+            /**
+             * Gets the MISSING type. This is for types that don't exist at runtime.
+             * Keys created using this type don't do anything, and always return null.
+             *
+             * @return Missing Type
+             * @param <T> Type of value (unused)
+             */
+            public static <T> Type<T> missing() {
+                return LogicUtil.unsafeCast(MISSING_TYPE);
             }
         }
 
@@ -1170,6 +1222,8 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             typeMapping.put(IntVector3.class, BlockPositionHandle.T.getType());
             // Bukkit ItemStack -> nms ItemStack
             typeMapping.put(ItemStack.class, ItemStackHandle.T.getType());
+            // BlockData -> nms IBlockData
+            typeMapping.put(BlockData.class, IBlockDataHandle.T.getType());
         }
 
         private static void register(Class<?> type, Object token) {

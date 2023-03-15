@@ -61,12 +61,12 @@ class EntityArmorStand extends EntityLiving {
 
     <code>
     public static final Key<Byte> DATA_ARMORSTAND_FLAGS = Key.Type.BYTE.createKey(T.DATA_ARMORSTAND_FLAGS, 10);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_HEAD = Key.Type.VECTOR.createKey(T.DATA_POSE_HEAD, 11);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_BODY = Key.Type.VECTOR.createKey(T.DATA_POSE_BODY, 12);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_LEFT, 13);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_ARM_RIGHT, 14);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_LEFT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_LEFT, 15);
-    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_RIGHT = Key.Type.VECTOR.createKey(T.DATA_POSE_LEG_RIGHT, 16);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_HEAD = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_HEAD, 11);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_BODY = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_BODY, 12);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_LEFT = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_ARM_LEFT, 13);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_ARM_RIGHT = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_ARM_RIGHT, 14);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_LEFT = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_LEG_LEFT, 15);
+    public static final Key<org.bukkit.util.Vector> DATA_POSE_LEG_RIGHT = Key.Type.ROTATION_VECTOR.createKey(T.DATA_POSE_LEG_RIGHT, 16);
 
     public static final int DATA_FLAG_IS_SMALL = (1 << 0);
     public static final int DATA_FLAG_HAS_ARMS = (1 << 2);
