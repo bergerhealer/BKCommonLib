@@ -4,7 +4,12 @@ import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import com.bergerkiller.bukkit.common.math.Quaternion;
+import com.bergerkiller.bukkit.common.utils.ItemUtil;
+import com.bergerkiller.bukkit.common.wrappers.BlockData;
+import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import com.bergerkiller.generated.net.minecraft.world.entity.DisplayHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.decoration.EntityItemFrameHandle;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
@@ -151,6 +156,18 @@ public class DataWatcherTest {
     }
 
     @Test
+    public void testItemFrameMeta() {
+        ItemStack item = ItemUtil.createItem(MaterialUtil.getFirst("OAK_LOG", "LEGACY_LOG"), 2);
+        ItemUtil.getMetaTag(item, true).putValue("UniqueKey", "UniqueValue123");
+
+        DataWatcher metadata = new DataWatcher();
+        metadata.set(EntityItemFrameHandle.DATA_ITEM, item);
+        ItemStack read = metadata.get(EntityItemFrameHandle.DATA_ITEM);
+        assertEquals(item, read);
+        assertEquals("UniqueValue123", ItemUtil.getMetaTag(read).getValue("UniqueKey"));
+    }
+
+    @Test
     public void testDisplayEntityMeta() {
         if (!CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
             return;
@@ -172,5 +189,52 @@ public class DataWatcherTest {
         MathUtilTest.testQuaternionsEqual(rightRotation, metadata.get(DisplayHandle.DATA_RIGHT_ROTATION), 0.01);
         MathUtilTest.testVectorsEqual(scale, metadata.get(DisplayHandle.DATA_SCALE), 0.001);
         MathUtilTest.testVectorsEqual(translation, metadata.get(DisplayHandle.DATA_TRANSLATION), 0.001);
+    }
+
+    @Test
+    public void testTextDisplayEntityMeta() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
+            return;
+        }
+
+        ChatText text = ChatText.fromMessage(ChatColor.GREEN + "Hello, " + ChatColor.RED + " world!");
+        DataWatcher metadata = new DataWatcher();
+        metadata.set(DisplayHandle.TextDisplayHandle.DATA_TEXT, text);
+        assertEquals(text, metadata.get(DisplayHandle.TextDisplayHandle.DATA_TEXT));
+    }
+
+    @Test
+    public void testBlockDisplayEntityMeta() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
+            return;
+        }
+
+        BlockData blockData = BlockData.fromMaterial(MaterialUtil.getMaterial("ACACIA_LOG"));
+        DataWatcher metadata = new DataWatcher();
+        metadata.set(DisplayHandle.BlockDisplayHandle.DATA_BLOCK_STATE, blockData);
+        assertEquals(blockData, metadata.get(DisplayHandle.BlockDisplayHandle.DATA_BLOCK_STATE));
+    }
+
+    @Test
+    public void testItemDisplayEntityMeta() {
+        if (!CommonBootstrap.evaluateMCVersion(">=", "1.19.4")) {
+            return;
+        }
+
+        ItemStack item = ItemUtil.createItem(MaterialUtil.getMaterial("ACACIA_LOG"), 1);
+        ItemUtil.getMetaTag(item, true).putValue("UniqueKey", "UniqueValue123");
+
+        DataWatcher metadata = new DataWatcher();
+        {
+            metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK, item);
+            ItemStack read = metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_STACK);
+            assertEquals(item, read);
+            assertEquals("UniqueValue123", ItemUtil.getMetaTag(read).getValue("UniqueKey"));
+        }
+
+        for (ItemDisplayMode mode : ItemDisplayMode.values()) {
+            metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE, mode);
+            assertEquals(mode, metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE));
+        }
     }
 }

@@ -168,7 +168,7 @@ public abstract class DisplayHandle extends EntityHandle {
 
 
         public static final Key<org.bukkit.inventory.ItemStack> DATA_ITEM_STACK = Key.Type.ITEMSTACK.createKey(T.DATA_ITEM_STACK_ID, -1);
-        public static final Key<Byte> DATA_ITEM_DISPLAY = Key.Type.BYTE.createKey(T.DATA_ITEM_DISPLAY_ID, -1);
+        public static final Key<com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode> DATA_ITEM_DISPLAY_MODE = Key.Type.ITEM_DISPLAY_MODE.createKey(T.DATA_ITEM_DISPLAY_ID, -1);
         /**
          * Stores class members for <b>net.minecraft.world.entity.Display.ItemDisplay</b>.
          * Methods, fields, and constructors can be used without using Handle Objects.

@@ -774,6 +774,7 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     ? INTEGER : new Type<Integer>(BYTE._token, new SlimeSizeByteConverter());
             public static final Type<BlockData> BLOCK_DATA = CommonCapabilities.HAS_BLOCKDATA_METADATA
                     ? getForType(BlockData.class) : missing();
+            public static final Type<ItemDisplayMode> ITEM_DISPLAY_MODE = BYTE.translate(ItemDisplayMode.class);
 
             // Used by missing() only
             private Type() {

@@ -9,6 +9,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.bergerkiller.bukkit.common.conversion.type.JOMLConversion;
+import com.bergerkiller.bukkit.common.wrappers.ItemDisplayMode;
 import org.bukkit.Bukkit;
 
 import com.bergerkiller.bukkit.common.Common;
@@ -751,6 +752,7 @@ public class CommonBootstrap {
         Conversion.registerConverters(WrapperConversion.class);
         Conversion.registerConverters(HandleConversion.class);
         Conversion.registerConverters(NBTConversion.class);
+        Conversion.registerConverters(ItemDisplayMode.class);
 
         // EquipmentSlot <> EnumItemSlot, only for later version of 1.8 builds
         {
