@@ -239,7 +239,7 @@ public class YamlTest {
         child_new.set("key2", 102);
         assertEquals(101, child_old.get("key2"));
         assertEquals(102, child_new.get("key2"));
-        assertNotEquals(child_old.getNode("key3"), child_new.getNode("key3"));
+        assertFalse(child_old.getNode("key3") == child_new.getNode("key3"));
         child_old.set("key3.sub2", 103);
         child_new.set("key3.sub2", 104);
         assertEquals(103, child_old.get("key3.sub2"));

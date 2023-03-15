@@ -91,6 +91,16 @@ public class ConfigurationNode extends YamlNodeAbstract<ConfigurationNode> {
     }
 
     @Override
+    public ConfigurationNode getNodeIfExists(String path) {
+        return super.getNodeIfExists(path);
+    }
+
+    @Override
+    public ConfigurationNode getNodeIfExists(YamlPath relativePath) {
+        return super.getNodeIfExists(relativePath);
+    }
+
+    @Override
     public ConfigurationNode clone() {
         return super.clone();
     }

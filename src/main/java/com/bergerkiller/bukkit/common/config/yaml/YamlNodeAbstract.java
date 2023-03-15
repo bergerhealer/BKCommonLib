@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -495,6 +496,32 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
     }
 
     /**
+     * Gets the node at the path specified. If no node exists here, or a
+     * non-node value is stored, returns <i>null</i>.
+     *
+     * @param path to get a node
+     * @return the node, or null if it does not exist, or a non-node value is stored
+     */
+    @SuppressWarnings("unchecked")
+    public N getNodeIfExists(String path) {
+        YamlEntry entry = this.getEntryIfExists(path);
+        return (entry != null && entry.isNode()) ? (N) entry.value : null;
+    }
+
+    /**
+     * Gets the node at the path specified. If no node exists here, or a
+     * non-node value is stored, returns <i>null</i>.
+     *
+     * @param relativePath Relative YamlPath to get a node at
+     * @return the node, or null if it does not exist, or a non-node value is stored
+     */
+    @SuppressWarnings("unchecked")
+    public N getNodeIfExists(YamlPath relativePath) {
+        YamlEntry entry = this.getEntryIfExists(relativePath);
+        return (entry != null && entry.isNode()) ? (N) entry.value : null;
+    }
+
+    /**
      * Stores a list of nodes at the path specified, creates one if not present.<br>
      * <br>
      * If at the path a node is stored rather than a list, then the nodes are set
@@ -653,6 +680,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param path The path to the value to get
      * @param type of value to get
      * @return the converted value, or null if not found or of the wrong type
+     * @param <T> Value type
      */
     public <T> T get(String path, Class<T> type) {
         return this.get(path, type, null);
@@ -668,6 +696,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param path   The path to the value to get
      * @param def    The value to return and store on failure, defines the type of value to return
      * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String path, T def) {
@@ -683,6 +712,7 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
      * @param type    The type of value to convert the stored value to
      * @param def     The value to return and store on failure
      * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
      */
     @SuppressWarnings("unchecked")
     public <T> T get(String path, Class<T> type, T def) {
@@ -698,6 +728,50 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             this.set(path, rval);
         }
         return rval;
+    }
+
+    /**
+     * Gets the raw value at the path as the type specified. Does
+     * <b>not</b> set the default value if it is missing, instead
+     * only returning the default value. This is unlike
+     * {@link #get(String, Object)} which sets the default
+     * value in the configuration.<br>
+     * <br>
+     * <b>The def value is used to get the type, it can not be null!</b>
+     *
+     * @param path   The path to the value to get
+     * @param def    The value to return and store on failure, defines the type of value to return
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getOrDefault(String path, T def) {
+        return this.getOrDefault(path, (Class<T>) def.getClass(), def);
+    }
+
+    /**
+     * Gets the raw value at the path as the type specified. Does
+     * <b>not</b> set the default value if it is missing, instead
+     * only returning the default value. This is unlike
+     * {@link #get(String, Class, Object)} which sets the default
+     * value in the configuration.
+     *
+     * @param path    The path to the value to get
+     * @param type    The type of value to convert the stored value to
+     * @param def     The value to return and store on failure
+     * @return The converted value, or the default value if not found or of the wrong type
+     * @param <T> Value type
+     */
+    @SuppressWarnings("unchecked")
+    public <T> T getOrDefault(String path, Class<T> type, T def) {
+        Object value = this.get(path);
+        if (type == String.class && value instanceof String[]) {
+            // Special conversion to line-by-line String
+            // This is needed, as it saves line-split Strings as such
+            return (T) StringUtil.join("\n", (String[]) value);
+        }
+        T rval = ParseUtil.convert(value, type, null);
+        return (rval != null) ? rval : def;
     }
 
     /**
@@ -1212,6 +1286,71 @@ public abstract class YamlNodeAbstract<N extends YamlNodeAbstract<?>> implements
             }
             return yaml.toString();
         }
+    }
+
+    /**
+     * Checks whether this yaml configuration is exactly equal to another one. In this comparison
+     * field order is important. Parents and headers are not important.
+     *
+     * @param o Other object
+     * @return True if the other object is an abstract node, and this node equals the other node
+     */
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        } else if (o instanceof YamlNodeAbstract) {
+            return isSameConfig(this, (YamlNodeAbstract) o);
+        } else {
+            return false;
+        }
+    }
+
+    private static boolean isSameConfig(YamlNodeAbstract<?> a, YamlNodeAbstract<?> b) {
+        Map<String, Object> a_entries = a.getValues();
+        Map<String, Object> b_entries = b.getValues();
+        if (a_entries.size() != b_entries.size()) {
+            return false;
+        }
+        Iterator<Map.Entry<String, Object>> a_iter = a_entries.entrySet().iterator();
+        Iterator<Map.Entry<String, Object>> b_iter = b_entries.entrySet().iterator();
+        while (true) {
+            boolean has = a_iter.hasNext();
+            if (has != b_iter.hasNext()) {
+                return false; // Shouldn't happen, really
+            } else if (!has) {
+                break;
+            }
+            Map.Entry<String, Object> a_entry = a_iter.next();
+            Map.Entry<String, Object> b_entry = b_iter.next();
+            if (!a_entry.getKey().equals(b_entry.getKey())) {
+                return false;
+            }
+            Object a_value = a_entry.getValue();
+            Object b_value = b_entry.getValue();
+            if (a_value == null && b_value == null) {
+                continue;
+            }
+            if (a_value == null || b_value == null) {
+                return false;
+            }
+            if (a_value instanceof YamlNodeAbstract && b_value instanceof YamlNodeAbstract) {
+                YamlNodeAbstract<?> a_cfg = (YamlNodeAbstract<?>) a_value;
+                YamlNodeAbstract<?> b_cfg = (YamlNodeAbstract<?>) b_value;
+                if (isSameConfig(a_cfg, b_cfg)) {
+                    continue;
+                } else {
+                    return false;
+                }
+            }
+            if (a_value instanceof YamlNodeAbstract || b_value instanceof YamlNodeAbstract) {
+                return false;
+            }
+            if (!a_value.equals(b_value)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     protected YamlEntry createChildEntry(int index, YamlPath path) {
