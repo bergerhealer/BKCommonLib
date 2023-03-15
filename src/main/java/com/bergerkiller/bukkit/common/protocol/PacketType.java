@@ -381,7 +381,7 @@ public class PacketType extends ClassTemplate<Object> {
                         for (Method m : flowType.getDeclaredMethods()) {
                             if (m.getParameterCount() == 1 &&
                                 m.getParameterTypes()[0].equals(Class.class) &&
-                                m.getReturnType() == Integer.class
+                                (m.getReturnType() == Integer.class || m.getReturnType() == int.class)
                             ) {
                                 getPacketIdMethod = m;
                                 break;
@@ -395,7 +395,8 @@ public class PacketType extends ClassTemplate<Object> {
 
                     // Invoke and check
                     getPacketIdMethod.setAccessible(true);
-                    if (getPacketIdMethod.invoke(directionFlows, packetClass) != null) {
+                    Integer packetId = (Integer) getPacketIdMethod.invoke(directionFlows, packetClass);
+                    if (packetId != null && packetId.intValue() != -1) {
                         return true;
                     }
                 }

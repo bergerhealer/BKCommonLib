@@ -172,8 +172,14 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
             return !Helper.ADDED_MC_1_19_3.contains(type);
         });
 
+        // From MC 1.19.4 to 1.19.3
+        this.register(3218, map -> {
+            Object type = map.get("type");
+            return !Helper.ADDED_MC_1_19_4.contains(type);
+        });
+
         // Maximum supported data version
-        this.max_version = 3218; // MC 1.19.3
+        this.max_version = 3337; // MC 1.19.4
     }
 
     // Registers a converter if it can convert from a future data version only
@@ -255,7 +261,7 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
      * Deserializes ItemStack properties that are stored as just maps into the correct
      * metadata type, and converts Double to Integer where needed.
      * 
-     * @param map
+     * @param values
      */
     private void deserializeMaps(Map<String, Object> values) {
         convertNumberToIntegerInMap(values, "amount");
@@ -563,5 +569,26 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 "CAMEL_SPAWN_EGG", "ENDER_DRAGON_SPAWN_EGG",
                 "IRON_GOLEM_SPAWN_EGG", "SNOW_GOLEM_SPAWN_EGG",
                 "WITHER_SPAWN_EGG", "PIGLIN_HEAD", "PIGLIN_WALL_HEAD"));
+
+        // All material names (Material enum) added Minecraft 1.19.3 -> 1.19.4
+        public static final Set<String> ADDED_MC_1_19_4 = new HashSet<String>(Arrays.asList(
+                "CHERRY_PLANKS", "CHERRY_SAPLING", "SUSPICIOUS_SAND", "CHERRY_LOG",
+                "STRIPPED_CHERRY_LOG", "STRIPPED_CHERRY_WOOD", "CHERRY_WOOD",
+                "CHERRY_LEAVES", "TORCHFLOWER", "PINK_PETALS", "CHERRY_SLAB",
+                "DECORATED_POT", "CHERRY_FENCE", "CHERRY_STAIRS",
+                "CHERRY_BUTTON", "CHERRY_PRESSURE_PLATE", "CHERRY_DOOR",
+                "CHERRY_TRAPDOOR", "CHERRY_FENCE_GATE", "CHERRY_BOAT",
+                "CHERRY_CHEST_BOAT", "CHERRY_SIGN", "CHERRY_HANGING_SIGN",
+                "SNIFFER_SPAWN_EGG", "TORCHFLOWER_SEEDS", "BRUSH",
+                "NETHERITE_UPGRADE_SMITHING_TEMPLATE", "SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "DUNE_ARMOR_TRIM_SMITHING_TEMPLATE", "COAST_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "WILD_ARMOR_TRIM_SMITHING_TEMPLATE", "WARD_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "EYE_ARMOR_TRIM_SMITHING_TEMPLATE", "VEX_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "TIDE_ARMOR_TRIM_SMITHING_TEMPLATE", "SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "RIB_ARMOR_TRIM_SMITHING_TEMPLATE", "SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE",
+                "POTTERY_SHARD_ARCHER", "POTTERY_SHARD_PRIZE", "POTTERY_SHARD_ARMS_UP",
+                "POTTERY_SHARD_SKULL", "CHERRY_WALL_SIGN", "CHERRY_WALL_HANGING_SIGN",
+                "POTTED_TORCHFLOWER", "POTTED_CHERRY_SAPLING", "TORCHFLOWER_CROP"
+        ));
     }
 }

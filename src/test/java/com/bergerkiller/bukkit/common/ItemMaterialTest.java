@@ -194,6 +194,11 @@ public class ItemMaterialTest {
                     .check(Material.getMaterial("REDSTONE_COMPARATOR_OFF"), true);
             }
 
+            if (Common.evaluateMCVersion(">=", "1.19.4")) {
+                test.check(Material.getMaterial("JUKEBOX"), true)
+                    .check(Material.getMaterial("LEGACY_JUKEBOX"), true);
+            }
+
             test.check(ParseUtil.parseMaterial("OBSERVER", null), true)
                 .checkData(org.bukkit.material.Redstone.class, true) // when new redstone-like types are added, this should fail
                 .checkOthers(false)
@@ -465,7 +470,7 @@ public class ItemMaterialTest {
     public void testItemStackDeserializationVersion() {
         int curr = CraftMagicNumbersHandle.getDataVersion();
         if (curr > ItemStackDeserializer.INSTANCE.getMaxSupportedDataVersion()) {
-            fail("ItemStacKDeserializer needs to support the new Data Version (" + curr + ")");
+            fail("ItemStackDeserializer needs to support the new Data Version (" + curr + ")");
         }
     }
 

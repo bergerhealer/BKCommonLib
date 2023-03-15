@@ -192,6 +192,8 @@ public class IBlockDataToMaterialData {
                        "MANGROVE_BUTTON")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
                        "BAMBOO_BUTTON")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                       "CHERRY_BUTTON")
              .setDataValues(0,1,2,3,4,5, 8,9,10,11,12,13)
              .build();
         }
@@ -259,6 +261,8 @@ public class IBlockDataToMaterialData {
                        "MANGROVE_PRESSURE_PLATE")
              .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
                        "BAMBOO_PRESSURE_PLATE")
+             .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                       "CHERRY_PRESSURE_PLATE")
              .setDataValues(0, 1)
              .build();
         }
@@ -464,6 +468,8 @@ public class IBlockDataToMaterialData {
                            "MANGROVE_WALL_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
                            "BAMBOO_WALL_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                           "CHERRY_WALL_SIGN")
                  .setDataValues(2, 3, 4, 5)
                  .build();
             }
@@ -499,6 +505,8 @@ public class IBlockDataToMaterialData {
                            "MANGROVE_SIGN")
                  .addTypesIf(Common.evaluateMCVersion(">=", "1.19.3"),
                            "BAMBOO_SIGN")
+                 .addTypesIf(Common.evaluateMCVersion(">=", "1.19.4"),
+                           "CHERRY_SIGN")
                  .setDataValues(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15)
                  .build();
             }

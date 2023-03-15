@@ -2,6 +2,7 @@ package com.bergerkiller.bukkit.common;
 
 import static org.junit.Assert.*;
 
+import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -35,6 +36,7 @@ public class PacketTest {
 
     @Test
     public void testPacketDirection() {
+        CommonBootstrap.initServer();
         assertFalse(PacketType.IN_CHAT.isOutGoing());
         assertFalse(PacketType.IN_STEER_VEHICLE.isOutGoing());
         assertFalse(PacketType.IN_POSITION_LOOK.isOutGoing());

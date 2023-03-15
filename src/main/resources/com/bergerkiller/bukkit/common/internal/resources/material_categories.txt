@@ -63,6 +63,9 @@ ISBUTTON:
 #if version >= 1.19.3
   BAMBOO_BUTTON
 #endif
+#if version >= 1.19.4
+  CHERRY_BUTTON
+#endif
 
 ISCOMPARATOR:
   COMPARATOR
@@ -120,6 +123,10 @@ ISSIGN:
   BAMBOO_SIGN
   BAMBOO_WALL_SIGN
 #endif
+#if version >= 1.19.4
+  CHERRY_SIGN
+  CHERRY_WALL_SIGN
+#endif
 
 #else
 ISSIGN:
@@ -154,6 +161,9 @@ ISPRESSUREPLATE:
 #endif
 #if version >= 1.19.3
   BAMBOO_PRESSURE_PLATE
+#endif
+#if version >= 1.19.4
+  CHERRY_PRESSURE_PLATE
 #endif
 
 ISMINECART:
