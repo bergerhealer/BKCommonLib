@@ -128,6 +128,63 @@ class DataWatcher {
 #endif
     }
 
+    public void forceSet(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key, Object value) {
+        if (key == null) {
+            throw new IllegalArgumentException("key is null");
+        }
+        Object convertedValue = key.getType().getConverter().convertReverse(value);
+        DataWatcherObject dwo = (DataWatcherObject) key.getRawHandle();
+
+#if version >= 1.19.4
+        instance.set(dwo, convertedValue, true);
+#else
+        // API doesn't exist yet, but it's also not too important as it isn't used at all.
+        // Use the read API to get the item object, which might return null
+        // We throw in that case as that's what is expected to happen in that case...
+        com.bergerkiller.mountiplex.reflection.declarations.Template.Method readRaw;
+        readRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template.Method) DataWatcherHandle.T.read.raw;
+  #if version >= 1.9
+        DataWatcher$Item item = (DataWatcher$Item) readRaw.invoke(instance, dwo);
+  #else
+        DataWatcher$Item item = (DataWatcher$Item) readRaw.invoke(instance, Integer.valueOf(dwo.getId()));
+  #endif
+        if (item == null) {
+            throw new NullPointerException();
+        }
+
+        // Get Entity owner that should be notified of the datawatcher change
+        com.bergerkiller.mountiplex.reflection.declarations.Template.Field ownerRaw;
+        ownerRaw = (com.bergerkiller.mountiplex.reflection.declarations.Template.Field) DataWatcherHandle.T.owner.raw;
+        Entity owner = (Entity) ownerRaw.get(instance);
+
+  #if version >= 1.18
+        item.setValue(convertedValue);
+        owner.onSyncedDataUpdated(dwo);
+        item.setDirty(true);
+  #elseif version >= 1.9
+        item.a(convertedValue);
+        owner.a(dwo);
+        item.a(true);
+  #else
+        item.a(convertedValue);
+        owner.i(dwo.getId());
+        item.a(true);
+  #endif
+
+        // Set DataWatcher itself dirty too
+  #if version >= 1.17
+        #require DataWatcher private boolean dw_isDirty:isDirty;
+  #elseif version >= 1.10.2
+        #require DataWatcher private boolean dw_isDirty:g;
+  #elseif version >= 1.9
+        #require DataWatcher private boolean dw_isDirty:f;
+  #else
+        #require DataWatcher private boolean dw_isDirty:e;
+  #endif
+        instance#dw_isDirty = true;
+#endif
+    }
+
     public Object get(com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key<?> key) {
         if (key == null) {
             throw new IllegalArgumentException("key is null");
@@ -136,7 +193,7 @@ class DataWatcher {
         Object rawValue = instance.get((DataWatcherObject) key.getRawHandle());
 #else
         com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item item;
-        Object itemRaw = com.bergerkiller.generated.net.minecraft.network.syncher.DataWatcherHandle.T.read.invoke(instance, key);
+        Object itemRaw = DataWatcherHandle.T.read.invoke(instance, key);
         item = (com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item) itemRaw;
         Object rawValue = com.bergerkiller.bukkit.common.wrappers.DataWatcher.Item.getRawValue(item);
 #endif

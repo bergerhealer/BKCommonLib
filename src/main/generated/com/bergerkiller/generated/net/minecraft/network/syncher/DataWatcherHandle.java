@@ -35,6 +35,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
     public abstract Item<Object> read(Key<?> key);
     public abstract void register(Key<?> key, Object defaultValue);
     public abstract void set(Key<?> key, Object value);
+    public abstract void forceSet(Key<?> key, Object value);
     public abstract Object get(Key<?> key);
     public abstract boolean isChanged();
     public abstract boolean isEmpty();
@@ -60,6 +61,7 @@ public abstract class DataWatcherHandle extends Template.Handle {
         public final Template.Method.Converted<Item<Object>> read = new Template.Method.Converted<Item<Object>>();
         public final Template.Method<Void> register = new Template.Method<Void>();
         public final Template.Method<Void> set = new Template.Method<Void>();
+        public final Template.Method<Void> forceSet = new Template.Method<Void>();
         public final Template.Method<Object> get = new Template.Method<Object>();
         public final Template.Method<Boolean> isChanged = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isEmpty = new Template.Method<Boolean>();

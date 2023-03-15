@@ -146,6 +146,26 @@ public class DataWatcherTest {
     }
 
     @Test
+    public void testForceSet() {
+        DataWatcher dataWatcher = new DataWatcher();
+
+        // Start watching, but because we used forceSet, changed is true!
+        dataWatcher.forceSet(EntityHandle.DATA_AIR_TICKS, 500);
+        assertTrue(dataWatcher.isChanged());
+        assertTrue(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
+
+        // Pack changes, which should reset changed back to false
+        dataWatcher.packChanges();
+        assertFalse(dataWatcher.isChanged());
+        assertFalse(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
+
+        // Set to the same value again, but because it's forced, it should mark as changed
+        dataWatcher.forceSet(EntityHandle.DATA_AIR_TICKS, 500);
+        assertTrue(dataWatcher.isChanged());
+        assertTrue(dataWatcher.getItem(EntityHandle.DATA_AIR_TICKS).isChanged());
+    }
+
+    @Test
     public void testItemItemStack() {
         Material itemType = MaterialUtil.getFirst("STONE", "LEGACY_STONE");
         DataWatcher metadata = new DataWatcher();

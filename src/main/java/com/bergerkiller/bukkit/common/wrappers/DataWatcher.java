@@ -95,6 +95,41 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
     /**
      * Write a new value to the watched objects.
      * If the key does not yet exist, the key is added with the value specified.
+     * Forces a change to be sent with this value, even if the value has
+     * not changed. Equivalent to doing:
+     * <pre>
+     *     data.set(DisplayHandle.DATA_INTERPOLATION_START_DELTA_TICKS, 1);
+     *     data.set(DisplayHandle.DATA_INTERPOLATION_START_DELTA_TICKS, 0);
+     * </pre>
+     *
+     * @param key Object key
+     * @param value Value to set to
+     */
+    public <V> void forceSet(Key<V> key, V value) {
+        if (key == null) {
+            throw new IllegalArgumentException("Key is null");
+        } else if (key instanceof Key.Disabled) {
+            // Pass. Do nothing.
+        } else {
+            // Note: throws a NPE when the key is not watched inside the datawatcher
+            // When this occurs, and after verifying it is indeed not watched, watch() it instead.
+            // This preserves performance for the most common set case
+            try {
+                handle.forceSet(key, value);
+            } catch (NullPointerException ex) {
+                if (isWatched(key)) {
+                    throw ex;
+                } else {
+                    watch(key, value);
+                    handle.forceSet(key, value); // Must set as changed!
+                }
+            }
+        }
+    }
+
+    /**
+     * Write a new value to the watched objects.
+     * If the key does not yet exist, the key is added with the value specified.
      * This is a special overload for Byte keys that can be set using an int without a cast.
      * 
      * @param key Object key
