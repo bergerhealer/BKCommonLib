@@ -115,7 +115,7 @@ class DamageSource {
         return DamageSource.GENERIC;
     }
 
-    public static (DamageSourceHandle) DamageSource genericForEntity((org.bukkit.World) net.minecraft.world.level.World world) {
+    public static (DamageSourceHandle) DamageSource genericForEntity((org.bukkit.entity.Entity) net.minecraft.world.entity.Entity entity) {
         return DamageSource.GENERIC;
     }
 
