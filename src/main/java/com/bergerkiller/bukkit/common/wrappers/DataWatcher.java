@@ -753,6 +753,22 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             private final DuplexConverter<Object, T> _converter;
             private Type<T> _optional_opposite;
 
+            // Placeholder for Types that are missing (on this version of the server)
+            // Keys created using this type behave like a no-op and always return null.
+            private static final Type<Object> MISSING_TYPE = new Type<Object>() {
+                private final Key<Object> disabled_key = new Key.Disabled<>(this);
+
+                @Override
+                public Key<Object> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
+                    return disabled_key;
+                }
+
+                @Override
+                public <C> Type<C> translate(DuplexConverter<Object, C> converter) {
+                    return LogicUtil.unsafeCast(this);
+                }
+            };
+
             // All below serializers are guaranteed to always be available
             public static final Type<Boolean> BOOLEAN = getForType(Boolean.class);
             public static final Type<Byte> BYTE = getForType(Byte.class);
@@ -760,9 +776,9 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
             public static final Type<Float> FLOAT = getForType(Float.class);
             public static final Type<String> STRING = getForType(String.class);
             public static final Type<Vector> ROTATION_VECTOR = new Type<>(Vector3fHandle.T.getType(), Vector.class);
-            public static final Type<Vector> JOML_VECTOR3F = JOMLConversion.available()
+            public static final Type<Vector> JOML_VECTOR3F = CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
                     ? new Type<>(JOMLConversion.JOML_VECTOR3F_TYPE, Vector.class) : missing();
-            public static final Type<Quaternion> JOML_QUATERNIONF = JOMLConversion.available()
+            public static final Type<Quaternion> JOML_QUATERNIONF = CommonBootstrap.evaluateMCVersion(">=", "1.19.4")
                     ? new Type<>(JOMLConversion.JOML_QUATERNIONF_TYPE, Quaternion.class) : missing();
             public static final Type<IntVector3> BLOCK_POSITION = getForType(IntVector3.class);
             public static final Type<ChatText> CHAT_TEXT = getForType(ChatText.class);
@@ -990,22 +1006,6 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                 }
                 return (Type<V>) result;
             }
-
-            // Placeholder for Types that are missing (on this version of the server)
-            // Keys created using this type behave like a no-op and always return null.
-            private static final Type<Object> MISSING_TYPE = new Type<Object>() {
-                private final Key<Object> disabled_key = new Key.Disabled<>(this);
-
-                @Override
-                public Key<Object> createKey(Template.StaticField.Converted<? extends Key<?>> tokenField, int alternativeId) {
-                    return disabled_key;
-                }
-
-                @Override
-                public <C> Type<C> translate(DuplexConverter<Object, C> converter) {
-                    return LogicUtil.unsafeCast(this);
-                }
-            };
 
             /**
              * Gets the MISSING type. This is for types that don't exist at runtime.

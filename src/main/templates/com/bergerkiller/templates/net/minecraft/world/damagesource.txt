@@ -149,11 +149,11 @@ class DamageSource {
   #endif
 
     public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.World world, String name) {
-        return DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
+        return (DamageSourceHandle) DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
     }
 
     public static DamageSourceHandle byNameForEntity((org.bukkit.entity.Entity) net.minecraft.world.entity.Entity entity, String name) {
-        return DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
+        return (DamageSourceHandle) DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
     }
 
     public static void initNameLookup(java.util.Map<String, Object> lookup) {
