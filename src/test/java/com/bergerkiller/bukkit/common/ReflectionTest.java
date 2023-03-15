@@ -65,7 +65,6 @@ public class ReflectionTest {
             loadClass(NMSWorldServer.class);
             loadClass(NMSPlayerAbilities.class);
             loadClass(NMSIChatBaseComponent.class);
-            loadClass(NMSDamageSource.class);
             loadClass(NMSNibbleArray.class);
             loadClass(NMSTileEntity.class);
             loadClass(NMSEntityTypes.class);

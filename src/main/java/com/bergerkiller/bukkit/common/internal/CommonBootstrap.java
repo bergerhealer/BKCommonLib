@@ -468,7 +468,7 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.syncher.DataWatcher$WatchableObject", "net.minecraft.network.syncher.WatchableObject");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutScoreboardScore$EnumScoreboardAction", "net.minecraft.network.protocol.game.EnumScoreboardAction");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutMapChunk$ChunkMap", "net.minecraft.network.protocol.game.ChunkMap");
-            remappings.put("net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
+            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.EnumPlayerTeleportFlags");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutTitle$EnumTitleAction", "net.minecraft.network.protocol.game.EnumTitleAction");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutCombatEvent$EnumCombatEventType", "net.minecraft.network.protocol.game.EnumCombatEventType");
             remappings.put("net.minecraft.network.protocol.game.PacketPlayOutWorldBorder$EnumWorldBorderAction", "net.minecraft.network.protocol.game.EnumWorldBorderAction");
@@ -661,6 +661,15 @@ public class CommonBootstrap {
             remappings.put("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo");
             remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$EnumPlayerInfoAction", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$EnumPlayerInfoAction");
             remappings.putIfAbsent("net.minecraft.network.protocol.game.ClientboundPlayerInfoRemovePacket$PlayerInfoData", "net.minecraft.network.protocol.game.PacketPlayOutPlayerInfo$PlayerInfoData");
+        }
+
+        // 1.19.4 mappings
+        if (evaluateMCVersion(">=", "1.19.4")) {
+            //NOOP
+
+        } else {
+            // This class was moved from an inner class of PacketPlayOutPosition to be its own RelativeMovement class
+            remappings.put("net.minecraft.world.entity.RelativeMovement", "net.minecraft.network.protocol.game.PacketPlayOutPosition$EnumPlayerTeleportFlags");
         }
 
         // There have been various locations where starlight was installed

@@ -798,7 +798,11 @@ class PacketPlayOutSpawnEntityPainting extends Packet {
 
     // Position/Facing integrated in PacketPlayOutSpawnEntity itself as position/data
     public (IntVector3) BlockPosition getPosition() {
+  #if version >= 1.19.4
+        return BlockPosition.containing(instance.getX(), instance.getY(), instance.getZ());
+  #else
         return new BlockPosition(instance.getX(), instance.getY(), instance.getZ());
+  #endif
     }
     public void setPosition((IntVector3) BlockPosition position) {
         #require PacketPlayOutSpawnEntityPainting private final double posX:x;

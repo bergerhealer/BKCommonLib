@@ -22,15 +22,11 @@ public abstract class EntityMinecartHopperHandle extends EntityMinecartAbstractH
     public abstract boolean suckItems();
     public abstract boolean isSuckingEnabled();
     public abstract void setSuckingEnabled(boolean enabled);
-    public abstract int getSuckingCooldown();
-    public abstract void setSuckingCooldown(int value);
     /**
      * Stores class members for <b>net.minecraft.world.entity.vehicle.EntityMinecartHopper</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class EntityMinecartHopperClass extends Template.Class<EntityMinecartHopperHandle> {
-        public final Template.Field.Integer suckingCooldown = new Template.Field.Integer();
-
         public final Template.Method<Boolean> suckItems = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isSuckingEnabled = new Template.Method<Boolean>();
         public final Template.Method<Void> setSuckingEnabled = new Template.Method<Void>();

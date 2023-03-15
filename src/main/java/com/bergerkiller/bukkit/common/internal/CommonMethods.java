@@ -1,7 +1,9 @@
 package com.bergerkiller.bukkit.common.internal;
 
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -23,13 +25,25 @@ public class CommonMethods {
         } else if (damager instanceof LivingEntity) {
             source = DamageSourceHandle.mobAttack((LivingEntity) damager);
         } else {
-            source = DamageSourceHandle.byName("generic");
+            source = DamageSourceHandle.genericForEntity(entity);
         }
         CommonNMS.getHandle(entity).damageEntity(source, (float) damage);
     }
 
-    public static DamageSourceHandle DamageSource_from_damagecause(DamageCause cause) {
-        return DamageSourceHandle.byName(getSourceName(cause));
+    public static DamageSourceHandle DamageSource_from_damagecause(Entity entity, DamageCause cause) {
+        DamageSourceHandle result = DamageSourceHandle.byNameForEntity(entity, getSourceName(cause));
+        if (result == null) {
+            result = DamageSourceHandle.genericForEntity(entity);
+        }
+        return result;
+    }
+
+    public static DamageSourceHandle DamageSource_from_damagecause(World world, DamageCause cause) {
+        DamageSourceHandle result = DamageSourceHandle.byName(world, getSourceName(cause));
+        if (result == null) {
+            result = DamageSourceHandle.generic(world);
+        }
+        return result;
     }
 
     private static String getSourceName(DamageCause cause) {

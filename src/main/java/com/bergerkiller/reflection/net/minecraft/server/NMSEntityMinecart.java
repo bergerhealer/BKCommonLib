@@ -47,7 +47,6 @@ public class NMSEntityMinecart {
 
     public static class Hopper {
         public static final ClassTemplate<?> T = ClassTemplate.create(EntityMinecartHopperHandle.T.getType());
-        public static final FieldAccessor<Integer> suckingCooldown = EntityMinecartHopperHandle.T.suckingCooldown.toFieldAccessor();
     }
 
     public static class TNT {

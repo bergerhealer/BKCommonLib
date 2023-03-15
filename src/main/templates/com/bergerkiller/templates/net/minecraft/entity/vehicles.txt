@@ -117,14 +117,6 @@ class EntityMinecartFurnace extends EntityMinecartAbstract {
 }
 
 class EntityMinecartHopper extends EntityMinecartAbstract {
-#if version >= 1.17
-    private int suckingCooldown:cooldownTime;
-#elseif version >= 1.13
-    private int suckingCooldown:e;
-#else
-    private int suckingCooldown:b;
-#endif
-
 #if version >= 1.18
     public boolean suckItems:suckInItems();
 #elseif version >= 1.16

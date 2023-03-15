@@ -1,10 +1,12 @@
 package com.bergerkiller.generated.net.minecraft.world.damagesource;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
+import org.bukkit.World;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.LivingEntity;
+import java.util.Map;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.world.damagesource.DamageSource</b>.
@@ -22,6 +24,14 @@ public abstract class DamageSourceHandle extends Template.Handle {
     }
 
     /* ============================================================================== */
+
+    public static DamageSourceHandle generic(World world) {
+        return T.generic.invoke(world);
+    }
+
+    public static DamageSourceHandle genericForEntity(Entity entity) {
+        return T.genericForEntity.invoke(entity);
+    }
 
     public static DamageSourceHandle mobAttack(LivingEntity livingEntity) {
         return T.mobAttack.invoke(livingEntity);
@@ -47,43 +57,86 @@ public abstract class DamageSourceHandle extends Template.Handle {
         return T.thorns.invoke(entity);
     }
 
+    public static DamageSourceHandle byName(World world, String name) {
+        return T.byName.invoke(world, name);
+    }
+
+    public static DamageSourceHandle byNameForEntity(Entity entity, String name) {
+        return T.byNameForEntity.invoke(entity, name);
+    }
+
+    public static void initNameLookup(Map<String, Object> lookup) {
+        T.initNameLookup.invoker.invoke(null,lookup);
+    }
+
+    public abstract String getTranslationIndex();
+    public abstract Entity getEntity();
     public abstract boolean isExplosion();
     public abstract boolean isFireDamage();
-    public abstract Entity getEntity();
 
-    private static final java.util.HashMap<String, DamageSourceHandle> _values = new java.util.HashMap<String, DamageSourceHandle>();
-    public static DamageSourceHandle byName(String name) {
-        if (_values.size() == 0) {
-            for (Object rawValue : com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(T.getType())) {
-                DamageSourceHandle handle = createHandle(rawValue);
-                _values.put(handle.getTranslationIndex(), handle);
-            }
+    public static final java.util.Map<String, Object> INTERNAL_NAME_TO_KEY = new java.util.HashMap<>();
+    static {
+        try {
+            initNameLookup(INTERNAL_NAME_TO_KEY);
+        } catch (Throwable t) {
+            com.bergerkiller.bukkit.common.Logging.LOGGER_REGISTRY.log(java.util.logging.Level.SEVERE,
+                    "Failed to initialize damage sources by name", t);
         }
-        DamageSourceHandle result = _values.get(name);
-        if (result == null) {
-            result = _values.get("generic");
-        }
-        return result;
+
+        translateLegacyName("inFire", "in_fire");
+        translateLegacyName("lightningBolt", "lightning_bolt");
+        translateLegacyName("onFire", "on_fire");
+        translateLegacyName("hotFloor", "hot_floor");
+        translateLegacyName("inWall", "in_wall");
+        translateLegacyName("flyIntoWall", "fly_into_wall");
+        translateLegacyName("outOfWorld", "out_of_world");
+        translateLegacyName("dragonBreath", "dragon_breath");
+        translateLegacyName("dryout", "dry_out");
+        translateLegacyName("sweetBerryBush", "sweet_berry_bush");
+        translateLegacyName("fallingBlock", "falling_block");
+        translateLegacyName("anvil", "falling_anvil");
+        translateLegacyName("fallingStalactite", "falling_stalactite");
+        translateLegacyName("mob", "mob_attack");
+        translateLegacyName("mob", "mob_attack_no_aggro");
+        translateLegacyName("player", "player_attack");
+        translateLegacyName("mob", "mob_projectile");
+        translateLegacyName("onFire", "unattributed_fireball");
+        translateLegacyName("witherSkull", "wither_skull");
+        translateLegacyName("indirectMagic", "indirect_magic");
+        translateLegacyName("explosion.player", "player_explosion");
+        translateLegacyName("badRespawnPoint", "bad_respawn_point");
     }
-    public abstract String getTranslationIndex();
-    public abstract void setTranslationIndex(String value);
+
+    private static void translateLegacyName(String legacyName, String registryName) {
+        Object byLegacy = INTERNAL_NAME_TO_KEY.get(legacyName);
+        Object byRegistyName = INTERNAL_NAME_TO_KEY.get(registryName);
+        if (byLegacy != null && byRegistyName == null) {
+            INTERNAL_NAME_TO_KEY.put(registryName, byLegacy);
+        } else if (byLegacy == null && byRegistyName != null) {
+            INTERNAL_NAME_TO_KEY.put(legacyName, byRegistyName);
+        }
+    }
     /**
      * Stores class members for <b>net.minecraft.world.damagesource.DamageSource</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class DamageSourceClass extends Template.Class<DamageSourceHandle> {
-        public final Template.Field<String> translationIndex = new Template.Field<String>();
-
+        public final Template.StaticMethod.Converted<DamageSourceHandle> generic = new Template.StaticMethod.Converted<DamageSourceHandle>();
+        public final Template.StaticMethod.Converted<DamageSourceHandle> genericForEntity = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> mobAttack = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> playerAttack = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> arrowHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> thrownHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> magicHit = new Template.StaticMethod.Converted<DamageSourceHandle>();
         public final Template.StaticMethod.Converted<DamageSourceHandle> thorns = new Template.StaticMethod.Converted<DamageSourceHandle>();
+        public final Template.StaticMethod.Converted<DamageSourceHandle> byName = new Template.StaticMethod.Converted<DamageSourceHandle>();
+        public final Template.StaticMethod.Converted<DamageSourceHandle> byNameForEntity = new Template.StaticMethod.Converted<DamageSourceHandle>();
+        public final Template.StaticMethod<Void> initNameLookup = new Template.StaticMethod<Void>();
 
+        public final Template.Method<String> getTranslationIndex = new Template.Method<String>();
+        public final Template.Method.Converted<Entity> getEntity = new Template.Method.Converted<Entity>();
         public final Template.Method<Boolean> isExplosion = new Template.Method<Boolean>();
         public final Template.Method<Boolean> isFireDamage = new Template.Method<Boolean>();
-        public final Template.Method.Converted<Entity> getEntity = new Template.Method.Converted<Entity>();
 
     }
 

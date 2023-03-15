@@ -23,6 +23,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectList;
 import net.minecraft.world.entity.player.EnumChatVisibility;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.RelativeMovement;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.biome.BiomeManager;
@@ -63,7 +64,6 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayInBlockDigHandle.EnumPlayerDigTypeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutOpenWindowHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle;
-import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle.EnumPlayerTeleportFlagsHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutKeepAliveHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutUpdateAttributesHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTitleHandle;
@@ -79,6 +79,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
+import com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle;
 import com.bergerkiller.generated.net.minecraft.world.entity.ai.attributes.AttributeModifiableHandle;
 
 class PacketPlayOutEntityDestroy extends Packet {
@@ -1592,7 +1593,7 @@ class PacketPlayOutPosition extends Packet {
     private double z:z;
     private float yaw:yRot;
     private float pitch:xRot;
-    private (Set<EnumPlayerTeleportFlagsHandle>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:relativeArguments;
+    private (Set<RelativeMovementHandle>) Set<RelativeMovement> teleportFlags:relativeArguments;
 
     // >= MC 1.9
     private optional int teleportWaitTimer:id;
@@ -1602,7 +1603,7 @@ class PacketPlayOutPosition extends Packet {
     private double z:c;
     private float yaw:d;
     private float pitch:e;
-    private (Set<EnumPlayerTeleportFlagsHandle>) Set<PacketPlayOutPosition.EnumPlayerTeleportFlags> teleportFlags:f;
+    private (Set<RelativeMovementHandle>) Set<RelativeMovement> teleportFlags:f;
 
     // >= MC 1.9
     private optional int teleportWaitTimer:g;
@@ -1624,33 +1625,35 @@ class PacketPlayOutPosition extends Packet {
     }
 
     public void setRotationRelative(boolean relative) {
-        Set<EnumPlayerTeleportFlagsHandle> flags = getTeleportFlags();
+        Set<RelativeMovementHandle> flags = getTeleportFlags();
         if (relative) {
-            flags.add(EnumPlayerTeleportFlagsHandle.Y_ROT);
-            flags.add(EnumPlayerTeleportFlagsHandle.X_ROT);
+            flags.add(RelativeMovementHandle.Y_ROT);
+            flags.add(RelativeMovementHandle.X_ROT);
         } else {
-            flags.remove(EnumPlayerTeleportFlagsHandle.Y_ROT);
-            flags.remove(EnumPlayerTeleportFlagsHandle.X_ROT);
+            flags.remove(RelativeMovementHandle.Y_ROT);
+            flags.remove(RelativeMovementHandle.X_ROT);
         }
     }
 
     public void setPositionRelative(boolean relative) {
-        Set<EnumPlayerTeleportFlagsHandle> flags = getTeleportFlags();
+        Set<RelativeMovementHandle> flags = getTeleportFlags();
         if (relative) {
-            flags.add(EnumPlayerTeleportFlagsHandle.X);
-            flags.add(EnumPlayerTeleportFlagsHandle.Y);
-            flags.add(EnumPlayerTeleportFlagsHandle.Z);
+            flags.add(RelativeMovementHandle.X);
+            flags.add(RelativeMovementHandle.Y);
+            flags.add(RelativeMovementHandle.Z);
         } else {
-            flags.remove(EnumPlayerTeleportFlagsHandle.X);
-            flags.remove(EnumPlayerTeleportFlagsHandle.Y);
-            flags.remove(EnumPlayerTeleportFlagsHandle.Z);
+            flags.remove(RelativeMovementHandle.X);
+            flags.remove(RelativeMovementHandle.Y);
+            flags.remove(RelativeMovementHandle.Z);
         }
     }
     </code>
 
     public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createRelative(double dx, double dy, double dz, float dyaw, float dpitch) {
-        java.util.Set flags = com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allRelative();
-#if version >= 1.17
+        java.util.Set flags = com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle.allRelative();
+#if version >= 1.19.4
+        return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
+#elseif version >= 1.17
         return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0, false);
 #elseif version >= 1.9
         return new PacketPlayOutPosition(dx, dy, dz, dyaw, dpitch, flags, 0);
@@ -1666,32 +1669,16 @@ class PacketPlayOutPosition extends Packet {
     </code>
 
     public static (PacketPlayOutPositionHandle) PacketPlayOutPosition createAbsolute(double x, double y, double z, float yaw, float pitch) {
-        java.util.Set flags = com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutPositionHandle$EnumPlayerTeleportFlagsHandle.allAbsolute();
-#if version >= 1.17
+        java.util.Set flags = com.bergerkiller.generated.net.minecraft.world.entity.RelativeMovementHandle.allAbsolute();
+#if version >= 1.19.4
+        return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
+#elseif version >= 1.17
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0, false);
 #elseif version >= 1.9
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags, 0);
 #else
         return new PacketPlayOutPosition(x, y, z, yaw, pitch, flags);
 #endif
-    }
-
-    class PacketPlayOutPosition.EnumPlayerTeleportFlags {
-        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags X;
-        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Y;
-        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Z;
-        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags Y_ROT;
-        enum (EnumPlayerTeleportFlagsHandle) PacketPlayOutPosition.EnumPlayerTeleportFlags X_ROT;
-
-        <code>
-        public static Set<?> allAbsolute() {
-            return java.util.EnumSet.noneOf((Class) T.getType());
-        }
-
-        public static Set<?> allRelative() {
-            return java.util.EnumSet.allOf((Class) T.getType());
-        }
-        </code>
     }
 }
 

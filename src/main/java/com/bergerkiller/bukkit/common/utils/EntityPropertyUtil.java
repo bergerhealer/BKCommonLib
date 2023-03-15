@@ -171,7 +171,7 @@ public class EntityPropertyUtil extends EntityGroupingUtil {
      */
     public static void damage(org.bukkit.entity.Entity entity, DamageCause cause, double damage) {
         EntityHandle eh = EntityHandle.fromBukkit(entity);
-        eh.damageEntity(CommonMethods.DamageSource_from_damagecause(cause), (float) damage);
+        eh.damageEntity(CommonMethods.DamageSource_from_damagecause(entity, cause), (float) damage);
     }
 
     /**

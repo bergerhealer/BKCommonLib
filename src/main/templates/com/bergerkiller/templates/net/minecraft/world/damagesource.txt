@@ -6,15 +6,101 @@ import net.minecraft.world.entity.player.EntityHuman;
 import net.minecraft.world.entity.projectile.EntityArrow;
 import net.minecraft.world.entity.projectile.EntityFireball;
 
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.MinecraftKey;
+
 import com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle;
 
 class DamageSource {
-#if version >= 1.17
-    public String translationIndex:msgId;
+#if version >= 1.18
+    public String getTranslationIndex:getMsgId();
 #else
-    public String translationIndex;
+    public String getTranslationIndex() {
+  #if version >= 1.17
+        return instance.msgId;
+  #else
+        return instance.translationIndex;
+  #endif
+    }
 #endif
 
+    public (org.bukkit.entity.Entity) Entity getEntity();
+
+#if version >= 1.19.4
+    public boolean isExplosion() {
+        return instance.is(DamageTypes.EXPLOSION) || instance.is(DamageTypes.PLAYER_EXPLOSION);
+    }
+
+    public boolean isFireDamage() {
+        return instance.is(DamageTypes.IN_FIRE) || instance.is(DamageTypes.ON_FIRE);
+    }
+
+    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.World world) {
+        return world.damageSources().generic();
+    }
+
+    public static (DamageSourceHandle) DamageSource genericForEntity((org.bukkit.entity.Entity) net.minecraft.world.entity.Entity entity) {
+        return entity.damageSources().generic();
+    }
+
+    public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) EntityLiving livingEntity) {
+        return livingEntity.damageSources().mobAttack(livingEntity);
+    }
+
+    public static (DamageSourceHandle) DamageSource playerAttack((org.bukkit.entity.HumanEntity) EntityHuman humanEntity) {
+        return humanEntity.damageSources().playerAttack(humanEntity);
+    }
+
+    public static (DamageSourceHandle) DamageSource arrowHit:arrow((org.bukkit.entity.Arrow) EntityArrow arrow, (org.bukkit.entity.Entity) Entity damager) {
+        return arrow.damageSources().arrow(arrow, damager);
+    }
+
+    public static (DamageSourceHandle) DamageSource thrownHit:thrown((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager) {
+        return projectile.damageSources().thrown(projectile, damager);
+    }
+
+    public static (DamageSourceHandle) DamageSource magicHit:indirectMagic((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager) {
+        return magicEntity.damageSources().indirectMagic(magicEntity, damager);
+    }
+
+    public static (DamageSourceHandle) DamageSource thorns((org.bukkit.entity.Entity) Entity entity) {
+        return entity.damageSources().thorns(entity);
+    }
+
+    #require net.minecraft.world.damagesource.DamageSources public com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle lookupDamageSource(String name) {
+        net.minecraft.resources.ResourceKey key = (ResourceKey) com.bergerkiller.generated.net.minecraft.world.damagesource.DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
+        if (key == null) {
+            return null;
+        }
+        DamageSource source;
+        try {
+            #require DamageSources private DamageSource source(net.minecraft.resources.ResourceKey<DamageType> resourcekey);
+            source = instance#source(key);
+        } catch (Throwable t) {
+            return null;
+        }
+        return DamageSourceHandle.createHandle(source);
+    }
+
+    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.World world, String name) {
+        DamageSources sources = world.damageSources();
+        return sources#lookupDamageSource(name);
+    }
+
+    public static DamageSourceHandle byNameForEntity((org.bukkit.entity.Entity) net.minecraft.world.entity.Entity entity, String name) {
+        DamageSources sources = entity.damageSources();
+        return sources#lookupDamageSource(name);
+    }
+
+    public static void initNameLookup(java.util.Map<String, Object> lookup) {
+        Object[] constants = com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(DamageTypes.class);
+        for (int i = 0; i < constants.length; i++) {
+            ResourceKey key = (ResourceKey) constants[i];
+            lookup.put(key.location().getPath(), key);
+        }
+    }
+
+#else
     public boolean isExplosion();
 
 #if version >= 1.15
@@ -25,7 +111,13 @@ class DamageSource {
     public boolean isFireDamage:o();
 #endif
 
-    public (org.bukkit.entity.Entity) Entity getEntity();
+    public static (DamageSourceHandle) DamageSource generic((org.bukkit.World) net.minecraft.world.level.World world) {
+        return DamageSource.GENERIC;
+    }
+
+    public static (DamageSourceHandle) DamageSource genericForEntity((org.bukkit.World) net.minecraft.world.level.World world) {
+        return DamageSource.GENERIC;
+    }
 
     public static (DamageSourceHandle) DamageSource mobAttack((org.bukkit.entity.LivingEntity) EntityLiving livingEntity);
 
@@ -36,41 +128,87 @@ class DamageSource {
     // Now uses EntityFireballFireball but no clue what that is?
     //public static (DamageSourceHandle) DamageSource fireballHit:fireball((org.bukkit.entity.Fireball) EntityFireball fireball, (org.bukkit.entity.Entity) Entity damager)
 
-#if version >= 1.18
+  #if version >= 1.18
     public static (DamageSourceHandle) DamageSource thrownHit:thrown((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
-#else
+  #else
     public static (DamageSourceHandle) DamageSource thrownHit:projectile((org.bukkit.entity.Entity) Entity projectile, (org.bukkit.entity.Entity) Entity damager);
-#endif
+  #endif
 
-#if version >= 1.18
+  #if version >= 1.18
     public static (DamageSourceHandle) DamageSource magicHit:indirectMagic((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
-#elseif version >= 1.13
+  #elseif version >= 1.13
     public static (DamageSourceHandle) DamageSource magicHit:c((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
-#else
+  #else
     public static (DamageSourceHandle) DamageSource magicHit:b((org.bukkit.entity.Entity) Entity magicEntity, (org.bukkit.entity.Entity) Entity damager);
-#endif
+  #endif
 
-#if version >= 1.18
+  #if version >= 1.18
     public static (DamageSourceHandle) DamageSource thorns((org.bukkit.entity.Entity) Entity entity);
-#else
+  #else
     public static (DamageSourceHandle) DamageSource thorns:a((org.bukkit.entity.Entity) Entity entity);
+  #endif
+
+    public static DamageSourceHandle byName((org.bukkit.World) net.minecraft.world.level.World world, String name) {
+        return DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
+    }
+
+    public static DamageSourceHandle byNameForEntity((org.bukkit.entity.Entity) net.minecraft.world.entity.Entity entity, String name) {
+        return DamageSourceHandle.INTERNAL_NAME_TO_KEY.get(name);
+    }
+
+    public static void initNameLookup(java.util.Map<String, Object> lookup) {
+        Object[] constants = com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(DamageSource.class);
+        for (int i = 0; i < constants.length; i++) {
+            Object constant = constants[i];
+            DamageSourceHandle handle = DamageSourceHandle.createHandle(constant);
+            lookup.put(handle.getTranslationIndex(), handle);
+        }
+    }
 #endif
 
-    /* Get damage source by translationIndex key */
-    <code>
-    private static final java.util.HashMap<String, DamageSourceHandle> _values = new java.util.HashMap<String, DamageSourceHandle>();
-    public static DamageSourceHandle byName(String name) {
-        if (_values.size() == 0) {
-            for (Object rawValue : com.bergerkiller.bukkit.common.utils.CommonUtil.getClassConstants(T.getType())) {
-                DamageSourceHandle handle = createHandle(rawValue);
-                _values.put(handle.getTranslationIndex(), handle);
-            }
+<code>
+    public static final java.util.Map<String, Object> INTERNAL_NAME_TO_KEY = new java.util.HashMap<>();
+    static {
+        try {
+            initNameLookup(INTERNAL_NAME_TO_KEY);
+        } catch (Throwable t) {
+            com.bergerkiller.bukkit.common.Logging.LOGGER_REGISTRY.log(java.util.logging.Level.SEVERE,
+                    "Failed to initialize damage sources by name", t);
         }
-        DamageSourceHandle result = _values.get(name);
-        if (result == null) {
-            result = _values.get("generic");
-        }
-        return result;
+
+        // Bleh!
+        translateLegacyName("inFire", "in_fire");
+        translateLegacyName("lightningBolt", "lightning_bolt");
+        translateLegacyName("onFire", "on_fire");
+        translateLegacyName("hotFloor", "hot_floor");
+        translateLegacyName("inWall", "in_wall");
+        translateLegacyName("flyIntoWall", "fly_into_wall");
+        translateLegacyName("outOfWorld", "out_of_world");
+        translateLegacyName("dragonBreath", "dragon_breath");
+        translateLegacyName("dryout", "dry_out");
+        translateLegacyName("sweetBerryBush", "sweet_berry_bush");
+        translateLegacyName("fallingBlock", "falling_block");
+        translateLegacyName("anvil", "falling_anvil");
+        translateLegacyName("fallingStalactite", "falling_stalactite");
+        translateLegacyName("mob", "mob_attack");
+        translateLegacyName("mob", "mob_attack_no_aggro");
+        translateLegacyName("player", "player_attack");
+        translateLegacyName("mob", "mob_projectile");
+        translateLegacyName("onFire", "unattributed_fireball");
+        translateLegacyName("witherSkull", "wither_skull");
+        translateLegacyName("indirectMagic", "indirect_magic");
+        translateLegacyName("explosion.player", "player_explosion");
+        translateLegacyName("badRespawnPoint", "bad_respawn_point");
     }
-    </code>
+
+    private static void translateLegacyName(String legacyName, String registryName) {
+        Object byLegacy = INTERNAL_NAME_TO_KEY.get(legacyName);
+        Object byRegistyName = INTERNAL_NAME_TO_KEY.get(registryName);
+        if (byLegacy != null && byRegistyName == null) {
+            INTERNAL_NAME_TO_KEY.put(registryName, byLegacy);
+        } else if (byLegacy == null && byRegistyName != null) {
+            INTERNAL_NAME_TO_KEY.put(legacyName, byRegistyName);
+        }
+    }
+</code>
 }

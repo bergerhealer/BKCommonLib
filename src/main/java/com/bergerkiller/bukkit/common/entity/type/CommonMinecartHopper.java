@@ -59,18 +59,20 @@ public class CommonMinecartHopper extends CommonMinecartInventory<HopperMinecart
      * Sets the remaining ticks until the next Item sucking operation occurs
      *
      * @param cooldownTicks to set to
+     * @deprecated This method doesn't do anything and never did
      */
+    @Deprecated
     public void setSuckingCooldown(int cooldownTicks) {
-        EntityMinecartHopperHandle.T.suckingCooldown.setInteger(getHandle(), cooldownTicks);
     }
 
     /**
      * Gets the remaining ticks until the next Item sucking operation occurs
      *
      * @return sucking cooldown ticks
+     * @deprecated This method always returns 0. It never was used for anything.
      */
+    @Deprecated
     public int getSuckingCooldown() {
-        return EntityMinecartHopperHandle.T.suckingCooldown.getInteger(getHandle());
+        return 0;
     }
-
 }

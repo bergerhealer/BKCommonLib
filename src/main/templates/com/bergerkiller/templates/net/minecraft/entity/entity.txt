@@ -1321,6 +1321,12 @@ optional (EntityTrackerEntryHandle) EntityTrackerEntry tracker;
      */
 #if exists net.minecraft.world.entity.Entity public void burn(float dmg);
     public void burn(float dmg);
+#elseif version >= 1.19.4
+    public void burn(float dmg) {
+        if (!instance.fireImmune()) {
+            instance.hurt(instance.damageSources().inFire(), dmg);
+        }
+    }
 #elseif version >= 1.18
     public void burn(float dmg) {
         if (!instance.fireImmune()) {
