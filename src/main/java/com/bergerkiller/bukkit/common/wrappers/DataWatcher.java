@@ -87,6 +87,10 @@ public class DataWatcher extends BasicWrapper<DataWatcherHandle> implements Clon
                     throw ex;
                 } else {
                     watch(key, value);
+
+                    // It's essential we force-set afterwards, because otherwise this
+                    // updated value isn't going to be sent to clients.
+                    handle.forceSet(key, value);
                 }
             }
         }
