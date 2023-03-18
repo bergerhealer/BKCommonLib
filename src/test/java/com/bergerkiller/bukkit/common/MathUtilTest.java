@@ -125,6 +125,29 @@ public class MathUtilTest {
     }
 
     @Test
+    public void testMatrixRotationFlip() {
+        // Two identical transforms
+        Matrix4x4 transformA = new Matrix4x4();
+        transformA.translateRotate(2.0, 3.0, 4.0, -12.0f, 34.0f);
+        Matrix4x4 transformB = transformA.clone();
+
+        // Flip X
+        transformA.rotateX(180.0);
+        transformB.rotateXFlip();
+        testMatricesEqual(transformA, transformB);
+
+        // Flip Y
+        transformA.rotateY(180.0);
+        transformB.rotateYFlip();
+        testMatricesEqual(transformA, transformB);
+
+        // Flip Z
+        transformA.rotateZ(180.0);
+        transformB.rotateZFlip();
+        testMatricesEqual(transformA, transformB);
+    }
+
+    @Test
     public void testQuaternionYPRRollSuppression() {
         // Try many different kind of rotations, and verify that roll is always kept between -90 and 90
         for (int i = 0; i < 10000; i++) {
@@ -550,6 +573,22 @@ public class MathUtilTest {
                  "{" + expected.getX() + "/" + expected.getY() + "/" + expected.getZ() + "}, but was " +
                  "{" + actual.getX() + "/" + actual.getY() + "/" + actual.getZ() + "}");
                    
+        }
+    }
+
+    // checks all 16 components of a 4x4 matrix are roughly equal
+    public static void testMatricesEqual(Matrix4x4 expected, Matrix4x4 actual) {
+        testMatricesEqual(expected, actual, 1e-8);
+    }
+
+    // checks all 16 components of a 4x4 matrix are roughly equal
+    public static void testMatricesEqual(Matrix4x4 expected, Matrix4x4 actual, double delta) {
+        double[] exp_d  = new double[16];
+        double[] act_d  = new double[16];
+        expected.toArray(exp_d);
+        actual.toArray(act_d);
+        for (int i = 0; i < 16; i++) {
+            assertEquals(exp_d[i], act_d[i], delta);
         }
     }
 }

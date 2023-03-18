@@ -241,6 +241,22 @@ public class Matrix4x4 implements Cloneable {
     }
 
     /**
+     * Rotates this matrix 180 degrees around the x-axis
+     */
+    public final void rotateXFlip() {
+        // rotateX_unsafe(-1.0, 0.0);
+
+        m01 = -m01;
+        m02 = -m02;
+        m11 = -m11;
+        m12 = -m12;
+        m21 = -m21;
+        m22 = -m22;
+        m31 = -m31;
+        m32 = -m32;
+    }
+
+    /**
      * Multiplies this matrix with a rotation transformation about the X-axis.
      * Instead of a single angle, the y and z of the rotated vector can be specified.
      * 
@@ -286,6 +302,22 @@ public class Matrix4x4 implements Cloneable {
             double angleRad = Math.toRadians(angle);
             rotateY_unsafe(Math.cos(angleRad), Math.sin(angleRad));
         }
+    }
+
+    /**
+     * Rotates this matrix 180 degrees around the y-axis
+     */
+    public final void rotateYFlip() {
+        //rotateY_unsafe(-1.0, 0.0);
+
+        m00 = -m00;
+        m02 = -m02;
+        m10 = -m10;
+        m12 = -m12;
+        m20 = -m20;
+        m22 = -m22;
+        m30 = -m30;
+        m32 = -m32;
     }
 
     /**
@@ -348,6 +380,22 @@ public class Matrix4x4 implements Cloneable {
         rotateZ_unsafe(x * f, y * f);
     }
 
+    /**
+     * Rotates this matrix 180 degrees around the z-axis
+     */
+    public final void rotateZFlip() {
+        // rotateZ_unsafe(-1.0, 0.0);
+
+        m00 = -m00;
+        m01 = -m01;
+        m10 = -m10;
+        m11 = -m11;
+        m20 = -m20;
+        m21 = -m21;
+        m30 = -m30;
+        m31 = -m31;
+    }
+
     private final void rotateZ_unsafe(double cos, double sin) {
         double m00, m01;
         double m10, m11;
@@ -371,7 +419,7 @@ public class Matrix4x4 implements Cloneable {
         this.m20 = m20; this.m21 = m21;
         this.m30 = m30; this.m31 = m31;
     }
-    
+
     /**
      * Multiplies this matrix with a rotation transformation in yaw/pitch/roll, based on the Minecraft
      * coordinate system. This will differ slightly from the standard rotateX/Y/Z functions.
