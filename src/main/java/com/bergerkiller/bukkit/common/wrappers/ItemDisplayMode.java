@@ -59,7 +59,7 @@ public enum ItemDisplayMode {
      * @param id Mode ID
      * @return Mode. {@link #NONE} if out of bounds.
      */
-    @ConverterMethod
+    @ConverterMethod(cost=-1)
     public static ItemDisplayMode byId(byte id) {
         int int_id = (id & 0xFF);
         ItemDisplayMode[] values = VALUES_BY_ID;
@@ -72,7 +72,7 @@ public enum ItemDisplayMode {
      * @param mode Item Display Mode
      * @return ID of this mode
      */
-    @ConverterMethod
+    @ConverterMethod(cost=-1)
     public static byte getId(ItemDisplayMode mode) {
         return mode.bId;
     }

@@ -241,6 +241,8 @@ public class DataWatcherTest {
             return;
         }
 
+        CommonBootstrap.initServer();
+
         ItemStack item = ItemUtil.createItem(MaterialUtil.getMaterial("ACACIA_LOG"), 1);
         ItemUtil.getMetaTag(item, true).putValue("UniqueKey", "UniqueValue123");
 
@@ -253,6 +255,8 @@ public class DataWatcherTest {
         }
 
         for (ItemDisplayMode mode : ItemDisplayMode.values()) {
+            assertEquals(mode, ItemDisplayMode.byId(ItemDisplayMode.getId(mode)));
+
             metadata.set(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE, mode);
             assertEquals(mode, metadata.get(DisplayHandle.ItemDisplayHandle.DATA_ITEM_DISPLAY_MODE));
         }
