@@ -927,8 +927,24 @@ public class CommonUtil {
      * @param theClass to get the class constants of
      * @return class constants defined in class 'theClass'
      */
+    @SuppressWarnings("unchecked")
     public static <T> T[] getClassConstants(Class<T> theClass) {
-        return getClassConstants(theClass, theClass);
+        // Class itself is an enum?
+        if (theClass.isEnum()) {
+            return getEnumClassConstants(theClass, theClass);
+        }
+
+        // Check type is not a subclass of the actual enum it is stored inside of
+        // This happens when enums are declared with bodies (method overrides)
+        {
+            Class<?> superType = theClass.getSuperclass();
+            if (superType != null && superType.isEnum()) {
+                return (T[]) getEnumClassConstants(superType, superType);
+            }
+        }
+
+        // Try static fields
+        return getStaticFieldConstants(theClass, theClass);
     }
 
     /**
@@ -943,35 +959,60 @@ public class CommonUtil {
      */
     @SuppressWarnings("unchecked")
     public static <T> T[] getClassConstants(Class<?> theClass, Class<T> type) {
+        // Check the class is an enum
         if (theClass.isEnum() && type.isAssignableFrom(theClass)) {
-            if (type.equals(theClass)) {
-                // If same class, return the enum constants instantly
-                return type.getEnumConstants();
-            } else {
-                // Need to create a new array of the type specified
-                Object[] constants = theClass.getEnumConstants();
-                T[] result = LogicUtil.createArray(type, constants.length);
-                System.arraycopy(constants, 0, result, 0, constants.length);
-                return result;
+            return getEnumClassConstants(theClass, type);
+        }
+
+        // Check type is not a subclass of the actual enum it is stored inside of
+        // This happens when enums are declared with bodies (method overrides)
+        {
+            Class<?> superType;
+            if (!theClass.isEnum() &&
+                    (superType=theClass.getSuperclass()) != null &&
+                    superType.isEnum() &&
+                    type.isAssignableFrom(superType)
+            ) {
+                return getEnumClassConstants(superType, type);
             }
+        }
+
+        // Try static fields
+        return getStaticFieldConstants(theClass, type);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] getEnumClassConstants(Class<?> enumClass, Class<T> typeToReturn) {
+        if (enumClass.equals(typeToReturn)) {
+            // If same class, return the enum constants instantly
+            return (T[]) enumClass.getEnumConstants();
         } else {
-            // Get using reflection
-            try {
-                Field[] declaredFields = theClass.getDeclaredFields();
-                ArrayList<T> constants = new ArrayList<T>(declaredFields.length);
-                for (Field field : declaredFields) {
-                    if (Modifier.isStatic(field.getModifiers()) && type.isAssignableFrom(field.getType())) {
-                        T constant = (T) field.get(null);
-                        if (constant != null) {
-                            constants.add(constant);
-                        }
+            // Need to create a new array of the type specified
+            Object[] constants = enumClass.getEnumConstants();
+            T[] result = LogicUtil.createArray(typeToReturn, constants.length);
+            System.arraycopy(constants, 0, result, 0, constants.length);
+            return result;
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T[] getStaticFieldConstants(Class<?> theClass, Class<T> typeToReturn) {
+        // Get using reflection
+        try {
+            Field[] declaredFields = theClass.getDeclaredFields();
+            ArrayList<T> constants = new ArrayList<T>(declaredFields.length);
+            for (Field field : declaredFields) {
+                if (Modifier.isStatic(field.getModifiers()) && typeToReturn.isAssignableFrom(field.getType())) {
+                    T constant = (T) field.get(null);
+                    if (constant != null) {
+                        constants.add(constant);
                     }
                 }
-                return LogicUtil.toArray(constants, type);
-            } catch (Throwable t) {
-                Logging.LOGGER.log(Level.WARNING, "Failed to find class constants of " + theClass, t);
-                return LogicUtil.createArray(type, 0);
             }
+            return LogicUtil.toArray(constants, typeToReturn);
+        } catch (Throwable t) {
+            Logging.LOGGER.log(Level.WARNING, "Failed to find class constants of " + theClass, t);
+            return LogicUtil.createArray(typeToReturn, 0);
         }
     }
 
