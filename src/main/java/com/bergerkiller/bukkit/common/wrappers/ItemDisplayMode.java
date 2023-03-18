@@ -9,13 +9,13 @@ import com.bergerkiller.mountiplex.conversion.annotations.ConverterMethod;
  */
 public enum ItemDisplayMode {
     NONE(0, "none"),
-    THIRD_PERSON_LEFT_HAND(1, "thirdperson_lefthand"),
-    THIRD_PERSON_RIGHT_HAND(2, "thirdperson_righthand"),
-    FIRST_PERSON_LEFT_HAND(3, "firstperson_lefthand"),
-    FIRST_PERSON_RIGHT_HAND(4, "firstperson_righthand"),
     HEAD(5, "head"),
-    GUI(6, "gui"),
+    THIRD_PERSON_LEFT_HAND(1, "3P left hand"),
+    THIRD_PERSON_RIGHT_HAND(2, "3P right hand"),
+    FIRST_PERSON_LEFT_HAND(3, "1P left hand"),
+    FIRST_PERSON_RIGHT_HAND(4, "1P right hand"),
     GROUND(7, "ground"),
+    GUI(6, "gui"),
     FIXED(8, "fixed");
 
     private final byte bId;
@@ -46,6 +46,11 @@ public enum ItemDisplayMode {
      */
     public String description() {
         return description;
+    }
+
+    @Override
+    public String toString() {
+        return description();
     }
 
     /**
