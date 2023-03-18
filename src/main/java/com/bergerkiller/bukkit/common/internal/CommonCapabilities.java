@@ -255,4 +255,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.19.4 BlockData can be serialized in entity metadata
      */
     public static final boolean HAS_BLOCKDATA_METADATA = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
+
+    /**
+     * Since Minecraft 1.19.4 the Display Entity can be used to display items/blocks/text
+     */
+    public static final boolean HAS_DISPLAY_ENTITY = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
 }
