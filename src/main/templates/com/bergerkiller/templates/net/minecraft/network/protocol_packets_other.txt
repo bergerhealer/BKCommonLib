@@ -2947,4 +2947,60 @@ optional class ClientboundBundlePacket extends Packet {
         #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> packets;
         instance#packets = packets;
     }
+
+    public boolean filterSubPackets(java.util.function.Predicate<Object> filter) {
+        Iterable packets = instance.subPackets();
+
+        // Begin by simply iterating and sending all elements to the filter
+        // So long the filter does not return false, we don't have to change anything
+        // Count the number of packets we've iterated so we know how many packets to
+        // copy over later.
+        int numIterated = 0;
+        java.util.Iterator iter = packets.iterator();
+        while (true) {
+            if (!iter.hasNext())
+                return true;
+
+            if (filter.test(iter.next())) {
+                numIterated++;
+                continue;
+            }
+        }
+
+        // Must rewrite the subpackets. For this, create a new ArrayList
+        // If the original iterable is already a List we can re-use its capacity
+        java.util.List newPackets;
+        if (packets instanceof java.util.List) {
+            java.util.List packetsList = (java.util.List) packets;
+            newPackets = new java.util.ArrayList(packetsList.size());
+            for (int i = 0; i < numIterated; i++) {
+                newPackets.add(packetsList.get(i));
+            }
+        } else {
+            newPackets = new java.util.ArrayList(numIterated + 8);
+            java.util.Iterator temp = packets.iterator();
+            for (int i = 0; i < numIterated && temp.hasNext(); i++) {
+                newPackets.add(temp.next());
+            }
+        }
+
+        // Resume as before and fill the new list of rewritten packets
+        while (true) {
+            if (iter.hasNext()) {
+                Object packet = iter.next();
+                if (filter.test(packet)) {
+                    newPackets.add(packet);
+                }
+            } else {
+                break;
+            }
+        }
+
+        // Update field with the new packets
+        #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> packets;
+        instance#packets = newPackets;
+
+        boolean hasPackets = !newPackets.isEmpty();
+        return hasPackets;
+    }
 }

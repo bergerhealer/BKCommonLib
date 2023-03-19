@@ -2,6 +2,7 @@ package com.bergerkiller.generated.net.minecraft.network.protocol.game;
 
 import com.bergerkiller.mountiplex.reflection.declarations.Template;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
+import java.util.function.Predicate;
 
 /**
  * Instance wrapper handle for type <b>net.minecraft.network.protocol.game.ClientboundBundlePacket</b>.
@@ -27,6 +28,7 @@ public abstract class ClientboundBundlePacketHandle extends PacketHandle {
 
     public abstract Iterable<Object> subPackets();
     public abstract void setSubPackets(Iterable<Object> packets);
+    public abstract boolean filterSubPackets(Predicate<Object> filter);
     /**
      * Stores class members for <b>net.minecraft.network.protocol.game.ClientboundBundlePacket</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
@@ -36,6 +38,7 @@ public abstract class ClientboundBundlePacketHandle extends PacketHandle {
 
         public final Template.Method.Converted<Iterable<Object>> subPackets = new Template.Method.Converted<Iterable<Object>>();
         public final Template.Method<Void> setSubPackets = new Template.Method<Void>();
+        public final Template.Method<Boolean> filterSubPackets = new Template.Method<Boolean>();
 
     }
 

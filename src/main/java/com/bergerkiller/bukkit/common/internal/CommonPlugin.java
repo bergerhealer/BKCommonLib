@@ -104,6 +104,7 @@ public class CommonPlugin extends PluginBase {
     private CommonEventFactory eventFactory;
     private boolean isServerStarted = false;
     private PacketHandler packetHandler = null;
+    private boolean warnedAboutBrokenBundlePacket = false;
     private PermissionHandler permissionHandler = null;
     private CommonServerLogRecorder serverLogRecorder = new CommonServerLogRecorder(this);
     private CommonMapController mapController = null;
@@ -389,16 +390,17 @@ public class CommonPlugin extends PluginBase {
 
     private boolean updatePacketHandler() {
         try {
-            final Class<? extends PacketHandler> handlerClass;
+            Class<? extends PacketHandler> handlerClass = CommonPacketHandler.class;
             if (CommonUtil.isPluginEnabled("ProtocolLib")) {
-                handlerClass = ProtocolLibPacketHandler.class;
-//			} else if (CommonUtil.getClass("org.spigotmc.netty.NettyServerConnection") != null) {
-//				handlerClass = SpigotPacketHandler.class;
-            } else {
-                handlerClass = CommonPacketHandler.class;
-//			} else {
-//				handlerClass = DisabledPacketHandler.class;
+                if (ProtocolLibPacketHandler.isBundlePacketWorking()) {
+                    handlerClass = ProtocolLibPacketHandler.class;
+                } else if (!warnedAboutBrokenBundlePacket) {
+                    warnedAboutBrokenBundlePacket = true;
+                    Logging.LOGGER_NETWORK.log(Level.WARNING, "ProtocolLib cannot be used because it does not support the Bundle packet yet");
+                    Logging.LOGGER_NETWORK.log(Level.WARNING, "Please update ProtocolLib to a 1.19.4+ supporting version");
+                }
             }
+
             // Register the packet handler
             if (this.packetHandler != null && this.packetHandler.getClass() == handlerClass) {
                 return true;

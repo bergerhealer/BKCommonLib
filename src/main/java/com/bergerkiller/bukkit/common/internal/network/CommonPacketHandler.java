@@ -10,11 +10,13 @@ import com.bergerkiller.generated.net.minecraft.server.network.PlayerConnectionH
 
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelDuplexHandler;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPromise;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.logging.Level;
 

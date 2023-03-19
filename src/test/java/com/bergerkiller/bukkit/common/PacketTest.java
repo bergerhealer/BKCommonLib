@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common;
 import static org.junit.Assert.*;
 
 import com.bergerkiller.bukkit.common.internal.CommonBootstrap;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import org.junit.Test;
 
 import com.bergerkiller.bukkit.common.bases.IntVector3;
@@ -13,6 +14,17 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutTileEntityDataHandle;
 
 public class PacketTest {
+
+    @Test
+    public void testBundleOutgoing() {
+        if (!CommonCapabilities.HAS_BUNDLE_PACKET) {
+            return;
+        }
+
+        CommonBootstrap.initServer();
+        assertNotNull(PacketType.OUT_BUNDLE.getType());
+        assertTrue(PacketType.OUT_BUNDLE.isOutGoing());
+    }
 
     @Test
     public void testBlockStateType() {

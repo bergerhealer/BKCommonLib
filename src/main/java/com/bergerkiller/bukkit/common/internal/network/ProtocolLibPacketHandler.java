@@ -5,6 +5,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.Task;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
@@ -29,6 +30,7 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 
 import java.util.*;
+import java.util.function.BooleanSupplier;
 import java.util.logging.Level;
 
 /**
@@ -46,6 +48,11 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private Class<?> loggedOutPlayerExceptionType = String.class;
     private boolean useSilentPacketQueue = false;
     private boolean isSendSilentPacketBroken = false;
+    private ProtocolLibBundlePacketHandler bundlePacketHandler = null;
+
+    public static boolean isBundlePacketWorking() {
+        return !CommonCapabilities.HAS_BUNDLE_PACKET || getPacketType(PacketType.OUT_BUNDLE) != null;
+    }
 
     @Override
     public void onPlayerJoin(Player player) {
@@ -95,6 +102,17 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.isSendSilentPacketBroken = false;
         }
 
+        // Since 1.19.4 there is a Bundle packet. We listen for this one ourselves and process it with our
+        // own listener system
+        if (CommonCapabilities.HAS_BUNDLE_PACKET) {
+            if (getPacketType(PacketType.OUT_BUNDLE) == null) {
+                Logging.LOGGER_NETWORK.log(Level.SEVERE, "ProtocolLib does not support listening for Bundle packets. Functionality will be broken!");
+            } else {
+                bundlePacketHandler = new ProtocolLibBundlePacketHandler(this, CommonPlugin.getInstance());
+                bundlePacketHandler.register();
+            }
+        }
+
         return true;
     }
 
@@ -110,6 +128,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         this.monitors.clear();
         this.listeners.clear();
         this.silentQueueCleanupTask.disable();
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.unregister();
+            bundlePacketHandler = null;
+        }
         if (!CommonUtil.isShuttingDown()) {
             Logging.LOGGER_NETWORK.warning("Reload detected! ProtocolLib does not officially support reloading the server!");
             if (!Bukkit.getOnlinePlayers().isEmpty()) {
@@ -304,6 +326,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 mon_iter.remove();
             }
         }
+
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.removePacketListeners(plugin);
+        }
     }
 
     @Override
@@ -315,6 +341,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 getProtocolManager().removePacketListener(cpl);
                 iter.remove();
             }
+        }
+
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.removePacketListener(listener);
         }
     }
 
@@ -328,6 +358,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 iter.remove();
             }
         }
+
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.removePacketMonitor(monitor);
+        }
     }
 
     @Override
@@ -335,6 +369,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         CommonPacketListener commonListener = new CommonPacketListener(plugin, listener, types);
         getProtocolManager().addPacketListener(commonListener);
         this.listeners.add(commonListener);
+
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.addPacketListener(plugin, listener, types);
+        }
     }
 
     @Override
@@ -342,6 +380,10 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         CommonPacketMonitor commonMonitor = new CommonPacketMonitor(plugin, monitor, types);
         getProtocolManager().addPacketListener(commonMonitor);
         this.monitors.add(commonMonitor);
+
+        if (bundlePacketHandler != null) {
+            bundlePacketHandler.addPacketMonitor(plugin, monitor, types);
+        }
     }
 
     @Override
@@ -402,7 +444,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         return PacketRegistry.getPacketType(packetClass);
     }
 
-    private static ProtocolManager getProtocolManager() {
+    static ProtocolManager getProtocolManager() {
         ProtocolManager manager = ProtocolLibrary.getProtocolManager();
         if (manager == null) {
             Logging.LOGGER.log(Level.SEVERE, "Unexpected NPE: ProtocolLibrary.getProtocolManager() is returning null!");
@@ -421,6 +463,24 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             throw new NullPointerException("ProtocolLibrary.getProtocolManager() is null");
         }
         return manager;
+    }
+
+    static ListeningWhitelist getWhiteList(ListenerPriority priority, PacketType[] types, boolean receiving) {
+        List<com.comphenix.protocol.PacketType> comTypes = new ArrayList<com.comphenix.protocol.PacketType>();
+        for (PacketType type : types) {
+            if ((!type.isOutGoing()) != receiving) {
+                continue;
+            }
+            if (type.getType() == null) {
+                continue;
+            }
+            com.comphenix.protocol.PacketType comType = getPacketType(type);
+            if (comType != null) {
+                comTypes.add(comType);
+            }
+        }
+        return ListeningWhitelist.newBuilder().priority(priority).types(comTypes)
+                .gamePhase(GamePhase.PLAYING).options(new ListenerOptions[] { ListenerOptions.ASYNC } ).build();
     }
 
     private class CommonPacketMonitor extends CommonPacketAdapter {
@@ -502,15 +562,20 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             PacketSendEvent sendEvent = new PacketSendEvent(event.getPlayer(), packet);
             sendEvent.setCancelled(event.isCancelled());
 
-            ThreadLocal<PacketEvent> tCurrentEvent = currentHandledEvent;
-            try {
-                tCurrentEvent.set(event);
+            event.setCancelled(handleSendDuring(event, () -> {
                 listener.onPacketSend(sendEvent);
-            } finally {
-                tCurrentEvent.set(null);
-            }
+                return sendEvent.isCancelled();
+            }));
+        }
+    }
 
-            event.setCancelled(sendEvent.isCancelled());
+    boolean handleSendDuring(PacketEvent event, BooleanSupplier sendAction) {
+        ThreadLocal<PacketEvent> tCurrentEvent = currentHandledEvent;
+        try {
+            tCurrentEvent.set(event);
+            return sendAction.getAsBoolean();
+        } finally {
+            tCurrentEvent.set(null);
         }
     }
 
@@ -561,7 +626,7 @@ public class ProtocolLibPacketHandler implements PacketHandler {
          * Gets whether the event involves a temporary player. A temporary player has no entity
          * id, no world and no location information.
          *
-         * @param player
+         * @param event Event to check if its for a temporary player
          * @return True if event is using a temporary player
          */
         protected boolean isTemporary(PacketEvent event) {
@@ -575,24 +640,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
 
         private static boolean isEventPlayerTemporary(PacketEvent event) {
             return event.isPlayerTemporary();
-        }
-
-        private static ListeningWhitelist getWhiteList(ListenerPriority priority, PacketType[] types, boolean receiving) {
-            List<com.comphenix.protocol.PacketType> comTypes = new ArrayList<com.comphenix.protocol.PacketType>();
-            for (PacketType type : types) {
-                if ((!type.isOutGoing()) != receiving) {
-                    continue;
-                }
-                if (type.getType() == null) {
-                    continue;
-                }
-                com.comphenix.protocol.PacketType comType = getPacketType(type);
-                if (comType != null) {
-                    comTypes.add(comType);
-                }
-            }
-            return ListeningWhitelist.newBuilder().priority(priority).types(comTypes)
-                    .gamePhase(GamePhase.PLAYING).options(new ListenerOptions[] { ListenerOptions.ASYNC } ).build();
         }
 
         @Override

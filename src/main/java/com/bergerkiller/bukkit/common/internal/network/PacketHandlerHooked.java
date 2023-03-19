@@ -2,10 +2,7 @@ package com.bergerkiller.bukkit.common.internal.network;
 
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.collections.ClassMap;
-import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
-import com.bergerkiller.bukkit.common.events.PacketSendEvent;
 import com.bergerkiller.bukkit.common.internal.PacketHandler;
-import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
@@ -20,7 +17,6 @@ import org.bukkit.plugin.Plugin;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.logging.Level;
 
 /**
@@ -33,10 +29,7 @@ import java.util.logging.Level;
  */
 public abstract class PacketHandlerHooked implements PacketHandler {
 
-    private final Map<PacketType, List<PacketListener>> listeners = new HashMap<PacketType, List<PacketListener>>();
-    private final Map<PacketType, List<PacketMonitor>> monitors = new HashMap<PacketType, List<PacketMonitor>>();
-    private final Map<Plugin, List<PacketListener>> listenerPlugins = new HashMap<Plugin, List<PacketListener>>();
-    private final Map<Plugin, List<PacketMonitor>> monitorPlugins = new HashMap<Plugin, List<PacketMonitor>>();
+    private final PacketHandlerRegistration handlers = new PacketHandlerRegistration();
     private final ClassMap<SafeMethod<?>> receiverMethods = new ClassMap<SafeMethod<?>>();
     private final SilentPacketQueue silentQueue = new SilentPacketQueue();
 
@@ -60,120 +53,27 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 
     @Override
     public void removePacketListeners(Plugin plugin) {
-        // Listeners
-        List<PacketListener> listeners = listenerPlugins.get(plugin);
-        if (listeners != null) {
-            for (PacketListener listener : listeners) {
-                removePacketListener(listener, false);
-            }
-        }
-        // Monitors
-        List<PacketMonitor> monitors = monitorPlugins.get(plugin);
-        if (monitors != null) {
-            for (PacketMonitor monitor : monitors) {
-                removePacketMonitor(monitor, false);
-            }
-        }
+        handlers.removePacketListeners(plugin);
     }
 
     @Override
     public void removePacketMonitor(PacketMonitor monitor) {
-        removePacketMonitor(monitor, true);
-    }
-
-    private void removePacketMonitor(PacketMonitor monitor, boolean fromPlugins) {
-        if (monitor == null) {
-            return;
-        }
-        for (List<PacketMonitor> monitorList : monitors.values()) {
-            monitorList.remove(monitor);
-        }
-        if (fromPlugins) {
-            // Remove from plugin list
-            for (Plugin plugin : monitorPlugins.keySet().toArray(new Plugin[0])) {
-                List<PacketMonitor> list = monitorPlugins.get(plugin);
-                // If not null, remove the monitor, if empty afterwards remove the entire entry
-                if (list != null && list.remove(monitor) && list.isEmpty()) {
-                    monitorPlugins.remove(plugin);
-                }
-            }
-        }
+        handlers.removePacketMonitor(monitor);
     }
 
     @Override
     public void removePacketListener(PacketListener listener) {
-        removePacketListener(listener, true);
-    }
-
-    private void removePacketListener(PacketListener listener, boolean fromPlugins) {
-        if (listener == null) {
-            return;
-        }
-        for (List<PacketListener> listenerList : listeners.values()) {
-            listenerList.remove(listener);
-        }
-        if (fromPlugins) {
-            // Remove from plugin list
-            for (Plugin plugin : listenerPlugins.keySet().toArray(new Plugin[0])) {
-                List<PacketListener> list = listenerPlugins.get(plugin);
-                // If not null, remove the listener, if empty afterwards remove the entire entry
-                if (list != null && list.remove(listener) && list.isEmpty()) {
-                    listenerPlugins.remove(plugin);
-                }
-            }
-        }
+        handlers.removePacketListener(listener);
     }
 
     @Override
     public void addPacketMonitor(Plugin plugin, PacketMonitor monitor, PacketType[] types) {
-        if (monitor == null) {
-            throw new IllegalArgumentException("Monitor is not allowed to be null");
-        } else if (plugin == null) {
-            throw new IllegalArgumentException("Plugin is not allowed to be null");
-        }
-        // Register the listener
-        for (PacketType type : types) {
-            // Map to listener array
-            List<PacketMonitor> monitorList = monitors.get(type);
-            if (monitorList == null) {
-                monitorList = new ArrayList<PacketMonitor>();
-                monitors.put(type, monitorList);
-            }
-            monitorList.add(monitor);
-            // Map to plugin list
-            List<PacketMonitor> list = monitorPlugins.get(plugin);
-            if (list == null) {
-                list = new ArrayList<PacketMonitor>(2);
-                monitorPlugins.put(plugin, list);
-            }
-            list.add(monitor);
-        }
+        handlers.addPacketMonitor(plugin, monitor, types);
     }
 
     @Override
     public void addPacketListener(Plugin plugin, PacketListener listener, PacketType[] types) {
-        if (listener == null) {
-            throw new IllegalArgumentException("Listener is not allowed to be null");
-        } else if (plugin == null) {
-            throw new IllegalArgumentException("Plugin is not allowed to be null");
-        }
-        // Register the listener
-        for (PacketType type : types) {
-            // Map to listener array
-            List<PacketListener> listenerList = listeners.get(type);
-            if (listenerList == null) {
-                listenerList = new ArrayList<PacketListener>();
-                listeners.put(type, listenerList);
-            }
-            listenerList.add(listener);
-            // Map to plugin list
-            List<PacketListener> list = listenerPlugins.get(plugin);
-            if (list == null) {
-                list = new ArrayList<PacketListener>(2);
-                listenerPlugins.put(plugin, list);
-            }
-            list.add(listener);
-        }
+        handlers.addPacketListener(plugin, listener, types);
     }
 
     @Override
@@ -232,39 +132,18 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 
     @Override
     public Collection<Plugin> getListening(PacketType type) {
-        List<PacketListener> listenerList = listeners.get(type);
-        if (listenerList == null) {
-            return Collections.emptySet();
-        }
-        List<Plugin> plugins = new ArrayList<Plugin>();
-        for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
-            for (PacketListener listener : listenerList) {
-                if (entry.getValue().contains(listener)) {
-                    plugins.add(entry.getKey());
-                    break;
-                }
-            }
-        }
-        return plugins;
+        return handlers.getListeningPlugins(type);
     }
 
     @Override
     public void transfer(PacketHandler to) {
-        for (Entry<Plugin, List<PacketListener>> entry : listenerPlugins.entrySet()) {
-            for (PacketListener listener : entry.getValue()) {
-                to.addPacketListener(entry.getKey(), listener, getListenerTypes(listener));
-            }
-        }
-        for (Entry<Plugin, List<PacketMonitor>> entry : monitorPlugins.entrySet()) {
-            for (PacketMonitor listener : entry.getValue()) {
-                to.addPacketMonitor(entry.getKey(), listener, getMonitorTypes(listener));
-            }
-        }
+        handlers.forAllListeners((p, listener) -> to.addPacketListener(p, listener, getListenerTypes(listener)));
+        handlers.forAllMonitors((p, monitor) -> to.addPacketMonitor(p, monitor, getMonitorTypes(monitor)));
     }
 
     private PacketType[] getListenerTypes(PacketListener listener) {
         ArrayList<PacketType> list = new ArrayList<PacketType>();
-        for (Map.Entry<PacketType, List<PacketListener>> entry : listeners.entrySet()) {
+        for (Map.Entry<PacketType, List<PacketListener>> entry : handlers.listeners.entrySet()) {
             if (entry.getValue().contains(listener)) {
                 list.add(entry.getKey());
             }
@@ -274,7 +153,7 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 
     private PacketType[] getMonitorTypes(PacketMonitor listener) {
         ArrayList<PacketType> list = new ArrayList<PacketType>();
-        for (Map.Entry<PacketType, List<PacketMonitor>> entry : monitors.entrySet()) {
+        for (Map.Entry<PacketType, List<PacketMonitor>> entry : handlers.monitors.entrySet()) {
             if (entry.getValue().contains(listener)) {
                 list.add(entry.getKey());
             }
@@ -300,42 +179,8 @@ public abstract class PacketHandlerHooked implements PacketHandler {
 
         // Handle listeners
         PacketType type = PacketType.getType(packet);
-        if (!is_silent) {
-            List<PacketListener> listenerList = listeners.get(type);
-            if (listenerList != null) {
-                CommonPacket cp = new CommonPacket(packet, type);
-                PacketSendEvent ev = new PacketSendEvent(player, cp);
-                ev.setCancelled(wasCancelled);
-                for (PacketListener listener : listenerList) {
-                    try {
-                        listener.onPacketSend(ev);
-                    } catch (Throwable t) {
-                        Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketSend handling " + type + ":", t);
-                    }
-                }
-                if (ev.isCancelled()) {
-                    return false;
-                }
-            }
-        }
 
-        // Handle monitors
-        handlePacketSendMonitor(player, type, packet);
-        return true;
-    }
-
-    private void handlePacketSendMonitor(Player player, PacketType packetType, Object packet) {
-        List<PacketMonitor> monitorList = monitors.get(packetType);
-        if (monitorList != null) {
-            CommonPacket cp = new CommonPacket(packet, packetType);
-            for (PacketMonitor monitor : monitorList) {
-                try {
-                    monitor.onMonitorPacketSend(cp, player);
-                } catch (Throwable t) {
-                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onMonitorPacketSend handling " + packetType + ":", t);
-                }
-            }
-        }
+        return handlers.handlePacketSend(player, type, packet, is_silent, wasCancelled);
     }
 
     /**
@@ -348,39 +193,6 @@ public abstract class PacketHandlerHooked implements PacketHandler {
      * @return True if the packet is allowed to be received, False if not
      */
     public boolean handlePacketReceive(Player player, Object packet, boolean wasCancelled) {
-        if (player == null || packet == null) {
-            return true;
-        }
-        // Handle listeners
-        PacketType type = PacketType.getType(packet);
-        List<PacketListener> listenerList = listeners.get(type);
-        if (listenerList != null) {
-            CommonPacket cp = new CommonPacket(packet, type);
-            PacketReceiveEvent ev = new PacketReceiveEvent(player, cp);
-            ev.setCancelled(wasCancelled);
-            for (PacketListener listener : listenerList) {
-                try {
-                    listener.onPacketReceive(ev);
-                } catch (Throwable t) {
-                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onPacketReceive handling " + type + ":", t);
-                }
-            }
-            if (ev.isCancelled()) {
-                return false;
-            }
-        }
-        // Handle monitors
-        List<PacketMonitor> monitorList = monitors.get(type);
-        if (monitorList != null) {
-            CommonPacket cp = new CommonPacket(packet, type);
-            for (PacketMonitor monitor : monitorList) {
-                try {
-                    monitor.onMonitorPacketReceive(cp, player);
-                } catch (Throwable t) {
-                    Logging.LOGGER_NETWORK.log(Level.SEVERE, "Error occurred in onMonitorPacketReceive handling " + type + ":", t);
-                }
-            }
-        }
-        return true;
+        return handlers.handlePacketReceive(player, packet, wasCancelled);
     }
 }

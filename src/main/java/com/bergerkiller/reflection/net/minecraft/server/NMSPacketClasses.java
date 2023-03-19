@@ -2235,4 +2235,11 @@ public class NMSPacketClasses {
         public final FieldAccessor<ChatText[]> lines = PacketPlayOutUpdateSignHandle.T.lines.toFieldAccessor();
     }
 
+    public static class NMSClientboundBundlePacket extends NMSPacket {
+
+        @Override
+        public boolean isOutGoing() {
+            return true; // Bug because this packet isn't registered in the normal places
+        }
+    }
 }

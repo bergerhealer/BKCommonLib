@@ -260,4 +260,9 @@ public class CommonCapabilities {
      * Since Minecraft 1.19.4 the Display Entity can be used to display items/blocks/text
      */
     public static final boolean HAS_DISPLAY_ENTITY = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
+
+    /**
+     * Since Minecraft 1.19.4 there is a bundle packet. Is also used by the server.
+     */
+    public static final boolean HAS_BUNDLE_PACKET = CommonBootstrap.evaluateMCVersion(">=", "1.19.4");
 }

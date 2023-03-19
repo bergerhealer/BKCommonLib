@@ -130,6 +130,9 @@ public class PacketType extends ClassTemplate<Object> {
     // MC 1.8.8 only
     public static final NMSPacketPlayOutUpdateSign OUT_UPDATE_SIGN = new NMSPacketPlayOutUpdateSign();
 
+    // MC 1.19.4 only
+    public static final NMSClientboundBundlePacket OUT_BUNDLE = new NMSClientboundBundlePacket();
+
     /*
      * ========================
      * === Incoming packets ===
