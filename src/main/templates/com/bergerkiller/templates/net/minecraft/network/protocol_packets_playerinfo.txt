@@ -110,7 +110,7 @@ class ClientboundPlayerInfoUpdatePacket extends Packet {
         } else {
             ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction action;
             action = (size == 0) ? null : (ClientboundPlayerInfoUpdatePacket$EnumPlayerInfoAction) actions.iterator().next();
-            instance#action = null;
+            instance#action = action;
         }
 #endif
     }
