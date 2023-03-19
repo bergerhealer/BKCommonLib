@@ -153,6 +153,11 @@ public class CommonEntityType {
                 nmsName = "net.minecraft.world.entity.animal.camel.Camel";
             }
 
+            // Added in >= 1.19.4
+            if (entityTypeEnumName.equals("SNIFFER")) {
+                nmsName = "net.minecraft.world.entity.animal.sniffer.Sniffer";
+            }
+
             // Try retrieving NMS class again
             if (nmsName != null) {
                 nmsType = CommonUtil.getClass(nmsName);
