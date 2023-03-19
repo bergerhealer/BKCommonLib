@@ -1,6 +1,15 @@
 package net.minecraft.network.protocol;
 
 class Packet {
+    public static Iterable<Object> tryUnwrapBundlePacket(Object packet) {
+#if version >= 1.19.4
+        if (packet instanceof net.minecraft.network.protocol.game.ClientboundBundlePacket) {
+            return ((net.minecraft.network.protocol.game.ClientboundBundlePacket) packet).subPackets();
+        }
+#endif
+        return null;
+    }
+
     <code>
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());

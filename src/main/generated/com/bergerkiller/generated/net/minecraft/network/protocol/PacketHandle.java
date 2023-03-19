@@ -19,6 +19,10 @@ public abstract class PacketHandle extends Template.Handle {
 
     /* ============================================================================== */
 
+    public static Iterable<Object> tryUnwrapBundlePacket(Object packet) {
+        return T.tryUnwrapBundlePacket.invoker.invoke(null,packet);
+    }
+
 
     public com.bergerkiller.bukkit.common.protocol.CommonPacket toCommonPacket() {
         return new com.bergerkiller.bukkit.common.protocol.CommonPacket(getRaw(), getPacketType());
@@ -87,6 +91,8 @@ public abstract class PacketHandle extends Template.Handle {
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class PacketClass extends Template.Class<PacketHandle> {
+        public final Template.StaticMethod<Iterable<Object>> tryUnwrapBundlePacket = new Template.StaticMethod<Iterable<Object>>();
+
     }
 
 }

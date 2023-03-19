@@ -76,6 +76,7 @@ import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlay
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutBlockChangeHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutCustomPayloadHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.PacketPlayOutSetSlotHandle;
+import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
 import com.bergerkiller.generated.net.minecraft.resources.MinecraftKeyHandle;
 import com.bergerkiller.generated.net.minecraft.sounds.SoundCategoryHandle;
 import com.bergerkiller.generated.net.minecraft.world.effect.MobEffectListHandle;
@@ -2931,4 +2932,19 @@ class PacketPlayOutCustomPayload extends Packet {
         return com.bergerkiller.bukkit.common.protocol.PacketType.OUT_CUSTOM_PAYLOAD;
     }
     </code>
+}
+
+// Since MC 1.19.4
+optional class ClientboundBundlePacket extends Packet {
+
+    public static (ClientboundBundlePacketHandle) ClientboundBundlePacket createNew(Iterable<Object> rawPackets) {
+        return new ClientboundBundlePacket(com.bergerkiller.bukkit.common.internal.proxy.BundleUnwrapperIterator_1_19_4.unwrap(rawPackets));
+    }
+
+    public final (Iterable<Object>) Iterable<Packet<T extends net.minecraft.network.PacketListener>> subPackets();
+
+    public void setSubPackets(Iterable<Object> packets) {
+        #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> packets;
+        instance#packets = packets;
+    }
 }
