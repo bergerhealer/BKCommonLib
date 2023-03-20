@@ -2937,6 +2937,10 @@ class PacketPlayOutCustomPayload extends Packet {
 // Since MC 1.19.4
 optional class ClientboundBundlePacket extends Packet {
 
+#if version >= 1.19.4
+    #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> bundlePackets:packets;
+#endif
+
     public static (ClientboundBundlePacketHandle) ClientboundBundlePacket createNew(Iterable<Object> rawPackets) {
         return new ClientboundBundlePacket(com.bergerkiller.bukkit.common.internal.proxy.BundleUnwrapperIterator_1_19_4.unwrap(rawPackets));
     }
@@ -2944,8 +2948,7 @@ optional class ClientboundBundlePacket extends Packet {
     public final (Iterable<Object>) Iterable<Packet<T extends net.minecraft.network.PacketListener>> subPackets();
 
     public void setSubPackets(Iterable<Object> packets) {
-        #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> packets;
-        instance#packets = packets;
+        instance#bundlePackets = packets;
     }
 
     public boolean filterSubPackets(java.util.function.Predicate<Object> filter) {
@@ -2997,8 +3000,7 @@ optional class ClientboundBundlePacket extends Packet {
         }
 
         // Update field with the new packets
-        #require net.minecraft.network.protocol.BundlePacket private final Iterable<Packet<T extends net.minecraft.network.PacketListener>> packets;
-        instance#packets = newPackets;
+        instance#bundlePackets = newPackets;
 
         boolean hasPackets = !newPackets.isEmpty();
         return hasPackets;
