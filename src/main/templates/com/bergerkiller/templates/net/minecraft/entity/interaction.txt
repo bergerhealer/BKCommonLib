@@ -1,0 +1,19 @@
+package net.minecraft.world.entity;
+
+import net.minecraft.network.syncher.DataWatcherObject;
+
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher;
+import com.bergerkiller.bukkit.common.wrappers.DataWatcher.Key;
+
+// Since 1.19.4
+optional class Interaction extends Entity {
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_WIDTH_ID;
+    private static optional final (DataWatcher.Key<Float>) DataWatcherObject<Float> DATA_HEIGHT_ID;
+    private static optional final (DataWatcher.Key<Boolean>) DataWatcherObject<Boolean> DATA_RESPONSE_ID;
+
+    <code>
+    public static final Key<Float> DATA_WIDTH = Key.Type.FLOAT.createKey(T.DATA_WIDTH_ID, -1);
+    public static final Key<Float> DATA_HEIGHT = Key.Type.FLOAT.createKey(T.DATA_HEIGHT_ID, -1);
+    public static final Key<Boolean> DATA_RESPONSE = Key.Type.BOOLEAN.createKey(T.DATA_RESPONSE_ID, -1);
+    </code>
+}
