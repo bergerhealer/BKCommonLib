@@ -3,7 +3,6 @@ package com.bergerkiller.bukkit.common.internal.network;
 import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.events.PacketReceiveEvent;
 import com.bergerkiller.bukkit.common.events.PacketSendEvent;
-import com.bergerkiller.bukkit.common.internal.proxy.BundleUnwrapperIterator_1_19_4;
 import com.bergerkiller.bukkit.common.protocol.CommonPacket;
 import com.bergerkiller.bukkit.common.protocol.PacketListener;
 import com.bergerkiller.bukkit.common.protocol.PacketMonitor;
@@ -181,7 +180,7 @@ class PacketHandlerRegistration {
             ClientboundBundlePacketHandle bundle = ClientboundBundlePacketHandle.createHandle(packet);
             if (is_silent) {
                 // Only send all sub-packets by the monitors
-                for (Object subPacket : BundleUnwrapperIterator_1_19_4.unwrap(bundle.subPackets())) {
+                for (Object subPacket : bundle.subPackets()) {
                     handlePacketSendMonitor(player, packetType, subPacket);
                 }
                 return true;

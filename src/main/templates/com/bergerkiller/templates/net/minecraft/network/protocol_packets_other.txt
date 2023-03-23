@@ -2942,7 +2942,7 @@ optional class ClientboundBundlePacket extends Packet {
 #endif
 
     public static (ClientboundBundlePacketHandle) ClientboundBundlePacket createNew(Iterable<Object> rawPackets) {
-        return new ClientboundBundlePacket(com.bergerkiller.bukkit.common.internal.proxy.BundleUnwrapperIterator_1_19_4.unwrap(rawPackets));
+        return new ClientboundBundlePacket(rawPackets);
     }
 
     public final (Iterable<Object>) Iterable<Packet<T extends net.minecraft.network.PacketListener>> subPackets();

@@ -1,6 +1,5 @@
 package com.bergerkiller.bukkit.common.internal.network;
 
-import com.bergerkiller.bukkit.common.internal.proxy.BundleUnwrapperIterator_1_19_4;
 import com.bergerkiller.bukkit.common.protocol.PacketType;
 import com.bergerkiller.generated.net.minecraft.network.protocol.PacketHandle;
 import com.bergerkiller.generated.net.minecraft.network.protocol.game.ClientboundBundlePacketHandle;
@@ -31,7 +30,7 @@ class ProtocolLibBundlePacketHandler extends PacketHandlerRegistration {
                 if (!packetEvent.isPlayerTemporary() && !packetEvent.isCancelled()) {
                     ClientboundBundlePacketHandle bundle = ClientboundBundlePacketHandle.createHandle(packetEvent.getPacket().getHandle());
                     final Player player = packetEvent.getPlayer();
-                    if (!bundle.filterSubPackets(packet -> handleSendPacket(packetEvent, player, packet))) {
+                    if (!bundle.filterSubPackets(packet -> handleSendBundlePacket(packetEvent, player, packet))) {
                         packetEvent.setCancelled(true);
                     }
                 }
@@ -43,7 +42,7 @@ class ProtocolLibBundlePacketHandler extends PacketHandlerRegistration {
                 // Notify all packets contained within bundle packets
                 if (!packetEvent.isPlayerTemporary()) {
                     Iterable<Object> subPackets = PacketHandle.tryUnwrapBundlePacket(packetEvent.getPacket().getHandle());
-                    for (Object raw_packet : BundleUnwrapperIterator_1_19_4.unwrap(subPackets)) {
+                    for (Object raw_packet : subPackets) {
                         handlePacketSendMonitor(packetEvent.getPlayer(), PacketType.getType(raw_packet), raw_packet);
                     }
                 }
@@ -61,18 +60,12 @@ class ProtocolLibBundlePacketHandler extends PacketHandlerRegistration {
         ProtocolLibPacketHandler.getProtocolManager().removePacketListener(monitorHandler);
     }
 
-    private boolean handleSendPacket(PacketEvent event, Player player, Object raw_packet) {
-        PacketType packetType = PacketType.getType(raw_packet);
+    private boolean handleSendBundlePacket(PacketEvent event, Player player, Object raw_packet) {
+        ClientboundBundlePacketHandle bundle = ClientboundBundlePacketHandle.createHandle(raw_packet);
+        PacketType packetType = PacketType.OUT_BUNDLE;
 
-        // If packet is a bundle itself, recursively unwrap and process all thats inside
-        if (packetType == PacketType.OUT_BUNDLE) {
-            ClientboundBundlePacketHandle bundle = ClientboundBundlePacketHandle.createHandle(raw_packet);
-            return bundle.filterSubPackets(p -> handleSendPacket(event, player, p));
-        }
-
-        // Handle packet - go through plib handler so PacketEvent is registered in ThreadLocal
-        return protocolLibHandler.handleSendDuring(event, () ->
-                handlePacketSend(player, packetType, raw_packet, false, false));
+        return bundle.filterSubPackets(p -> protocolLibHandler.handleSendDuring(event, () ->
+                handlePacketSend(player, packetType, p, false, false)));
     }
 
     private abstract class Handler implements com.comphenix.protocol.events.PacketListener {
