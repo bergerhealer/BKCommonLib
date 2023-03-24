@@ -6,6 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.events.map.MapClickEvent;
@@ -1218,6 +1219,14 @@ public class MapWidget implements MapDisplayEvents {
     public boolean onItemDrop(Player player, ItemStack item) {
         MapWidget next = this.getNextInputWidget();
         return next != null && next.onItemDrop(player, item);
+    }
+
+    @Override
+    public void onBlockInteract(PlayerInteractEvent event) {
+        MapWidget next = this.getNextInputWidget();
+        if (next != null) {
+            next.onBlockInteract(event);
+        }
     }
 
     private MapWidget getInputWidget() {

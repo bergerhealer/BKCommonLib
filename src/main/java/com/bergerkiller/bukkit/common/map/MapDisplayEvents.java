@@ -1,6 +1,8 @@
 package com.bergerkiller.bukkit.common.map;
 
 import org.bukkit.entity.Player;
+import org.bukkit.event.Event;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 
 import com.bergerkiller.bukkit.common.controller.Tickable;
@@ -96,4 +98,21 @@ public interface MapDisplayEvents extends Tickable {
      * @return True if the drop was handled and the item drop should be cancelled
      */
     public boolean onItemDrop(Player player, ItemStack item);
+
+    /**
+     * Callback function called when a player holding this display in either hand clicks on a block
+     * in the world. This can be useful when selecting block coordinates in the current
+     * menu.<br>
+     * <br>
+     * Callers can cancel the event by using {@link PlayerInteractEvent#setUseInteractedBlock(Event.Result)},
+     * indicating the interaction was handled by the display. By default the callback should not touch
+     * the event<br>
+     * <br>
+     * Important note: this will be called also if the original event was cancelled. If this is
+     * important, use {@link PlayerInteractEvent#useInteractedBlock()} to check whether interaction
+     * was cancelled by another plugin.
+     *
+     * @param event Player interaction event associated with this click
+     */
+    public void onBlockInteract(PlayerInteractEvent event);
 }

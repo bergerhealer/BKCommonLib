@@ -14,6 +14,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -1539,6 +1540,10 @@ public class MapDisplay implements MapDisplayEvents {
 
     @Override
     public boolean onItemDrop(Player player, ItemStack item) { return false; }
+
+    @Override
+    public void onBlockInteract(PlayerInteractEvent event) {
+    }
 
     /**
      * Creates a new Map Display item that will automatically initialize a particular Map Display class

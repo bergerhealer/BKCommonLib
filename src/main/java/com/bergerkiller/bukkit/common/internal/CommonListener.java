@@ -32,6 +32,7 @@ import org.bukkit.event.block.BlockPhysicsEvent;
 import org.bukkit.event.player.PlayerChangedWorldEvent;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerTeleportEvent;
@@ -214,6 +215,26 @@ public class CommonListener implements Listener {
                 event.setCancelled(true);
                 return;
             }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.NORMAL)
+    public void onPlayerInteractWithBlock(PlayerInteractEvent event) {
+        Player p = event.getPlayer();
+        MapDisplay display;
+
+        // Try map held in main hand first
+        display = MapDisplay.getViewedDisplay(p, HumanHand.getItemInMainHand(event.getPlayer()));
+        if (display != null) {
+            display.onBlockInteract(event);
+            display.getRootWidget().onBlockInteract(event);
+        }
+
+        // Try map held in off hand second
+        display = MapDisplay.getViewedDisplay(p, HumanHand.getItemInOffHand(event.getPlayer()));
+        if (display != null) {
+            display.onBlockInteract(event);
+            display.getRootWidget().onBlockInteract(event);
         }
     }
 
