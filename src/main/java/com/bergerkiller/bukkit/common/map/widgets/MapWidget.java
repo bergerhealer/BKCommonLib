@@ -913,7 +913,7 @@ public class MapWidget implements MapDisplayEvents {
         if (this != this.root && this._lastView != null) {
 
             // Detect changes in bounds and invalidate when it happens
-            if (currentView == null || this._lastView.isSameView(currentView)) {
+            if (currentView == null || !this._lastView.isSameView(currentView)) {
                 this.invalidate();
             }
 
