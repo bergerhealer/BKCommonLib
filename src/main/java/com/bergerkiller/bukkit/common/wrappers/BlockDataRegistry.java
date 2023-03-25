@@ -3,6 +3,7 @@ package com.bergerkiller.bukkit.common.wrappers;
 import java.util.Collection;
 import java.util.logging.Level;
 
+import com.bergerkiller.generated.org.bukkit.craftbukkit.block.data.CraftBlockDataHandle;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.MaterialData;
@@ -83,6 +84,18 @@ public class BlockDataRegistry {
         } else {
             return fromMaterialData(state.getType(), state.getRawData());
         }
+    }
+
+    /**
+     * Obtains an immutable BlockData state copy of the specified Bukkit BlockData
+     * value. Only works on Minecraft 1.13+ where Bukkit BlockData was introduced.
+     *
+     * @param bukkitBlockData Bukkit <i>org.bukkit.block.data.BlockData</i>
+     * @return BlockData
+     */
+    public static BlockData fromBukkit(Object bukkitBlockData) {
+        //TODO: Is non-craftbukkit BlockData even a thing in the wild?
+        return CraftBlockDataHandle.T.getState.invoke(bukkitBlockData);
     }
 
     /**
