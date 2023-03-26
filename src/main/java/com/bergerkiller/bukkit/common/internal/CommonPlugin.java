@@ -397,8 +397,7 @@ public class CommonPlugin extends PluginBase {
                 } else if (!warnedAboutBrokenBundlePacket) {
                     warnedAboutBrokenBundlePacket = true;
                     Logging.LOGGER_NETWORK.log(Level.WARNING, "ProtocolLib cannot be used because it does not support the Bundle packet yet");
-                    Logging.LOGGER_NETWORK.log(Level.WARNING, "Please update ProtocolLib to a 1.19.4+ supporting version");
-                    Logging.LOGGER_NETWORK.log(Level.WARNING, "For more info, see: https://github.com/dmulloy2/ProtocolLib/issues/2244");
+                    Logging.LOGGER_NETWORK.log(Level.WARNING, "Please update ProtocolLib to a 1.19.4+ supporting version (build #620 or newer)");
                 }
             }
 

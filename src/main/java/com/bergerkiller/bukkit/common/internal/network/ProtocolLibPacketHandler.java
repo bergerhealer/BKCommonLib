@@ -48,10 +48,34 @@ public class ProtocolLibPacketHandler implements PacketHandler {
     private Class<?> loggedOutPlayerExceptionType = String.class;
     private boolean useSilentPacketQueue = false;
     private boolean isSendSilentPacketBroken = false;
-    private ProtocolLibBundlePacketHandler bundlePacketHandler = null;
 
     public static boolean isBundlePacketWorking() {
-        return !CommonCapabilities.HAS_BUNDLE_PACKET || getPacketType(PacketType.OUT_BUNDLE) != null;
+        // Unimportant on older MC
+        if (!CommonCapabilities.HAS_BUNDLE_PACKET) {
+            return true;
+        }
+
+        // Check for a >5.0.0 version of protocollib, where for sure it's supported
+        Plugin p = CommonUtil.getPlugin("ProtocolLib");
+        if (p != null) {
+            // 5.0.0-SNAPSHOT-b621
+            String ver = p.getDescription().getVersion();
+            int dashIdx = ver.indexOf('-');
+            if (dashIdx != -1) {
+                ver = ver.substring(0, dashIdx);
+            }
+            if (TextValueSequence.evaluateText(ver, ">", "5.0.0")) {
+                return true;
+            }
+        }
+
+        // Support is unsure - check that the PacketEvent has a getBundle() to indicate its fixed
+        try {
+            PacketEvent.class.getMethod("getBundle");
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
     }
 
     @Override
@@ -102,17 +126,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
             this.isSendSilentPacketBroken = false;
         }
 
-        // Since 1.19.4 there is a Bundle packet. We listen for this one ourselves and process it with our
-        // own listener system
-        if (CommonCapabilities.HAS_BUNDLE_PACKET) {
-            if (getPacketType(PacketType.OUT_BUNDLE) == null) {
-                Logging.LOGGER_NETWORK.log(Level.SEVERE, "ProtocolLib does not support listening for Bundle packets. Functionality will be broken!");
-            } else {
-                bundlePacketHandler = new ProtocolLibBundlePacketHandler(this, CommonPlugin.getInstance());
-                bundlePacketHandler.register();
-            }
-        }
-
         return true;
     }
 
@@ -128,10 +141,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         this.monitors.clear();
         this.listeners.clear();
         this.silentQueueCleanupTask.disable();
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.unregister();
-            bundlePacketHandler = null;
-        }
         if (!CommonUtil.isShuttingDown()) {
             Logging.LOGGER_NETWORK.warning("Reload detected! ProtocolLib does not officially support reloading the server!");
             if (!Bukkit.getOnlinePlayers().isEmpty()) {
@@ -326,10 +335,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 mon_iter.remove();
             }
         }
-
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.removePacketListeners(plugin);
-        }
     }
 
     @Override
@@ -341,10 +346,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 getProtocolManager().removePacketListener(cpl);
                 iter.remove();
             }
-        }
-
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.removePacketListener(listener);
         }
     }
 
@@ -358,10 +359,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
                 iter.remove();
             }
         }
-
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.removePacketMonitor(monitor);
-        }
     }
 
     @Override
@@ -369,10 +366,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         CommonPacketListener commonListener = new CommonPacketListener(plugin, listener, types);
         getProtocolManager().addPacketListener(commonListener);
         this.listeners.add(commonListener);
-
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.addPacketListener(plugin, listener, types);
-        }
     }
 
     @Override
@@ -380,10 +373,6 @@ public class ProtocolLibPacketHandler implements PacketHandler {
         CommonPacketMonitor commonMonitor = new CommonPacketMonitor(plugin, monitor, types);
         getProtocolManager().addPacketListener(commonMonitor);
         this.monitors.add(commonMonitor);
-
-        if (bundlePacketHandler != null) {
-            bundlePacketHandler.addPacketMonitor(plugin, monitor, types);
-        }
     }
 
     @Override
