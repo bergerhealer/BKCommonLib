@@ -929,4 +929,28 @@ public class MathUtil {
         vector.setZ(vector.getZ() / mz);
         return vector;
     }
+
+    /**
+     * Gets the maximum of three double values
+     *
+     * @param x Value 1
+     * @param y Value 2
+     * @param z Value 3
+     * @return Max of the three values
+     */
+    public static double max(double x, double y, double z) {
+        return (x > z) ? Math.max(x, y) : Math.max(y, z);
+    }
+
+    /**
+     * Gets the minimum of three double values
+     *
+     * @param x Value 1
+     * @param y Value 2
+     * @param z Value 3
+     * @return Min of the three values
+     */
+    public static double min(double x, double y, double z) {
+        return (x < z) ? Math.min(x, y) : Math.min(y, z);
+    }
 }

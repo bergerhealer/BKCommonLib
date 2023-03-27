@@ -503,6 +503,16 @@ public class MathUtilTest {
         testAngleDiff(47.97136094010452,    0.5, 1.0, 2.0,    3.0, -5.1, 12.2);
     }
 
+    @Test
+    public void testThreeMinMax() {
+        assertEquals(1.0, MathUtil.max(1.0, 0.1, 0.2), 0.0);
+        assertEquals(1.0, MathUtil.max(0.2, 1.0, 0.1), 0.0);
+        assertEquals(1.0, MathUtil.max(0.1, 0.2, 1.0), 0.0);
+        assertEquals(0.1, MathUtil.min(1.0, 0.1, 0.2), 0.0);
+        assertEquals(0.1, MathUtil.min(0.2, 1.0, 0.1), 0.0);
+        assertEquals(0.1, MathUtil.min(0.1, 0.2, 1.0), 0.0);
+    }
+
     private static void testAngleDiff(double result, double x0, double y0, double z0, double x1, double y1, double z1) {
         assertEquals(result, MathUtil.getAngleDifference(new Vector(x0, y0, z0), new Vector(x1, y1, z1)), 1e-6);
     }
