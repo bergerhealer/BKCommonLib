@@ -72,6 +72,10 @@ public class Vector3 {
         return p.x == x && p.y == y && p.z == z;
     }
 
+    public boolean equals(Vector v) {
+        return v.getX() == x && v.getY() == y && v.getZ() == z;
+    }
+
     /**
      * Returns the cross product of two vectors
      * 

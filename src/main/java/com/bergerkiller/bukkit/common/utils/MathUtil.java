@@ -1,5 +1,6 @@
 package com.bergerkiller.bukkit.common.utils;
 
+import com.bergerkiller.bukkit.common.math.Vector3;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -952,5 +953,41 @@ public class MathUtil {
      */
     public static double min(double x, double y, double z) {
         return (x < z) ? Math.min(x, y) : Math.min(y, z);
+    }
+
+    /**
+     * Checks whether two Vectors are exactly equal. This is unlike Bukkit's default Vector equals(),
+     * which checks using an epsilon.
+     *
+     * @param v0 First Vector
+     * @param v1 Second Vector
+     * @return True if both Vectors are equal
+     */
+    public static boolean vectorEquals(Vector v0, Vector v1) {
+        return v0.getX() == v1.getX() && v0.getY() == v1.getY() && v0.getZ() == v1.getZ();
+    }
+
+    /**
+     * Checks whether two Vectors are exactly equal. This is unlike Bukkit's default Vector equals(),
+     * which checks using an epsilon.
+     *
+     * @param v0 First Vector
+     * @param v1 Second Vector
+     * @return True if both Vectors are equal
+     */
+    public static boolean vectorEquals(Vector3 v0, Vector v1) {
+        return v0.equals(v1);
+    }
+
+    /**
+     * Checks whether two Vectors are exactly equal. This is unlike Bukkit's default Vector equals(),
+     * which checks using an epsilon.
+     *
+     * @param v0 First Vector
+     * @param v1 Second Vector
+     * @return True if both Vectors are equal
+     */
+    public static boolean vectorEquals(Vector v0, Vector3 v1) {
+        return v1.equals(v0);
     }
 }
