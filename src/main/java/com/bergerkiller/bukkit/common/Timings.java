@@ -9,14 +9,16 @@ import com.bergerkiller.bukkit.common.internal.CommonPlugin;
 import com.bergerkiller.bukkit.common.utils.CommonUtil;
 
 import co.aikar.timings.lib.MCTiming;
-import co.aikar.timings.lib.TimingManager;
 
 /**
  * Thin wrapper around MC Timings by aikar for easily storing and performing timings measurements.
  * https://github.com/aikar/minecraft-timings<br>
  * <br>
  * Implements AutoCloseable so it can be used with Java7's try with resources statement.
+ *
+ * @deprecated Timings is being phased out of paper/spigot. This class doesn't do anything anymore.
  */
+@Deprecated
 public class Timings implements AutoCloseable {
     private static final Map<TimingsKey, Timings> cachedTimings = new HashMap<TimingsKey, Timings>();
     private static final boolean hasTimingsV2;
@@ -33,7 +35,8 @@ public class Timings implements AutoCloseable {
 
     public Timings(Plugin plugin, String name) {
         this.plugin = plugin;
-        this.timing = TimingManager.of(plugin).of(getTimingName(plugin, name));
+        this.timing = NOOP_MC_TIMINGS;
+        //this.timing = TimingManager.of(plugin).of(getTimingName(plugin, name));
     }
 
     /**
