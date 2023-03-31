@@ -1,13 +1,19 @@
 package com.bergerkiller.bukkit.common.internal.logic;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.Logging;
+import com.google.common.collect.MapMaker;
 import org.bukkit.Material;
 import org.bukkit.configuration.serialization.ConfigurationSerializable;
 import org.bukkit.inventory.ItemStack;
@@ -18,6 +24,7 @@ import com.bergerkiller.bukkit.common.utils.LogicUtil;
 import com.bergerkiller.bukkit.common.utils.MaterialUtil;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.inventory.CraftItemStackHandle;
 import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersHandle;
+import org.bukkit.inventory.meta.ItemMeta;
 
 /**
  * Deserializes Bukkit ItemStack objects from a key-value map, with the added feature
@@ -43,20 +50,32 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
 
         // FROM MC 1.13 to 1.12.2 (perform the material enum remapping logic in reverse)
         this.register(0, map -> {
+            // Damage value needs to be moved from Meta to be part of the ItemStack
+            // However, CraftItemMeta doesn't store this original Damage value anywhere. We
+            // cache the original Map that de-serialized into this meta in a WeakHashMap for
+            // that reason.
+            Object meta = map.get("meta");
+            if (meta != null) {
+                Map<String, Object> metaMap = LegacyItemMeta.cachedMeta.get(meta);
+                if (metaMap != null) {
+                    map.putAll(metaMap);
+                }
+            }
+
             Object type = map.get("type");
             if (type instanceof String && ((String) type).startsWith("LEGACY_")) {
                 map.put("type", ((String) type).substring(7));
                 return true;
             }
 
-            if ("BEETROOTS".equals(type)) {
-                map.put("type", "BEETROOT_BLOCK");
-            } else if ("SPAWNER".equals(type)) {
-                map.put("type", "MOB_SPAWNER");
+            String repl = Helper.LEGACY_MAPPING_1_13.get(type);
+            if (repl != null) {
+                map.put("type", repl);
+                return true;
             }
 
-            //TODO: There are a lot more changes here!
-            return true;
+            // Not a legacy material, can't use
+            return false;
         });
 
         // From MC 1.13.1 to 1.13 (dead coral types no longer valid)
@@ -260,12 +279,15 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
     /**
      * Deserializes ItemStack properties that are stored as just maps into the correct
      * metadata type, and converts Double to Integer where needed.
+     * This is primarily important for JSON deserialization logic.
      * 
      * @param values
      */
     private void deserializeMaps(Map<String, Object> values) {
         convertNumberToIntegerInMap(values, "amount");
+        convertNumberToIntegerInMap(values, "damage");
         convertNumberToIntegerInMapValues(values, "enchantments");
+
         replaceMapInMap(values, "meta", meta -> {
             convertNumberToIntegerInMap(meta, "custom-model-data");
             convertNumberToIntegerInMap(meta, "repair-cost");
@@ -288,7 +310,11 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
                 return new org.bukkit.potion.PotionEffect(potionEffect);
             });
 
-            return CraftItemStackHandle.deserializeItemMeta(meta);
+            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
+                return LegacyItemMeta.DESERIALIZER.apply(meta);
+            } else {
+                return CraftItemStackHandle.deserializeItemMeta(meta);
+            }
         });
     }
 
@@ -370,7 +396,49 @@ public class ItemStackDeserializer implements Function<Map<String, Object>, Item
         boolean convert(Map<String, Object> values);
     }
 
+    public static class LegacyItemMeta {
+        private static final Map<Object, Map<String, Object>> cachedMeta = new MapMaker().weakKeys().concurrencyLevel(4).makeMap();
+
+        /**
+         * Legacy ItemMeta de-serializer that stores some original Map contents that created an
+         * ItemMeta so that it can be restored when deserializing the ItemStack later. This migrates
+         * the "Damage" value to the ItemStack's "damage" field.
+         */
+        public static final Function<Map<String, Object>, ItemMeta> DESERIALIZER = map -> {
+            ItemMeta meta = CraftItemStackHandle.deserializeItemMeta(map);
+
+            Object damage = map.get("Damage");
+            if (damage != null) {
+                Map<String, Object> itemStackMeta = new HashMap<>();
+                itemStackMeta.put("damage", damage);
+                cachedMeta.put(meta, itemStackMeta);
+            }
+            return meta;
+        };
+    }
+
     private static class Helper {
+        // Remappings from 1.13 materials to the 1.12.2 and before LEGACY material names
+        public static final Map<String, String> LEGACY_MAPPING_1_13 = new HashMap<>();
+        static {
+            try {
+                String mat_cat_path = "/com/bergerkiller/bukkit/common/internal/resources/mat_to_legacy.txt";
+                try (InputStream input = ItemStackDeserializer.class.getResourceAsStream(mat_cat_path)) {
+                    try (Scanner scanner = new Scanner(input, "UTF-8")) {
+                        while (scanner.hasNext()) {
+                            String line = scanner.nextLine();
+                            int splitIdx = line.indexOf('=');
+                            if (splitIdx != -1) {
+                                LEGACY_MAPPING_1_13.put(line.substring(0, splitIdx), line.substring(splitIdx + 1));
+                            }
+                        }
+                    }
+                }
+            } catch (Throwable t) {
+                Logging.LOGGER.log(Level.SEVERE, "Failed to initialize legacy material conversion table", t);
+            }
+        }
+
         // All material names (Material enum) added Minecraft 1.13.2 -> 1.14
         public static final Set<String> ADDED_MC_1_14 = new HashSet<String>(Arrays.asList(
                 "ACACIA_SIGN", "ACACIA_WALL_SIGN",

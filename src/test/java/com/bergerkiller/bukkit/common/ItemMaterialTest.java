@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import com.bergerkiller.bukkit.common.conversion.type.WrapperConversion;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.DetectorRail;
@@ -40,6 +41,43 @@ import com.bergerkiller.generated.org.bukkit.craftbukkit.util.CraftMagicNumbersH
  */
 public class ItemMaterialTest {
 
+    @Test
+    @Ignore
+    public void printModernToLegacyMaterialMapping() {
+        for (Material mlegacy : MaterialUtil.getAllMaterials()) {
+            if (MaterialUtil.isLegacyType(mlegacy)) {
+                String legacyName = mlegacy.name().substring(7);
+                Material mmodern = null;
+                if ( mlegacy.isBlock()) {
+                    BlockData b = BlockData.fromMaterial(mlegacy);
+                    mmodern = b.getType();
+                } else {
+                    Object item = HandleConversion.toItemHandle(mlegacy);
+                    mmodern = WrapperConversion.toMaterialFromItemHandle(item);
+                }
+                if (mmodern == null) {
+                    // Try to find non-legacy by the exact same name LEGACY_
+                    for (Material m : MaterialUtil.getAllMaterials()) {
+                        if (MaterialUtil.isLegacyType(m)) {
+                            continue;
+                        }
+                        if (m.isBlock() != mlegacy.isBlock()) {
+                            continue;
+                        }
+                        if (m.name().equals(legacyName)) {
+                            mmodern = m;
+                            break;
+                        }
+                        if (m.name().contains(legacyName) || legacyName.contains(m.name())) {
+                            mmodern = m;
+                        }
+                    }
+                }
+                System.out.println(mmodern + " = " + legacyName);
+            }
+        }
+    }
+    
     @Test
     public void testMaterialProperties() {
         // Requires Block now. Test broken.

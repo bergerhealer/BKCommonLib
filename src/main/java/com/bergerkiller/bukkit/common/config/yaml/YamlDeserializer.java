@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.logging.Level;
 
+import com.bergerkiller.bukkit.common.internal.CommonCapabilities;
 import org.bukkit.configuration.serialization.ConfigurationSerialization;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.LoaderOptions;
@@ -336,6 +337,14 @@ public class YamlDeserializer {
             this.yamlConstructors.put(Tag.MAP, new ConstructCustomObject());
             this.custom_builders = new HashMap<>();
             this.register("org.bukkit.inventory.ItemStack", ItemStackDeserializer.INSTANCE);
+
+            // On versions 1.12.2 and before we must keep a backup of the original Map that created the
+            // ItemMeta as this is important for restoring some properties like Damage that get lost
+            // due to CraftItemMeta not storing these.
+            if (CommonCapabilities.NEEDS_LEGACY_ITEMMETA_MIGRATION) {
+                this.register("org.bukkit.inventory.ItemMeta", ItemStackDeserializer.LegacyItemMeta.DESERIALIZER);
+                this.register("ItemMeta", ItemStackDeserializer.LegacyItemMeta.DESERIALIZER);
+            }
         }
 
         private void register(String typeName, Function<Map<String, Object>, ? extends Object> builder) {
