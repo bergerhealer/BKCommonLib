@@ -131,11 +131,11 @@ public class InputDialogAnvil {
     }
 
     public void open() {
-        this.setWindowOpen(true);
+        this.setWindowOpen(true, false);
     }
 
     public void close() {
-        this.setWindowOpen(false);
+        this.setWindowOpen(false, false);
     }
 
     private void handleTextChange(InventoryView view) {
@@ -168,7 +168,7 @@ public class InputDialogAnvil {
         RIGHT_BUTTON.refresh(view);
     }
 
-    private void setWindowOpen(boolean enabled) {
+    private void setWindowOpen(boolean enabled, boolean delayCallback) {
         if (this._isWindowOpen == enabled) {
             return;
         }
@@ -209,7 +209,7 @@ public class InputDialogAnvil {
 
             // If it couldn't be opened for anyone, close itself
             if (this._openInventories.isEmpty()) {
-                setWindowOpen(false);
+                setWindowOpen(false, false);
             } else {
                 //LEFT_BUTTON.refresh(view);
             }
@@ -219,7 +219,11 @@ public class InputDialogAnvil {
             CommonUtil.unregisterListener(this._listener);
 
             // Event
-            onClose();
+            if (delayCallback) {
+                Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, this::onClose);
+            } else {
+                onClose();
+            }
         }
     }
 
@@ -383,7 +387,7 @@ public class InputDialogAnvil {
             // Check whether we even have windows open
             // If not, deactivate the widget again
             if (_openInventories.isEmpty()) {
-                setWindowOpen(false);
+                setWindowOpen(false, false);
                 return false;
             }
 
@@ -400,14 +404,14 @@ public class InputDialogAnvil {
         @EventHandler(priority = EventPriority.MONITOR)
         public void onPlayerQuit(PlayerQuitEvent event) {
             if (event.getPlayer() == player) {
-                setWindowOpen(false);
+                setWindowOpen(false, false);
             }
         }
 
         @EventHandler(priority = EventPriority.MONITOR, ignoreCancelled = true)
         public void onPlayerTeleport(PlayerTeleportEvent event) {
             if (event.getPlayer() == player) {
-                setWindowOpen(false);
+                setWindowOpen(false, false);
             }
         }
 
@@ -415,7 +419,7 @@ public class InputDialogAnvil {
         public void onInventoryClose(InventoryCloseEvent event) {
             if (!mustHandle(event)) return;
 
-            setWindowOpen(false);
+            setWindowOpen(false, true);
         }
 
         @SuppressWarnings("deprecation")
