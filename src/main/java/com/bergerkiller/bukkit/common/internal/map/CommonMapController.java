@@ -44,6 +44,7 @@ import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.player.PlayerRespawnEvent;
+import org.bukkit.event.player.PlayerToggleFlightEvent;
 import org.bukkit.event.world.WorldLoadEvent;
 import org.bukkit.event.world.WorldUnloadEvent;
 import org.bukkit.inventory.ItemStack;
@@ -1044,6 +1045,21 @@ public final class CommonMapController implements PacketListener, Listener {
             UUID mapUUID = CommonMapUUIDStore.getMapUUID(event.getCurrentItem());
             if (mapUUID != null) {
                 this.creativeDraggedMapItems.put(mapUUID, new CreativeDraggedMapItem(event.getCurrentItem().clone()));
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    protected void onFlightToggled(PlayerToggleFlightEvent event) {
+        // While player is controlling the map (not off-hand), disallow flight toggling
+        // This prevents the player falling down when spamming SPACEBAR in the menu,
+        // which would be highly annoying.
+        // TODO: Iterating all map displays feels kind of slow
+        for (MapDisplayInfo info : mapsValues) {
+            MapDisplay display = info.getViewing(event.getPlayer());
+            if (display != null && display.isControlling(event.getPlayer())) {
+                event.setCancelled(true);
+                break;
             }
         }
     }
