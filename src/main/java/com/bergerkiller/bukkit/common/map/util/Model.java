@@ -612,7 +612,7 @@ public class Model extends ModelInfo {
                 public void applyToItem(ItemStack item, String value) {
                     CommonTagCompound tag = ItemUtil.getMetaTag(item, true);
                     if (tag != null) {
-                        tag.putValue("Unbreakable", !value.equals("0"));
+                        tag.putValue("Unbreakable", value.equals("0"));
                     }
                 }
 
