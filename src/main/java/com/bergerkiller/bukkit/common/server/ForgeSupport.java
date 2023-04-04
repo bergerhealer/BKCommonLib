@@ -16,6 +16,7 @@ import com.bergerkiller.bukkit.common.Logging;
 import com.bergerkiller.bukkit.common.nbt.CommonTagCompound;
 import com.bergerkiller.bukkit.common.utils.StreamUtil;
 import com.bergerkiller.mountiplex.MountiplexUtil;
+import org.bukkit.World;
 
 /**
  * Special helper methods specifically for Forge servers
@@ -50,6 +51,9 @@ public class ForgeSupport {
             for (LevelDimension dim : listDimensions(worldFolder)) {
                 rval.add(dim.toBukkitName());
             }
+        }
+        for (World world : Bukkit.getWorlds()) {
+            rval.add(world.getName());
         }
         return rval;
     }
