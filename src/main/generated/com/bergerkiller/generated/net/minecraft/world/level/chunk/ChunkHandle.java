@@ -38,6 +38,7 @@ public abstract class ChunkHandle extends Template.Handle {
     public abstract ChunkSection getSection(int cy);
     public abstract Collection<?> getRawTileEntities();
     public abstract List<Entity> getEntities();
+    public abstract Chunk getBukkitChunk();
     public abstract BlockData getBlockData(IntVector3 blockposition);
     public abstract BlockData getBlockDataAtCoord(int x, int y, int z);
     public abstract BlockData setBlockData(IntVector3 blockposition, BlockData iblockdata, int updateFlags);
@@ -65,15 +66,11 @@ public abstract class ChunkHandle extends Template.Handle {
             return null;
         }
     }
-    public abstract Chunk getBukkitChunk();
-    public abstract void setBukkitChunk(Chunk value);
     /**
      * Stores class members for <b>net.minecraft.world.level.chunk.Chunk</b>.
      * Methods, fields, and constructors can be used without using Handle Objects.
      */
     public static final class ChunkClass extends Template.Class<ChunkHandle> {
-        public final Template.Field<Chunk> bukkitChunk = new Template.Field<Chunk>();
-
         public final Template.Method.Converted<WorldHandle> getWorld = new Template.Method.Converted<WorldHandle>();
         public final Template.Method<Integer> getLocX = new Template.Method<Integer>();
         public final Template.Method<Integer> getLocZ = new Template.Method<Integer>();
@@ -82,6 +79,7 @@ public abstract class ChunkHandle extends Template.Handle {
         public final Template.Method.Converted<ChunkSection> getSection = new Template.Method.Converted<ChunkSection>();
         public final Template.Method<Collection<?>> getRawTileEntities = new Template.Method<Collection<?>>();
         public final Template.Method.Converted<List<Entity>> getEntities = new Template.Method.Converted<List<Entity>>();
+        public final Template.Method<Chunk> getBukkitChunk = new Template.Method<Chunk>();
         public final Template.Method.Converted<BlockData> getBlockData = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> getBlockDataAtCoord = new Template.Method.Converted<BlockData>();
         public final Template.Method.Converted<BlockData> setBlockData = new Template.Method.Converted<BlockData>();

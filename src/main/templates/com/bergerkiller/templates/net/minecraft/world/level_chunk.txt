@@ -234,7 +234,13 @@ class Chunk {
 #endif
     }
 
-    public org.bukkit.Chunk bukkitChunk;
+    public org.bukkit.Chunk getBukkitChunk() {
+#if version >= 1.19.4 && !exists net.minecraft.world.level.chunk.Chunk public org.bukkit.Chunk bukkitChunk;
+        return new org.bukkit.craftbukkit.CraftChunk(instance);
+#else
+        return instance.bukkitChunk;
+#endif
+    }
 
 #if version >= 1.18
     public (BlockData) IBlockData getBlockData:getBlockState((IntVector3) BlockPosition blockposition);

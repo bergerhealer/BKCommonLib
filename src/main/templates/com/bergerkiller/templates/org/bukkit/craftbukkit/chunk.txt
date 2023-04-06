@@ -1,5 +1,11 @@
 package org.bukkit.craftbukkit;
 
 class CraftChunk {
+#if version >= 1.19.4 && exists org.bukkit.craftbukkit.CraftChunk public net.minecraft.world.level.chunk.IChunkAccess getHandle(net.minecraft.world.level.chunk.ChunkStatus chunkStatus);
+    public (Object) Object getHandle() {
+        return instance.getHandle(net.minecraft.world.level.chunk.ChunkStatus.FULL);
+    }
+#else
     public (Object) net.minecraft.world.level.chunk.Chunk getHandle();
+#endif
 }

@@ -143,7 +143,7 @@ public class WrapperConversion {
 
     @ConverterMethod(input="net.minecraft.world.level.chunk.Chunk")
     public static org.bukkit.Chunk toChunk(Object nmsChunkHandle) {
-        return ChunkHandle.T.bukkitChunk.get(nmsChunkHandle);
+        return ChunkHandle.T.getBukkitChunk.invoker.invoke(nmsChunkHandle);
     }
 
     @ConverterMethod
