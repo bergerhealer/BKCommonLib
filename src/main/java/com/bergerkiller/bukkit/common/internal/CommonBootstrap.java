@@ -259,7 +259,7 @@ public class CommonBootstrap {
                 _isCompatible = event.isCompatible();
                 _incompatibleReason = event.getIncompatibleReason();
                 _isSpigotServer = (_commonServer instanceof SpigotServer);
-                _isPaperServer = (_commonServer instanceof SpigotServer && ((SpigotServer) _commonServer).isPaperSpigot());
+                _isPaperServer = (_commonServer instanceof SpigotServer && ((SpigotServer) _commonServer).isPaperServer());
                 _isPurpurServer = (_commonServer instanceof PurpurServer);
             } finally {
                 _isInitializingCommonServer = false;

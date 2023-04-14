@@ -6,7 +6,7 @@ public class PurpurServer extends SpigotServer {
 
     @Override
     public boolean init() {
-        // Must be a Paper Spigot server, when it is a Purpur server
+        // Must be a Paper server, when it is a Purpur server
         if (!super.init()) {
             return false;
         }

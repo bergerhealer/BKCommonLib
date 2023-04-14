@@ -1,7 +1,5 @@
 package com.bergerkiller.bukkit.common.server;
 
-import java.util.Map;
-
 public class SpigotServer extends CraftBukkitServer {
     private boolean _paper;
 
@@ -11,8 +9,8 @@ public class SpigotServer extends CraftBukkitServer {
             return false;
         }
 
-        // Detect presence of Paperspigot fork
-        // Attempt to load the Paperspigot's 'PaperConfig' class, which only exists on paperspigot servers
+        // Detect presence of Paper APIs
+        // Attempt to load Paper's 'PaperConfig' class, which only exists if the api is also implemented
         try {
             Class.forName("com.destroystokyo.paper.PaperConfig");
             _paper = true;
@@ -43,25 +41,17 @@ public class SpigotServer extends CraftBukkitServer {
     }
 
     /**
-     * Gets whether the Paperspigot fork of Spigot is used
+     * Gets whether the PaperMC server of Bukkit is used. If true, the Paper
+     * API is available.
      * 
-     * @return True if paperspigot is used
+     * @return True if PaperMC is used
      */
-    public boolean isPaperSpigot() {
+    public boolean isPaperServer() {
         return _paper;
     }
 
     @Override
     public String getServerName() {
-        return _paper ? "Paperspigot" : "Spigot";
-    }
-
-    @Override
-    public void addVariables(Map<String, String> variables) {
-        super.addVariables(variables);
-        variables.put("spigot", "true");
-        if (_paper) {
-            variables.put("paperspigot", "true");
-        }
+        return _paper ? "Paper" : "Spigot";
     }
 }
